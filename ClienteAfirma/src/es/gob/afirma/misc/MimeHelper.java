@@ -1,0 +1,293 @@
+/*
+ * Este fichero forma parte del Cliente @firma. 
+ * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010 Gobierno de España
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
+ * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ */
+
+
+package es.gob.afirma.misc;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.util.Date;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import es.gob.afirma.misc.AOCryptoUtil.RawBASE64Encoder;
+
+import net.sf.jmimemagic.Magic;
+import net.sf.jmimemagic.MagicMatch;
+import net.sf.jmimemagic.MagicMatchNotFoundException;
+
+/** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID identificadores de tipo de contenidos. */
+public class MimeHelper {
+
+    /** Tabla que asocia Oids y Mimetypes. */
+    private static Properties oidMimetypeProp = null;
+
+    /** Tabla que asocia Mimetypes y Oids. */
+    private static Properties mimetypeOidProp = null;
+
+    /** Objeto de an&aacute;lisis de datos . */
+    private MagicMatch match = null;
+    
+    /** Datos analizados. */
+    private byte[] data = null;
+    
+    /** MimeType de los datos analizados. */
+    private String mimeType = null;
+    
+    /**
+     * Realiza el an&aacute;lisis de los datos.
+     * @param data Datos que se desean analizar.
+     * @throws NullPointerException Cuando se introducen datos nulos.
+     */
+    public MimeHelper(byte[] data) {
+    	
+    	if(data == null)
+    		throw new NullPointerException("No se han indicado los datos que se desean analizar");
+    	
+    	this.data = data;
+        this.match = null;
+        
+        try {
+            this.match = Magic.getMagicMatch(data);
+        } catch (MagicMatchNotFoundException e) {
+            Logger.getLogger("es.gob.afirma").warning(
+                    "No se pudo detectar el formato de los datos");
+        } catch (Throwable e) {
+            Logger.getLogger("es.gob.afirma").warning(
+                    "Ocurrio un error durante el analisis de la cabecera de los datos: "+e);
+        }
+    }
+    
+    /**
+     * Obtiene el Oid correspondiente a un Mime Type concreto. Si no conoce el Oid
+     * asociado, devuelve <code>null</code>.
+     * @param mimetype del que deseamos obtener el Oid.
+     * @return OID asociado al Mime Type.
+     */
+    public static String transformMimeTypeToOid(String mimetype) {
+     
+        if(mimetypeOidProp == null)
+            loadMimetypeOidProperties();
+        
+        return mimetypeOidProp.getProperty(mimetype);
+    }
+    
+    /**
+     * Obtiene el Mime correspondiente a un Oid concreto. Si no conoce el Mime Type
+     * asociado, devuelve <code>null</code>.
+     * @param oid del que deseamos obtener el Mime Type.
+     * @return MimeType asociado al OID.
+     */
+    public static String transformOidToMimeType(String oid) {
+        
+        if(oidMimetypeProp == null)
+            loadOidMimetypeProperties();
+        
+        return oidMimetypeProp.getProperty(oid);
+    }
+    
+    /**
+     * Carga el properties que relaciona OIDs de formato con su mime type correspondiente.
+     */
+    private static void loadOidMimetypeProperties() {
+        oidMimetypeProp = new Properties();
+        
+        InputStream isProp = MimeHelper.class.getResourceAsStream(
+                "/resources/oids_mimetypes.properties");
+        try {
+            oidMimetypeProp.load(isProp);
+        } catch (Throwable e) {
+            Logger.getLogger("es.gob.afirma").warning(
+                    "No se ha podido cargar la tabla de relaciones Oid-Mimetype: "+e);
+        }
+        try {isProp.close();} catch (Throwable e) {}
+    }
+    
+    
+    /**
+     * Carga la tabla de relacion de MimeTypes y Oids.
+     */
+    private static void loadMimetypeOidProperties() {
+ 
+        if(oidMimetypeProp == null)
+            loadOidMimetypeProperties();
+        
+        mimetypeOidProp = new Properties();
+        for(String key : oidMimetypeProp.keySet().toArray(new String[0])) {
+            mimetypeOidProp.put(oidMimetypeProp.get(key), key);
+        }
+    }
+    
+    /**
+     * Recupera el MimeType de lso datos analizados, <code>null</code> si no
+     * se pudo detectar.
+     * @return MimeType de los datos.
+     */
+    public String getMimeType() {
+
+    	// Comprobamos si ya se calculo previamente el tipo de datos
+    	if(mimeType == null) {
+    		
+    		// Probamos a pasear los datos como si fuesen un XML, si no lanzan una excepcion, entonces son
+    		// datos XML.
+    		try {
+    			DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
+    			mimeType = "text/xml";
+    		} catch (Exception e) {}
+    		
+    		if(mimeType == null && match != null) {
+    			mimeType = match.getMimeType();
+    		}
+    		
+    		// Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en realidad
+    		// alguno de los ficheros ofimaticos soportados (que son ZIP con una estructura concreta)
+    		// Comprobaciones especiales para los ficheros ZIP
+    		if(mimeType != null && mimeType.equals("application/zip")) {
+    			mimeType = OfficeXMLAnalizer.getMimeType(data);
+    		}
+    	}
+        
+        return mimeType;
+    }
+    
+    /**
+     * Recupera la descripcion de los datos analizados, <code>null</code> si no
+     * se pudo detectar.
+     * @return Descripci&oacute;n del tipo de dato.
+     */
+    public String getDescription() {
+        String description = null;
+        if(match != null) {
+            description = match.getDescription();
+        }
+        return description;
+    }
+    
+    /**
+     * Devuelve un binario en forma de Base64 con cabecera MIME tal y como se define en la
+     * especificaci&oacute;n MIME.
+     * @param data Datos originales
+     * @param contentID Identificador de los datos
+     * @param contentType Tipo de los datos, en formato MIMEType
+     * @param fileName Nombre del fichero original en el que se encontraban los datos
+     * @param modificationDate Fecha de la &uacute;ltima modificaci&oacute;n de los datos
+     * @return Codificaci&oacute;n MIME de los datos, con cabecera
+     */
+    public static String getMimeEncodedAsAttachment(final byte[] data,
+    		                            final String contentID,
+    		                            String contentType,
+    		                            final String fileName,
+    		                            final Date modificationDate) {
+    	
+    	StringBuilder sb = new StringBuilder();
+    	
+    	sb.append("MIME-Version: 1.0\n");
+    	if (contentID != null) {
+    		sb.append("Content-ID: ");
+    		sb.append(contentID);
+    		sb.append('\n');
+    	}
+    	
+    	if (contentType == null) contentType = new MimeHelper(data).getMimeType();
+		if (contentType != null) {
+			sb.append("Content-Type: ");
+			sb.append(contentType);
+			sb.append('\n');
+		}
+    	
+		sb.append("Content-Disposition: attachment");
+		// De la RFC 2183:
+		// A short (length <= 78 characters)
+		// parameter value containing only non-`tspecials' characters SHOULD be
+		// represented as a single `token'.
+		// A short (length <= 78 characters) parameter value containing
+		// only ASCII characters, but including 'tspecials' characters, SHOULD
+		// be represented as 'quoted-string'.
+
+		if (fileName != null) {
+			if (!isPureAscii(fileName)) {
+				Logger.getLogger("es.gob.afirma").warning(
+					"MIME solo soporta nombres de ficheros ASCII, se ignorara el campo 'filename': " + fileName
+				);				
+			}
+			else if (fileName.length() > 78) {
+				Logger.getLogger("es.gob.afirma").warning(
+					"No se soporta la codificacion RFC 2184 para los nombres de fichero de mas de 78 caracteres, se ignorara el campo 'filename': " + fileName
+				);				
+			}
+			else {
+				sb.append("; filename=");
+				if (containsTSpecial(fileName)) sb.append('"');
+				sb.append(fileName);
+				if (containsTSpecial(fileName)) sb.append('"');
+				sb.append(";");
+    		}
+    	}
+		
+    	if (modificationDate != null) {
+    		sb.append(" modification-date=\"");
+    		sb.append(modificationDate.toString());
+    		sb.append("\";");
+    	}
+    	sb.append('\n');
+    	
+    	sb.append('\n');
+    	
+    	sb.append(new RawBASE64Encoder().encode(data));
+    	
+    	return sb.toString();
+
+    	
+    }
+    
+//    public static void main(String args[]) {
+//    	System.out.println(MimeHelper.getMimeEncodedAsAttachment(
+//			"Hola Manola".getBytes(), 
+//			"IDENTIFICADOR-001",
+//			"text/xml",
+//			"texto nuevo.txt", 
+//			new Date()
+//		));
+//    }
+    
+    private static final String[] MIME_T_SPECIALS = new String[] {
+    	"(", ")", "<", ">", "@", ",", ";", ":", "\\", "\"", "/", "[", "]", "?", "=", " "
+    };
+    
+    private static boolean containsTSpecial(final String in) {
+    	if (in == null) return false;
+    	for (String s : MIME_T_SPECIALS) {
+    		if (in.indexOf(s) != -1) return true;
+    	}
+    	return false;
+    }
+    
+    private static boolean isPureAscii(String v) {
+        byte bytearray []  = v.getBytes();
+        CharsetDecoder d = Charset.forName("US-ASCII").newDecoder();
+        try {
+          CharBuffer r = d.decode(ByteBuffer.wrap(bytearray));
+          r.toString();
+        }
+        catch(CharacterCodingException e) {
+          return false;
+        }
+        return true;
+      }
+
+
+}

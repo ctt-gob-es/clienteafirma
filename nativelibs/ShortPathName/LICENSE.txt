@@ -1,0 +1,9 @@
+
+Este fichero forma parte de la distribución del cliente @firma e indica las condiciones de licencia
+del mismo.
+
+El Cliente @firma se encuentra bajo las licencias EUPL versión 1.1 y GNU GPL versión 3.0, o superiores,
+cuyos textos completos se encuentran en los ficheros adjuntos "EUPL.pdf" y "GPL.txt", respectivamente.
+
+Usted puede elegir acogerse a los derechos que le proporcionan una o ambas licencias, a su
+conveniencia, siempre que cumpla con las condiciones que cada una de ellas le impone.
