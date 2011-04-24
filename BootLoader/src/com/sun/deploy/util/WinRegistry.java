@@ -24,13 +24,13 @@ public final class WinRegistry {
 	static native KeyValue sysQueryKey(int hKey, String name);
 	static native int sysCreateKey(int hKey, String name, int sam);
 	static native boolean sysSetStringValue(int hKey, String name, String value);
-  static native void initIDs();
+	static native void initIDs();
 
   
 	/**
 	 * Los valores del registro se componen de un tipo y de unos datos. 
 	 */
-	static class KeyValue {
+	final static class KeyValue {
 		private final int type;
 		private final byte[] data;
 
@@ -39,13 +39,6 @@ public final class WinRegistry {
 			this.data = data;
 		}
 		
-		/**
-		 * Retorna el tipo del valor del par-valor
-		 */
-		public int getType() {
-			return type;
-		}
-
 		/**
 		 * Retorna el valor del par-valor
 		 */
@@ -81,49 +74,28 @@ public final class WinRegistry {
 	
 	/**
 	 * Realiza la b&uacute;squeda en el registro.
-	 * @param hKey entero con la clave 
-	 * @param path ruta
-	 * @param name nombre de clave a buscar
+	 * @param hKey Entero con la clave 
+	 * @param path Ruta
+	 * @param name Nombre de clave a buscar
 	 * @return
 	 */
-	public static Object get(int hKey, String path, String name) {
-		Object value = null;
-		int key = sysOpenKey(hKey, path, KEY_READ);
+	public static Object get(final int hKey, final String path, final String name) {
+		final int key = sysOpenKey(hKey, path, KEY_READ);
 		if (key != 0) {
 			KeyValue keyValue = sysQueryKey(key, name);
 			sysCloseKey(key);
-			if (keyValue != null) {
-				value = keyValue.getValue();
-			}
+			if (keyValue != null) return keyValue.getValue();
 		}
-		
-		return value;
+		return null;
 	}
 
 	/**
 	 * Realiza la b&uacute;squeda de una clave en el registro, si el valor no es de tipo cadena retorna
 	 * un valor nulo.
 	 */
-	public static String getString(int hKey, String path, String name) {
-		Object rv = get(hKey, path, name);
+	public static String getString(final int hKey, final String path, final String name) {
+		final Object rv = get(hKey, path, name);
 		return (rv instanceof String) ? (String)rv : null;
 	}
-
-	/**
-	 * A&ntilde;ade una cadena como valor del registro, para lo cual se especifica una ruta, un nombre,
-	 * un valor y una clave.
-	 * @return
-	 */
-	public static boolean setStringValue(int hKey, String path, String name, String value) {
-		boolean returnValue = false;
-		int key = sysCreateKey(hKey, path, KEY_WRITE);
-		if (key != 0) {
-			returnValue = sysSetStringValue(key, name, value);
-			sysCloseKey(key);
-		}
-		
-		return returnValue;
-	}
-
 
 }

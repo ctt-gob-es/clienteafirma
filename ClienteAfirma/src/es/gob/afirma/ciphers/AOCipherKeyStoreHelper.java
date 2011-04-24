@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.ciphers;
 
@@ -16,6 +15,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyStore;
 import java.util.Enumeration;
@@ -49,15 +50,14 @@ public final class AOCipherKeyStoreHelper {
 		try {
 			ks.setKeyEntry(alias, key, pss, null);
 		}
-		catch(Throwable e) {
-			e.printStackTrace();
-			throw new AOException("Error almacenando la clave en el almacen: " + e);
+		catch(final Throwable e) {
+			throw new AOException("Error almacenando la clave en el almacen", e);
 		}
 		try {
 			ks.store(new BufferedOutputStream(new FileOutputStream(new File(AOUtil.getCipherKeystore()))), pss);
 		}
-		catch(Throwable e) {
-			e.printStackTrace();
+		catch(final Throwable e) {
+			throw new AOException("Error guardando el almacen de claves", e);
 		}
 	}
 	
@@ -65,15 +65,14 @@ public final class AOCipherKeyStoreHelper {
 	 * Obtiene los alias de todas las claves del almac&eacute;n privado de AFIrma.
 	 * @return Alias de todas las claves del almac&eacute;n
 	 */
-	@SuppressWarnings("unchecked")
 	public String[] getAliases() {
-		final Enumeration aliases;
+		final Enumeration<String> aliases;
 		try {
 			aliases = ks.aliases();
 		}
 		catch(Throwable e) {
 			Logger.getLogger("es.gob.afirma").severe(
-				"Ocurrio un error obteniendo los alias del almacen, se devolvera una lista vacia: " + e 
+				"Error obteniendo los alias del almacen, se devolvera una lista vacia: " + e 
 			);
 			return new String[0];
 		}
@@ -82,14 +81,18 @@ public final class AOCipherKeyStoreHelper {
 		return tmpRet.toArray(new String[0]);
 	}
 	
+	/**
+	 * Crea, si no existe ya, el almac&eacute;n de claves de cifrado en el directorio del
+	 * usuario activo. 
+	 * @throws AOException Cuando se produce un error al crear el almac&eacute;n.
+	 */
 	private void createCipherKeyStore() throws AOException {
 		if (ks == null) {
 			try {
 				ks = KeyStore.getInstance("JCEKS");
 			}
-			catch(Throwable e) {
-				e.printStackTrace();
-				throw new AOException("Error obteniendo una instancia de KeyStore JCE: " + e);
+			catch(final Throwable e) {
+				throw new AOException("Error obteniendo una instancia de KeyStore JCE", e);
 			}
 		}
 		if (new File(AOUtil.getCipherKeystore()).exists()) {
@@ -103,16 +106,14 @@ public final class AOCipherKeyStoreHelper {
 		try {
 			ks.load(null, pss);
 		}
-		catch(Throwable e) {
-			e.printStackTrace();
-			throw new AOException("Error creando un KeyStore vacio: " + e);
+		catch(final Throwable e) {
+			throw new AOException("Error creando un KeyStore vacio", e);
 		}
 		try {
 			ks.store(new FileOutputStream(new File(AOUtil.getCipherKeystore())), pss);
 		} 
-		catch (Throwable e) {
-			e.printStackTrace();
-			throw new AOException("Error guardando en disco el KeyStore vacio: " + e);
+		catch (final Throwable e) {
+			throw new AOException("Error guardando en disco el KeyStore vacio", e);
 		}
 		if (!new File(AOUtil.getCipherKeystore()).exists()) {
 			throw new AOException(
@@ -123,14 +124,15 @@ public final class AOCipherKeyStoreHelper {
 	
 	/**
 	 * Carga el almac&eacute;n privado de claves de cifrado de AFirma.
-	 * @throws AOException Cuando ocurre cualquier problema durante la carga
+	 * @throws AOException Cuando ocurre cualquier problema durante la carga.
+	 * @throws IOException Cuando se inserta una clave incorrecta.
 	 */
-	public void loadCipherKeyStore() throws AOException {
+	public void loadCipherKeyStore() throws AOException, IOException {
 		if (ks == null) {
 			try {
 				ks = KeyStore.getInstance("JCEKS");
 			}
-			catch(Throwable e) {
+			catch(final Throwable e) {
 			    throw new AOException("Error al instalanciar un almacen de claves", e);
 			}
 		}
@@ -138,11 +140,24 @@ public final class AOCipherKeyStoreHelper {
 			Logger.getLogger("es.gob.afirma").warning("El almacen no existe, se creara uno nuevo");
 			createCipherKeyStore();
 		}
+		final InputStream ksIs;
 		try {
-			ks.load(new BufferedInputStream(new FileInputStream(new File(AOUtil.getCipherKeystore()))), pss);
-		}
-		catch(Throwable e) {
+			ksIs = new FileInputStream(new File(AOUtil.getCipherKeystore()));
+		} 
+		catch(final IOException e) {
 			throw new AOException("Error al cargar el almacen de claves de cifrado", e);
+		}
+		try {
+			ks.load(new BufferedInputStream(ksIs), pss);
+		}
+		catch(final IOException e) {
+			throw new IOException("La clave insertada no es valida: " + e);
+		}
+		catch(final Throwable e) {
+			throw new AOException("Error al cargar el almacen de claves de cifrado", e);
+		} 
+		finally {
+			try { ksIs.close(); } catch (final Throwable e) {}
 		}
 	}
 	
@@ -158,17 +173,18 @@ public final class AOCipherKeyStoreHelper {
 		try {
 			return ks.getKey(alias, pss);
 		}
-		catch(Throwable e) {
-			throw new AOException("Error recuperando la contrasena con alias '" + alias + "': " + e);
+		catch(final Throwable e) {
+			throw new AOException("Error recuperando la contrasena con alias '" + alias + "'", e);
 		}	
 	}
 	
 	/**
 	 * Crea un <code>AOCipherKeyStoreHelper</code>.
 	 * @param p Contrase&ntilde;a del almac&eacute;n de claves
-	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
+	 * @throws AOException Cuando ocurre cualquier problema durante la carga del almac&eacute;n.
+	 * @throws IOException Cuando la contrase&ntilde;a es incorrecta.
 	 */
-	public AOCipherKeyStoreHelper(char[] p) throws AOException {
+	public AOCipherKeyStoreHelper(char[] p) throws AOException, IOException {
 		if (p == null) throw new NullPointerException("Se necesita una contrasena para instanciar la clase");
 		pss = p;
 		loadCipherKeyStore();

@@ -2,17 +2,17 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.ciphers;
 
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.BadPaddingException;
@@ -24,12 +24,12 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import sun.misc.BASE64Decoder;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOInvalidKeyException;
 import es.gob.afirma.misc.AOConstants.AOCipherAlgorithm;
 import es.gob.afirma.misc.AOConstants.AOCipherBlockMode;
 import es.gob.afirma.misc.AOConstants.AOCipherPadding;
+import es.gob.afirma.misc.AOCryptoUtil;
 
 /**
  * Cifrador seg&uacute;n las capacidades del proveedor JCE (<i>Java Cryptography Extension</i>). 
@@ -69,92 +69,95 @@ public final class AOSunJCECipher implements AOCipher {
 	};
 	
 	/** Configuraciones de cifrado soportadas. */
-    private static final AOAlgorithmConfig[] SUPPORTED_CONFIGS = new AOAlgorithmConfig[] {
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.ARCFOUR, AOCipherBlockMode.ECB, AOCipherPadding.NOPADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
-    	new AOAlgorithmConfig(AOCipherAlgorithm.PBEWITHMD5ANDDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING)
+    private static final AOCipherConfig[] SUPPORTED_CONFIGS = new AOCipherConfig[] {
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.AES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.ARCFOUR, AOCipherBlockMode.ECB, AOCipherPadding.NOPADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.BLOWFISH, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.DES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CBC, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.PCBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.PCBC, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CTR, AOCipherPadding.NOPADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CTR, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.CFB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.TRIPLEDES, AOCipherBlockMode.OFB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.RC2, AOCipherBlockMode.ECB, AOCipherPadding.ISO10126PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING),
+    	new AOCipherConfig(AOCipherAlgorithm.PBEWITHMD5ANDDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING)
 	};
 	
-	public AOAlgorithmConfig[] getSupportedConfigs() {
+	public AOCipherConfig[] getSupportedConfigs() {
 		return SUPPORTED_CONFIGS.clone();
 	}
     
-	public byte[] cipher(byte[] data, AOAlgorithmConfig algorithmConfig, Key cipherKey) throws AOException, AOInvalidKeyException {
+
+	public byte[] cipher(byte[] data, AOCipherConfig algorithmConfig, Key cipherKey) throws AOException, AOInvalidKeyException {
 	
 		if(data == null || algorithmConfig == null || cipherKey == null || data.length == 0) {
 			throw new AOException("Los parametros de la funcion de cifrado no pueden ser nulos o vacios");
 		}
 		
 		// Tomamos el cipher para el algoritmo indicado
+		
+		//System.out.println(" --->  " + algorithmConfig.toString());
+		
 		final Cipher cipher;
 		try {
 			cipher = Cipher.getInstance(algorithmConfig.toString(), PROVIDER);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw new AOException("Error al obtener el cifrador: " + e);
+		catch (final Throwable e) {
+			throw new AOException("Error al obtener el cifrador", e);
 		}
 		
 		// Inicializamos el cipher
 		try {
 			cipher.init(Cipher.ENCRYPT_MODE, cipherKey, this.getParams(algorithmConfig));
 		}
-		catch (InvalidKeyException e) {
-			throw new AOInvalidKeyException("La clave de cifrado introducida no es valida para el algoritmo '" + algorithmConfig.getAlgorithm().getName() + "': " + e);
+		catch (final InvalidKeyException e) {
+			throw new AOInvalidKeyException("La clave de cifrado introducida no es valida para el algoritmo '" + algorithmConfig.getAlgorithm().getName() + "'", e);
 		}
-		catch (Exception e) {
-			throw new AOException("Error al inicializar el cifrador: " + e);
+		catch (final Throwable e) {
+			throw new AOException("Error al inicializar el cifrador", e);
 		}
 
 		// Realizamos el cifrado
@@ -162,15 +165,14 @@ public final class AOSunJCECipher implements AOCipher {
 			return cipher.doFinal(data);
 		}
 		catch (BadPaddingException e) {
-			throw new AOInvalidKeyException(e.toString());
+			throw new AOInvalidKeyException("La clave o contrase\u00F1a introducida no es v\u00E1lida");
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw new AOException("Error cifrando los datos: " + e);
+		catch (final Throwable e) {
+			throw new AOException("Error cifrando los datos", e);
 		}
 	}
 
-	public byte[] decipher(byte[] data, AOAlgorithmConfig algorithmConfig, Key decipherKey) throws AOException, AOInvalidKeyException {
+	public byte[] decipher(byte[] data, AOCipherConfig algorithmConfig, Key decipherKey) throws AOException, AOInvalidKeyException {
 		
 		if(data == null || algorithmConfig == null || decipherKey == null) {
 			throw new AOException("Los parametros de la funcion de descifrado no pueden ser nulos");
@@ -181,9 +183,8 @@ public final class AOSunJCECipher implements AOCipher {
 		try {
 			cipher = Cipher.getInstance(algorithmConfig.toString(), PROVIDER);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw new AOException("Error obteniendo el descifrador: " + e);
+		catch (final Throwable e) {
+			throw new AOException("Error obteniendo el descifrador", e);
 		}
 
 		// Inicializamos el cipher
@@ -194,12 +195,11 @@ public final class AOSunJCECipher implements AOCipher {
 				this.getParams(algorithmConfig)
 			);
 		}
-		catch (InvalidKeyException e) {
-			throw new AOInvalidKeyException("La clave de descifrado introducida no es valida para el algoritmo '" + algorithmConfig.getAlgorithm().getName() + "': " + e);
+		catch (final InvalidKeyException e) {
+			throw new AOInvalidKeyException("La clave de descifrado introducida no es valida para el algoritmo '" + algorithmConfig.getAlgorithm().getName() + "'", e);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw new AOException("Error al inicializar el descifrador: " + e);
+		catch (final Throwable e) {
+			throw new AOException("Error al inicializar el descifrador", e);
 		}
 		
 		// Realizamos el descifrado
@@ -209,44 +209,49 @@ public final class AOSunJCECipher implements AOCipher {
 		catch (BadPaddingException e) {
 			throw new AOInvalidKeyException(e.toString());
 		}
-		catch (Exception e) {
-			throw new AOException(e.toString());
+		catch (final Throwable e) {
+			throw new AOException("Error descifrando los datos", e);
 		}
 	}
 
-	public Key decodeKey(String base64Key, AOAlgorithmConfig algorithmConfig, Object[] params) throws AOException {
+	public Key decodeKey(String base64Key, AOCipherConfig algorithmConfig, Object[] params) throws AOException {
 		if(base64Key == null || base64Key.length() < 1) throw new NullPointerException("La clave a descodificar no puede ser nula ni vacia");
 		if(algorithmConfig == null) throw new NullPointerException("La configuracion de cifrado no puede ser nula");
 
 		try {
-			return new SecretKeySpec(new BASE64Decoder().decodeBuffer(base64Key), algorithmConfig.getAlgorithm().getName());
+			return new SecretKeySpec(AOCryptoUtil.decodeBase64(base64Key), algorithmConfig.getAlgorithm().getName());
 		}
-		catch (Exception e) {
-			throw new AOException(e.toString());
+		catch (final Throwable e) {
+			throw new AOException("Error creando la clave secreta", e);
 		}
 	}
 	
-	public Key decodePassphrase(String passphrase, AOAlgorithmConfig algorithmConfig, Object[] params) throws AOException {
+	public Key decodePassphrase(final char[] passphrase, 
+			                    final AOCipherConfig algorithmConfig, 
+			                    final Object[] params) throws AOException {
 		
-		if(passphrase == null || passphrase.length() < 1) throw new NullPointerException("La contrase\u00F1a para la generacion de la clave no puede ser nula ni vacia");
+		if(passphrase == null || passphrase.length < 1) throw new NullPointerException("La contrase\u00F1a para la generacion de la clave no puede ser nula ni vacia");
 		if(algorithmConfig == null) throw new NullPointerException("La configuracion de cifrado no puede ser nula");
 		
 		try {
 			return SecretKeyFactory.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER)
-				.generateSecret(new PBEKeySpec(passphrase.toCharArray(), SALT, ITERATION_COUNT));
+				.generateSecret(new PBEKeySpec(passphrase, SALT, ITERATION_COUNT));
 		}
-		catch (Exception e) {
-			throw new AOException(e.toString());
+		catch (final Throwable e) {
+			throw new AOException("Error generando la clave secreata", e);
 		}
 	}
 	
-	public Key generateKey(AOAlgorithmConfig algorithmConfig) throws AOException {
+	public Key generateKey(AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException {
 		try {
 			return KeyGenerator.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER).generateKey();
 		}
+		catch (NoSuchAlgorithmException e) {
+			throw e;
+		}
 		catch (Exception e) {
 			throw new AOException("No se pudo generar una clave compatible para la configuracion '"
-					+ algorithmConfig + "': " + e);
+					+ algorithmConfig + "'", e);
 		}
 	}
 	
@@ -256,7 +261,7 @@ public final class AOSunJCECipher implements AOCipher {
 	 * @param algorithmConfig Configuracion de cifrado que debemos parametrizar.
 	 * @return Par&aacute;metros para operar.
 	 */
-	private AlgorithmParameterSpec getParams(AOAlgorithmConfig algorithmConfig) {
+	private AlgorithmParameterSpec getParams(AOCipherConfig algorithmConfig) {
 		
 		AlgorithmParameterSpec params = null;
 		if(algorithmConfig.getAlgorithm().supportsPassword()) params = new PBEParameterSpec(SALT, ITERATION_COUNT);

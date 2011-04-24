@@ -2,36 +2,27 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.misc;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import es.gob.afirma.misc.AOCryptoUtil.RawBASE64Encoder;
 
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
 import net.sf.jmimemagic.MagicMatchNotFoundException;
 
 /** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID identificadores de tipo de contenidos. */
-public class MimeHelper {
+public final class MimeHelper {
 
     /** Tabla que asocia Oids y Mimetypes. */
     private static Properties oidMimetypeProp = null;
@@ -43,7 +34,7 @@ public class MimeHelper {
     private MagicMatch match = null;
     
     /** Datos analizados. */
-    private byte[] data = null;
+    private final byte[] data;
     
     /** MimeType de los datos analizados. */
     private String mimeType = null;
@@ -53,7 +44,7 @@ public class MimeHelper {
      * @param data Datos que se desean analizar.
      * @throws NullPointerException Cuando se introducen datos nulos.
      */
-    public MimeHelper(byte[] data) {
+    public MimeHelper(final byte[] data) {
     	
     	if(data == null)
     		throw new NullPointerException("No se han indicado los datos que se desean analizar");
@@ -63,12 +54,16 @@ public class MimeHelper {
         
         try {
             this.match = Magic.getMagicMatch(data);
-        } catch (MagicMatchNotFoundException e) {
+        } 
+        catch (final MagicMatchNotFoundException e) {
             Logger.getLogger("es.gob.afirma").warning(
-                    "No se pudo detectar el formato de los datos");
-        } catch (Throwable e) {
+                "No se pudo detectar el formato de los datos"
+    		);
+        } 
+        catch (final Throwable e) {
             Logger.getLogger("es.gob.afirma").warning(
-                    "Ocurrio un error durante el analisis de la cabecera de los datos: "+e);
+                "Error durante el analisis de la cabecera de los datos: " + e
+            );
         }
     }
     
@@ -78,11 +73,8 @@ public class MimeHelper {
      * @param mimetype del que deseamos obtener el Oid.
      * @return OID asociado al Mime Type.
      */
-    public static String transformMimeTypeToOid(String mimetype) {
-     
-        if(mimetypeOidProp == null)
-            loadMimetypeOidProperties();
-        
+    public static String transformMimeTypeToOid(final String mimetype) {
+        if(mimetypeOidProp == null) loadMimetypeOidProperties();
         return mimetypeOidProp.getProperty(mimetype);
     }
     
@@ -92,11 +84,8 @@ public class MimeHelper {
      * @param oid del que deseamos obtener el Mime Type.
      * @return MimeType asociado al OID.
      */
-    public static String transformOidToMimeType(String oid) {
-        
-        if(oidMimetypeProp == null)
-            loadOidMimetypeProperties();
-        
+    public static String transformOidToMimeType(final String oid) {
+        if(oidMimetypeProp == null) loadOidMimetypeProperties();
         return oidMimetypeProp.getProperty(oid);
     }
     
@@ -106,15 +95,18 @@ public class MimeHelper {
     private static void loadOidMimetypeProperties() {
         oidMimetypeProp = new Properties();
         
-        InputStream isProp = MimeHelper.class.getResourceAsStream(
-                "/resources/oids_mimetypes.properties");
+        final InputStream isProp = MimeHelper.class.getResourceAsStream(
+            "/resources/oids_mimetypes.properties"
+		);
         try {
             oidMimetypeProp.load(isProp);
-        } catch (Throwable e) {
+        } 
+        catch (final Throwable e) {
             Logger.getLogger("es.gob.afirma").warning(
-                    "No se ha podido cargar la tabla de relaciones Oid-Mimetype: "+e);
+                "No se ha podido cargar la tabla de relaciones Oid-Mimetype: " + e
+            );
         }
-        try {isProp.close();} catch (Throwable e) {}
+        try { isProp.close(); } catch (final Throwable e) {}
     }
     
     
@@ -122,10 +114,7 @@ public class MimeHelper {
      * Carga la tabla de relacion de MimeTypes y Oids.
      */
     private static void loadMimetypeOidProperties() {
- 
-        if(oidMimetypeProp == null)
-            loadOidMimetypeProperties();
-        
+        if(oidMimetypeProp == null) loadOidMimetypeProperties();
         mimetypeOidProp = new Properties();
         for(String key : oidMimetypeProp.keySet().toArray(new String[0])) {
             mimetypeOidProp.put(oidMimetypeProp.get(key), key);
@@ -147,7 +136,8 @@ public class MimeHelper {
     		try {
     			DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
     			mimeType = "text/xml";
-    		} catch (Exception e) {}
+    		} 
+    		catch (final Throwable e) {}
     		
     		if(mimeType == null && match != null) {
     			mimeType = match.getMimeType();
@@ -176,13 +166,18 @@ public class MimeHelper {
         }
         return description;
     }
-    
+
+//************************************************************
+//***************** SOPORTE DE ADJUNTOS MIME *****************
+//************************************************************
+
     /**
      * Devuelve un binario en forma de Base64 con cabecera MIME tal y como se define en la
      * especificaci&oacute;n MIME.
      * @param data Datos originales
      * @param contentID Identificador de los datos
-     * @param contentType Tipo de los datos, en formato MIMEType
+     * @param contentType Tipo de los datos, en formato MIMEType. 
+     *                    Si se proporciona <code>null</code> se intenta determinar
      * @param fileName Nombre del fichero original en el que se encontraban los datos
      * @param modificationDate Fecha de la &uacute;ltima modificaci&oacute;n de los datos
      * @return Codificaci&oacute;n MIME de los datos, con cabecera
@@ -191,9 +186,9 @@ public class MimeHelper {
     		                            final String contentID,
     		                            String contentType,
     		                            final String fileName,
-    		                            final Date modificationDate) {
+    		                            final java.util.Date modificationDate) {
     	
-    	StringBuilder sb = new StringBuilder();
+    	final StringBuilder sb = new StringBuilder();
     	
     	sb.append("MIME-Version: 1.0\n");
     	if (contentID != null) {
@@ -247,22 +242,12 @@ public class MimeHelper {
     	
     	sb.append('\n');
     	
-    	sb.append(new RawBASE64Encoder().encode(data));
+    	sb.append(AOCryptoUtil.encodeBase64(data, false));
     	
     	return sb.toString();
 
     	
     }
-    
-//    public static void main(String args[]) {
-//    	System.out.println(MimeHelper.getMimeEncodedAsAttachment(
-//			"Hola Manola".getBytes(), 
-//			"IDENTIFICADOR-001",
-//			"text/xml",
-//			"texto nuevo.txt", 
-//			new Date()
-//		));
-//    }
     
     private static final String[] MIME_T_SPECIALS = new String[] {
     	"(", ")", "<", ">", "@", ",", ";", ":", "\\", "\"", "/", "[", "]", "?", "=", " "
@@ -276,18 +261,27 @@ public class MimeHelper {
     	return false;
     }
     
+    /**
+     * Comprueba que la cadena de texto s&oacute;lo contenga caracteres ASCII.
+     * @param v Cadena que se desea comprobar.
+     * @return Devuelve {@code true} si todos los caracteres de la cadena son ASCII,
+     * {@code false} en caso contrario.
+     */
     private static boolean isPureAscii(String v) {
         byte bytearray []  = v.getBytes();
-        CharsetDecoder d = Charset.forName("US-ASCII").newDecoder();
+        final java.nio.charset.CharsetDecoder d = java.nio.charset.Charset.forName("US-ASCII").newDecoder();
         try {
-          CharBuffer r = d.decode(ByteBuffer.wrap(bytearray));
+          java.nio.CharBuffer r = d.decode(java.nio.ByteBuffer.wrap(bytearray));
           r.toString();
         }
-        catch(CharacterCodingException e) {
+        catch(final java.nio.charset.CharacterCodingException e) {
           return false;
         }
         return true;
       }
 
+//************************************************************
+//*** FIN SOPORTE DE ADJUNTOS MIME ***************************
+//************************************************************
 
 }

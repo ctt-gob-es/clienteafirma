@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.ui;
 
@@ -19,12 +18,15 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.security.KeyStore;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -47,6 +49,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -57,6 +60,7 @@ import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.misc.AOConstants;
+import es.gob.afirma.misc.tree.TreeNode;
 
 /** 
  * Gestor de componentes de interfas gr&aacute;fico (tanto para Applet como para aplicaci&oacute;n de escritorio)
@@ -69,7 +73,7 @@ public final class AOUIManager {
 	
 	static {
 		
-		String lookandfeel = UIManager.getSystemLookAndFeelClassName(); 
+		final String lookandfeel = UIManager.getSystemLookAndFeelClassName(); 
 		
 		try {
 	        UIManager.setLookAndFeel(lookandfeel);
@@ -148,18 +152,11 @@ public final class AOUIManager {
 			                                     final boolean mandatoryCertificate) throws AOCancelledOperationException, 
 			                                                                             AOCertificatesNotFoundException {
 		if (alias == null || alias.length == 0) {
-			//Logger.getLogger("es.gob.afirma").warning("No se han encontrado certificados en el repositorio indicado");
-			JOptionPane.showMessageDialog(
-					parentComponent,
-					Messages.getString("AOUIManager.4"), //$NON-NLS-1$
-					Messages.getString("AOUIManager.5"), //$NON-NLS-1$
-					JOptionPane.WARNING_MESSAGE
-			);
 			throw new AOCertificatesNotFoundException("El almac\u00E9n no conten\u00EDa entradas"); //$NON-NLS-1$
 		}
 		
 		
-		Hashtable<String, String> aliassesByFriendlyName = KeyStoreUtilities.getAlisasesByFriendlyName(
+		final Hashtable<String, String> aliassesByFriendlyName = KeyStoreUtilities.getAlisasesByFriendlyName(
 			alias, 
 			kss, 
 			keyUsageFilter, 
@@ -172,12 +169,6 @@ public final class AOUIManager {
 		
 		// Miramos si despues de filtrar las entradas queda alguna o se ha quedado la lista vacia
 		if (aliassesByFriendlyName.size() == 0) {
-			JOptionPane.showMessageDialog(
-					parentComponent,
-					Messages.getString("AOUIManager.10"), //$NON-NLS-1$
-					Messages.getString("AOUIManager.5"), //$NON-NLS-1$
-					JOptionPane.WARNING_MESSAGE
-			);
 			throw new AOCertificatesNotFoundException("El almacen no contenia entradas validas"); //$NON-NLS-1$
 		}
 		
@@ -189,13 +180,13 @@ public final class AOUIManager {
 		
 		// Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
 		// mayúsculas y minúsculas
-		Object[] finalOrderedAliases = aliassesByFriendlyName.values().toArray();
-		Arrays.sort(finalOrderedAliases, new Comparator<Object>() {
-			public int compare(Object o1, Object o2) {
+		final String[] finalOrderedAliases = aliassesByFriendlyName.values().toArray(new String[0]);
+		Arrays.sort(finalOrderedAliases, new Comparator<String>() {
+			public int compare(String o1, String o2) {
 				if (o1==null && o2==null) return 0;
-				else if (o1==null && o2!=null) return 1;
-				else if (o1!=null && o2==null) return -1;
-				else return o1.toString().compareToIgnoreCase(o2.toString()); 
+				else if (o1==null) return 1;
+				else if (o2==null) return -1;
+				else return o1.compareToIgnoreCase(o2); 
 			}
 		});
 		
@@ -220,17 +211,18 @@ public final class AOUIManager {
 			if(aliassesByFriendlyName.get(al).equals(certName)) {
 				if (checkValidity && kss != null) {
 					boolean rejected = false;
-					AOCertVerifier cv = new AOCertVerifier();
+					final AOCertVerifier cv = new AOCertVerifier();
 					for (KeyStore ks : kss) {
 						try {
 							if (ks.containsAlias(al)) {
 								try {
 									cv.checkCertificate(new java.security.cert.Certificate[] { ks.getCertificate(al) }, false);
 								}
-								catch(Throwable t) {
+								catch(final Throwable t) {
+									Logger.getLogger("es.gob.afirma").warning(t.getMessage());
 									if (JOptionPane.showConfirmDialog(
 										parentComponent, 
-										t.getMessage() + 
+										cv.getErrorMessage() + 
 										Messages.getString("AOUIManager.8"),  //$NON-NLS-1$
 										Messages.getString("AOUIManager.5"),  //$NON-NLS-1$
 										JOptionPane.YES_NO_OPTION, 
@@ -311,6 +303,7 @@ public final class AOUIManager {
 			                                   final Component parentComponent) {
 
 		final JFileChooser jfc = new JFileChooser();
+		jfc.setLocale(Locale.getDefault());
 		if (extensions != null && extensions.length > 0) {
 			jfc.setFileFilter(new ExtFilter(extensions, description));
 			jfc.setSelectedFile(new File("*."+extensions[0])); //$NON-NLS-1$
@@ -321,7 +314,7 @@ public final class AOUIManager {
 		do {
 			int ret = jfc.showSaveDialog(parentComponent);
 			if(ret == JFileChooser.APPROVE_OPTION) {
-				File tempFile = jfc.getSelectedFile();
+				final File tempFile = jfc.getSelectedFile();
 				if(tempFile.exists()) {
 					if(tempFile.isDirectory() && !tempFile.canWrite()) {
 						JOptionPane.showMessageDialog(
@@ -342,9 +335,11 @@ public final class AOUIManager {
 					if(resp == JOptionPane.YES_OPTION) {	// Sobreescribir fichero
 						finalFilename = jfc.getSelectedFile().getAbsolutePath();
 						selectedFilename = true;
-					} else if(resp == JOptionPane.NO_OPTION) {	// Seleccionar fichero
+					} 
+					else if(resp == JOptionPane.NO_OPTION) {	// Seleccionar fichero
 						continue;
-					} else { 		// Cancelar operacion de guardado
+					} 
+					else { 		// Cancelar operacion de guardado
 						finalFilename = null;
 						selectedFilename = true;
 					}
@@ -579,13 +574,14 @@ public final class AOUIManager {
 	
 	/**
 	 * Muestra el di&aacute;logo de selecci&oacute;n de nodos de firma. 
-	 * @param tree &Aacute;rbol de firmantes asociado a un fichero de firma.
+	 * @param treeModel &Aacute;rbol de firmantes asociado a un fichero de firma.
 	 * @param parentComponent Componente padre sobre el que se mostrar&aacute;n los di&aacute;logos.
 	 * @return Listado con los &iacute;ndices de los nodos seleccionados.
 	 * @throws AOCancelledOperationException Cuando el usuario cancel&oacute; la operaci&oacute;n.
 	 */
-	public static final int[] showNodeSignSelectionPane(final TreeModel tree, final Component parentComponent) throws AOCancelledOperationException {
-
+	public static final int[] showNodeSignSelectionPane(final es.gob.afirma.misc.tree.TreeModel treeModel, final Component parentComponent) throws AOCancelledOperationException {
+		TreeModel tree = convertToSwingModel(treeModel);
+		
 		final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
 		treeRenderer.setLeafIcon(null);
 		treeRenderer.setClosedIcon(null);
@@ -643,15 +639,16 @@ public final class AOUIManager {
 	
 	/**
 	 * Muestra el di&aacute;logo de selecci&oacute;n de firmantes. 
-	 * @param tree &Aacute;rbol de firmantes asociado a un fichero de firma.
+	 * @param treeModel &Aacute;rbol de firmantes asociado a un fichero de firma.
 	 * @param parentComponent Componente padre sobre el que se mostrar&aacute;n los di&aacute;logos.
 	 * @return Listado de firmantes seleccionados.
 	 * @throws AOException Cuando el &aacute;rbol de firmantes contiene errores.
 	 * @throws AOCancelledOperationException Cuando el usuario cancel&oacute; la operaci&oacute;n.
 	 */
-	public static final String[] showSignersSelectionPane(final TreeModel tree, final Component parentComponent) throws AOException, AOCancelledOperationException {
-
-		final HashSet<String> signersSet = new HashSet<String>();
+	public static final String[] showSignersSelectionPane(final es.gob.afirma.misc.tree.TreeModel treeModel, final Component parentComponent) throws AOException, AOCancelledOperationException {
+		TreeModel tree = convertToSwingModel(treeModel);
+		
+		final Set<String> signersSet = new HashSet<String>();
 		
 		if(tree == null || tree.getRoot() == null || !(tree.getRoot() instanceof DefaultMutableTreeNode)) {
 			throw new AOException("El arbol introducido no es valido"); //$NON-NLS-1$
@@ -662,8 +659,8 @@ public final class AOUIManager {
 		try {
 			for(int i=0; i<root.getChildCount(); i++) getSigners((DefaultMutableTreeNode)root.getChildAt(i), signersSet);
 		} 
-		catch(Throwable e) {
-			throw new AOException("El arbol introducido contiene elementos no validos: " + e); //$NON-NLS-1$
+		catch (final Throwable e) {
+			throw new AOException("El arbol introducido contiene elementos no validos", e); //$NON-NLS-1$
 		}
 		
 		// Recogemos los firmantes de los nodos
@@ -671,7 +668,6 @@ public final class AOUIManager {
 		signersSet.toArray(signers);
 
 		// Mostramos la lista de firmantes de la firma introducida
-		
 		final JList jList = new JList(signers);
 		final JScrollPane spArbolNodos = new JScrollPane(jList);
 		spArbolNodos.setPreferredSize(new Dimension(280, 200));
@@ -715,7 +711,7 @@ public final class AOUIManager {
 	 * @param node Nodo de firma.
 	 * @param signersSet Conjunto con los alias de los certificados de firma.
 	 */
-	private static final void getSigners(final DefaultMutableTreeNode node, final HashSet<String> signersSet) {
+	private static final void getSigners(final DefaultMutableTreeNode node, final Set<String> signersSet) {
 		signersSet.add((String)node.getUserObject());
 		for(int i=0; i<node.getChildCount(); i++) {
 			getSigners((DefaultMutableTreeNode)node.getChildAt(i), signersSet);
@@ -726,18 +722,9 @@ public final class AOUIManager {
 	 * Original code: <a href="http://tactika.com/realhome/realhome.html">http://tactika.com/realhome/realhome.html</a>
 	 * @author Real Gagnon
 	 */
-	public static final class  JTextFieldFilter extends PlainDocument {
+	private static final class  JTextFieldFilter extends PlainDocument {
 
 		private static final long serialVersionUID = -5746396042117084830L;
-		
-		/**
-		 * Crea un nuevo filtro para campo de entrada de texto.
-		 * @param beepOnError <code>true</code> si desea que se reproduzca un sonido cuando el usuario
-		 *                    introduce un caracter no v&aacute;lido, false en caso contrario
-		 */
-		public JTextFieldFilter(final boolean beepOnError) {
-		      this(AOConstants.ACCEPTED_CHARS, beepOnError);
-		}
 		
 		private String acceptedChars = null;
 
@@ -748,7 +735,7 @@ public final class AOUIManager {
 		 * @param beepOnError <code>true</code> si desea que se reproduzca un sonido cuando el usuario
 		 *                    introduce un caracter no v&aacute;lido, false en caso contrario
 		 */
-		public JTextFieldFilter(final String acceptedchars, final boolean beepOnError) {
+		JTextFieldFilter(final String acceptedchars, final boolean beepOnError) {
 			beep = beepOnError;
 		    acceptedChars = acceptedchars;
 		}
@@ -769,6 +756,40 @@ public final class AOUIManager {
 	}
 	
 	/**
+	 * Filtro de caracteres ASCCI imprimibles.
+	 */
+	public static final class  JTextFieldASCIIFilter extends PlainDocument {
+		
+		private static final long serialVersionUID = 1979726487852842735L;
+
+		private boolean beep = false;
+		
+		/**
+		 * Crea un nuevo filtro para campo de entrada de texto.
+		 * @param beepOnError <code>true</code> si desea que se reproduzca un sonido cuando el usuario
+		 *                    introduce un caracter no v&aacute;lido, false en caso contrario
+		 */
+		public JTextFieldASCIIFilter(final boolean beepOnError) {
+			beep = beepOnError;		   
+		}
+		
+		   
+		@Override
+		public void insertString
+	      (int offset, String  str, AttributeSet attr) throws BadLocationException {
+	      if (str == null) return;
+	      
+	      for (int i=0; i < str.length(); i++)
+	    	  if (str.charAt(i) < 32 || str.charAt(i) > 126) {
+	    		  if (beep) Toolkit.getDefaultToolkit().beep();
+	    		  return;
+	    	  }
+	      super.insertString(offset, str, attr);
+	    }
+
+	}
+	
+	/**
 	 * Muestra un di&aacute;logo de guardado para almacenar los datos indicados. Los datos
 	 * ser&aacute;n almacenados en el directorio y con el nombre que indique el usuario. Si
 	 * el fichero ya existe se le preguntar&aacute; al usuario si desea sobreescribirlo.
@@ -778,7 +799,7 @@ public final class AOUIManager {
 	 * @param data Datos que se desean almacenar.
 	 * @param selectedFile Nombre de fichero por defecto.
 	 * @param fileFilter Filtro de fichero para el di&aacute;logo de guardado.
-	 * @return Nombre del fichero  
+	 * @return Nombre del fichero.
 	 * @throws NullPointerException No se introdujeron los datos que se desean almacenar.
 	 */
 	public final static String saveDataToFile(final Component parentComponent, 
@@ -797,7 +818,7 @@ public final class AOUIManager {
 		while(tryAgain) {
 			
 			tryAgain = false;
-			JFileChooser fileChooser = new JFileChooser();
+			final JFileChooser fileChooser = new JFileChooser();
 			fileChooser.getAccessibleContext().setAccessibleName(Messages.getString("AOUIManager.81")); //$NON-NLS-1$
 			fileChooser.getAccessibleContext().setAccessibleDescription(Messages.getString("AOUIManager.82")); //$NON-NLS-1$
 			fileChooser.setToolTipText(Messages.getString("AOUIManager.81")); //$NON-NLS-1$
@@ -834,21 +855,16 @@ public final class AOUIManager {
 						fos = new FileOutputStream(file);
 						fos.write(data);
 					} 
-					catch (Throwable ex) {
+					catch (final Throwable ex) {
 						Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$ 
-						ex.printStackTrace();
 						JOptionPane.showMessageDialog(parentComponent, Messages.getString("AOUIManager.88"), Messages.getString("AOUIManager.89"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 						fos = null;
 						// Volvemos a intentar guardar
 						tryAgain = true;
 					}
 					if(fos != null) {
-						try {
-							fos.close();
-						}
-						catch (IOException ex) {
-							Logger.getLogger("es.gob.afirma").warning("No se pudo cerrar el fichero generado con los datos cifrados: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-						}
+						try { fos.flush(); } catch (final Throwable e) { }
+						try { fos.close(); } catch (final Throwable e) { }
 					}
 					filename = file.getAbsolutePath();
 				}
@@ -859,4 +875,51 @@ public final class AOUIManager {
 		return filename;
 	}
 	
+	/**
+	 * Transforma un TreeModel de Swing a uno propio
+	 * @param treeModel &Aacute;rbol gen&eacute;rico de AFirma
+	 * @return &Aacute;rbol Swing creado a partir de un &aacute;rbol gen&eacute;rico de AFirma
+	 */
+	public static DefaultTreeModel convertToSwingModel(final es.gob.afirma.misc.tree.TreeModel treeModel) {
+		// Primero hay que obtener el objeto raiz
+		es.gob.afirma.misc.tree.TreeNode root = (es.gob.afirma.misc.tree.TreeNode) treeModel.getRoot();
+		Object rootObject = root.getUserObject();
+		
+		// Iniciamos el DefaultTreeModel
+		DefaultMutableTreeNode rootSwing = new DefaultMutableTreeNode(rootObject);
+		DefaultTreeModel swingDefaultTreeModel = new DefaultTreeModel(rootSwing, treeModel.asksAllowsChildren());
+
+		// Listado con los padres del modelo original
+		List<es.gob.afirma.misc.tree.TreeNode> parents = new ArrayList<es.gob.afirma.misc.tree.TreeNode>();
+		parents.add(root);
+		
+		// Listado con los padres que introduciremos en el modelo swing
+		List<DefaultMutableTreeNode> parentsSwing = new ArrayList<DefaultMutableTreeNode>();
+		parentsSwing.add(rootSwing);
+
+		int nParent = 0;
+		TreeNode node;
+		TreeNode childNode;
+		DefaultMutableTreeNode swingNode;
+		while (nParent < parents.size()) {
+		
+			node = parents.get(nParent);
+			
+			int nNodes = node.getChildCount();
+			for(int i = 0; i < nNodes; i++) {
+				// Tomamos el hijo de la lista de padres del arbol original
+				childNode = node.getChildAt(i);
+				parents.add(childNode);
+				
+				// Agregamos un hijo equivalente a la lista de padres del arbol Swing
+				swingNode = new DefaultMutableTreeNode(childNode.getUserObject());
+				parentsSwing.add(swingNode);
+				
+				// Agregamos el nuevo hijo a su padre del arbol
+				parentsSwing.get(nParent).add(swingNode);				
+			}
+			nParent++;
+		}
+		return swingDefaultTreeModel;
+	}
 }

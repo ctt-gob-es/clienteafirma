@@ -2,9 +2,9 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
@@ -13,17 +13,21 @@ package es.gob.afirma.keystores;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import es.gob.afirma.exceptions.AOException;
+import es.gob.afirma.misc.AOInstallParameters;
 import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.misc.Platform;
 
 /**
  * Clase para la obtenci&oacute;n de los m&oacute;dulos PKCS#11 instalados en la base de datos
  * <i>secmod.db</i> de Mozilla / Firefox.
  */
 
-class AOSecMod {
+final class AOSecMod {
 	
     /**
      * Listado de m&oacute;dulos almacenados en el fichero "Secmod.db". 
@@ -50,12 +54,12 @@ class AOSecMod {
 		
 		int namesRunningOffset = namesOffset;
 		
-		int len = AOUtil.getShort(secmoddb, namesRunningOffset + 0);
+		int len = getShort(secmoddb, namesRunningOffset + 0);
 		String commonName = new String(secmoddb, namesRunningOffset + 2, len);
 		
 		namesRunningOffset += len + 2;
 		
-		len = AOUtil.getShort(secmoddb, namesRunningOffset);
+		len = getShort(secmoddb, namesRunningOffset);
 		String libName = new String(secmoddb, namesRunningOffset + 2, len);
 		
 		if (libName.endsWith(".DLL") ||
@@ -63,9 +67,9 @@ class AOSecMod {
             libName.endsWith(".so")  ||
             libName.endsWith(".dylib")) {
 		
-				namesRunningOffset += len + 2;
+				//namesRunningOffset += len + 2;
 						
-				String trueLibName = AOUtil.searchPathForFile(new String[] { libName }, false);
+				String trueLibName = searchPathForFile(new String[] { libName }, false);
 				
 				if (trueLibName != null) {
 					return new ModuleName(trueLibName, commonName);
@@ -101,12 +105,12 @@ class AOSecMod {
 		        secMod = AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(secmod.getAbsolutePath()), null, false));
 		    }
 		    catch(Throwable e) {
-		        throw new AOException("Ocurrio un error leyendo la base de datos de modulos (secmod.db)");
+		        throw new AOException("Error leyendo la base de datos de modulos (secmod.db)");
 		    }
 
 		    // Obtenemos los modulos PKCS#11 asegurandonos de que no aparecen mas de una vez
 		    modules = new Vector<ModuleName>();
-		    final HashSet<String> libs = new HashSet<String>();
+		    final Set<String> libs = new HashSet<String>();
 		    for (int i=0;i<secMod.length;i++) {
 		        try {
 		            ModuleName module = processNames(secMod, i);
@@ -160,15 +164,45 @@ class AOSecMod {
 			return description + " (EXTERNAL, " + lib + ", slot 0)";
 		}
 	}
-
 	
-//    public static void main(String args[]) throws Throwable {
-//        
-//        long start = System.currentTimeMillis();
-//        Vector<ModuleName> mods = getModules("C:\\secmods");
-//        for (ModuleName m : mods) System.out.println(m.toString());
-//        
-//        System.out.println(System.currentTimeMillis()-start);
-//    }
+	 /**
+	  * Obtiene un n&uacute;mero de 16 bits a partir de dos posiciones de un array de octetos.
+	  * @param src Array de octetos origen
+	  * @param offset Desplazamiento desde el origen para el comienzo del par de octetos
+	  * @return N&ueacute;mero entero de 16 bits (sin signo)
+	  */
+	 private final static int getShort(final byte[] src, final int offset) {
+		 return (((src)[offset + 0] << 8) | (src)[offset + 1]);
+	 }
+	
+		/**
+		 * Busca un fichero (o una serie de ficheros) en el PATH del sistema.
+		 * Deja de buscar en la primera ocurrencia
+		 * @param files Ficheros a buscar en el PATH
+		 * @param excludeAFirma Excluye el directorio de instalaci&oacute;n de AFirma de la b&uacute;squeda
+		 * @return Ruta completa del fichero encontrado en el PATH o <code>null</code> si no se encontr&oacute; nada 
+		 */
+		private final static String searchPathForFile(final String[] files, final boolean excludeAFirma) {
+			if (files == null || files.length < 1) return null;
+			
+	        // Si existe el primero con el PATH completo lo devolvemos sin mas
+	        if (new File(files[0]).exists()) return files[0];
+	        
+			final StringTokenizer st = new StringTokenizer(Platform.getJavaLibraryPath(), File.pathSeparator);
+			String libPath;
+			while (st.hasMoreTokens()) {
+				libPath = st.nextToken();
+				if (libPath.startsWith(AOInstallParameters.getHomeApplication()) && excludeAFirma) continue;
+				if (!libPath.endsWith(File.separator)) libPath = libPath + File.separator;
+				File tmpFile;
+				for (String f : files) {
+					tmpFile = new File(libPath + f); 
+					if (tmpFile.exists() && (!tmpFile.isDirectory())) return libPath + f; 
+				}
+		     }
+			return null;
+		}
+
+
 
 }

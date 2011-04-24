@@ -2,22 +2,20 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.misc;
 
+import java.awt.Component;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -28,11 +26,12 @@ import java.util.logging.Logger;
 import javax.security.auth.callback.PasswordCallback;
 import javax.xml.crypto.dsig.DigestMethod;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
+
+import es.gob.afirma.Messages;
 import es.gob.afirma.callbacks.NullPasswordCallback;
 import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
 
@@ -96,72 +95,36 @@ public final class AOCryptoUtil {
 		int nBytes = 0;
 		byte[] buffer = new byte[1024];
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		FileInputStream fis = null;
+		final InputStream fis;
 		try {
 			fis = new FileInputStream(signFile);
 			while((nBytes = fis.read(buffer)) != -1) {
 				baos.write(buffer, 0, nBytes);
 			}
-		} catch (Exception e) {
+		} 
+		catch (final Throwable e) {
 			Logger.getLogger("es.gob.afirma").warning(
 					"No se pudo leer el fichero '" + signFile.getAbsolutePath() + "': " + e
 			);
 			return null;
 		}
-		try {
-			fis.close();
-		} catch (Exception e) {
-			Logger.getLogger("es.gob.afirma").warning(
-					"No se pudo cerrar el fichero '"+signFile.getAbsolutePath()+"': "+e
-			);
-		}
+		try { fis.close(); } catch(final Throwable e) {}
 
-		AOSigner signer = getSigner(baos.toByteArray());
+		AOSigner signer = AOSignerFactory.getSigner(baos.toByteArray());
 
-		try {
-			baos.close();
-		} catch (Exception e) {
-			Logger.getLogger("es.gob.afirma").warning("No se pudo cerrar el flujo de datos"+e);
-		}
+		try { baos.close(); } catch (Exception e) { }
 		
 		return signer;
-	}
-	
-	/**
-	 * Recupera un manejador de firma capaz de tratar la firma indicada. En caso de no tener cargado
-	 * ning&uacute;n manejador compatible se devolver&aacute; <code>null</code>. 
-	 * @param signData Firma electr&oacute;nica
-	 * @return Manejador de firma
-	 */
-	public static AOSigner getSigner(byte[] signData) {
-		
-		if(signData == null) throw new NullPointerException("No se han indicado datos de firma");
-		
-		AOSigner result = null;
-		// Recorremos los formatos soportados
-		for(String signerID : AOSignerFactory.getInstance().getSignersID()) {
-			AOSigner signer = AOSignerFactory.getInstance().getSigner(signerID);
-			try {
-				if(signer.isSign(new ByteArrayInputStream(signData))) {
-					result = signer;
-					break;
-				}
-			} catch (Exception e) {
-				Logger.getLogger("es.gob.afirma").warning(
-					"El manejador "+signer.getClass().getName()+" produjo un error al analizar la informacion de firma: "+e
-				);
-			}
-		}
-		return result;
 	}
 	
 	/**
 	 * Recupera el manejador de claves asociado a un certificado seg&uacute;n el repositorio en
 	 * el que se aloja. 
 	 * @param store Almace&eacute;n de claves del certificado.
-	 * @return Manejador de claves asociado.
+	 * @param parent Componente sobre el que se deben visualizar los di&aacute;logos modales.
+	 * @return Manejador para la solicitud de la clave.
 	 */
-	public static PasswordCallback getCertificatePC(AOConstants.AOKeyStore store) {
+	public static PasswordCallback getCertificatePC(AOConstants.AOKeyStore store, Component parent) {
 		PasswordCallback pssCallback;
 		if(store == AOConstants.AOKeyStore.WINDOWS ||
 		   store == AOConstants.AOKeyStore.WINROOT ||
@@ -173,11 +136,37 @@ public final class AOCryptoUtil {
 		   store == AOConstants.AOKeyStore.PKCS11)
 			pssCallback = new NullPasswordCallback();
 		else 
-			pssCallback = new UIPasswordCallback("Contrase\u00F1a del certificado", null);
+			pssCallback = new UIPasswordCallback("Contrase\u00F1a del certificado", parent);
 		
 		return pssCallback;
 	}
 
+	/**
+	 * Recupera el PasswordCallback que com&uacute;nmente se requiere para el acceso a un
+	 * almac&eacute;n de claves.  
+	 * @param kStore Almac&eacuten de claves
+	 * @param parent Componente sobre el que se deben visualizar los di&aacute;logos modales.
+	 * @return Manejador para la solicitud de la clave.
+	 */
+	public static PasswordCallback getPreferredPCB(AOConstants.AOKeyStore kStore, Component parent) {
+
+		if(kStore == null)
+			throw new NullPointerException("No se ha indicado el KeyStore del que desea " + //$NON-NLS-1$
+			"obtener le PasswordCallBack"); //$NON-NLS-1$
+
+		PasswordCallback pssCallback;
+		if(kStore == AOConstants.AOKeyStore.WINDOWS || 
+		   kStore == AOConstants.AOKeyStore.WINROOT || 
+		   kStore == AOConstants.AOKeyStore.PKCS11  ||
+		   kStore == AOConstants.AOKeyStore.APPLE)
+			pssCallback = new NullPasswordCallback();
+		else {
+			pssCallback = new UIPasswordCallback(
+					Messages.getString("AOCryptoUtil.0", kStore.getDescription()), parent); //$NON-NLS-1$ 
+		}
+		return pssCallback;
+	}
+	
     /**
      * Crea un X509Certificate a partir de un certificado en Base64. 
      * @param b64Cert Certificado en Base64. No debe incluir <i>Bag Attributes</i>
@@ -190,9 +179,9 @@ public final class AOCryptoUtil {
 		}
 		X509Certificate cert;		
 		try {			 
-			InputStream isCert = new ByteArrayInputStream(new BASE64Decoder().decodeBuffer(b64Cert));
+			InputStream isCert = new ByteArrayInputStream(decodeBase64(b64Cert));
 			cert = (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(isCert);
-			isCert.close();
+			try { isCert.close(); } catch (Exception e) {}
 		}
 		catch (Throwable e) {
 			Logger.getLogger("es.gob.afirma").severe("No se pudo decodificar el certificado en Base64, se devolvera null: " + e);
@@ -246,21 +235,6 @@ public final class AOCryptoUtil {
 		throw new IllegalArgumentException("Algoritmo de huella digital no soportado: " + pseudoName);
 	}
 	
-
-  
-	
-  /**
-   * BASE64Encoder que s&oacute;lo inserta un '\n' al final de cada l&iacute;nea y no el
-   * '\r\n' del Base64Encoder de Sun que hace aparecer el '\r' codificado en las firmas XML.
-   * Necesario porque java.util.jar hace su propia gesti&oacute;n de l&iacute;neas (ver Manifest.make72Safe()). 
-   */
-	public static class RawBASE64Encoder extends BASE64Encoder {
-		@Override
-		protected void encodeLineSuffix(OutputStream aStream) throws IOException {
-			pStream.print('\n');
-		}
-	}
-	
 //	/**
 //	 * Codifica unos datos a base 64. Si ocurre un error durante la lectura de los datos,
 //	 * incluyendo desbordamiento de memoria, se devolver&aacute; {@code null}.
@@ -282,7 +256,7 @@ public final class AOCryptoUtil {
 //
 //			return destBuffer.toString();
 //		} catch (Throwable e) {
-//			Logger.getLogger("es.gob.afirma").severe("Ocurrio un error durante la transformacion a base 64: "+e);
+//			Logger.getLogger("es.gob.afirma").severe("Error durante la transformacion a base 64: "+e);
 //			return null;
 //		}
 //	}
@@ -290,18 +264,36 @@ public final class AOCryptoUtil {
 	/**
 	 * Codifica unos datos a base 64. Si ocurre cualquier error durante la lectura de
 	 * los datos, se devolver&aacute; {@code null}.
-	 * @param dataIs Datos que deseamos transformar.
+	 * @param data Datos que deseamos transformar.
+	 * @param chunked Indica si debe insertarse un salto de l&iacute;nea cada 76 caracteres.
 	 * @return Cadena en base 64.
-	 * @throws AOException Cuando Ocurre cualquier error.
 	 */
-	public static String getBase64Encoded(InputStream dataIs) throws AOException {
+	public static String encodeBase64(byte[] data, boolean chunked) {
 
 		try {
-			return new BASE64Encoder().encode(AOUtil.getDataFromInputStream(dataIs));
+			return StringUtils.newStringUtf8(Base64.encodeBase64(data, chunked));
 		} catch (Throwable e) {
-			Logger.getLogger("es.gob.afirma").severe("No se pudo convertir un binario a base 64: "+e);
+			Logger.getLogger("es.gob.afirma").severe("No se pudo convertir un binario a base 64, se devolvera null: "+e);
 			return null;
 		}
+	}
+	
+	/**
+	 * Descodifica una cadena en base 64. Si se le proporciona un {@code null}, devuelve {@code null}.
+	 * @param b64Data Cadena de texto en base 64.
+	 * @return Datos descodificados.
+	 */
+	public static byte[] decodeBase64(String b64Data) {
+		return (b64Data == null ? null : Base64.decodeBase64(b64Data));
+	}
+	
+	/**
+	 * Descodifica un array en base 64. Si se le proporciona un {@code null}, devuelve {@code null}.
+	 * @param b64Data Array con los contenidos en base 64.
+	 * @return Datos descodificados.
+	 */
+	public static byte[] decodeBase64(byte[] b64Data) {
+		return (b64Data == null ? null : Base64.decodeBase64(b64Data));
 	}
 	
 //	/**

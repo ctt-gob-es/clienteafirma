@@ -2,21 +2,17 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.misc;
 
-import java.io.File;
 import java.util.logging.Logger;
 
 import com.sun.deploy.util.WinRegistry;
-
-
 
 /**
  * Clase envoltorio para las clases de Sun para acceso al registro de Windows.
@@ -26,31 +22,20 @@ public final class WinRegistryWrapper {
 
     static {
 
-        if (System.getProperty("os.name").contains("indows")) {
-            // En caso de java 6 o superior, cargamos la libreria 'deploy.dll' que incorporan
-            boolean loaded = false;
-//            if(!System.getProperty("java.version").startsWith("1.5")) {	// Caso de Java 6 o superior (Con Java 4 no carga la aplicacion)
-                try {
-                    AOUtil.loadNativeLibrary(es.gob.afirma.misc.AOUtil.getJavaHome() + File.separator + "bin" + File.separator + "deploy.dll");
-                    loaded = true;
-                }
-                catch(Throwable e) {
-                    Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll', se cargara la libreria incluida en el cliente: "+e);
-                }
-//            }
-
-            if(!loaded) {
-                try {
-                	if(new File(AOInstallParameters.getDeployDllDir() + File.separator + "aodeploy.dll").exists())
-                    AOUtil.loadNativeLibrary(AOInstallParameters.getDeployDllDir() + File.separator + "aodeploy.dll");
-                }
-                catch(Throwable e) {
-                    Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'aodeploy.dll' incluida en el cliente: "+e);
-                }
-            }
+        if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+            // Cargamos la libreria nativa 'deploy.dll'
+        	try {
+        		AOUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll");
+        	}
+        	catch(final Throwable e) {
+        		Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll': "+e);
+        	}
         }
     }
 
+    /** Carga la DLL <i>deploy.dll</i>, o la original de Java o la propia del Cliente @firma. */  
+    public static void loadDeployDll() {}
+    
     private WinRegistryWrapper() {}
 
     /** Clave <i>HKEY_LOCAL_MACHINE</i> del registro de Windows. */
@@ -67,14 +52,14 @@ public final class WinRegistryWrapper {
      * @return Valor de la clave obtenida, <i>null</i> si no se encontr&oacute; la clave o si se produjeron errores
      *         durante la obtenci&oacute;n
      */
-    public static Object get(int hKey, String path, String name) {
+    public static Object get(final int hKey, final String path, final String name) {
         try {
             return WinRegistry.get(hKey, path, name);
         }
-        catch(Throwable e) {
+        catch(final Throwable e) {
             Logger.getLogger("es.gob.afirma").severe(
-                    "No se ha podido obtener la clave de registro con ruta '" +
-                    path + "' y nombre '" + name + "', se devolvera null: " + e 
+                "No se ha podido obtener la clave de registro con ruta '" +
+                path + "' y nombre '" + name + "', se devolvera null: " + e 
             );
         }
         return null;
@@ -88,14 +73,14 @@ public final class WinRegistryWrapper {
      * @return Texto correspondiente a la clave obtenida, <i>null</i> si no se encontr&oacute; la clave o si se produjeron errores
      *         durante la obtenci&oacute;n
      */
-    public static String getString(int hKey, String path, String name) {
+    public static String getString(final int hKey, final String path, final String name) {
         try {
             return WinRegistry.getString(hKey, path, name);
         }
-        catch(Throwable e) {
+        catch(final Throwable e) {
             Logger.getLogger("es.gob.afirma").severe(
-                    "No se ha podido obtener la clave de registro con ruta '" +
-                    path + "' y nombre '" + name + "', se devolvera null: " + e 
+                "No se ha podido obtener la clave de registro con ruta '" +
+                path + "' y nombre '" + name + "', se devolvera null: " + e 
             );
         }
         return null;
@@ -110,14 +95,17 @@ public final class WinRegistryWrapper {
      * @param value Valor textual que se desea dar a la clave
      * @return <code>true</code> si se estableci&oacute; el valor, <code>false</code> si no se pudo establecer
      */
-    public static boolean setStringValue(int hKey, String path, String name, String value) {
+    public static boolean setStringValue(final int hKey, 
+    		                             final String path, 
+    		                             final String name, 
+    		                             final String value) {
         try {
             return WinRegistry.setStringValue(hKey, path, name, value);
         }
-        catch(Throwable e) {
+        catch(final Throwable e) {
             Logger.getLogger("es.gob.afirma").severe(
-                    "No se ha podido establecer la clave de registro con ruta '" +
-                    path + "' y nombre '" + name + "', se devolvera false: " + e 
+                "No se ha podido establecer la clave de registro con ruta '" +
+                path + "' y nombre '" + name + "', se devolvera false: " + e 
             );
         }
         return false;

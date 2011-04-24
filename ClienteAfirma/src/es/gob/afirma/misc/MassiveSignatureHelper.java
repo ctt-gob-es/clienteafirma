@@ -2,18 +2,15 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.misc;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -23,13 +20,18 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import sun.misc.BASE64Decoder;
+import javax.activation.MimeType;
+
+import org.ietf.jgss.Oid;
+
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOFormatFileException;
-import es.gob.afirma.misc.AOCryptoUtil.RawBASE64Encoder;
 import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.misc.DirectorySignatureHelper.MassiveType;
 import es.gob.afirma.signers.AOSigner;
+import es.gob.afirma.signers.AOSignerFactory;
+import es.gob.afirma.signers.AOXAdESSigner;
+import es.gob.afirma.signers.AOXMLDSigSigner;
 
 /**
  * M&oacute;dulo para el soporte de multifirmas m&aacute;sivas. Permite configurar una operaci&oacute;n
@@ -70,7 +72,9 @@ public final class MassiveSignatureHelper {
 		// Creamos el manejador de firma por defecto
 		this.defaultSigner = AOCryptoUtil.getSigner(this.massiveConfiguration.defaultFormat);
 		if(this.defaultSigner == null) {
-			throw new AOException("Formato de firma no soportado: "+this.massiveConfiguration.defaultFormat);
+			throw new AOException(
+				"Formato de firma no soportado: " + this.massiveConfiguration.defaultFormat
+			);
 		}
 		
 		this.isInitialized = true;
@@ -92,8 +96,7 @@ public final class MassiveSignatureHelper {
 	 * @see MassiveType
 	 */
 	public void setMassiveOperation(MassiveType massiveOperation) {
-	    if(massiveOperation == null)
-	        massiveOperation = MassiveType.SIGN;
+	    if(massiveOperation == null) massiveOperation = MassiveType.SIGN;
 	    this.massiveConfiguration.massiveOperation = massiveOperation;
 	}
 	
@@ -125,36 +128,29 @@ public final class MassiveSignatureHelper {
 			return null;
 		}
 		
-		// Transformamos los datos
-		byte[] data;
-		try {
-			data = new BASE64Decoder().decodeBuffer(b64Data);
-		} catch (Exception e1) {
-			Logger.getLogger("es.gob.afirma").severe("Los datos introducidos no poseen un formato Base 64 valido");
-			this.addLog("Operaci\u00F3n sobre datos: Los datos introducidos no poseen un formato Base 64 v\u00E1lido");
-			return null;
-		}
-
-		// Solo para aclarar los posibles mensajes por consola, almacenaremos 
-		String operation = null;
-		
-		// Firma resultante
-		byte[] signData = null;
+		final Properties config = (Properties) massiveConfiguration.extraParams.clone(); // Configuracion
+		config.setProperty("headLess", "true");
+		final byte[] data = AOCryptoUtil.decodeBase64(b64Data); // Datos a firmar
+		String operation = null;	// Para aclarar mensajes por consola
+		byte[] signData = null;		// Firma resultante
 		
 		// Ejecutamos la operacion que corresponda
 		try {
 			if(massiveConfiguration.massiveOperation == MassiveType.SIGN) {  // Firma
 				operation = "firmar"; 
-				signData = signDataFromData(defaultSigner, data, null);
-			} else if(massiveConfiguration.massiveOperation == MassiveType.COSIGN) {  // Cofirma
+				signData = signDataFromData(defaultSigner, data, null, config);
+			} 
+			else if(massiveConfiguration.massiveOperation == MassiveType.COSIGN) {  // Cofirma
 				operation = "cofirmar";
-				signData = cosign(defaultSigner, data);
-			} else if(massiveConfiguration.massiveOperation == MassiveType.COUNTERSIGN_ALL) {  // Contraforma del arbol completo
+				signData = cosign(defaultSigner, data, config);
+			} 
+			else if(massiveConfiguration.massiveOperation == MassiveType.COUNTERSIGN_ALL) {  // Contraforma del arbol completo
 				operation = "contrafirmar el arbol de firmas de";
-				signData = countersignTree(defaultSigner, data);
-			} else {  // Contrafirma de los nodos hoja 
+				signData = countersignTree(defaultSigner, data, config);
+			} 
+			else {  // Contrafirma de los nodos hoja 
 				operation = "contrafirmar los nodos hoja de";
-				signData = countersignLeafs(defaultSigner, data);
+				signData = countersignLeafs(defaultSigner, data, config);
 			}
 		}
 		catch(final AOFormatFileException e) {
@@ -163,14 +159,14 @@ public final class MassiveSignatureHelper {
 			return null;
 		}
 		catch(final Throwable e) {
-			Logger.getLogger("es.gob.afirma").severe("Ocurrio un error al "+operation+" los datos introducidos: "+e.getMessage());
+			Logger.getLogger("es.gob.afirma").severe("Error al "+operation+" los datos introducidos: "+e.getMessage());
 			this.addLog("Operaci\u00F3n sobre datos: "+e.getMessage());
 			return null;
 		}
 		
 		this.addLog("Operaci\u00F3n sobre datos: Correcta");
 		
-		return new RawBASE64Encoder().encode(signData);
+		return AOCryptoUtil.encodeBase64(signData, false);
 	}
 	
 	/**
@@ -192,14 +188,7 @@ public final class MassiveSignatureHelper {
 		}
 		
 		// Transformamos los datos
-		byte[] hash;
-		try {
-			hash = new BASE64Decoder().decodeBuffer(b64Hash);
-		} catch (IOException e) {
-			Logger.getLogger("es.gob.afirma").severe("El hash introducido no posee un formato Base 64 valido");
-			this.addLog("Operaci\u00F3n sobre hash: El hash introducido no posee un formato Base 64 valido");
-			return null;
-		}
+		byte[] hash = AOCryptoUtil.decodeBase64(b64Hash);
 		
 		// Solo para aclarar los posibles mensajes por consola, almacenaremos 
 		String operation =  "firmar";
@@ -208,10 +197,12 @@ public final class MassiveSignatureHelper {
 		byte[] signData = null;
 
 		// Ejecutamos la operacion que corresponda
+		Properties config = (Properties) massiveConfiguration.extraParams.clone();
+		config.setProperty("headLess", "true");
 		try {
 			if(massiveConfiguration.massiveOperation == MassiveType.SIGN) {  // Firma
 				operation =  "firmar";
-				signData = signDataFromHash(defaultSigner, hash);
+				signData = signDataFromHash(defaultSigner, hash, config);
 			} else if(massiveConfiguration.massiveOperation == MassiveType.COSIGN) {  // Cofirma
 				operation =  "cofirmar";
 				throw new UnsupportedOperationException("La cofirma de un hash no es una operacion valida");
@@ -221,14 +212,14 @@ public final class MassiveSignatureHelper {
 			}
 		}
 		catch(Throwable e) {
-			Logger.getLogger("es.gob.afirma").severe("Ocurrio un error al "+operation+" el hash '"+b64Hash+"': "+e.getMessage());
+			Logger.getLogger("es.gob.afirma").severe("Error al "+operation+" el hash '"+b64Hash+"': "+e.getMessage());
 			this.addLog("Operaci\u00F3n sobre hash: " + e.getMessage());
 			return null;
 		}
 		
 		this.addLog("Operaci\u00F3n sobre hash: Correcta");
 		
-		return new RawBASE64Encoder().encode(signData);
+		return AOCryptoUtil.encodeBase64(signData, false);
 	}
 	
 	/**
@@ -298,35 +289,39 @@ public final class MassiveSignatureHelper {
 			Logger.getLogger("es.gob.afirma").warning("No se ha podido liberar el fichero '"+fileUri+"': "+e);
 		}
 
-		// Firma resultante
-		byte[] signData = null;
-		
 		// Ejecutamos la operacion que corresponda
+		byte[] signData = null;
+		final Properties config = (Properties) massiveConfiguration.extraParams.clone();
+		config.setProperty("headLess", "true");
+		
 		try {
 			if(massiveConfiguration.massiveOperation == MassiveType.SIGN) {  // Firma
-				signData = signDataFromData(defaultSigner, data, uri);
-			} else if(massiveConfiguration.massiveOperation == MassiveType.COSIGN) {  // Cofirma
-				signData = cosign(defaultSigner, data);
-			} else if(massiveConfiguration.massiveOperation == MassiveType.COUNTERSIGN_ALL) {  // Contraforma del arbol completo
-				signData = countersignTree(defaultSigner, data);
-			} else {  // Contraforma de los nodos hoja
-				signData = countersignLeafs(defaultSigner, data);
+				signData = signDataFromData(defaultSigner, data, uri, config);
+			} 
+			else if(massiveConfiguration.massiveOperation == MassiveType.COSIGN) {  // Cofirma
+				signData = cosign(defaultSigner, data, config);
+			} 
+			else if(massiveConfiguration.massiveOperation == MassiveType.COUNTERSIGN_ALL) {  // Contraforma del arbol completo
+				signData = countersignTree(defaultSigner, data, config);
+			} 
+			else {  // Contraforma de los nodos hoja
+				signData = countersignLeafs(defaultSigner, data, config);
 			}
 		}
-		catch(AOFormatFileException e) {
+		catch(final AOFormatFileException e) {
 			Logger.getLogger("es.gob.afirma").severe("El fichero '"+fileUri+"' no tiene un formato v\u00E1lido: "+e.getMessage());
 			this.addLog("Operaci\u00F3n sobre fichero: El fichero '"+fileUri+"' no tiene un formato v\u00E1lido");
 			return null;
 		}
-		catch(Throwable e) {
-			Logger.getLogger("es.gob.afirma").severe("Ocurrio un error al realizar la operacion "+massiveConfiguration.massiveOperation+" sobre el fichero '"+fileUri+"': "+e.getMessage());
+		catch(final Throwable e) {
+			Logger.getLogger("es.gob.afirma").severe("Error al realizar la operacion "+massiveConfiguration.massiveOperation+" sobre el fichero '"+fileUri+"': "+e.getMessage());
 			this.addLog("Operaci\u00F3n sobre fichero: "+e.getMessage());
 			return null;
 		}
 		
 		this.addLog("Operaci\u00F3n sobre fichero: Correcta");
 		
-		return new RawBASE64Encoder().encode(signData);
+		return AOCryptoUtil.encodeBase64(signData, false);
 	}
 	
 	/**
@@ -334,26 +329,49 @@ public final class MassiveSignatureHelper {
 	 * @param signer Manejador con el que firmar los datos.
 	 * @param data Datos a firmar.
 	 * @param uri Uri de los datos a firmar (opcional seg&uacute;n formato de firma).
+	 * @param config Configuraci&oacute;n general para la operaci&oacute;n.
 	 * @return Firma electr&oacute;nica con el formato dado por el manejador de firma.
 	 * @throws AOException Cuando ocurre un error durante la operaci&oacute;n de firma.
 	 */
-	private byte[] signDataFromData(AOSigner signer, byte[] data, URI uri) throws AOException {
+	private byte[] signDataFromData(final AOSigner signer, 
+			                        final byte[] data, 
+			                        final URI uri, 
+			                        final Properties config) throws AOException {
 
 		// Configuramos y ejecutamos la operacion
-		Properties config = (Properties)massiveConfiguration.extraParams.clone();
 		config.setProperty("mode", massiveConfiguration.mode);
 		config.setProperty("format", massiveConfiguration.defaultFormat);
-		if(uri != null)
-			config.setProperty("uri", uri.toString());
+		if(uri != null) config.setProperty("uri", uri.toString());
 		
-		byte[] signData = signer.sign(
-				new ByteArrayInputStream(data),
-				massiveConfiguration.algorithm,
-				massiveConfiguration.keyEntry,
-				massiveConfiguration.certificate,
-				config
+		// Deteccion del MIMEType, solo para XAdES y XMLDSig
+		if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+			final MimeHelper mimeHelper = new MimeHelper(data);
+			final String mimeType = mimeHelper.getMimeType();
+			if (mimeType != null) {
+				try {
+					signer.setDataObjectFormat(
+						mimeHelper.getDescription(), 
+						new Oid(MimeHelper.transformMimeTypeToOid(mimeType)),
+						new MimeType(mimeType),
+						null
+					);
+				}
+				catch(final Throwable e) {
+					Logger.getLogger("es.gob.afirma").warning(
+						"No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e
+					);
+				}
+			}
+		}
+		
+		final byte[] signData = signer.sign(
+			data,
+			massiveConfiguration.algorithm,
+			massiveConfiguration.getKeyEntry(),
+			config
 		);
-		if(signData == null)throw new AOException("No se generaron datos de firma");
+		
+		if(signData == null) throw new AOException("No se generaron datos de firma");
 		return signData;
 	}
 	
@@ -361,27 +379,47 @@ public final class MassiveSignatureHelper {
 	 * Firma un hash con el signer indicado.
 	 * @param signer Manejador con el que firmar el hash.
 	 * @param data Hash a firmar.
+	 * @param config Configuraci&oacute;n general para la operaci&oacute;n.
 	 * @return Firma electr&oacute;nica con el formato configurado.
 	 * @throws AOException Cuando ocurre un error durante la operaci&oacute;n de firma.
 	 */
-	private byte[] signDataFromHash(AOSigner signer, byte[] data) throws AOException {
+	private byte[] signDataFromHash(final AOSigner signer, 
+			                        final byte[] data, 
+			                        final Properties config) throws AOException {
 		
 		int pos = massiveConfiguration.algorithm.indexOf("with");
-		if(pos == -1)
-			throw new AOException("El algoritmo '" + massiveConfiguration.algorithm + "' no esta soportado para la firma de huellas digitales");
+		if(pos == -1) throw new AOException(
+			"El algoritmo '" + massiveConfiguration.algorithm + "' no esta soportado para la firma de huellas digitales"
+		);
 		
 		// Configuramos y ejecutamos la operacion
-		Properties config = (Properties)massiveConfiguration.extraParams.clone();
 		config.setProperty("mode", massiveConfiguration.mode);
 		config.setProperty("format", massiveConfiguration.defaultFormat);
 		config.setProperty("precalculatedHashAlgorithm", massiveConfiguration.algorithm.substring(0, pos));
 		
-		byte[] signData = signer.sign(
-				new ByteArrayInputStream(data),
-				massiveConfiguration.algorithm,
-				massiveConfiguration.keyEntry,
-				massiveConfiguration.certificate,
-				config
+		// Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
+		if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+			final String mimeType = "hash/" + massiveConfiguration.algorithm.substring(0, pos).toLowerCase();
+			try {
+				signer.setDataObjectFormat(
+					"Huella digital precalculada", 
+					new Oid(MimeHelper.transformMimeTypeToOid(mimeType)),
+					new MimeType(mimeType),
+					null
+				);
+			}
+			catch(final Throwable e) {
+				Logger.getLogger("es.gob.afirma").warning(
+					"Error al indicar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e
+				);
+			}
+		}
+		
+		final byte[] signData = signer.sign(
+			data,
+			massiveConfiguration.algorithm,
+			massiveConfiguration.getKeyEntry(),
+			config
 		);
 		if(signData == null)throw new AOException("No se generaron datos de firma");
 		return signData;
@@ -392,24 +430,25 @@ public final class MassiveSignatureHelper {
 	 * indic&oacute; que se buscase.
 	 * @param signer Manejador con el que cofirmar los datos.
 	 * @param sign Firma con los datos a cofirmar.
+	 * @param config Configuraci&oacute;n general para la operaci&oacute;n.
 	 * @return Firma electr&oacute;nica con el formato dado por el manejador de firma.
 	 * @throws AOException Cuando ocurre un error durante la operaci&oacute;n de firma.
 	 */
-	private byte[] cosign(AOSigner signer, byte[] sign) throws AOException {
+	private byte[] cosign(final AOSigner signer, 
+			              final byte[] sign, 
+			              final Properties config) throws AOException {
 		
 		// Tomamos el signer adecuado para la operacion o el obligatorio si se especifico
-		AOSigner validSigner = this.getValidSigner(signer, sign);
+		final AOSigner validSigner = this.getValidSigner(signer, sign);
 		
 		// Configuramos y ejecutamos la operacion
-		Properties config = (Properties)massiveConfiguration.extraParams.clone();
 		config.setProperty("mode", massiveConfiguration.mode);
 		
-		byte[] signData = validSigner.cosign(
-				new ByteArrayInputStream(sign),
-				massiveConfiguration.algorithm,
-				massiveConfiguration.keyEntry,
-				massiveConfiguration.certificate,
-				config
+		final byte[] signData = validSigner.cosign(
+			sign,
+			massiveConfiguration.algorithm,
+			massiveConfiguration.getKeyEntry(),
+			config
 		);
 		if(signData == null)throw new AOException("No se generaron datos de firma");
 		return signData;
@@ -420,11 +459,14 @@ public final class MassiveSignatureHelper {
 	 * configurado o el m&aacute;s apropiado si se indic&oacute; que se buscase.
 	 * @param signer Manejador con el que contrafirmar.
 	 * @param sign Firma a contrafirmar.
+	 * @param config Configuraci&oacute;n general para la operaci&oacute;n.
 	 * @return Firma electr&oacute;nica con el formato dado por el manejador de firma.
 	 * @throws AOException Cuando ocurre un error durante la operaci&oacute;n de contrafirma.
 	 */
-	private byte[] countersignTree(AOSigner signer, byte[] sign) throws AOException {
-		return countersignOperation(signer, sign, CounterSignTarget.Tree);
+	private byte[] countersignTree(final AOSigner signer, 
+			                       final byte[] sign, 
+			                       final Properties config) throws AOException {
+		return countersignOperation(signer, sign, CounterSignTarget.Tree, config);
 	}
 	
 	/**
@@ -432,11 +474,14 @@ public final class MassiveSignatureHelper {
 	 * configurado o el m&aacute;s apropiado si se indic&oacute; que se buscase.
 	 * @param signer Manejador con el que contrafirmar.
 	 * @param sign Firma a contrafirmar.
+	 * @param config Configuraci&oacute;n general para la operaci&oacute;n.
 	 * @return Firma electr&oacute;nica con el formato dado por el manejador de firma.
 	 * @throws AOException Cuando ocurre un error durante la operaci&oacute;n de contrafirma.
 	 */
-	private byte[] countersignLeafs(final AOSigner signer, final byte[] sign) throws AOException {
-		return countersignOperation(signer, sign, CounterSignTarget.Leafs);
+	private byte[] countersignLeafs(final AOSigner signer, 
+			                        final byte[] sign, 
+			                        final Properties config) throws AOException {
+		return countersignOperation(signer, sign, CounterSignTarget.Leafs, config);
 	}
 	
 	/**
@@ -445,25 +490,25 @@ public final class MassiveSignatureHelper {
 	 * @param signer Manejador con el que contrafirmar.
 	 * @param sign Firma a contrafirmar.
 	 * @param target Nodos objetivos para la contrafirma.
+	 * @param config Configuraci&oacute;n general para la operaci&oacute;n.
 	 * @return Firma electr&oacute;nica con el formato dado por el manejador de firma.
 	 * @throws AOException Cuando ocurre un error durante la operaci&oacute;n de contrafirma.
 	 */
-	private byte[] countersignOperation(AOSigner signer, byte[] sign, CounterSignTarget target) throws AOException {
-
-		// Configuramos la operacion
-		Properties config = (Properties)massiveConfiguration.extraParams.clone();
+	private byte[] countersignOperation(final AOSigner signer, 
+			                            final byte[] sign, 
+			                            final CounterSignTarget target, 
+			                            final Properties config) throws AOException {
 		
 		// Tomamos el signer adecuado para la operacion o el obligatorio si se especifico
 		AOSigner validSigner = this.getValidSigner(signer, sign);
 		
 		byte[] signData = validSigner.countersign(
-				new ByteArrayInputStream(sign),
-				massiveConfiguration.algorithm,
-				target,
-				null,
-				massiveConfiguration.keyEntry,
-				massiveConfiguration.certificate,
-				config
+			sign,
+			massiveConfiguration.algorithm,
+			target,
+			null,
+			massiveConfiguration.getKeyEntry(),
+			config
 		);
 		if(signData == null)throw new AOException("No se generaron datos de firma");
 		return signData;
@@ -479,18 +524,22 @@ public final class MassiveSignatureHelper {
 	 * @throws AOException Si la firma introducida no se corresponde con ning&uacute;n formato
 	 * soportado o se obliga a usar el manejador por defecto y este no la soporta.
 	 */
-	private AOSigner getValidSigner(AOSigner signer, byte[] signData) throws AOException {
+	private AOSigner getValidSigner(final AOSigner signer, final byte[] signData) throws AOException {
 		// Tomamos el signer adecuado para la operacion o el obligatorio si se especifico
 		AOSigner validSigner = signer;
 		if(!this.massiveConfiguration.originalFormat) {
-			if(!signer.isSign(new ByteArrayInputStream(signData))) {
-				throw new AOException("La firma introducida no se corresponde con el formato de firma especificado");
+			if(!signer.isSign(signData)) {
+				throw new AOException(
+					"La firma introducida no se corresponde con el formato de firma especificado"
+				);
 			}
 		}
 		else {
-			validSigner = AOCryptoUtil.getSigner(signData);
+			validSigner = AOSignerFactory.getSigner(signData);
 			if(validSigner == null) {
-				throw new AOException("La firma introducida no se corresponde con ning\u00FAn formato soportado");
+				throw new AOException(
+					"La firma introducida no se corresponde con ning\u00FAn formato soportado"
+				);
 			}
 		}
 		return validSigner;
@@ -500,10 +549,8 @@ public final class MassiveSignatureHelper {
 	 * Agrega una entrada al log de la operacion de multifirma masiva global.
 	 * @param message Entrada del log.
 	 */
-	private void addLog(String message) {
-		if(this.log == null) {
-			this.log = new Vector<String>();
-		}
+	private void addLog(final String message) {
+		if(this.log == null) this.log = new Vector<String>();
 		this.log.add(message);
 	}
 	
@@ -524,7 +571,7 @@ public final class MassiveSignatureHelper {
 	 * @return Log de la operaci&oacute;n masiva completa. 
 	 */
 	public String getAllLogEntries() {
-		StringBuilder buffer = new StringBuilder();
+		final StringBuilder buffer = new StringBuilder();
 		if(this.log != null) {
 			for(String logEntry : this.log) {
 				buffer.append(logEntry).append("\r\n");
@@ -553,7 +600,7 @@ public final class MassiveSignatureHelper {
 		 * @param keyEntry Clave privada para las firmas
 		 * @param certificate Certificado X.509 firmante
 		 */
-		public MassiveSignConfiguration(PrivateKeyEntry keyEntry, X509Certificate certificate) {
+		public MassiveSignConfiguration(final PrivateKeyEntry keyEntry, final X509Certificate certificate) {
 			this.keyEntry = keyEntry;
 			this.certificate = certificate;
 			this.extraParams = new Properties();
@@ -571,7 +618,7 @@ public final class MassiveSignatureHelper {
 		 * Establece la operaci&oacute;n masiva que deber&aacute; ejecutarse.
 		 * @param massiveOperation Tipo de operaci&oacute;n masiva.
 		 */
-		public void setMassiveOperation(MassiveType massiveOperation) {
+		public void setMassiveOperation(final MassiveType massiveOperation) {
 			this.massiveOperation = massiveOperation;
 		}
 
@@ -587,7 +634,7 @@ public final class MassiveSignatureHelper {
 		 * Estable el algoritmo de firma.
 		 * @param algorithm Algoritmo de firma.
 		 */
-		public void setAlgorithm(String algorithm) {
+		public void setAlgorithm(final String algorithm) {
 			this.algorithm = algorithm;
 		}
 
@@ -603,7 +650,7 @@ public final class MassiveSignatureHelper {
 		 * Estable el modo de firma.
 		 * @param mode Modo de firma.
 		 */
-		public void setMode(String mode) {
+		public void setMode(final String mode) {
 			this.mode = mode;
 		}
 
@@ -620,7 +667,7 @@ public final class MassiveSignatureHelper {
 		 * original o se realiza una firma masiva).
 		 * @param defaultFormat Formato de firma.
 		 */
-		public void setDefaultFormat(String defaultFormat) {
+		public void setDefaultFormat(final String defaultFormat) {
 			this.defaultFormat = defaultFormat;
 		}
 
@@ -637,7 +684,7 @@ public final class MassiveSignatureHelper {
 		 * Estable si debe utilizarse un formato de firma original en le caso de las multifirmas masivas.
 		 * @param originalFormat Respetar formato original de firma.
 		 */
-		public void setOriginalFormat(boolean originalFormat) {
+		public void setOriginalFormat(final boolean originalFormat) {
 			this.originalFormat = originalFormat;
 		}
 
@@ -670,7 +717,7 @@ public final class MassiveSignatureHelper {
 		 * la operaci&oacute;n masiva.
 		 * @param extraParams Par&aacute;metros adicionales.
 		 */
-		public void setExtraParams(Properties extraParams) {
+		public void setExtraParams(final Properties extraParams) {
 			if(extraParams != null)
 				this.extraParams = (Properties)extraParams.clone();
 			else

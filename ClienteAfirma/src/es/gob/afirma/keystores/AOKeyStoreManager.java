@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.keystores;
 
@@ -16,6 +15,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.Certificate;
@@ -33,6 +33,7 @@ import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOKeyStoreManagerException;
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOConstants.AOKeyStore;
+import es.gob.afirma.misc.Platform;
 
 /** 
  * Clase gestora de claves y certificados.
@@ -84,16 +85,13 @@ public class AOKeyStoreManager {
 			                     PasswordCallback pssCallBack, 
 			                     final Object[] params) throws AOException {
 	    
-		System.out.println("Inicializamos el almacen de tipo: "+type);
-		
-		
+		Logger.getLogger("es.gob.afirma").info("Inicializamos el almacen de tipo: " + type);
 		
 	    final Vector<KeyStore> ret = new Vector<KeyStore>(1);
 	    
 		if(type == null) {
-			Logger.getLogger("es.gob.afirma").severe("Se ha solicitado inicializar un AOKeyStore nulo, se intentara u");
-			if(System.getProperty("os.name").contains("indows")) type = AOConstants.AOKeyStore.WINDOWS;
-			else type = AOConstants.AOKeyStore.MOZ_UNI;
+			Logger.getLogger("es.gob.afirma").severe("Se ha solicitado inicializar un AOKeyStore nulo, se intentara inicializar un PKCS#12");
+			type = AOConstants.AOKeyStore.PKCS12;
 		}
 		ksType = type;
 
@@ -110,9 +108,8 @@ public class AOKeyStoreManager {
 				ks = KeyStore.getInstance(type.getName(), pkcs7Provider);
 			}
 			catch(final Throwable e) {
-				//e.printStackTrace();
 				throw new AOKeyStoreManagerException(
-					"No se ha podido obtener el almacen " + type.getName() + " solicitado: " + e
+					"No se ha podido obtener el almacen " + type.getName() + " solicitado", e
 				);
 			}
 			
@@ -131,6 +128,7 @@ public class AOKeyStoreManager {
                 );
 			}
 			ret.add(ks);
+			try { store.close(); } catch(final Throwable e) {}
 			return ret;
 			
 		}
@@ -146,9 +144,8 @@ public class AOKeyStoreManager {
 				ks = KeyStore.getInstance(type.getName());
 			}
 			catch(final Throwable e) {
-			    //e.printStackTrace();
 				throw new AOKeyStoreManagerException(
-					"No se ha podido obtener el almac\u00E9n de nombre '" + type.getName() + "': " + e
+					"No se ha podido obtener el almacen de nombre '" + type.getName() + "'", e
 				);
 			}
 
@@ -163,13 +160,12 @@ public class AOKeyStoreManager {
 				throw e;
 			}
 			catch(final Throwable e) {
-			    Logger.getLogger("es.gob.afirma").warning("No se ha podido abrir el almacen " 
-                        + type.getName() + " solicitado : " + e);
                 throw new AOKeyStoreManagerException(
-                        "No se ha podido abrir el almac\u00E9n " + type.getName() + " solicitado.", e
+                    "No se ha podido abrir el almacen " + type.getName() + " solicitado.", e
                 );
 			}
 	        ret.add(ks);
+	        try { store.close(); } catch(final Throwable e) {}
 	        return ret;
 		}
 
@@ -184,9 +180,8 @@ public class AOKeyStoreManager {
 				ks = KeyStore.getInstance(type.getName());
 			}
 			catch(final Throwable e) {
-                //e.printStackTrace();
                 throw new AOKeyStoreManagerException(
-                    "No se ha podido obtener el almac\u00E9n de nombre '" + type.getName() + "': " + e
+                    "No se ha podido obtener el almacen de nombre '" + type.getName() + "'", e
                 );
 			}
 			try {
@@ -199,19 +194,62 @@ public class AOKeyStoreManager {
 				throw e;
 			}
 			catch(final Throwable e) {
-                Logger.getLogger("es.gob.afirma").warning(
-            		"No se ha podido abrir el almacen " + type.getName() + " solicitado : " + e
-        		);
                 throw new AOKeyStoreManagerException(
-                    "No se ha podido abrir el almac\u00E9n " + type.getName() + " solicitado.", e
+                    "No se ha podido abrir el almacen " + type.getName() + " solicitado.", e
                 );
 			}
 	        ret.add(ks);
+	        try { store.close(); } catch(final Throwable e) {}
 	        return ret;
 	        
 		}
 		
+//		else if (type == AOConstants.AOKeyStore.WINDEPLOY) {
+//			if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
+//				throw new AOKeyStoreManagerException(
+//					"No se puede obtener el KeyStore de Windows en un sistema no Windows:" +
+//					Platform.getOS()
+//				);
+//			}
+//			try {
+//				Security.addProvider((Provider)Class.forName("com.sun.deploy.security.MSCryptoProvider").newInstance());
+//			}
+//			catch(final Throwable e) {
+//				Logger.getLogger("es.gob.afirma").warning(
+//					"No se ha podido instanciar el proveedor 'com.sun.deploy.security.MSCryptoProvider': " + e
+//				);
+//			}
+//			try {
+//				ks = KeyStore.getInstance(type.getName());
+//			}
+//			catch(final Throwable e) {
+//				throw new AOKeyStoreManagerException(
+//					"No se ha podido obtener el KeyStore de nombre '" + type.getName() +
+//					"' del Provider 'com.sun.deploy.security.MSCryptoProvider'", e
+//				);
+//			}
+//			try {
+//				ks.load(null, null);
+//			}
+//			catch(final Throwable e) {
+//				throw new AOException(
+//					"Error inicializando el almacen de claves y certificados del proveedor com.sun.deploy.security.MSCryptoProvider", e
+//				);
+//			}
+//
+//			ret.add(ks);
+//			return ret;
+//			
+//		}
+		
 		else if (type == AOConstants.AOKeyStore.WINDOWS || type == AOConstants.AOKeyStore.WINROOT) {
+			
+			if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
+				throw new AOKeyStoreManagerException(
+					"No se puede obtener el KeyStore de Windows en un sistema no Windows:" +
+					Platform.getOS()
+				);
+			}
 
 			// Si no se ha agregado el proveedor CAPI de Sun, lo anadimos
 			// En java 6 viene instalado de serie, pero no pasa nada por
@@ -233,10 +271,9 @@ public class AOKeyStoreManager {
 				ks = KeyStore.getInstance(type.getName());
 			}
 			catch(final Throwable e) {
-				//e.printStackTrace();
 				throw new AOKeyStoreManagerException(
 					"No se ha podido obtener el KeyStore de nombre '" + type.getName() +
-					"' del Provider 'sun.security.mscapi.SunMSCAPI': " + e
+					"' del Provider 'sun.security.mscapi.SunMSCAPI'", e
 				);
 			}
 
@@ -244,14 +281,13 @@ public class AOKeyStoreManager {
 			try {
 				ks.load(store, pssCallBack.getPassword());
 			}
-			catch (AOCancelledOperationException e) {
+			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
-			catch(Throwable e) {
-				e.printStackTrace();
+			catch(final Throwable e) {
 				throw new AOKeyStoreManagerException(
 					"No se ha podido inicializar el KeyStore de nombre '" + type.getName() +
-					"' del Provider 'sun.security.mscapi.SunMSCAPI': " + e
+					"' del Provider 'sun.security.mscapi.SunMSCAPI'", e
 				);
 			}
 			
@@ -261,7 +297,7 @@ public class AOKeyStoreManager {
 			try {
 				KeyStoreUtilities.cleanCAPIDuplicateAliases(ks);
 			}
-			catch(Throwable e) {
+			catch(final Throwable e) {
 				Logger.getLogger("es.gob.afirma").warning(
 					"No se han podido tratar los alias duplicados: " + e
 				);
@@ -273,20 +309,33 @@ public class AOKeyStoreManager {
 		
 		else if (type == AOConstants.AOKeyStore.WINCA || type == AOConstants.AOKeyStore.WINADDRESSBOOK) {
 			
+			if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
+				throw new AOKeyStoreManagerException(
+					"No se puede obtener el KeyStore ADDRESSBOOK de Windows en un sistema no Windows:" +
+					Platform.getOS()
+				);
+			}
+			
 			// Nos aseguramos de que SunMSCAPI este cargado, para que la DLL sunmscapi.dll tambien lo este
 			if (Security.getProvider("SunMSCAPI") == null) {
 				try {
 					Security.addProvider((Provider)Class.forName("sun.security.mscapi.SunMSCAPI").newInstance());
-				} catch (Throwable e) {
+				} 
+				catch (final Throwable e) {
 					throw new AOKeyStoreManagerException(
-							"No se ha podido obtener el KeyStore de nombre '" + type.getName() +
-							"' por no poderse cargar el Provider 'sun.security.mscapi.SunMSCAPI': " + e
+						"No se ha podido obtener el KeyStore de nombre '" + type.getName() +
+						"' por no poderse cargar el Provider 'sun.security.mscapi.SunMSCAPI'", e
 					);
 				}
 			}
 			Provider p = Security.getProvider("SunMSCAPIAddressBook");
 			if (p == null) {
-				p = new SunMSCAPIAddressBook();
+				try {
+					p = (Provider) Class.forName("es.gob.afirma.keystores.SunMSCAPIAddressBook").newInstance();
+				}
+				catch(final Throwable e) {
+					throw new AOException("Error obteniendo el almacen '" + type.getName() + "' por no poder instanciarse el proveedor SunMSCAPIAddressBook", e);
+				}
 				Security.addProvider(p);
 			}
 			
@@ -294,14 +343,14 @@ public class AOKeyStoreManager {
 				ks = KeyStore.getInstance(type.getName(), p);
 			}
 			catch(final Throwable e) {
-				throw new AOException("Error obteniendo el almacen '" + type.getName() + "' del proveedor SunMSCAPIAddressBook: " + e);
+				throw new AOException("Error obteniendo el almacen '" + type.getName() + "' del proveedor SunMSCAPIAddressBook", e);
 			}
 			
 			try {
 				ks.load(null, null);
 			}
 			catch(final Throwable e) {
-				throw new AOException("Error inicializando el proveedor SunMSCAPIAddressBook: " + e);
+				throw new AOException("Error inicializando el almacen de claves y certificados del proveedor SunMSCAPIAddressBook", e);
 			}
 
 			ret.add(ks);
@@ -310,19 +359,26 @@ public class AOKeyStoreManager {
 		
 		else if (type == AOConstants.AOKeyStore.PKCS11) {
 			// En el "params" debemos traer los parametros:
-			// - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el
+			// [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el
 			//           LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
-			//  -desc: Descripcion del token PKCS#11 (opcional)
+			// [1] -desc: Descripcion del token PKCS#11 (opcional)
+			// [2] -slot: Numero de lector de tarjeta (Sistema Operativo) [OPCIONAL]
 			
 			// Anadimos el proveedor PKCS11 de Sun
 			if (params==null || params.length < 2) throw new AOException(
-					"No se puede acceder al KeyStore PKCS#11 si no se especifica la biblioteca"
+				"No se puede acceder al KeyStore PKCS#11 si no se especifica la biblioteca"
 			);
 			final String p11lib;
 			if (params[0] != null) p11lib = params[0].toString();
 			else throw new NullPointerException(
-					"No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula"
+				"No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula"
 			);
+			
+			// Numero de lector
+			Integer slot = null;
+			if (params.length >=3) {
+				if (params[2] instanceof Integer) slot = (Integer) params[2];
+			}
 			
 			// Agregamos un nombre a cada PKCS#11 para asegurarnos de no se agregan mas de una vez como provider.
 			// Si ya se cargo el PKCS#11 anteriormente, se volvera a instanciar.
@@ -335,21 +391,17 @@ public class AOKeyStoreManager {
 		    	try {
 		    		sunPKCS11Contructor =
 		    			Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class);
-		    	} catch (Throwable e) {
+		    	} 
+		    	catch (Throwable e) {
 		    		throw new AOKeyStoreManagerException(
-		    				"No se ha podido construir un proveedor de tipo 'sun.security.pkcs11.SunPKCS11': " + e
+	    				"No se ha podido construir un proveedor de tipo 'sun.security.pkcs11.SunPKCS11'", e
 		    		);
 		    	}
 		    	
-		    	//TODO:Borrar
-		    	System.out.println(KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName));
-		    	System.out.println("---");
-		    	
+		    	byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
 		    	try {
 		    		p11Provider = (Provider)sunPKCS11Contructor.newInstance(		//TODO: InvocationTargetException
-		    				new ByteArrayInputStream(
-		    						KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName).getBytes()
-		    				)
+	    				new ByteArrayInputStream(config)
 		    		);
 		    	}
 		    	catch(final Throwable e) {
@@ -357,14 +409,12 @@ public class AOKeyStoreManager {
 		    		// asi que reintentamos una vez mas
 		    		try {
 			    		p11Provider = (Provider)sunPKCS11Contructor.newInstance(
-		    				new ByteArrayInputStream(
-	    						KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName).getBytes()
-		    				)
+		    				new ByteArrayInputStream(config)
 			    		);
 		    		}
 		    		catch(final Throwable ex) {
 			    		throw new AOException(
-		    				"Error instanciando el proveedor SunPKCS11 para la la biblioteca " + p11lib + ": " + e
+		    				"Error instanciando el proveedor SunPKCS11 para la la biblioteca " + p11lib, ex
 			    		);	
 		    		}
 		    	}
@@ -373,12 +423,14 @@ public class AOKeyStoreManager {
 		    	}
 		    	catch(final Throwable e) {
 		    		throw new AOException(
-		    				"Error instalando el proveedor SunPKCS11 para la la biblioteca " + p11lib + ": " + e
+	    				"Error instalando el proveedor SunPKCS11 para la la biblioteca " + p11lib, e
 		    		);
 		    	}
 		    }
 		    else {
-		    	Logger.getLogger("es.gob.afirma").info("El proveedor PKCS#11 solicitado ya estaba instanciado, se reutilizara esa instancia: " + p11Provider.getName());
+		    	Logger.getLogger("es.gob.afirma").info(
+	    			"El proveedor PKCS#11 solicitado ya estaba instanciado, se reutilizara esa instancia: " + p11Provider.getName()
+    			);
 		    }
 		    
 			try {
@@ -387,10 +439,9 @@ public class AOKeyStoreManager {
 			catch(final Throwable e) {
 				Security.removeProvider(p11Provider.getName());
 				p11Provider = null;
-				//e.printStackTrace();
 				throw new AOKeyStoreManagerException(
 					"No se ha podido obtener el KeyStore de nombre '" + type.getName() +
-					"' del Provider 'sun.security.pkcs11.SunPKCS11': " + e
+					"' del Provider 'sun.security.pkcs11.SunPKCS11'", e
 				);
 			}
 			
@@ -404,12 +455,11 @@ public class AOKeyStoreManager {
 				throw e;
 			}
 			catch(final Throwable e) {
-				//e.printStackTrace();
 				Security.removeProvider(p11Provider.getName());
 				p11Provider = null;
 				throw new AOKeyStoreManagerException(
 					"No se ha podido inicializar el KeyStore de nombre '" + type.getName() +
-					"' del Provider 'sun.security.pkcs11.SunPKCS11': " + e
+					"' del Provider 'sun.security.pkcs11.SunPKCS11'", e
 				);
 			}
 			ret.add(ks);
@@ -431,27 +481,25 @@ public class AOKeyStoreManager {
 				"No se puede acceder al KeyStore PKCS#11 de NSS si no se especifica el directorio del perfil de " +
 				"usuario y la ubicacion de las bibliotecas"
 			);
-			String mozillaProfileDir = params[0].toString();
-			String NSSLibDir = params[1].toString();
+			final String mozillaProfileDir = params[0].toString();
+			final String NSSLibDir = params[1].toString();
 			
-			Logger.getLogger("es.gob.afirma").info("Se usaran las bibliotecas NSS del siguiente directorio: "+NSSLibDir);
+			//Logger.getLogger("es.gob.afirma").info("Se usaran las bibliotecas NSS del siguiente directorio: "+NSSLibDir);
 			
 			nssProvider = Security.getProvider("SunPKCS11-NSSCrypto-AFirma");
 			
 			if(nssProvider == null) {	
-				KeyStoreUtilities.loadNSSDependencies(NSSLibDir);
+				MozillaKeyStoreUtilities.loadNSSDependencies(NSSLibDir);
 				try {
 //					nssProvider = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(KeyStoreUtilities.createPKCS11NSSConfigFile(mozillaProfileDir, NSSLibDir).getBytes()));
 					Constructor<?> sunPKCS11Constructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class);
 					nssProvider = (Provider)sunPKCS11Constructor.newInstance(
 						new ByteArrayInputStream(
-								KeyStoreUtilities.createPKCS11NSSConfigFile(mozillaProfileDir, NSSLibDir).getBytes())
+							MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(mozillaProfileDir, NSSLibDir).getBytes())
 					);
 				}
-				catch(Throwable e) {
-					e.printStackTrace();
-					//Logger.getLogger("es.gob.afirma").severe("No se ha podido instanciar la clase SunPKCS11, se abortara la operacion: "+e);
-					throw new AOException("No se ha podido instanciar la clase SunPKCS11, se abortara la operacion: " + e);
+				catch(final Throwable e) {
+					throw new AOException("No se ha podido instanciar la clase SunPKCS11, se abortara la operacion", e);
 				}
 				Security.addProvider(nssProvider);
 			}
@@ -459,11 +507,10 @@ public class AOKeyStoreManager {
 			try {
 				ks = KeyStore.getInstance(type.getName(), nssProvider);
 			} 
-			catch(Throwable e) {
-				e.printStackTrace();
+			catch(final Throwable e) {
 				throw new AOKeyStoreManagerException(
 					"No se ha podido obtener el KeyStore de nombre '" + type.getName() +
-					"' del Provider 'sun.security.pkcs11.SunPKCS11': " + e
+					"' del Provider 'sun.security.pkcs11.SunPKCS11'", e
 				);
 			}
 
@@ -473,14 +520,13 @@ public class AOKeyStoreManager {
 					pssCallBack.getPassword()
 				);
 			}
-			catch (AOCancelledOperationException e) {
+			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
-			catch(Throwable e) {
-			    e.printStackTrace();
+			catch(final Throwable e) {
 				throw new AOKeyStoreManagerException(
 					"No se ha podido inicializar el KeyStore de nombre '" + type.getName() +
-					"' del Provider 'sun.security.pkcs11.SunPKCS11': " + e
+					"' del Provider 'sun.security.pkcs11.SunPKCS11'", e
 				);
 			}
 			ret.add(ks);
@@ -493,37 +539,36 @@ public class AOKeyStoreManager {
 			try {
 				Security.insertProviderAt((Provider)Class.forName("com.apple.crypto.provider.Apple").newInstance(), 0);
 			} 
-			catch(Throwable e) {
-				e.printStackTrace();
-				throw new AOException("No se ha podido instanciar el proveedor 'com.apple.crypto.provider.Apple': " + e);
+			catch(final Throwable e) {
+				throw new AOException(
+					"No se ha podido instanciar el proveedor 'com.apple.crypto.provider.Apple'", e
+				);
 			}
 
 			// Inicializamos
 			try {
 				ks = KeyStore.getInstance(type.getName());
 			}
-			catch(Throwable e) {
-				e.printStackTrace();
+			catch(final Throwable e) {
 				throw new AOKeyStoreManagerException(
-						"No se ha podido obtener el KeyStore de nombre '" + type.getName() +
-						"' del Provider 'com.apple.crypto.provider.Apple': " + e
+					"No se ha podido obtener el KeyStore de nombre '" + type.getName() +
+					"' del Provider 'com.apple.crypto.provider.Apple'", e
 				);
 			}
 
 			try {
 				ks.load(
-						store,
-						pssCallBack.getPassword()
+					store,
+					pssCallBack.getPassword()
 				);
 			}
-			catch (AOCancelledOperationException e) {
+			catch (final AOCancelledOperationException e) {
 				throw e;
 			}
-			catch(Throwable e) {
-				e.printStackTrace();
+			catch(final Throwable e) {
 				throw new AOKeyStoreManagerException(
-						"No se ha podido inicializar el KeyStore de nombre '" + type.getName() +
-						"' del Provider 'com.apple.crypto.provider.Apple': " + e
+					"No se ha podido inicializar el KeyStore de nombre '" + type.getName() +
+					"' del Provider 'com.apple.crypto.provider.Apple'", e
 				);
 			}
 			ret.add(ks);
@@ -541,20 +586,58 @@ public class AOKeyStoreManager {
 	 * @throws AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice
 	 * @throws AOCertificateKeyException Cuando ocurren errores obteniendo la clave privada del certificado
 	 */
-	public KeyStore.PrivateKeyEntry getKeyEntry(String alias, PasswordCallback pssCallback) throws AOCancelledOperationException, AOCertificateKeyException {
+	public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, 
+			                                    PasswordCallback pssCallback) throws AOCancelledOperationException, 
+			                                                                         AOCertificateKeyException {
+		
+		if (pssCallback == null) pssCallback = new NullPasswordCallback();
+		
 		if (ks == null) throw new NullPointerException("Se han pedido claves a un almacen no inicializado");
 		
-		KeyStore.PrivateKeyEntry keyEntry;
-		try {
-			keyEntry = (KeyStore.PrivateKeyEntry)ks.getEntry(
+		final KeyStore.PrivateKeyEntry keyEntry;
+		
+		// El llavero de Mac OS X no responde al getKeyEntry(), solo al getKey(), pero
+		// obligartoriamente hay que proporcionarle una cadena de texto no vacia y no nula
+		// como contrasena. Esta cadena puede contener cualquier texto, no se comprueba.
+		// Esta cadena de texto debe contener unicamente caracteres ASCII. 
+		if ("KeychainStore".equals(ks.getType())) {
+			try {
+				Logger.getLogger("es.gob.afirma").info(
+					"Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"
+				);
+				Certificate[] certChain = ks.getCertificateChain(alias);
+				if (certChain == null) {
+					Logger.getLogger("es.gob.afirma").warning(
+						"El certificado " + alias + " no tiene su cadena completa de confianza " +
+						"instalada en el Llavero de Mac OS X, se insertara solo este certificado"
+					);
+					certChain = new Certificate[] { ks.getCertificate(alias) };
+				}
+				
+				keyEntry = new KeyStore.PrivateKeyEntry(
+					(PrivateKey)ks.getKey(alias, "dummy".toCharArray()), 
+					certChain
+				);
+			}
+			catch(final Throwable e) {
+				throw new AOCertificateKeyException(
+					"Error intentando obtener la clave privada en Mac OS X", e
+				);
+			}
+		}
+		else {
+			try {
+				keyEntry = (KeyStore.PrivateKeyEntry)ks.getEntry(
 					alias,
 					new KeyStore.PasswordProtection(pssCallback.getPassword())
-			);
-		} catch (AOCancelledOperationException e) {
-			throw e;
-		} 
-		catch(Throwable e) {
-			throw new AOCertificateKeyException("Error intentando obtener la clave privada: "+ e);
+				);
+			} 
+			catch (final AOCancelledOperationException e) {
+				throw e;
+			} 
+			catch(final Throwable e) {
+				throw new AOCertificateKeyException("Error intentando obtener la clave privada", e);
+			}
 		}
 		
 		return keyEntry;
@@ -565,16 +648,84 @@ public class AOKeyStoreManager {
 	 * @param privateKeyEntry Clave privada del certificado
 	 * @return Certificado cuya clave privada es la indicada
 	 */
-	public X509Certificate getCertificate(KeyStore.PrivateKeyEntry privateKeyEntry) {
-		return (X509Certificate)privateKeyEntry.getCertificate();
+	public X509Certificate getCertificate(final KeyStore.PrivateKeyEntry privateKeyEntry) {
+		final Certificate cert = privateKeyEntry.getCertificate();
+		if (cert instanceof X509Certificate) return (X509Certificate) cert;
+		Logger.getLogger("es.gob.afirma").severe(
+			"El certificado solicitado no era de tipo X509Certificate, se devolvera null"
+		);
+		return null;
 	}
 	
 	/**
 	 * Obtiene un certificado del keystore activo a partir de su alias.
 	 * @param alias Alias del certificado.
-	 * @return Certificado.
+	 * @return El certificado o {@code null} si no se pudo recuperar. 
 	 */
-	public Certificate getCertificate(String alias) {
+	public X509Certificate getCertificate(final String alias) {
+		if (alias == null) {
+			Logger.getLogger("es.gob.afirma").warning(
+				"El alias del certificado es nulo, se devolvera null"
+			);
+			return null;
+		}
+			
+		if (this.ks == null) {
+			Logger.getLogger("es.gob.afirma").warning(
+				"No se ha podido recuperar el certificado con alias '" + alias + "' porque el KeyStore no estaba inicializado, se devolvera null"
+			);
+			return null;
+		}
+
+		Certificate cert = null;
+		try {
+			cert = ks.getCertificate(alias);
+		}
+		catch(final Throwable e) {
+			Logger.getLogger("es.gob.afirma").warning(
+				"No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null: " + e
+			);
+			return null;
+		}
+		if (cert == null) {
+			Logger.getLogger("es.gob.afirma").warning(
+				"No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null"
+			);
+			return null;
+		}
+		if (cert instanceof X509Certificate) return (X509Certificate) cert;
+		
+		Logger.getLogger("es.gob.afirma").warning(
+			"El certificado con alias '" + alias + "' no es de tipo X509Certificate, se devolvera null"
+		);
+		return null;
+
+	}
+	
+	/**
+	 * Obtiene la cadena de certificaci&oacute;n correspondiente a una clave privada.
+	 * @param privateKeyEntry Clave privada del certificado
+	 * @return Certificados de la cadena de certificaci&oacute;n.
+	 */
+	public X509Certificate[] getCertificateChain(final KeyStore.PrivateKeyEntry privateKeyEntry) {
+    	final Certificate[] certs = privateKeyEntry.getCertificateChain();
+    	if (certs != null && (certs instanceof X509Certificate[])) return (X509Certificate[]) certs;
+   		final Certificate cert = privateKeyEntry.getCertificate();
+   		if (cert instanceof X509Certificate) return new X509Certificate[] { (X509Certificate) cert };
+   		Logger.getLogger("es.gob.afirma").severe(
+			"No se ha podido obtener la cadena de certificados, se devolvera una cadena vacia"
+		);
+   		return new X509Certificate[0];
+	}
+	
+	/**
+	 * Obtiene la cadena de certificaci&oacute;n de un certificado del keystore activo a
+	 * partir de su alias.
+	 * @param alias Alias del certificado.
+	 * @return Certificados de la cadena de certificaci&oacute;n o {@code null} si no se
+	 * pudo recuperar.
+	 */
+	public X509Certificate[] getCertificateChain(final String alias) {
 	    if (ks == null) {
            Logger.getLogger("es.gob.afirma").warning(
                "El KeyStore actual no esta inicializado, por lo que no se pudo recuperar el certificado para el alias '" + alias + "'"
@@ -582,14 +733,21 @@ public class AOKeyStoreManager {
 	        return null;
 	    }
 	    try {
-	        return ks.getCertificate(alias);
+	    	final Certificate[] certs = ks.getCertificateChain(alias);
+	    	if (certs != null && (certs instanceof X509Certificate[])) return (X509Certificate[]) certs;
+	   		final Certificate cert = ks.getCertificate(alias);
+	   		if (cert instanceof X509Certificate) return new X509Certificate[] { (X509Certificate) cert };
 	    }
-	    catch(Throwable e) {
-	        Logger.getLogger("es.gob.afirma").warning(
-	            "El KeyStore actual no contenia o no pudo recuperar el certificado para el alias '" + alias + "': " + e
-	        );
-	        return null;
+	    catch(final Throwable e) {
+	        Logger.getLogger("es.gob.afirma").severe(
+                "Error al obtener la cadena de certificados para el alias '" + alias + "', se devolvera una cadena vacia: " + e
+            );
+    	    return new X509Certificate[0];
 	    }
+        Logger.getLogger("es.gob.afirma").severe(
+            "No se ha podido obtener la cadena de certificados para el alias '" + alias + "', se devolvera una cadena vacia"
+        );
+	    return new X509Certificate[0];
 	}
 	
 	/**
@@ -598,24 +756,24 @@ public class AOKeyStoreManager {
 	 */
 	public String[] getAliases() {
 		
-		Enumeration<String> aliases;
 		if (ks == null) throw new NullPointerException("Se han pedido los alias de un almacen no inicializado");
 		
 		Logger.getLogger("es.gob.afirma").info("Solicitando los alias al KeyStore (" + ks.getProvider() + ")");
-		
+
+		final Enumeration<String> aliases;
 		try {
 			aliases = ks.aliases();
 		} 
-		catch(Throwable e) {
+		catch(final Throwable e) {
 			Logger.getLogger("es.gob.afirma").severe(
-					"Ocurrio un error intentando obtener los alias del almacen de claves, se devolvera " +
+					"Error intentando obtener los alias del almacen de claves, se devolvera " +
 					"una enumeracion vacia: " + e
 			);
 			return new String[0];
 		}
 		
 		String currAlias;
-		Vector<String> v = new Vector<String>();
+		final Vector<String> v = new Vector<String>();
 		
 		Logger.getLogger("es.gob.afirma").info("Componiendo el vector de alias");
 		
@@ -630,11 +788,11 @@ public class AOKeyStoreManager {
 
 	
 	/**
-	 * Devualve el <code>keyStore</code> en uso.
+	 * Devuelve el <code>keyStore</code> en uso.
 	 * @return Almac&eacute;n de claves (<code>KeyStore</code>) actual
 	 */
 	public Vector<KeyStore> getKeyStores() {
-	    Vector<KeyStore> ret = new Vector<KeyStore>(1);
+	    final Vector<KeyStore> ret = new Vector<KeyStore>(1);
 	    ret.add(ks);
 		return ret;
 	}
@@ -645,7 +803,7 @@ public class AOKeyStoreManager {
 	 * @param description Descripci&oacute;n del repositorio que se desea recuperar.  
 	 * @return KeyStore Repositorio de certificados.
 	 */
-	public static AOKeyStore getKeyStore(String description) {
+	public static AOKeyStore getKeyStore(final String description) {
 	    AOKeyStore keystore = null;
 	    for(AOKeyStore tempKs : AOKeyStore.values()) {
 	        if(tempKs.getDescription().equals(description)) {
@@ -657,7 +815,7 @@ public class AOKeyStoreManager {
 	
 	@Override
 	public String toString() {
-		StringBuilder ret = new StringBuilder("Gestor de almacenes de claves");
+		final StringBuilder ret = new StringBuilder("Gestor de almacenes de claves");
 		if (ksType !=null) {
 			String tmpStr = ksType.getDescription();
 			if (tmpStr != null) {

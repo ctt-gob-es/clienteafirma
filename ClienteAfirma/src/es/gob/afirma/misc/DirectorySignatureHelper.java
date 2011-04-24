@@ -2,16 +2,14 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.misc;
 
-import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
@@ -28,12 +26,17 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import sun.misc.BASE64Decoder;
+import javax.activation.MimeType;
+
+import org.ietf.jgss.Oid;
 
 import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.misc.AOCryptoUtil.RawBASE64Encoder;
+import es.gob.afirma.exceptions.AOUnsupportedSignFormatException;
 import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.signers.AOSigner;
+import es.gob.afirma.signers.AOSignerFactory;
+import es.gob.afirma.signers.AOXAdESSigner;
+import es.gob.afirma.signers.AOXMLDSigSigner;
 
 /**
  * M&oacute;dulo para la ejecuci&oacute;n de multifirmas masivas. La firma masiva puede
@@ -42,6 +45,9 @@ import es.gob.afirma.signers.AOSigner;
  * el resultado de forma acorde con el objetivo establecido.
  */
 public class DirectorySignatureHelper {
+	
+	/** Fichero de log por defecto. */
+	private final static String DEFAULT_LOG_FILE = "result.log";
 	
 	/**
 	 * Tipo de firma masiva. Declara los tipos de firma masiva que existen:
@@ -101,6 +107,9 @@ public class DirectorySignatureHelper {
 	
 	/** Indica si se debe generar un fichero de log con los resultados de las operaciones. */
 	private boolean activeLog = true;
+	
+	/** Ruta del fichero de log. */
+	private String logPath = null;
 		
 	/**
 	 * Contruye un objeto para la firma masiva. Este objeto se configurar&aacute; con un tipo de
@@ -111,14 +120,18 @@ public class DirectorySignatureHelper {
 	 * @param algorithm Algoritmo de firma.
 	 * @param format Formato de firma.
 	 * @param mode Modo de firma.
+	 * @throws AOUnsupportedSignFormatException Cuando se indica un formato no soportado.
 	 */
-	public DirectorySignatureHelper(String algorithm, String format, String mode) {
+	public DirectorySignatureHelper(String algorithm, String format, String mode) throws AOUnsupportedSignFormatException {
 		if(algorithm == null || format == null || mode == null)
 			throw new NullPointerException("No se ha indicado una configuracion de algoritmo de firma valida");
 		this.algorithm = algorithm;
 		this.format = format;
 		this.mode = mode;
 		this.defaultSigner = AOCryptoUtil.getSigner(this.format);
+		if (this.defaultSigner == null) {
+			throw new AOUnsupportedSignFormatException("El formato de firma '" + format + "' seleccionado para la firma masiva no esta soportado");
+		}
 	}
 	
 	/**
@@ -187,7 +200,7 @@ public class DirectorySignatureHelper {
 	 * @param config Configuraci&oacute;n de firma.
 	 * @return Devuelve <code>true</code> si todas las firmas se realizaron correctamente, 
 	 * <code>false</code> en caso contrario.
-	 * @throws AOException Ocurrio un error grave durante el proceso de firma masiva.
+	 * @throws AOException Error grave durante el proceso de firma masiva.
 	 */
 	public boolean massiveSign(
 			MassiveType type, 
@@ -302,7 +315,7 @@ public class DirectorySignatureHelper {
 	 * @param config Configuraci&oacute;n de firma.
 	 * @return Devuelve <code>true</code> si todas las firmas se realizaron correctamente, 
 	 * <code>false</code> en caso contrario.
-	 * @throws AOException Ocurrio un error grave durante el proceso de firma masiva.
+	 * @throws AOException Error grave durante el proceso de firma masiva.
 	 */
 	public boolean massiveSign(
 			MassiveType type,
@@ -317,7 +330,8 @@ public class DirectorySignatureHelper {
 		if(config == null || !config.containsKey("format") || !config.containsKey("mode"))
 			throw new NullPointerException("No se ha establecido el formato y modo de firma");
 		
-		Properties signConfig = (Properties)config.clone();
+		Properties signConfig = (Properties) config.clone();
+		signConfig.setProperty("headLess", "true");
 		
 		// Establecemos la configuracion de firma por defecto si no se indica
 		if(!signConfig.containsKey("mode")) signConfig.setProperty("mode", this.mode);
@@ -358,8 +372,11 @@ public class DirectorySignatureHelper {
 		);
 
 		// Inicializamos el log de operacion
-		if(this.activeLog)
-			this.logHandler = this.initLogRegistry(outDir);
+		if (this.activeLog) {
+			this.logHandler =
+				this.initLogRegistry(
+						(this.logPath != null) ? this.logPath : (outDir + File.separator + DEFAULT_LOG_FILE)); 
+		}
 
 		// Realizamos la operacion masiva correspondiente
 		File[] files = this.getFiles(filenames);
@@ -393,7 +410,7 @@ public class DirectorySignatureHelper {
 	 * @param showHashes Indica si se debe mostrar un di&acute;logo al usuario para idenfificar cada hash que se vaya a firmar.
 	 * @param config Configuraci&oacute;n preestablecida de firma. 
 	 * @return Firmas generadas.
-	 * @throws AOException Ocurrio un error durante la operacion de firma de hashes.
+	 * @throws AOException Error durante la operacion de firma de hashes.
 	 */
 	public String[] hashesMassiveSign(
 			final String[] hashes,
@@ -401,11 +418,12 @@ public class DirectorySignatureHelper {
 			final X509Certificate cert,
 			final AOSigner configuredSigner,
 			final boolean showHashes,
-			Properties config
-			) throws AOException {
+			Properties config) throws AOException {
 
 		if(hashes == null || keyEntry == null || cert == null) {
-			throw new NullPointerException("Los hashes a firmar y la clave y el certificado de firma no pueden ser nulos");
+			throw new NullPointerException(
+				"Los hashes a firmar y la clave y el certificado de firma no pueden ser nulos"
+			);
 		}
 
 		if(config == null || !config.containsKey("format") || !config.containsKey("mode"))
@@ -413,12 +431,15 @@ public class DirectorySignatureHelper {
 		
 		// Comprobamos que no se nos haya introducido un signer de distinto tipo
 		if(configuredSigner != null && !configuredSigner.getClass().equals(this.defaultSigner.getClass())) {
-			throw new ClassCastException("El signer configurado para la multifirma debe ser compatible con el signer del formato indicado en el constructor");
+			throw new ClassCastException(
+				"El signer configurado para la multifirma debe ser compatible con el signer del formato indicado en el constructor"
+			);
 		}
 
-		Properties signConfig = (Properties)config.clone();
+		final Properties signConfig = (Properties)config.clone();
+		signConfig.setProperty("headLess", "true");
 		
-		AOSigner signer = (configuredSigner != null ? configuredSigner : this.defaultSigner);
+		final AOSigner signer = (configuredSigner != null ? configuredSigner : this.defaultSigner);
 		
 		// Establecemos el algoritmo de Hash 
 		int pos = this.algorithm.indexOf("with");
@@ -430,27 +451,37 @@ public class DirectorySignatureHelper {
 		if(!signConfig.containsKey("format")) signConfig.setProperty("format", this.format);
 		signConfig.setProperty("precalculatedHashAlgorithm", this.algorithm.substring(0, pos));
 		
-		byte[][] signs = new byte[hashes.length][];
+		// Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
+		if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+			final String mimeType = "hash/" + this.algorithm.substring(0, pos).toLowerCase();
+			try {
+				signer.setDataObjectFormat(
+					"Huella digital precalculada", 
+					new Oid(MimeHelper.transformMimeTypeToOid(mimeType)),
+					new MimeType(mimeType),
+					null
+				);
+			}
+			catch(final Throwable e) {
+				Logger.getLogger("es.gob.afirma").warning(
+					"Error al indicar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e
+				);
+			}
+		}
+		
+		final byte[][] signs = new byte[hashes.length][];
 		for(int i=0; i<hashes.length; i++) {
-			InputStream hashIS;
-            try {
-                hashIS = new ByteArrayInputStream(new BASE64Decoder().decodeBuffer(hashes[i]));
-            } catch (Throwable e) {
-                throw new AOException("Se ha introducido una cadena Base64 no v\u00E1lida", e);
-            }
-            
 			signs[i] = signer.sign(
-					hashIS,
-					this.algorithm,
-					keyEntry,
-					cert,
-					signConfig);
-			this.closeStream(hashIS);
+				AOCryptoUtil.decodeBase64(hashes[i]),
+				this.algorithm,
+				keyEntry,
+				signConfig
+			);
 		}
 
-		String[] signsB64 = new String[signs.length];
+		final String[] signsB64 = new String[signs.length];
 		for(int i=0; i<signs.length; i++) {
-			signsB64[i] = new RawBASE64Encoder().encode(signs[i]);
+			signsB64[i] = AOCryptoUtil.encodeBase64(signs[i], false);
 		}
 		return signsB64;
 	}
@@ -461,9 +492,9 @@ public class DirectorySignatureHelper {
 	 * @param filenames Nombres de los ficheros.
 	 * @return Listado de ficheros v&aacute;lidos.
 	 */
-	private File[] getFiles(String[] filenames) {
+	private File[] getFiles(final String[] filenames) {
 		File tempFile = null;
-		Vector<File> vFiles = new Vector<File>(filenames.length);
+		final Vector<File> vFiles = new Vector<File>(filenames.length);
 		for(String filename : filenames) {
 			tempFile = new File(filename);
 			if (!tempFile.exists()) {
@@ -496,33 +527,38 @@ public class DirectorySignatureHelper {
 	 * <code>false</code> en caso contrario.
 	 */
 	private boolean massiveSignOperation(
-			File[] files, 
-			File outDir,
-			PrivateKeyEntry keyEntry, 
-			X509Certificate cert,
-			Properties signConfig) {
+			final File[] files, 
+			final File outDir,
+			final PrivateKeyEntry keyEntry, 
+			final X509Certificate cert,
+			final Properties signConfig) {
 		
 		boolean allOK = true;
-		FileInputStream fis = null;
-		AOSigner signer = this.defaultSigner;
+		InputStream fis = null;
+		byte[] dataToSign = null;
+		final AOSigner signer = this.defaultSigner;
 		for(File file : files) {
 			
 			try {
 				this.preProcessFile(new File(file.getAbsolutePath()));
-			} catch (Throwable e) {
-				Logger.getLogger("Ocurrio un error en el preproceso del fichero '"+file.getPath()+"': "+e);
-			}
+			} 
+			catch (final Throwable e) {
+				Logger.getLogger("Error en el preproceso del fichero '" + file.getPath() + "': " + e);
+			} 
 			
 			// Comprobamos que el fichero actual se pueda firmar con la configuracion de firma actual
 			try {
 				if(!this.isValidDataFile(signer, file)) {
-					Logger.getLogger("es.gob.afirma").warning("El fichero '"+file.getPath()+"' no puede ser firmado con la configuracion de firma actual");
+					Logger.getLogger("es.gob.afirma").warning(
+						"El fichero '"+file.getPath()+"' no puede ser firmado con la configuracion de firma actual"
+					);
 					this.addLogRegistry(Level.WARNING, "El fichero '"+file.getPath()+"' no puede ser firmado con la configuracion de firma actual");
 					this.closeStream(fis);
 					allOK = false;
 					continue;
 				}
-			} catch (Exception e) {
+			} 
+			catch (final Throwable e) {
 				Logger.getLogger("es.gob.afirma").warning("No se pudo leer fichero '"+file.getPath()+"': "+e);
 				this.addLogRegistry(Level.SEVERE, "No se pudo leer fichero '"+file.getPath()+"'");
 				allOK = false; continue;
@@ -531,20 +567,56 @@ public class DirectorySignatureHelper {
 			// Configuramos y ejecutamos la operacion
 			signConfig.setProperty("uri", file.toURI().toASCIIString());
 			
-			try { fis = getFileInputStream(file); } catch (Exception e) { allOK = false; continue;}
-			byte[] signData;
+			try { 
+				fis = getFileInputStream(file);
+				dataToSign = AOUtil.getDataFromInputStream(fis);
+			} 
+			catch (final Throwable e) { 
+				Logger.getLogger("es.gob.afirma").warning("No se pudo leer fichero '" + file.getPath() + "': " + e);
+				this.addLogRegistry(Level.SEVERE, "No se pudo leer fichero '" + file.getPath() + "'");
+				dataToSign = null;
+				allOK = false; continue;
+			}
+			finally {
+				this.closeStream(fis);
+			}
+			
+			// Deteccion del MIMEType, solo para XAdES y XMLDSig
+			if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+				final MimeHelper mimeHelper = new MimeHelper(dataToSign);
+				final String mimeType = mimeHelper.getMimeType();
+				if (mimeType != null) {
+					try {
+						signer.setDataObjectFormat(
+							mimeHelper.getDescription(), 
+							new Oid(MimeHelper.transformMimeTypeToOid(mimeType)),
+							new MimeType(mimeType),
+							null
+						);
+					}
+					catch(final Throwable e) {
+						Logger.getLogger("es.gob.afirma").warning(
+							"No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e
+						);
+					}
+				}
+			}
+			
+			byte[] signData = null;
 			try {
 				signData = signer.sign(
-						fis,
-						this.algorithm,
-						keyEntry,
-						cert,
-						signConfig);
-			} catch (Exception e) {
+					dataToSign,
+					this.algorithm,
+					keyEntry,
+					signConfig
+				);
+			} 
+			catch (final Throwable e) {
 				if(e instanceof UnsupportedOperationException) {
 					Logger.getLogger("es.gob.afirma").severe("No ha sido posible firmar el fichero '" + file + "': "+e.getMessage());
 					this.addLogRegistry(Level.SEVERE, "No ha sido posible firmar el fichero '" + file + "': "+e.getMessage());	
-				} else {
+				} 
+				else {
 					Logger.getLogger("es.gob.afirma").severe("No ha sido posible firmar el fichero '" + file + "': "+e);
 					this.addLogRegistry(Level.SEVERE, "No ha sido posible firmar el fichero '" + file + "'");
 				}
@@ -552,7 +624,6 @@ public class DirectorySignatureHelper {
 				allOK = false;
 				continue;
 			}
-			this.closeStream(fis);
 			
 			// Guardamos la firma en disco
 			if(!this.saveSignToDirectory(file.getPath(), signData, outDir, signer, ".signed")) { allOK = false; continue;}
@@ -575,12 +646,12 @@ public class DirectorySignatureHelper {
      * <code>false</code> en caso contrario.
      */
 	private boolean massiveCosignOperation(
-	        File[] files,
-	        File outDir,
-	        boolean originalFormat,
-	        PrivateKeyEntry keyEntry, 
-	        X509Certificate cert,
-	        Properties signConfig) {
+	        final File[] files,
+	        final File outDir,
+	        final boolean originalFormat,
+	        final PrivateKeyEntry keyEntry, 
+	        final X509Certificate cert,
+	        final Properties signConfig) {
 
 	    boolean allOK = true;
 
@@ -598,7 +669,7 @@ public class DirectorySignatureHelper {
 	    AOSigner signer;
 	    for(File file : files) {
 	        try { originalData = AOUtil.getDataFromInputStream(getFileInputStream(file)); } catch (Exception e) { allOK = false; continue;}
-	        if(this.defaultSigner.isSign(new ByteArrayInputStream(originalData))) {
+	        if(this.defaultSigner.isSign(originalData)) {
 	            textAux = "cofirmado";
 	            signer = this.defaultSigner;
 	            signConfig.setProperty("uri", file.toURI().toASCIIString());
@@ -608,21 +679,46 @@ public class DirectorySignatureHelper {
 	            		algorithm,
 	            		keyEntry,
 	            		cert,
-	            		signConfig);
-	        } else if(originalFormat) {
-	            signer = AOCryptoUtil.getSigner(originalData);
+	            		signConfig
+        		);
+	        } 
+	        else if(originalFormat) {
+	            signer = AOSignerFactory.getSigner(originalData);
 	            if(signer != null) {
 	                textAux = "cofirmado";
-	                signedData = this.cosign(signer, originalData, algorithm, keyEntry, cert, signConfig);
-	            } else {
+	                signedData = this.cosign(
+                		signer, 
+                		originalData, 
+                		algorithm, 
+                		keyEntry, 
+                		cert, 
+                		signConfig
+            		);
+	            } 
+	            else {
 	                textAux = "firmado";
 	                signer = this.defaultSigner;
-	                signedData = this.sign(signer, originalData, algorithm, keyEntry, cert, signConfig);
+	                signedData = this.sign(
+                		signer, 
+                		originalData, 
+                		algorithm, 
+                		keyEntry, 
+                		cert, 
+                		signConfig
+            		);
 	            }
-	        } else {
+	        } 
+	        else {
 	            textAux = "firmado";
 	            signer = this.defaultSigner;
-	            signedData = this.sign(signer, originalData, algorithm, keyEntry, cert, signConfig);
+	            signedData = this.sign(
+            		signer, 
+            		originalData, 
+            		algorithm, 
+            		keyEntry, 
+            		cert, 
+            		signConfig
+        		);
 	        }
 
 	        // Comprobamos si la operacion ha finalizado correctamente
@@ -649,24 +745,28 @@ public class DirectorySignatureHelper {
      * @param signConfig Configurac&oacute;n de firma.
      * @return Cofirma.
      */
-    private byte[] cosign(AOSigner signer, byte[] signData, String algo, PrivateKeyEntry keyEntry, X509Certificate cert, Properties signConfig) {
+    private byte[] cosign(final AOSigner signer, 
+    		              final byte[] signData, 
+    		              final String algo, 
+    		              final PrivateKeyEntry keyEntry, 
+    		              final X509Certificate cert, 
+    		              final Properties signConfig) {
         
 		// Configuramos y ejecutamos la operacion
 		byte[] signedData;
-        ByteArrayInputStream bais = new ByteArrayInputStream(signData);
         try {
             signedData = signer.cosign(
-            		bais,
-            		algo,
-            		keyEntry,
-            		cert,
-            		signConfig);
-        } catch (Exception e) {
+        		signData,
+        		algo,
+        		keyEntry,
+        		signConfig
+    		);
+        } 
+        catch (final Throwable e) {
             Logger.getLogger("es.gob.afirma").severe("No ha sido posible cofirmar el fichero '" + signConfig.getProperty("uri") + "': "+e);
             this.addLogRegistry(Level.SEVERE, "No ha sido posible cofirmar el fichero '" + signConfig.getProperty("uri") + "'");
             signedData = null;
         }
-        this.closeStream(bais);
         return signedData;
     }
     
@@ -680,24 +780,49 @@ public class DirectorySignatureHelper {
      * @param signConfig Configurac&oacute;n de firma.
      * @return Firma electr&oacute;nica.
      */
-    private byte[] sign(AOSigner signer, byte[] data, String algo, PrivateKeyEntry keyEntry, X509Certificate cert, Properties signConfig) {
+    private byte[] sign(final AOSigner signer, 
+    		            final byte[] data, 
+    		            final String algo, 
+    		            final PrivateKeyEntry keyEntry, 
+    		            final X509Certificate cert, 
+    		            final Properties signConfig) {
         
+		// Deteccion del MIMEType, solo para XAdES y XMLDSig
+		if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+			final MimeHelper mimeHelper = new MimeHelper(data);
+			final String mimeType = mimeHelper.getMimeType();
+			if (mimeType != null) {
+				try {
+					signer.setDataObjectFormat(
+						mimeHelper.getDescription(), 
+						new Oid(MimeHelper.transformMimeTypeToOid(mimeType)),
+						new MimeType(mimeType),
+						null
+					);
+				}
+				catch(final Throwable e) {
+					Logger.getLogger("es.gob.afirma").warning(
+						"No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e
+					);
+				}
+			}
+		}
+    	
 		// Configuramos y ejecutamos la operacion
         byte[] signedData;
-        ByteArrayInputStream bais = new ByteArrayInputStream(data);
         try {
             signedData = signer.sign(
-            		bais,
-            		algo,
-            		keyEntry,
-            		cert,
-            		signConfig);
-        } catch (Exception e) {
+        		data,
+        		algo,
+        		keyEntry,
+        		signConfig
+    		);
+        } 
+        catch (final Throwable e) {
             Logger.getLogger("es.gob.afirma").severe("No ha sido posible firmar el fichero de datos'" + signConfig.getProperty("uri") + "': "+e);
             this.addLogRegistry(Level.SEVERE, "No ha sido posible firmar el fichero de datos '" + signConfig.getProperty("uri") + "'");
             signedData = null;
         }
-        this.closeStream(bais);
         return signedData;
     }
     
@@ -712,29 +837,24 @@ public class DirectorySignatureHelper {
 	 * @param signConfig Configuraci&oacute;n de firma.
 	 * @return Indica si la operaci&oacute;n finaliz&oacute; correctamente.
 	 */
-	private boolean massiveCounterSignOperation(
-			MassiveType type, 
-			File[] files, 
-			File outDir,
-			boolean originalFormat,
-			PrivateKeyEntry keyEntry, 
-			X509Certificate cert,
-			Properties signConfig) {
-		
+	private boolean massiveCounterSignOperation(final MassiveType type, 
+												final File[] files, 
+												final File outDir,
+												final boolean originalFormat,
+												final PrivateKeyEntry keyEntry, 
+												final X509Certificate cert,
+												final Properties signConfig) {
 		boolean allOK = true;
-		FileInputStream fis = null;
-		CounterSignTarget target = (type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.Tree : CounterSignTarget.Leafs);
+		InputStream fis = null;
+		final CounterSignTarget target = (type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.Tree : CounterSignTarget.Leafs);
 		AOSigner signer = this.defaultSigner;
 		for(File file : files) {
 			if(originalFormat) {
 				try {
-				    if ((signer = this.getAppropiatedSigner(file)) == null) {
-				        this.addLogRegistry(Level.SEVERE, "El fichero '" + file + "' no es un fichero de firma soportada");
-				        allOK = false;
-				        continue;
-				    }
-				} catch (Exception e) {
-				    this.addLogRegistry(Level.SEVERE, "No ha sido posible contrafirmar el fichero '" + file + "': "+e.getMessage());
+				    signer = this.getAppropiatedSigner(file);
+				} 
+				catch (final Exception e) {
+				    this.addLogRegistry(Level.SEVERE, "No ha sido posible contrafirmar el fichero '" + file + "': " + e.getMessage());
 					allOK = false;
 					continue;
 				}
@@ -745,7 +865,8 @@ public class DirectorySignatureHelper {
 			boolean isSignFile = false;
 			try {
 			    isSignFile = this.isSign(signer, file);
-			} catch (Exception e) {
+			} 
+			catch (final Throwable e) {
 			    this.addLogRegistry(Level.SEVERE, "El fichero '" + file + "' no es un fichero de firma en formato '"+signConfig.getProperty("format")+"'");
 			    allOK = false;
 			    continue;
@@ -757,14 +878,15 @@ public class DirectorySignatureHelper {
 					// a otra. Si no es necesario respetar el formato, el signer siempre sera el por defecto establecido.
 					if((fis = this.getFileInputStream(file)) == null) { allOK = false; continue; }
 					signData = signer.countersign(
-							fis,
-							this.algorithm,
-							target,
-							null,
-							keyEntry,
-							cert,
-							signConfig);
-				} catch (Exception e) {
+						AOUtil.getDataFromInputStream(fis),
+						this.algorithm,
+						target,
+						null,
+						keyEntry,
+						signConfig
+					);
+				} 
+				catch (final Throwable e) {
 					Logger.getLogger("es.gob.afirma").severe("No ha sido posible contrafirmar el fichero '" + file.getPath() + "': "+e);
 					this.addLogRegistry(Level.SEVERE, "No ha sido posible contrafirmar el fichero '" + file.getPath() + "'");
 					allOK = false;
@@ -810,11 +932,15 @@ public class DirectorySignatureHelper {
 	 * @return Devuelve <code>true</code> si la operaci&oacute;n finaliz&oacute; correctamente,
 	 * <code>false</code> en caso contrario.
 	 */
-	private boolean saveSignToDirectory(String filename, byte[] signData, File outDirectory, AOSigner signer, String inText) {
+	private boolean saveSignToDirectory(final String filename, 
+			                            final byte[] signData, 
+			                            final File outDirectory, 
+			                            final AOSigner signer, 
+			                            String inText) {
 		
-		String relativePath = this.getRelativePath(filename);
-		String signFilename = new File(outDirectory, relativePath).getName();
-		File parentFile = new File(outDirectory, relativePath).getParentFile();
+		final String relativePath = this.getRelativePath(filename);
+		final String signFilename = new File(outDirectory, relativePath).getName();
+		final File parentFile = new File(outDirectory, relativePath).getParentFile();
 		
 		// Nos aseguramos de que exista la estructura de directorios apropiada
 		if(!parentFile.exists()) {
@@ -822,8 +948,8 @@ public class DirectorySignatureHelper {
 			try {
 				createdParent = parentFile.mkdirs();
 			} catch (Exception e) {
-				Logger.getLogger("es.gob.afirma").severe("Ocurrio un error al crearse la estructura de directorios del fichero '" + filename + "': "+e);
-				this.addLogRegistry(Level.SEVERE, "Ocurrio un error al crearse la estructura de directorios del fichero '" + filename + "'");
+				Logger.getLogger("es.gob.afirma").severe("Error al crearse la estructura de directorios del fichero '" + filename + "': "+e);
+				this.addLogRegistry(Level.SEVERE, "Error al crearse la estructura de directorios del fichero '" + filename + "'");
 				return false;
 			}
 			if(!createdParent) {
@@ -847,10 +973,12 @@ public class DirectorySignatureHelper {
 		try {
 			fos = new FileOutputStream(finalFile);
 			fos.write(signData);
-		} catch (Exception e) {
+		} 
+		catch (final Throwable e) {
 			Logger.getLogger("es.gob.afirma").severe("No se pudo crear la estructura de directorios del fichero '" + filename + "': "+e);
 			this.addLogRegistry(Level.SEVERE, "No se pudo crear la estructura de directorios del fichero '" + finalFile + "'");
-		} finally {
+		} 
+		finally {
 			this.closeStream(fos);
 		}
 		
@@ -862,22 +990,23 @@ public class DirectorySignatureHelper {
 
 	/**
 	 *  Recupera un manejador de firma compatible para el fichero de firma introducido. Si no
-	 *  se encuentra uno, se devuelve <code>null</code>. En caso de no encontrar el fichero, agrega
-	 * una entrada al logger indic&aacute;ndolo y se lanza una excepci&oacute;n.
+	 *  se encuentra uno o no se encuentra el fichero se lanza una excepci&oacute;n.
 	 *  @param file Fichero de firma.
 	 *  @return Manejador de firma.
 	 */
-	private AOSigner getAppropiatedSigner(File file) throws Exception {
-		AOSigner signer = null;
+	private AOSigner getAppropiatedSigner(final File file) throws Exception {
+		final AOSigner signer;
 		try {
 			signer = determineType(file);
-		} catch (Exception e) {
-			Logger.getLogger("Ocurrio un error durante el analisis del fichero de firma: "+ e);
+		} 
+		catch (final Exception e) {
+			Logger.getLogger("Error durante el analisis del fichero de firma: "+ e);
 			throw e;
 		}
 		if(signer == null) {
-			Logger.getLogger("es.gob.afirma").severe("No se ha encontrado un manejador de firma valido para el fichero '"+file.getAbsolutePath()+"'");
-			//this.addLogRegistry(Level.SEVERE, "No se ha encontrado un manejador de firma valido para el fichero '"+file.getAbsolutePath()+"'");
+			throw new IllegalArgumentException(
+				"No se ha encontrado un manejador de firma valido para el fichero '" + file.getName() + "'"
+			);
 		}
 		return signer;
 	}
@@ -890,10 +1019,11 @@ public class DirectorySignatureHelper {
 	 * @param file Fichero a analizar.
 	 * @return Devuelve <code>true</code> si el fichero es una firma compatible con el signer
 	 * indicado, <code>false</code> en caso contrario.
+	 * @throws IOException Cuando no se pudo leer el fichero.
 	 */
-	private boolean isSign(AOSigner signer, File file) throws FileNotFoundException {
-		InputStream is = this.getFileInputStream(file);
-		boolean isSignFile = signer.isSign(is);
+	private boolean isSign(final AOSigner signer, final File file) throws IOException {
+		final InputStream is = this.getFileInputStream(file);
+		final boolean isSignFile = signer.isSign(AOUtil.getDataFromInputStream(is));
 		this.closeStream(is);
 		return isSignFile;
 	}
@@ -906,11 +1036,11 @@ public class DirectorySignatureHelper {
 	 * @param file Fichero a analizar.
 	 * @return Devuelve <code>true</code> si el fichero puede firmarse con el signer
 	 * indicado, <code>false</code> en caso contrario.
-	 * @throws FileNotFoundException No se encuentra el fichero de datos.
+	 * @throws IOException Cuando no se pudo leer el fichero.
 	 */
-	private boolean isValidDataFile(AOSigner signer, File file) throws FileNotFoundException {
-		InputStream is = this.getFileInputStream(file);
-		boolean isValidDataFile = signer.isValidDataFile(is);
+	private boolean isValidDataFile(final AOSigner signer, final File file) throws IOException {
+		final InputStream is = this.getFileInputStream(file);
+		boolean isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
 		this.closeStream(is);
 		return isValidDataFile;
 	}
@@ -919,8 +1049,27 @@ public class DirectorySignatureHelper {
 	 * Permite activar y desactivar la generaci&oacute;n del fichero de log.
 	 * @param activeLog Si es <code>true</code> activa el log, <code>false</code> lo desactiva.
 	 */
-	public void setActiveLog(boolean activeLog) {
+	public void setActiveLog(final boolean activeLog) {
 		this.activeLog = activeLog;
+	}
+	
+	/**
+	 * Establece la ruta del fichero de log. Si no se configura, se utilizar&aacute; el
+	 * directorio de salida de las firmas y el nombre de fichero "result.log".
+	 * @param path Ruta del fichero de log.
+	 */
+	public void setLogPath(final String path) {
+		this.logPath = ((path == null || path.trim().length() == 0) ? null : path);
+	}
+	
+	/**
+	 * Recupera la ruta del fichero con el log de la operaci&oacute;n. Si no se ha establecido
+	 * una ruta, se devolver&aacute;a {@code null} y el log se alamacenar&aacute;n en el directorio de
+	 * salida de las firmas con el nombre "result.log". 
+	 * @return Ruta del fichero de log.
+	 */
+	public String getLogPath() {
+		return this.logPath;
 	}
 	
 	/**
@@ -939,12 +1088,13 @@ public class DirectorySignatureHelper {
 	 * @return Flujo de entrada de datos.
 	 * @throws FileNotFoundException No se encuentra el fichero.
 	 */
-	private FileInputStream getFileInputStream(File file) throws FileNotFoundException {
+	private FileInputStream getFileInputStream(final File file) throws FileNotFoundException {
 		try {
 			return new FileInputStream(file);
-		} catch (FileNotFoundException e) {
-			Logger.getLogger("es.gob.afirma").severe("No se ha encontrado el fichero '"+file.getPath()+"': "+e);
-			this.addLogRegistry(Level.SEVERE, "No se ha encontrado el fichero '"+file.getPath()+"'");
+		} 
+		catch (final FileNotFoundException e) {
+			Logger.getLogger("es.gob.afirma").severe("No se ha encontrado el fichero '" + file.getPath() + "': " + e);
+			this.addLogRegistry(Level.SEVERE, "No se ha encontrado el fichero '" + file.getPath() + "'");
 			throw e;
 		}
 	}
@@ -954,10 +1104,10 @@ public class DirectorySignatureHelper {
 	 * Si la entrada es nula, no hace nada.
 	 * @param stream InputStream a cerrar.
 	 */
-	private void closeStream(Closeable stream) {
+	private void closeStream(final Closeable stream) {
 		if(stream != null) {
-			try { stream.close(); } catch (Exception e) {
-				Logger.getLogger("es.gob.afirma").warning("Ocurrio un error al cerrar un fichero de recursos");
+			try { stream.close(); } catch (final Throwable e) {
+				Logger.getLogger("es.gob.afirma").warning("Error al cerrar un fichero de recursos");
 			}
 		}
 	}
@@ -971,12 +1121,10 @@ public class DirectorySignatureHelper {
 	 * @param path Ruta absoluta del fichero.
 	 * @return Camino relativo del fichero.
 	 */
-	private String getRelativePath(String path) {
-		
+	private String getRelativePath(final String path) {
 		if(this.inDir != null) {
 			return path.substring(this.inDir.length());
 		}
-		
 		int pos = path.indexOf(File.separator);
 		if(pos != -1) {
 			return path.substring(pos+1);
@@ -989,7 +1137,7 @@ public class DirectorySignatureHelper {
 	 * se introduce <code>null</code> no se realizar&aacute; un filtrado de ficheros.
 	 * @param fileFilter Filtro de fichero.
 	 */
-	public void setFileFilter(FileFilter fileFilter) {
+	public void setFileFilter(final FileFilter fileFilter) {
 		this.fileFilter = fileFilter;
 	}
 	
@@ -1015,7 +1163,7 @@ public class DirectorySignatureHelper {
 	 * encuentren con el mismo nombre.
 	 * @param overwirte Sobrescribir ficheros.
 	 */
-	public void setOverwritePreviuosFileSigns(boolean overwirte) {
+	public void setOverwritePreviuosFileSigns(final boolean overwirte) {
 		this.overwriteFiles = overwirte;
 	}
 	
@@ -1025,7 +1173,7 @@ public class DirectorySignatureHelper {
 	 * @param typeLog Tipo de mensaje.
 	 * @param logRegistry Entrada del log.
 	 */
-	private void addLogRegistry(Level typeLog, String logRegistry) {
+	private void addLogRegistry(final Level typeLog, final String logRegistry) {
 		if(this.activeLog) {
 			if(logRegistry == null) {
 				Logger.getLogger("es.gob.afirma").warning("Se ha intentado insertar un registro nulo en el log");
@@ -1034,7 +1182,8 @@ public class DirectorySignatureHelper {
 			if(this.logHandler != null) {
 				try {
 					this.logHandler.write(("\n" + typeLog.getName() + ": "+ logRegistry).getBytes());
-				} catch (IOException e1) {
+				} 
+				catch (final IOException e1) {
 					Logger.getLogger("es.gob.afirma").warning("Se ha pudo insertar una entrada en el log de error: "+e1);
 				}
 			}
@@ -1045,12 +1194,13 @@ public class DirectorySignatureHelper {
 	
 	/**
 	 * Inicializa el fichero de log para la firma masiva.
-	 * @param outDir Directorio en donde se crear&aacute; el fichero de log.
+	 * @param outFile Ruta del fichero de log.
 	 */
-	protected OutputStream initLogRegistry(String outDir) {
+	protected OutputStream initLogRegistry(final String outFile) {
 		try {
-			return new FileOutputStream(outDir+File.separator+"result.log");
-		} catch (Exception e) {
+			return new FileOutputStream(outFile);
+		} 
+		catch (final Throwable e) {
 			Logger.getLogger("es.gob.afirma").warning("No se ha podido crear el fichero de log");
 			return null;
 		}
@@ -1065,14 +1215,16 @@ public class DirectorySignatureHelper {
 			try{
 				logHandler.write(("\n\nAdvertencias emitidas: "+warnCount).getBytes());
 				logHandler.write(("\nErrores emitidos: "+errorCount).getBytes());
-			} catch (Exception e) {
+			} 
+			catch (final Throwable e) {
 				Logger.getLogger("es.gob.afirma").warning(
 					"No se ha podido almacenar el resultado de la operacion en el fichero de log"
 				);
 			}
 			try {
 				this.logHandler.close();
-			} catch (Exception e) {
+			} 
+			catch (final Throwable e) {
 				Logger.getLogger("es.gob.afirma").warning("No se cerrar el fichero de log");
 			}
 		}
@@ -1085,7 +1237,7 @@ public class DirectorySignatureHelper {
 	 * @param file Fichero que deseamos analizar.
 	 * @return Resultado del an&aacute;lisis.
 	 */
-	private static AOSigner determineType(File file) throws Exception {
+	private static AOSigner determineType(final File file) throws Exception {
 		if(file == null) {
 			throw new NullPointerException("Se ha introducido un fichero de firma nulo");
 		}
@@ -1110,7 +1262,7 @@ public class DirectorySignatureHelper {
 	 * Preparamos cualquier operaci&oacute;n que queramos ejecutar a lo largo de la operaci&oacute;n masiva.
 	 * @param files Listado de ficheros que se van a procesar durante la operaci&oacute;n masiva. 
 	 */
-	protected void prepareOperation(File[] files) {}
+	protected void prepareOperation(final File[] files) {}
 	
 	/**
 	 * Liberamos los recursos de la operaci&oacute;n que hayamos ejecutado simult&aacute;neamente a la
@@ -1122,5 +1274,5 @@ public class DirectorySignatureHelper {
 	 * Ejecutamos cualquier operaci&oacute;n antes del procesado de un fichero concreto.
 	 * @param file El proximo fichero que se va a procesar.
 	 */
-	protected void preProcessFile(File file) {}
+	protected void preProcessFile(final File file) {}
 }

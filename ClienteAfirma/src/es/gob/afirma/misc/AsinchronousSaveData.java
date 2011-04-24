@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.misc;
 
@@ -24,7 +23,7 @@ import es.gob.afirma.ui.AOUIManager;
  * Invocar preferentemente de la siguiente manera:<br> 
  * <code>SwingUtilities.invokeLater(new AsinchronousSaveData(data, file, desc, exts, parent, true));</code>
  */
-public class AsinchronousSaveData implements Runnable {
+public final class AsinchronousSaveData implements Runnable {
 
 	private byte[] dataToSave = null;
 	private String savingTarget = null;
@@ -32,6 +31,31 @@ public class AsinchronousSaveData implements Runnable {
 	private String description = "Firma digital";
 	private Frame parent = null;
 	private boolean showDialogIfError = true;
+	
+	
+	/**
+	 * Crea una clase para el guardado as&iacute;ncrono de datos en disco.
+	 * @param data Datos a guardar
+	 * @param fileName Nombre del fichero destino
+	 * @param description Descripci&oacute;n del fichero destino
+	 * @param extensions Posibles extensiones para el fichero destino
+	 * @param parent Componente padre para la modalidad
+	 * @param errorDialog <code>true</code> si queremos mostrar un di&aacute;logo gr&aacute;fico en caso
+	 *                    de error, <code>false</code> en caso contrario
+	 */
+	public AsinchronousSaveData(final byte[] data, 
+			                    final String fileName, 
+			                    final String description, 
+			                    final String[] extensions, 
+			                    final Frame parent, 
+			                    final boolean errorDialog) {
+		setDataToSave(data);
+		setSavingTarget(fileName);
+		setDescription(description);
+		setExtensions(extensions);
+		setParentComponent(parent);
+		setShowDialogIfError(errorDialog);
+	}
 	
 	/**
 	 * Indica si se debe mostrar un di&aacute;logo de advertencia en caso de fallo
@@ -81,25 +105,6 @@ public class AsinchronousSaveData implements Runnable {
 	 */
 	public void setParentComponent(Frame p) {
 		parent = p;
-	}
-	
-	/**
-	 * Crea una clase para el guardado as&iacute;ncrono de datos en disco.
-	 * @param data Datos a guardar
-	 * @param fileName Nombre del fichero destino
-	 * @param description Descripci&oacute;n del fichero destino
-	 * @param extensions Posibles extensiones para el fichero destino
-	 * @param parent Componente padre para la modalidad
-	 * @param errorDialog <code>true</code> si queremos mostrar un di&aacute;logo gr&aacute;fico en caso
-	 *                    de error, <code>false</code> en caso contrario
-	 */
-	public AsinchronousSaveData(byte[] data, String fileName, String description, String[] extensions, Frame parent, boolean errorDialog) {
-		setDataToSave(data);
-		setSavingTarget(fileName);
-		setDescription(description);
-		setExtensions(extensions);
-		setParentComponent(parent);
-		setShowDialogIfError(errorDialog);
 	}
 	
 	public void run() {

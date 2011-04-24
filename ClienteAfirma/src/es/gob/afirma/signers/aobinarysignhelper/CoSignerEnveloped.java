@@ -2,29 +2,29 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers.aobinarysignhelper;
 
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.fillRestCerts;
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.getAttributeSet;
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.makeAlgId;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +68,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para crear un
  * mensaje SignedAndEnvelopedData pero con la peculiaridad de que es una Cofirma.
  */
-public final class CoSignerEnveloped extends SigUtils {
+public final class CoSignerEnveloped  {
 
     ASN1Set signedAttr2;
     /**
@@ -78,7 +78,7 @@ public final class CoSignerEnveloped extends SigUtils {
      *
      * @param parameters    par&aacute;metros necesarios que contienen tanto la firma
      *                      del archivo a firmar como los datos del firmante.
-     * @param data          Archivo que contiene las firmas.
+     * @param sign          Archivo que contiene las firmas.
      * 
      * @param dataType      Identifica el tipo del contenido a firmar.
      * @param keyEntry      Clave privada del firmante.
@@ -91,21 +91,20 @@ public final class CoSignerEnveloped extends SigUtils {
      * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de firma.
      */
-    @SuppressWarnings("unchecked")
 	public byte[] coSigner(final P7ContentSignerParameters parameters, 
-			               final InputStream data, 
+			               final byte[] sign, 
 			               final Oid dataType, 
 			               final PrivateKeyEntry keyEntry, 
-			               final HashMap<Oid, byte[]> atrib, 
-			               final HashMap<Oid, byte[]> uatrib, 
+			               final Map<Oid, byte[]> atrib, 
+			               final Map<Oid, byte[]> uatrib, 
 			               final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
     	
-        ASN1InputStream is = new ASN1InputStream(data);
+        ASN1InputStream is = new ASN1InputStream(sign);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq=(ASN1Sequence)is.readObject();
-        Enumeration<Object> e = dsq.getObjects();
+        Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID signedAndEnvelopedData
         e.nextElement();
         // Contenido de signedAndEnvelopedData
@@ -122,7 +121,7 @@ public final class CoSignerEnveloped extends SigUtils {
 
         ASN1Set certificatesSigned = sd.getCertificates();
         ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        Enumeration<Object> certs =certificatesSigned.getObjects();
+        Enumeration<?> certs =certificatesSigned.getObjects();
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()) vCertsSig.add((DEREncodable) certs.nextElement());
@@ -132,7 +131,7 @@ public final class CoSignerEnveloped extends SigUtils {
              List<DEREncodable> ce = new ArrayList<DEREncodable>();
             for (int i=0; i<signerCertificateChain.length;i++)
                 ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
-            certificates = FillRestCerts(ce,vCertsSig);
+            certificates = fillRestCerts(ce,vCertsSig);
 
             //y comentar esta parte de abajo
 //            vCertsSig.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getEncoded())));
@@ -209,7 +208,7 @@ public final class CoSignerEnveloped extends SigUtils {
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         } 
-        catch (Throwable ex) {
+        catch (final Throwable ex) {
             throw new IOException("Error al generar la firma: " + ex);
         }
 
@@ -260,7 +259,7 @@ public final class CoSignerEnveloped extends SigUtils {
      * @param signatureAlgorithm Algoritmo para la firma
      * @param signerCertificateChain Cadena de certificados para la construccion de los
      * 						parametros de firma.
-     * @param data          Archivo que contiene las firmas.
+     * @param sign          Archivo que contiene las firmas.
      * @param dataType      Identifica el tipo del contenido a firmar.
      * @param keyEntry      Clave privada del firmante.
      * @param atrib         Atributos firmados adicionales.
@@ -272,23 +271,22 @@ public final class CoSignerEnveloped extends SigUtils {
      * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de firma.
      */
-    @SuppressWarnings("unchecked")
 	public byte[] coSigner(
 			String signatureAlgorithm, 
 			X509Certificate[] signerCertificateChain, 
-			InputStream data, 
+			byte[] sign, 
 			Oid dataType, 
 			PrivateKeyEntry keyEntry, 
-			HashMap<Oid, byte[]> atrib, 
-			HashMap<Oid, byte[]> uatrib, 
+			Map<Oid, byte[]> atrib, 
+			Map<Oid, byte[]> uatrib, 
 			byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        ASN1InputStream is = new ASN1InputStream(data);
+        ASN1InputStream is = new ASN1InputStream(sign);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq=(ASN1Sequence)is.readObject();
-        Enumeration<Object> e = dsq.getObjects();
+        Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID signedAndEnvelopedData
         e.nextElement();
         // Contenido de signedAndEnvelopedData
@@ -305,7 +303,7 @@ public final class CoSignerEnveloped extends SigUtils {
 
         ASN1Set certificatesSigned = sd.getCertificates();
         ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        Enumeration<Object> certs =certificatesSigned.getObjects();
+        Enumeration<?> certs =certificatesSigned.getObjects();
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()){
@@ -317,7 +315,7 @@ public final class CoSignerEnveloped extends SigUtils {
              List<DEREncodable> ce = new ArrayList<DEREncodable>();
             for (int i=0; i<signerCertificateChain.length;i++)
                 ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
-            certificates = FillRestCerts(ce,vCertsSig);
+            certificates = fillRestCerts(ce,vCertsSig);
 
             //y comentar esta parte de abajo
 //            vCertsSig.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getEncoded())));
@@ -384,7 +382,7 @@ public final class CoSignerEnveloped extends SigUtils {
             SignerInfo si = new SignerInfo((ASN1Sequence)signerInfosSd.getObjectAt(i));
             AlgorithmIdentifier algHash = si.getDigestAlgorithm();
             // Solo si coninciden los algos puedo sacar el hash de dentro
-            if (algHash.getObjectId().toString().equals(digestAlgorithmId.getOID().toString())){
+            if (algHash.getAlgorithm().toString().equals(digestAlgorithmId.getOID().toString())){
             	ASN1Set signedAttrib = si.getAuthenticatedAttributes();
             	 for (int s=0; s<signedAttrib.size();s++){
             		 ASN1Sequence elemento =(ASN1Sequence) signedAttrib.getObjectAt(s);
@@ -415,7 +413,7 @@ public final class CoSignerEnveloped extends SigUtils {
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         } 
-        catch (Throwable ex) {
+        catch (final Throwable ex) {
             throw new IOException("Error al generar la firma: " + ex);
         }
 
@@ -469,7 +467,7 @@ public final class CoSignerEnveloped extends SigUtils {
                             String digestAlgorithm,
                             byte[] datos,
                             Oid dataType,
-                            HashMap<Oid, byte[]> atrib)
+                            Map<Oid, byte[]> atrib)
                         throws NoSuchAlgorithmException {
 
         
@@ -542,7 +540,7 @@ public final class CoSignerEnveloped extends SigUtils {
                                 String digestAlgorithm,
                                 byte[] datos,
                                 Oid dataType,
-                                HashMap<Oid, byte[]> atrib)
+                                Map<Oid, byte[]> atrib)
                             throws NoSuchAlgorithmException {
             
             //// ATRIBUTOS
@@ -606,7 +604,7 @@ public final class CoSignerEnveloped extends SigUtils {
      *
      * @return      Los atributos no firmados de la firma
      */
-    private ASN1Set generateUnsignerInfo(HashMap<Oid, byte[]> uatrib){
+    private ASN1Set generateUnsignerInfo(Map<Oid, byte[]> uatrib){
 
         //// ATRIBUTOS
 
@@ -650,8 +648,11 @@ public final class CoSignerEnveloped extends SigUtils {
         Signature sig = null;
 		try {
 			sig = Signature.getInstance(signatureAlgorithm);
-		} catch (Exception e) {
-            e.printStackTrace();
+		} 
+		catch (final Throwable e) {
+            throw new AOException(
+        		"Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e
+    		);
 		}
         
         byte[] tmp= null;
@@ -665,9 +666,11 @@ public final class CoSignerEnveloped extends SigUtils {
         //Indicar clave privada para la firma
 		try {
 			sig.initSign(keyEntry.getPrivateKey());
-		} catch (final Throwable e) {
+		} 
+		catch (final Throwable e) {
 			throw new AOException(
-					"Error al obtener la clave de firma para el algoritmo '" + signatureAlgorithm + "': " + e);
+				"Error al inicializar la firma con la clave privada", e
+			);
 		}
 
         
@@ -675,9 +678,10 @@ public final class CoSignerEnveloped extends SigUtils {
         // Actualizamos la configuracion de firma
 		try {
 			sig.update(tmp);
-		} catch (SignatureException e) {
+		} 
+		catch (final SignatureException e) {
 			throw new AOException(
-					"Error al configurar la informacion de firma: " + e);
+				"Error al configurar la informacion de firma", e);
 		}
 
         
@@ -685,8 +689,9 @@ public final class CoSignerEnveloped extends SigUtils {
         byte[] realSig=null;
         try {
 			realSig = sig.sign();
-		} catch (Exception e) {
-			throw new AOException("Error durante el proceso de firma: " + e);
+		} 
+        catch (final Throwable e) {
+			throw new AOException("Error durante el proceso de firma", e);
 		}
 
         ASN1OctetString encDigest = new DEROctetString(realSig);

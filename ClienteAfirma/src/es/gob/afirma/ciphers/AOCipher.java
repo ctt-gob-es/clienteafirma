@@ -2,16 +2,16 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.ciphers;
 
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOInvalidKeyException;
@@ -30,7 +30,7 @@ public interface AOCipher {
 	 * que soporta el proveedor.
 	 * @return Configuraciones de cifrado.
 	 */
-	public AOAlgorithmConfig[] getSupportedConfigs();
+	public AOCipherConfig[] getSupportedConfigs();
 	
 	/**
 	 * Cifra un mensaje. El algoritmo que deseamos utilizar para el descifrado puede ir
@@ -47,7 +47,7 @@ public interface AOCipher {
 	 * @throws AOException Cuando ocurre un error durante la operaci&oacute;n
 	 * @throws AOInvalidKeyException Cuando la clave de cifrado introducida no es compatible con este algoritmo.
 	 */
-	public byte[] cipher(byte[] data, AOAlgorithmConfig algorithmConfig, Key cipherKey) throws AOException, AOInvalidKeyException;
+	public byte[] cipher(byte[] data, AOCipherConfig algorithmConfig, Key cipherKey) throws AOException, AOInvalidKeyException;
 	
 	/**
 	 * Descifra un mensaje. El algoritmo que deseamos utilizar para el descifrado puede ir
@@ -64,7 +64,7 @@ public interface AOCipher {
 	 * @throws AOException Cuando ocurre un error durante la operaci&oacute;n
 	 * @throws AOInvalidKeyException Cuando la clave de cifrado introducida no es compatible con este algoritmo.
 	 */
-	public byte[] decipher(byte[] data, AOAlgorithmConfig algorithmConfig, Key decipherKey) throws AOException, AOInvalidKeyException;
+	public byte[] decipher(byte[] data, AOCipherConfig algorithmConfig, Key decipherKey) throws AOException, AOInvalidKeyException;
 	
 	/**
 	 * Obtiene una clave para el algoritmo seleccionado a partir de su codificaci&oacute;n.
@@ -75,7 +75,7 @@ public interface AOCipher {
 	 * @return Clave.
 	 * @throws AOException Cuando se produce un error al generar la clave.
 	 */
-	public Key decodeKey(String base64Key, AOAlgorithmConfig algorithmConfig, Object[] params) throws AOException;
+	public Key decodeKey(String base64Key, AOCipherConfig algorithmConfig, Object[] params) throws AOException;
 	
 	/**
 	 * Obtiene una clave para el algoritmo seleccionado a partir de la contrase&ntilde;a.
@@ -86,14 +86,15 @@ public interface AOCipher {
 	 * @return Clave.
 	 * @throws AOException Cuando se produce un error al generar la clave.
 	 */
-	public Key decodePassphrase(String passphrase, AOAlgorithmConfig algorithmConfig, Object[] params) throws AOException;
+	public Key decodePassphrase(char[] passphrase, AOCipherConfig algorithmConfig, Object[] params) throws AOException;
 	
 	/**
 	 * Genera una nueva clave para el algoritmo seleccionado.
 	 * @param algorithmConfig Algoritmo de cifrado.
 	 * @return Clave.
+ 	 * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado no est&aacute; soportado.
 	 * @throws AOException Cuando se produce un error al generar la clave.
 	 */
-	public Key generateKey(AOAlgorithmConfig algorithmConfig) throws AOException;
+	public Key generateKey(AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException;
 
 }

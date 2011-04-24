@@ -2,34 +2,36 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers.aobinarysignhelper;
+
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.createBerSetFromList;
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.getAttributeSet;
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.makeAlgId;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BERConstructedOctetString;
@@ -90,7 +92,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para crear un
  * mensaje SignedData de BouncyCastle: <a href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
  */
-public class GenSignedData extends SigUtils {
+public final class GenSignedData  {
 
     ASN1Set signedAttr2;
     /**
@@ -129,8 +131,8 @@ public class GenSignedData extends SigUtils {
             boolean applyTimestamp,
             Oid dataType,
             PrivateKeyEntry keyEntry,
-            HashMap<Oid, byte[]> atrib,
-            HashMap<Oid, byte[]> uatrib,
+            Map<Oid, byte[]> atrib,
+            Map<Oid, byte[]> uatrib,
             byte[] messageDigest)
             throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
 
@@ -158,12 +160,11 @@ public class GenSignedData extends SigUtils {
             else keyAlgorithm = signatureAlgorithm.substring(with + 4);
         }
 
-        AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
+        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
         try {
             digAlgId = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
         }
-        catch (Throwable e) {
-        	e.printStackTrace();
+        catch (final Throwable e) {
             throw new IOException("Error de codificacion: " + e);
         }
 
@@ -173,7 +174,7 @@ public class GenSignedData extends SigUtils {
         // si se introduce el contenido o no
 
         ContentInfo encInfo = null;
-        DERObjectIdentifier contentTypeOID = new DERObjectIdentifier(dataType.toString());
+        ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
 
         if (omitContent == false) {
             ByteArrayOutputStream bOut = new ByteArrayOutputStream();
@@ -182,7 +183,7 @@ public class GenSignedData extends SigUtils {
             try {
             	msg.write(bOut);
             }
-            catch (Throwable ex) {
+            catch (final Throwable ex) {
                 throw new IOException("Error en la escritura del procesable CMS: " + ex);
             }
             encInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
@@ -227,24 +228,29 @@ public class GenSignedData extends SigUtils {
         //// ATRIBUTOS
 
         //ATRIBUTOS FIRMADOS
-        ASN1Set signedAttr = null;        
-        signedAttr = generateSignerInfo(signerCertificateChain[0], digestAlgorithm, parameters.getContent(),dataType, applyTimestamp,atrib, messageDigest);
+        ASN1Set signedAttr = generateSignerInfo(
+        		signerCertificateChain[0],
+        		digestAlgorithm,
+        		parameters.getContent(),
+        		dataType,
+        		applyTimestamp,
+        		atrib,
+        		messageDigest);
         
         //ATRIBUTOS NO FIRMADOS.
 
-        ASN1Set unSignedAttr = null;
-        unSignedAttr = generateUnsignerInfo(uatrib);
+        ASN1Set unSignedAttr = generateUnsignerInfo(uatrib);
 
 
         ////  FIN ATRIBUTOS
 
         //digEncryptionAlgorithm
         AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
+        final AlgorithmIdentifier encAlgId;
         try {
             encAlgId = makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
         }
-        catch (Throwable e) {
+        catch (final Throwable e) {
             throw new IOException("Error de codificacion: " + e);
         }
 
@@ -294,7 +300,7 @@ public class GenSignedData extends SigUtils {
                             byte[] datos,
                             Oid datatype,
                             boolean timestamp,
-                            HashMap<Oid, byte[]> atrib,
+                            Map<Oid, byte[]> atrib,
                             byte[] messageDigest)
                         throws NoSuchAlgorithmException {
 
@@ -372,7 +378,7 @@ public class GenSignedData extends SigUtils {
      *
      * @return      Los atributos no firmados de la firma.
      */
-    private ASN1Set generateUnsignerInfo(HashMap<Oid, byte[]> uatrib){
+    private ASN1Set generateUnsignerInfo(Map<Oid, byte[]> uatrib){
 
         //// ATRIBUTOS
 
@@ -416,18 +422,19 @@ public class GenSignedData extends SigUtils {
 		try {
 			sig = Signature.getInstance(signatureAlgorithm);
 		} 
-		catch (Throwable e) {
-            //e.printStackTrace();
-            throw new AOException("No ha instalado soporte para el algoritmo de firma '" + signatureAlgorithm + "': " + e);
+		catch (final Throwable e) {
+            throw new AOException(
+        		"Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e
+    		);
 		}
 
         //Indicar clave privada para la firma
 		try {
 			sig.initSign(keyEntry.getPrivateKey());
-		} catch (Throwable e) {
-		    Logger.getLogger("es.gob.afirma").severe("Error inicializando la firma, clave de tipo: "+keyEntry.getPrivateKey().getClass().getName());
+		} 
+		catch (final Throwable e) {
 			throw new AOException(
-				"Error al obtener la clave de firma para el algoritmo '" + signatureAlgorithm + "': " + e
+				"Error al inicializar la firma con la clave privada", e
 			);
 		}
 		
@@ -435,9 +442,9 @@ public class GenSignedData extends SigUtils {
 		try {
 			sig.update(signedAttr2.getEncoded(ASN1Encodable.DER));
 		}
-		catch (Throwable e) {
+		catch (final Throwable e) {
 			throw new AOException(
-				"Error al configurar la informacion de firma o al obtener los atributos a firmar: " + e
+				"Error al configurar la informacion de firma o al obtener los atributos a firmar", e
 			);
 		}
 
@@ -447,9 +454,8 @@ public class GenSignedData extends SigUtils {
         try {
 			realSig = sig.sign();
 		} 
-        catch (Throwable e) {
-        	e.printStackTrace();
-			throw new AOException("Error durante el proceso de firma: " + e);
+        catch (final Throwable e) {
+			throw new AOException("Error durante el proceso de firma", e);
 		}
 
         ASN1OctetString encDigest = new DEROctetString(realSig);

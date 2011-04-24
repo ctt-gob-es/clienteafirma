@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package com.sun.deploy.util;
 
@@ -34,7 +33,7 @@ public final class WinRegistry {
 	static native KeyValue sysQueryKey(int hKey, String name);
 	static native int sysCreateKey(int hKey, String name, int sam);
 	static native boolean sysSetStringValue(int hKey, String name, String value);
-  static native void initIDs();
+	static native void initIDs();
 
   
 	/**
@@ -51,6 +50,7 @@ public final class WinRegistry {
 		
 		/**
 		 * Retorna el tipo del valor del par-valor
+		 * @return Entero identificador del tipo de clave
 		 */
 		public int getType() {
 			return type;
@@ -58,6 +58,7 @@ public final class WinRegistry {
 
 		/**
 		 * Retorna el valor del par-valor
+		 * @return Valor de la clave
 		 */
 		public byte[] getData() {
 			return data;
@@ -66,7 +67,7 @@ public final class WinRegistry {
 		/**
 		 * Retorna el valor tras realizar el casting al objeto java adecuado, ya sea este un entero,
 		 * una cadena o en su defecto un array de bytes. 
-		 * @return
+		 * @return Valor del objeto
 		 */
 		public Object getValue() {
 			switch (type) {
@@ -80,7 +81,7 @@ public final class WinRegistry {
 				for(int i = 0; (i < 4) && (i < data.length); i++) {
 					n += data[i] << (i * 8);
 				}
-				return new Integer(n);
+				return Integer.valueOf(n);
 			}
 
 			default:
@@ -90,48 +91,55 @@ public final class WinRegistry {
 	}
 	
 	/**
-	 * Realiza la b&uacute;squeda en el registro.
-	 * @param hKey entero con la clave 
-	 * @param path ruta
-	 * @param name nombre de clave a buscar
-	 * @return
+	 * Realiza una b&uacute;squeda en el registro.
+	 * @param hKey Entero con la clave a buscar 
+	 * @param path Ruta de inicio de la b&uacute;squeda
+	 * @param name Nombre de clave a buscar
+	 * @return Valor de la clave buscada o <code>null</code> si no se ha encontrado
 	 */
-	public static Object get(int hKey, String path, String name) {
+	public static Object get(final int hKey, final String path, final String name) {
 		Object value = null;
-		int key = sysOpenKey(hKey, path, KEY_READ);
+		final int key = sysOpenKey(hKey, path, KEY_READ);
 		if (key != 0) {
-			KeyValue keyValue = sysQueryKey(key, name);
+			final KeyValue keyValue = sysQueryKey(key, name);
 			sysCloseKey(key);
 			if (keyValue != null) {
 				value = keyValue.getValue();
 			}
 		}
-		
 		return value;
 	}
 
 	/**
 	 * Realiza la b&uacute;squeda de una clave en el registro, si el valor no es de tipo cadena retorna
 	 * un valor nulo.
+	 * @param hKey Tipo de clave a buscar
+	 * @param path Ruta de inicio de la b&uacute;squeda
+	 * @param name Nombre de la clave a buscar
+	 * @return Valor la de clave encontrada o <code>null</code> si no se encontr&oacute;
 	 */
-	public static String getString(int hKey, String path, String name) {
-		Object rv = get(hKey, path, name);
+	public static String getString(final int hKey, final String path, final String name) {
+		final Object rv = get(hKey, path, name);
 		return (rv instanceof String) ? (String)rv : null;
 	}
 
 	/**
-	 * A&ntilde;ade una cadena como valor del registro, para lo cual se especifica una ruta, un nombre,
+	 * A&ntilde;ade una cadena como clave del registro, para lo cual se especifica una ruta, un nombre,
 	 * un valor y una clave.
-	 * @return
+	 * @param hKey Tipo de dato a a&ntilde;adir
+	 * @param path Ruta donde a&ntilde;adir la clave
+	 * @param name Nombre de la clave a a&ntilde;adir
+	 * @param value Valor de la clave a a&ntilde;adir
+	 * @return <code>true</code> si se ha posido completar adecuadamente la operaci&oacute;n,
+	 *         <code>false</code> en caso contrario
 	 */
 	public static boolean setStringValue(int hKey, String path, String name, String value) {
 		boolean returnValue = false;
-		int key = sysCreateKey(hKey, path, KEY_WRITE);
+		final int key = sysCreateKey(hKey, path, KEY_WRITE);
 		if (key != 0) {
 			returnValue = sysSetStringValue(key, name, value);
 			sysCloseKey(key);
 		}
-		
 		return returnValue;
 	}
 

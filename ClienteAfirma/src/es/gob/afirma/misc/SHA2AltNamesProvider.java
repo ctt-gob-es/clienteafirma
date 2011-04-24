@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.misc;
 
@@ -22,10 +21,9 @@ import sun.security.action.PutAllAction;
  * Proveedor para huellas digitales SHA2 con variantes de nombre no contempladas en
  * el proveedor Sun.
  */
-public class SHA2AltNamesProvider extends Provider {
+public final class SHA2AltNamesProvider extends Provider {
 
 	/** Construye un nuevo proveedor de huellas digitales SHA-2 con nombres alternativos. */
-	@SuppressWarnings("unchecked")
 	public SHA2AltNamesProvider() {
 		super("AOSHA2AltNamesProvider", 1.0, "Proveedor para huellas digitales SHA-2 con nombres alternativos");
 		

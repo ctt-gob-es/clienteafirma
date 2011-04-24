@@ -2,17 +2,17 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.misc;
 
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -28,15 +28,15 @@ import org.w3c.dom.NodeList;
 /**
  * Clase para el an&aacute;lisis de ficheros OOXML.
  */
-public class OfficeXMLAnalizer {
+public final class OfficeXMLAnalizer {
 
     private static final String ZIP_MIMETYPE = "application/zip";
     
     /** MimeTypes reconocidos del formato OOXML. */
-    private static final HashSet<String> OOXML_MIMETYPES = new HashSet<String>(17);;
+    private static final Set<String> OOXML_MIMETYPES = new HashSet<String>(17);
     
     /** MimeTypes reconocidos del formato ODF. */
-    private static final HashSet<String> ODF_MIMETYPES = new HashSet<String>(15);
+    private static final Set<String> ODF_MIMETYPES = new HashSet<String>(15);
     
     static {
         // MimeTypes reconocidos del formato OOXML
@@ -115,6 +115,7 @@ public class OfficeXMLAnalizer {
     
     /**
      * Indica si un fichero tiene la estructura de un documento OOXML.
+     * @param document Fichero a analizar
      * @return Devuelve <code>true</code> si el fichero era un OOXML,
      * <code>false</code> en caso contrario.
      */
@@ -192,6 +193,7 @@ public class OfficeXMLAnalizer {
 
     /**
      * Indica si un fichero tiene la estructura de un documento ODF.
+     * @param document Fichero a analizar
      * @return Devuelve <code>true</code> si el fichero era un ODF,
      * <code>false</code> en caso contrario.
      */

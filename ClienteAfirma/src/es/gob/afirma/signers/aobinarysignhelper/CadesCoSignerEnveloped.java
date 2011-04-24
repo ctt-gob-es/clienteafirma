@@ -2,26 +2,27 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers.aobinarysignhelper;
+
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.fillRestCerts;
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.getAttributeSet;
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.makeAlgId;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,32 +39,17 @@ import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEREncodable;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DERUTCTime;
-import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSAttributes;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.cms.SignerIdentifier;
 import org.bouncycastle.asn1.cms.SignerInfo;
-import org.bouncycastle.asn1.ess.ESSCertID;
-import org.bouncycastle.asn1.ess.ESSCertIDv2;
-import org.bouncycastle.asn1.ess.SigningCertificate;
-import org.bouncycastle.asn1.ess.SigningCertificateV2;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.DigestInfo;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.IssuerSerial;
-import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
-import org.bouncycastle.asn1.x509.X509Name;
 import org.ietf.jgss.Oid;
 
 import sun.security.x509.AlgorithmId;
@@ -127,7 +113,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
  * </code></pre>
  *
  */
-public final class CadesCoSignerEnveloped extends SigUtils{
+public final class CadesCoSignerEnveloped {
 
     ASN1Set signedAttr2;
     /**
@@ -136,7 +122,7 @@ public final class CadesCoSignerEnveloped extends SigUtils{
      *
      * @param parameters    par&aacute;metros necesarios que contienen tanto la firma
      *                      del archivo a firmar como los datos del firmante.
-     * @param data          Archivo que contiene las firmas.
+     * @param sign          Archivo que contiene las firmas.
      * @param policy        Url de la Politica aplicada.
      * @param qualifier		OID de la pol&iacute;tica.
      * @param signingCertificateV2 <code>true</code> si se desea usar la versi&oacute;n 2 del atributo <i>Signing Certificate</i>
@@ -150,15 +136,14 @@ public final class CadesCoSignerEnveloped extends SigUtils{
      * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de firma.
      */
-    @SuppressWarnings("unchecked")
-	public byte[] coSigner(P7ContentSignerParameters parameters, InputStream data, String policy, Oid qualifier, boolean signingCertificateV2, Oid dataType, PrivateKeyEntry keyEntry, byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
+	public byte[] coSigner(P7ContentSignerParameters parameters, byte[] sign, String policy, Oid qualifier, boolean signingCertificateV2, Oid dataType, PrivateKeyEntry keyEntry, byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
-        ASN1InputStream is = new ASN1InputStream(data);
+        ASN1InputStream is = new ASN1InputStream(sign);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq=(ASN1Sequence)is.readObject();
-        Enumeration<Object> e = dsq.getObjects();
+        Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedAndEnvelopedData
         e.nextElement();
         // Contenido de SignedAndEnvelopedData
@@ -174,7 +159,7 @@ public final class CadesCoSignerEnveloped extends SigUtils{
 
         ASN1Set certificatesSigned = sd.getCertificates();
         ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        Enumeration<Object> certs =certificatesSigned.getObjects();
+        Enumeration<?> certs =certificatesSigned.getObjects();
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()){
@@ -185,7 +170,7 @@ public final class CadesCoSignerEnveloped extends SigUtils{
             List<DEREncodable> ce = new ArrayList<DEREncodable>();
             for (int i=0; i<signerCertificateChain.length;i++)
                 ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
-            certificates = FillRestCerts(ce,vCertsSig);
+            certificates = fillRestCerts(ce,vCertsSig);
         }
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
@@ -211,7 +196,8 @@ public final class CadesCoSignerEnveloped extends SigUtils{
         //// ATRIBUTOS
 
         ASN1Set signedAttr = null;
-        if (messageDigest == null) signedAttr = generateSignerInfo(
+        if (messageDigest == null) {
+        	ASN1EncodableVector contextExpecific = Utils.generateSignerInfo(
     		signerCertificateChain[0],           
             digestAlgorithmId,
             digestAlgorithm,
@@ -220,19 +206,28 @@ public final class CadesCoSignerEnveloped extends SigUtils{
             policy,
             qualifier,
             signingCertificateV2,
-            dataType
-        );
-        else signedAttr = generateSignerInfoFromHash(
-        	signerCertificateChain[0],
-        	digestAlgorithmId,
-            digestAlgorithm,
-            digAlgId,
-            policy,
-            qualifier,
-            signingCertificateV2,
-            messageDigest,
-            dataType
-    	);
+            dataType,
+            null);
+        	
+        	signedAttr2 = getAttributeSet(new AttributeTable(contextExpecific));
+        	signedAttr = getAttributeSet(new AttributeTable(contextExpecific));
+        }
+        else {
+        	ASN1EncodableVector contextExpecific = Utils.generateSignerInfo(
+        			signerCertificateChain[0],
+        			digestAlgorithmId,
+        			digestAlgorithm,
+        			digAlgId,
+        			null,
+        			policy,
+        			qualifier,
+        			signingCertificateV2,
+        			dataType,
+        			messageDigest
+        	);
+        	signedAttr2 = getAttributeSet(new AttributeTable(contextExpecific));
+        	signedAttr = getAttributeSet(new AttributeTable(contextExpecific));
+        }
 
         //digEncryptionAlgorithm
         AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
@@ -314,7 +309,6 @@ public final class CadesCoSignerEnveloped extends SigUtils{
      * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de firma.
      */
-    @SuppressWarnings("unchecked")
 	public byte[] coSigner(String signatureAlgorithm, X509Certificate[] signerCertificateChain, InputStream data, String policy, Oid qualifier, boolean signingCertificateV2, Oid dataType, PrivateKeyEntry keyEntry, byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
         ASN1InputStream is = new ASN1InputStream(data);
@@ -322,7 +316,7 @@ public final class CadesCoSignerEnveloped extends SigUtils{
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq=(ASN1Sequence)is.readObject();
-        Enumeration<Object> e = dsq.getObjects();
+        Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedAndEnvelopedData
         e.nextElement();
         // Contenido de SignedAndEnvelopedData
@@ -337,7 +331,7 @@ public final class CadesCoSignerEnveloped extends SigUtils{
         ASN1Set certificates = null;
         ASN1Set certificatesSigned = sd.getCertificates();
         ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        Enumeration<Object> certs =certificatesSigned.getObjects();
+        Enumeration<?> certs =certificatesSigned.getObjects();
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()){
@@ -348,7 +342,7 @@ public final class CadesCoSignerEnveloped extends SigUtils{
             List<DEREncodable> ce = new ArrayList<DEREncodable>();
             for (int i=0; i<signerCertificateChain.length;i++)
                 ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
-            certificates = FillRestCerts(ce,vCertsSig);
+            certificates = fillRestCerts(ce,vCertsSig);
         }
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
@@ -389,7 +383,7 @@ public final class CadesCoSignerEnveloped extends SigUtils{
         for(int i =0; i< signerInfosSd.size(); i++){
             SignerInfo si = new SignerInfo((ASN1Sequence)signerInfosSd.getObjectAt(i));
             AlgorithmIdentifier algHash = si.getDigestAlgorithm();
-            if (algHash.getObjectId().toString().equals(digestAlgorithmId.getOID().toString())){
+            if (algHash.getAlgorithm().toString().equals(digestAlgorithmId.getOID().toString())){
             	ASN1Set signedAttrib = si.getAuthenticatedAttributes();
             	 for (int s=0; s<signedAttrib.size();s++){
             		 ASN1Sequence elemento =(ASN1Sequence) signedAttrib.getObjectAt(s);
@@ -405,22 +399,26 @@ public final class CadesCoSignerEnveloped extends SigUtils{
             signerInfos.add(si);
         }
         
-   //// ATRIBUTOS
+        //// ATRIBUTOS
 
         ASN1Set signedAttr = null;       
       //atributos firmados
-        if (messageDigest!=null)
-        	 signedAttr = generateSignerInfoFromHash(signerCertificateChain[0],
-                 digestAlgorithmId,
-                 digestAlgorithm,
-                 digAlgId,
-                 policy,
-                 qualifier,
-                 signingCertificateV2,
-                 messageDigest,
-                 dataType
-        	 );
-        else{
+        if (messageDigest != null) {
+        	ASN1EncodableVector contextExpecific = Utils.generateSignerInfo(
+        			signerCertificateChain[0],
+        			digestAlgorithmId,
+        			digestAlgorithm,
+        			digAlgId,
+        			null,
+        			policy,
+        			qualifier,
+        			signingCertificateV2,
+        			dataType,
+        			messageDigest);
+        	signedAttr2 = getAttributeSet(new AttributeTable(contextExpecific));
+        	signedAttr = getAttributeSet(new AttributeTable(contextExpecific));
+        }
+        else {
         	throw new NullPointerException(
         		"No se puede crear la firma ya que no se ha encontrado un message digest valido"
 			);
@@ -462,631 +460,6 @@ public final class CadesCoSignerEnveloped extends SigUtils{
         ).getDEREncoded();
 
     }
-
-    /**
-     *  M&eacute;todo que genera la parte que contiene la informaci&oacute;n del Usuario.
-     *  Se generan los atributos que se necesitan para generar la firma.
-     *
-     * @param cert Certificado de firma.
-     * @param digestAlgorithmId Identificador del algoritmo de firma.
-     * @param digestAlgorithm   Algoritmo Firmado.
-     * @param datos             Datos firmados.
-     * @param dataType          Identifica el tipo del contenido a firmar.
-     *
-     * @return      Los datos necesarios para generar la firma referente a los
-     *              datos del usuario.
-     *
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.security.cert.CertificateException
-     * @throws java.io.IOException
-     */
-     private ASN1Set generateSignerInfo(X509Certificate cert,
-                            AlgorithmId digestAlgorithmId,
-                            String digestAlgorithm,
-                            AlgorithmIdentifier digAlgId,
-                            byte[] datos,
-                            String politica,
-                            Oid qualifier,
-                            boolean signingCertificateV2,
-                            Oid dataType)
-                        throws NoSuchAlgorithmException, CertificateException, IOException{
-
-        //AlgorithmIdentifier
-        //digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
-
-        //// ATRIBUTOS
-
-        //authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
-
-        //tipo de contenido
-        ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
-
-        //fecha de firma
-        ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
-
-        //MessageDigest
-        // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equals("SHA512")) digestAlgorithm = "SHA-512";
-        else if (digestAlgorithm.equals("SHA384")) digestAlgorithm = "SHA-384";
-        else if (digestAlgorithm.equals("SHA256")) digestAlgorithm = "SHA-256";
-        
-        //MessageDigest
-        ContexExpecific.add(
-            new Attribute(
-            	CMSAttributes.messageDigest,
-                new DERSet(
-                	new DEROctetString(
-                		MessageDigest.getInstance(digestAlgorithm).digest(datos)
-                	)
-                )
-            )
-        );
-
-        //Serial Number
-        // comentar lo de abajo para version del rfc 3852
-        ContexExpecific.add(
-    		new Attribute(
-				X509Name.SERIALNUMBER,
-                new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))
-			)
-        );
-
-        if (signingCertificateV2){
-         	
-     		/********************************************/
-     		/*  La Nueva operatividad esta comentada    */
-     		/********************************************/
-             //INICIO SINGING CERTIFICATE-V2
-
-             /**
-              * IssuerSerial ::= SEQUENCE {
-              *   issuer                   GeneralNames,
-              *   serialNumber             CertificateSerialNumber
-              *
-              */
-
-             TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-             GeneralName gn = new GeneralName(tbs.getIssuer());
-             GeneralNames gns = new GeneralNames(gn);
-
-             IssuerSerial isuerSerial = new IssuerSerial(gns,tbs.getSerialNumber());
-
-
-             /**
-              * ESSCertIDv2 ::=  SEQUENCE {
-              *       hashAlgorithm           AlgorithmIdentifier  DEFAULT {algorithm id-sha256},
-              *       certHash                 Hash,
-              *       issuerSerial             IssuerSerial OPTIONAL
-              *   }
-              *
-              *   Hash ::= OCTET STRING
-              */
-
-             MessageDigest md = MessageDigest.getInstance(AOCryptoUtil.getDigestAlgorithmName(digestAlgorithmId.getName()));
-             byte [] certHash = md.digest(cert.getEncoded());
-             ESSCertIDv2[] essCertIDv2 = {new ESSCertIDv2(digAlgId,certHash,isuerSerial)};
-
-
-             /**
-              * PolicyInformation ::= SEQUENCE {
-              *           policyIdentifier   CertPolicyId,
-              *           policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-              *                                  PolicyQualifierInfo OPTIONAL }
-              *
-              *      CertPolicyId ::= OBJECT IDENTIFIER
-              *
-              *      PolicyQualifierInfo ::= SEQUENCE {
-              *           policyQualifierId  PolicyQualifierId,
-              *           qualifier          ANY DEFINED BY policyQualifierId }
-              *
-              */
-                    
-             PolicyInformation[] pI ; 
-             SigningCertificateV2 scv2 = null;
-             if (qualifier!=null){
-             	
-     	        DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
-     	        if(politica.equals("")){
-     	        	pI = new PolicyInformation[]{new PolicyInformation(oidQualifier)};
-     	        }else{
-     	        	PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
-     	        	pI = new PolicyInformation[]{new PolicyInformation(oidQualifier, new DERSequence(pqInfo))};
-     	        }
-     	        
-     	        /**
-     	         * SigningCertificateV2 ::=  SEQUENCE {
-     	         *          certs        SEQUENCE OF ESSCertIDv2,
-     	         *          policies     SEQUENCE OF PolicyInformation OPTIONAL
-     	         *      }
-     	         *
-     	         */ 
-     	        scv2 = new SigningCertificateV2(essCertIDv2,pI); // con politica
-             }
-             else{
-             	scv2 = new SigningCertificateV2(essCertIDv2);	// Sin politica
-             }
-
-             //Secuencia con singningCertificate
-             ContexExpecific.add(
-                     new Attribute(
-                 	PKCSObjectIdentifiers.id_aa_signingCertificateV2,
-                     new DERSet(
-                     	scv2
-                     )
-                 )
-                     );
-
-
-             //FIN SINGING CERTIFICATE-V2
-         
-             }else{
-             	
-             //INICIO SINGNING CERTIFICATE
-             	
-     			/**
-     			 *	IssuerSerial ::= SEQUENCE {
-     			 *	     issuer                   GeneralNames,
-     			 *	     serialNumber             CertificateSerialNumber
-     			 *	}
-             	 */
-             	
-             	 
-             TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-             GeneralName gn = new GeneralName(tbs.getIssuer());
-             GeneralNames gns = new GeneralNames(gn);
-
-             IssuerSerial isuerSerial = new IssuerSerial(gns,tbs.getSerialNumber());
-
-             /**
-              *	ESSCertID ::=  SEQUENCE {
-              *   certHash                 Hash,
-              *   issuerSerial             IssuerSerial OPTIONAL
-            	 *	}
-     		 * 
-            	 *	Hash ::= OCTET STRING -- SHA1 hash of entire certificate
-              */
-             //MessageDigest
-             // Los DigestAlgorithms con SHA-2 tienen un guion:
-             String digestAlgorithmName = AOCryptoUtil.getDigestAlgorithmName(digestAlgorithmId.getName());
-             MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
-             byte [] certHash = md.digest(cert.getEncoded());
-             ESSCertID essCertID = new ESSCertID(certHash,isuerSerial);
-             
-             /**
-              * PolicyInformation ::= SEQUENCE {
-              *           policyIdentifier   CertPolicyId,
-              *           policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-              *                                  PolicyQualifierInfo OPTIONAL }
-              *
-              *      CertPolicyId ::= OBJECT IDENTIFIER
-              *
-              *      PolicyQualifierInfo ::= SEQUENCE {
-              *           policyQualifierId  PolicyQualifierId,
-              *           qualifier          ANY DEFINED BY policyQualifierId }
-              *
-              */
-             
-             PolicyInformation[] pI ; 
-             SigningCertificate scv = null;
-             if (qualifier!=null){
-             	
-     	        DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
-     	        if(politica.equals("")){
-     	        	pI = new PolicyInformation[]{new PolicyInformation(oidQualifier)};
-     	        }else{
-     	        	PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
-     	        	pI = new PolicyInformation[]{new PolicyInformation(oidQualifier, new DERSequence(pqInfo))};
-     	        }
-     	        
-     	        /**
-     	         * SigningCertificateV2 ::=  SEQUENCE {
-     	         *          certs        SEQUENCE OF ESSCertIDv2,
-     	         *          policies     SEQUENCE OF PolicyInformation OPTIONAL
-     	         *      }
-     	         *
-     	         */ 
-     	        /* HAY QUE HACER UN SEQUENCE, YA QUE EL CONSTRUCTOR DE BOUNCY CASTLE
-     	         * NO TIENE DICHO CONSTRUCTOR.
-     	         */
-     	        ASN1EncodableVector v = new ASN1EncodableVector();
-     	        v.add(new DERSequence(essCertID));
-     	        v.add(new DERSequence(pI));
-     	        scv = new SigningCertificate(new DERSequence(v)); //con politica
-             }
-             else{
-             	scv = new SigningCertificate(essCertID);	// Sin politica
-             }
-             
-             /**
-              * id-aa-signingCertificate OBJECT IDENTIFIER ::= { iso(1)
-     		 *   member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
-     		 *   smime(16) id-aa(2) 12 }
-              */
-             //Secuencia con singningCertificate
-             ContexExpecific.add(
-                     new Attribute(
-                 	PKCSObjectIdentifiers.id_aa_signingCertificate,
-                     new DERSet(
-                     	scv
-                     )
-                 )
-                     );
-             }    
-             
-             // INICIO SIGPOLICYID ATTRIBUTE
-
-             if (qualifier!=null){
-     	        /*
-     	         *  SigPolicyId ::= OBJECT IDENTIFIER
-     	         *  Politica de firma.
-     	         */
-     	        DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(qualifier.toString());
-     	
-     	        /*
-     	         *   OtherHashAlgAndValue ::= SEQUENCE {
-     	         *     hashAlgorithm    AlgorithmIdentifier,
-     	         *     hashValue        OCTET STRING }
-     	         *
-     	         */
-     	         MessageDigest mdgest = MessageDigest.getInstance(digestAlgorithm);
-     	         byte[] hashed = mdgest.digest(politica.getBytes());
-     	         DigestInfo OtherHashAlgAndValue =new DigestInfo(digAlgId, hashed);
-     	
-     	          /*
-     	         *   SigPolicyQualifierInfo ::= SEQUENCE {
-     	         *       SigPolicyQualifierId  SigPolicyQualifierId,
-     	         *       SigQualifier          ANY DEFINED BY policyQualifierId }
-     	         */
-     	
-     	        SigPolicyQualifierInfo spqInfo = new SigPolicyQualifierInfo(politica);
-     	
-     	        /*
-     	         * SignaturePolicyId ::= SEQUENCE {
-     	         *  sigPolicyId           SigPolicyId,
-     	         *  sigPolicyHash         SigPolicyHash,
-     	         *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
-     	         *                          SigPolicyQualifierInfo OPTIONAL}
-     	         *
-     	         */
-     	        ASN1EncodableVector v = new ASN1EncodableVector();
-     	        //sigPolicyId
-     	        v.add(DOISigPolicyId);
-     	        //sigPolicyHash
-     	        v.add(OtherHashAlgAndValue.toASN1Object()); // como sequence
-     	        //sigPolicyQualifiers
-     	        v.add(spqInfo.toASN1Object());
-     	
-     	        DERSequence ds = new DERSequence(v);
-     	
-     	
-     	        //Secuencia con singningCertificate
-     	        ContexExpecific.add(
-     	                new Attribute(
-     	            	PKCSObjectIdentifiers.id_aa_ets_sigPolicyId,
-     	                    new DERSet(
-     	                        ds.toASN1Object()
-     	                    )
-     	                )
-     	                );
-     	        // FIN SIGPOLICYID ATTRIBUTE
-             }
-      
-
-        signedAttr2 = getAttributeSet(new AttributeTable(ContexExpecific));
-
-        return getAttributeSet(new AttributeTable(ContexExpecific));
-
-    }
-
-     /**
-      *  M&eacute;todo que genera la parte que contiene la informaci&oacute;n del Usuario.
-      *  Se generan los atributos que se necesitan para generar la firma.
-      *
-      * @param cert Certificado de firma.
-      * @param digestAlgorithmId Identificador del algoritmo de firma.
-      * @param digestAlgorithm   Algoritmo Firmado.
-      * @param datos             Datos firmados.
-      * @param dataType          Identifica el tipo del contenido a firmar.
-      *
-      * @return      Los datos necesarios para generar la firma referente a los
-      *              datos del usuario.
-      *
-      * @throws java.security.NoSuchAlgorithmException
-      * @throws java.security.cert.CertificateException
-      * @throws java.io.IOException
-      */
-      private ASN1Set generateSignerInfoFromHash(X509Certificate cert,
-                             AlgorithmId digestAlgorithmId,
-                             String digestAlgorithm,
-                             AlgorithmIdentifier digAlgId,
-                             String politica,
-                             Oid qualifier,
-                             boolean signingCertificateV2,
-                             byte[] messageDigest,
-                             Oid dataType)
-                         throws NoSuchAlgorithmException, CertificateException, IOException{
-
-         //// ATRIBUTOS
-
-         //authenticatedAttributes
-         ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
-
-         //tipo de contenido
-         ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
-
-         //fecha de firma
-         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
-
-         //MessageDigest
-         ContexExpecific.add(
-             new Attribute(
-             	CMSAttributes.messageDigest,
-                 new DERSet(
-                 	new DEROctetString(
-                 		messageDigest
-                 	)
-                 )
-             )
-         );
-
-         //Serial Number
-         // comentar lo de abajo para version del rfc 3852
-         ContexExpecific.add(
-     		new Attribute(
- 				X509Name.SERIALNUMBER,
-                 new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))
- 			)
-         );
-
-
-         if (signingCertificateV2){
-         	
- 		/********************************************/
- 		/*  La Nueva operatividad esta comentada    */
- 		/********************************************/
-         //INICIO SINGING CERTIFICATE-V2
-
-         /**
-          * IssuerSerial ::= SEQUENCE {
-          *   issuer                   GeneralNames,
-          *   serialNumber             CertificateSerialNumber
-          *
-          */
-
-         TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-         GeneralName gn = new GeneralName(tbs.getIssuer());
-         GeneralNames gns = new GeneralNames(gn);
-
-         IssuerSerial isuerSerial = new IssuerSerial(gns,tbs.getSerialNumber());
-
-
-         /**
-          * ESSCertIDv2 ::=  SEQUENCE {
-          *       hashAlgorithm           AlgorithmIdentifier  DEFAULT {algorithm id-sha256},
-          *       certHash                 Hash,
-          *       issuerSerial             IssuerSerial OPTIONAL
-          *   }
-          *
-          *   Hash ::= OCTET STRING
-          */
-
-         MessageDigest md = MessageDigest.getInstance(AOCryptoUtil.getDigestAlgorithmName(digestAlgorithmId.getName()));
-         byte [] certHash = md.digest(cert.getEncoded());
-         ESSCertIDv2[] essCertIDv2 = {new ESSCertIDv2(digAlgId,certHash,isuerSerial)};
-
-
-         /**
-          * PolicyInformation ::= SEQUENCE {
-          *           policyIdentifier   CertPolicyId,
-          *           policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-          *                                  PolicyQualifierInfo OPTIONAL }
-          *
-          *      CertPolicyId ::= OBJECT IDENTIFIER
-          *
-          *      PolicyQualifierInfo ::= SEQUENCE {
-          *           policyQualifierId  PolicyQualifierId,
-          *           qualifier          ANY DEFINED BY policyQualifierId }
-          *
-          */
-                
-         PolicyInformation[] pI ; 
-         SigningCertificateV2 scv2 = null;
-         if (qualifier!=null){
-         	
- 	        DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
- 	        if(politica.equals("")){
- 	        	pI = new PolicyInformation[]{new PolicyInformation(oidQualifier)};
- 	        }else{
- 	        	PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
- 	        	pI = new PolicyInformation[]{new PolicyInformation(oidQualifier, new DERSequence(pqInfo))};
- 	        }
- 	        
- 	        /**
- 	         * SigningCertificateV2 ::=  SEQUENCE {
- 	         *          certs        SEQUENCE OF ESSCertIDv2,
- 	         *          policies     SEQUENCE OF PolicyInformation OPTIONAL
- 	         *      }
- 	         *
- 	         */ 
- 	        scv2 = new SigningCertificateV2(essCertIDv2,pI); // con politica
-         }
-         else{
-         	scv2 = new SigningCertificateV2(essCertIDv2);	// Sin politica
-         }
-
-         //Secuencia con singningCertificate
-         ContexExpecific.add(
-                 new Attribute(
-             	PKCSObjectIdentifiers.id_aa_signingCertificateV2,
-                 new DERSet(
-                 	scv2
-                 )
-             )
-                 );
-
-
-         //FIN SINGING CERTIFICATE-V2
-     
-         }else{
-         	
-         //INICIO SINGNING CERTIFICATE
-         	
- 			/**
- 			 *	IssuerSerial ::= SEQUENCE {
- 			 *	     issuer                   GeneralNames,
- 			 *	     serialNumber             CertificateSerialNumber
- 			 *	}
-         	 */
-         	
-         	 
-         TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-         GeneralName gn = new GeneralName(tbs.getIssuer());
-         GeneralNames gns = new GeneralNames(gn);
-
-         IssuerSerial isuerSerial = new IssuerSerial(gns,tbs.getSerialNumber());
-
-         /**
-          *	ESSCertID ::=  SEQUENCE {
-          *   certHash                 Hash,
-          *   issuerSerial             IssuerSerial OPTIONAL
-        	 *	}
- 		 * 
-        	 *	Hash ::= OCTET STRING -- SHA1 hash of entire certificate
-          */
-         //MessageDigest
-         // Los DigestAlgorithms con SHA-2 tienen un guion:
-         String digestAlgorithmName = AOCryptoUtil.getDigestAlgorithmName(digestAlgorithmId.getName());
-         MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
-         byte [] certHash = md.digest(cert.getEncoded());
-         ESSCertID essCertID = new ESSCertID(certHash,isuerSerial);
-         
-         /**
-          * PolicyInformation ::= SEQUENCE {
-          *           policyIdentifier   CertPolicyId,
-          *           policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-          *                                  PolicyQualifierInfo OPTIONAL }
-          *
-          *      CertPolicyId ::= OBJECT IDENTIFIER
-          *
-          *      PolicyQualifierInfo ::= SEQUENCE {
-          *           policyQualifierId  PolicyQualifierId,
-          *           qualifier          ANY DEFINED BY policyQualifierId }
-          *
-          */
-         
-         PolicyInformation[] pI ; 
-         SigningCertificate scv = null;
-         if (qualifier!=null){
-         	
- 	        DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
- 	        if(politica.equals("")){
- 	        	pI = new PolicyInformation[]{new PolicyInformation(oidQualifier)};
- 	        }else{
- 	        	PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
- 	        	pI = new PolicyInformation[]{new PolicyInformation(oidQualifier, new DERSequence(pqInfo))};
- 	        }
- 	        
- 	        /**
- 	         * SigningCertificateV2 ::=  SEQUENCE {
- 	         *          certs        SEQUENCE OF ESSCertIDv2,
- 	         *          policies     SEQUENCE OF PolicyInformation OPTIONAL
- 	         *      }
- 	         *
- 	         */ 
- 	        /* HAY QUE HACER UN SEQUENCE, YA QUE EL CONSTRUCTOR DE BOUNCY CASTLE
- 	         * NO TIENE DICHO CONSTRUCTOR.
- 	         */
- 	        ASN1EncodableVector v = new ASN1EncodableVector();
- 	        v.add(new DERSequence(essCertID));
- 	        v.add(new DERSequence(pI));
- 	        scv = new SigningCertificate(new DERSequence(v)); //con politica
-         }
-         else{
-         	scv = new SigningCertificate(essCertID);	// Sin politica
-         }
-         
-         /**
-          * id-aa-signingCertificate OBJECT IDENTIFIER ::= { iso(1)
- 		 *   member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
- 		 *   smime(16) id-aa(2) 12 }
-          */
-         //Secuencia con singningCertificate
-         ContexExpecific.add(
-                 new Attribute(
-             	PKCSObjectIdentifiers.id_aa_signingCertificate,
-                 new DERSet(
-                 	scv
-                 )
-             )
-                 );
-         }    
-         
-         // INICIO SIGPOLICYID ATTRIBUTE
-
-         if (qualifier!=null){
- 	        /*
- 	         *  SigPolicyId ::= OBJECT IDENTIFIER
- 	         *  Politica de firma.
- 	         */
- 	        DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(qualifier.toString());
- 	
- 	        /*
- 	         *   OtherHashAlgAndValue ::= SEQUENCE {
- 	         *     hashAlgorithm    AlgorithmIdentifier,
- 	         *     hashValue        OCTET STRING }
- 	         *
- 	         */
- 	         MessageDigest mdgest = MessageDigest.getInstance(digestAlgorithm);
- 	         byte[] hashed = mdgest.digest(politica.getBytes());
- 	         DigestInfo OtherHashAlgAndValue =new DigestInfo(digAlgId, hashed);
- 	
- 	          /*
- 	         *   SigPolicyQualifierInfo ::= SEQUENCE {
- 	         *       SigPolicyQualifierId  SigPolicyQualifierId,
- 	         *       SigQualifier          ANY DEFINED BY policyQualifierId }
- 	         */
- 	
- 	        SigPolicyQualifierInfo spqInfo = new SigPolicyQualifierInfo(politica);
- 	
- 	        /*
- 	         * SignaturePolicyId ::= SEQUENCE {
- 	         *  sigPolicyId           SigPolicyId,
- 	         *  sigPolicyHash         SigPolicyHash,
- 	         *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
- 	         *                          SigPolicyQualifierInfo OPTIONAL}
- 	         *
- 	         */
- 	        ASN1EncodableVector v = new ASN1EncodableVector();
- 	        //sigPolicyId
- 	        v.add(DOISigPolicyId);
- 	        //sigPolicyHash
- 	        v.add(OtherHashAlgAndValue.toASN1Object()); // como sequence
- 	        //sigPolicyQualifiers
- 	        v.add(spqInfo.toASN1Object());
- 	
- 	        DERSequence ds = new DERSequence(v);
- 	
- 	
- 	        //Secuencia con singningCertificate
- 	        ContexExpecific.add(
- 	                new Attribute(
- 	            	PKCSObjectIdentifiers.id_aa_ets_sigPolicyId,
- 	                    new DERSet(
- 	                        ds.toASN1Object()
- 	                    )
- 	                )
- 	                );
- 	        // FIN SIGPOLICYID ATTRIBUTE
-         }
-
-
-         signedAttr2 = getAttributeSet(new AttributeTable(ContexExpecific));
-
-         return getAttributeSet(new AttributeTable(ContexExpecific));
-
-     }
-
      
      /**
      * Realiza la firma usando los atributos del firmante.
@@ -1100,8 +473,10 @@ public final class CadesCoSignerEnveloped extends SigUtils{
         Signature sig = null;
 		try {
 			sig = Signature.getInstance(signatureAlgorithm);
-		} catch (Exception e) {
-            e.printStackTrace();
+		} catch (final Throwable e) {
+            throw new AOException(
+        		"Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e
+    		);
 		}
 
         byte[] tmp= null;
@@ -1115,9 +490,11 @@ public final class CadesCoSignerEnveloped extends SigUtils{
         //Indicar clave privada para la firma
 		try {
 			sig.initSign(keyEntry.getPrivateKey());
-		} catch (final Throwable e) {
+		} 
+		catch (final Throwable e) {
 			throw new AOException(
-					"Error al obtener la clave de firma para el algoritmo '" + signatureAlgorithm + "'", e);
+				"Error al inicializar la firma con la clave privada", e
+			);
 		}
 
 

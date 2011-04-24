@@ -2,41 +2,39 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
-
-import javax.swing.tree.TreeModel;
 
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.ietf.jgss.Oid;
 
-import es.gob.afirma.beans.AOSignInfo;
-import es.gob.afirma.ciphers.AOAlgorithmConfig;
+import es.gob.afirma.ciphers.AOCipherConfig;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOInvalidFormatException;
 import es.gob.afirma.exceptions.AOUnsupportedSignFormatException;
 import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.misc.MimeHelper;
 import es.gob.afirma.misc.AOConstants.AOCipherAlgorithm;
 import es.gob.afirma.misc.AOConstants.AOCipherBlockMode;
 import es.gob.afirma.misc.AOConstants.AOCipherPadding;
 import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.misc.MimeHelper;
+import es.gob.afirma.misc.tree.TreeModel;
 import es.gob.afirma.signers.aobinarysignhelper.CADESData;
 import es.gob.afirma.signers.aobinarysignhelper.CADESDigestedData;
 import es.gob.afirma.signers.aobinarysignhelper.CADESEPESSignedAndEnvelopedData;
@@ -53,13 +51,14 @@ import es.gob.afirma.signers.aobinarysignhelper.P7ContentSignerParameters;
 import es.gob.afirma.signers.aobinarysignhelper.ReadNodesTree;
 import es.gob.afirma.signers.aobinarysignhelper.ValidateCADES;
 import es.gob.afirma.signers.aobinarysignhelper.ValidateCMS;
+import es.gob.afirma.signers.beans.AOSignInfo;
 
 /**
  * Manejador de firmas binarias CADES.<p>
  * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
  * <dl>
  *  <dt>mode</dt>
- *  	<dd>Modo de firma a usar (Expl&iacute;cita o Impl&iacute;cita)</dd>
+ *  	<dd>Modo de firma a usar (Expl&iacute;cita = <code>explicit</code> o Impl&iacute;cita = <code>implicit</code>)</dd>
  *  <dt>policyIdentifier</dt>
  *  	<dd>URL identificadora de la pol&iacute;tica de firma (normalmente una URL hacia el documento que describe la pol&iacute;tica)</dd>
  *  <dt>policyQualifier</dt>
@@ -67,20 +66,33 @@ import es.gob.afirma.signers.aobinarysignhelper.ValidateCMS;
  *  <dt>precalculatedHashAlgorithm</dt>
  *  	<dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
  *  <dt>signingCertificateV2</dt>
- *      <dd>Debe establecerse a <code>true</code> si desea usarse la versi&oacute;n 2 del atributo <i>Signing Certificate</i> de CAdES. Si no se establece o se hace a <code>false</code> se utilizara la versi&oacute;n 1</dd> 
+ *      <dd>Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo <i>Signing Certificate</i> de CAdES. Si no se establece o se hace a <code>false</code> se utilizara la versi&oacute;n 1</dd>
+ *  <dt>useMIMEencoding</dt>
+ *      <dd>Debe establecerse a <code>true</code> si se desea usar codificaci&oacute;n MIME para empotrar el binario en la firma (seg&uacute;n recomendaciones de la CE). Este par&aacute;metro solo tiene efecto si el par&aacute;metro <code>mode</code> se estableci&oacute; a <code>implicit</code></dd>
+ *  <dt>MIMEContentID</dt>
+ *      <dd>Identificador MIME del contenido a firmar. S&oacute;lo se tiene en cuenta si el par&aacute;metro <code>MIMEContentID</code> est&aacute; establecido a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd>
+ *  <dt>MIMEContentType</dt>
+ *    <dd>Tipo MIME (MIME-Type) del contenido a firmar. S&oacute;lo se tiene en cuenta si el par&aacute;metro <code>MIMEContentID</code> est&aacute; establecido a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd>
+ *  <dt>MIMEFileName</dt>      
+ *    <dd>Nombre original del fichero a firmar. S&oacute;lo se tiene en cuenta si el par&aacute;metro <code>MIMEContentID</code> est&aacute; establecido a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd>
+ *  <dt>MIMEModificationDate</dt>
+ *    <dd>Fecha de la &uacute;ltima modificaci&oacute;n (por defecto en formato "<i>yyyy/MM/dd HH:mm:ss</i>") del contenido a firmar. S&oacute;lo se tiene en cuenta si el par&aacute;metro <code>MIMEContentID</code> est&aacute; establecido a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd>
+ *  <dt>MIMEModificationDateFormat</dt>
+ *    <dd>Formato en el que se ha proporcionado el valor del par&aacute;metro <code></code> (fecha de la &uacute;ltima modificaci&oacute;n del contenido a firmar) si este difiere de "<i>yyyy/MM/dd HH:mm:ss</i>". Misma sintaxis de formato que <code>java.text.SimpleDateFormat</code>. S&oacute;lo se tiene en cuenta si se ha establecido un valor para el par&aacute;metro <code>MIMEModificationDate</code>, <code>MIMEContentID</code> est&aacute; establecido a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd>       
  * </dl> 
- * @version 0.2
+ * @version 0.3
  */
-public final class AOCADESSigner implements AOSigner {
+public final class AOCAdESSigner implements AOSigner {
 
     /* Propiedades de la clase. */
-    private AOCipherAlgorithm cipherAlgorithm= null;
+    private AOCipherAlgorithm cipherAlgorithm = null;
     private Oid dataType = null;
     
-    public byte[] sign(final InputStream file, 
+    private static final String DEFAULT_MIME_MODIFICATION_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+    
+    public byte[] sign(byte[] data, 
     		           String algorithm, 
     		           final PrivateKeyEntry keyEntry, 
-    		           final X509Certificate cert, 
     		           Properties extraParams) throws AOException {
 
     	if (extraParams == null) extraParams = new Properties();
@@ -92,25 +104,56 @@ public final class AOCADESSigner implements AOSigner {
 		
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
         final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
-		
-		byte[] plainData;
-		try {
-			plainData = AOUtil.getDataFromInputStream(file);
-		} 
-		catch (final Throwable e1) {
-			throw new AOException("No se han podido leer los datos a firmar: "+e1);
-		}
     	
         byte[] messageDigest = null;
         
         if(precalculatedDigest != null) {
-            messageDigest = plainData; 
+            messageDigest = data; 
         }
         
+		final String mode = extraParams.getProperty("mode", AOConstants.DEFAULT_SIGN_MODE);
+        
+    	if (mode.equals(AOConstants.SIGN_MODE_IMPLICIT) &&
+		    "true".equalsIgnoreCase(extraParams.getProperty("useMIMEencoding"))) {
+    		
+    		Date modDateObject = null;
+    		final String modDate = extraParams.getProperty("MIMEModificationDate");
+    		if (modDate != null) {
+	    		try {
+	    			modDateObject = new SimpleDateFormat(
+    					extraParams.getProperty("useMIMEencoding", DEFAULT_MIME_MODIFICATION_DATE_FORMAT)
+					).parse(modDate);
+	    		}
+	    		catch(final Throwable e) {
+	    			Logger.getLogger("es.gob.afirma").warning(
+    					"La fecha MIME de ultima modificacion del contenido a firmar proporcionada (" +
+    					modDate +
+    					") no corresponde al formato establecido, se omitira este dato: " +
+    					e
+					);
+	    		}
+    		}	    		
+    		data = MimeHelper.getMimeEncodedAsAttachment(
+				data, 
+				extraParams.getProperty("MIMEContentID"), 
+				extraParams.getProperty("MIMEContentType"), 
+				extraParams.getProperty("MIMEFileName"), 
+				modDateObject
+			).getBytes();
+    	}
+        
+    	X509Certificate[] xCerts = new X509Certificate[0];
+    	final Certificate[] certs = keyEntry.getCertificateChain();
+    	if (certs != null && (certs instanceof X509Certificate[])) xCerts = (X509Certificate[]) certs;
+    	else {
+    		final Certificate cert = keyEntry.getCertificate();
+    		if (cert instanceof X509Certificate) xCerts = new X509Certificate[] { (X509Certificate) cert };
+    	}
+    	
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
-            plainData,
+            data,
             algorithm,
-            (X509Certificate[]) keyEntry.getCertificateChain()
+            xCerts
         );
 
         // tipos de datos a firmar.
@@ -123,8 +166,6 @@ public final class AOCADESSigner implements AOSigner {
             }
         }
         
-		final String mode = extraParams.getProperty("mode", AOConstants.DEFAULT_SIGN_MODE);
-
         try {
             boolean omitContent = false;
         	if (mode.equals(AOConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null) omitContent = true;
@@ -133,6 +174,7 @@ public final class AOCADESSigner implements AOSigner {
         		policyQualifier = new Oid(extraParams.getProperty("policyQualifier"));
         	}
         	catch(final Throwable e) {}
+        	
         	return new GenCadesEPESSignedData().generateSignedData(
     			csp, 
     			omitContent, 
@@ -143,13 +185,18 @@ public final class AOCADESSigner implements AOSigner {
     			keyEntry, 
     			messageDigest
 			);
+        	
         }
-        catch (Throwable e) {
+        catch (final Throwable e) {
             throw new AOException("Error generando la firma CAdES", e);
         }
     }
 
-    public byte[] cosign(InputStream file, InputStream signFile, String algorithm, PrivateKeyEntry keyEntry, X509Certificate cert, Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] data, 
+    		             final byte[] sign, 
+    		             String algorithm, 
+    		             final PrivateKeyEntry keyEntry, 
+    		             Properties extraParams) throws AOException {
         
     	if (extraParams == null) extraParams = new Properties();
     	
@@ -160,31 +207,25 @@ public final class AOCADESSigner implements AOSigner {
 		
 		final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
 		final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
- 		
- 		byte[] plainData;
-		try {
-			plainData = AOUtil.getDataFromInputStream(file);
-		} catch (Throwable e1) {
-			throw new AOException("No se han podido leer los datos a firmar: "+e1);
-		}
-		
-		byte[] plainSign;
-		try {
-			plainSign = AOUtil.getDataFromInputStream(signFile);
-		} catch (Exception e1) {
-			throw new AOException("No se han podido leer los datos de firma: "+e1);
-		}
 		
 		byte[] messageDigest = null;
 		
 		if(precalculatedDigest != null) {
-		    messageDigest = plainData;
+		    messageDigest = data;
 		}
     	
+    	X509Certificate[] xCerts = new X509Certificate[0];
+    	final Certificate[] certs = keyEntry.getCertificateChain();
+    	if (certs != null && (certs instanceof X509Certificate[])) xCerts = (X509Certificate[]) certs;
+    	else {
+    		final Certificate cert = keyEntry.getCertificate();
+    		if (cert instanceof X509Certificate) xCerts = new X509Certificate[] { (X509Certificate) cert };
+    	}
+		
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(
-    		plainData,
+    		data,
             algorithm,
-            (X509Certificate[]) keyEntry.getCertificateChain()
+            xCerts
         );
 
         // tipos de datos a firmar.
@@ -205,15 +246,15 @@ public final class AOCADESSigner implements AOSigner {
         	catch(Throwable e) {}
         	
         	//Si la firma que nos introducen es SignedData
-    		boolean signedData = new ValidateCMS().isCMSSignedData(new ByteArrayInputStream(plainSign));
+    		boolean signedData = new ValidateCMS().isCMSSignedData(sign);
         	if (signedData){
         		
         		final String mode = extraParams.getProperty("mode", AOConstants.DEFAULT_SIGN_MODE);
-          	final boolean omitContent = mode.equals(AOConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
+        		final boolean omitContent = mode.equals(AOConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
         		
 	            return new CadesCoSigner().coSigner(
 	        		csp, 
-	        		new ByteArrayInputStream(plainSign), 
+	        		sign, 
 	        		omitContent, 
 	        		extraParams.getProperty("policyIdentifier"), 
 	        		policyQualifier, 
@@ -223,29 +264,28 @@ public final class AOCADESSigner implements AOSigner {
 	        		messageDigest
 	    		);
         	}
-        	else{
-        		return new CadesCoSignerEnveloped().coSigner(
-    	        		csp, 
-    	        		new ByteArrayInputStream(plainSign), 
-    	        		extraParams.getProperty("policyIdentifier"), 
-    	        		policyQualifier, 
-    	        		signingCertificateV2, 
-    	        		dataType, 
-    	        		keyEntry, 
-    	        		messageDigest
-    	    		);
-        	}
+
+    		return new CadesCoSignerEnveloped().coSigner(
+        		csp, 
+        		sign, 
+        		extraParams.getProperty("policyIdentifier"), 
+        		policyQualifier, 
+        		signingCertificateV2, 
+        		dataType, 
+        		keyEntry, 
+        		messageDigest
+    		);
+
         }
-        catch (Throwable e) {
+        catch (final Throwable e) {
             throw new AOException("Error generando la Cofirma CAdES", e);
         }
     }
     
 
-    public byte[] cosign(final InputStream signFile, 
+    public byte[] cosign(final byte[] sign, 
     		             String algorithm, 
     		             final PrivateKeyEntry keyEntry, 
-    		             final X509Certificate cert, 
     		             Properties extraParams) throws AOException {
     
     	if (extraParams == null) extraParams = new Properties();
@@ -268,29 +308,28 @@ public final class AOCADESSigner implements AOSigner {
         //algoritmo de firma.
         String typeAlgorithm = algorithm;
         // Array de certificados
-        X509Certificate[] aCertificados=(X509Certificate[]) keyEntry.getCertificateChain();
+    	X509Certificate[] aCertificados = new X509Certificate[0];
+    	final Certificate[] certs = keyEntry.getCertificateChain();
+    	if (certs != null && (certs instanceof X509Certificate[])) aCertificados = (X509Certificate[]) certs;
+    	else {
+    		final Certificate cert = keyEntry.getCertificate();
+    		if (cert instanceof X509Certificate) aCertificados = new X509Certificate[] { (X509Certificate) cert };
+    	}
+        
     	Oid policyQualifier = null;
     	try {
     		policyQualifier = new Oid(extraParams.getProperty("policyQualifier"));
     	}
-    	catch(Throwable e) {}
-    	
-    	byte[] plainData;
-		try {
-			plainData = AOUtil.getDataFromInputStream(signFile);
-		} 
-		catch (Throwable e1) {
-			throw new AOException("No se han podido leer los datos a firmar: "+e1);
-		}
+    	catch(final Throwable e) {}
     	
 		//     	Si la firma que nos introducen es SignedData
-		boolean signedData = new ValidateCMS().isCMSSignedData(new ByteArrayInputStream(plainData));
+		boolean signedData = new ValidateCMS().isCMSSignedData(sign);
     	if (signedData){
 	        try {
 	            return new CadesCoSigner().coSigner(
 	        		typeAlgorithm, 
 	        		aCertificados, 
-	        		new ByteArrayInputStream(plainData), 
+	        		new ByteArrayInputStream(sign), 
 	        		extraParams.getProperty("policyIdentifier"), 
 	        		policyQualifier, 
 	        		signingCertificateV2,
@@ -304,28 +343,32 @@ public final class AOCADESSigner implements AOSigner {
 	        }
     	}
     	// Signed And Enveloped.
-    	else{
-    		try {
-	            return new CadesCoSignerEnveloped().coSigner(
-	        		typeAlgorithm, 
-	        		aCertificados, 
-	        		new ByteArrayInputStream(plainData), 
-	        		extraParams.getProperty("policyIdentifier"), 
-	        		policyQualifier, 
-	        		signingCertificateV2,
-	        		dataType,
-	        		keyEntry,
-	        		null // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
-	    		);
-	        }
-	        catch (Throwable e) {
-	            throw new AOException("Error generando la Cofirma CADES", e);
-	        }
-    	}
+
+		try {
+            return new CadesCoSignerEnveloped().coSigner(
+        		typeAlgorithm, 
+        		aCertificados, 
+        		new ByteArrayInputStream(sign), 
+        		extraParams.getProperty("policyIdentifier"), 
+        		policyQualifier, 
+        		signingCertificateV2,
+        		dataType,
+        		keyEntry,
+        		null // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
+    		);
+        }
+        catch (final Throwable e) {
+            throw new AOException("Error generando la Cofirma CADES", e);
+        }
 
     }
 
-    public byte[] countersign(final InputStream signFile, String algorithm, final CounterSignTarget targetType, final Object[] targets, final PrivateKeyEntry keyEntry, final X509Certificate cert, Properties extraParams) throws AOException {
+    public byte[] countersign(final byte[] sign, 
+    		                  String algorithm, 
+    		                  final CounterSignTarget targetType, 
+    		                  final Object[] targets, 
+    		                  final PrivateKeyEntry keyEntry, 
+    		                  Properties extraParams) throws AOException {
 
     	if (extraParams == null) extraParams = new Properties();
     	final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
@@ -335,17 +378,19 @@ public final class AOCADESSigner implements AOSigner {
     	else if(algorithm.equalsIgnoreCase("DSA"))
     		algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
 
-    	byte[] plainData;
-    	try {
-    		plainData = AOUtil.getDataFromInputStream(signFile);
-    	} catch (Exception e1) {
-    		throw new AOException("No se han podido leer los datos a firmar: "+e1);
+    	X509Certificate[] xCerts = new X509Certificate[0];
+    	final Certificate[] certs = keyEntry.getCertificateChain();
+    	if (certs != null && (certs instanceof X509Certificate[])) xCerts = (X509Certificate[]) certs;
+    	else {
+    		final Certificate cert = keyEntry.getCertificate();
+    		if (cert instanceof X509Certificate) xCerts = new X509Certificate[] { (X509Certificate) cert };
     	}
-
-    	P7ContentSignerParameters csp = new P7ContentSignerParameters(
-    			plainData,
-    			algorithm,
-    			(X509Certificate[]) keyEntry.getCertificateChain());
+    	
+    	final P7ContentSignerParameters csp = new P7ContentSignerParameters(
+			sign,
+			algorithm,
+			xCerts
+		);
 
 
     	// tipos de datos a firmar.
@@ -364,7 +409,7 @@ public final class AOCADESSigner implements AOSigner {
     	if(extraParams.containsKey("policyQualifier")) {
     		try {
     			policyQualifier = new Oid(extraParams.getProperty("policyQualifier"));
-    		} catch(Throwable e) {}
+    		} catch(final Throwable e) {}
     		policyIdentifier = extraParams.getProperty("policyIdentifier");
     	}
 
@@ -372,7 +417,7 @@ public final class AOCADESSigner implements AOSigner {
     	byte[] dataSigned = null;
 
     	// Si la firma que nos introducen es SignedData
-		boolean signedData = new ValidateCMS().isCMSSignedData(new ByteArrayInputStream(plainData));
+		boolean signedData = new ValidateCMS().isCMSSignedData(sign);
     	if (signedData){
 	    	try {
 	    		// CASO DE FIRMA DE ARBOL
@@ -381,7 +426,7 @@ public final class AOCADESSigner implements AOSigner {
 	
 	    			dataSigned= new CadesCounterSigner().counterSigner(
 	    					csp,
-	    					plainData,
+	    					sign,
 	    					CounterSignTarget.Tree,
 	    					nodes,
 	    					keyEntry, 
@@ -396,7 +441,7 @@ public final class AOCADESSigner implements AOSigner {
 	    			int[] nodes={0};
 	    			dataSigned= new CadesCounterSigner().counterSigner(
 	    					csp,
-	    					plainData,
+	    					sign,
 	    					CounterSignTarget.Leafs,
 	    					nodes,
 	    					keyEntry, 
@@ -413,7 +458,7 @@ public final class AOCADESSigner implements AOSigner {
 	    			nodesID = new ReadNodesTree().simplyArray(nodesID);
 	    			dataSigned= new CadesCounterSigner().counterSigner(
 						csp, 
-						plainData, 
+						sign, 
 						CounterSignTarget.Nodes, 
 						nodesID, 
 						keyEntry, 
@@ -429,10 +474,10 @@ public final class AOCADESSigner implements AOSigner {
 	    			//clase que lee los nodos de un fichero firmado (p7s, csig, sig)
 	    			final String[] signers = new String[targets.length];
 	    			for(int i=0; i<targets.length; i++) signers[i] = (String)targets[i];
-	    			final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, plainData);
+	    			final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
 	    			dataSigned= new CadesCounterSigner().counterSigner(
 	    					csp,
-	    					plainData,
+	    					sign,
 	    					CounterSignTarget.Signers,
 	    					nodes2,
 	    					keyEntry, 
@@ -451,82 +496,81 @@ public final class AOCADESSigner implements AOSigner {
 	    	}
     	}
     	//Signed and enveloped
-    	else{
-    		try {
-	    		// CASO DE FIRMA DE ARBOL
-	    		if(targetType == CounterSignTarget.Tree){
-	    			int[] nodes = {0};
-	
-	    			dataSigned= new CadesCounterSignerEnveloped().counterSigner(
-	    					csp,
-	    					plainData,
-	    					CounterSignTarget.Tree,
-	    					nodes,
-	    					keyEntry, 
-	    					policyIdentifier, 
-	    					policyQualifier, 
-	    					signingCertificateV2,
-	    					dataType
-	    			);
-	    		}
-	    		// CASO DE FIRMA DE HOJAS
-	    		else if(targetType == CounterSignTarget.Leafs){
-	    			int[] nodes={0};
-	    			dataSigned= new CadesCounterSignerEnveloped().counterSigner(
-	    					csp,
-	    					plainData,
-	    					CounterSignTarget.Leafs,
-	    					nodes,
-	    					keyEntry, 
-	    					policyIdentifier, 
-	    					policyQualifier, 
-	    					signingCertificateV2, 
-	    					dataType
-	    			);
-	    		}
-	    		// CASO DE FIRMA DE NODOS
-	    		else if(targetType == CounterSignTarget.Nodes){
-	    			int[] nodesID = new int[targets.length];
-	    			for(int i=0; i<targets.length; i++) nodesID[i] = ((Integer)targets[i]).intValue();
-	    			nodesID = new ReadNodesTree().simplyArray(nodesID);
-	    			dataSigned= new CadesCounterSignerEnveloped().counterSigner(
-						csp, 
-						plainData, 
-						CounterSignTarget.Nodes, 
-						nodesID, 
-						keyEntry, 
-						policyIdentifier, 
-						policyQualifier, 
-						signingCertificateV2, 
-						dataType
-	    			);
-	    		}
-	    		// CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
-	    		else if(targetType == CounterSignTarget.Signers){
-	
-	    			//clase que lee los nodos de un fichero firmado (p7s, csig, sig)
-	    			final String[] signers = new String[targets.length];
-	    			for(int i=0; i<targets.length; i++) signers[i] = (String)targets[i];
-	    			final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, plainData);
-	    			dataSigned= new CadesCounterSignerEnveloped().counterSigner(
-	    					csp,
-	    					plainData,
-	    					CounterSignTarget.Signers,
-	    					nodes2,
-	    					keyEntry, 
-	    					policyIdentifier, 
-	    					policyQualifier, 
-	    					signingCertificateV2, 
-	    					dataType
-	    			);
-	
-	    		}
-	
-	    		return dataSigned;
-	
-	    	} catch (final Throwable e) {
-	    		throw new AOException("Error generando la Contrafirma CAdES", e);
-	    	}
+
+		try {
+    		// CASO DE FIRMA DE ARBOL
+    		if(targetType == CounterSignTarget.Tree){
+    			int[] nodes = {0};
+
+    			dataSigned= new CadesCounterSignerEnveloped().counterSigner(
+    					csp,
+    					sign,
+    					CounterSignTarget.Tree,
+    					nodes,
+    					keyEntry, 
+    					policyIdentifier, 
+    					policyQualifier, 
+    					signingCertificateV2,
+    					dataType
+    			);
+    		}
+    		// CASO DE FIRMA DE HOJAS
+    		else if(targetType == CounterSignTarget.Leafs){
+    			int[] nodes={0};
+    			dataSigned= new CadesCounterSignerEnveloped().counterSigner(
+    					csp,
+    					sign,
+    					CounterSignTarget.Leafs,
+    					nodes,
+    					keyEntry, 
+    					policyIdentifier, 
+    					policyQualifier, 
+    					signingCertificateV2, 
+    					dataType
+    			);
+    		}
+    		// CASO DE FIRMA DE NODOS
+    		else if(targetType == CounterSignTarget.Nodes){
+    			int[] nodesID = new int[targets.length];
+    			for(int i=0; i<targets.length; i++) nodesID[i] = ((Integer)targets[i]).intValue();
+    			nodesID = new ReadNodesTree().simplyArray(nodesID);
+    			dataSigned= new CadesCounterSignerEnveloped().counterSigner(
+					csp, 
+					sign, 
+					CounterSignTarget.Nodes, 
+					nodesID, 
+					keyEntry, 
+					policyIdentifier, 
+					policyQualifier, 
+					signingCertificateV2, 
+					dataType
+    			);
+    		}
+    		// CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
+    		else if(targetType == CounterSignTarget.Signers){
+
+    			//clase que lee los nodos de un fichero firmado (p7s, csig, sig)
+    			final String[] signers = new String[targets.length];
+    			for(int i=0; i<targets.length; i++) signers[i] = (String)targets[i];
+    			final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
+    			dataSigned = new CadesCounterSignerEnveloped().counterSigner(
+    					csp,
+    					sign,
+    					CounterSignTarget.Signers,
+    					nodes2,
+    					keyEntry, 
+    					policyIdentifier, 
+    					policyQualifier, 
+    					signingCertificateV2, 
+    					dataType
+    			);
+
+    		}
+
+    		return dataSigned;
+
+    	} catch (final Throwable e) {
+    		throw new AOException("Error generando la Contrafirma CAdES", e);
     	}
 
     }
@@ -581,17 +625,27 @@ public final class AOCADESSigner implements AOSigner {
 			plainData = AOUtil.getDataFromInputStream(file);
 		} 
 		catch (final Throwable e1) {
-			throw new AOException("No se han podido leer los datos a firmar: "+e1);
+			throw new AOException("No se han podido leer los datos a firmar", e1);
 		}
 		
         
 		P7ContentSignerParameters csp = null;
         if (keyEntry!=null){
+        	
+        	X509Certificate[] xCerts = new X509Certificate[0];
+        	final Certificate[] certs = keyEntry.getCertificateChain();
+        	if (certs != null && (certs instanceof X509Certificate[])) xCerts = (X509Certificate[]) certs;
+        	else {
+        		final Certificate cert = keyEntry.getCertificate();
+        		if (cert instanceof X509Certificate) xCerts = new X509Certificate[] { (X509Certificate) cert };
+        	}
+        	
             csp = new P7ContentSignerParameters(
         		plainData,
                 digestAlgorithm,
-                (X509Certificate[]) keyEntry.getCertificateChain()
+                xCerts
             );
+            
         }
 
         // tipos de datos a firmar.
@@ -608,10 +662,10 @@ public final class AOCADESSigner implements AOSigner {
         byte[] dataSigned = null;
 
         //Seleccion del algoritmo de cifrado.
-        AOAlgorithmConfig config=null;
+        AOCipherConfig config=null;
         if (this.cipherAlgorithm == null){
             // Por defecto usamos el AES.
-            config = new AOAlgorithmConfig(
+            config = new AOCipherConfig(
                 AOCipherAlgorithm.AES,
                 AOCipherBlockMode.CBC,
                 AOCipherPadding.PKCS5PADDING
@@ -620,7 +674,7 @@ public final class AOCADESSigner implements AOSigner {
         /* En caso de usar un algoritmo de cifrado, si no funciona es porque el
            Provider no lo soporta. */
         else{
-            config = new AOAlgorithmConfig(
+            config = new AOCipherConfig(
                 this.cipherAlgorithm,
 				AOCipherBlockMode.CBC,
 				AOCipherPadding.PKCS5PADDING
@@ -630,27 +684,27 @@ public final class AOCADESSigner implements AOSigner {
         try {
             // Busqueda del tipo que nos han solicitado.
             if ((type== null) || (type.equals(""))){
-                type = AOConstants.DEFAULT_BINARY_ENVELOP;
+                type = AOConstants.DEFAULT_CMS_CONTENTTYPE;
             }
             // Es Data.
-            else if (type.equals(AOConstants.BINARY_ENVELOP_DATA)){
+            else if (type.equals(AOConstants.CMS_CONTENTTYPE_DATA)){
                 dataSigned = new CADESData().genData(csp);
             }
             //Es Digested Data.
-            else if(type.equals(AOConstants.BINARY_ENVELOP_DIGESTEDDATA)){
+            else if(type.equals(AOConstants.CMS_CONTENTTYPE_DIGESTEDDATA)){
                 dataSigned = new CADESDigestedData().genDigestedData(csp,dataType);
             }
             // Es Enveloped Data.
-            else if(type.equals(AOConstants.BINARY_ENVELOP_ENVELOPEDDATA)){
+            else if(type.equals(AOConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)){
                  if (keyEntry != null){
                     dataSigned = new CADESEnvelopedData().genEnvelopedData(csp, config, certDest, dataType);
                  }
                  else{
-                    dataSigned = new CADESEnvelopedData().genEnvelopedData(file, digestAlgorithm, config, certDest, dataType);
+                    dataSigned = new CADESEnvelopedData().genEnvelopedData(plainData, digestAlgorithm, config, certDest, dataType);
                  }
             }
             // Es Signed and Enveloped Data.
-            else{
+            else {
                 try {
                     this.dataType = new Oid(PKCSObjectIdentifiers.signedData.getId());
                 } 
@@ -705,7 +759,7 @@ public final class AOCADESSigner implements AOSigner {
     public byte[] encrypt(final InputStream file, final String digestAlgorithm, final String key) throws AOException {
 
         //Comprobamos que el archivo a cifrar no sea nulo.
-        if (file==null){
+        if (file == null){
             throw new NullPointerException("El archivo a cifrar no puede ser nulo.");
         }
 
@@ -719,14 +773,11 @@ public final class AOCADESSigner implements AOSigner {
             }
         }
 
-        // Datos firmados.
-        byte[] dataSigned = null;
-
         //Seleccion del algoritmo de cifrado.
-        AOAlgorithmConfig config=null;
+        AOCipherConfig config=null;
         if (this.cipherAlgorithm == null){
             // Por defecto usamos el PBEWITHSHA1ANDDESEDE. El AES en este caso no funciona.
-            config = new AOAlgorithmConfig(
+            config = new AOCipherConfig(
                 AOCipherAlgorithm.AES,
                 AOCipherBlockMode.CBC,
                 AOCipherPadding.PKCS5PADDING
@@ -735,15 +786,15 @@ public final class AOCADESSigner implements AOSigner {
         /* En caso de usar un algoritmo de cifrado, si no funciona es porque el
            Provider no lo soporta. */
         else{
-            config = new AOAlgorithmConfig(
+            config = new AOCipherConfig(
                 this.cipherAlgorithm,
 				AOCipherBlockMode.CBC,
 				AOCipherPadding.PKCS5PADDING
             );
         }
 
-        try{
-            dataSigned = new CADESEncryptedData().genEncryptedData(
+        try {
+            return new CADESEncryptedData().genEncryptedData(
         		file, 
         		digestAlgorithm, 
         		config , 
@@ -752,56 +803,34 @@ public final class AOCADESSigner implements AOSigner {
     		);
         } 
         catch (final Throwable e) {
-            throw new AOException("Error generando en el enveloped de CADES", e);
+            throw new AOException("Error generando el enveloped de CADES", e);
         }
-
-        return dataSigned;
 
     }
 
-	public TreeModel getSignersStructure(final InputStream sign, final boolean asSimpleSignInfo){
-
-        TreeModel treeModel = null;
-
-        BufferedInputStream bufin = new BufferedInputStream(sign);
-        byte[] buffer = new byte[1024];
-        int len;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
+	public TreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo){
+        final ReadNodesTree Rn = new ReadNodesTree();
         try {
-            while (bufin.available() != 0) {
-                len = bufin.read(buffer);
-                baos.write(buffer, 0, len);
-            }
-        } 
-        catch (final Throwable e) {
-        	Logger.getLogger("es.gob.afirma").warning (
-    			"Error al leer los datos a firmar: " + e 
-        	);
-        	return null;
-        }
-
-       //clase que lee los nodos de un fichero firmado (p7s, csig, sig)
-        ReadNodesTree Rn = new ReadNodesTree();
-        try {
-            treeModel = Rn.readNodesTree(baos.toByteArray(), asSimpleSignInfo);
+            return Rn.readNodesTree(sign, asSimpleSignInfo);
         } 
         catch (final Throwable ex) {
-            Logger.getLogger("es.gob.afirma").severe(ex.toString());
+            Logger.getLogger("es.gob.afirma").severe(
+        		"No se ha podido obtener el albol de firmantes de la firma, se devolvera null: " + ex
+    		);
         }
-        return treeModel;
+        return null;
     }
 
-	public boolean isSign(final InputStream file) {
-		if(file == null) {
+	public boolean isSign(final byte[] data) {
+		if(data == null) {
 			Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
 			return false;
 		}
-    	return new ValidateCADES().isCADESSignedData(file);
+    	return new ValidateCADES().isCADESSignedData(data);
     }
 
-	public boolean isValidDataFile(final InputStream file) {
-		if(file == null) {
+	public boolean isValidDataFile(final byte[] data) {
+		if(data == null) {
 			Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
 			return false;
 		}
@@ -819,39 +848,28 @@ public final class AOCADESSigner implements AOSigner {
      *  <li>Enveloped Data</li>
      *  <li>Signed and Enveloped Data</li>
      * </ul>
-     * @param file  Fichero que deseamos comprobar.
+     * @param data  Datos que deseamos comprobar.
      * @return La validez del archivo cumpliendo la estructura.
      */
-	public boolean isCADESValid(final InputStream file){
+	public boolean isCADESValid(final byte[] data){
 		// si se lee en el CMSDATA, el inputstream ya esta leido y en los demás siempre será nulo
-		if(file == null) {
+		if(data == null) {
 			Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
 			return false;
 		}    	
-    	//leemos los datos
-    	byte[] plainData = new byte[0];
-		try {
-			plainData = AOUtil.getDataFromInputStream(file);
-		} 
-		catch (Exception e1) {
-			try {
-				throw new AOException("No se han podido leer los datos a firmar: "+e1);
-			} catch (AOException e) {
-				e.printStackTrace();
-			}			
-		}
+
     	// Comprobamos si su contenido es de tipo DATA
-    	boolean valido = new ValidateCADES().isCADESData(new ByteArrayInputStream(plainData));
+    	boolean valido = new ValidateCADES().isCADESData(data);
     	// Comprobamos si su contenido es de tipo SIGNEDDATA
-    	if (!valido) valido = new ValidateCADES().isCADESSignedData(new ByteArrayInputStream(plainData));
+    	if (!valido) valido = new ValidateCADES().isCADESSignedData(data);
     	// Comprobamos si su contenido es de tipo DIGESTDATA
-    	if (!valido) valido = new ValidateCADES().isCADESDigestedData(new ByteArrayInputStream(plainData));
+    	if (!valido) valido = new ValidateCADES().isCADESDigestedData(data);
     	// Comprobamos si su contenido es de tipo ENCRYPTEDDATA
-    	if (!valido) valido = new ValidateCADES().isCADESEncryptedData(new ByteArrayInputStream(plainData));
+    	if (!valido) valido = new ValidateCADES().isCADESEncryptedData(data);
     	// Comprobamos si su contenido es de tipo ENVELOPEDDATA
-    	if (!valido) valido = new ValidateCADES().isCADESEnvelopedData(new ByteArrayInputStream(plainData));
+    	if (!valido) valido = new ValidateCADES().isCADESEnvelopedData(data);
     	// Comprobamos si su contenido es de tipo SIGNEDANDENVELOPED
-    	if (!valido) valido = new ValidateCADES().isCADESSignedAndEnvelopedData(new ByteArrayInputStream(plainData));
+    	if (!valido) valido = new ValidateCADES().isCADESSignedAndEnvelopedData(data);
     	return valido;
     }
 
@@ -868,25 +886,24 @@ public final class AOCADESSigner implements AOSigner {
      *  <li>Signed and Enveloped Data</li>
      * </ul>
      *
-     * @param signFile  Archivo con contiene el archivo firmado.
+     * @param signData  Datos que se desean comprobar.
      * @param type      Tipo de firma que se quiere verificar.
      *
      * @return          La validez del archivo cumpliendo la estructura.
      */
-    public static boolean isCADESValid(final InputStream signFile, final String type){
-
-        if (type.equals(AOConstants.BINARY_ENVELOP_DATA)){
-            return new ValidateCADES().isCADESData(signFile);
-        }else if (type.equals(AOConstants.BINARY_ENVELOP_SIGNEDDATA)){
-            return new ValidateCADES().isCADESSignedData(signFile);
-        }else if (type.equals(AOConstants.BINARY_ENVELOP_DIGESTEDDATA)){
-            return new ValidateCADES().isCADESDigestedData(signFile);
-        }else if (type.equals(AOConstants.BINARY_ENVELOP_ENCRYPTEDDATA)){
-            return new ValidateCADES().isCADESEncryptedData(signFile);
-        }else if (type.equals(AOConstants.BINARY_ENVELOP_ENVELOPEDDATA)){
-            return new ValidateCADES().isCADESEnvelopedData(signFile);
-        }else if (type.equals(AOConstants.BINARY_ENVELOP_SIGNEDANDENVELOPEDDATA)){
-            return new ValidateCADES().isCADESSignedAndEnvelopedData(signFile);
+    public static boolean isCADESValid(final byte[] signData, final String type){
+        if (type.equals(AOConstants.CMS_CONTENTTYPE_DATA)){
+            return new ValidateCADES().isCADESData(signData);
+        } else if (type.equals(AOConstants.CMS_CONTENTTYPE_SIGNEDDATA)){
+            return new ValidateCADES().isCADESSignedData(signData);
+        } else if (type.equals(AOConstants.CMS_CONTENTTYPE_DIGESTEDDATA)){
+            return new ValidateCADES().isCADESDigestedData(signData);
+        } else if (type.equals(AOConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)){
+            return new ValidateCADES().isCADESEncryptedData(signData);
+        } else if (type.equals(AOConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)){
+            return new ValidateCADES().isCADESEnvelopedData(signData);
+        } else if (type.equals(AOConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)){
+            return new ValidateCADES().isCADESSignedAndEnvelopedData(signData);
         }
         Logger.getLogger("es.gob.afirma").warning("Tipo de contenido CADES no reconocido");
 		return false;
@@ -900,41 +917,31 @@ public final class AOCADESSigner implements AOSigner {
      * @return Mime Type de los datos contenidos en la firma.
      * @throws AOUnsupportedSignFormatException Cuando la firma no est&eacute; soportada por el manejador proporcionado.
      */
-    public String getDataMimeType(final InputStream signData) throws AOUnsupportedSignFormatException {
-		
-    	// introducimos los datos en plainData
-    	final byte[] plainData;
-		try {
-			plainData = AOUtil.getDataFromInputStream(signData);
-		} 
-		catch (final Throwable e) {
-		    throw new NullPointerException("No se han podido leer los datos a firmar: " + e);
-		}
+    public String getDataMimeType(final byte[] signData) throws AOUnsupportedSignFormatException {
 		
 		//Comprobamos que sea una firma valida
-		try{
-			this.isSign(new ByteArrayInputStream(plainData));
+		try {
+			this.isSign(signData);
 		}
 		catch(final Throwable e1){
-			throw new AOUnsupportedSignFormatException("No es un tipo de firma valido: " + e1);
+			throw new AOUnsupportedSignFormatException("No es un tipo de firma valido", e1);
 		}
 		
 		//Extraemos el mimetype y transformamos el OID a mimeType
 		return MimeHelper.transformOidToMimeType(
-			new ExtractMimeType().extractMimeType(new ByteArrayInputStream(plainData))
+			new ExtractMimeType().extractMimeType(signData)
 		);
 		
     }
     
 	/**
 	 * Inserta un nuevo firmante dentro de una firma signedAndEnveloped dada.
-	 * 
 	 * @param signFile				Flujo de entrada de datos que contiene la firma.
 	 * @param file					Fichero de firma, necesario para calcular los datos del nuevo firmante.
 	 * @param signatureAlgorithm	Algoritmo de firma.
 	 * @param keyEntry				Clave privada a usar para firmar.
-	 * @param Properties			Propiedades necesarias para poder agregar un nuevo firmante.
-	 * @return
+	 * @param extraParams           Par&aacute;metros adiocionales (variables) 
+	 * @return Firma original con el nuevo firmante a&ntilde;adido 
 	 * @throws AOException			Cuando ocurre cualquier problema durante el proceso
 	 */
 	public byte[] addOriginatorInfo(InputStream signFile, InputStream file, String signatureAlgorithm, PrivateKeyEntry keyEntry, Properties extraParams ) throws AOException {
@@ -944,20 +951,31 @@ public final class AOCADESSigner implements AOSigner {
 			throw new NullPointerException("El archivo a tratar no puede ser nulo.");
 		}
 
-		byte[] plainData;
+		final byte[] plainData;
 		try {
 			plainData = AOUtil.getDataFromInputStream(file);
 		} 
-		catch (Throwable e1) {
-			throw new AOException("No se han podido leer los datos a firmar: "+e1);
+		catch (final Throwable e1) {
+			throw new AOException("No se han podido leer los datos a firmar", e1);
 		}
 
 		P7ContentSignerParameters csp = null;
-		if (keyEntry!=null){
+		if (keyEntry!=null) {
+			
+	    	X509Certificate[] xCerts = new X509Certificate[0];
+	    	final Certificate[] certs = keyEntry.getCertificateChain();
+	    	if (certs != null && (certs instanceof X509Certificate[])) xCerts = (X509Certificate[]) certs;
+	    	else {
+	    		final Certificate cert = keyEntry.getCertificate();
+	    		if (cert instanceof X509Certificate) xCerts = new X509Certificate[] { (X509Certificate) cert };
+	    	}
+	    	
 			csp = new P7ContentSignerParameters(
-					plainData,
-					signatureAlgorithm,
-					(X509Certificate[]) keyEntry.getCertificateChain());
+				plainData,
+				signatureAlgorithm,
+				xCerts
+			);
+			
 		}
 
 		// Tipos de datos a firmar.
@@ -965,16 +983,16 @@ public final class AOCADESSigner implements AOSigner {
 			try {
 				this.dataType = new Oid(PKCSObjectIdentifiers.data.getId());
 			} 
-			catch (Throwable ex) {
-				//Logger.getLogger("es.gob.afirma").severe("Ocurrio un error al asignar el OID por defecto en el envoltorio CMS: " + ex);
-				throw new AOException("Ocurrio un error al asignar el OID por defecto en el envoltorio CMS", ex);
+			catch (final Throwable ex) {
+				//Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto en el envoltorio CMS: " + ex);
+				throw new AOException("Error al asignar el OID por defecto en el envoltorio CMS", ex);
 			}
 		}
 		
 		Oid policyQualifier = null;
     	try {
     		policyQualifier = new Oid(extraParams.getProperty("policyQualifier"));
-	    }catch(Throwable e) {}
+	    } catch(Throwable e) {}
 
 	    final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
 	    
@@ -984,10 +1002,9 @@ public final class AOCADESSigner implements AOSigner {
 		try {
 			dataSigned = new CADESEPESSignedAndEnvelopedData().addOriginatorInfo(signFile, csp, keyEntry, dataType, extraParams.getProperty("policyIdentifier"),policyQualifier , signingCertificateV2);
 			
-		} catch (Exception e) {
-			Logger.getLogger("es.gob.afirma").severe(
-					"Ocurrio un error generando el enveloped de CMS: " + e);
-			throw new AOException("Ocurrio un error generando el enveloped de CMS", e);
+		} 
+		catch (final Throwable e) {
+			throw new AOException("Error generando el enveloped de CMS", e);
 		}
 		return dataSigned;
 	}
@@ -1006,55 +1023,40 @@ public final class AOCADESSigner implements AOSigner {
     	// this.dataType = objectIdentifier;
     }
 
-    public byte[] getData(InputStream signData) throws AOInvalidFormatException{
+    public byte[] getData(final byte[] signData) throws AOInvalidFormatException{
     	
-    	if(signData == null) {
-			Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
-			return new byte[0];
+		if(signData == null) {
+			throw new NullPointerException(
+				"Se han introducido datos nulos para su comprobacion"
+			);
 		}
     	
-    	//leemos los datos
-    	final byte[] plainData;
-		try {
-			plainData = AOUtil.getDataFromInputStream(signData);
-		} 
-		catch (final Throwable e1) {
-			throw new AOInvalidFormatException("No se han podido leer los datos a firmar",e1);
-		}
-		
-		// validamos que eson datos firmados.
-    	if (isCADESValid(new ByteArrayInputStream(plainData))){
-    		return new ObtainContentSignedData().obtainData(new ByteArrayInputStream(plainData));
+    	if (!this.isCADESValid(signData)) {
+    		throw new AOInvalidFormatException(
+				"Los datos introducidos no se corresponden con un objeto de firma"
+			);
     	}
-   		Logger.getLogger("es.gob.afirma").warning(
-			"La firma no es valida. No se pueden sacar los datos que contiene."
-		);
-    	return new byte[0];
     	
+   		return new ObtainContentSignedData().obtainData(signData);
     }
 
     public String getSignedName(final String originalName, final String inText) {
 		return originalName + (inText != null ? inText : "") + ".csig";
 	}
 
-    public AOSignInfo getSignInfo(final InputStream signData) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
         if(signData == null) throw new NullPointerException("No se han introducido datos para analizar");
         
-        final byte[] signDataReaded;
-        try {
-            signDataReaded = AOUtil.getDataFromInputStream(signData);
-        } 
-        catch (final Throwable e) {
-            throw new AOException("No se han podido leer los datos de firma: "+e);
-        }
         
-        if(!isSign(new ByteArrayInputStream(signDataReaded))) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
+        if(!isSign(signData)) {
+            throw new AOInvalidFormatException(
+        		"Los datos introducidos no se corresponden con un objeto de firma"
+    		);
         }
         
         return new AOSignInfo(AOConstants.SIGN_FORMAT_CADES); 
         // Aqui podria venir el analisis de la firma buscando alguno de los otros datos de relevancia
         // que se almacenan en el objeto AOSignInfo
         
-    };
+    }
 }

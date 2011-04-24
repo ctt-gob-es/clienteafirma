@@ -2,18 +2,19 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.signers;
 
 import java.security.Security;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -27,16 +28,20 @@ public final class AOSignerFactory {
 
 	private static AOSignerFactory signerFactory = null;
 	
+	private static Vector<String> signersID;
+	
+	private static Map<String, AOSigner> signers;
+	
 	/** Listado completo de formatos de firma soportados y el manejador de firma asociado. */
 	private static final String[][] ID_SIGNERS = {
-		{AOConstants.SIGN_FORMAT_CADES, "es.gob.afirma.signers.AOCADESSigner"},
+		{AOConstants.SIGN_FORMAT_CADES, "es.gob.afirma.signers.AOCAdESSigner"},
 		{AOConstants.SIGN_FORMAT_CMS, "es.gob.afirma.signers.AOCMSSigner"},
 		{AOConstants.SIGN_FORMAT_XADES_DETACHED, "es.gob.afirma.signers.AOXAdESSigner"},
-		{AOConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED, "es.gob.afirma.signers.AOXAdESSigner"},
+//		{AOConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED, "es.gob.afirma.signers.AOXAdESSigner"},
 		{AOConstants.SIGN_FORMAT_XADES_ENVELOPED, "es.gob.afirma.signers.AOXAdESSigner"},
 		{AOConstants.SIGN_FORMAT_XADES_ENVELOPING, "es.gob.afirma.signers.AOXAdESSigner"},
 		{AOConstants.SIGN_FORMAT_XMLDSIG_DETACHED, "es.gob.afirma.signers.AOXMLDSigSigner"},
-		{AOConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED, "es.gob.afirma.signers.AOXMLDSigSigner"},
+//		{AOConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED, "es.gob.afirma.signers.AOXMLDSigSigner"},
 		{AOConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED, "es.gob.afirma.signers.AOXMLDSigSigner"},
 		{AOConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, "es.gob.afirma.signers.AOXMLDSigSigner"},
 		{AOConstants.SIGN_FORMAT_PDF, "es.gob.afirma.signers.AOPDFSigner"},
@@ -44,10 +49,7 @@ public final class AOSignerFactory {
 		{AOConstants.SIGN_FORMAT_OOXML, "es.gob.afirma.signers.AOOOXMLSigner"},
 		{AOConstants.SIGN_FORMAT_PKCS1, "es.gob.afirma.signers.AOPKCS1Signer"}
 	};
-	
-	private static Vector<String> signersID;
-	private static HashMap<String, AOSigner> signers;
-		
+
 	private AOSignerFactory() {}
 	
 	/**
@@ -58,7 +60,15 @@ public final class AOSignerFactory {
 		if(signerFactory != null) {
 			return signerFactory;
 		}
-				
+		return initialize();
+	}
+	
+	/**
+	 * Carga los manejadores de firma para poder hacer uso de la factor&iacute;a. 
+	 * @return La factor&iacute;a inicializada.
+	 */
+	private static AOSignerFactory initialize() {
+
 		// Cargamos 
 		signerFactory = new AOSignerFactory();
 		signersID = new Vector<String>();
@@ -87,12 +97,49 @@ public final class AOSignerFactory {
 	}
 	
 	/**
+	 * Recupera un manejador de firma capaz de tratar la firma indicada. En caso de no tener cargado
+	 * ning&uacute;n manejador compatible se devolver&aacute; <code>null</code>. 
+	 * @param signData Firma electr&oacute;nica
+	 * @return Manejador de firma
+	 */
+	public static AOSigner getSigner(byte[] signData) {
+		
+		if(signData == null) throw new NullPointerException("No se han indicado datos de firma");
+
+		// Inicializamos las referencias estaticas
+		if (signerFactory == null) {
+			initialize();
+		}
+		
+		Set<String> checkedFormats = new HashSet<String>(signers.size()-1);
+		
+		// Recorremos los formatos soportados
+		for(int i=0; i<signersID.size(); i++) {
+			// Buscamos el manejador del formato
+			for(int j=0; j<ID_SIGNERS.length; j++) {
+				if(signersID.get(i).equals(ID_SIGNERS[j][0])) {
+					// Si no lo hemos probado antes, lo intentamos
+					if(!checkedFormats.contains(ID_SIGNERS[j][1])) {
+						AOSigner signer = signers.get(ID_SIGNERS[j][1]);
+						if (signer.isSign(signData)) {
+							return signer;
+						}
+						checkedFormats.add(ID_SIGNERS[j][1]);
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Obtiene un manejador para un formato de firma dado. En caso de no encontrar ninguno, se devuelve
 	 * <code>null</code>.
 	 * @param signerID Formato de firma para el cual solicitamos el manejador.
 	 * @return Manejador capaz de firmar en el formato indicado.
 	 */
 	public final AOSigner getSigner(String signerID) {
+		
 		if (signersID.contains(signerID)) {
 			for (int i = 0; i < ID_SIGNERS.length; i++) {
 				if (ID_SIGNERS[i][0].equals(signerID)) {
@@ -138,7 +185,7 @@ public final class AOSignerFactory {
 	 */
 	public final AOSigner[] getSigners() {
 		Vector<AOSigner> result = new Vector<AOSigner>(signers.size());
-		HashSet<String> classes = new HashSet<String>(signers.size());
+		Set<String> classes = new HashSet<String>(signers.size());
 		
 		// Recorremos los formatos soportados
 		for(int i=0; i<signersID.size(); i++) {
@@ -157,6 +204,7 @@ public final class AOSignerFactory {
 		return result.toArray(new AOSigner[result.size()]); 
 	}
 	
+	
 	/**
 	 * Recupera el listado de identificadores de formatos de firma actualmente disponibles en un orden
 	 * predefinido.  
@@ -171,6 +219,7 @@ public final class AOSignerFactory {
 	 * Devuelve el listado de formatos de firma soportados.
 	 * @return Indentificadores de los formatos de firma soportados. 
 	 */
+	@Override
 	public String toString() {
 		StringBuilder exstr = new StringBuilder(); //$NON-NLS-1$
 		for (String format : signersID) {

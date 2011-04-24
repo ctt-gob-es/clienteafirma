@@ -4,10 +4,7 @@
  * Copyright 2006 Sun Microsystems, Inc. All rights reserved.
  * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
-/*
- * SunMSCAPI provider modified for accessing CAPI ADDRESSBOOK and CA KeyStores, just for
- * extracting X509Certificates and public keys. 
- */
+
 package es.gob.afirma.keystores;
 
 import java.security.AccessController;
@@ -22,15 +19,14 @@ import sun.security.action.PutAllAction;
  * Basado en SunMSCAPI.java
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
-public final class SunMSCAPIAddressBook extends Provider {
+final class SunMSCAPIAddressBook extends Provider {
 
 	private static final long serialVersionUID = 2561943190524802403L;
 
 	private static final String INFO = "Provider for CAPI ADDRESSBOOK and CA KeyStores, based on SunMSCAPI";
 
     /** Construye el proveedor JCA para el acceso a los almacenes de claves <i>CA</i> y <i>ADDRESSBOOK</i>. */
-    @SuppressWarnings("unchecked")
-	public SunMSCAPIAddressBook() {
+	SunMSCAPIAddressBook() {
 		super("SunMSCAPIAddressBook", 0.1d, INFO);
 		
 		// if there is no security manager installed, put directly into

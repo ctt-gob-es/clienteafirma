@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.keystores;
 
@@ -38,7 +37,7 @@ import es.gob.afirma.misc.AOUtil;
 /**
  * <code>KeyStore</code> para el manejo de certificados en disco en formato PKCS#7 o X.509 en Base64.
  */
-public final class SingleCertKeyStore extends KeyStoreSpi {
+final class SingleCertKeyStore extends KeyStoreSpi {
 
 	private Hashtable<String, X509Certificate> certificates = new Hashtable<String, X509Certificate>();
 		
@@ -129,7 +128,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 				}
 				catch(Throwable e) {
 					Logger.getLogger("es.gob.afirma").warning(
-						"Ocurrio un error anadiendo un certificado, se ignorara y se continuara con los siguientes: " + e
+						"Error anadiendo un certificado, se ignorara y se continuara con los siguientes: " + e
 					);
 				}
 			}
@@ -154,30 +153,6 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 	@Override
 	public void engineStore(OutputStream arg0, char[] arg1) throws IOException, NoSuchAlgorithmException, CertificateException {}
 	
-//	public static void main(String args[]) throws Exception {
-//		
-//		javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
-//		fileChooser.getAccessibleContext().setAccessibleName("Selecci\u00F3n del fichero");
-//		fileChooser.getAccessibleContext().setAccessibleDescription("Pantalla para la selecci\u00F3n del fichero que deseamos firmar");
-//		// Comprobamos que el fileFilter no sea nulo, ya que de asignarlo nulo nos aparecera
-//		// vacio el campo de filtro en lugar de indicar por defecto "Todos los ficheros".
-//		javax.swing.filechooser.FileFilter fileFilter = es.gob.afirma.ui.AOUIManager.getFileFilter("cer");
-//		if(fileFilter != null) {
-//			fileChooser.setFileFilter(fileFilter);
-//		}
-//		
-//		String txSelFichero = "";
-//		int returnVal = fileChooser.showOpenDialog(null);
-//	    if(returnVal == javax.swing.JFileChooser.APPROVE_OPTION) txSelFichero = fileChooser.getSelectedFile().getAbsolutePath();
-//	    
-//	    InputStream fileIn = new java.io.FileInputStream(txSelFichero);
-//	    
-//	    new SingleCertKeyStore().engineLoad(fileIn, null);
-//	    
-//	    //a.engineLoad(fileIn, null);
-//	    
-//	}
-
 	private void getCertificatesFromStream(InputStream stream) {
 		BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(stream)));
 		String strLine;
@@ -191,10 +166,12 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 					currentCertificate.append("\n");
 				}
 				else if (strLine.trim().equals("-----END CERTIFICATE-----")) {
-					if (currentCertificate != null) currentCertificate.append(strLine);
-					addCertificate(currentCertificate.toString(), currentAlias);
-					currentCertificate = null;
-					currentAlias = null;
+					if (currentCertificate != null) {
+						currentCertificate.append(strLine);
+						addCertificate(currentCertificate.toString(), currentAlias);
+						currentCertificate = null;
+						currentAlias = null;
+					}
 				}
 				else if (strLine.trim().startsWith("friendlyName:")) {
 						currentAlias = strLine.replace("friendlyName:", "").trim();
@@ -205,17 +182,16 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 				}
 			}
 		}
-		catch(Throwable e) {
+		catch(final Throwable e) {
 			Logger.getLogger("es.gob.afirma").severe(
-				"Ocurrio un error leyendo los certificados, puede que no se anadiesen todos: " + e
+				"Error leyendo los certificados, puede que no se anadiesen todos: " + e
 			);
-			e.printStackTrace();
 		}
 	}
 	
 	private CertificateFactory cf = null;
 	
-	private void addCertificate(String base64Cert, String alias) {
+	private void addCertificate(final String base64Cert, String alias) {
 		if (base64Cert == null) {
 			Logger.getLogger("es.gob.afirma").warning("El certificado es nulo, no se anadira al almacen");
 			return;

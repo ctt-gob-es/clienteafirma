@@ -2,18 +2,17 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.signers.aobinarysignhelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.zip.DataFormatException;
+import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -22,7 +21,7 @@ import java.util.zip.Inflater;
  * Permite tanto comprimir como descomprimir.
  *
  */
-public class BinaryUtils {
+final class BinaryUtils {
 
 	/**
 	 * M&eacute;todo que comprime una entrada con un nivel de compresion dado.
@@ -83,15 +82,17 @@ public class BinaryUtils {
 			try {
 				int count = decompressor.inflate(buf);
 				bos.write(buf, 0, count);
-			} catch (DataFormatException e) {
-				e.printStackTrace();
+			} 
+			catch (final Throwable e) {
+				Logger.getLogger("es.gob.afirma").severe("Error descomprimiendo los datos: " + e);
 				break;
 			}
 		}
 		try {
 			bos.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} 
+		catch (final IOException e) {
+			Logger.getLogger("es.gob.afirma").warning("Error cerrando el flujo binario: " + e);
 		}
 
 		// Get the decompressed data

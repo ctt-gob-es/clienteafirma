@@ -2,20 +2,21 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers.aobinarysignhelper;
+
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.makeAlgId;
 
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.bouncycastle.asn1.DERObjectIdentifier;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -45,7 +46,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
  * mensaje DigestedData de BouncyCastle: <a href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
  */
 
-public final class CADESDigestedData extends SigUtils {
+public final class CADESDigestedData  {
 
     /**
     * M&eacute;todo que genera la firma de tipo digestedData.
@@ -68,14 +69,14 @@ public final class CADESDigestedData extends SigUtils {
         org.bouncycastle.asn1.x509.AlgorithmIdentifier digAlgId;
         try {
             digAlgId = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } 
+        catch (final Throwable e) {
             throw new IOException((new StringBuilder()).append("Error de codificacion: ").append(e).toString());
         }
         ContentInfo encInfo = null;
 
         // indicamos el tipo de contenido
-        DERObjectIdentifier contentTypeOID = new DERObjectIdentifier(dataType.toString());
+        ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
         encInfo = new ContentInfo(contentTypeOID, null);
 
         byte data[] = parameters.getContent();

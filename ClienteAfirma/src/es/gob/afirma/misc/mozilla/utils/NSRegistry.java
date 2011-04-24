@@ -2,13 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
-
 
 package es.gob.afirma.misc.mozilla.utils;
 
@@ -93,7 +91,7 @@ final class NSRegistry {
      * the "location" field in the record doesn't match its offset
      * in the file.
      */
-    private Record readRecord(long offset) throws IOException {
+    private Record readRecord(final long offset) throws IOException {
 		in.seek(offset);
 		if (readInt() != offset) {
 		    throw new IOException("invalid offset for record [" + offset + "]");
@@ -198,7 +196,7 @@ final class NSRegistry {
     	}
     	catch (IOException e) {
     		Logger.getLogger("es.gob.afirma").severe(
-    				"Ocurrio un error abriendo el registro de Mozilla, se devolvera null: " + e
+    				"Error abriendo el registro de Mozilla, se devolvera null: " + e
     		);
     		return null;
     	}
@@ -212,7 +210,7 @@ final class NSRegistry {
 		    }
 		    catch(IOException exc) {
         	   Logger.getLogger("es.gob.afirma").warning(
-               	   	"Ocurrio un error cerrando el flujo de lectura del registro de Mozilla "
+               	   	"Error cerrando el flujo de lectura del registro de Mozilla "
                );
 		    }
 		    in = null;

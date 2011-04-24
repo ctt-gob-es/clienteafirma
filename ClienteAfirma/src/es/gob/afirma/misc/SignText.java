@@ -2,18 +2,16 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.misc;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.io.ByteArrayInputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
@@ -37,6 +35,7 @@ import es.gob.afirma.callbacks.NullPasswordCallback;
 import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.KeyStoreUtilities;
+import es.gob.afirma.signers.AOCAdESSigner;
 import es.gob.afirma.signers.AOCMSSigner;
 
 /**
@@ -55,11 +54,12 @@ public final class SignText {
 	private final AOKeyStoreManager kss;
 	private final Component parent;
 	private String result = USER_CANCEL;
+	private boolean useCAdES = false;
 	
 	/**
 	 * Obtiene el resultado de la operaci&oacute;n <code>SignText</code>.
 	 * @return Si el usuario aprob&oacute; la operaci&oacute;n y esta termin&oacute; correctamente se devuelve el objeto firmado
-	 *         en formato CMS codificado en Base64. En caso contrario devuelve uno de los siguientes c&oacute;digos
+	 *         en formato CMS (por defecto) o CAdES codificado en Base64. En caso contrario devuelve uno de los siguientes c&oacute;digos
 	 *         de error:
 	 *         <br>
 	 *         <ul>
@@ -77,6 +77,14 @@ public final class SignText {
 	 */
 	public String getResult() {
 		return result;
+	}
+	
+	/**
+	 * Establece si debe usarse CAdES en vez de CMS para la firma.
+	 * @param useit <code>true</code> para usar CAdES, <code>false</code> (por defecto) para usar CMS
+	 */
+	public void setUseCAdES(boolean useit) {
+		useCAdES = useit;
 	}
 	
 	/**
@@ -219,19 +227,28 @@ public final class SignText {
 			return NO_MATCHING_CERT;
 		}
 		if (cert == null) {
-			Logger.getLogger("es.gob.afirma").severe("El certificao de firma no puede ser nulo");
+			Logger.getLogger("es.gob.afirma").severe("El certificado de firma no puede ser nulo");
 			return NO_MATCHING_CERT;
 		}
  		try {
-			AOCMSSigner signer = new AOCMSSigner();
-
-			return new AOCryptoUtil.RawBASE64Encoder().encode(signer.sign(
-				new ByteArrayInputStream(stringToSign.getBytes()), 
-				AOConstants.SIGN_ALGORITHM_SHA1WITHRSA, 
-				keyEntry, 
-				cert, 
-				null
-			));
+			if (!useCAdES) return AOCryptoUtil.encodeBase64(
+				new AOCMSSigner().sign(
+					stringToSign.getBytes(), 
+					AOConstants.SIGN_ALGORITHM_SHA1WITHRSA, 
+					keyEntry, 
+					null
+				),
+				false
+			);
+			return AOCryptoUtil.encodeBase64(
+				new AOCAdESSigner().sign(
+					stringToSign.getBytes(), 
+					AOConstants.SIGN_ALGORITHM_SHA1WITHRSA, 
+					keyEntry, 
+					null
+				),
+				false
+			);
 		}
 		catch(final Throwable e) {
 			Logger.getLogger("es.gob.afirma").severe(
@@ -288,7 +305,7 @@ public final class SignText {
 				if (o1==null && o2==null) return 0;
 				else if (o1==null && o2!=null) return 1;
 				else if (o1!=null && o2==null) return -1;
-				else return o1.toString().compareToIgnoreCase(o2.toString()); 
+				return o1.toString().compareToIgnoreCase(o2.toString());
 			}
 		});
 		
@@ -346,9 +363,10 @@ public final class SignText {
 											cv.checkCertificate(new java.security.cert.Certificate[] { ks.getCertificate(al) }, false);
 										}
 										catch(Throwable t) {
+											Logger.getLogger("es.gob.afirma").warning(t.getMessage());
 											if (JOptionPane.showConfirmDialog(
 												parent, 
-												t.getMessage() + 
+												cv.getErrorMessage() + 
 												Messages.getString("AOUIManager.8"),  //$NON-NLS-1$
 												Messages.getString("AOUIManager.5"),  //$NON-NLS-1$
 												JOptionPane.YES_NO_OPTION, 
@@ -357,7 +375,7 @@ public final class SignText {
 												result = firmar(
 													stringToSign, 
 													kss.getKeyEntry(al, passCbk), 
-													(X509Certificate) kss.getCertificate(al)
+													kss.getCertificate(al)
 												);
 											}
 											return;
@@ -366,7 +384,7 @@ public final class SignText {
 										result = firmar(
 												stringToSign, 
 												kss.getKeyEntry(al, passCbk), 
-												(X509Certificate) kss.getCertificate(al)
+												kss.getCertificate(al)
 											);
 									}
 								}

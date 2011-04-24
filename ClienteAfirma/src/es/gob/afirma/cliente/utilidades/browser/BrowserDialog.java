@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.cliente.utilidades.browser;
 
@@ -39,8 +38,7 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-class BrowserDialog extends JDialog
-{
+class BrowserDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     
     private boolean firmar= false;
@@ -133,21 +131,19 @@ class BrowserDialog extends JDialog
                     catch (IOException exc)
                     {
                         Logger.getLogger("es.map").severe(exc.toString());
-                        JOptionPane.showMessageDialog(BrowserDialog.this, "Ocurrio un error al leer el fichero adjunto", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(BrowserDialog.this, "Error al leer el fichero adjunto", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
         }
     };
 
-    public BrowserDialog(String html,Frame parent)
+    BrowserDialog(String html,Frame parent)
     {
         super(parent, "Firma web", true);
                 
         this.getAccessibleContext().setAccessibleParent(parent);
         
-//        this.setAlwaysOnTop(true);
-//        this.setModal(true);
         JEditorPane ep = new JEditorPane();
         ep.setEditable(false);
         ep.setEnabled(false);
@@ -194,64 +190,6 @@ class BrowserDialog extends JDialog
     	super.setVisible(b);
     }
     
-//	@Override
-//	public void show()
-//    {
-////        if (firmar)
-//    	JOptionPane.showMessageDialog(this, "Cualquier modificacion NO sera incluida en el documento firmado", "Advertencia", JOptionPane.WARNING_MESSAGE);
-//        //super.show();
-//    	setVisible(true);
-//        
-//    }
-    
-//    /*
-//     * Funciones para expresiones regulares
-//     */
-//    private String inactiveInputs(String origHtml){
-////        String result=origHtml.replaceAll(toIgnoreCase("type='text'"),"TYPE='TEXT' READONLY");
-////        result=result.replaceAll("<"+toIgnoreCase("textarea"),"<TEXTAREA READONLY");
-////        result=result.replaceAll("<"+toIgnoreCase("select"),"<SELECT READONLY");
-////        result=result.replaceAll(toIgnoreCase("type='checkbox'"),"TYPE='CHECKBOX' DISABLED");
-////        result=result.replaceAll(toIgnoreCase("type='radio'"),"TYPE='RADIO' DISABLED");
-////        result=result.replaceAll(toIgnoreCase("type='password'"),"TYPE='PASSWORD' READONLY");
-////        result=result.replaceAll(toIgnoreCase("type='button'"),"TYPE='BUTTON' DISABLED");
-//        String result=origHtml.replaceAll(toIgnoreCase("type='text'"),"TYPE='TEXT' READONLY");
-//        result=result.replaceAll("<"+toIgnoreCase("textarea"),"<TEXTAREA READONLY");
-//        result=result.replaceAll("<"+toIgnoreCase("select"),"<SELECT READONLY");
-//        result=result.replaceAll(toIgnoreCase("type='checkbox'"),"TYPE='CHECKBOX' DISABLED");
-//        result=result.replaceAll(toIgnoreCase("type='radio'"),"TYPE='RADIO' DISABLED");
-//        result=result.replaceAll(toIgnoreCase("type='password'"),"TYPE='PASSWORD' READONLY");
-//        result=result.replaceAll(toIgnoreCase("type='button'"),"TYPE='BUTTON' DISABLED");
-//        return result;
-//    }
-//    
-//    private String toIgnoreCase(String src){
-//        String res="";
-//        char[] srcCharArray=src.toCharArray();
-//        for (int i=0;i<srcCharArray.length;i++){
-//            if (Character.isLetter(srcCharArray[i]))
-//                res+="["+Character.toUpperCase(srcCharArray[i])+Character.toLowerCase(srcCharArray[i])+"]";
-//            else if (srcCharArray[i]=='\''||srcCharArray[i]=='\"')
-//                res+="(\'|\")";
-//            else
-//                res+=srcCharArray[i];
-//        }
-//        return res;
-//    }
-//    
-//    private String toParagraph(String src){
-//        String res="";
-//        if(src.matches("<"+toIgnoreCase("input")+".*"+toIgnoreCase("type='text'")+".*>")){
-//            res=src.replaceAll(toIgnoreCase("input"),"P");
-//            res=res.replaceAll(toIgnoreCase("type='text'"),"");
-//        }else if (src.matches("<"+toIgnoreCase("input")+".*("+toIgnoreCase("type='checkbox'")+"|"+toIgnoreCase("type='radio'")+".*")){
-//            res=src.replaceAll(toIgnoreCase("input"),"P");
-//            res=res.replaceAll(toIgnoreCase("type='(checkbox|radio)'"),"");
-//        }else if()
-//        return res;
-//    }
-
-
     public boolean isFirmar()
     {
         return firmar;

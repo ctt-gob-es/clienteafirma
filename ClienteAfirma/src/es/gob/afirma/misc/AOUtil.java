@@ -2,9 +2,9 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
@@ -12,6 +12,7 @@ package es.gob.afirma.misc;
 
 import java.awt.Component;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,18 +26,18 @@ import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import javax.swing.ProgressMonitorInputStream;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
+
+import org.apache.commons.codec.binary.Base64;
 
 import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.misc.mozilla.utils.NSPreferences;
+import es.gob.afirma.misc.tree.TreeModel;
+import es.gob.afirma.misc.tree.TreeNode;
 
 /** 
  * M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
@@ -72,15 +73,27 @@ public final class AOUtil {
 		// Cambiamos los caracteres Windows
 		filename = filename.replace('\\', '/');
 
-		// Cambiamos los espacios por %20
-		filename = filename.replace(" ", "%20");
-
-		URI uri;
+		// Realizamos los cambios necesarios para proteger los caracteres no seguros
+		// de la URL
+		filename = filename
+		.replace(" ", "%20")
+		.replace("<", "%3C")
+		.replace(">", "%3E")
+		.replace("\"", "%22")
+		.replace("{", "%7B")
+		.replace("}", "%7D")
+		.replace("|", "%7C")
+		.replace("^", "%5E")
+		.replace("[", "%5B")
+		.replace("]", "%5D")
+		.replace("`", "%60");
+		
+		final URI uri;
 		try {
 			uri = new URI(filename);
 		}
 		catch(final Throwable e) {
-			throw new AOException("Formato de URI (" + filename + ") incorrecto: " + e);
+			throw new AOException("Formato de URI (" + filename + ") incorrecto", e);
 		}
 
 		// Comprobamos si es un esquema soportado
@@ -90,113 +103,24 @@ public final class AOUtil {
 				return uri;
 
 		// Si el esquema es nulo, aun puede ser un nombre de fichero valido
-		if(scheme == null)
+		// El caracter '#' debe protegerse en rutas locales
+		if(scheme == null) {
+			filename = filename.replace("#", "%23");
 			return createURI("file://" + filename);
+		}
 
 		// Miramos si el esquema es una letra, en cuyo caso seguro que es una
 		// unidad de Windows ("C:", "D:", etc.), y le anado el file://
-		if (scheme.length() == 1 && Character.isLetter((char) scheme.getBytes()[0]))
-			return createURI("file://" + filename);		
+		// El caracter '#' debe protegerse en rutas locales
+		if (scheme.length() == 1 && Character.isLetter((char) scheme.getBytes()[0])) {
+			filename = filename.replace("#", "%23");
+			return createURI("file://" + filename);
+		}
+					
 
 		throw new AOException("Formato de URI valido pero no soportado '" + filename + "'");
 
 	}
-
-//	/**
-//	 * Obtiene el flujo de entrada de un fichero (para su lectura) a partir de su URI.
-//	 * @param uri URI del fichero a leer
-//	 * @param c Componente grafico que invoca al m&eacute;todo (para la modalidad
-//	 *          del di&aacute;logo de progreso)
-//	 * @param waitDialog Indica si debe mostrarse o no un di&aacute;logo de progreso de la carga y lectura
-//	 * @return Flujo de entrada hacia el contenido del fichero
-//	 * @throws FileNotFoundException Cuando no se encuentra el fichero indicado
-//	 * @throws AOException Cuando ocurre cualquier problema obteniendo el flujo
-//	 */
-//	public final static InputStream loadFile(final URI uri, final Component c, final boolean waitDialog) throws FileNotFoundException, AOException {
-//		
-//		// Cuidado: Repinta mal el dialogo de espera, hay que tratar con hilos nuevos
-//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
-//
-//		if (uri == null) throw new NullPointerException("Se ha pedido el contenido de una URI nula");
-//
-//		javax.swing.ProgressMonitor pm = null;
-//		
-//		if (uri.getScheme().equals("file")) {
-//			// Es un fichero en disco. Las URL de Java no soportan file://, con
-//			// lo que hay que diferenciarlo a mano
-//			try {
-//				// Retiramos el "file://" de la uri
-//				String path = uri.getSchemeSpecificPart();
-//				if(path.startsWith("//")) path = path.substring(2);
-//				// Cuidado, el ProgressMonitor no se entera del tamano de los ficheros grandes:
-//				// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6445283
-//				if (waitDialog) return new BufferedInputStream(new ProgressMonitorInputStream(
-//					c,
-//					"Leyendo " + path,
-//					new FileInputStream(new File(path))
-//				));
-//				
-//				return new BufferedInputStream(new FileInputStream(new File(path)));
-//			}
-//			catch(final NullPointerException e) {
-//				throw e;
-//			}
-//			catch(final FileNotFoundException e) {
-//				throw e;
-//			}
-//			catch(final Throwable e) {
-//			    e.printStackTrace();
-//			    throw new AOException("Ocurrio un error intentando abrir un archivo en almacenamiento local: " + e);
-//			}
-//		}
-//		
-//		// Es una URL
-//		InputStream tmpStream;
-//		try {
-//			if (waitDialog) {
-//				final ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(
-//					c,
-//					"Leyendo " + uri.toURL().toString(),
-//					uri.toURL().openStream()
-//				);
-//				pm = pmis.getProgressMonitor(); 
-////					pm.setMillisToDecideToPopup(0);
-////					pm.setMillisToPopup(0);
-//				
-//				// Las URL pocas veces informan del tamano del fichero, asi que ponemos un valor alto
-//				// por defecto para segurarnos de que el dialogo se muestra
-//				pm.setMaximum(10000000);
-//				
-//				tmpStream = new BufferedInputStream(pmis);
-//			}
-//			else tmpStream = new BufferedInputStream(uri.toURL().openStream());
-//		}
-//		catch(final Throwable e) {
-//			if (pm != null) pm.close();
-//			throw new AOException(
-//				"Ocurrio un error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e
-//			);
-//		}
-//		// Las firmas via URL fallan en la descarga por temas de Sun, asi que descargamos primero
-//		// y devolvemos un Stream contra un array de bytes
-//		final byte[] tmpBuffer;
-//		try {
-//			tmpBuffer = getDataFromInputStream(tmpStream);
-//		}
-//		catch(final Throwable e) {
-//			if (pm != null) pm.close();
-//			throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "': " + e);
-//		}
-//		
-//		// Hay que cerrar el ProgressMonitor a mano:
-//		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4174850
-//		if (pm != null) pm.close();
-//
-////		Logger.getLogger("es.gob.afirma").info(
-////			"Leido fichero de " + tmpBuffer.length + " bytes:\n" + new String(tmpBuffer)
-////		);
-//		return new java.io.ByteArrayInputStream(tmpBuffer);
-//	}
 
 	/**
 	 * Obtiene el flujo de entrada de un fichero (para su lectura) a partir de su URI.
@@ -241,8 +165,7 @@ public final class AOUtil {
 				throw e;
 			}
 			catch(final Throwable e) {
-			    e.printStackTrace();
-			    throw new AOException("Ocurrio un error intentando abrir un archivo en almacenamiento local: " + e);
+			    throw new AOException("Error intentando abrir un archivo en almacenamiento local", e);
 			}
 		}
 		
@@ -270,7 +193,7 @@ public final class AOUtil {
 		catch(final Throwable e) {
 			if (pm != null) pm.close();
 			throw new AOException(
-				"Ocurrio un error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e
+				"Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL", e
 			);
 		}
 		// Las firmas via URL fallan en la descarga por temas de Sun, asi que descargamos primero
@@ -281,7 +204,7 @@ public final class AOUtil {
 		}
 		catch(final Throwable e) {
 			if (pm != null) pm.close();
-			throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "': " + e);
+			throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "'", e);
 		}
 		
 		// Hay que cerrar el ProgressMonitor a mano:
@@ -292,6 +215,36 @@ public final class AOUtil {
 //			"Leido fichero de " + tmpBuffer.length + " bytes:\n" + new String(tmpBuffer)
 //		);
 		return new java.io.ByteArrayInputStream(tmpBuffer);
+	}
+	
+	/**
+	 * Obtiene el flujo de entrada de un fichero (para su lectura) a partir de su URI. Si se introduce
+	 * una ruta nula, se devuelve nulo.
+	 * @param uri URI del fichero a leer
+	 * @param parent Componente grafico que invoca al m&eacute;todo (para la modalidad
+	 *          del di&aacute;logo de progreso)
+	 * @param waitDialog Indica si debe mostrarse o no un di&aacute;logo de progreso de la carga y lectura
+	 * @param b64Content Indica si el contenido es base 64 para que se descodifique.
+	 * @return Flujo de entrada hacia el contenido del fichero
+	 * @throws FileNotFoundException Cuando no se encuentra el fichero indicado
+	 * @throws AOException Cuando ocurre cualquier problema obteniendo el flujo
+	 */
+	public final static InputStream loadFile(final URI uri, final Component parent, final boolean waitDialog, final boolean b64Content) throws FileNotFoundException, AOException {
+
+		if(uri == null) {
+			return null;
+		}
+		
+		InputStream dataStream = AOUtil.loadFile(uri, parent, true);
+		if (b64Content) {
+			try {
+				dataStream = new ByteArrayInputStream(Base64.decodeBase64(AOUtil.getDataFromInputStream(dataStream)));
+			} catch (final IOException e) {
+				throw new AOException("Error en la lectura del fichero de entrada de datos: " + uri, e); //$NON-NLS-1$
+			}
+		}
+
+		return dataStream;
 	}
 	
 	/**
@@ -313,282 +266,11 @@ public final class AOUtil {
 	}
 
 	/**
-	 * Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
-	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
-	 */
-	public final static String getMozillaUserProfileDirectory() {
-		return getMozillaUserProfileDirectory(System.getProperty("os.name").contains("indows"));
-	}
-
-	/**
-	 * Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
-	 * @param windows <code>true</code> si de debe buscar el directorio en un entorno Windows,
-	 *                <code>false</code> si el entorno es UNIX
-	 * @return Ruta completa del directorio del perfil de usuario de Mozilla / Firefox
-	 */
-	public final static String getMozillaUserProfileDirectory(final boolean windows) {
-
-		File regFile;
-		if (windows) {
-			final String appDataDir = WinRegistryWrapper.getString(
-					WinRegistryWrapper.HKEY_CURRENT_USER,
-				"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",
-				"AppData"
-			);
-			if (appDataDir != null) {
-				String finalDir = null;
-				// En Firefox usamos preferentemente el profiles.ini
-				regFile = new File(appDataDir + "\\Mozilla\\Firefox\\profiles.ini");
-				try {
-					if (regFile.exists())
-						finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
-				}
-				catch (Throwable e) {
-					Logger.getLogger("es.gob.afirma").severe(
-							"Ocurrio un error obteniendo el directorio de perfil de usuario de Firefox, " +
-							"se devolvera null: " + e
-					);
-					return null;
-				}
-				if (finalDir != null) {
-					try {
-						return AOWinNativeUtil.getShortPathName(finalDir).replace('\\', '/');
-					}
-					catch(final Throwable e) {
-						Logger.getLogger("es.gob.afirma").warning(
-							"No se ha podido obtener el nombre corto de la ruta de NSS en Firefox ('" +
-							finalDir +
-							"'), se usara el nombre largo: " +
-							e
-						);
-						
-						return finalDir.replace('\\', '/');
-					}
-				}
-				// Hemos probado el de Firefox, vamos ahora con el de Mozilla
-				regFile = new File(appDataDir + "\\Mozilla\\registry.dat");
-				try {
-					if (regFile.exists()) finalDir = NSPreferences.getNS6UserProfileDirectory(regFile);
-				}
-				catch (Throwable e) {
-					Logger.getLogger("es.gob.afirma").severe(
-						"Ocurrio un error obteniendo el directorio de perfil de usuario de Mozilla, " +
-						"se devolvera null: " + e
-					);
-					return null;
-				}
-				if (finalDir != null) {
-					try {
-						return AOWinNativeUtil.getShortPathName(finalDir).replace('\\', '/');
-					}
-					catch(final Throwable e) {
-						Logger.getLogger("es.gob.afirma").warning(
-							"No se ha podido obtener el nombre corto de la ruta de NSS en Mozilla ('" +
-							finalDir +
-							"'), se usara el nombre largo: " +
-							e
-						);
-						return finalDir.replace('\\', '/');
-					}
-				}
-			}
-			Logger.getLogger("es.gob.afirma").severe(
-					"Ocurrio un error obteniendo el directorio de perfil de usuario de Mozilla/Firefox (Windows), " +
-					"se devolvera null"
-			);
-			return null;
-		}
-		
-		// No es Windows, entonces es UNIX
-
-		// Probamos primero con "profiles.ini" de Firefox
-		regFile = new File(System.getProperty("user.home") + "/.mozilla/firefox/profiles.ini");
-		try {
-			if (regFile.exists()) return NSPreferences.getFireFoxUserProfileDirectory(regFile);
-		}
-		catch (Exception e) {
-			Logger.getLogger("es.gob.afirma").severe(
-					"Ocurrio un error obteniendo el directorio de perfil de usuario de Firefox, " +
-					"se devolvera null: " + e
-			);
-			return null;
-		}
-
-		// Si es un Mac OS X, profiles.ini esta en una ruta distinta...
-		regFile = new File(System.getProperty("user.home") + "/Library/Application Support/Firefox/profiles.ini");
-		try {
-			if (regFile.exists()) return NSPreferences.getFireFoxUserProfileDirectory(regFile);
-		}
-		catch (Exception e) {
-			Logger.getLogger("es.gob.afirma").severe(
-					"Ocurrio un error obteniendo el directorio de perfil de usuario de Firefox (" +
-					regFile.getAbsolutePath() + "), se devolvera null: " + e
-			);
-			return null;
-		}
-
-		// Y luego con el registro clasico de Mozilla
-		regFile = new File(System.getProperty("user.home") + "/.mozilla/appreg");
-		try {
-			if (regFile.exists()) return NSPreferences.getNS6UserProfileDirectory(regFile);
-		}
-		catch (Exception e) {
-			Logger.getLogger("es.gob.afirma").severe(
-					"Ocurrio un error obteniendo el directorio de perfil de usuario de Firefox, " +
-					"se devolvera null: " + e
-			);
-			return null;
-		}
-
-		Logger.getLogger("es.gob.afirma").severe(
-				"Ocurrio un error obteniendo el directorio de perfil de usuario de Mozilla/Firefox (UNIX), " +
-				"se devolvera null"
-		);
-		return null;
-	}
-
-	/** 
-	 * Obtiene el directorio de instalaci&oacute;n del entorno de ejecuci&oacute;n de Java
-	 * actualmente en uso.
-	 * Copiado de com.sun.deploy.config.Config. 
-	 * @return Directorio del entorno de ejecuci&oacute;n de Java
-	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
-	 */
-	public final static String getJavaHome() throws AOException {
-		String ret = null;
-		try {
-			ret = System.getProperty("jnlpx.home");
-		}
-		catch(final Throwable e) {
-			Logger.getLogger("es.gob.afirma").warning(
-				"No se ha podido leer 'jnlp.home', se intentara 'java.home'"
-			);
-		}
-		if (ret != null) {
-			// use jnlpx.home if available
-			// jnlpx.home always point to the location of the
-			// jre bin directory (where javaws is installed)
-			return ret.substring(0, ret.lastIndexOf(File.separator));
-		}
-
-		try {
-			return System.getProperty("java.home");
-		} 
-		catch (Throwable e) {
-			Logger.getLogger("es.gob.afirma").warning(
-					"No se ha podido leer 'java.home'"
-				);
-		}
-		
-		throw new AOException("No ha podido recuperar el directorio de Java");
-	}
-
-	/**
-	 * En sistemas Windows, a&ntilde;ade un directorio al PATH del sistema. Si el PATH en el
-	 * registro de Windows es de tipo REG_EXPAND_SZ lo convierte a REG_SZ
-	 * @param dir Directorio a a&ntilde;adir al PATH
-	 * @throws AOException Cuando ocurre cualquier problema durante el proceso o si se invoca al
-	 *                     m&eacute;todo en un sistema no Windows
-	 */
-	public final static void addDirToPath(final String dir) throws AOException {
-		
-		if (dir == null) {
-			Logger.getLogger("No se puede anadir un directorio nulo al PATH, se ignorara la llamada");
-			return;
-		}
-
-		if (!System.getProperty("os.name").contains("indows")) throw new AOException(
-				"Solo se puede establecer el Path en sistemas Windows"
-		);
-		if ("".equals(dir)) throw new AOException(
-				"El directorio a anadir al Path no puede ser ni nulo ni vacio"
-		);
-		if(dir.equals(System.getProperty("file.separator"))) throw new AOException(
-				"El directorio a anadir al Path no puede ser unicamente el separador de ficheros"
-		);
-		
-		// Retiramos la barra final en caso de haberla
-		final String dirToAdd = dir.endsWith(System.getProperty("file.separator")) ? dir.substring(0, dir.length()-System.getProperty("file.separator").length()) : dir;
-		
-		// Si ya esta el directorio en el path, abortamos la operacion
-		String[] paths = System.getProperty("java.library.path").split(System.getProperty("path.separator"));
-		for(String path : paths) if(dirToAdd.equals(path) || (path.endsWith(System.getProperty("file.separator")) && dirToAdd.equals(path.substring(0, path.length()-System.getProperty("file.separator").length())))) return;
-		
-		// Cuidado!! El Path es un REG_EXPAND_SZ, que WinRegistry no soporta, asi que lo obtenemos con un
-		// get() directamente y haciendo el casting a byte[]
-		// Puede traer un caracter extrano al final de la linea, mejor limpiar con trim()
-		// Leemos con un get y luego diferenciamos si es un REG_SZ o un REG_SZ_EXPAND
-
-		// Intentaremos agregar los directorio al path de la "CurrentControlSet" (sesion de Windows abierta).
-		// Si no existe trataremos de agregarla a las sesiones de la 1 a la 9 ("ControlSet001" - "ControlSet009").
-		String controlSetName = "CurrentControlSet";
-		
-
-		Object out = WinRegistryWrapper.get(
-				WinRegistryWrapper.HKEY_LOCAL_MACHINE,
-				"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
-				"Path"
-		);
-
-		if(out == null) {
-			int i = 0;
-			do {
-				i++;
-				out = WinRegistryWrapper.get(
-						WinRegistryWrapper.HKEY_LOCAL_MACHINE,
-						"SYSTEM\\ControlSet00"+ i + "\\Control\\Session Manager\\Environment",
-						"Path"
-				);
-			} while (out == null && i < 9);
-
-			// Establecemos el ControlSet adecuado
-			if(out != null) controlSetName = "ControlSet00" + i; 
-		}
-
-		String actualPath;
-		if (out instanceof String) actualPath = out.toString();
-		else if (out instanceof byte[]) actualPath = new String((byte[])out);
-		else throw new AOException(
-				"No se pudo establecer el Path, la lectura del Path actual devolvio un tipo " + out.getClass().toString()
-		);
-
-		// Expandimos el String con el caracter %SystemRoot%
-		String systemRoot = getSystemRoot();
-
-		if (systemRoot != null) {
-			// Se puede encontrar en MizedCase y el LowerCase
-			// Podría haber MixedCase que no siguiese el patron de 'S' y 'R' en mayusculas, pero no los
-			// tratamos. Evitamos la tentacion de pasar el Path a LowerCase porque si ha instalado MS-SFU
-			// Windows se convierte en Case Sensitive y podemos hacer un estropicio
-			actualPath = actualPath.replace("%SystemRoot%", systemRoot).replace("%systemroot%", systemRoot);
-		}
-
-		// Comprobamos que el path que deseamos anadir no estuviese ya en el registro. Esto puede
-		// suceder cuando no se ha recargado la variable path del sistema tomando el nuevo valor del
-		// registro
-		paths = actualPath.split(System.getProperty("path.separator"));
-		for(String path : paths) if(dirToAdd.equals(path) || (path.endsWith(System.getProperty("file.separator")) && dirToAdd.equals(path.substring(0, path.length()-System.getProperty("file.separator").length())))) return;
-		
-		// Ahora debemos establecer el nuevo PATH con WinRegistry.setStringValue()
-		// CUIDADO!!! Convierte los REG_SZ_EXPAND en REG_SZ
-		if (!WinRegistryWrapper.setStringValue(
-			WinRegistryWrapper.HKEY_LOCAL_MACHINE,
-			"SYSTEM\\" + controlSetName + "\\Control\\Session Manager\\Environment",
-			"Path",
-			dirToAdd + File.pathSeparator + actualPath
-		)) throw new AOException(
-			"Ocurrio un error indefinido intentando anadir el directorio '" + dirToAdd +
-			"' al Path del sistema (" + actualPath + "), el sistema puede haber quedado " +
-			"inconsistente"
-		);
-	}
-
-	/**
 	 * Obtiene el directorio principal del sistema operativo del sistema.
 	 * @return Directorio principal del sistema operativo
 	 */
-	public final static String getSystemRoot() {
-		if (!System.getProperty("os.name").contains("indows")) return File.separator;
+	private final static String getSystemRoot() {
+		if (!Platform.getOS().equals(Platform.OS.WINDOWS)) return File.separator;
 		String systemRoot = null;
 		final String defaultSystemRoot = "C:\\WINDOWS";
 		try {
@@ -621,7 +303,7 @@ public final class AOUtil {
 	 * @return Directorio principal de bibliotecas
 	 */
 	public final static String getSystemLibDir() {
-		if (System.getProperty("os.name").contains("indows")) {
+		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
 			String systemRoot = AOUtil.getSystemRoot();
 			if (systemRoot == null) {
 				Logger.getLogger("es.gob.afirma").warning(
@@ -659,7 +341,7 @@ public final class AOUtil {
 		}
 		catch(final Throwable e) {
 			Logger.getLogger("es.gob.afirma").warning(
-					"No se ha podido obtener el Common Name, se devolvera la cadena de entrada: " + e
+				"No se ha podido obtener el Common Name, se devolvera la cadena de entrada: " + e
 			);
 			return principal;
 		}
@@ -688,69 +370,6 @@ public final class AOUtil {
 		Logger.getLogger("es.gob.afirma").warning("Principal no valido, se devolvera la entrada");
 		return principal;
 	}
-
-	/**
-	 * Comprueba si el uso un certificado concuerda con un filtro dado. 
-	 * @param cert Certificado X.509 que queremos comprobar
-	 * @param filter Filtro con los bits de uso (<i>KeyUsage</i>) a verificar
-	 * @return <code>true</code> si el certificado concuerda con el filtro, <code>false</code>
-	 *         en caso contrario
-	 */
-	public final static boolean matchesKeyUsageFilter(final X509Certificate cert, final Boolean[] filter) {
-	    if (filter == null) return true;
-		if (cert == null) return false;
-		if (filter.length == 9) {
-			boolean[] certUsage = cert.getKeyUsage();
-			if (certUsage != null) {
-				for (int j=0;j<certUsage.length;j++) {
-					if (filter[j] != null && filter[j].booleanValue() != certUsage[j]) return false;
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Busca un fichero (o una serie de ficheros) en el PATH del sistema.
-	 * Deja de buscar en la primera ocurrencia
-	 * @param files Ficheros a buscar en el PATH
-	 * @param excludeAFirma Excluye el directorio de instalaci&oacute;n de AFirma de la b&uacute;squeda
-	 * @return Ruta completa del fichero encontrado en el PATH o <code>null</code> si no se encontr&oacute; nada 
-	 */
-	public final static String searchPathForFile(final String[] files, final boolean excludeAFirma) {
-		if (files == null || files.length < 1) return null;
-		
-        // Si existe el primero con el PATH completo lo devolvemos sin mas
-        if (new File(files[0]).exists()) return files[0];
-        
-		final StringTokenizer st = new StringTokenizer(
-			System.getProperty("java.library.path"),
-			File.pathSeparator
-		);
-		String libPath;
-		while (st.hasMoreTokens()) {
-			libPath = st.nextToken();
-			if (libPath.startsWith(AOInstallParameters.getHomeApplication()) && excludeAFirma) continue;
-			if (!libPath.endsWith(File.separator)) libPath = libPath + File.separator;
-			File tmpFile;
-			for (String f : files) {
-				tmpFile = new File(libPath + f); 
-				if (tmpFile.exists() && (!tmpFile.isDirectory())) return libPath + f; 
-			}
-	     }
-		return null;
-	}
-
-	 /**
-	  * Obtiene un n&uacute;mero de 16 bits a partir de dos posiciones de un array de octetos.
-	  * @param src Array de octetos origen
-	  * @param offset Desplazamiento desde el origen para el comienzo del par de octetos
-	  * @return N&ueacute;mero entero de 16 bits (sin signo)
-	  */
-	 public final static int getShort(final byte[] src, final int offset) {
-		 return (((src)[offset + 0] << 8) | (src)[offset + 1]);
-	 }
 	
 	/**
 	 * Caracterres aceptados en una codificaci&oacute;n Base64 seg&uacute;n la <a href="http://www.faqs.org/rfcs/rfc3548.html">RFC 3548</a>. 
@@ -872,7 +491,7 @@ public final class AOUtil {
 	 * @param signatureAlgorithm Nombre del algoritmo de firma
 	 * @return Algoritmo de hash.
 	 */
-	public final static String getDigestAlgorithm(String signatureAlgorithm) {
+	public final static String getDigestAlgorithm(final String signatureAlgorithm) {
 		
 		final int withPos = signatureAlgorithm.indexOf("with");
 		if(withPos == -1) return null;
@@ -910,7 +529,9 @@ public final class AOUtil {
             p.load(is);
         } 
         catch (final Throwable e) {
-            Logger.getLogger("es.gob.afirma").warning("No se han podido obtener los datos de version del cliente de firma");
+            Logger.getLogger("es.gob.afirma").warning(
+        		"No se han podido obtener los datos de version del cliente de firma"
+    		);
         }
         final StringBuilder version = new StringBuilder();
         version.append(p.getProperty("version.mayor", "0")).append(".")
@@ -939,7 +560,7 @@ public final class AOUtil {
             return null;
         }
 
-        if(!(tree.getRoot() instanceof DefaultMutableTreeNode)) {
+        if(!(tree.getRoot() instanceof TreeNode)) {
             Logger.getLogger("es.gob.afirma").severe("La raiz del arbol de firmas no es de tipo DafaultMutableTreeNode"); //$NON-NLS-1$
             return null;
         }
@@ -950,7 +571,7 @@ public final class AOUtil {
         StringBuilder buffer = new StringBuilder();
         
         // Transformamos en cadenas de texto cada rama que surja del nodo raiz del arbol
-        TreeNode root = (DefaultMutableTreeNode)tree.getRoot();
+        TreeNode root = (TreeNode)tree.getRoot();
         for(int i=0; i < root.getChildCount(); i++) {
             archiveTreeNode(root.getChildAt(i), 0, linePrefx, identationString, buffer); 
         }
@@ -975,7 +596,7 @@ public final class AOUtil {
                                               final StringBuilder buffer) {
         buffer.append('\n').append(linePrefx);
         for(int i=0; i<depth; i++) buffer.append(identationString);
-        buffer.append(((DefaultMutableTreeNode)node).getUserObject());
+        buffer.append((node).getUserObject());
         for(int i=0; i<node.getChildCount(); i++) {
             archiveTreeNode(node.getChildAt(i), depth+1, linePrefx, identationString, buffer);
         }
@@ -985,32 +606,42 @@ public final class AOUtil {
      * Carga una librer&iacute;a nativa del sistema. 
      * @param path Ruta a la libreria de sistema.
      */
-    public static void loadNativeLibrary(String path) {
-        
+    public static void loadNativeLibrary(final String path) {
+        if (path == null) {
+        	Logger.getLogger("es.gob.afirma").warning(
+    			"No se puede cargar una biblioteca nula"
+			);
+        	return;
+        }
     	boolean copyOK = false;
-        int pos = path.lastIndexOf('.');
-        File file = new File(path);
+        final int pos = path.lastIndexOf('.');
+        final File file = new File(path);
         File tempLibrary = null;
         try {
             tempLibrary = File.createTempFile(
-            		pos < 1 ? file.getName() : file.getName().substring(0, file.getName().indexOf('.')),
-                    pos < 1 || pos == path.length()-1 ? null : path.substring(pos));
+        		pos < 1 ? file.getName() : file.getName().substring(0, file.getName().indexOf('.')),
+                pos < 1 || pos == path.length()-1 ? null : path.substring(pos)
+    		);
             
             // Copiamos el fichero
             copyOK = copyFile(file, tempLibrary);
-        } catch (Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("Ocurrio un error al generar una nueva instancia de la libreria "
-                    + path + " para su carga: "+e);
+        } 
+        catch (final Throwable e) {
+            Logger.getLogger("es.gob.afirma").warning(
+        		"Error al generar una nueva instancia de la libreria " + path + " para su carga: " + e
+    		);
         }
         
         // Pedimos borrar los temporales cuando se cierre la JVM
         if(tempLibrary != null) {
         	try {
         		tempLibrary.deleteOnExit();
-        	} catch (Exception e) { }
+        	} catch (final Throwable e) { }
         }
         
-        Logger.getLogger("es.gob.afirma").info("Cargamos "+(tempLibrary == null ? path : tempLibrary.getAbsolutePath()));
+        Logger.getLogger("es.gob.afirma").info(
+    		"Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath())
+		);
         System.load((copyOK && tempLibrary != null) ? tempLibrary.getAbsolutePath() : path);
     }
     
@@ -1021,19 +652,24 @@ public final class AOUtil {
      * @return Devuelve <code>true</code> si la operac&oacute;n  finaliza correctamente,
      * <code>false</code> en caso contrario.
      */
-    public static boolean copyFile(File source, File dest) {
+    public static boolean copyFile(final File source, final File dest) {
     	if (source == null || dest == null) return false;
     	try {
-    	 FileChannel in = new FileInputStream(source).getChannel();
-    	 FileChannel out = new FileOutputStream(dest).getChannel();
-         MappedByteBuffer buf = in.map(FileChannel.MapMode.READ_ONLY, 0, in.size());
+    	 final FileInputStream is = new FileInputStream(source);
+    	 final FileOutputStream os = new FileOutputStream(dest);
+    	 final FileChannel in = is.getChannel();
+    	 final FileChannel out = os.getChannel();
+         final MappedByteBuffer buf = in.map(FileChannel.MapMode.READ_ONLY, 0, in.size());
          out.write(buf);
          
          // Cerramos los canales sin preocuparnos de que lo haga correctamente 
-         try { in.close(); } catch (Exception e) {}
-         try { out.close(); } catch (Exception e) {}
+         try { in.close(); } catch (final Throwable e) {}
+         try { out.close(); } catch (final Throwable e) {}
+         try { is.close(); } catch (final Throwable e) {}
+         try { os.close(); } catch (final Throwable e) {}
+         
     	}
-    	catch(Throwable e) {
+    	catch(final Throwable e) {
     		Logger.getLogger("es.gob.afirma").severe(
 				"No se ha podido copiar el fichero origen '" +
 				source.getName() +
@@ -1047,4 +683,32 @@ public final class AOUtil {
     	return true;
     }
     
+    /**
+     * Genera una lista de cadenas compuesta por los fragmentos de texto separados por la cadena
+     * de separaci&oacute;n indicada. No soporta expresiones regulares. Por ejemplo:<br/>
+     * <ul>
+     *  <li><b>Texto:</b> foo$bar$foo$$bar$</li>
+     *  <li><b>Separado:</b> $</li>
+     *  <li><b>Resultado:</b> "foo", "bar", "foo", "", "bar", ""</li>
+     * </ul>
+     * @param text Texto que deseamos dividir.
+     * @param sp Separador entre los fragmentos de texto.
+     * @return Listado de fragmentos de texto entre separadores.
+     * @throws NullPointerException Cuando alguno de los par&aacute;metros de entrada es {@code null}.
+     */
+    public static String[] split(String text, String sp) {
+    	
+    	Vector<String> parts = new Vector<String>();
+    	int i = 0;
+    	int j = 0;
+    	while ( i != text.length() && (j = text.indexOf(sp, i)) != -1) {
+    		if ( i == j) parts.add("");
+    		else parts.add(text.substring(i, j));
+    		i = j + sp.length();
+    	}
+    	if (i == text.length()) parts.add("");
+    	else parts.add(text.substring(i));
+    	    	
+    	return parts.toArray(new String[0]);
+    }
 }

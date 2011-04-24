@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.signers.aobinarysignhelper;
 
@@ -21,10 +20,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
-
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -44,7 +39,9 @@ import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 
-import es.gob.afirma.beans.AOSimpleSignInfo;
+import es.gob.afirma.misc.tree.TreeModel;
+import es.gob.afirma.misc.tree.TreeNode;
+import es.gob.afirma.signers.beans.AOSimpleSignInfo;
 
 
 /**
@@ -52,12 +49,13 @@ import es.gob.afirma.beans.AOSimpleSignInfo;
  */
 public final class ReadNodesTree {
 
-    String StringRetorn="";
-    DefaultMutableTreeNode raiz,rama,rama2,seleccion;
-    JTree arbol;
-    int seleccionados [];
-    List<String> lista = new ArrayList<String>();
-    List<X509Certificate[]> listaCert = new ArrayList<X509Certificate[]>();
+    private String StringRetorn="";
+    private TreeNode raiz;
+    private TreeNode rama;
+    private TreeNode rama2;
+    private int seleccionados [];
+    private final List<String> lista = new ArrayList<String>();
+    private final List<X509Certificate[]> listaCert = new ArrayList<X509Certificate[]>();
 
     int[] getSeleccionados() {
         return seleccionados;
@@ -67,13 +65,6 @@ public final class ReadNodesTree {
         this.seleccionados = seleccionados;
     }
 
-    JTree getArbol() {
-        return arbol;
-    }
-
-    void setArbol(JTree arbol) {
-        this.arbol = arbol;
-    }
     //DefaultTreeModel modelo;
 
     String getStringRetorn() {
@@ -91,7 +82,6 @@ public final class ReadNodesTree {
      * @return      Un modelo de &aacute;rbol.
      * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
      */
-    @SuppressWarnings("unchecked")
 	public TreeModel readNodesTree(byte[] data, boolean asSimpleSignInfo) throws IOException {
 
         ASN1InputStream is = new ASN1InputStream(data);
@@ -99,7 +89,7 @@ public final class ReadNodesTree {
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq=(ASN1Sequence)is.readObject();
-        Enumeration<Object> e = dsq.getObjects();
+        Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
         // Contenido de SignedData
@@ -129,12 +119,11 @@ public final class ReadNodesTree {
 
 
         //Para la creacion del arbol
-        raiz = new DefaultMutableTreeNode("Datos");
-        arbol = new JTree( raiz );
+        raiz = new TreeNode("Datos");
 
         //introducimos el nuevo SignerInfo del firmante actual.
 
-        if (asSimpleSignInfo){
+        if (asSimpleSignInfo && signerInfosSd != null){
         	for(int i =0; i< signerInfosSd.size(); i++){
 	            ASN1Sequence atribute = (ASN1Sequence)signerInfosSd.getObjectAt(i);
 	            IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence)atribute.getObjectAt(1));
@@ -143,20 +132,20 @@ public final class ReadNodesTree {
 	            Date signingTime= getSigningTime(si);
 	            AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner,signingTime);
 	            aossi.setPkcs1(si.getEncryptedDigest().getOctets());
-	            rama = new DefaultMutableTreeNode(aossi);	            
+	            rama = new TreeNode(aossi);	            
 	            listaCert.add(nameSigner);
 	            getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(),rama,certificates);
 	
 	            raiz.add(rama);
 	        }
         }
-        else{
+        else if (signerInfosSd != null){
 	        for(int i =0; i< signerInfosSd.size(); i++){
 	            ASN1Sequence atribute = (ASN1Sequence)signerInfosSd.getObjectAt(i);
 	            IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence)atribute.getObjectAt(1));
 	            String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
 	            SignerInfo si = new SignerInfo(atribute);
-	            rama = new DefaultMutableTreeNode(nameSigner);
+	            rama = new TreeNode(nameSigner);
 	            lista.add(nameSigner);
 	            getUnsignedAtributes(si.getUnauthenticatedAttributes(),rama,certificates);
 	
@@ -164,7 +153,7 @@ public final class ReadNodesTree {
 	        }
         }
 
-        return arbol.getModel();
+        return new TreeModel(raiz);
     }
     
     /**
@@ -174,16 +163,15 @@ public final class ReadNodesTree {
      * @param ramahija          Rama hija donde buscar los siguientes nodos.
      * @param certificates      Certificados.
      */
-    @SuppressWarnings("unchecked")
-	private void getUnsignedAtributesWithCertificates(ASN1Set signerInfouAtrib, DefaultMutableTreeNode ramahija, ASN1Set certificates){
+	private void getUnsignedAtributesWithCertificates(ASN1Set signerInfouAtrib, TreeNode ramahija, ASN1Set certificates){
 
         if (signerInfouAtrib!= null){
-            Enumeration<Object> eAtributes = signerInfouAtrib.getObjects();
+            Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
             while (eAtributes.hasMoreElements()){
                 Attribute data = new Attribute((ASN1Sequence)eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)){
 	                ASN1Set setInto = data.getAttrValues();
-	                Enumeration<Object> eAtributesData = setInto.getObjects();
+	                Enumeration<?> eAtributesData = setInto.getObjects();
 	                while (eAtributesData.hasMoreElements()){
 	                    Object obj =eAtributesData.nextElement();
 	                    if (obj instanceof ASN1Sequence){
@@ -194,7 +182,7 @@ public final class ReadNodesTree {
 	                        Date signingTime= getSigningTime(si);
 	                        AOSimpleSignInfo aossi =new AOSimpleSignInfo(nameSigner,signingTime);
 	                        aossi.setPkcs1(si.getEncryptedDigest().getOctets());
-	                        rama2 = new DefaultMutableTreeNode(aossi);
+	                        rama2 = new TreeNode(aossi);
 	                        listaCert.add(nameSigner);
 	                        ramahija.add(rama2);
 	                        getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(),rama2,certificates);
@@ -214,16 +202,15 @@ public final class ReadNodesTree {
      * @param ramahija          Rama hija donde buscar los siguientes nodos.
      * @param certificates      Certificados.
      */
-    @SuppressWarnings("unchecked")
-	private void getUnsignedAtributes(ASN1Set signerInfouAtrib, DefaultMutableTreeNode ramahija, ASN1Set certificates){
+	private void getUnsignedAtributes(ASN1Set signerInfouAtrib, TreeNode ramahija, ASN1Set certificates){
 
         if (signerInfouAtrib!= null){
-            Enumeration<Object> eAtributes = signerInfouAtrib.getObjects();
+            Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
             while (eAtributes.hasMoreElements()){
                 Attribute data = new Attribute((ASN1Sequence)eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)){
 	                ASN1Set setInto = data.getAttrValues();
-	                Enumeration<Object> eAtributesData = setInto.getObjects();
+	                Enumeration<?> eAtributesData = setInto.getObjects();
 	                while (eAtributesData.hasMoreElements()){
 	                    Object obj =eAtributesData.nextElement();
 	                    if (obj instanceof ASN1Sequence){
@@ -231,7 +218,7 @@ public final class ReadNodesTree {
 	                        IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence)atrib.getObjectAt(1));
 	                        SignerInfo si = new SignerInfo(atrib);
 	                        String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
-	                        rama2 = new DefaultMutableTreeNode(nameSigner);
+	                        rama2 = new TreeNode(nameSigner);
 	                        lista.add(nameSigner);
 	                        ramahija.add(rama2);
 	                        getUnsignedAtributes(si.getUnauthenticatedAttributes(),rama2,certificates);
@@ -310,10 +297,9 @@ public final class ReadNodesTree {
      * @param serialNumber      N&uacute;mero de serie del certificado a firmar.
      * @return                  El nombre com&uacute;n.
      */
-    @SuppressWarnings("unchecked")
 	private String searchName(ASN1Set certificates, DERInteger serialNumber) {
         String nombre="";
-        Enumeration<Object> certSet = certificates.getObjects();
+        Enumeration<?> certSet = certificates.getObjects();
         while (certSet.hasMoreElements()) {
            ASN1Sequence atrib2 = (ASN1Sequence) certSet.nextElement();
            TBSCertificateStructure atrib = TBSCertificateStructure.getInstance(atrib2.getObjectAt(0));
@@ -340,9 +326,8 @@ public final class ReadNodesTree {
      * @param serialNumber      N&uacute;mero de serie del certificado a firmar.
      * @return                  El certificado (en la posici&oacute;n 0 y su cadena de confianza en orden).
      */
-    @SuppressWarnings("unchecked")
 	private X509Certificate[] searchCert(ASN1Set certificates, DERInteger serialNumber) {
-    	Enumeration<Object> certSet = certificates.getObjects();
+    	Enumeration<?> certSet = certificates.getObjects();
     	ASN1Sequence atrib2;
         while (certSet.hasMoreElements()) {
             atrib2 = (ASN1Sequence) certSet.nextElement();

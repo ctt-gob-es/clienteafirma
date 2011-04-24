@@ -204,6 +204,8 @@
 
 package es.atosorigin.exe;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.logging.Logger;
 
 import es.gob.afirma.exceptions.AOException;
@@ -214,24 +216,33 @@ import es.gob.afirma.misc.AOUtil;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s Capote
  */
 public class PEParser {
+	
+	private static final Dictionary<String, String> MACHINE_TYPE;
+	
+	static {
+		MACHINE_TYPE = new Hashtable<String, String>();
+		MACHINE_TYPE.put("00-00", "Desconocida");
+		MACHINE_TYPE.put("01-D3", "Matsushita AM33");
+		MACHINE_TYPE.put("86-64", "x64");
+		MACHINE_TYPE.put("01-C0", "ARM little endian");
+		MACHINE_TYPE.put("0E-BC", "EFI byte code");
+		MACHINE_TYPE.put("01-4C", "Intel 386 o posteriores y compatibles");
+		MACHINE_TYPE.put("02-00", "Familia de procesadores Intel Itanium");
+		MACHINE_TYPE.put("90-41", "Mitsubishi M32R little endian");
+		MACHINE_TYPE.put("02-66", "MIPS16");
+		MACHINE_TYPE.put("03-66", "MIPS con FPU");
+	}
 
 	private static final byte PE_SIGNATURE_OFFSET = (byte) 0x3c;
 
-//	public static void main(String[] args) throws Exception {
-//		new PEParser().parse(AOUtil.getDataFromInputStream(new FileInputStream(new File("D:\\Program Files\\Mozilla Firefox\\softokn3.dll"))));
-//		//new PEParser().parse(AOBinUtil.getDataFromInputStream(new FileInputStream(new File("d:\\vmame.exe"))));
-//		//new PEParser().parse(AOBinUtil.getDataFromInputStream(new FileInputStream(new File("d:\\documents\\OGCheck.exe"))));
-//		//new PEParser().parse(AOBinUtil.getDataFromInputStream(new FileInputStream(new File("d:\\documents\\pfc.dll"))));
-//		//new PEParser().parse(AOBinUtil.getDataFromInputStream(new FileInputStream(new File("c:\\windows\\system32\\drivers\\dxgthk.sys"))));
-//		//new PEParser().parse(AOBinUtil.getDataFromInputStream(new FileInputStream(new File("C:\\Program Files\\Minefield\\nss3.dll"))));
-//	}
-	
 	/**
 	 * Analiza un fichero PE de Microsoft e imprime informaci&oacute;n en consola sobre &eacute;l.
 	 * @param peFile Fichero PE (<i>Portable Executable</i>) de Microsoft
+	 * @param logger <code>Logger</code> donde registrar como <code>info</code> informaci&oacute; textual descriptiva del binario
+	 * @return <code>true</code> si el binario es de 64 bits, <code>false</code> en caso contrario
 	 * @throws AOException Si ocurre cualquier problema durante el an&aacute;lisis
 	 */
-	public void parse(byte[] peFile) throws AOException {
+	public boolean parse(final byte[] peFile, final Logger logger) throws AOException {
 		
 		int coffOffset = AOBinUtil.getU2(peFile, PE_SIGNATURE_OFFSET) + 4;
 		if (!"PE\0\0".equals(
@@ -243,16 +254,24 @@ public class PEParser {
 			})
 		)) throw new AOException("Cabecera PE\\0\\0 no encontrada en el offset " + AOUtil.hexify(new byte[] { PE_SIGNATURE_OFFSET }, false));
 		
-		System.out.println(" Cabecera PE\\0\\0 encontrada en el offset " + AOUtil.hexify(new byte[] { PE_SIGNATURE_OFFSET }, false));
+		final StringBuilder sb = new StringBuilder();
 		
-		System.out.println(" Tipo de maquina: " + PEConstants.machineTypes.get(AOUtil.hexify(new byte[] {
+		//sb.append(" Cabecera PE\\0\\0 encontrada en el offset " + AOUtil.hexify(new byte[] { PE_SIGNATURE_OFFSET }, false));
+		
+		sb.append("Tipo de maquina: ");
+		
+		final String machineType = AOUtil.hexify(new byte[] {
 				peFile[coffOffset+1],
-				peFile[coffOffset],
-		}, true))); // +0, +1
+				peFile[coffOffset],  
+		}, true);  // +0, +1
+		sb.append(MACHINE_TYPE.get(machineType));
 		
-		int numberOfSections = AOBinUtil.getU2(peFile, coffOffset+2); // +2, +3
+		boolean is64 = false;
+		if (machineType.equals("86-64") /* x64 */ || machineType.equals("02-00") /* IA64 */) is64 = true; 
 		
-		System.out.println(" Numero de secciones de la tabla de secciones: " + numberOfSections);
+		//int numberOfSections = AOBinUtil.getU2(peFile, coffOffset+2); // +2, +3
+		
+		//sb.append(" Numero de secciones de la tabla de secciones: " + numberOfSections);
 		
 		//int timeDateStamp = AOBinUtil.getInt(peFile, coffOffset+4); // +4, +5, +6, +7
 		
@@ -265,72 +284,75 @@ public class PEParser {
         }
 
         int sizeOfOptionalHeader = AOBinUtil.getU2(peFile, coffOffset+16); // +16, +17
-        
-        if (sizeOfOptionalHeader == 0) System.out.println(
-        	" El fichero es un objeto (no tiene cabecera opcional)"
+
+        if (sizeOfOptionalHeader == 0) sb.append(
+        	"\nEl fichero es un objeto (no tiene cabecera opcional)"
         );
-        else System.out.println(
-        	" El fichero es ejecutable (tamano de la cabecera opcional: " + sizeOfOptionalHeader + ")"
-        );
+        //else {
+        //	sb.append(
+    	//		"\nEl fichero es ejecutable (tamano de la cabecera opcional: " 
+        //	);
+        //	sb.append(sizeOfOptionalHeader);
+        //	sb.append(")");
+        //}
         
-        byte[] characteristics = new byte[] {peFile[coffOffset+19], peFile[coffOffset+18]}; // +18, +19
+        //byte[] characteristics = new byte[] {peFile[coffOffset+19], peFile[coffOffset+18]}; // +18, +19
         
-        if (0 != (byte) (characteristics[1] & (byte) 0x01)) System.out.println(" El fichero no contiene relocalizaciones de base");
-        if (0 != (byte) (characteristics[1] & (byte) 0x02)) System.out.println(" Imagen valida");
-        if (0 != (byte) (characteristics[1] & (byte) 0x04)) Logger.getLogger("es.atosorigin").warning("Numeros de linea de la imagen COFF eliminados (se implementa una caracteristica deprecada");
-        if (0 != (byte) (characteristics[1] & (byte) 0x08)) Logger.getLogger("es.atosorigin").warning("Entradas de la tabla de simbolos de la imagen COFF para simbolos locales eliminadas (se implementa una caracteristica deprecada)");
-        if (0 != (byte) (characteristics[1] & (byte) 0x10)) Logger.getLogger("es.atosorigin").warning("Conjunto trucando agresivamente (se implementa una caracteristica deprecada para Windows 2000 y posteriores)");
-        if (0 != (byte) (characteristics[1] & (byte) 0x20)) System.out.println(" La aplicacion puede gestionar direccionamiento superior a 2GB");
-        if (0 != (byte) (characteristics[1] & (byte) 0x40)) Logger.getLogger("es.atosorigin").warning("Se hace uso de un bit reservado para uso futuro");
-        if (0 != (byte) (characteristics[1] & (byte) 0x80)) System.out.println(" Arquitectura Little Endian");
-        if (0 != (byte) (characteristics[0] & (byte) 0x01)) System.out.println(" Arquitectura con palabras de 32 bits");
-        if (0 != (byte) (characteristics[0] & (byte) 0x02)) System.out.println(" Informacion de depuracion eliminada de la imagen");
-        if (0 != (byte) (characteristics[0] & (byte) 0x04)) System.out.println(" Si la imagen se encuentra en almacenamiento extraible, debe cargarse completamente y copiarse al fichero de intercambio");
-        if (0 != (byte) (characteristics[0] & (byte) 0x08)) System.out.println(" Si la imagen se encuantra en almacenamiento en red, debe cargarse completamente y copiarse al fichero de intercambio");
-        if (0 != (byte) (characteristics[0] & (byte) 0x10)) System.out.println(" La imagen es un fichero de sistema, no un programa de usuario");
-        if (0 != (byte) (characteristics[0] & (byte) 0x20)) System.out.println(" La imagen es una biblioteca de enlace dinamico");
-        if (0 != (byte) (characteristics[0] & (byte) 0x40)) System.out.println(" La imagen debe ejecutarse en una maquina con un unico procesador");
-        if (0 != (byte) (characteristics[0] & (byte) 0x20)) System.out.println(" Arquitectura Big Endian");
+        //if (0 != (byte) (characteristics[1] & (byte) 0x01)) sb.append("\nEl fichero no contiene relocalizaciones de base");
+        //if (0 != (byte) (characteristics[1] & (byte) 0x02)) sb.append("\nImagen valida");
+        //if (0 != (byte) (characteristics[1] & (byte) 0x04)) Logger.getLogger("es.atosorigin").warning("Numeros de linea de la imagen COFF eliminados (se implementa una caracteristica deprecada");
+        //if (0 != (byte) (characteristics[1] & (byte) 0x08)) Logger.getLogger("es.atosorigin").warning("Entradas de la tabla de simbolos de la imagen COFF para simbolos locales eliminadas (se implementa una caracteristica deprecada)");
+        //if (0 != (byte) (characteristics[1] & (byte) 0x10)) Logger.getLogger("es.atosorigin").warning("Conjunto trucando agresivamente (se implementa una caracteristica deprecada para Windows 2000 y posteriores)");
+        //if (0 != (byte) (characteristics[1] & (byte) 0x20)) sb.append("\nLa aplicacion puede gestionar direccionamiento superior a 2GB");
+        //if (0 != (byte) (characteristics[1] & (byte) 0x40)) Logger.getLogger("es.atosorigin").warning("Se hace uso de un bit reservado para uso futuro");
+        //if (0 != (byte) (characteristics[1] & (byte) 0x80)) sb.append("\nArquitectura Little Endian");
+        //if (0 != (byte) (characteristics[0] & (byte) 0x01)) sb.append("\nArquitectura con palabras de 32 bits");
+        //if (0 != (byte) (characteristics[0] & (byte) 0x02)) sb.append("\nInformacion de depuracion eliminada de la imagen");
+        //if (0 != (byte) (characteristics[0] & (byte) 0x04)) sb.append("\nSi la imagen se encuentra en almacenamiento extraible, debe cargarse completamente y copiarse al fichero de intercambio");
+        //if (0 != (byte) (characteristics[0] & (byte) 0x08)) sb.append("\nSi la imagen se encuantra en almacenamiento en red, debe cargarse completamente y copiarse al fichero de intercambio");
+        //if (0 != (byte) (characteristics[0] & (byte) 0x10)) sb.append("\nLa imagen es un fichero de sistema, no un programa de usuario");
+        //if (0 != (byte) (characteristics[0] & (byte) 0x20)) sb.append("\nLa imagen es una biblioteca de enlace dinamico");
+        //if (0 != (byte) (characteristics[0] & (byte) 0x40)) sb.append("\nLa imagen debe ejecutarse en una maquina con un unico procesador");
+        //if (0 != (byte) (characteristics[0] & (byte) 0x20)) sb.append("\nArquitectura Big Endian");
               
-        //System.out.println(" Bits de caracteristicas: " + AOBinUtil.hexify(characteristics, true));
+        //sb.append(" Bits de caracteristicas: " + AOBinUtil.hexify(characteristics, true));
 	
         if (sizeOfOptionalHeader > 0) {
         	
         	final int optionalHeaderOffset = 20;
         	
-        	boolean pe32Plus = false;
+        	//boolean pe32Plus = false;
         	
         	// Magic +0, +1
         	if (peFile[coffOffset+optionalHeaderOffset+1] == (byte) 0x01) {
-        		if (peFile[coffOffset+optionalHeaderOffset+0] == (byte) 0x0B) System.out.println(" La imagen es un ejecutable normal (PE32)");
-        		else if (peFile[coffOffset+optionalHeaderOffset+0] == (byte) 0x07) System.out.println(" La imagen es una ROM");
+        		if (peFile[coffOffset+optionalHeaderOffset+0] == (byte) 0x0B) sb.append("\nLa imagen es un ejecutable normal (PE32)");
+        		else if (peFile[coffOffset+optionalHeaderOffset+0] == (byte) 0x07) sb.append("\nLa imagen es una ROM");
         		else Logger.getLogger("es.atosorigin").warning("El fichero de imagen es de un tipo desconocido (Magic: " + AOUtil.hexify(new byte[] {peFile[coffOffset+21], peFile[coffOffset+20]}, true) + ")");
         	}
         	else if ((peFile[coffOffset+optionalHeaderOffset+1] == (byte) 0x02) && (peFile[coffOffset+20] == (byte) 0x0B)) {
-        		System.out.println(" La imagen es un ejecutable PE32+");
-        		pe32Plus = true;
+        		sb.append("\nLa imagen es un ejecutable PE32+");
+        		//pe32Plus = true;
         	}
         	else Logger.getLogger("es.atosorigin").warning("El fichero de imagen es de un tipo desconocido (Magic: " + AOUtil.hexify(new byte[] {peFile[coffOffset+21], peFile[coffOffset+20]}, true) + ")");
        
         	// Linker, +2, +3
-        	System.out.println(" Version del enlazador usado para crear la imagen: " + peFile[coffOffset+optionalHeaderOffset+2] + "." + peFile[coffOffset+optionalHeaderOffset+3]);
+        	//sb.append("\nVersion del enlazador usado para crear la imagen: " + peFile[coffOffset+optionalHeaderOffset+2] + "." + peFile[coffOffset+optionalHeaderOffset+3]);
         	
         	// Version del sistema operativo +40, +41, +42, +43 - WINDOWS SPECIFIC
-        	System.out.println(" Version requerida del sistema operativo: " +
-        		AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+40) +
-	        	"." +
-	        	AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+42)
-        	);
+        	sb.append("\nVersion requerida del sistema operativo: ");
+        	sb.append(AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+40));
+        	sb.append(".");
+        	sb.append(AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+42));
         	
 //        	// Version de la imagen +44, +45, +46, +47
-//        	System.out.println(" Version de la imagen: " +
+//        	sb.append("\nVersion de la imagen: " +
 //        		AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+44) +
 //	        	"." +
 //	        	AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+46)
 //        	);
         	
 //        	// Checksum +64 +65 +66 +67
-//        	System.out.println(" Checksum de la imagen: " +
+//        	sb.append("\nChecksum de la imagen: " +
 //        		AOBinUtil.hexify(new byte[] {
 //    				peFile[coffOffset+optionalHeaderOffset+64],
 //    				peFile[coffOffset+optionalHeaderOffset+65],
@@ -340,56 +362,59 @@ public class PEParser {
 //        	);
         	
         	// Subsistema Windows - WINDOWS SPECIFIC
-        	System.out.print(" Tipo de subsistema Windows: ");
+        	sb.append("\nTipo de subsistema Windows: ");
         	switch (AOBinUtil.getU2(peFile, coffOffset+optionalHeaderOffset+68)) {
 			case 0:
-				System.out.println(" Desconocido");
+				sb.append("Desconocido");
 				break;
 			case 1:
-				System.out.println(" Controlador de dispositiovo o proceso nativo Windows");
+				sb.append("Controlador de dispositiovo o proceso nativo Windows");
 				break;
 			case 2:
-				System.out.println(" Windows en modo grafico (GUI)");
+				sb.append("Windows en modo grafico (GUI)");
 				break;
 			case 3:
-				System.out.println(" Windows en modo texto");
+				sb.append("Windows en modo texto");
 				break;
 			case 7:
-				System.out.println(" POSIX en modo texto");
+				sb.append("POSIX en modo texto");
 				break;
 			case 9:
-				System.out.println(" Windows CE");
+				sb.append("Windows CE");
 				break;
 			case 10:
-				System.out.println(" Aplicacion EFI (Extensible Firmware Iterface)");
+				sb.append("Aplicacion EFI (Extensible Firmware Iterface)");
 				break;
 			case 11:
-				System.out.println(" Controlador EFI (Extensible Firmware Iterface) con servicios de arranque");
+				sb.append("Controlador EFI (Extensible Firmware Iterface) con servicios de arranque");
 				break;
 			case 12:
-				System.out.println(" Controlador EFI (Extensible Firmware Iterface) con servicios de ejecucion");
+				sb.append("Controlador EFI (Extensible Firmware Iterface) con servicios de ejecucion");
 				break;
 			case 13:
-				System.out.println(" Imagen ROM EFI (Extensible Firmware Iterface)");
+				sb.append("Imagen ROM EFI (Extensible Firmware Iterface)");
 				break;
 			case 14:
-				System.out.println(" XBOX");
+				sb.append("XBOX");
 				break;
 			default:
-				System.out.println(" No valido");
+				sb.append("No valido");
 				break;
 			}
         	
-        	int resourceTablePointerOffset = 112;
-        	if (pe32Plus) resourceTablePointerOffset = 128;
+        	//int resourceTablePointerOffset = 112;
+        	//if (pe32Plus) resourceTablePointerOffset = 128;
         	
-        	final int resourceTableOffset = AOBinUtil.getDWord(peFile,coffOffset+optionalHeaderOffset+resourceTablePointerOffset); // 112, 113, 114, 115 (PE32)
-        	final int resourceTableSize = AOBinUtil.getDWord(peFile,coffOffset+optionalHeaderOffset+resourceTablePointerOffset+4); // 116, 117, 118, 119 (PE32)
+        	//final int resourceTableOffset = AOBinUtil.getDWord(peFile,coffOffset+optionalHeaderOffset+resourceTablePointerOffset); // 112, 113, 114, 115 (PE32)
+        	//final int resourceTableSize = AOBinUtil.getDWord(peFile,coffOffset+optionalHeaderOffset+resourceTablePointerOffset+4); // 116, 117, 118, 119 (PE32)
         	
-        	System.out.println(" Tamano (en memoria) de la tabla de recursos: " + resourceTableSize + " (" + AOUtil.hexify(new byte[] { peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+7], peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+6], peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+5],peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+4] }, false) + "h)");
-        	System.out.println(" Offset (virtual) de la tabla de recursos: " + resourceTableOffset + " (" + AOUtil.hexify(new byte[] { peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+3], peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+2], peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+1],peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset] }, false) + "h)");
+        	//sb.append("\nTamano (en memoria) de la tabla de recursos: " + resourceTableSize + " (" + AOUtil.hexify(new byte[] { peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+7], peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+6], peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+5],peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+4] }, false) + "h)");
+        	//sb.append("\nOffset (virtual) de la tabla de recursos: " + resourceTableOffset + " (" + AOUtil.hexify(new byte[] { peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+3], peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+2], peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset+1],peFile[coffOffset+optionalHeaderOffset+resourceTablePointerOffset] }, false) + "h)");
         	
         }
+        
+        if (logger != null) logger.info(sb.toString());
+        return is64;
 	}
 
 }

@@ -2,30 +2,26 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers;
 
-import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
-
-import javax.swing.tree.TreeModel;
 
 import org.ietf.jgss.Oid;
 
-import es.gob.afirma.beans.AOSignInfo;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOInvalidFormatException;
 import es.gob.afirma.exceptions.AOUnsupportedSignFormatException;
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOSignConstants;
+import es.gob.afirma.misc.tree.TreeModel;
+import es.gob.afirma.signers.beans.AOSignInfo;
 
 /**
  * Define los requerimientos de las clases capaces de efectuar firmas digitales.
@@ -36,46 +32,46 @@ public interface AOSigner {
 	/**
 	 * Firma un contenido (t&iacute;picamente un fichero).<br/>
 	 * Los algoritmos y modos de firma disponibles se declaran en {@link es.gob.afirma.misc.AOConstants}.
-	 * @param file Flujo de lectura de los datos a firmar
+	 * @param data Datos que deseamos a firmar.
 	 * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
 	 * @param keyEntry Clave privada a usar para firmar
-	 * @param cert Certificado a usar para firmar (debe ser relativo a la clave privada)
 	 * @param extraParams Par&aacute;metros adicionales para la firma
 	 * @return Contenido firmado
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
 	 */
-	public byte[] sign(InputStream file, String algorithm, PrivateKeyEntry keyEntry, X509Certificate cert, Properties extraParams) throws AOException;
+	public byte[] sign(byte[] data, 
+			           String algorithm, 
+			           PrivateKeyEntry keyEntry, 
+			           Properties extraParams) throws AOException;
 
 	/**
 	 * Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la cofirma se necesitan los
 	 * datos originales (que este m&eacute;todo firmar&aacute; normalmente) y la firma sobre la que se
 	 * realiza la cofirma (a los que se agregar&aacute; el resultado de la nueva firma).<br/>
 	 * Los algoritmos y modos de firma disponibles se declaran en {@link es.gob.afirma.misc.AOConstants}.
-	 * @param file Flujo de lectura de los datos a firmar
-	 * @param signFile Flujo de lectura de la firma de los datos que se quiere cofirmar.
+	 * @param data Datos que deseamos a cofirmar.
+	 * @param sign Flujo de lectura de la firma de los datos que se quiere cofirmar.
 	 * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
 	 * @param keyEntry Clave privada a usar para firmar
-	 * @param cert Certificado a usar para firmar (debe ser relativo a la clave privada)
 	 * @param extraParams Par&aacute;metros adicionales para la cofirma
 	 * @return Contenido firmado
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
 	 */
-	public byte[] cosign(InputStream file, InputStream signFile, String algorithm, PrivateKeyEntry keyEntry, X509Certificate cert, Properties extraParams) throws AOException;
+	public byte[] cosign(byte[] data, byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
 
 	/**
 	 * Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la cofirma se necesita
 	 * el documento en el que se encuentra la firma sobre la que se
 	 * realiza la cofirma (a los que se agregar&aacute; el resultado de la nueva firma).<br/>
 	 * Los algoritmos y modos de firma disponibles se declaran en {@link AOConstants}.
-	 * @param signFile Flujo de lectura de la firma de los datos que se quiere cofirmar.
+	 * @param sign Firma de los datos que se quiere cofirmar.
 	 * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
 	 * @param keyEntry Clave privada a usar para firmar
-	 * @param cert Certificado a usar para firmar (debe ser relativo a la clave privada)
 	 * @param extraParams Par&aacute;metros adicionales para la cofirma
 	 * @return Contenido firmado
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
 	 */
-	public byte[] cosign(InputStream signFile, String algorithm, PrivateKeyEntry keyEntry, X509Certificate cert, Properties extraParams) throws AOException;
+	public byte[] cosign(byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
 	
 	/**
 	 * Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br/>
@@ -89,24 +85,23 @@ public interface AOSigner {
 	 * </ul>
 	 * Los algoritmos y tipos de objetivo de la contrafirma disponibles se
 	 * declaran en {@link es.gob.afirma.misc.AOConstants}.
-	 * @param signFile Flujo de lectura de los datos a firmar
+	 * @param sign Flujo de lectura de los datos a firmar
 	 * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
 	 * @param targetType Tipo de objetivo de la contrafirma
 	 * @param targets Informaci&oacute;n complementario seg&uacute;n el tipo de objetivo de la contrafirma
 	 * @param keyEntry Clave privada a usar para firmar
-	 * @param cert Certificado a usar para firmar (debe ser relativo a la clave privada)
 	 * @param extraParams Par&aacute;metros adicionales para la contrafirma
 	 * @return Contenido firmado
 	 * @throws AOException Cuando ocurre cualquier problema durante el proceso
 	 */
-	public byte[] countersign(InputStream signFile, String algorithm, AOSignConstants.CounterSignTarget targetType, Object[] targets, PrivateKeyEntry keyEntry, X509Certificate cert, Properties extraParams) throws AOException;
+	public byte[] countersign(byte[] sign, String algorithm, AOSignConstants.CounterSignTarget targetType, Object[] targets, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
 	
 	/**
 	 * Recupera el &aacute;rbol de nodos de firma de una firma electr&oacute;nica.
 	 * Cada uno de los nodos de firma est&aacute; representado por el alias del
 	 * certificado con el que se realizo firma.<br/>
 	 * Los nodos del &aacute;rbol ser&aacute;n cadena de texto con el CommonName del
-	 * certificado u objetos de tipo {@link es.gob.afirma.beans.AOSimpleSignInfo}
+	 * certificado u objetos de tipo {@link es.gob.afirma.signers.beans.AOSimpleSignInfo}
 	 * con la informaci&oacute;n b&aacute;sica de las firmas individuales, seg&uacute;n
 	 * el valor del par&aacute;metro <code>asSimpleSignInfo</code>. Los nodos se
 	 * mostrar&aacute;n en el mismo orden y con la misma estructura con el que aparecen
@@ -116,11 +111,11 @@ public interface AOSigner {
 	 * @param sign Firma electr&oacute;nica de la que se desea obtener la estructura.
 	 * @param asSimpleSignInfo Si es <code>true</code> se devuelve un &aacute;rbol con la
 	 * informaci&oacute;n b&aacute;sica de cada firma individual mediante objetos
-	 * {@link es.gob.afirma.beans.AOSimpleSignInfo}, si es <code>false</code>
+	 * {@link es.gob.afirma.signers.beans.AOSimpleSignInfo}, si es <code>false</code>
 	 * un &aacute;rbol con los nombres de los certificados.
 	 * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error.
 	 */
-	public TreeModel getSignersStructure(InputStream sign, boolean asSimpleSignInfo);
+	public TreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo);
 	
 	/**
 	 * Indica si un dato es una firma compatible con el signer concreto.
@@ -128,7 +123,7 @@ public interface AOSigner {
 	 * @return Devuelve <code>true</code> si el dato es una firma reconocida por este signer,
 	 * <code>false</code> en caso contrario.
 	 */
-	public boolean isSign(InputStream is);
+	public boolean isSign(byte[] is);
 	
 	/**
 	 * Comprueba que el dato introducido sea v&aacute;lido para ser firmado por este manejador
@@ -144,7 +139,7 @@ public interface AOSigner {
 	 * @return Devuelve <code>true</code> si el dato es V6aacute;lido para firmar, <code>false</code>
 	 * en caso contrario.
 	 */
-	public boolean isValidDataFile(InputStream is);
+	public boolean isValidDataFile(byte[] is);
 	
 	/**
 	 * Devuelve el nombre de fichero de firma predeterminado que asignar&iacute;a este signer a
@@ -175,7 +170,7 @@ public interface AOSigner {
 	 * @throws AOException Ocurri&oacute; un error durante la recuperaci&oacute;n de los datos.
 	 * @throws NullPointerException La firma introducida es nula.
 	 */
-	public byte[] getData(InputStream signData) throws AOInvalidFormatException, AOException;
+	public byte[] getData(byte[] signData) throws AOInvalidFormatException, AOException;
 
 	/**
 	 * Obtiene la informacion general de un objeto de firma. Ya que un objeto de firma puede
@@ -194,7 +189,7 @@ public interface AOSigner {
 	 * @throws AOException Ocurri&oacute; un error durante la recuperaci&oacute;n de los datos.
 	 * @throws NullPointerException La firma introducida es nula.
 	 */
-	public AOSignInfo getSignInfo(InputStream signData) throws AOInvalidFormatException, AOException;
+	public AOSignInfo getSignInfo(byte[] signData) throws AOInvalidFormatException, AOException;
 	
 	/**
 	 * Obtiene el tipo de datos declarado en una firma mediante su Mime Type. Si no se conoce
@@ -205,5 +200,5 @@ public interface AOSigner {
 	 * @throws AOUnsupportedSignFormatException Cuando la firma no est&eacute; soportada por
 	 * el manejador proporcionado.
 	 */
-	public String getDataMimeType(InputStream signData) throws AOUnsupportedSignFormatException;
+	public String getDataMimeType(byte[] signData) throws AOUnsupportedSignFormatException;
 }

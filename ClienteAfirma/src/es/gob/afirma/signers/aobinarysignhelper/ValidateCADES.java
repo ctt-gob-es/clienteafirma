@@ -2,16 +2,14 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers.aobinarysignhelper;
 
-import java.io.InputStream;
 import java.util.Enumeration;
 
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -50,32 +48,29 @@ public final class ValidateCADES {
     /**
      * M&eacute;todo que verifica que es una firma de tipo "data"
      *
-     * @param   data fichero que tiene la firma.
+     * @param   data El envoltorio.
      * @return  si es de este tipo.
      */
-    @SuppressWarnings("unchecked")
-	public boolean isCADESData(InputStream data){
+	public boolean isCADESData(byte[] data){
         boolean isValid = true;
         try {
-            ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = null;
-            dsq=(ASN1Sequence)is.readObject();
-            Enumeration<Object> e = dsq.getObjects();
+            Enumeration<?> e = ((ASN1Sequence)new ASN1InputStream(data).readObject()).getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.data)){
                 isValid=false;
             }
             // Contenido de Data
             ASN1TaggedObject doj =(ASN1TaggedObject) e.nextElement();
 
-            /* Estas variables no se usan, solo es para verificar que
+            /* Los valores de retorno no se usan, solo es para verificar que
                la conversion ha sido correcta. De no ser asi, se pasaria
-               al manejo de la excepcion.*/
-            /*DEROctetString sd = */new DEROctetString(doj.getObject());
+               al manejo de la excepcion. */
+            new DEROctetString(doj.getObject());
 
-        } catch (Exception ex) {
+        } 
+        catch (final Throwable ex) {
             //Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion " + ex);
             isValid= false;
         }
@@ -86,18 +81,17 @@ public final class ValidateCADES {
     /**
      * M&eacute;todo que verifica que es una firma de tipo "Signed data"
      *
-     * @param   data fichero que tiene la firma.
+     * @param   data El envoltorio.
      * @return  si es de este tipo.
      */
-    @SuppressWarnings("unchecked")
-	public boolean isCADESSignedData(InputStream data){
+	public boolean isCADESSignedData(byte[] data){
         boolean isValid = false;
         try {
             ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             ASN1Sequence dsq = null;
             dsq=(ASN1Sequence)is.readObject();
-            Enumeration<Object> e = dsq.getObjects();
+            Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
             if (doi.equals(PKCSObjectIdentifiers.signedData)){
@@ -130,11 +124,10 @@ public final class ValidateCADES {
      * @param si    SignerInfo para la verificaci&oacute;n del p&aacute;rametro adecuado.
      * @return      si contiene el par&aacute;metro.
      */
-    @SuppressWarnings("unchecked")
 	private boolean verifySignerInfo(SignerInfo si){
         boolean isSignerValid= false;
         ASN1Set attrib = si.getAuthenticatedAttributes();
-        Enumeration<Object> e = attrib.getObjects();
+        Enumeration<?> e = attrib.getObjects();
         Attribute atribute;
         while (e.hasMoreElements()){
             atribute = new Attribute((ASN1Sequence) e.nextElement());
@@ -152,18 +145,17 @@ public final class ValidateCADES {
     /**
      * M&eacute;todo que verifica que es una firma de tipo "Digested data"
      *
-     * @param   data fichero que tiene la firma.
+     * @param   data El envoltorio.
      * @return  si es de este tipo.
      */
-    @SuppressWarnings("unchecked")
-	public boolean isCADESDigestedData(InputStream data){
+	public boolean isCADESDigestedData(byte[] data){
         boolean isValid = false;
         try {
             ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             ASN1Sequence dsq = null;
             dsq=(ASN1Sequence)is.readObject();
-            Enumeration<Object> e = dsq.getObjects();
+            Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
             if (doi.equals(PKCSObjectIdentifiers.digestedData)){
@@ -172,12 +164,13 @@ public final class ValidateCADES {
             // Contenido de Data
             ASN1TaggedObject doj =(ASN1TaggedObject) e.nextElement();
 
-            /* Estas variables no se usan, solo es para verificar que
+            /* Los resultados no se usan, solo es para verificar que
                la conversion ha sido correcta. De no ser asi, se pasaria
                al manejo de la excepcion.*/
-            /*DigestedData sd = */new DigestedData((ASN1Sequence)doj.getObject());
+            new DigestedData((ASN1Sequence)doj.getObject());
 
-        } catch (Exception ex) {
+        } 
+        catch (final Throwable ex) {
             //Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion " + ex);
             isValid= false;
         }
@@ -188,18 +181,17 @@ public final class ValidateCADES {
     /**
      * M&eacute;todo que verifica que es una firma de tipo "Encrypted data"
      *
-     * @param   data fichero que tiene la firma.
+     * @param   data El envoltorio.
      * @return  si es de este tipo.
      */
-    @SuppressWarnings("unchecked")
-	public boolean isCADESEncryptedData(InputStream data){
+	public boolean isCADESEncryptedData(byte[] data){
         boolean isValid = false;
         try {
             ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             ASN1Sequence dsq = null;
             dsq=(ASN1Sequence)is.readObject();
-            Enumeration<Object> e = dsq.getObjects();
+            Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
             if (doi.equals(PKCSObjectIdentifiers.encryptedData)){
@@ -231,18 +223,17 @@ public final class ValidateCADES {
     /**
      * M&eacute;todo que verifica que es una firma de tipo "Enveloped data"
      *
-     * @param   data fichero que tiene la firma.
+     * @param   data El envoltorio.
      * @return  si es de este tipo.
      */
-    @SuppressWarnings("unchecked")
-	public boolean isCADESEnvelopedData(InputStream data){
+	public boolean isCADESEnvelopedData(byte[] data){
         boolean isValid = false;
         try {
             ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             ASN1Sequence dsq = null;
             dsq=(ASN1Sequence)is.readObject();
-            Enumeration<Object> e = dsq.getObjects();
+            Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
             if (doi.equals(PKCSObjectIdentifiers.envelopedData)){
@@ -251,12 +242,13 @@ public final class ValidateCADES {
             // Contenido de Data
             ASN1TaggedObject doj =(ASN1TaggedObject) e.nextElement();
 
-            /* Estas variables no se usan, solo es para verificar que
+            /* los retornos no se usan, solo es para verificar que
                la conversion ha sido correcta. De no ser asi, se pasaria
                al manejo de la excepcion.*/
-            /*EnvelopedData sd = */new EnvelopedData((ASN1Sequence)doj.getObject());
+            new EnvelopedData((ASN1Sequence)doj.getObject());
 
-        } catch (Exception ex) {
+        } 
+        catch (final Throwable ex) {
             //Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion " + ex);
             isValid= false;
         }
@@ -267,18 +259,17 @@ public final class ValidateCADES {
     /**
      * M&eacute;todo que verifica que es una firma de tipo "Signed and Enveloped data"
      *
-     * @param   data fichero que tiene la firma.
+     * @param   data El envoltorio.
      * @return  si es de este tipo.
      */
-    @SuppressWarnings("unchecked")
-	public boolean isCADESSignedAndEnvelopedData(InputStream data){
+	public boolean isCADESSignedAndEnvelopedData(byte[] data){
         boolean isValid = false;
         try {
             ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             ASN1Sequence dsq = null;
             dsq=(ASN1Sequence)is.readObject();
-            Enumeration<Object> e = dsq.getObjects();
+            Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
             if (doi.equals(PKCSObjectIdentifiers.signedData)){

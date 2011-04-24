@@ -2,21 +2,23 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers.aobinarysignhelper;
 
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.getAttributeSet;
+import static es.gob.afirma.signers.aobinarysignhelper.SigUtils.makeAlgId;
+
 import java.io.IOException;
+import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -69,13 +71,13 @@ import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para crear un
  * mensaje SignedData pero con la peculiaridad de que es una Contrafirma.
  */
-public class CounterSignerEnveloped extends SigUtils {
+public final class CounterSignerEnveloped  {
 
     int actualIndex = 0;
     Oid actualOid=null;
     ASN1Set signedAttr2;
-    private HashMap<Oid, byte[]> atrib2 = new HashMap<Oid, byte[]>();
-    private HashMap<Oid, byte[]> uatrib2 = new HashMap<Oid, byte[]>();
+    private Map<Oid, byte[]> atrib2 = new HashMap<Oid, byte[]>();
+    private Map<Oid, byte[]> uatrib2 = new HashMap<Oid, byte[]>();
     
     /**
      * Constructor de la clase.
@@ -100,7 +102,17 @@ public class CounterSignerEnveloped extends SigUtils {
      * @throws AOException Cuando ocurre cualquier error no contemplado por el resto de las excepciones declaradas
      * @throws es.gob.afirma.exceptions.AOException Cuando ocurre un error durante el proceso de contrafirma (formato o clave incorrecto,...)
      */
-    public byte[] counterSignerEnveloped(P7ContentSignerParameters parameters, byte[] data, CounterSignTarget targetType, int[] targets, PrivateKeyEntry keyEntry, Oid dataType, HashMap<Oid, byte[]> atri, HashMap<Oid, byte[]> uatri) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
+    public byte[] counterSignerEnveloped(P7ContentSignerParameters parameters, 
+    		                             byte[] data, 
+    		                             CounterSignTarget targetType, 
+    		                             int[] targets, 
+    		                             PrivateKeyEntry keyEntry, 
+    		                             Oid dataType, 
+    		                             Map<Oid, byte[]> atri, 
+    		                             Map<Oid, byte[]> uatri) throws IOException, 
+    		                                                            NoSuchAlgorithmException, 
+    		                                                            CertificateException, 
+    		                                                            AOException {
 
         // Inicializamos el Oid
         actualOid= dataType;
@@ -1153,8 +1165,11 @@ public class CounterSignerEnveloped extends SigUtils {
         Signature sig = null;
 		try {
 			sig = Signature.getInstance(signatureAlgorithm);
-		} catch (Exception e) {
-            e.printStackTrace();
+		} 
+		catch (final Throwable e) {
+            throw new AOException(
+        		"Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e
+    		);
 		}
 
         byte[] tmp= null;
@@ -1168,9 +1183,11 @@ public class CounterSignerEnveloped extends SigUtils {
         //Indicar clave privada para la firma
 		try {
 			sig.initSign(keyEntry.getPrivateKey());
-		} catch (final Throwable e) {
+		} 
+		catch (final Throwable e) {
 			throw new AOException(
-					"Error al obtener la clave de firma para el algoritmo '" + signatureAlgorithm + "': " + e);
+				"Error al inicializar la firma con la clave privada", e
+			);
 		}
 
 
@@ -1178,9 +1195,10 @@ public class CounterSignerEnveloped extends SigUtils {
         // Actualizamos la configuracion de firma
 		try {
 			sig.update(tmp);
-		} catch (SignatureException e) {
+		} 
+		catch (final SignatureException e) {
 			throw new AOException(
-					"Error al configurar la informacion de firma: " + e);
+				"Error al configurar la informacion de firma", e);
 		}
 
 
@@ -1188,8 +1206,9 @@ public class CounterSignerEnveloped extends SigUtils {
         byte[] realSig=null;
         try {
 			realSig = sig.sign();
-		} catch (Exception e) {
-			throw new AOException("Error durante el proceso de firma: " + e);
+		} 
+        catch (final Throwable e) {
+			throw new AOException("Error durante el proceso de firma", e);
 		}
 
         ASN1OctetString encDigest = new DEROctetString(realSig);

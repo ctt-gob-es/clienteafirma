@@ -2,16 +2,14 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-
 package es.gob.afirma.signers.aobinarysignhelper;
 
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
@@ -29,7 +27,7 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * Clase que obtiene el contenido de un fichero en formato SignedData.
  * de CMS o CADES.
  */
-public class ObtainContentSignedData {
+public final class ObtainContentSignedData {
 
     /**
      * M&eacute;todo que obtiene el contenido firmado de un tipo Signed Data tanto
@@ -38,15 +36,14 @@ public class ObtainContentSignedData {
      * @param data  datos que contienen la firma.
      * @return      el contenido firmado.
      */
-    @SuppressWarnings("unchecked")
-	public byte[] obtainData(InputStream data){
+	public byte[] obtainData(byte[] data){
         byte[] contenido = null;
         try{
             ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             ASN1Sequence dsq = null;
             dsq=(ASN1Sequence)is.readObject();
-            Enumeration<Object> e = dsq.getObjects();
+            Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             DERObjectIdentifier doi = (DERObjectIdentifier)e.nextElement();
             // Contenido a obtener informacion
@@ -72,7 +69,6 @@ public class ObtainContentSignedData {
 
         }catch(Exception e){
         	Logger.getLogger("es.gob.afirma").severe("No se pudieron recuperar los datos contenidos en la firma: "+e);
-            e.printStackTrace();
             contenido = null;
         }
 

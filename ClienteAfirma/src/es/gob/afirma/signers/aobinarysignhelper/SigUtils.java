@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.signers.aobinarysignhelper;
 
@@ -16,8 +15,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Signature;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.Signature;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -41,7 +40,7 @@ import es.gob.afirma.exceptions.AOException;
  *  Clase que contiene una serie de m&eacute;todos utilizados por GenSignedData,
  *  GenCadesSignedData, CoSigner y CounterSigner.
  */
-class SigUtils {
+final class SigUtils {
 
     /**
      * M&eacute;todo que devuelve el Identificador del algoritmo.
@@ -52,8 +51,9 @@ class SigUtils {
      * en el cms.
      * @throws java.io.IOException
      */
-    protected AlgorithmIdentifier makeAlgId(String oid, byte[] params) throws IOException {
-        if (params != null) return new AlgorithmIdentifier(new DERObjectIdentifier(oid), makeObj(params));
+    static AlgorithmIdentifier makeAlgId(String oid, byte[] params) throws IOException {
+        if (params != null) 
+        	return new AlgorithmIdentifier(new DERObjectIdentifier(oid), makeObj(params));
         return new AlgorithmIdentifier(new DERObjectIdentifier(oid), new DERNull());
     }
 
@@ -64,7 +64,7 @@ class SigUtils {
      * @return  Un objeto formateado de tipo DER
      * @throws java.io.IOException
      */
-    private DERObject makeObj(byte[] encoding) throws IOException {
+    static DERObject makeObj(byte[] encoding) throws IOException {
         if (encoding == null) {
         	Logger.getLogger("es.gob.afirma").warning("La codificacion era nula, se devolvera null");
             return null;
@@ -77,7 +77,7 @@ class SigUtils {
      * @param derObjects Una lista con los objetos a obtener el tipo SET
      * @return  Un SET de ASN1 con los elementos de la lista introducida.
      */
-    protected ASN1Set createBerSetFromList(List<DEREncodable> derObjects) {
+    static ASN1Set createBerSetFromList(List<DEREncodable> derObjects) {
         ASN1EncodableVector v = new ASN1EncodableVector();
         for (DEREncodable d : derObjects) v.add(d);
 //		  Version del blucle para Java 1.4
@@ -92,7 +92,7 @@ class SigUtils {
      * @param attr Atributo a formatear.
      * @return SET en formato DER del atributo.
      */
-    protected ASN1Set getAttributeSet(AttributeTable attr) {
+    static ASN1Set getAttributeSet(AttributeTable attr) {
         if (attr != null) return new DERSet(attr.toASN1EncodableVector());
     	Logger.getLogger("es.gob.afirma").warning("Los atributos eran nulos, se devolvera null");
         return null;
@@ -103,12 +103,8 @@ class SigUtils {
      * @param derObjects Una lista con los objetos a obtener el tipo SET
      * @return  Un SET de ASN1 con los elementos de la lista introducida.
      */
-    protected ASN1Set FillRestCerts(List<DEREncodable> derObjects, ASN1EncodableVector v) {
+    static ASN1Set fillRestCerts(final List<DEREncodable> derObjects, final ASN1EncodableVector v) {
         for (DEREncodable d : derObjects) v.add(d);
-//		  Version del blucle para Java 1.4
-//        for (Iterator it = derObjects.iterator(); it.hasNext();) {
-//            v.add((DEREncodable) it.next());
-//        }
         return new BERSet(v);
     }
 
@@ -120,23 +116,25 @@ class SigUtils {
 	 * @return Firma en formato binario sin ning&uacute;n tipo de a&ntilde;adido
 	 * @throws AOException Cuando ocurre cualquier error en la firma PKCS#1
 	 */
-	protected byte[] signData(InputStream file, String algorithm, PrivateKeyEntry keyEntry) throws AOException {
+	static byte[] signData(final InputStream file, 
+			                      final String algorithm, 
+			                      final PrivateKeyEntry keyEntry) throws AOException {
 
 		Signature sig = null;
 		try {
 			sig = Signature.getInstance(algorithm);
 		}
-		catch (Exception e) {
-            Logger.getLogger("es.gob.afirma").severe(
-					"Error en la definicion del formato de firma: " + e
+		catch (final Throwable e) {
+			throw new AOException(
+				"Error obteniendo la clase de firma para el algoritmo " + algorithm, e
 			);
 		}
 		try {
 			sig.initSign(keyEntry.getPrivateKey());
 		}
-		catch (Exception e) {
-             Logger.getLogger("es.gob.afirma").severe(
-					"Error al obtener la clave de firma para el algoritmo '" + algorithm + "': " + e
+		catch (final Throwable e) {
+            throw new AOException(
+        		"Error al inicializar la firma con la clave privada", e
 			);
 		}
 		BufferedInputStream bufin = new BufferedInputStream(file);
@@ -151,7 +149,7 @@ class SigUtils {
                 baos.write(buffer, 0, len);
 			}
 		}
-		catch (Exception e) {
+		catch (final Throwable e) {
              Logger.getLogger("es.gob.afirma").severe(
 					"Error al leer los datos a firmar: " + e
 			);
@@ -159,7 +157,7 @@ class SigUtils {
 		try {
 			bufin.close();
 		}
-		catch (Exception e) {
+		catch (final Throwable e) {
 			Logger.getLogger("es.gob.afirma").warning(
 				"Error al cerrar el fichero de datos, el proceso de firma continuara: "+e
 			);
@@ -169,10 +167,7 @@ class SigUtils {
 			realSig = sig.sign();
 		}
 		catch (final Throwable e) {
-            Logger.getLogger("es.gob.afirma").severe(
-					"Error durante el proceso de firma: " + e
-			);
-			throw new AOException("Error durante el proceso de firma: " + e);
+			throw new AOException("Error durante el proceso de firma", e);
 		}
 
 		return realSig;

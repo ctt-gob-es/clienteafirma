@@ -2,16 +2,16 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.misc;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Constantes de utilidad para toda la aplicaci&oacute;n.
@@ -104,34 +104,34 @@ public final class AOConstants {
     public static final String DEFAULT_MASSIVE_OPERATION = MASSIVE_OPERATION_SIGN;
     
     /** Envoltorio binario de tipo Data (datos envueltos en un envoltorio PKCS#7).  */
-    public static final String BINARY_ENVELOP_DATA = "Data";
+    public static final String CMS_CONTENTTYPE_DATA = "Data";
     
     /** Firma binaria de tipo Signed Data */
-    public static final String BINARY_ENVELOP_SIGNEDDATA = "SignedData";
+    public static final String CMS_CONTENTTYPE_SIGNEDDATA = "SignedData";
 
     /** Envoltorio binario de tipo Digest. */
-    public static final String BINARY_ENVELOP_DIGESTEDDATA = "DigestedData";
+    public static final String CMS_CONTENTTYPE_DIGESTEDDATA = "DigestedData";
     
     /** Envoltario binario de tipo AuthenticatedEnvelopedData. */
-    public static final String BINARY_ENVELOP_COMPRESSEDDATA = "CompressedData";
+    public static final String CMS_CONTENTTYPE_COMPRESSEDDATA = "CompressedData";
     
     /** Firma binaria de tipo Encrypted Data */
-    public static final String BINARY_ENVELOP_ENCRYPTEDDATA = "EncryptedData";
+    public static final String CMS_CONTENTTYPE_ENCRYPTEDDATA = "EncryptedData";
     
     /** Envoltorio binario de tipo Enveloped (sobre digital).  */
-    public static final String BINARY_ENVELOP_ENVELOPEDDATA = "EnvelopedData";
+    public static final String CMS_CONTENTTYPE_ENVELOPEDDATA = "EnvelopedData";
     
     /** Envoltorio binario de tipo Signed and Enveloped.  */
-    public static final String BINARY_ENVELOP_SIGNEDANDENVELOPEDDATA = "SignedAndEnvelopedData";
+    public static final String CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA = "SignedAndEnvelopedData";
     
     /** Envoltario binario de tipo AuthenticatedData. */
-    public static final String BINARY_ENVELOP_AUTHENTICATEDDATA = "AuthenticatedData";
+    public static final String CMS_CONTENTTYPE_AUTHENTICATEDDATA = "AuthenticatedData";
     
     /** Envoltario binario de tipo AuthenticatedEnvelopedData. */
-    public static final String BINARY_ENVELOP_AUTHENTICATEDENVELOPEDDATA = "AuthEnvelopedData";
+    public static final String CMS_CONTENTTYPE_AUTHENVELOPEDDATA = "AuthEnvelopedData";
     
     /** Envoltorio binario por defecto. */
-    public static final String DEFAULT_BINARY_ENVELOP = BINARY_ENVELOP_ENVELOPEDDATA;
+    public static final String DEFAULT_CMS_CONTENTTYPE = CMS_CONTENTTYPE_ENVELOPEDDATA;
         
 	/** MimeType por defecto para los datos firmados. */
 	public static final String DEFAULT_MIMETYPE = "application/octet-stream";
@@ -179,12 +179,16 @@ public final class AOConstants {
     	/** MAC HMACSHA512 **/
     	HMACSHA512("HmacSHA512","HmacSHA512",false,true,"1.2.840.113549.2.11");
     	
+    	
+        /** Algoritmo de cifrado por defecto. */
+        private static final AOCipherAlgorithm DEFAULT_CIPHER_ALGO = AES;
+    	
     	/**
     	 * Obtiene al algoritmo de cifrado por defecto.
     	 * @return Algoritmo de cifrado por defecto
     	 */
     	public static AOCipherAlgorithm getDefault() {
-    		return AES;
+    		return DEFAULT_CIPHER_ALGO;
     	}
     	
     	private AOCipherAlgorithm(String n, String d, boolean p, boolean k, String oi) {
@@ -239,9 +243,6 @@ public final class AOConstants {
         public String getOid(){
             return oid;
         }
-    	
-        /** Algoritmo de cifrado por defecto. */
-        public static final String DEFAULT_CIPHER_ALGO = AOCipherAlgorithm.getDefault().name;
         
     	/**
     	 * Recupera el algoritmo soportado cuyo nombre se indique. Si el algoritmo
@@ -354,6 +355,12 @@ public final class AOConstants {
     		return null;
 		}
     }
+
+    /** Configuraci&oacute;n de cifrado por defecto. */
+    public static final String DEFAULT_CIPHER_CONFIG = 
+    		AOCipherAlgorithm.AES.name() + "/" +
+    		AOCipherBlockMode.CBC.name() + "/" +
+    		AOCipherPadding.PKCS5PADDING.name(); 
     
 	//************************************************************
 	//************* MODOS DE GENERACION DE CLAVES ****************
@@ -393,11 +400,18 @@ public final class AOConstants {
     /** Algoritmo de firma SHA512withRSA. */
     public static final String SIGN_ALGORITHM_SHA512WITHRSA = "SHA512withRSA";
     
-    /** Algoritmo de firma que no incluye la generaci&oacute;n del digest (NONEwithRSA). */
+    /** Algoritmo de firma RSA que no incluye la generaci&oacute;n de la huella digital (NONEwithRSA). */
     public static final String SIGN_ALGORITHM_NONEWITHRSA = "NONEwithRSA";
     
     /** Algoritmo de firma SHA1withDSA. */
     public static final String SIGN_ALGORITHM_SHA1WITHDSA = "SHA1withDSA";
+    
+    /** Algoritmo de firma SHA1withECDSA. */
+    public static final String SIGN_ALGORITHM_SHA1WITHECDSA = "SHA1withECDSA";
+        
+    /** Algoritmo de firma ECDSA que no incluye la generaci&oacute;n de la huella digital (NONEwithEDSSA). */
+    public static final String SIGN_ALGORITHM_NONEWITHECDSA = "NONEwithECDSA";
+
     
     /** Algoritmos de firma soportados. */
     public static final String[] SUPPORTED_SIGN_ALGOS = new String[] {
@@ -407,11 +421,13 @@ public final class AOConstants {
     	SIGN_ALGORITHM_NONEWITHRSA,
     	SIGN_ALGORITHM_SHA256WITHRSA,
     	SIGN_ALGORITHM_SHA384WITHRSA,
-    	SIGN_ALGORITHM_SHA512WITHRSA
+    	SIGN_ALGORITHM_SHA512WITHRSA,
+    	SIGN_ALGORITHM_SHA1WITHECDSA,
+    	SIGN_ALGORITHM_NONEWITHECDSA
     };
     
     /** URIs de los algoritmos de firma */
-    public static final HashMap<String, String> SIGN_ALGOS_URI = new HashMap<String, String>() {
+    public static final Map<String, String> SIGN_ALGOS_URI = new HashMap<String, String>() {
 		private static final long serialVersionUID = 1897588397257599853L;
 		{
     		put(SIGN_ALGORITHM_SHA1WITHRSA, "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
@@ -446,6 +462,36 @@ public final class AOConstants {
     	}
     };
     
+    /** URIs de los algoritmos de hash. Las claves se encuentran en min&uacute;sculas. */
+    public static final Map<String, String> MESSAGEDIGEST_ALGOS_URI = new HashMap<String, String>() {
+		private static final long serialVersionUID = 7994196143222514908L;
+		{
+    		// Introducimos variantes para hacerlo mas robusto
+
+			// SHA1
+			put("sha1",    "http://www.w3.org/2000/09/xmldsig#sha1");
+    		put("sha-1",   "http://www.w3.org/2000/09/xmldsig#sha1");
+    		
+    		// MD5
+    		put("md5",     "http://www.w3.org/2001/04/xmldsig-more#md5");
+    		
+    		// SHA256
+    		put("sha256",  "http://www.w3.org/2001/04/xmlenc#sha256");
+    		put("sha-256", "http://www.w3.org/2001/04/xmlenc#sha256");
+    		
+    		// SHA384
+    		put("sha384",  "http://www.w3.org/2001/04/xmldsig-more#sha384");
+    		put("sha-384", "http://www.w3.org/2001/04/xmldsig-more#sha384");
+
+    		// SHA512
+    		put("sha512",  "http://www.w3.org/2001/04/xmlenc#sha512");
+    		put("sha-512", "http://www.w3.org/2001/04/xmlenc#sha512");
+    	}
+    };
+    
+    /** Codificaci&oacute;n Base64 para firmas XMLDSig y XAdES. */
+    public static final String BASE64_ENCODING = "http://www.w3.org/2000/09/xmldsig#base64";
+    
     /** Algoritmo de firma por defecto. */
     public static final String DEFAULT_SIGN_ALGO = SIGN_ALGORITHM_SHA1WITHRSA;
     
@@ -461,7 +507,7 @@ public final class AOConstants {
     public enum AOKeyStore {
     	/** Windows / Internet Explorer (CAPI, certificados de usuario). */
     	WINDOWS ("Windows / Internet Explorer", 0, "Windows-MY"),
-    	/** Apple Mac OS X / Safari Keyring. */
+    	/** Apple Mac OS X / Safari Keychain. */
     	APPLE   ("Mac OS X / Safari", 1, "KeychainStore"),
     	/** Mozilla / Firefox (NSS v&iacute;a PKCS#11). */
     	MOZILLA ("Mozilla / Firefox", 2, "PKCS11"), // Via PKCS11/NSS
@@ -484,7 +530,10 @@ public final class AOConstants {
     	/** Windows / INternet Explorer (CAPI, certificados de otras personas / libreta de direcciones). */
     	WINADDRESSBOOK ("Windows / Internet Explorer (otras personas / libreta de direcciones)", 11, "Windows-ADDRESSBOOK"),
     	/** Windows / Internet Explorer (CAPI, certificados CA intermedias). */
-    	WINCA ("Windows / Internet Explorer (CA intermedias)", 12, "Windows-CA");
+    	WINCA ("Windows / Internet Explorer (CA intermedias)", 12, "Windows-CA")
+//    	/** Windows (MY) con proveedor alternativo (JRE Deploy). */
+//    	WINDEPLOY("Windows / Internet Explorer (despliegue)", 13, "WIExplorerMy")
+    	;
 
     	private AOKeyStore(String d, int o, String n) {
     		description = d;

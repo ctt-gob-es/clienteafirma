@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.signers.xmlhelper;
 
@@ -23,7 +22,6 @@ import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignature;
@@ -34,12 +32,12 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
-import org.w3c.dom.Element;
-
 import net.java.xades.security.xml.WrappedKeyStorePlace;
 import net.java.xades.security.xml.XmlWrappedKeyInfo;
 import net.java.xades.security.xml.XAdES.XAdES_BES;
 import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
+
+import org.w3c.dom.Element;
 
 /**
  * Derivado de <code>net.java.xades.security.xml.XAdES.XMLAdvancedSignature</code> con los siguientes cambios:
@@ -51,7 +49,6 @@ import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
  *  <li>Se puede a&ntilde;adir una hoja de estilo en modo <i>enveloping</i> dentro de la firma
  * </ul>
  */
-@SuppressWarnings("unused")
 public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 	
 	private AOXMLAdvancedSignature(final XAdES_BES xades) {
@@ -73,9 +70,9 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 	 * @param sId Identificador de la hoja de estilo (si se proporciona un nulo no se a&ntilde;ade la hoja de estilo)
 	 */
 	public void addStyleSheetEnvelopingOntoSignature(final Element s, 
-													                         final String sType, 
-													                         final String sEncoding, 
-													                         final String sId) {
+							                         final String sType, 
+							                         final String sEncoding, 
+							                         final String sId) {
 		this.styleElement = s;
 		if (sType != null) this.styleType = sType;
 		this.styleId = sId;
@@ -102,62 +99,87 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         return keyInfoFactory.newKeyInfo(newList, keyInfoId);
     }
 	
-	@SuppressWarnings("unchecked")
 	@Override
     public void sign(final X509Certificate certificate, 
     		             final PrivateKey privateKey,
     		             final String signatureMethod,
     		             final List refsIdList,
-                     final String signatureIdPrefix, 
-                     final String tsaURL) throws MarshalException,
-                                                 XMLSignatureException, 
-                                                 GeneralSecurityException, 
-                                                 TransformException {
+    		             final String signatureIdPrefix, 
+    		             final String tsaURL) throws MarshalException,
+                                                     XMLSignatureException, 
+                                                     GeneralSecurityException, 
+                                                     TransformException {
 		
-        List referencesIdList = new ArrayList(refsIdList);
+        final List<?> referencesIdList = new ArrayList(refsIdList);
 
         if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()))
             xades.setSigningCertificate(certificate);
-        else {
-            /*
-             * @ToDo The ds:KeyInfo element also MAY contain other certificates forming a chain that
-             * MAY reach the point of trust;
-             */
-        }
 
-        addXMLObject(marshalXMLSignature(xadesNamespace, signatureIdPrefix, referencesIdList, tsaURL));
+        XMLObject xadesObject = marshalXMLSignature(
+    		xadesNamespace, 
+    		signatureIdPrefix, 
+    		referencesIdList, 
+    		tsaURL
+		);
+        addXMLObject(xadesObject);
 
         final XMLSignatureFactory fac = getXMLSignatureFactory();
         
         if (styleElement != null && styleId != null) {
         	addXMLObject(fac.newXMLObject(
-        			Collections.singletonList(new DOMStructure(styleElement)), 
-        			styleId, 
-        			styleType, 
-        			styleEncoding
-    			));
+    			Collections.singletonList(new DOMStructure(styleElement)), 
+    			styleId, 
+    			styleType, 
+    			styleEncoding
+			));
         }
         
         final List<Reference> documentReferences = getReferences(referencesIdList);
         final String keyInfoId = getKeyInfoId(signatureIdPrefix);
         documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod()));
-
+        
         this.signature = fac.newXMLSignature(
       		fac.newSignedInfo(
-    				fac.newCanonicalizationMethod(
-              canonicalizationMethod, 
-              (C14NMethodParameterSpec) null
-            ), 
-    				fac.newSignatureMethod(signatureMethod, null), 
-    				documentReferences
-    			), 
-    			newKeyInfo(certificate, keyInfoId),
-          getXMLObjects(), 
-          getSignatureId(signatureIdPrefix), 
-          getSignatureValueId(signatureIdPrefix)
+				fac.newCanonicalizationMethod(
+					canonicalizationMethod, 
+					(C14NMethodParameterSpec) null
+				), 
+    			fac.newSignatureMethod(signatureMethod, null), 
+    			documentReferences
+			), 
+			newKeyInfo(certificate, keyInfoId),
+			getXMLObjects(), 
+			getSignatureId(signatureIdPrefix), 
+			getSignatureValueId(signatureIdPrefix)
         );
 
         this.signContext = new DOMSignContext(privateKey, baseElement);
+        
+//        //*********************************************************************
+//        //************ PARCHE PARA PROBLEMAS JAVA 7 ***************************
+//        //*********************************************************************
+//        String referenceId;
+//        for (Reference reference : documentReferences) {
+//            if (reference.getURI() != null && reference.getURI().length() > 0) {
+//            	referenceId = reference.getURI();
+//                if (referenceId.startsWith("#")) {
+//                	referenceId = referenceId.substring(referenceId.lastIndexOf('-')+1);
+//                    NodeList elementsByTagNameNS = 
+//                    	((Element)((QualifyingProperties) xadesObject.getContent().get(0)).getNode()).getElementsByTagNameNS(xadesNamespace, referenceId);
+//                    if (elementsByTagNameNS.getLength() > 0) {
+//                        this.signContext.setIdAttributeNS(
+//                    		(Element)elementsByTagNameNS.item(0), 
+//                    		xadesNamespace, 
+//                    		"Id"
+//                		);
+//                    }
+//                }
+//            }
+//        }
+//        //*********************************************************************
+//        //************ FIN PARCHE PARA PROBLEMAS JAVA 7 ***********************
+//        //*********************************************************************
+        
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(xadesNamespace, xades.getXadesPrefix());
 
@@ -165,7 +187,7 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
     }
 	
     public static AOXMLAdvancedSignature newInstance(final XAdES_BES xades) throws GeneralSecurityException {
-        AOXMLAdvancedSignature result = new AOXMLAdvancedSignature(xades);
+        final AOXMLAdvancedSignature result = new AOXMLAdvancedSignature(xades);
         result.setDigestMethod(xades.getDigestMethod());
         result.setXadesNamespace(xades.getXadesNamespace());
         return result;

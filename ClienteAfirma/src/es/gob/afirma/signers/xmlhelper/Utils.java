@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.signers.xmlhelper;
 
@@ -17,13 +16,13 @@ import static es.gob.afirma.misc.AOConstants.SIGN_FORMAT_XADES_ENVELOPING;
 import static es.gob.afirma.misc.AOConstants.SIGN_FORMAT_XADES_EXTERNALLY_DETACHED;
 import static es.gob.afirma.misc.AOConstants.SIGN_MODE_EXPLICIT;
 import static es.gob.afirma.misc.AOConstants.SIGN_MODE_IMPLICIT;
-
 import static es.gob.afirma.signers.xmlhelper.XMLConstants.DSIGNNS;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -53,8 +52,8 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilter2ParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathType;
-import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathType.Filter;
+import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -69,16 +68,14 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 
-import sun.misc.BASE64Decoder;
-
 import com.sun.org.apache.xerces.internal.dom.DOMOutputImpl;
 
 import es.gob.afirma.Messages;
-import es.gob.afirma.beans.AOSimpleSignInfo;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOCryptoUtil;
 import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.signers.beans.AOSimpleSignInfo;
 
 /** Utilidades para las firmas XML. */
 public final class Utils {
@@ -99,6 +96,8 @@ public final class Utils {
 		 * @param s Mesaje de excepci&oacute;n
 		 */
 		public CannotDereferenceException(final String s) { super(s); }
+		
+		public CannotDereferenceException(final String s, final Throwable e) { super(s, e); }
 	}
 	
 	/** La referencia de hoja de estilo apunta a un no-XML. */
@@ -170,10 +169,12 @@ public final class Utils {
 						"No se ha podido dereferenciar la hoja de estilo" //$NON-NLS-1$
 					);
 					try {
-						xml = AOUtil.getDataFromInputStream(new FileInputStream(fc.getSelectedFile()));
+						final InputStream is = new FileInputStream(fc.getSelectedFile());
+						xml = AOUtil.getDataFromInputStream(is);
+						try { is.close(); } catch (final Throwable ex) { }
 					}
 					catch(final Throwable ex) {
-						throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo: " + ex); //$NON-NLS-1$
+						throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", ex); //$NON-NLS-1$
 					}
 				}
 			}
@@ -586,9 +587,9 @@ public final class Utils {
      */
     public static String guessXAdESNamespaceURL(final Node el) {
 
-    	final String latest = "http://uri.etsi.org/01903#"; //$NON-NLS-1$
-    	final String xades132 = "http://uri.etsi.org/01903/v1.3.2#"; //$NON-NLS-1$
-    	final String xades141 = "http://uri.etsi.org/01903/v1.4.1#"; //$NON-NLS-1$
+    	final String latest = "\"http://uri.etsi.org/01903#\""; //$NON-NLS-1$
+    	final String xades132 = "\"http://uri.etsi.org/01903/v1.3.2#\""; //$NON-NLS-1$
+    	final String xades141 = "\"http://uri.etsi.org/01903/v1.4.1#\""; //$NON-NLS-1$
     	
     	String signatureText = new String(writeXML(el, null, null, null));
     	
@@ -597,11 +598,11 @@ public final class Utils {
     	int numXades141 = countSubstring(signatureText, xades141);
     	
     	//Prioridad: xades132 > latest > xades141
-    	if(numXades132 >= numLatest && numXades132 >= numXades141) return xades132;
-    	if(numLatest >= numXades132 && numLatest >= numXades141) return latest;
-    	if(numXades141 >= numLatest && numXades141 >= numXades132) return xades141;
+    	if(numXades132 >= numLatest && numXades132 >= numXades141) return xades132.replace("\"", "");
+    	if(numLatest >= numXades132 && numLatest >= numXades141) return latest.replace("\"", "");
+    	if(numXades141 >= numLatest && numXades141 >= numXades132) return xades141.replace("\"", "");
     	
-    	return xades132;
+    	return xades132.replace("\"", "");
     }
         
     /**
@@ -823,8 +824,7 @@ public final class Utils {
 	        serializer.transform(domSource, streamResult);
     	}
     	catch(final Throwable e) {
-    		e.printStackTrace();
-    		Logger.getLogger("es.gob.afirma").severe("Ocurrio un error escribiendo el XML: " + e);
+    		Logger.getLogger("es.gob.afirma").severe("Error escribiendo el XML: " + e);
     	}
     }
 
@@ -857,7 +857,7 @@ public final class Utils {
   		
   		byte[] pkcs1;
   		try {
-  			pkcs1 = new BASE64Decoder().decodeBuffer(
+  			pkcs1 = AOCryptoUtil.decodeBase64(
   					((Element)signature.getElementsByTagNameNS(DSIGNNS, "SignatureValue").item(0))
   					.getTextContent());
   		} catch (Exception e) {

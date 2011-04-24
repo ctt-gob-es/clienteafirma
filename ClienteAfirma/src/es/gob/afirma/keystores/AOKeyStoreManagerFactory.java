@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 package es.gob.afirma.keystores;
 
@@ -15,13 +14,15 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import es.atosorigin.exe.PEParser;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.misc.Platform;
 import es.gob.afirma.ui.AOUIManager;
 
 /**
@@ -45,13 +46,18 @@ public final class AOKeyStoreManagerFactory {
 	 * @param parentComponent Componente padre sobre el que mostrar los di&aacute;logos modales de ser necesario. 
 	 * @return KeyStoreManager del tipo indicado
 	 * @throws AOCancelledOperationException Cuando el usuario cancela el proceso (por ejemplo, al introducir la contrase&ntilde;a) 
-	 * @throws AOException Cuando ocurre cualquier otro problema durante el proceso
+	 * @throws AOKeystoreAlternativeException Cuando ocurre cualquier otro problema durante el proceso
 	 */
-	public static AOKeyStoreManager getAOKeyStoreManager(AOConstants.AOKeyStore store, String lib, String description, PasswordCallback pssCallback, Component parentComponent) throws AOCancelledOperationException, AOException {
+	public static AOKeyStoreManager getAOKeyStoreManager(final AOConstants.AOKeyStore store, 
+			                                             final String lib, 
+			                                             final String description, 
+			                                             final PasswordCallback pssCallback, 
+			                                             final Component parentComponent) throws AOCancelledOperationException, 
+			                                                                                     AOKeystoreAlternativeException {
 
 		final AOKeyStoreManager ksm = new AOKeyStoreManager();
 		
-		final String osname = System.getProperty("os.name");
+		
 		
 		// Fichero P7, X509, P12/PFX o Java JKS, en cualquier sistema operativo
 		if (store == AOConstants.AOKeyStore.PKCS12 || 
@@ -86,15 +92,18 @@ public final class AOKeyStoreManagerFactory {
                 storeFilename = AOUIManager.getLoadFileName("Abrir repositorio " + store.getDescription(), exts, desc, parentComponent);
 			    if(storeFilename == null) throw new AOCancelledOperationException("No se ha seleccionado el almac\u00E9n de certificados");
 			}
-			InputStream is;
+			final InputStream is;
 			try {
 			    is = new FileInputStream(storeFilename);
+				ksm.init(store, is, pssCallback, null);
 			}
-			catch(Throwable e) {
-			    e.printStackTrace();
-			    throw new AOException("No se ha podido abrir el almacen de tipo "+store.getDescription());
+			catch(final Throwable e) {
+			    throw new AOKeystoreAlternativeException(
+			    	getAlternateKeyStoreType(store),
+			    	"No se ha podido abrir el almacen de tipo " + store.getDescription(),
+			    	e
+	    		);
 			}
-			ksm.init(store, is, pssCallback, null);
 			return ksm;
 		}
 		// Token PKCS#11, en cualquier sistema operativo
@@ -103,6 +112,24 @@ public final class AOKeyStoreManagerFactory {
 		    if (lib != null && !"".equals(lib) && new File(lib).exists()) p11Lib = lib;
             if (p11Lib == null) p11Lib = AOUIManager.getLoadFileName("Seleccionar biblioteca PKCS#11", new String[] { "dll", "so"}, "Bibliotecas PKCS#11 (*.dll, *.so)", parentComponent);
             if (p11Lib == null) throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11");
+            if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            	try {
+	            	final InputStream is = new FileInputStream(new File(p11Lib));
+	            	Logger.getLogger("es.gob.afirma").info(
+            			"Informacion sobre el modulo PKCS11 '" + p11Lib + "':" 
+        			);
+	            	new PEParser().parse(
+	        			AOUtil.getDataFromInputStream(is), 
+	        			Logger.getLogger("es.gob.afirma")
+	    			);
+	            	try { is.close(); } catch(final Throwable e) {}
+            	}
+            	catch(final Throwable e) {
+            		Logger.getLogger("es.gob.afirma").warning(
+        				"No se ha podido obtener informacion sobre el modulo PKCS11 '" + p11Lib + "':" + e
+    				);
+            	}
+            }
 		    try {
 		    	ksm.init(
 		    			store, 
@@ -110,78 +137,105 @@ public final class AOKeyStoreManagerFactory {
 		    			pssCallback,
 		    			new String[] { p11Lib, description }				
 		    	);
-		    } catch (Throwable e) {
-		    	throw new AOException("Ocurrio un error al inicializar el modulo PKCS#11", e);
+		    } 
+		    catch (final Throwable e) {
+		    	throw new AOKeystoreAlternativeException(
+	    			getAlternateKeyStoreType(store),
+	    			"Error al inicializar el modulo PKCS#11", 
+	    			e
+    			);
 		    }
 			return ksm;
 		}
 		
-		// Internet Explorer en Windows (decartamos Internet Explorer en Solaris, HP-UX o Mac OS X)
+		// Internet Explorer en Windows (descartamos Internet Explorer en Solaris, HP-UX o Mac OS X)
 		// o Google Chrome en Windows, que tambien usa el almacen de CAPI
-		else if ((store == AOConstants.AOKeyStore.WINDOWS || 
+		else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
+				 (store == AOConstants.AOKeyStore.WINDOWS || 
 				  store == AOConstants.AOKeyStore.WINROOT ||
 				  store == AOConstants.AOKeyStore.WINADDRESSBOOK ||
-				  store == AOConstants.AOKeyStore.WINCA) && 
-				  osname.contains("indows") /*&&
-				  !(System.getProperty("java.version").compareTo("1.6") < 0)*/) {
-			ksm.init(
-				store, 
-				null, 
-				pssCallback,
-				null
-			);
+				  store == AOConstants.AOKeyStore.WINCA /* ||
+				  store == AOConstants.AOKeyStore.WINDEPLOY*/)) {
+			try {
+				ksm.init(store, null, pssCallback, null);
+			}
+			catch(final Throwable e) {
+		    	throw new AOKeystoreAlternativeException(
+	    			getAlternateKeyStoreType(store),
+	    			"Error al inicializar el almacen " + store.getDescription(), 
+	    			e
+    			);
+			}
 			return ksm;
 		}
 				
 		// Mozilla / Firefox en cualquier plataforma, via PKCS#11 y NSS
 		else if (store == AOConstants.AOKeyStore.MOZILLA) {
 			
-			// Nos aseguramos de que el directorio de Firefox esta en el path y esta el primero.
-			// Es posible que los cambios no surtan efecto hasta despues de reiniciar el navegador  
-			KeyStoreUtilities.fixFirefoxNSSPath();
-						
-			ksm.init(
-				store,  
-				null,  
-				pssCallback,
-				new String[] {
-						AOUtil.getMozillaUserProfileDirectory(), // MozillaUserProfileDirectory
-						KeyStoreUtilities.getSystemNSSLibDir()	
-				}
-			);
+			final String nssLibDir;
+			try {
+				nssLibDir = MozillaKeyStoreUtilities.getSystemNSSLibDir();
+				ksm.init(
+					store,  
+					null,  
+					pssCallback,
+					new String[] {
+						MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(),
+						nssLibDir	
+					}
+				);
+			} 
+			catch (final Throwable e) {
+		    	throw new AOKeystoreAlternativeException(
+	    			getAlternateKeyStoreType(store),
+	    			"Error al inicializar el almacen NSS de Mozilla Firefox", 
+	    			e
+    			);
+			}
 			return ksm;
 		}
-		
-		// Apple Safari sobre Mac OS X
-		// Identificacion del sistema operativo segun (anadiendo mayusculas donde se necesitaba)
-		// http://developer.apple.com/technotes/tn2002/tn2110.html
-		else if (store == AOConstants.AOKeyStore.APPLE && osname.startsWith("Mac OS X")) {
-			ksm.init(
-				store,
-				null,
-				pssCallback,
-				null
-			);
-			return ksm;
-		}
-		
+
 		// Se soporta aqui el almacen unificado de Mozilla unicamente para facilitar las pruebas
 		else if (store == AOConstants.AOKeyStore.MOZ_UNI) {
-			
-			// Nos aseguramos de que el directorio de Firefox esta en el path y esta el primero.
-			// Es posible que los cambios no surtan efecto hasta despues de reiniciar el navegador  
-			KeyStoreUtilities.fixFirefoxNSSPath();
-			
-			MozillaUnifiedKeyStoreManager ksmUni = new MozillaUnifiedKeyStoreManager();
+			final MozillaUnifiedKeyStoreManager ksmUni = new MozillaUnifiedKeyStoreManager();
+			ksmUni.setParentComponent(parentComponent);
 			ksmUni.setPasswordCallback(pssCallback);
 			ksmUni.init();
 			return ksmUni;
 		}
 		
-		throw new AOException(
+		// Apple Safari sobre Mac OS X
+		// Identificacion del sistema operativo segun (anadiendo mayusculas donde se necesitaba)
+		// http://developer.apple.com/technotes/tn2002/tn2110.html
+		else if (Platform.getOS().equals(Platform.OS.MACOSX) && store == AOConstants.AOKeyStore.APPLE) {
+			try {
+				ksm.init(store, null, pssCallback, null);
+			}
+			catch(final Throwable e) {
+		    	throw new AOKeystoreAlternativeException(
+	    			getAlternateKeyStoreType(store),
+	    			"Error al inicializar el Llavero de Mac OS X", 
+	    			e
+    			);
+			}
+			return ksm;
+		}
+		
+		throw new AOKeystoreAlternativeException(
+			getAlternateKeyStoreType(store),
 			"La plataforma de navegador '" + store.getDescription() + "' mas sistema operativo '" +
-			System.getProperty("os.name") + "' mas Java '"+System.getProperty("java.version")+
-			"' no esta soportada"
+				Platform.getOS() + " (" + Platform.getOsVersion() + ")' mas Java '" +
+				Platform.getJavaVersion() + "' no esta soportada"
 		);
+	}
+	
+	/**
+	 * @return <code>AOConstants.AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo
+	 */
+	private static AOConstants.AOKeyStore getAlternateKeyStoreType(final AOConstants.AOKeyStore currentStore) {
+		if (AOConstants.AOKeyStore.PKCS12.equals(currentStore)) return null;
+		if (Platform.OS.WINDOWS.equals(Platform.getOS()) && (!AOConstants.AOKeyStore.WINDOWS.equals(currentStore))) return AOConstants.AOKeyStore.WINDOWS;
+		if (Platform.OS.MACOSX.equals(Platform.getOS()) && (!AOConstants.AOKeyStore.APPLE.equals(currentStore))) return AOConstants.AOKeyStore.APPLE;
+		return AOConstants.AOKeyStore.PKCS12;
 	}
 }

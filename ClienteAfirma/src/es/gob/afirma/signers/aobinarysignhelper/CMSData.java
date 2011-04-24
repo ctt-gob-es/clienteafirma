@@ -2,12 +2,11 @@
  * Este fichero forma parte del Cliente @firma. 
  * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
-
 
 
 package es.gob.afirma.signers.aobinarysignhelper;
@@ -36,22 +35,13 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 public final class CMSData {
 
     /**
-     * M&eacute;odo que genera una firma digital usando el sitema conocido como
-     * Data y que consiste en el contenido del fichero codificado como un conjunto
-     * de bytes.
-     *
-     * @param parameters Par&aacute;metros necesarios para obtener los datos
-     *                      de SignedData.
-     * @return           El contenido del fichero en formato Data.
+     * M&eacute;odo que genera una estructura CMS de tipo Data.
+     * @param content Datos que se desean envolver.
+     * @return El envoltorio de tipo data.
      */
-    public byte[] genData(P7ContentSignerParameters parameters){
-
-        
-       // construimos el Data y lo devolvemos
-        return new ContentInfo(
-        	PKCSObjectIdentifiers.data,
-        	new DEROctetString(parameters.getContent())
-        ).getDEREncoded();
+    public byte[] genData(byte[] content){
+        return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(content))
+        	.getDEREncoded();
     }
 
 
