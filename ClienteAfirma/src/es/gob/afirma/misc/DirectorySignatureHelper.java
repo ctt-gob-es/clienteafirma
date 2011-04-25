@@ -35,8 +35,6 @@ import es.gob.afirma.exceptions.AOUnsupportedSignFormatException;
 import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
-import es.gob.afirma.signers.AOXAdESSigner;
-import es.gob.afirma.signers.AOXMLDSigSigner;
 
 /**
  * M&oacute;dulo para la ejecuci&oacute;n de multifirmas masivas. La firma masiva puede
@@ -452,7 +450,8 @@ public class DirectorySignatureHelper {
 		signConfig.setProperty("precalculatedHashAlgorithm", this.algorithm.substring(0, pos));
 		
 		// Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
-		if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+		if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || 
+		    (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {
 			final String mimeType = "hash/" + this.algorithm.substring(0, pos).toLowerCase();
 			try {
 				signer.setDataObjectFormat(
@@ -582,7 +581,8 @@ public class DirectorySignatureHelper {
 			}
 			
 			// Deteccion del MIMEType, solo para XAdES y XMLDSig
-			if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+			if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || 
+				(signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {
 				final MimeHelper mimeHelper = new MimeHelper(dataToSign);
 				final String mimeType = mimeHelper.getMimeType();
 				if (mimeType != null) {
@@ -788,7 +788,8 @@ public class DirectorySignatureHelper {
     		            final Properties signConfig) {
         
 		// Deteccion del MIMEType, solo para XAdES y XMLDSig
-		if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+		if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || 
+			(signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {
 			final MimeHelper mimeHelper = new MimeHelper(data);
 			final String mimeType = mimeHelper.getMimeType();
 			if (mimeType != null) {
@@ -1275,4 +1276,5 @@ public class DirectorySignatureHelper {
 	 * @param file El proximo fichero que se va a procesar.
 	 */
 	protected void preProcessFile(final File file) {}
+	
 }

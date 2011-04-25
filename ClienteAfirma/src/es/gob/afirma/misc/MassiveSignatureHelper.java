@@ -30,8 +30,6 @@ import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.misc.DirectorySignatureHelper.MassiveType;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
-import es.gob.afirma.signers.AOXAdESSigner;
-import es.gob.afirma.signers.AOXMLDSigSigner;
 
 /**
  * M&oacute;dulo para el soporte de multifirmas m&aacute;sivas. Permite configurar una operaci&oacute;n
@@ -344,7 +342,8 @@ public final class MassiveSignatureHelper {
 		if(uri != null) config.setProperty("uri", uri.toString());
 		
 		// Deteccion del MIMEType, solo para XAdES y XMLDSig
-		if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+		if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || 
+			(signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {
 			final MimeHelper mimeHelper = new MimeHelper(data);
 			final String mimeType = mimeHelper.getMimeType();
 			if (mimeType != null) {
@@ -398,7 +397,8 @@ public final class MassiveSignatureHelper {
 		config.setProperty("precalculatedHashAlgorithm", massiveConfiguration.algorithm.substring(0, pos));
 		
 		// Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
-		if ((signer instanceof AOXAdESSigner ) || (signer instanceof AOXMLDSigSigner)) {
+		if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || 
+			(signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {
 			final String mimeType = "hash/" + massiveConfiguration.algorithm.substring(0, pos).toLowerCase();
 			try {
 				signer.setDataObjectFormat(
