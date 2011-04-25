@@ -15,6 +15,8 @@ import java.security.PrivilegedAction;
 /**
  * Clase privilegiada b&aacute;sica. Implementa las funciones necesarias para conocer
  * si la operaci&oacute;n produjo alg&uacute;n error durante su ejecuci&oacute;n. 
+ * @param <T> Tipo de retorno de la acci&oacute;n
+ * @param <U> Tipo del resultado de la acci&oacute;n
  */
 public abstract class BasicPrivilegedAction<T, U> implements PrivilegedAction<T> {
 
@@ -44,7 +46,9 @@ public abstract class BasicPrivilegedAction<T, U> implements PrivilegedAction<T>
 		return result;
 	}
 	
-	/** Indica si ocurri&oacute; alg&uacute;n error. */
+	/** Indica si ocurri&oacute; alg&uacute;n error. 
+	 * @return <code>true</code> si ocurrieron errores, <code>false</code> en caso contrario 
+	 */
 	public boolean isError() {
 		return errorMsg != null;
 	}

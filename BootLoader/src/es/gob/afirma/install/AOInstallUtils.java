@@ -231,14 +231,16 @@ final class AOInstallUtils {
     		try {
 				file = File.createTempFile("afirma", null);
 			} 
-    		catch (final IOException e) { }
-    		if (file.exists() && file.isFile()) {
+    		catch (final Throwable e) { 
+    			continue;
+    		}
+    		if (file != null && file.exists() && file.isFile()) {
     			file.delete();
     		}
     		n++;
-    	} while (file.exists() && n <= 5);
+    	} while (file != null && file.exists() && n <= 5);
     	
-    	if (n > 5) {
+    	if (n > 5 || file == null) {
     		Logger.getLogger("es.gob.afirma").warning("No se pudo crear un fichero temporal");
     		return null;
     	}
@@ -375,19 +377,16 @@ final class AOInstallUtils {
 						);
 						return;
 					}
-					else {
-						Logger.getLogger("es.gob.afirma").severe(
-							"'" + dir.getAbsolutePath() + "' ya existia como fichero y se ha borrado, pero no se ha podido crear un directorio con el mismo nombre"
-						);
-						return;
-					}
-				}
-				else {
+				
 					Logger.getLogger("es.gob.afirma").severe(
-						"'" + dir.getAbsolutePath() + "' ya existe como fichero y no se ha podido borrar"
+						"'" + dir.getAbsolutePath() + "' ya existia como fichero y se ha borrado, pero no se ha podido crear un directorio con el mismo nombre"
 					);
 					return;
 				}
+				Logger.getLogger("es.gob.afirma").severe(
+					"'" + dir.getAbsolutePath() + "' ya existe como fichero y no se ha podido borrar"
+				);
+				return;
 			}
 		}
 		// Si no existe

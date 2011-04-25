@@ -114,7 +114,7 @@ public final class AOBootUtil {
 					new FileInputStream(new File(path))
 				));
 				
-				else return new BufferedInputStream(new FileInputStream(new File(path)));
+				return new BufferedInputStream(new FileInputStream(new File(path)));
 			}
 			catch (NullPointerException e) {
 				throw e;
@@ -127,50 +127,49 @@ public final class AOBootUtil {
 			}
 		}
 		// Es una URL
-		else {
-			InputStream tmpStream;
-			try {
-				if (waitDialog) {
-					ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(
-						c,
-						Messages.getString("AOBootUtil.0") + uri.toURL().toString(), //$NON-NLS-1$
-						uri.toURL().openStream()
-					);
-					pm = pmis.getProgressMonitor(); 
+		InputStream tmpStream;
+		try {
+			if (waitDialog) {
+				ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(
+					c,
+					Messages.getString("AOBootUtil.0") + uri.toURL().toString(), //$NON-NLS-1$
+					uri.toURL().openStream()
+				);
+				pm = pmis.getProgressMonitor(); 
 //					pm.setMillisToDecideToPopup(0);
 //					pm.setMillisToPopup(0);
-					
-					// Las URL pocas veces informan del tamano del fichero, asi que ponemos un valor alto
-					// por defecto para segurarnos de que el dialogo se muestra
-					pm.setMaximum(10000000);
-					
-					tmpStream = new BufferedInputStream(pmis);
-				}
-				else tmpStream = new BufferedInputStream(uri.toURL().openStream());
+				
+				// Las URL pocas veces informan del tamano del fichero, asi que ponemos un valor alto
+				// por defecto para segurarnos de que el dialogo se muestra
+				pm.setMaximum(10000000);
+				
+				tmpStream = new BufferedInputStream(pmis);
 			}
-			catch(Throwable e) {
-				if (pm != null) pm.close();
-				throw new AOException(
-					"Ocurrio un error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e //$NON-NLS-1$ //$NON-NLS-2$
-				);
-			}
-			// Las firmas via URL fallan en la descarga por temas de Sun, asi que descargamos primero
-			// y devolvemos un Stream contra un array de bytes
-			byte[] tmpBuffer = new byte[0];
-			try {
-				tmpBuffer = getDataFromInputStream(tmpStream);
-			}
-			catch(Throwable e) {
-				if (pm != null) pm.close();
-				throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			
-			// Hay que cerrar el ProgressMonitor a mano:
-			// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4174850
-			if (pm != null) pm.close();
-			
-			return new java.io.ByteArrayInputStream(tmpBuffer);
+			else tmpStream = new BufferedInputStream(uri.toURL().openStream());
 		}
+		catch(Throwable e) {
+			if (pm != null) pm.close();
+			throw new AOException(
+				"Ocurrio un error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		// Las firmas via URL fallan en la descarga por temas de Sun, asi que descargamos primero
+		// y devolvemos un Stream contra un array de bytes
+		final byte[] tmpBuffer;
+		try {
+			tmpBuffer = getDataFromInputStream(tmpStream);
+		}
+		catch(final Throwable e) {
+			if (pm != null) pm.close();
+			throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		// Hay que cerrar el ProgressMonitor a mano:
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4174850
+		if (pm != null) pm.close();
+		
+		return new java.io.ByteArrayInputStream(tmpBuffer);
+
 	}
 
 	/**

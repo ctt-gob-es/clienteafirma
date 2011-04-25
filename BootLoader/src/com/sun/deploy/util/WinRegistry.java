@@ -41,29 +41,30 @@ public final class WinRegistry {
 		
 		/**
 		 * Retorna el valor del par-valor
+		 * @return Valor como array de bytes del par-valor
 		 */
 		public byte[] getData() {
-			return data;
+			return this.data;
 		}
 
 		/**
 		 * Retorna el valor tras realizar el casting al objeto java adecuado, ya sea este un entero,
 		 * una cadena o en su defecto un array de bytes. 
-		 * @return
+		 * @return Valor actual
 		 */
 		public Object getValue() {
-			switch (type) {
+			switch (this.type) {
 			case REG_SZ:
-				if (data.length <= 0) return null;
-				return new String(data, 0, data.length - 1);
+				if (this.data.length <= 0) return null;
+				return new String(this.data, 0, this.data.length - 1);
 
 			case REG_DWORD:
 			{
 				int n = 0;
-				for(int i = 0; (i < 4) && (i < data.length); i++) {
-					n += data[i] << (i * 8);
+				for(int i = 0; (i < 4) && (i < this.data.length); i++) {
+					n += this.data[i] << (i * 8);
 				}
-				return new Integer(n);
+				return Integer.valueOf(n);
 			}
 
 			default:
@@ -77,7 +78,7 @@ public final class WinRegistry {
 	 * @param hKey Entero con la clave 
 	 * @param path Ruta
 	 * @param name Nombre de clave a buscar
-	 * @return
+	 * @return Valor de la clave del registro
 	 */
 	public static Object get(final int hKey, final String path, final String name) {
 		final int key = sysOpenKey(hKey, path, KEY_READ);
@@ -92,6 +93,10 @@ public final class WinRegistry {
 	/**
 	 * Realiza la b&uacute;squeda de una clave en el registro, si el valor no es de tipo cadena retorna
 	 * un valor nulo.
+	 * @param hKey Clave a buscar
+	 * @param path Ruta de la clave
+	 * @param name Nombre de la clave
+	 * @return Valor como cadena de texto de la clave
 	 */
 	public static String getString(final int hKey, final String path, final String name) {
 		final Object rv = get(hKey, path, name);

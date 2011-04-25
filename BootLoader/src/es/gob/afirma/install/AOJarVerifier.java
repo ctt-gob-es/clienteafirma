@@ -113,7 +113,7 @@ class AOJarVerifier {
 					anySigned |= isSigned;
 					hasUnsignedEntry |= !je.isDirectory() && !isSigned && !signatureRelated(name);
 		
-					if (isSigned) {
+					if (isSigned && signers != null) {
 						for (CodeSigner cs : signers) {
 							final Certificate cert = cs.getSignerCertPath().getCertificates().get(0);
 							if (cert instanceof  X509Certificate) {
