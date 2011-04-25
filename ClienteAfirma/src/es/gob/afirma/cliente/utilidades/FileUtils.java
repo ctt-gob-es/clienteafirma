@@ -1,4 +1,4 @@
-package es.gob.afirma.cliente.utils;
+package es.gob.afirma.cliente.utilidades;
 
 import java.awt.Component;
 import java.net.URI;

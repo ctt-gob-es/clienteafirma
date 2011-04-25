@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-package es.gob.afirma.cliente.utils;
+package es.gob.afirma.cliente.utilidades;
 
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;

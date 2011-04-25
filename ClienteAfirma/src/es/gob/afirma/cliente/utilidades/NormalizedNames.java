@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
  */
 
-package es.gob.afirma.cliente.utils;
+package es.gob.afirma.cliente.utilidades;
 
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.misc.AOConstants;
