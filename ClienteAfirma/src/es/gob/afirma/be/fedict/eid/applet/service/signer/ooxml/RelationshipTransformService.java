@@ -72,14 +72,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import com.sun.org.apache.xml.internal.security.utils.Constants;
-import com.sun.org.apache.xpath.internal.XPathAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.sun.org.apache.xml.internal.security.utils.Constants;
+import com.sun.org.apache.xpath.internal.XPathAPI;
 
 /**
  * JSR105 implementation of the RelationshipTransform transformation.

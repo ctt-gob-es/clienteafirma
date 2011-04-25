@@ -60,7 +60,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-
 import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
@@ -121,9 +120,6 @@ public abstract class AbstractOOXMLSignatureService extends
 	public byte[] outputSignedOfficeOpenXMLDocument(byte[] signatureData) throws IOException, ParserConfigurationException, SAXException, TransformerException {
 
 		ByteArrayOutputStream signedOOXMLOutputStream = new ByteArrayOutputStream();
-		if (null == signedOOXMLOutputStream) {
-			throw new NullPointerException("signedOOXMLOutputStream is null");
-		}
 
 		String signatureZipEntryName = "_xmlsignatures/sig-" + UUID.randomUUID().toString() + ".xml";
 

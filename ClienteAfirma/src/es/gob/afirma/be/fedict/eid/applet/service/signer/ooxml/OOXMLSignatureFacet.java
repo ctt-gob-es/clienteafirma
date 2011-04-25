@@ -72,7 +72,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
@@ -285,7 +284,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 	private void addRelationshipsReferences(
 			XMLSignatureFactory signatureFactory, Document document,
 			List<Reference> manifestReferences) throws IOException,
-			ParserConfigurationException, SAXException, TransformerException,
+			ParserConfigurationException, SAXException,
 			NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()));
 		ZipEntry zipEntry;

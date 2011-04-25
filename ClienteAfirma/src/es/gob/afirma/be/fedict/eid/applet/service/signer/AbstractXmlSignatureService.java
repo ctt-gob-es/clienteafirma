@@ -96,8 +96,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
-
 import com.sun.org.apache.xml.internal.security.signature.XMLSignature;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 import com.sun.org.apache.xml.internal.security.utils.Constants;
@@ -152,7 +150,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	protected Document getEnvelopingDocument() throws ParserConfigurationException, IOException, SAXException {
+	protected Document getEnvelopingDocument() throws IOException, SAXException {
 		return null;
 	}
 
@@ -182,11 +180,11 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			return getSignedXML(getSignatureDigestAlgorithm(), digestInfos, signingCertificateChain, signingKey);
 		} 
 		catch (Exception e) {
-			e.printStackTrace();
 			throw new RuntimeException("XML signature error: " + e.getMessage(), e);
 		}
 	}
 
+	
 	public byte[] postSign(byte[] signedXML, List<X509Certificate> signingCertificateChain, String signatureId, byte[] signatureValue) {
 
 		/*
@@ -233,10 +231,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
 		//TODO: Cambiar a OOXMLSignedDocumentOutputStream
 		ByteArrayOutputStream signedDocumentOutputStream = new ByteArrayOutputStream();
-		if (null == signedDocumentOutputStream) {
-			throw new IllegalArgumentException(
-					"signed document output stream is null");
-		}
 		try {
 			writeDocument(document, signedDocumentOutputStream);
 		} 
@@ -250,7 +244,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		return CanonicalizationMethod.EXCLUSIVE;
 	}
 
-	@SuppressWarnings("unchecked")
 	private byte[] getSignedXML(String digestAlgo,
 			                    List<DigestInfo> digestInfos,
 			                    List<X509Certificate> signingCertificateChain,
@@ -484,12 +477,12 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		documentOutputStream.close();
 	}
 
-	protected void writeDocumentNoClosing(Document document, OutputStream documentOutputStream) throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException, IOException {
+	protected void writeDocumentNoClosing(Document document, OutputStream documentOutputStream) throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
 		// we need the XML processing initial line for OOXML
 		writeDocumentNoClosing(document, documentOutputStream, false);
 	}
 
-	protected void writeDocumentNoClosing(Document document, OutputStream documentOutputStream, boolean omitXmlDeclaration) throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException, IOException {
+	protected void writeDocumentNoClosing(Document document, OutputStream documentOutputStream, boolean omitXmlDeclaration) throws TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
 		NoCloseOutputStream outputStream = new NoCloseOutputStream(documentOutputStream);
 		Result result = new StreamResult(outputStream);
 		Transformer xformer = TransformerFactory.newInstance().newTransformer();
