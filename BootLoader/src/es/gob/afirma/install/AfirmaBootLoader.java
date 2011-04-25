@@ -20,7 +20,7 @@ import es.gob.afirma.misc.Platform;
  */
 public final class AfirmaBootLoader extends JApplet {
 	
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	private static final long serialVersionUID = -2570412953683244702L;
 
