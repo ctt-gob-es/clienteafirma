@@ -1,7 +1,5 @@
 package es.gob.afirma.cliente.actions;
 
-import java.io.IOException;
-
 import es.gob.afirma.cliente.EnveloperManager;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
@@ -22,6 +20,11 @@ public final class CoEnvelopAction extends BasicPrivilegedAction<Boolean, byte[]
 	/** Envoltorio que se desea desensobrar. */
 	private byte[] envelop;
 	
+	/**
+	 * Envoltorio de m&uacute;ltiples remitentes.
+	 * @param enveloperManager Gestor de envoltorios
+	 * @param envelop Envoltorio
+	 */
 	public CoEnvelopAction(EnveloperManager enveloperManager, byte[] envelop) {
 		if (enveloperManager == null) {
 			throw new NullPointerException();
@@ -34,22 +37,19 @@ public final class CoEnvelopAction extends BasicPrivilegedAction<Boolean, byte[]
 	public Boolean run() {
 		try {
 			enveloperManager.coEnvelop(envelop);
-		} catch (AOCancelledOperationException e) {
+		} catch (final AOCancelledOperationException e) {
 			setError("Operacion cancelada por el usuario", e); //$NON-NLS-1$
 			return false;
-		} catch (AOKeyStoreManagerException e) {
+		} catch (final AOKeyStoreManagerException e) {
 			setError("No se ha podido acceder al almac&eacute;n de certificados seleccionado", e); //$NON-NLS-1$
 			return false;
-		} catch (AOCertificatesNotFoundException e) {
+		} catch (final AOCertificatesNotFoundException e) {
 			setError("No se han encontrado certificados en el almacen seleccionado", e); //$NON-NLS-1$
 			return false;
-		} catch (AOInvalidFormatException e) {
+		} catch (final AOInvalidFormatException e) {
 			setError("No se ha proporcionado un envoltorio soportado", e); //$NON-NLS-1$
 			return false;
-		} catch (IOException e) {
-			setError("El sobre electronico esta corrupto o no ha podido leerse", e); //$NON-NLS-1$
-			return false;
-		} catch (AOException e) {
+		} catch (final AOException e) {
 			setError("Error al agregar el nuevo remitente", e); //$NON-NLS-1$
 			return false;
 		}

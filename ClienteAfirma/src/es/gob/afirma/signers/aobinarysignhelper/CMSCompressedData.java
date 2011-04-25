@@ -49,15 +49,12 @@ public final class CMSCompressedData {
 	public static final String ZLIB = "1.2.840.113549.1.9.16.3.8";
 
 	/**
-	 * M&eacute;todo que obtiene un tipo CompressedData.
-	 * 
+	 * Obtiene un tipo CompressedData.
+
 	 * @param data Datos a comprimir
 	 * @return Tipo CompressedData.
-	 * @throws IOException
-	 *             Se produce cuando se produce un error al comprimir los datos.
 	 */
-	public byte[] genCompressedData(byte[] data)
-			throws IOException {
+	public byte[] genCompressedData(byte[] data) {
 
 		// Algoritmo de compresion
 		AlgorithmIdentifier comAlgId = new AlgorithmIdentifier(

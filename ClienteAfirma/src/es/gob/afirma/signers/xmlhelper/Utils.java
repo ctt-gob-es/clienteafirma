@@ -71,7 +71,6 @@ import org.w3c.dom.ls.LSSerializer;
 import com.sun.org.apache.xerces.internal.dom.DOMOutputImpl;
 
 import es.gob.afirma.Messages;
-import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOCryptoUtil;
 import es.gob.afirma.misc.AOUtil;
@@ -521,9 +520,8 @@ public final class Utils {
 	 * @param uri URI del objeto a firmar
 	 * @param externallyDetachedHashAlgorithm Algoritmo de huella digital en el caso de estar esta pre-calculada
 	 * @param xades <code>true</code> si la firma es XAdES, <code>false</code> si es XMLDSig
-	 * @throws AOException si hay incorrecciones o incompatibilidades en los par&aacute;metros
 	 */
-	public static void checkIllegalParams(final String format, final String mode, final URI uri, final String externallyDetachedHashAlgorithm, final boolean xades) throws AOException {
+	public static void checkIllegalParams(final String format, final String mode, final URI uri, final String externallyDetachedHashAlgorithm, final boolean xades) {
 		if (!mode.equals(SIGN_MODE_IMPLICIT) && !mode.equals(SIGN_MODE_EXPLICIT)) {
 			throw new UnsupportedOperationException("El modo de firma '" + mode + "' no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
 		}

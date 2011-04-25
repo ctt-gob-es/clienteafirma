@@ -32,7 +32,6 @@ import javax.swing.JTextArea;
 import es.atosorigin.AOCertVerifier;
 import es.gob.afirma.Messages;
 import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.signers.AOCAdESSigner;
@@ -184,10 +183,6 @@ public final class SignText {
 				issuerFilter, 
 				null  // subjectFilter
 			);
-		}
-		catch(final AOCertificatesNotFoundException e) {
-			result = NO_MATCHING_CERT;
-			return;
 		}
 		catch(final Throwable e) {
 			Logger.getLogger("es.gob.afirma").severe(

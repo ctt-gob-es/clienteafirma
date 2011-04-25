@@ -20,12 +20,17 @@ public final class AOCertificateKeyException extends AOException {
 
 	/**
 	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * @param msg Mensaje descriptivo de la excepci&oacute;n.
+	 * @param msg Mensaje descriptivo de la excepci&oacute;n
 	 */
 	public AOCertificateKeyException(String msg) {
 		super(msg);
 	}
 
+	/**
+	 * Crea la excepci&oacute;n con un mensaje determinado a&ntilde;adiendo a la pila otra excepci&oacute;n.
+	 * @param msg Mensaje descriptivo de la excepci&oacute;n
+	 * @param e Excepci&oacute;n a a&ntilde;afir a la pila
+	 */
 	public AOCertificateKeyException(String msg, Throwable e) {
 		super(msg, e);
 	}

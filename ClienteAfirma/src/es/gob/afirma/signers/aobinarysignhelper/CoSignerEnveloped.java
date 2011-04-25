@@ -534,14 +534,12 @@ public final class CoSignerEnveloped  {
          *
          * @return      Los atributos firmados de la firma.
          *
-         * @throws java.security.NoSuchAlgorithmException
          */
         private ASN1Set generateSignerInfoFromHash(X509Certificate cert,
                                 String digestAlgorithm,
                                 byte[] datos,
                                 Oid dataType,
-                                Map<Oid, byte[]> atrib)
-                            throws NoSuchAlgorithmException {
+                                Map<Oid, byte[]> atrib) {
             
             //// ATRIBUTOS
 

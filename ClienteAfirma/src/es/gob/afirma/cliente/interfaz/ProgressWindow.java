@@ -16,6 +16,9 @@ import java.awt.HeadlessException;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+/**
+ * Di&aacute;logo de progreso.
+ */
 public final class ProgressWindow extends JFrame {
 	
     private static final long serialVersionUID = 1L;
@@ -26,6 +29,13 @@ public final class ProgressWindow extends JFrame {
 
     private int progreso = 0;
 
+    /**
+     * Crea un di&aacute;logo de progreso
+     * @param windowTitle T&iacute;tulo de la ventana
+     * @param statusTitle T&iacute;tulo de la l&iacute;nea de estado
+     * @param max Valor m&aacute;ximo de la barra de progreso
+     * @throws HeadlessException Si no hay interfaz gr&aacute;fico
+     */
     public ProgressWindow(String windowTitle, String statusTitle, long max) throws HeadlessException {
         super(windowTitle);
 
@@ -41,17 +51,10 @@ public final class ProgressWindow extends JFrame {
         setVisible(true);
     }
 
-//    public void update(int value) {
-//        progreso = value;
-//
-//        double ratio = (double) progreso / max;
-//        int newVal = (int) (ratio * Integer.MAX_VALUE);
-//
-//        status.updateValue(newVal);
-//
-//        status.paint(status.getGraphics());
-//    }
-
+    /**
+     * Incrementa la barra de progreso.
+     * @param amount Cantidad de incremento de la barra de progreso
+     */
     public void inc(final int amount) {
         progreso += amount;
 

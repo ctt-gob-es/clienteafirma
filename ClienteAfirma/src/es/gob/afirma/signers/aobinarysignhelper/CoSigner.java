@@ -568,15 +568,12 @@ public final class CoSigner  {
          * @param atrib    Lista de atributos firmados que se insertar&aacute;n dentro del archivo de firma.
          *
          * @return      Los atributos firmados de la firma.
-         *
-         * @throws java.security.NoSuchAlgorithmException
          */
         private ASN1Set generateSignerInfoFromHash(X509Certificate cert,
                                 String digestAlgorithm,
                                 byte[] datos,
                                 Oid dataType,
-                                Map<Oid, byte[]> atrib)
-                            throws NoSuchAlgorithmException {
+                                Map<Oid, byte[]> atrib) {
             
             //// ATRIBUTOS
 

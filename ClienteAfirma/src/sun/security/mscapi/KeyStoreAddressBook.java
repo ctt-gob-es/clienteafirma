@@ -46,7 +46,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 		}
     }
     
-	class KeyEntry {
+	static class KeyEntry {
 		//private Key privateKey;
 		private X509Certificate certChain[];
 		private String alias;
@@ -396,9 +396,8 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return true if the alias exists, false otherwise
      */
     @Override
-	@SuppressWarnings("unchecked")
 	public boolean engineContainsAlias(String alias) {
-		for (Enumeration enumerator = engineAliases(); enumerator.hasMoreElements();) {
+		for (Enumeration<?> enumerator = engineAliases(); enumerator.hasMoreElements();) {
 		    String a = (String) enumerator.nextElement();
 		    if (a.equals(alias)) return true;
 		}

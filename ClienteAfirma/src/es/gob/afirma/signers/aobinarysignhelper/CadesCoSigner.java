@@ -148,7 +148,7 @@ public final class CadesCoSigner {
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de firma.
      * @throws javax.security.cert.CertificateException 
      */
-	public byte[] coSigner(P7ContentSignerParameters parameters, byte[] sign, boolean omitContent, String policy, Oid qualifier, boolean signingCertificateV2, Oid dataType, PrivateKeyEntry keyEntry, byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException, javax.security.cert.CertificateException {
+	public byte[] coSigner(P7ContentSignerParameters parameters, byte[] sign, boolean omitContent, String policy, Oid qualifier, boolean signingCertificateV2, Oid dataType, PrivateKeyEntry keyEntry, byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
         ASN1InputStream is = new ASN1InputStream(sign);
 
@@ -342,7 +342,7 @@ public final class CadesCoSigner {
      * @throws java.security.cert.CertificateException Si se produce alguna excepci&oacute;n con los certificados de firma.
      * @throws javax.security.cert.CertificateException 
      */
-	public byte[] coSigner(String signatureAlgorithm, X509Certificate[] signerCertificateChain, InputStream data, String policy, Oid qualifier, boolean signingCertificateV2, Oid dataType, PrivateKeyEntry keyEntry, byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException, javax.security.cert.CertificateException {
+	public byte[] coSigner(String signatureAlgorithm, X509Certificate[] signerCertificateChain, InputStream data, String policy, Oid qualifier, boolean signingCertificateV2, Oid dataType, PrivateKeyEntry keyEntry, byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
         ASN1InputStream is = new ASN1InputStream(data);
 

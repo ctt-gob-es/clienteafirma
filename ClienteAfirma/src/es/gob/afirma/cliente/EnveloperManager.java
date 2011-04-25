@@ -560,14 +560,12 @@ public final class EnveloperManager {
 	 * @throws AOCancelledOperationException Cuando el usuario cancela la operaci&oacute;n.
 	 * @throws AOCertificatesNotFoundException Cuando no hay certificados en el almac&eacute;n seleccionado.
 	 * @throws AOKeyStoreManagerException Cuando no se puede acceder al almac&eacute;n de certificados.
-	 * @throws IOException Cuando se produce un error al leer los datos.
 	 * @throws AOInvalidFormatException Tipo de envoltorio no soportado.
 	 */
 	public byte[] coEnvelop(final byte[] envelop)throws AOException, 
 	                                                    AOCancelledOperationException, 
 	                                                    AOCertificatesNotFoundException, 
 	                                                    AOKeyStoreManagerException, 
-	                                                    IOException, 
 	                                                    AOInvalidFormatException {
 		if (!ksConfigManager.isSelectedCertificate()) {
 			try {

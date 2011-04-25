@@ -18,47 +18,37 @@ import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 
-import es.gob.afirma.cliente.utilidades.browser.FirmadorWeb.FirmaWeb;
-
 public final class Browser {
 
-    static
-    {
-        try
-        {
+    static {
+        try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
-        catch (Exception evt)
-        {
-            Logger.getLogger("es.gob.afirma").warning("No se pudo cargar el Look and Feel de Windows" + evt);
+        catch (final Throwable evt) {
+            Logger.getLogger("es.gob.afirma").warning("No se pudo cargar el Look & Feel de Windows" + evt);
         }
     }
     
-    public FirmadorWeb.FirmaWeb browse(String html, String hashAlg) throws IOException, NoSuchAlgorithmException
-    {
-        BrowserDialog bd;
+    public FirmadorWeb.FirmaWeb browse(final String html, final String hashAlg) throws IOException, NoSuchAlgorithmException {
+        final BrowserDialog bd;
         if(Frame.getFrames()!=null&&Frame.getFrames().length>0){
         	Logger.getLogger("es.gob.afirma").info("Se ha encontrado al menos un frame");
-            bd= new BrowserDialog(html,Frame.getFrames()[0]);
-        }else{
+            bd = new BrowserDialog(html,Frame.getFrames()[0]);
+        }
+        else{
         	Logger.getLogger("es.gob.afirma").info("No se han encontrado frames. Creamos uno invisible");
-            bd= new BrowserDialog(html,new Frame());
+            bd = new BrowserDialog(html,new Frame());
         }
         
         bd.setVisible(true);
         boolean firmar= bd.isFirmar();
         
-        FirmaWeb firmaWeb;
-        if(firmar)
-        {
-            Attachment[] attachs= AFirmaWebSignHTMLDocument.files.toArray(new Attachment[AFirmaWebSignHTMLDocument.files.size()]);
-            firmaWeb= new FirmadorWeb().firmar(html, attachs, hashAlg);
-        }
-        else
-        {
-            firmaWeb = null;
-        }
+        if(firmar) return new FirmadorWeb().firmar(
+    		html, 
+    		AFirmaWebSignHTMLDocument.files.toArray(new Attachment[AFirmaWebSignHTMLDocument.files.size()]), 
+    		hashAlg
+		);
+        return null;
 
-        return firmaWeb;
     }
 }

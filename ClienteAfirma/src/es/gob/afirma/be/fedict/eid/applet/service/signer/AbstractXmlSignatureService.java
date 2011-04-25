@@ -145,12 +145,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	 * Gives back the enveloping document. Return <code>null</code> in case
 	 * ds:Signature should be the top-level element. Implementations can
 	 * override this method to provide a custom enveloping document.
-	 * 
 	 * @return
-	 * @throws SAXException
-	 * @throws IOException
 	 */
-	protected Document getEnvelopingDocument() throws IOException, SAXException {
+	protected Document getEnvelopingDocument() {
 		return null;
 	}
 
@@ -247,8 +244,14 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	private byte[] getSignedXML(String digestAlgo,
 			                    List<DigestInfo> digestInfos,
 			                    List<X509Certificate> signingCertificateChain,
-			                    PrivateKey signingKey
-	) throws ParserConfigurationException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, MarshalException, javax.xml.crypto.dsig.XMLSignatureException, TransformerFactoryConfigurationError, TransformerException, IOException, SAXException {
+			                    PrivateKey signingKey) throws ParserConfigurationException, 
+			                                                  NoSuchAlgorithmException, 
+			                                                  InvalidAlgorithmParameterException, 
+			                                                  MarshalException, 
+			                                                  javax.xml.crypto.dsig.XMLSignatureException, 
+			                                                  TransformerFactoryConfigurationError, 
+			                                                  TransformerException, 
+			                                                  IOException {
 
 		/*
 		 * DOM Document construction.

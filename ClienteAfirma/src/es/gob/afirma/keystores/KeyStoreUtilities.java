@@ -28,8 +28,6 @@ import javax.naming.ldap.Rdn;
 
 import com.sun.jndi.toolkit.dir.SearchFilter;
 
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
 import es.gob.afirma.misc.AOUtil;
 
 /**
@@ -127,8 +125,6 @@ public final class KeyStoreUtilities {
 	 * @param issuerFilter Filtro seg&uacute;n la RFC2254 para el emisor del certificado 
 	 * @param subjectFilter Filtro seg&uacute;n la RFC2254 para el titular del certificado
 	 * @return Alias seleccionado por el usuario
-	 * @throws AOCancelledOperationException Si el usuario cancela manualmente la operaci&oacute;n
-	 * @throws AOCertificatesNotFoundException Si no hay certificados que mostrar al usuario
 	 */
 	public final static Hashtable<String, String> getAlisasesByFriendlyName(
 			final String[] alias, 
@@ -138,7 +134,7 @@ public final class KeyStoreUtilities {
             final boolean checkValidity, 
             final boolean showExpiredCertificates,
             final String issuerFilter,
-            final String subjectFilter) throws AOCertificatesNotFoundException {
+            final String subjectFilter) {
 		
 		final String [] trimmedAliases = alias.clone();
 		
@@ -254,7 +250,7 @@ public final class KeyStoreUtilities {
 				else {
 					// Eliminamos aquellos certificados que no hayan encajado
 					Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-							"El certificado '" + al + "' no se mostrara por no cumplir el filtro de uso" //$NON-NLS-1$ //$NON-NLS-2$
+						"El certificado '" + al + "' no se mostrara por no cumplir el filtro de uso" //$NON-NLS-1$ //$NON-NLS-2$
 					);
 					aliassesByFriendlyName.remove(al);
 				}

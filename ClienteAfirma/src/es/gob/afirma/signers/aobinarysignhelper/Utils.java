@@ -12,7 +12,6 @@ import java.security.Key;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
@@ -314,7 +313,6 @@ final class Utils {
 	 * @param cipherKey 	Clave de cifrado
 	 * @return Un sistema EncryptedContentInfo.
 	 *
-	 * @throws java.security.NoSuchProviderException
 	 * @throws java.security.NoSuchAlgorithmException
 	 * @throws javax.crypto.NoSuchPaddingException
 	 * @throws java.security.InvalidAlgorithmParameterException
@@ -323,7 +321,7 @@ final class Utils {
 	 * @throws org.bouncycastle.cms.CMSException
 	 */
 	public static EncryptedContentInfo getEncryptedContentInfo(byte[] file, AOCipherConfig config, SecretKey cipherKey)
-	throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException {
+	throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException {
 
 		AlgorithmParameterSpec params = getParams(config);
 		Cipher cipher = createCipher(config.toString());
@@ -356,8 +354,13 @@ final class Utils {
 	 * @throws javax.crypto.IllegalBlockSizeException
 	 * @throws javax.crypto.BadPaddingException
 	 */
-	public static EncryptedContentInfo getEncryptedContentInfo(byte[] file, Key cipherKey, AOCipherConfig config) 
-	throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, IllegalBlockSizeException, BadPaddingException {
+	public static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, 
+			                                                   final Key cipherKey, 
+			                                                   final AOCipherConfig config)	throws NoSuchAlgorithmException, 
+			                                                                                       NoSuchPaddingException, 
+			                                                                                       InvalidAlgorithmParameterException, 
+			                                                                                       InvalidKeyException, 
+			                                                                                       IOException {
 		AlgorithmParameterSpec params = Utils.getParams(config);
 		Cipher cipher = createCipher(config.toString());
 		cipher.init(Cipher.ENCRYPT_MODE, cipherKey, params);
@@ -451,7 +454,6 @@ final class Utils {
 	 * @param cipherKey	Clave de cifrado
 	 * @return La clave cifrada en "WRAP_MODE".
 	 *
-	 * @throws java.security.NoSuchProviderException
 	 * @throws java.security.NoSuchAlgorithmException
 	 * @throws javax.crypto.NoSuchPaddingException
 	 * @throws java.security.InvalidKeyException
@@ -459,7 +461,7 @@ final class Utils {
 	 * @throws javax.crypto.IllegalBlockSizeException
 	 * @throws javax.crypto.BadPaddingException
 	 */
-	private static byte[] cipherKey(PublicKey pKey, SecretKey cipherKey) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException {
+	private static byte[] cipherKey(PublicKey pKey, SecretKey cipherKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException {
 
 		Cipher cipher = createCipher(pKey.getAlgorithm());
 		AlgorithmParameters params = cipher.getParameters();
@@ -699,7 +701,6 @@ final class Utils {
 	 * @param cipherKey	Clave de cifrado
 	 * @return      Conteido descifrado.
 	 *
-	 * @throws java.security.NoSuchProviderException
 	 * @throws java.security.NoSuchAlgorithmException
 	 * @throws javax.crypto.NoSuchPaddingException
 	 * @throws java.security.InvalidAlgorithmParameterException
@@ -709,7 +710,7 @@ final class Utils {
 	 * @throws javax.crypto.IllegalBlockSizeException
 	 * @throws javax.crypto.BadPaddingException
 	 */
-	public static byte [] deCipherContent(byte[] file, AOCipherConfig config, SecretKey cipherKey) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
+	public static byte [] deCipherContent(byte[] file, AOCipherConfig config, SecretKey cipherKey) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException{
 		//asignamos los par&aacute;metros
 		AlgorithmParameterSpec params = getParams(config);
 		//Creamos el cipher

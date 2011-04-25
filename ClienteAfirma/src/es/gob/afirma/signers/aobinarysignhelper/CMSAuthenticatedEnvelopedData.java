@@ -183,14 +183,9 @@ public final class CMSAuthenticatedEnvelopedData {
 	 * @param datatype          Identifica el tipo del contenido a firmar.
 	 * @param signingTime		Introducir la hora de firma (tomada del sistema)
 	 * @param atrib             Lista de atributos firmados que se insertar&aacute;n dentro del archivo de firma.
-	 *
 	 * @return      Los atributos firmados de la firma.
-	 *
-	 * @throws java.security.NoSuchAlgorithmException Si no se encuentra un algoritmo v&aacute;lido.
 	 */
-	private ASN1Set generateSignedAtt(Oid datatype, boolean signingTime,
-			Map<Oid, byte[]> atrib)
-	throws NoSuchAlgorithmException {
+	private ASN1Set generateSignedAtt(final Oid datatype, final boolean signingTime, final Map<Oid, byte[]> atrib) {
 
 		//// ATRIBUTOS
 

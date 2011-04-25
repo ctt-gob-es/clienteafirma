@@ -127,9 +127,8 @@ public final class AOCMSEnveloper {
 	 * Crea un envoltorio CMS de tipo CompressedData.
 	 * @param content Datos que se desean envolver.
 	 * @return Envoltorio CompressedData.
-	 * @throws IOException Error en la lectura de datos.
 	 */
-	byte[] createCMSCompressedData(byte[] content) throws IOException {
+	byte[] createCMSCompressedData(byte[] content) {
 		return new CMSCompressedData().genCompressedData(content);
 	}
 	
@@ -286,19 +285,20 @@ public final class AOCMSEnveloper {
 	 * @param envelop Envoltorio original.
 	 * @param ke Referencia a la clave privada del certificado del remitente.
 	 * @return Envoltorio con el nuevo remitente.
-	 * @throws IOException Cuando se produce un error al leer los datos.
 	 * @throws AOException Cuando se produce un error al agregar el nuevo remitente.
 	 * @throws AOInvalidFormatException Tipo de envoltorio no soportado.
 	 */
-	byte[] addOriginator(byte[] envelop, PrivateKeyEntry ke) throws IOException, AOException, AOInvalidFormatException {
+	byte[] addOriginator(byte[] envelop, PrivateKeyEntry ke) throws AOException, AOInvalidFormatException {
 		
 		String contentInfo;
 		ValidateCMS validator = new ValidateCMS();
 		if (validator.isCMSEnvelopedData(envelop)) {
 			contentInfo = AOConstants.CMS_CONTENTTYPE_ENVELOPEDDATA;
-		} else if (validator.isCMSSignedAndEnvelopedData(envelop)) {
+		} 
+		else if (validator.isCMSSignedAndEnvelopedData(envelop)) {
 			contentInfo = AOConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA;
-		} else if (validator.isCMSAuthenticatedEnvelopedData(envelop)) {
+		} 
+		else if (validator.isCMSAuthenticatedEnvelopedData(envelop)) {
 			contentInfo = AOConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
 		}
 		else {
@@ -476,10 +476,9 @@ public final class AOCMSEnveloper {
 	 * Recupera el contenido de un envoltorio CompressedData.
 	 * @param compressedData Envoltorio CMS de tipo CompressedData.
 	 * @return Contenido del envoltorio.
-	 * @throws AOException Cuando se produce un error al desenvolver los datos.
 	 * @throws IOException Cuando ocurre un error al descomprimir los datos.
 	 */
-	byte[] recoverCMSCompressedData(byte[] compressedData) throws AOException, IOException {
+	byte[] recoverCMSCompressedData(byte[] compressedData) throws IOException {
 		return new CMSCompressedData().getContentCompressedData(compressedData);
 	}
 	
