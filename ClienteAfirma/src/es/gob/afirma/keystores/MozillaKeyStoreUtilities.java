@@ -604,7 +604,7 @@ public final class MozillaKeyStoreUtilities {
 			if ( new File(nssPath + "mozsqlite3.dll").exists() ) { 
 				Logger.getLogger("es.gob.afirma").info("Detectado NSS de Firefox 4");
 				return new String[] {
-						nssPath + "mozcrt19.dl", 
+						nssPath + "mozcrt19.dll", 
 						nssPath + "nspr4.dll", 
 						nssPath + "plds4.dll", 
 						nssPath + "plc4.dll", 
