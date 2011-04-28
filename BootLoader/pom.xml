@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>jar</packaging>
+  <groupId>es.gob.afirma</groupId>
+  <artifactId>afirma-client-bootloader</artifactId>
+  <version>3.2.0</version>
+  <name>afirma-client-bootloader</name>
+
+  <repositories>
+    <repository>
+      <id>forjauji</id>
+      <url>http://maven.forja.uji.es/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+
+    <!-- Java Plugin 1.5 -->
+
+    <dependency>
+      <groupId>plugin</groupId>
+      <artifactId>plugin</artifactId>
+      <version>1.5</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+
+      <!-- JAR signature -->
+
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <keystore>${afirma.keytool.keystore}</keystore>
+          <alias>${afirma.keytool.alias}</alias>
+          <storepass>${afirma.keytool.password}</storepass>
+          <signedjar>target/${project.build.finalName}-signed.jar</signedjar>
+          <verify>true</verify>
+        </configuration>
+      </plugin>
+
+      <!-- JavaDoc -->
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+
+        <executions>
+          <execution>
+            <goals>
+              <goal>javadoc</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+
+        <configuration>
+          <encoding>iso-8859-1</encoding>
+          <verbose>false</verbose>
+          <show>public</show>
+          <subpackages>es.gob.afirma</subpackages>
+        </configuration>
+      </plugin>
+
+      <!-- Proguard -->
+
+      <plugin>
+        <groupId>com.pyx4me</groupId>
+        <artifactId>proguard-maven-plugin</artifactId>
+
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>proguard</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <proguardVersion>4.4</proguardVersion>
+          <obfuscate>true</obfuscate>
+          <proguardInclude>src/main/resources/proguard.conf</proguardInclude>
+          <injar>classes</injar>
+          <libs>
+            <lib>${java.home}/lib/rt.jar</lib>
+            <lib>${java.home}/lib/jsse.jar</lib>
+            <lib>${java.home}/lib/ext/sunpkcs11.jar</lib>
+          </libs>
+          <addMavenDescriptor>false</addMavenDescriptor>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>net.sf.proguard</groupId>
+            <artifactId>proguard</artifactId>
+            <version>4.4</version>
+            <scope>runtime</scope>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</project>

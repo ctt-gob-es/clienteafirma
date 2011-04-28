@@ -1,0 +1,15 @@
+<profilesXml>
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <afirma.keytool.keystore>afirma.keystore</afirma.keytool.keystore>
+        <afirma.keytool.alias>codesign</afirma.keytool.alias>
+        <afirma.keytool.password>afirma</afirma.keytool.password>
+      </properties>
+    </profile>
+  </profiles>
+</profilesXml>
