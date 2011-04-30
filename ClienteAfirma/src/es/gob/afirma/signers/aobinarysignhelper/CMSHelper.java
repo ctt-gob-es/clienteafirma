@@ -23,7 +23,7 @@ public final class CMSHelper {
 	 * @return La validez del archivo cumpliendo la estructura.
 	 */
 	public static boolean isCMSValid(final byte[] data){
-		// si se lee en el CMSDATA, el inputstream ya esta leido y en los demás siempre será nulo
+		// si se lee en el CMSDATA, el inputstream ya esta leido y en los demas siempre sera nulo
 		if(data == null) {
 			Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
 			return false;

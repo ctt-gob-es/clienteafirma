@@ -268,7 +268,7 @@ import es.gob.afirma.misc.AOUtil;
  * @version 0.1
  */
 
-public class AOCertVerifier {
+public final class AOCertVerifier {
 	
 	
 	private Set<TrustAnchor> tas = new HashSet<TrustAnchor>();

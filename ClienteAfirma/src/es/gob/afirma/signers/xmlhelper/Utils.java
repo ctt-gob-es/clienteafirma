@@ -1,11 +1,11 @@
 /*
  * Este fichero forma parte del Cliente @firma. 
- * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
 package es.gob.afirma.signers.xmlhelper;
@@ -687,7 +687,7 @@ public final class Utils {
     			for (Object t : r.getTransforms()) {
 						if (t instanceof Transform) {
     					if (!"http://www.w3.org/2000/09/xmldsig#base64".equals(((Transform) t).getAlgorithm())) {
-    						// Si el ID es nulo y hay una transformación Base64 reconstruimos la referencia
+    						// Si el ID es nulo y hay una transformacion Base64 reconstruimos la referencia
     						// pero quitando esa transformacion Base64
     						if (trans == null) trans = new ArrayList<Transform>();
     						trans.add((Transform)t);

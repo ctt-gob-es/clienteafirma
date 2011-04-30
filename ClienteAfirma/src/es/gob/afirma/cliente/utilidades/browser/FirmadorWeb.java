@@ -1,11 +1,11 @@
 /*
  * Este fichero forma parte del Cliente @firma. 
- * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
 package es.gob.afirma.cliente.utilidades.browser;
@@ -58,7 +58,7 @@ public final class FirmadorWeb {
             dos.write(html.getBytes());
             dos.flush();
 
-            // Añadimos los ficheros
+            // Anadimos los ficheros
             for(int i=0; i<attachments.length; i++)
             {
                 Attachment attach= attachments[i];
@@ -70,11 +70,11 @@ public final class FirmadorWeb {
                     dos.write(openTag.getBytes());
                     dos.flush();
     
-                    // Leemos el fichero con ventana gráfica
+                    // Leemos el fichero con ventana grafica
                     final FileInputStream attachIS= attach.getContentInputStream();
                     try {
                         // Volcamos el fichero en b64
-                        Logger.getLogger("es.map,afirma").info("Tama\u00F1o del buffer: "+1024);
+                        Logger.getLogger("es.map,afirma").info("Tamano del buffer: " + 1024);
                         int nBytes;
                 		byte[] buffer = new byte[1024];
                 		ByteArrayOutputStream baos = new ByteArrayOutputStream();

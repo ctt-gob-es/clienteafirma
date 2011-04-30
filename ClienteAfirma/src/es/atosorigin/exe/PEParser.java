@@ -215,7 +215,7 @@ import es.gob.afirma.misc.AOUtil;
  * Analizador de ficheros MS-PE. 
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s Capote
  */
-public class PEParser {
+public final class PEParser {
 	
 	private static final Dictionary<String, String> MACHINE_TYPE;
 	

@@ -1,11 +1,11 @@
 /*
  * Este fichero forma parte del Cliente @firma. 
- * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
 package es.gob.afirma.cliente;
@@ -2444,7 +2444,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 				String result = null;
 				try {
 					result = new String(AOUtil.getDataFromInputStream(is));
-				} catch (Throwable e) {
+				} 
+				catch (final Throwable e) {
 					logger.severe("No se pudo leer el contenido del fichero indicado: " + e); //$NON-NLS-1$
 					return ""; //$NON-NLS-1$
 				}
@@ -3886,8 +3887,8 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 	 *                 <li>"ask" indica que se debe solicitar al usuario que seleccione un certificado. Si se ha indicado 
 	 *                 uno o m&aacute;s nombre de CA mediante los par&aacute;metros caNameN la selecci&oacute;n 
 	 *                 autom&aacute;tica se limita a los certificado emitidos por las CA indicadas. </li></ul>
-	 * @param caNameN DN de las CA cuyos certificados deben tenerse en cuenta para la selección de firmante, 
-	 *                debe proporcionarse un par&aacute;metro por cada CA. Para mayor información sobre el formato DN consulte 
+	 * @param caNameN DN de las CA cuyos certificados deben tenerse en cuenta para la selecci&oacute;n de firmante, 
+	 *                debe proporcionarse un par&aacute;metro por cada CA. Para mayor informaci&oacute;n sobre el formato DN consulte 
 	 *                <a href="http://www.faqs.org/rfcs/rfc1485.html">String Representation of Distinguished Names</a>.
 	 * @return Si el usuario aprob&oacute; la operaci&oacute;n y esta termin&oacute; correctamente se 
 	 *         devuelve el objeto firmado en formato CMS codificado en Base64. En caso contrario devuelve uno 

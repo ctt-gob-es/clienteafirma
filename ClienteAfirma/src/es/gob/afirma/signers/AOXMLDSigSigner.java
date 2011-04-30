@@ -1,11 +1,11 @@
 /*
  * Este fichero forma parte del Cliente @firma. 
- * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
 package es.gob.afirma.signers;
@@ -628,7 +628,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 				);
 			}
 		}
-		// Si no era XML y tuve que convertir a Base64 yo mismo declaro la transformación 
+		// Si no era XML y tuve que convertir a Base64 yo mismo declaro la transformacion 
 		else if (wasEncodedToBase64 && !avoidBase64Transforms) {
 			try {
 				transformList.add(fac.newTransform(Transform.BASE64, (TransformParameterSpec)null));
@@ -1149,7 +1149,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 		try {
 			//comprueba que sea una documento de firma valido
 			if (!isSign(sign))
-				throw new AOInvalidFormatException("El documento no es un documento de firmas válido.");
+				throw new AOInvalidFormatException("El documento no es un documento de firmas valido.");
 
 			//obtiene la raiz del documento de firmas
 			rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
@@ -2105,7 +2105,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 			} 
 			//si es enveloping
 			else if (isEnveloping(rootSig)){			
-				//si el documento no tiene como nodo raiz AFIRMA se añade este
+				//si el documento no tiene como nodo raiz AFIRMA se anade este
 				//para que la lectura de las firmas del documento se haga correctamente
 				if (rootSig.getNodeName().equals(SIGNATURE_NODE_NAME)) {
 					try {

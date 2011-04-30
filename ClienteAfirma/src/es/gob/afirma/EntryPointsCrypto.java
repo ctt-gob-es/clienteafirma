@@ -1,11 +1,11 @@
 /*
  * Este fichero forma parte del Cliente @firma. 
- * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
 package es.gob.afirma;
@@ -383,7 +383,7 @@ public interface EntryPointsCrypto {
 	 * {@link #setElectronicSignatureFile(String)}. El an&aacute;lisis de la firma se realiza
 	 * primeramente por medio del manejador del formato de firma establecido con
 	 * {@link #setSignatureFormat(String)} y, en caso de que este manejador no soporte la firma
-	 * introducida, se buscar&aacute; entre el resto de manejadores el más adecuado para manejar
+	 * introducida, se buscar&aacute; entre el resto de manejadores el m&aacute;s adecuado para manejar
 	 * la firma. Si no se encuentra ninguno, se devuelve <code>null</code>.
 	 * <br><br>
 	 * Returns an electronic signature's signer structure. Signers are separated by
@@ -1047,7 +1047,7 @@ public interface EntryPointsCrypto {
 
 	/**
 	 * Establece los datos de entrada en base 64 para los procesos de firma, co-firma (firma en
-	 * paralelo) y generación de sobres digitales.
+	 * paralelo) y generaci&oacute;n de sobres digitales.
 	 * <br/>Los datos introducidos mediante esta funci&oacuten;n sobreescribir&aacute;n cualquier otro
 	 * establecido previamente mediante los m&eacute;todos setFileuri o setHash.
 	 * 
@@ -1091,7 +1091,7 @@ public interface EntryPointsCrypto {
 
 	/**
 	 * Establece los datos contenidos en el fichero indicado (en donde se encontrar&aacute;n
-	 * codificados en base 64), como los datos de entrada para las operaciones criptográficas
+	 * codificados en base 64), como los datos de entrada para las operaciones criptogr&aacute;ficas
 	 * y establece la ruta introducida como ruta de entrada.<br/>
 	 * El contenido del fichero se interpretar&aacute; siempre como datos en base 64 no
 	 * realiz&aacute;ndose la comprobaci&oacute;n de los mismos.
@@ -1150,7 +1150,7 @@ public interface EntryPointsCrypto {
 	 * valor del fichero de datos este permanece a&uacute;n cuando no se completa la operaci&acute;n
 	 * de firma. Si no hay un fichero de datos establecido se devuelve cadena vac&iacute;a.<br/>
 	 * La ruta del fichero se devolver&aacute; respetando el <i>URL Encoding</i>, es decir, se realizar&aacute;n
-	 * cambios tales como sustituir los espacios (' ') por "%20". Esta codificación impide obtener de 
+	 * cambios tales como sustituir los espacios (' ') por "%20". Esta codificaci&oacute;n impide obtener de 
 	 * forma directa un fichero mediante la clase {@link java.io.File}, previamente deberemos
 	 * obtener una URI. 
 	 * 
@@ -2776,7 +2776,7 @@ public interface EntryPointsCrypto {
 	public String getData();
 
 	/**
-	 * Devuelve los datos generados el la &uacute;ltima operación CMS
+	 * Devuelve los datos generados el la &uacute;ltima operaci&oacute;n CMS
 	 * 
 	 * <br><br>
 	 * 
