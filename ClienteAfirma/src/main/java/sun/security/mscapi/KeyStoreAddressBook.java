@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.Key;
 import java.security.KeyStoreException;
-import java.security.KeyStore;
+import sun.security.mscapi.KeyStore;
 import java.security.KeyStoreSpi;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecurityPermission;
