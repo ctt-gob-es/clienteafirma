@@ -14,10 +14,6 @@
       <id>forjauji</id>
       <url>http://maven.forja.uji.es/</url>
     </repository>
-    <repository>
-      <id>local</id>
-      <url>file://${basedir}/lib/</url>
-    </repository>
   </repositories>
 
   <dependencies>
