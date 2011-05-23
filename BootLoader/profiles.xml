@@ -6,7 +6,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <afirma.keytool.keystore>afirma.keystore</afirma.keytool.keystore>
+        <afirma.keytool.keystore>src/main/resources/afirma.keystore</afirma.keytool.keystore>
         <afirma.keytool.alias>codesign</afirma.keytool.alias>
         <afirma.keytool.password>afirma</afirma.keytool.password>
       </properties>
