@@ -1,11 +1,11 @@
 /*
  * Este fichero forma parte del Cliente @firma. 
- * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
 package es.gob.afirma.callbacks;
@@ -75,7 +75,7 @@ public final class UIPasswordCallbackLite extends PasswordCallback {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.add(lbText);
 		panel.add(pwd);
-		int action = JOptionPane.showConfirmDialog(
+		final int action = JOptionPane.showConfirmDialog(
 			c,
 			panel,
 			"Contrase\u00F1a",

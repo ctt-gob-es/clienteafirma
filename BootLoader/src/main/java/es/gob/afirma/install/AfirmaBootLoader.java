@@ -38,13 +38,8 @@ public final class AfirmaBootLoader extends JApplet {
 	public void init() {
 		this.codeBase = this.getCodeBase();
 		logger.info("BootLoader de @firma iniciado"); //$NON-NLS-1$
-		AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-			public Void run() {
-				logger.info("Arquitectura del JRE: " + Platform.getJavaArch());	 //$NON-NLS-1$
-				logger.info("Arquitectura del sistema operativo: " + Platform.getOsArch());  //$NON-NLS-1$
-				return null;
-			}
-		});
+		logger.info("Arquitectura del JRE: " + Platform.getJavaArch());
+		logger.info("Arquitectura del sistema operativo: " + Platform.getOsArch());
 		if (DEBUG) logger.warning("Modo de depuracion activado");
 	}
 
@@ -58,7 +53,7 @@ public final class AfirmaBootLoader extends JApplet {
 		try {
 			codeBase = new URL(url);
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			logger.severe(
 				"La URL establecida es incorrecta, se usara la original (" + codeBase.toString() + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
@@ -106,8 +101,10 @@ public final class AfirmaBootLoader extends JApplet {
 
 		// Realizamos la instalacion
 		return AccessController.doPrivileged(new java.security.PrivilegedAction<Boolean>() {
+			/** {@inheritDoc} */
 			public Boolean run() {
 				SwingUtilities.invokeLater(new Runnable() {
+					/** {@inheritDoc} */
 					public void run() {
 
 						// Configuramos el instalador
@@ -163,7 +160,7 @@ public final class AfirmaBootLoader extends JApplet {
 			try {
 				netscape.javascript.JSObject.getWindow(AfirmaBootLoader.this).call(jsMethodName, jsPreparedParams);
 			}
-			catch(final Throwable e) {
+			catch(final Exception e) {
 				logger.severe(
 					"No se ha podido realizar la llamada al metodo JavaScript '" + jsMethodName + "': " + e
 				);

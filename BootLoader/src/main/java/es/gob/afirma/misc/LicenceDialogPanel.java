@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.install.Messages;
 
@@ -22,7 +23,7 @@ import es.gob.afirma.install.Messages;
 public final class LicenceDialogPanel {
 
 	/** Componente sobre el que se debe mostrar el acuerdo de licencia. */
-	private Component parentComponent = null;
+	private final Component parentComponent;
 	
 	/**
 	 * Crea el di&aacute;logo y establece un componente padre sobre el que debe mostrarse.
@@ -59,13 +60,12 @@ public final class LicenceDialogPanel {
 	            AOBootUtil.getDataFromInputStream(licenseIs), "UTF-8" //$NON-NLS-1$
 	        );
 	    } 
-	    catch (final Throwable e2) {
+	    catch (final Exception e2) {
 	        licenseText = Messages.getString("LicenceDialogPanel.2"); //$NON-NLS-1$
 	        Logger.getLogger("es.gob.afirma").warning("Error al acceder a las condiciones de la licencia: " + e2); //$NON-NLS-1$ //$NON-NLS-2$
-	        e2.printStackTrace();
 	    }
 
-	    try { licenseIs.close(); } catch (final Throwable e) {}
+	    try { licenseIs.close(); } catch (final Exception e) {}
 	    
 	    // Texto del acuerdo de licencia
 	    final JTextArea textArea = new JTextArea(licenseText);
@@ -77,7 +77,7 @@ public final class LicenceDialogPanel {
 	    // Cuadro con el scroll
 	    final JScrollPane scrollPane = new JScrollPane(textArea);
 	    scrollPane.setPreferredSize(new Dimension(250, 400));
-	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 	    // Restricciones del layout
 	    final GridBagConstraints c = new GridBagConstraints();

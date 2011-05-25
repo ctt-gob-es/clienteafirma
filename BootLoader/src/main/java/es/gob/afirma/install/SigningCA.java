@@ -26,7 +26,7 @@ enum SigningCA {
 				)
 			);
 		} 
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			throw new UnsupportedOperationException(
 				"No se ha podido cargar el certificado raiz: " + caCertificatePath, e
 			);
@@ -41,7 +41,7 @@ enum SigningCA {
 					)
 				);
 			} 
-			catch(final Throwable e) {
+			catch(final Exception e) {
 				throw new UnsupportedOperationException(
 					"No se ha podido cargar el certificado firmante: " + sigCertificatePath, e
 				);

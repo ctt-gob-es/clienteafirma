@@ -1,6 +1,5 @@
 package es.gob.afirma.misc;
 
-import java.io.File;
 import java.util.logging.Logger;
 
 import com.sun.deploy.util.WinRegistry;
@@ -12,12 +11,12 @@ import com.sun.deploy.util.WinRegistry;
 public final class WinRegistryWrapper {
 	
 	static {
-		if (System.getProperty("os.name").contains("indows")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
 			try {
-				AOBootUtil.loadNativeLibrary(Platform.getJavaHome() + File.separator + "bin" + File.separator + "deploy.dll"); //$NON-NLS-1$ //$NON-NLS-2$
+				AOBootUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			catch(Throwable e) {
-				Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll', no se podra acceder al registro de Windows: "+e); //$NON-NLS-1$ //$NON-NLS-2$
+			catch(final Exception e) {
+				Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll', no se podra acceder al registro de Windows: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -37,11 +36,11 @@ public final class WinRegistryWrapper {
 	 * @param name Nombre de la clave
 	 * @return Clave (entrada) del registro de Windows
 	 */
-	public static String getString(int hKey, String path, String name) {
+	public static String getString(final int hKey, final String path, final String name) {
 		try {
 			return WinRegistry.getString(hKey, path, name);
 		}
-		catch(Throwable e) {
+		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 				"No se ha podido obtener la clave de registro con ruta '" + //$NON-NLS-1$
 				path + "' y nombre '" + name + "', se devolvera null: " + e  //$NON-NLS-1$ //$NON-NLS-2$

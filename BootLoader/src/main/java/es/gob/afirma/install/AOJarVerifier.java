@@ -38,7 +38,8 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Logger;
 
-class AOJarVerifier {
+final class AOJarVerifier {
+	
 	private boolean hasExpiredCert = false;
 	private boolean hasExpiringCert = false;
 	private boolean notYetValidCert = false;
@@ -58,7 +59,9 @@ class AOJarVerifier {
 	 * @throws SecurityException Si la firma no es v&aacute;lida u ocurre cualquier
 	 *                           problema durante la verificaci&oacute;n
 	 */
-	void verifyJar(final String jarName, final X509Certificate caCert, final X509Certificate signerCert) throws SecurityException {
+	void verifyJar(final String jarName, 
+			       final X509Certificate caCert, 
+			       final X509Certificate signerCert) throws SecurityException {
 		
 		if (jarName == null || "".equals(jarName)) throw new SecurityException(
 			"El fichero proporcionado es nulo o vacio, y por lo tanto no esta firmado"
@@ -68,7 +71,7 @@ class AOJarVerifier {
 			"Es obligatorio proporcionar un certificado CA para comprobar las firmas"
 		);
 		
-		PublicKey pkCA = caCert.getPublicKey();
+		final PublicKey pkCA = caCert.getPublicKey();
 		
 		boolean anySigned = false;
 		boolean hasUnsignedEntry = false;
@@ -93,7 +96,7 @@ class AOJarVerifier {
 				}
 				finally {
 					if (is != null) {
-						try { is.close(); } catch(final Throwable e) {}
+						try { is.close(); } catch(final Exception e) {}
 					}
 				}
 			}
@@ -161,14 +164,14 @@ class AOJarVerifier {
 			);
 
 		} 
-		catch (final Throwable e) {
+		catch (final Exception e) {
 			throw new SecurityException(
 				"La firma del fichero JAR/ZIP '" + jarName + "' no es valida o no se ha podido comprobar", e
 			);
 		} 
 		finally { // close the resource
 			if (jf != null) {
-				try { jf.close(); } catch(final Throwable e) {}
+				try { jf.close(); } catch(final Exception e) {}
 			}
 		}
 		

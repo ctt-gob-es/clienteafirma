@@ -71,7 +71,7 @@ final class AOInstallUtils {
         catch(final AOException e) {
             throw e;
         } 
-        catch(final Throwable e) {
+        catch(final Exception e) {
             throw new AOException("Error al desempaquetar el fichero '" + pack200Filename + "'", e);
         }
         
@@ -84,9 +84,9 @@ final class AOInstallUtils {
      * Descomprime un JAR comprimido con Pack200 y GZip.
      * @param packgz <i>jar.pack.gz</i> original
      * @param jar JAR resultante del desempaquetado
-     * @throws Throwable Si ocurre cualquier problema durante la descompresi&oacute;n
+     * @throws Exception Si ocurre cualquier problema durante la descompresi&oacute;n
      */
-    private static void unpack200gunzip(final InputStream packgz, final OutputStream jar) throws Throwable {
+    private static void unpack200gunzip(final InputStream packgz, final OutputStream jar) throws Exception {
         if (packgz == null) throw new NullPointerException("El pack.gz es nulo");
         InputStream is = new GZIPInputStream(packgz);
         Unpacker u = java.util.jar.Pack200.newUnpacker();
@@ -132,10 +132,10 @@ final class AOInstallUtils {
                 final FileOutputStream fos = new FileOutputStream(outputFile);
                 int nBytes;
                 while ((nBytes = zeis.read(buffer)) != -1) fos.write(buffer, 0, nBytes);
-                try { fos.flush(); } catch(final Throwable e) {}
-                try { fos.close(); } catch(final Throwable e) {}
+                try { fos.flush(); } catch(final Exception e) {}
+                try { fos.close(); } catch(final Exception e) {}
             }
-            catch (final Throwable e) {
+            catch (final Exception e) {
                 throw new AOException(
                     "Error durante la instalacion, no se pudo instalar la biblioteca '" //$NON-NLS-1$
                     + entry.getName() + "'", e //$NON-NLS-1$
@@ -150,7 +150,7 @@ final class AOInstallUtils {
      * @param dirDest Directorio local.
      * @throws Exception Ocurri&oacute; un error durante la copia del fichero.
      */
-    static void copyFileFromURL(URL file, File fileDest) throws Exception {
+    static void copyFileFromURL(final URL file, final File fileDest) throws Exception {
         copyFileFromURL(file, fileDest.getParentFile(), fileDest.getName());
     }
     
@@ -162,7 +162,7 @@ final class AOInstallUtils {
      * se almacena con el mismo nombre que tuviese el fichero remoto.
      * @throws Exception Ocurri&oacute; un error durante la copia del fichero.
      */
-    private static void copyFileFromURL(URL urlFile, File dirDest, String newFilename) throws Exception {
+    private static void copyFileFromURL(final URL urlFile, final File dirDest, final String newFilename) throws Exception {
 
         if (urlFile == null) {
             throw new NullPointerException("La URL al fichero remoto no puede ser nula"); //$NON-NLS-1$
@@ -173,8 +173,8 @@ final class AOInstallUtils {
 
         // Obtenemos el nombre del fichero destino a partir del directorio de destino y el nombre del nuevo
         // fichero o el del fichero remoto si no se indico uno nuevo
-        String filename = (newFilename != null ? newFilename : urlFile.getPath().substring(urlFile.getPath().lastIndexOf("/"))); //$NON-NLS-1$
-        File outFile = new File(dirDest, filename);
+        final String filename = (newFilename != null ? newFilename : urlFile.getPath().substring(urlFile.getPath().lastIndexOf("/"))); //$NON-NLS-1$
+        final File outFile = new File(dirDest, filename);
         if (!outFile.getParentFile().exists()) {
             outFile.getParentFile().mkdirs();
         } 
@@ -188,7 +188,7 @@ final class AOInstallUtils {
             try {
                 is = new FileInputStream(urlFile.toString().substring(7));
             }
-            catch (final Throwable e) {
+            catch (final Exception e) {
                 is = uri.toURL().openStream();
             }
         }
@@ -198,15 +198,15 @@ final class AOInstallUtils {
         
         int nBytes = 0;
         final byte[] buffer = new byte[1024];
-        FileOutputStream fos = new FileOutputStream(outFile);
+        final FileOutputStream fos = new FileOutputStream(outFile);
         while ((nBytes = is.read(buffer)) != -1) {
             fos.write(buffer, 0, nBytes);
         }
 
-        try { is.close(); } catch (final Throwable e) {
+        try { is.close(); } catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se pudo cerrar el fichero remoto: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        try { fos.close(); } catch (final Throwable e) {
+        try { fos.close(); } catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se pudo cerrar el fichero local: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
@@ -231,7 +231,7 @@ final class AOInstallUtils {
     		try {
 				file = File.createTempFile("afirma", null);
 			} 
-    		catch (final Throwable e) { 
+    		catch (final Exception e) { 
     			continue;
     		}
     		if (file != null && file.exists() && file.isFile()) {
@@ -259,10 +259,7 @@ final class AOInstallUtils {
      * <code>false</code> si no se pudo borrar el directorio o alguno de los ficheros que contiene. 
      */
     static boolean deleteDir(final File dir) {
-        if(dir == null || !dir.exists()) {
-            return true;
-        }
-
+        if(dir == null || !dir.exists()) return true;
         boolean success = true;
         
         // Si es un directorio, borramos su contenido
@@ -306,7 +303,7 @@ final class AOInstallUtils {
 			copyFileFromURL(remoteFile, tempFile);
 			checkSign(tempFile, signingCa);
 			AOBootUtil.copyFile(tempFile, installationFile);
-			try { tempFile.delete(); } catch (final Throwable e) { }
+			try { tempFile.delete(); } catch (final Exception e) { }
 		}
 	}
 
@@ -324,14 +321,11 @@ final class AOInstallUtils {
 			               final File installationDir, 
 			               final SigningCA signingCa) throws SecurityException, Exception {
 
-		File tempFile = createTempFile();
+		final File tempFile = createTempFile();
 		copyFileFromURL(remoteFile, tempFile);
-		
-		if (signingCa != null) {
-			checkSign(tempFile, signingCa);
-		}
-
+		if (signingCa != null) checkSign(tempFile, signingCa);
 		AOInstallUtils.unzip(new ZipFile(tempFile), installationDir);
+		tempFile.deleteOnExit();
 	}
 	
 	/**

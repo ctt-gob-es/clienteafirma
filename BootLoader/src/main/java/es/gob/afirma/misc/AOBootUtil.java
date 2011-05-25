@@ -53,16 +53,16 @@ public final class AOBootUtil {
 		// Cambiamos los espacios por %20
 		filename = filename.replace(" ", "%20"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		URI uri;
+		final URI uri;
 		try {
 			uri = new URI(filename);
 		}
-		catch(Throwable e) {
+		catch(final Exception e) {
 			throw new AOException("Formato de URI incorrecto: " + e); //$NON-NLS-1$
 		}
 
 		// Comprobamos si es un esquema soportado
-		String scheme = uri.getScheme();
+		final String scheme = uri.getScheme();
 		for(int i=0; i<SUPPORTED_URI_SCHEMES.length; i++) if (SUPPORTED_URI_SCHEMES[i].equals(scheme)) return uri;
 
 		// Si el esquema es nulo, aun puede ser un nombre de fichero valido
@@ -88,7 +88,10 @@ public final class AOBootUtil {
 	 * @throws FileNotFoundException Si el fichero no existe
 	 * @throws AOException Cuando ocurre cualquier problema obteniendo el flujo
 	 */
-	public static InputStream loadFile(final URI uri, final Component c, final boolean waitDialog) throws FileNotFoundException, AOException {
+	public static InputStream loadFile(final URI uri, 
+			                           final Component c, 
+			                           final boolean waitDialog) throws FileNotFoundException, 
+			                                                            AOException {
 		
 		// Cuidado: Repinta mal el dialogo de espera, hay que tratar con hilos nuevos
 		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
@@ -116,18 +119,18 @@ public final class AOBootUtil {
 				
 				return new BufferedInputStream(new FileInputStream(new File(path)));
 			}
-			catch (NullPointerException e) {
+			catch (final NullPointerException e) {
 				throw e;
 			}
-			catch (FileNotFoundException e) {
+			catch (final FileNotFoundException e) {
 				throw e;
 			}
-			catch(Throwable e) {
+			catch(final Exception e) {
 				throw new AOException("Ocurrio un error intentando abrir un archivo en almacenamiento local: " + e); //$NON-NLS-1$
 			}
 		}
 		// Es una URL
-		InputStream tmpStream;
+		final InputStream tmpStream;
 		try {
 			if (waitDialog) {
 				ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(
@@ -147,10 +150,10 @@ public final class AOBootUtil {
 			}
 			else tmpStream = new BufferedInputStream(uri.toURL().openStream());
 		}
-		catch(Throwable e) {
+		catch(final Exception e) {
 			if (pm != null) pm.close();
 			throw new AOException(
-				"Ocurrio un error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e //$NON-NLS-1$ //$NON-NLS-2$
+				"Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 		// Las firmas via URL fallan en la descarga por temas de Sun, asi que descargamos primero
@@ -159,7 +162,7 @@ public final class AOBootUtil {
 		try {
 			tmpBuffer = getDataFromInputStream(tmpStream);
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			if (pm != null) pm.close();
 			throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -180,11 +183,11 @@ public final class AOBootUtil {
 	 * @return Los datos obtenidos del flujo.
 	 * @throws IOException Si ocurre cualquier error durante la lectura de datos
 	 */
-	public static byte[] getDataFromInputStream(InputStream input) throws IOException {
+	public static byte[] getDataFromInputStream(final InputStream input) throws IOException {
 
 		int nBytes = 0;
-		byte[] buffer = new byte[1024];
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final byte[] buffer = new byte[1024];
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		while((nBytes = input.read(buffer)) != -1) {
 			baos.write(buffer, 0, nBytes);
 		}
@@ -205,7 +208,7 @@ public final class AOBootUtil {
             if(!codeBase.endsWith("/") && !codeBase.endsWith("\\")) codeBase = codeBase + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return AOBootUtil.createURI(codeBase + filename).toURL();
         } 
-        catch (final Throwable e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("No se pudo crear la referencia al fichero '"+filename+"': "+e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return null;
         }
@@ -238,7 +241,7 @@ public final class AOBootUtil {
          try { in.close(); } catch (Exception e) {}
          try { out.close(); } catch (Exception e) {}
     	}
-    	catch(final Throwable e) {
+    	catch(final Exception e) {
     		Logger.getLogger("es.gob.afirma").severe(
 				"No se ha podido copiar el fichero origen '" +
 				source.getName() +
@@ -277,7 +280,7 @@ public final class AOBootUtil {
         try {
             p.load(is);
         } 
-        catch (final Throwable e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se han podido obtener los datos de version"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         final StringBuilder version = new StringBuilder();
@@ -308,7 +311,7 @@ public final class AOBootUtil {
             try {is.close();} catch (Exception e) {}
             try {zipFile.close();} catch (Exception e) {}
         } 
-        catch (final Throwable e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido identificar el cliente de firma instalado"); //$NON-NLS-1$ //$NON-NLS-2$
             idVersion = "0.0.0"; //$NON-NLS-1$
         }
@@ -333,12 +336,15 @@ public final class AOBootUtil {
             // Copiamos el fichero
             copyOK = copyFile(file, tempLibrary);
         } 
-        catch (final Throwable e) {
-            Logger.getLogger("es.gob.afirma").warning("Ocurrio un error al generar una nueva instancia de la libreria "
-                    + path + " para su carga: "+e);
+        catch (final Exception e) {
+            Logger.getLogger("es.gob.afirma").warning(
+        		"Error al generar una nueva instancia de la libreria "
+                    + path + " para su carga: " + e
+            );
         }
         Logger.getLogger("es.gob.afirma").info("Cargamos "+(tempLibrary == null ? path : tempLibrary.getAbsolutePath()));
         System.load((copyOK && tempLibrary != null) ? tempLibrary.getAbsolutePath() : path);
+        if (tempLibrary != null) tempLibrary.deleteOnExit();
     }
     
     /**

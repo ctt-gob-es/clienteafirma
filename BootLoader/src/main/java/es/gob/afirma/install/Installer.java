@@ -1,11 +1,11 @@
 /*
  * Este fichero forma parte del Cliente @firma. 
- * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009-2011 Gobierno de España
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3, o superiores, según las
- * condiciones que figuran en el fichero 'LICENSE.txt' que se acompaña.  Si se   distribuyera este 
- * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
 package es.gob.afirma.install;
@@ -85,6 +85,7 @@ final class Installer {
 		final File afirmaDir = new File(Platform.getUserHome() + File.separator + Installer.INSTALL_DIR);		
 		
 		return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+			/** {@inheritDoc} */
 			public Boolean run() {
 				if (!afirmaDir.exists()) {
 					Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
@@ -102,7 +103,7 @@ final class Installer {
 					);
 					return true;
 				}
-				catch(final Throwable e) {
+				catch(final Exception e) {
 					Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 						"No se ha podido eliminar el directorio de instalacion: " + e //$NON-NLS-1$
 					);
@@ -115,7 +116,7 @@ final class Installer {
 					return false;
 				}
 			}
-			private void fileDelete(final File srcFile) throws Throwable {
+			private void fileDelete(final File srcFile) throws Exception {
 		        if (srcFile.isDirectory()) {
 		    		for (File f : srcFile.listFiles()) {
 		    			fileDelete(f);
@@ -161,7 +162,7 @@ final class Installer {
 				enviromentInstaller.installEndorsedApacheXMLSec();
 			}
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 				"Error instalando Apache XML Security, la ejecucion sobre Java 7 puede fallar: " + e //$NON-NLS-1$
 			);
@@ -176,7 +177,7 @@ final class Installer {
 				enviromentInstaller.installEndorsedJava5AFirmaDependencies();
 			}
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 				"Error instalando las dependencias para Java 5, la ejecucion sobre Java 5 puede fallar: " + e //$NON-NLS-1$
 			);
@@ -192,7 +193,7 @@ final class Installer {
 				enviromentInstaller.installEndorsedXalan();
 			}
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 				"Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e//$NON-NLS-1$
 			);
@@ -208,7 +209,7 @@ final class Installer {
 				enviromentInstaller.installNSS();
 			}
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 				"Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
 			);
@@ -223,7 +224,7 @@ final class Installer {
 				enviromentInstaller.configureNSS(parentComponent);
 			}
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 				"Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
 			);
@@ -245,7 +246,7 @@ final class Installer {
 				enviromentInstaller.installSunMSCAPI();
 			}
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 				"Error instalando SunMSCAPI, la ejecucion sobre Java 64 bits o Java 5 puede fallar: " + e //$NON-NLS-1$
 			);
@@ -261,7 +262,7 @@ final class Installer {
 				enviromentInstaller.installSunPKCS11();
 			}
 		}
-		catch(final Throwable e) {
+		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 				"Error instalando SunPKCS11, la ejecucion sobre Java 64 bits puede fallar: " + e //$NON-NLS-1$
 			);

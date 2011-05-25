@@ -1,11 +1,11 @@
 /*
  * Este fichero forma parte del Cliente @firma. 
- * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
- * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
  
 package es.gob.afirma.misc;
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Clase para la identificaci&oacute;n de la plataforma Cliente y
  * extracci&oacute;n de datos relativos a la misma.
  */
-public class Platform {
+public final class Platform {
 	
 	/** Sistema operativo. */
 	public enum OS {
@@ -51,9 +51,6 @@ public class Platform {
 	/** Sistema operativo. */
 	private static OS os;
 	
-	/** Versi&oacute;n del sistema operativo. */
-	private static String osVersion; 
-
 	/** Versi&oacute;n de la m&eacute;quina virtual de java. */
 	private static JREVER javaVersion; 
 	
@@ -94,7 +91,6 @@ public class Platform {
 	 */
 	public static void init() {
 		try {
-			osVersion = System.getProperty("os.version");
 			userHome = System.getProperty("user.home");
 			javaLibraryPath = System.getProperty("java.library.path");
 			String osName = System.getProperty("os.name");
@@ -127,7 +123,7 @@ public class Platform {
 			else javaVersion = JREVER.J7;
 			osArch = System.getProperty("os.arch");
 		} 
-		catch (final Throwable e) {
+		catch (final Exception e) {
 			initialized = false;
 		}
 	}
@@ -148,16 +144,7 @@ public class Platform {
 	public static Platform.OS getOS() {
 		return os;
 	}
-	
-	/**
-	 * Recupera la versi&oacute; del n&uacute;cleo del sistema operativo seg&uacute;n las
-	 * propiedades de Java.
-	 * @return Versi&oacute;n del sistema operativo actual.
-	 */
-	public static String getOsVersion() {
-		return osVersion;
-	}
-	
+		
 	/**
 	 * Recupera la arquitectura del sistema operativo seg&uacute;n las
 	 * propiedades de Java.
@@ -218,7 +205,7 @@ public class Platform {
 		try {
 			ret = System.getProperty("jnlpx.home");
 		}
-		catch(final Throwable e) {}
+		catch(final Exception e) {}
 		if (ret != null) {
 			return ret.substring(0, ret.lastIndexOf(File.separator));
 		}
@@ -226,7 +213,7 @@ public class Platform {
 		try {
 			return System.getProperty("java.home");
 		} 
-		catch (final Throwable e) {
+		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning("No se ha podido identificar el directorio de java");
 		}
 
