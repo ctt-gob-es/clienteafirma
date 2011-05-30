@@ -44,17 +44,16 @@ import es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml.AbstractOOXMLSign
 import es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
 import es.gob.afirma.misc.AOUtil;
 
-public class AbstractOOXMLSignatureServiceContainer {
+public final class AbstractOOXMLSignatureServiceContainer {
 
-	public static void setUp() {
+	public final static void setUp() {
 		OOXMLProvider.install();
 	}
 
-	private static class OOXMLTestSignatureService extends
-			AbstractOOXMLSignatureService {
+	private static final class OOXMLSignatureService extends AbstractOOXMLSignatureService {
 
 		@Override
-		protected String getSignatureDigestAlgorithm() {
+		protected final String getSignatureDigestAlgorithm() {
 			return digestAlgorithm;
 		}
 
@@ -62,62 +61,42 @@ public class AbstractOOXMLSignatureServiceContainer {
 
 		private final String digestAlgorithm;
 
-		public OOXMLTestSignatureService(InputStream ooxmlis, String digestAlgo) {
+		public OOXMLSignatureService(final InputStream ooxmlis, final String digestAlgo) {
 			try {
 				this.ooxml = AOUtil.getDataFromInputStream(ooxmlis);
-			} catch (Exception e) {
+			} 
+			catch (final Exception e) {
 				throw new IllegalArgumentException(
-						"No se ha podido leer el OOXML desde el InputStream de entrada");
+					"No se ha podido leer el OOXML desde el InputStream de entrada"
+				);
 			}
-			if (digestAlgo == null)
-				digestAlgorithm = "SHA1";
-			else
-				digestAlgorithm = digestAlgo;
+			if (digestAlgo == null) digestAlgorithm = "SHA1";
+			else digestAlgorithm = digestAlgo;
 		}
 
 		@Override
-		protected byte[] getOfficeOpenXMLDocument() {
+		protected final byte[] getOfficeOpenXMLDocument() {
 			return this.ooxml;
 		}
 
 	}
 
-	public byte[] sign(InputStream ooxml, List<X509Certificate> certChain,
-			String digestAlgorithm, PrivateKey pk, int signerCount)
-			throws Exception {
+	public final byte[] sign(final InputStream ooxml, 
+			           final List<X509Certificate> certChain, 
+			           final String digestAlgorithm, 
+			           final PrivateKey pk, 
+			           final int signerCount) throws Exception {
 
 		OOXMLProvider.install();
 
-		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
-				ooxml, digestAlgorithm);
+		OOXMLSignatureService signatureService = new OOXMLSignatureService(
+			ooxml, 
+			digestAlgorithm
+		);
 
-		// operate
-		byte[] signedXML = signatureService.preSign(null, certChain, pk);
-
-		// // setup: key material, signature value
-		// KeyPair keyPair = PkiTestUtils.generateKeyPair();
-		// Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		// cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-		// byte[] digestInfoValue = ArrayUtils.addAll(
-		// PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
-		// byte[] signatureValue = cipher.doFinal(digestInfoValue);
-		//
-		// DateTime notBefore = new DateTime();
-		// DateTime notAfter = new
-		// DateTime(System.currentTimeMillis()+600000000);
-		// X509Certificate certificate =
-		// PkiTestUtils.generateCertificate(keyPair
-		// .getPublic(), signerDn, notBefore, notAfter, null, keyPair
-		// .getPrivate(), true, 0, null, null, new KeyUsage(
-		// KeyUsage.nonRepudiation));
-		//
-		// // operate: postSign
-		// signatureService.postSign(signatureValue,
-		// Collections.singletonList(certificate));
-		//
-		return signatureService.outputSignedOfficeOpenXMLDocument(signedXML);
-
-		// return null;
+		return signatureService.outputSignedOfficeOpenXMLDocument(
+			signatureService.preSign(null, certChain, pk)
+		);
 
 	}
 

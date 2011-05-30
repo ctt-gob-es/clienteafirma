@@ -37,8 +37,7 @@ public final class OOXMLUtil {
 	 *            Documento OOXML.
 	 * @return N&uacute;mero de firma del documento OOXML.
 	 */
-	public static int countOOXMLSignatures(byte[] ooxmlFile) {
-
+	public static int countOOXMLSignatures(final byte[] ooxmlFile) {
 		RelationShip[] rels = getOOXMLSignaturesRelationships(ooxmlFile);
 		return (rels == null ? 0 : rels.length);
 	}
@@ -52,54 +51,56 @@ public final class OOXMLUtil {
 	 *            Documento OOXML.
 	 * @return N&uacute;mero de firma del documento OOXML.
 	 */
-	public static RelationShip[] getOOXMLSignaturesRelationships(
-			byte[] ooxmlFile) {
+	public static RelationShip[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) {
 
-		ZipFile zipFile;
+		final ZipFile zipFile;
 		try {
 			zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
-		} catch (ZipException e) {
+		} 
+		catch (final ZipException e) {
 			Logger.getLogger("es.gob.afirma").severe(
-					"El documento indicado no es un documento OOXML: " + e);
+				"El documento indicado no es un documento OOXML: " + e
+			);
 			return new RelationShip[0];
-		} catch (IOException e) {
+		} 
+		catch (final IOException e) {
 			Logger.getLogger("es.gob.afirma").severe(
-					"Error al abrir el documento OOXML: " + e);
+				"Error al abrir el documento OOXML: " + e
+			);
 			return new RelationShip[0];
 		}
 
 		// Comprobamos si existe la entrada en cuestion
-		ZipEntry relsEntry = zipFile
-				.getEntry("_xmlsignatures/_rels/origin.sigs.rels");
-		if (relsEntry == null)
-			relsEntry = zipFile
-					.getEntry("_xmlsignatures\\_rels\\origin.sigs.rels");
+		ZipEntry relsEntry = zipFile.getEntry("_xmlsignatures/_rels/origin.sigs.rels");
+		if (relsEntry == null) relsEntry = zipFile.getEntry("_xmlsignatures\\_rels\\origin.sigs.rels");
 
 		// Si no existe el fichero, el documento no contiene firmas
-		if (relsEntry == null)
-			return new RelationShip[0];
+		if (relsEntry == null) return new RelationShip[0];
 
 		// Analizamos el fichero de relaciones
-		RelationshipsParser parser;
+		final RelationshipsParser parser;
 		try {
 			parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe(
-					"Error en la lectura del OOXML: " + e);
+				"Error en la lectura del OOXML: " + e
+			);
 			return new RelationShip[0];
 		}
 
 		// ya podemos cerrar el documento
 		try {
 			zipFile.close();
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning(
 					"No se ha podido cerrar el documento OOXML: " + e);
 		}
 
 		// Contamos las relaciones de firma
-		Vector<RelationShip> relations = new Vector<RelationShip>();
-		for (RelationShip rel : parser.getRelationships()) {
+		final Vector<RelationShip> relations = new Vector<RelationShip>();
+		for (final RelationShip rel : parser.getRelationships()) {
 			if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
 				relations.add(rel);
 			}
@@ -115,7 +116,7 @@ public final class OOXMLUtil {
 	 *            Documento OOXML.
 	 * @return Firmas empotradas en el documento.
 	 */
-	public static byte[][] getOOXMLSignatures(byte[] ooxmlFile) {
+	public static byte[][] getOOXMLSignatures(final byte[] ooxmlFile) {
 
 		ZipFile zipFile;
 		try {
@@ -131,51 +132,44 @@ public final class OOXMLUtil {
 		}
 
 		// Comprobamos si existe la entrada en cuestion
-		ZipEntry relsEntry = zipFile
-				.getEntry("_xmlsignatures/_rels/origin.sigs.rels");
-		if (relsEntry == null)
-			relsEntry = zipFile
-					.getEntry("_xmlsignatures\\_rels\\origin.sigs.rels");
+		ZipEntry relsEntry = zipFile.getEntry("_xmlsignatures/_rels/origin.sigs.rels");
+		if (relsEntry == null) relsEntry = zipFile.getEntry("_xmlsignatures\\_rels\\origin.sigs.rels");
 
 		// Si no existe el fichero, el documento no contiene firmas
-		if (relsEntry == null)
-			return new byte[0][];
+		if (relsEntry == null) return new byte[0][];
 
 		// Analizamos el fichero de relaciones
-		RelationshipsParser parser;
+		final RelationshipsParser parser;
 		try {
 			parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
-		} catch (Exception e) {
-			Logger.getLogger("es.gob.afirma").severe(
-					"Error en la lectura del OOXML: " + e);
+		} 
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe("Error en la lectura del OOXML: " + e);
 			return new byte[0][];
 		}
 
 		// Contamos las relaciones de firma
-		Vector<byte[]> relations = new Vector<byte[]>();
-		for (RelationShip rel : parser.getRelationships()) {
+		final Vector<byte[]> relations = new Vector<byte[]>();
+		for (final RelationShip rel : parser.getRelationships()) {
 			if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
 
 				// Comprobamos que exista el firma referenciada
-				String target = rel.getTarget();
-				ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/"
-						+ target);
-				if (signEntry == null)
-					signEntry = zipFile.getEntry("_xmlsignatures\\" + target);
+				final String target = rel.getTarget();
+				ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target);
+				if (signEntry == null) signEntry = zipFile.getEntry("_xmlsignatures\\" + target);
 				if (signEntry == null) {
-					Logger.getLogger("es.gob.afirma")
-							.severe("El documento OOXML no contiene las firmas declaradas");
+					Logger.getLogger("es.gob.afirma").severe("El documento OOXML no contiene las firmas declaradas");
 					return new byte[0][];
 				}
 
 				// Guardamos la firma
 				try {
-					relations.add(AOUtil.getDataFromInputStream(zipFile
-							.getInputStream(signEntry)));
-				} catch (Exception e) {
+					relations.add(AOUtil.getDataFromInputStream(zipFile.getInputStream(signEntry)));
+				} 
+				catch (final Exception e) {
 					Logger.getLogger("es.gob.afirma").severe(
-							"No se pudo leer una de las firmas del documento OOXML: "
-									+ e);
+						"No se pudo leer una de las firmas del documento OOXML: " + e
+					);
 					return new byte[0][];
 				}
 			}
@@ -184,7 +178,8 @@ public final class OOXMLUtil {
 		// Ya podemos cerrar el documento
 		try {
 			zipFile.close();
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning(
 					"No se ha podido cerrar el documento OOXML: " + e);
 		}

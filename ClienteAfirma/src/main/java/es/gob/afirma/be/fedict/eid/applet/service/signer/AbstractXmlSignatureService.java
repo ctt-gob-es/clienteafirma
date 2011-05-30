@@ -67,9 +67,7 @@ import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignContext;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -106,27 +104,22 @@ import es.gob.afirma.be.fedict.eid.applet.service.spi.SignatureService;
 
 /**
  * Abstract base class for an XML Signature Service implementation.
- * 
  * @author fcorneli
- * 
  */
 public abstract class AbstractXmlSignatureService implements SignatureService {
 
 	private final List<SignatureFacet> signatureFacets;
 
-	/**
-	 * Main constructor.
-	 */
+	/** Main constructor. */
 	public AbstractXmlSignatureService() {
 		this.signatureFacets = new LinkedList<SignatureFacet>();
 	}
 
 	/**
 	 * Adds a signature facet to this XML signature service.
-	 * 
 	 * @param signatureFacet
 	 */
-	protected void addSignatureFacet(SignatureFacet signatureFacet) {
+	protected final void addSignatureFacet(SignatureFacet signatureFacet) {
 		this.signatureFacets.add(signatureFacet);
 	}
 
@@ -134,8 +127,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	 * Gives back the signature digest algorithm. Allowed values are SHA-1,
 	 * SHA-256, SHA-384, SHA-512, RIPEND160. The default algorithm is SHA-1.
 	 * Override this method to select another signature digest algorithm.
-	 * 
-	 * @return
+	 * @return Signature digest algorithm
 	 */
 	protected String getSignatureDigestAlgorithm() {
 		return "SHA1";
@@ -155,8 +147,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	/**
 	 * Override this method to change the URI dereferener used by the signing
 	 * engine.
-	 * 
-	 * @return
 	 */
 	protected URIDereferencer getURIDereferencer() {
 		return null;
@@ -166,76 +156,80 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 	 * Gives back the human-readable description of what the citizen will be
 	 * signing. The default value is "XML Document". Override this method to
 	 * provide the citizen with another description.
-	 * 
-	 * @return
 	 */
 	protected String getSignatureDescription() {
 		return "XML Document";
 	}
 
-	public byte[] preSign(List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain, PrivateKey signingKey)
-			throws NoSuchAlgorithmException {
+	public byte[] preSign(final List<DigestInfo> digestInfos,
+			              final List<X509Certificate> signingCertificateChain, 
+			              final PrivateKey signingKey) throws NoSuchAlgorithmException {
 		try {
-			return getSignedXML(getSignatureDigestAlgorithm(), digestInfos,
-					signingCertificateChain, signingKey);
-		} catch (Exception e) {
-			throw new RuntimeException(
-					"XML signature error: " + e.getMessage(), e);
+			return getSignedXML(
+				getSignatureDigestAlgorithm(), 
+				digestInfos,
+				signingCertificateChain, 
+				signingKey
+			);
+		} 
+		catch (final Exception e) {
+			throw new RuntimeException("XML signature error: " + e.getMessage(), e);
 		}
 	}
 
-	public byte[] postSign(byte[] signedXML,
-			List<X509Certificate> signingCertificateChain, String signatureId,
-			byte[] signatureValue) {
+	public byte[] postSign(final byte[] signedXML,
+			               final List<X509Certificate> signingCertificateChain, 
+			               final String signatureId,
+			               final byte[] signatureValue) {
 
-		/*
-		 * Load the signature DOM document.
-		 */
-		Document document;
+		// Load the signature DOM document.
+		final Document document;
 		try {
 			document = loadDocument(new ByteArrayInputStream(signedXML));
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			throw new RuntimeException("DOM error: " + e.getMessage(), e);
 		}
 
-		/*
-		 * Locate the correct ds:Signature node.
-		 */
-		Element nsElement = document.createElement("ns");
-		nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds",
-				Constants.SignatureSpecNS);
-		Element signatureElement;
+		// Locate the correct ds:Signature node.
+		final Element nsElement = document.createElement("ns");
+		nsElement.setAttributeNS(
+			Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS
+		);
+		final Element signatureElement;
 		try {
-			signatureElement = (Element) XPathAPI.selectSingleNode(document,
-					"//ds:Signature[@Id='" + signatureId + "']", nsElement);
-		} catch (TransformerException e) {
+			signatureElement = (Element) XPathAPI.selectSingleNode(
+				document,
+				"//ds:Signature[@Id='" + signatureId + "']", 
+				nsElement
+			);
+		} 
+		catch (final TransformerException e) {
 			throw new RuntimeException("XPATH error: " + e.getMessage(), e);
 		}
 		if (null == signatureElement) {
-			throw new RuntimeException("ds:Signature not found for @Id: "
-					+ signatureId);
+			throw new RuntimeException(
+				"ds:Signature not found for @Id: " + signatureId
+			);
 		}
 
-		/*
-		 * Insert signature value into the ds:SignatureValue element
-		 */
-		NodeList signatureValueNodeList = signatureElement
-				.getElementsByTagNameNS(
-						javax.xml.crypto.dsig.XMLSignature.XMLNS,
-						"SignatureValue");
-		Element signatureValueElement = (Element) signatureValueNodeList
-				.item(0);
+		// Insert signature value into the ds:SignatureValue element
+		final NodeList signatureValueNodeList = signatureElement.getElementsByTagNameNS(
+			javax.xml.crypto.dsig.XMLSignature.XMLNS,
+			"SignatureValue"
+		);
+		final Element signatureValueElement = (Element) signatureValueNodeList.item(0);
 		signatureValueElement.setTextContent(Base64.encode(signatureValue));
 
 		// TODO: Cambiar a OOXMLSignedDocumentOutputStream
-		ByteArrayOutputStream signedDocumentOutputStream = new ByteArrayOutputStream();
+		final ByteArrayOutputStream signedDocumentOutputStream = new ByteArrayOutputStream();
 		try {
 			writeDocument(document, signedDocumentOutputStream);
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			throw new RuntimeException(
-					"error writing the signed XML document: " + e.getMessage(),
-					e);
+				"error writing the signed XML document: " + e.getMessage(), e
+			);
 		}
 		return signedDocumentOutputStream.toByteArray();
 	}
@@ -244,134 +238,124 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 		return CanonicalizationMethod.EXCLUSIVE;
 	}
 
-	private byte[] getSignedXML(String digestAlgo,
-			List<DigestInfo> digestInfos,
-			List<X509Certificate> signingCertificateChain, PrivateKey signingKey)
-			throws ParserConfigurationException, NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException, MarshalException,
-			javax.xml.crypto.dsig.XMLSignatureException,
-			TransformerFactoryConfigurationError, TransformerException,
-			IOException {
-
-		/*
-		 * DOM Document construction.
-		 */
+	private byte[] getSignedXML(final String digestAlgo,
+							    final List<DigestInfo> digestInfos,
+							    final List<X509Certificate> signingCertificateChain, 
+							    final PrivateKey signingKey) throws ParserConfigurationException, 
+							                                        NoSuchAlgorithmException,
+							                                        InvalidAlgorithmParameterException, 
+							                                        MarshalException,
+							                                        javax.xml.crypto.dsig.XMLSignatureException,
+							                                        TransformerFactoryConfigurationError, 
+							                                        TransformerException,
+							                                        IOException {
+		// DOM Document construction.
 		Document document = getEnvelopingDocument();
 		if (null == document) {
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-					.newInstance();
+			final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 			documentBuilderFactory.setNamespaceAware(true);
-			document = documentBuilderFactory.newDocumentBuilder()
-					.newDocument();
+			document = documentBuilderFactory.newDocumentBuilder().newDocument();
 		}
 
-		XMLSignContext xmlSignContext = new DOMSignContext(signingKey, document);
-		URIDereferencer uriDereferencer = getURIDereferencer();
-		if (null != uriDereferencer)
-			xmlSignContext.setURIDereferencer(uriDereferencer);
+		final XMLSignContext xmlSignContext = new DOMSignContext(signingKey, document);
+		final URIDereferencer uriDereferencer = getURIDereferencer();
+		if (null != uriDereferencer) xmlSignContext.setURIDereferencer(uriDereferencer);
 
-		XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
-				"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
+		final XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance(
+			"DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI()
+		);
 
-		/*
-		 * Add ds:References that come from signing client local files.
-		 */
-		List<Reference> references = new LinkedList<Reference>();
+		// Add ds:References that come from signing client local files.
+		final List<Reference> references = new LinkedList<Reference>();
 		addDigestInfosAsReferences(digestInfos, signatureFactory, references);
 
-		/*
-		 * Invoke the signature facets.
-		 */
-		String signatureId = "xmldsig-" + UUID.randomUUID().toString();
-		List<XMLObject> objects = new LinkedList<XMLObject>();
-		for (SignatureFacet signatureFacet : this.signatureFacets) {
-			signatureFacet.preSign(signatureFactory, document, signatureId,
-					signingCertificateChain, references, objects);
+		// Invoke the signature facets.
+		final String signatureId = "xmldsig-" + UUID.randomUUID().toString();
+		final List<XMLObject> objects = new LinkedList<XMLObject>();
+		for (final SignatureFacet signatureFacet : this.signatureFacets) {
+			signatureFacet.preSign(
+				signatureFactory, 
+				document, 
+				signatureId, 
+				signingCertificateChain, 
+				references, 
+				objects
+			);
 		}
 
-		/*
-		 * ds:SignedInfo
-		 */
-		SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
-				getSignatureMethod(digestAlgo), null);
-		CanonicalizationMethod canonicalizationMethod = signatureFactory
-				.newCanonicalizationMethod(getCanonicalizationMethod(),
-						(C14NMethodParameterSpec) null);
+		// ds:SignedInfo
+		final SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(
+			getSignatureMethod(digestAlgo), null
+		);
 		SignedInfo signedInfo = signatureFactory.newSignedInfo(
-				canonicalizationMethod, signatureMethod, references);
+			signatureFactory.newCanonicalizationMethod(
+				getCanonicalizationMethod(), 
+				(C14NMethodParameterSpec) null
+			), 
+			signatureMethod, 
+			references
+		);
 
 		// Creamos el KeyInfo
-		X509Data cerData;
-		KeyInfoFactory kif = signatureFactory.getKeyInfoFactory();
-		List<Object> x509Content = new ArrayList<Object>();
+		final KeyInfoFactory kif = signatureFactory.getKeyInfoFactory();
+		final List<Object> x509Content = new ArrayList<Object>();
 		x509Content.add(signingCertificateChain.get(0));
-		cerData = kif.newX509Data(x509Content);
 
-		List<Object> content = new ArrayList<Object>();
+		final List<Object> content = new ArrayList<Object>();
 		try {
 			content.add(kif.newKeyValue(signingCertificateChain.get(0)
 					.getPublicKey()));
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe(
-					"Error creando el KeyInfo, la informacion puede resultar incompleta: "
-							+ e);
+				"Error creando el KeyInfo, la informacion puede resultar incompleta: " + e
+			);
 		}
-		content.add(cerData);
+		content.add(kif.newX509Data(x509Content));
 
-		KeyInfo ki = kif.newKeyInfo(content);
+		// JSR105 ds:Signature creation
+		final String signatureValueId = signatureId + "-signature-value";
+		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(
+			signedInfo, 
+			kif.newKeyInfo(content), // KeyInfo
+			objects, 
+			signatureId, 
+			signatureValueId
+		);
 
-		/*
-		 * JSR105 ds:Signature creation
-		 */
-		String signatureValueId = signatureId + "-signature-value";
-		javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory
-				.newXMLSignature(signedInfo, ki, // KeyInfo
-						objects, signatureId, signatureValueId);
-
-		/*
-		 * ds:Signature Marshalling.
-		 */
+		// ds:Signature Marshalling.
 		DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
 		Node documentNode = document.getDocumentElement();
 		if (null == documentNode) {
-			/*
-			 * In case of an empty DOM document.
-			 */
-			documentNode = document;
+			documentNode = document; // In case of an empty DOM document.
 		}
 		String dsPrefix = null;
-		domXmlSignature.marshal(documentNode, dsPrefix,
-				(DOMCryptoContext) xmlSignContext);
+		domXmlSignature.marshal(documentNode, dsPrefix, (DOMCryptoContext) xmlSignContext);
 
-		/*
-		 * Completion of undigested ds:References in the ds:Manifests.
-		 */
-		for (XMLObject object : objects) {
+		// Completion of undigested ds:References in the ds:Manifests.
+		for (final XMLObject object : objects) {
 
-			List<XMLStructure> objectContentList = object.getContent();
+			final List<XMLStructure> objectContentList = object.getContent();
 			for (XMLStructure objectContent : objectContentList) {
-
 				if (false == objectContent instanceof Manifest) {
 					continue;
 				}
-				Manifest manifest = (Manifest) objectContent;
-				List<Reference> manifestReferences = manifest.getReferences();
+				final Manifest manifest = (Manifest) objectContent;
+				final List<Reference> manifestReferences = manifest.getReferences();
 				for (Reference manifestReference : manifestReferences) {
 					if (null != manifestReference.getDigestValue()) {
 						continue;
 					}
-					DOMReference manifestDOMReference = (DOMReference) manifestReference;
+					final DOMReference manifestDOMReference = (DOMReference) manifestReference;
 					manifestDOMReference.digest(xmlSignContext);
 				}
 			}
 		}
 
-		/*
-		 * Completion of undigested ds:References.
-		 */
-		List<Reference> signedInfoReferences = signedInfo.getReferences();
+		// Completion of undigested ds:References.
+		final List<Reference> signedInfoReferences = signedInfo.getReferences();
 		for (Reference signedInfoReference : signedInfoReferences) {
-			DOMReference domReference = (DOMReference) signedInfoReference;
+			final DOMReference domReference = (DOMReference) signedInfoReference;
 			if (null != domReference.getDigestValue()) {
 				// ds:Reference with external digest value
 				continue;
@@ -379,151 +363,157 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 			domReference.digest(xmlSignContext);
 		}
 
-		/*
-		 * Calculation of signature
-		 */
-		DOMSignedInfo domSignedInfo = (DOMSignedInfo) signedInfo;
-		ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
+		// Calculation of signature
+		final DOMSignedInfo domSignedInfo = (DOMSignedInfo) signedInfo;
+		final ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
 		domSignedInfo.canonicalize(xmlSignContext, dataStream);
-		byte[] octets = dataStream.toByteArray();
+		final byte[] octets = dataStream.toByteArray();
 
-		Signature sig = Signature.getInstance(digestAlgo + "withRSA");
-		byte[] sigBytes;
+		final Signature sig = Signature.getInstance(digestAlgo + "withRSA");
+		final byte[] sigBytes;
 		try {
 			sig.initSign(signingKey);
 			sig.update(octets);
 			sigBytes = sig.sign();
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			throw new javax.xml.crypto.dsig.XMLSignatureException(
-					"Error en la firma PKCS#1 ('" + digestAlgo + "withRSA): "
-							+ e);
+				"Error en la firma PKCS#1 ('" + digestAlgo + "withRSA): " + e
+			);
 		}
 
 		// Sacamos el pre-XML a un OutputStream
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		writeDocument(document, baos);
 
 		// Ya tenemos el XML, con la firma vacia y el SignatureValue, cada uno
 		// por su lado...
-		return postSign(baos.toByteArray(), signingCertificateChain,
-				signatureId, sigBytes);
+		return postSign(
+			baos.toByteArray(), 
+			signingCertificateChain,
+			signatureId, 
+			sigBytes
+		);
 
 	}
 
-	private void addDigestInfosAsReferences(List<DigestInfo> digestInfos,
-			XMLSignatureFactory signatureFactory, List<Reference> references)
-			throws NoSuchAlgorithmException,
-			InvalidAlgorithmParameterException, MalformedURLException {
+	private void addDigestInfosAsReferences(final List<DigestInfo> digestInfos,
+			                                final XMLSignatureFactory signatureFactory, 
+			                                final List<Reference> references) throws NoSuchAlgorithmException,
+			                                                                         InvalidAlgorithmParameterException, 
+			                                                                         MalformedURLException {
 		if (null == digestInfos) {
 			return;
 		}
-		for (DigestInfo digestInfo : digestInfos) {
-			byte[] documentDigestValue = digestInfo.digestValue;
-
-			DigestMethod digestMethod = signatureFactory.newDigestMethod(
-					getXmlDigestAlgo(digestInfo.digestAlgo), null);
-
-			String uri = FilenameUtils.getName(new File(digestInfo.description)
-					.toURI().toURL().getFile());
-
-			Reference reference = signatureFactory.newReference(uri,
-					digestMethod, null, null, null, documentDigestValue);
-			references.add(reference);
+		for (final DigestInfo digestInfo : digestInfos) {
+			references.add(signatureFactory.newReference(
+				FilenameUtils.getName(new File(digestInfo.description).toURI().toURL().getFile()), 
+				signatureFactory.newDigestMethod(
+					getXmlDigestAlgo(digestInfo.digestAlgo), null
+				), 
+				null, 
+				null, 
+				null, 
+				digestInfo.digestValue
+			));
 		}
 	}
 
-	private String getXmlDigestAlgo(String digestAlgo) {
-		if ("SHA1".equals(digestAlgo) || "SHA-1".equals(digestAlgo)
-				|| "SHA".equals(digestAlgo)) {
-			return DigestMethod.SHA1;
+	private String getXmlDigestAlgo(final String digestAlgo) {
+		if ("SHA1".equals(digestAlgo) || 
+			"SHA-1".equals(digestAlgo) || 
+			"SHA".equals(digestAlgo)) {
+				return DigestMethod.SHA1;
 		}
-		if ("SHA-256".equals(digestAlgo) || "SHA256".equals(digestAlgo)) {
-			return DigestMethod.SHA256;
+		if ("SHA-256".equals(digestAlgo) || 
+			"SHA256".equals(digestAlgo)) {
+				return DigestMethod.SHA256;
 		}
-		if ("SHA-512".equals(digestAlgo) || "SHA512".equals(digestAlgo)) {
-			return DigestMethod.SHA512;
+		if ("SHA-512".equals(digestAlgo) || 
+			"SHA512".equals(digestAlgo)) {
+				return DigestMethod.SHA512;
 		}
 		throw new RuntimeException("unsupported digest algo: " + digestAlgo);
 	}
 
-	private String getSignatureMethod(String digestAlgo) {
+	private String getSignatureMethod(final String digestAlgo) {
 		if (null == digestAlgo) {
 			throw new RuntimeException("digest algo is null");
 		}
-		if ("SHA-1".equals(digestAlgo) || "SHA1".equals(digestAlgo)
-				|| "SHA".equals(digestAlgo)) {
-			return SignatureMethod.RSA_SHA1;
+		if ("SHA-1".equals(digestAlgo) || 
+			"SHA1".equals(digestAlgo) || 
+			"SHA".equals(digestAlgo)) {
+				return SignatureMethod.RSA_SHA1;
 		}
-		if ("SHA-256".equals(digestAlgo) || "SHA256".equals(digestAlgo)) {
-			return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256;
+		if ("SHA-256".equals(digestAlgo) || 
+			"SHA256".equals(digestAlgo)) {
+				return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256;
 		}
-		if ("SHA-512".equals(digestAlgo) || "SHA512".equals(digestAlgo)) {
-			return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512;
+		if ("SHA-512".equals(digestAlgo) || 
+			"SHA512".equals(digestAlgo)) {
+				return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA512;
 		}
-		if ("SHA-384".equals(digestAlgo) || "SHA384".equals(digestAlgo)) {
-			return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384;
+		if ("SHA-384".equals(digestAlgo) || 
+			"SHA384".equals(digestAlgo)) {
+				return XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA384;
 		}
-		if ("RIPEMD160".equals(digestAlgo) || "RIPEMD-160".equals(digestAlgo)) {
-			return XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160;
+		if ("RIPEMD160".equals(digestAlgo) || 
+			"RIPEMD-160".equals(digestAlgo)) {
+				return XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160;
 		}
 		throw new RuntimeException("unsupported sign algo: " + digestAlgo);
 	}
 
-	protected void writeDocument(Document document,
-			OutputStream documentOutputStream)
-			throws TransformerConfigurationException,
-			TransformerFactoryConfigurationError, TransformerException,
-			IOException {
+	protected void writeDocument(final Document document,
+			                     final OutputStream documentOutputStream) throws TransformerConfigurationException,
+			                                                            		 TransformerFactoryConfigurationError, 
+			                                                            		 TransformerException,
+			                                                            		 IOException {
 		writeDocumentNoClosing(document, documentOutputStream);
 		documentOutputStream.close();
 	}
 
-	protected void writeDocumentNoClosing(Document document,
-			OutputStream documentOutputStream)
-			throws TransformerConfigurationException,
-			TransformerFactoryConfigurationError, TransformerException {
+	protected void writeDocumentNoClosing(final Document document,
+			                              final OutputStream documentOutputStream) throws TransformerConfigurationException,
+			                                                                              TransformerFactoryConfigurationError, 
+			                                                                              TransformerException {
 		// we need the XML processing initial line for OOXML
 		writeDocumentNoClosing(document, documentOutputStream, false);
 	}
 
-	protected void writeDocumentNoClosing(Document document,
-			OutputStream documentOutputStream, boolean omitXmlDeclaration)
-			throws TransformerConfigurationException,
-			TransformerFactoryConfigurationError, TransformerException {
-		NoCloseOutputStream outputStream = new NoCloseOutputStream(
-				documentOutputStream);
-		Result result = new StreamResult(outputStream);
-		Transformer xformer = TransformerFactory.newInstance().newTransformer();
+	protected void writeDocumentNoClosing(final Document document, 
+			                              final OutputStream documentOutputStream, 
+			                              final boolean omitXmlDeclaration) throws TransformerConfigurationException,
+			                                                                       TransformerFactoryConfigurationError, 
+			                                                                       TransformerException {
+		final NoCloseOutputStream outputStream = new NoCloseOutputStream(
+			documentOutputStream
+		);
+		final Result result = new StreamResult(outputStream);
+		final Transformer xformer = TransformerFactory.newInstance().newTransformer();
 		if (omitXmlDeclaration) {
 			xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		}
-		Source source = new DOMSource(document);
+		final Source source = new DOMSource(document);
 		xformer.transform(source, result);
 	}
 
-	protected Document loadDocument(InputStream documentInputStream)
-			throws ParserConfigurationException, SAXException, IOException {
-		InputSource inputSource = new InputSource(documentInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+	protected Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, 
+	                                                                              SAXException, 
+	                                                                              IOException {
+		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
-		Document document = documentBuilder.parse(inputSource);
-		return document;
+		return documentBuilderFactory.newDocumentBuilder().parse(new InputSource(documentInputStream));
 	}
 
-	protected Document loadDocumentNoClose(InputStream documentInputStream)
-			throws ParserConfigurationException, SAXException, IOException {
-		NoCloseInputStream noCloseInputStream = new NoCloseInputStream(
-				documentInputStream);
-		InputSource inputSource = new InputSource(noCloseInputStream);
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+	protected Document loadDocumentNoClose(final InputStream documentInputStream) throws ParserConfigurationException, 
+	                                                                                     SAXException, 
+	                                                                                     IOException {
+		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
-		Document document = documentBuilder.parse(inputSource);
-		return document;
+		final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+		return documentBuilder.parse(new InputSource(new NoCloseInputStream(
+			documentInputStream
+		)));
 	}
 }

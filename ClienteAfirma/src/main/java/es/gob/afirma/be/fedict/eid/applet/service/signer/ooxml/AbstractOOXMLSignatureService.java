@@ -46,7 +46,6 @@ import java.util.zip.ZipOutputStream;
 
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -68,9 +67,7 @@ import es.gob.afirma.be.fedict.eid.applet.service.signer.AbstractXmlSignatureSer
 /**
  * Signature Service implementation for Office OpenXML document format XML
  * signatures.
- * 
  * @author Frank Cornelis
- * 
  */
 public abstract class AbstractOOXMLSignatureService extends
 		AbstractXmlSignatureService {
@@ -80,35 +77,33 @@ public abstract class AbstractOOXMLSignatureService extends
 	}
 
 	@Override
-	protected String getSignatureDescription() {
+	protected final String getSignatureDescription() {
 		return "Office OpenXML Document";
 	}
 
-	public String getFilesDigestAlgorithm() {
+	public final String getFilesDigestAlgorithm() {
 		return null;
 	}
 
 	@Override
 	protected final URIDereferencer getURIDereferencer() {
 		return new OOXMLURIDereferencer(getOfficeOpenXMLDocument());
-		// return new CustomDereferencer(null, getOfficeOpenXMLDocument());
 	}
 
 	@Override
-	protected String getCanonicalizationMethod() {
+	protected final String getCanonicalizationMethod() {
 		return CanonicalizationMethod.INCLUSIVE;
 	}
 
 	public class OOXMLSignedDocumentOutputStream extends ByteArrayOutputStream {
-
 		@Override
 		public void close() throws IOException {
 			super.close();
 			try {
 				outputSignedOfficeOpenXMLDocument(this.toByteArray());
-			} catch (Exception e) {
-				throw new IOException("generic error '" + e.getMessage()
-						+ "': " + e);
+			} 
+			catch (final Exception e) {
+				throw new IOException("generic error '" + e.getMessage() + "': " + e);
 			}
 		}
 	}
@@ -118,205 +113,214 @@ public abstract class AbstractOOXMLSignatureService extends
 	 */
 	abstract protected byte[] getOfficeOpenXMLDocument();
 
-	public byte[] outputSignedOfficeOpenXMLDocument(byte[] signatureData)
-			throws IOException, ParserConfigurationException, SAXException,
-			TransformerException {
+	public final byte[] outputSignedOfficeOpenXMLDocument(final byte[] signatureData) throws IOException, 
+	                                                                                         ParserConfigurationException, 
+	                                                                                         SAXException,
+	                                                                                         TransformerException {
 
-		ByteArrayOutputStream signedOOXMLOutputStream = new ByteArrayOutputStream();
+		final ByteArrayOutputStream signedOOXMLOutputStream = new ByteArrayOutputStream();
 
-		String signatureZipEntryName = "_xmlsignatures/sig-"
-				+ UUID.randomUUID().toString() + ".xml";
+		final String signatureZipEntryName = "_xmlsignatures/sig-" + UUID.randomUUID().toString() + ".xml";
 
 		/*
 		 * Copy the original OOXML content to the signed OOXML package. During
 		 * copying some files need to changed.
 		 */
-		ZipOutputStream zipOutputStream = copyOOXMLContent(
-				signatureZipEntryName, signedOOXMLOutputStream);
+		final ZipOutputStream zipOutputStream = copyOOXMLContent(
+			signatureZipEntryName, signedOOXMLOutputStream
+		);
 
-		/*
-		 * Add the OOXML XML signature file to the OOXML package.
-		 */
-		ZipEntry zipEntry = new ZipEntry(signatureZipEntryName);
-		zipOutputStream.putNextEntry(zipEntry);
+		// Add the OOXML XML signature file to the OOXML package.
+		zipOutputStream.putNextEntry(new ZipEntry(signatureZipEntryName));
 		IOUtils.write(signatureData, zipOutputStream);
 		zipOutputStream.close();
 
 		return signedOOXMLOutputStream.toByteArray();
 	}
 
-	private ZipOutputStream copyOOXMLContent(String signatureZipEntryName,
-			OutputStream signedOOXMLOutputStream) throws IOException,
-			ParserConfigurationException, SAXException,
-			TransformerConfigurationException,
-			TransformerFactoryConfigurationError, TransformerException {
-		ZipOutputStream zipOutputStream = new ZipOutputStream(
-				signedOOXMLOutputStream);
-		ZipInputStream zipInputStream = new ZipInputStream(
-				new ByteArrayInputStream(this.getOfficeOpenXMLDocument()));
+	private ZipOutputStream copyOOXMLContent(final String signatureZipEntryName,
+			                                 final OutputStream signedOOXMLOutputStream) throws IOException,
+			                                                                                    ParserConfigurationException, 
+			                                                                                    SAXException,
+			                                                                                    TransformerConfigurationException,
+			                                                                                    TransformerFactoryConfigurationError, 
+			                                                                                    TransformerException {
+		final ZipOutputStream zipOutputStream = new ZipOutputStream(
+			signedOOXMLOutputStream
+		);
+		final ZipInputStream zipInputStream = new ZipInputStream(
+			new ByteArrayInputStream(this.getOfficeOpenXMLDocument())
+		);
 		ZipEntry zipEntry;
 		boolean hasOriginSigsRels = false;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
-			ZipEntry newZipEntry = new ZipEntry(zipEntry.getName());
-			zipOutputStream.putNextEntry(newZipEntry);
+			zipOutputStream.putNextEntry(new ZipEntry(zipEntry.getName()));
 			if ("[Content_Types].xml".equals(zipEntry.getName())) {
 				Document contentTypesDocument = loadDocumentNoClose(zipInputStream);
-				Element typesElement = contentTypesDocument
-						.getDocumentElement();
+				final Element typesElement = contentTypesDocument.getDocumentElement();
 
-				/*
-				 * We need to add an Override element.
-				 */
-				Element overrideElement = contentTypesDocument
-						.createElementNS(
-								"http://schemas.openxmlformats.org/package/2006/content-types",
-								"Override");
-				overrideElement.setAttribute("PartName", "/"
-						+ signatureZipEntryName);
-				overrideElement
-						.setAttribute("ContentType",
-								"application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml");
+				// We need to add an Override element.
+				final Element overrideElement = contentTypesDocument.createElementNS(
+					"http://schemas.openxmlformats.org/package/2006/content-types",
+					"Override"
+				);
+				overrideElement.setAttribute(
+					"PartName", 
+					"/" + signatureZipEntryName
+				);
+				overrideElement.setAttribute(
+					"ContentType", 
+					"application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml"
+				);
 				typesElement.appendChild(overrideElement);
 
-				Element nsElement = contentTypesDocument.createElement("ns");
-				nsElement
-						.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-								"http://schemas.openxmlformats.org/package/2006/content-types");
-				NodeList nodeList = XPathAPI.selectNodeList(
-						contentTypesDocument,
-						"/tns:Types/tns:Default[@Extension='sigs']", nsElement);
+				final Element nsElement = contentTypesDocument.createElement("ns");
+				nsElement.setAttributeNS(
+					Constants.NamespaceSpecNS, 
+					"xmlns:tns",
+					"http://schemas.openxmlformats.org/package/2006/content-types"
+				);
+				final NodeList nodeList = XPathAPI.selectNodeList(
+					contentTypesDocument,
+					"/tns:Types/tns:Default[@Extension='sigs']", 
+					nsElement
+				);
 				if (0 == nodeList.getLength()) {
-					/*
-					 * Add Default element for 'sigs' extension.
-					 */
-					Element defaultElement = contentTypesDocument
-							.createElementNS(
-									"http://schemas.openxmlformats.org/package/2006/content-types",
-									"Default");
-					defaultElement.setAttribute("Extension", "sigs");
-					defaultElement
-							.setAttribute("ContentType",
-									"application/vnd.openxmlformats-package.digital-signature-origin");
+					// Add Default element for 'sigs' extension.
+					final Element defaultElement = contentTypesDocument.createElementNS(
+						"http://schemas.openxmlformats.org/package/2006/content-types",
+						"Default"
+					);
+					defaultElement.setAttribute(
+						"Extension", 
+						"sigs"
+					);
+					defaultElement.setAttribute(
+						"ContentType",
+						"application/vnd.openxmlformats-package.digital-signature-origin"
+					);
 					typesElement.appendChild(defaultElement);
 				}
 
-				writeDocumentNoClosing(contentTypesDocument, zipOutputStream,
-						false);
-			} else if ("_rels/.rels".equals(zipEntry.getName())) {
-				Document relsDocument = loadDocumentNoClose(zipInputStream);
+				writeDocumentNoClosing(contentTypesDocument, zipOutputStream, false);
+			} 
+			else if ("_rels/.rels".equals(zipEntry.getName())) {
+				final Document relsDocument = loadDocumentNoClose(zipInputStream);
 
-				Element nsElement = relsDocument.createElement("ns");
-				nsElement
-						.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
-								"http://schemas.openxmlformats.org/package/2006/relationships");
-				NodeList nodeList = XPathAPI
-						.selectNodeList(
-								relsDocument,
-								"/tns:Relationships/tns:Relationship[@Target='_xmlsignatures/origin.sigs']",
-								nsElement);
+				final Element nsElement = relsDocument.createElement("ns");
+				nsElement.setAttributeNS(
+					Constants.NamespaceSpecNS, 
+					"xmlns:tns",
+					"http://schemas.openxmlformats.org/package/2006/relationships"
+				);
+				final NodeList nodeList = XPathAPI.selectNodeList(
+					relsDocument,
+					"/tns:Relationships/tns:Relationship[@Target='_xmlsignatures/origin.sigs']",
+					nsElement
+				);
 				if (0 == nodeList.getLength()) {
-					Element relationshipElement = relsDocument
-							.createElementNS(
-									"http://schemas.openxmlformats.org/package/2006/relationships",
-									"Relationship");
-					relationshipElement.setAttribute("Id", "rel-id-"
-							+ UUID.randomUUID().toString());
-					relationshipElement
-							.setAttribute(
-									"Type",
-									"http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin");
-					relationshipElement.setAttribute("Target",
-							"_xmlsignatures/origin.sigs");
+					final Element relationshipElement = relsDocument.createElementNS(
+						"http://schemas.openxmlformats.org/package/2006/relationships",
+						"Relationship"
+					);
+					relationshipElement.setAttribute(
+						"Id", 
+						"rel-id-" + UUID.randomUUID().toString()
+					);
+					relationshipElement.setAttribute(
+						"Type",
+						"http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"
+					);
+					relationshipElement.setAttribute(
+						"Target",
+						"_xmlsignatures/origin.sigs"
+					);
 
 					relsDocument.getDocumentElement().appendChild(
 							relationshipElement);
 				}
 
 				writeDocumentNoClosing(relsDocument, zipOutputStream, false);
-			} else if ("_xmlsignatures/_rels/origin.sigs.rels".equals(zipEntry
-					.getName())) {
+			} 
+			else if ("_xmlsignatures/_rels/origin.sigs.rels".equals(zipEntry.getName())) {
+				
 				hasOriginSigsRels = true;
-				Document originSignRelsDocument = loadDocumentNoClose(zipInputStream);
+				final Document originSignRelsDocument = loadDocumentNoClose(zipInputStream);
 
-				Element relationshipElement = originSignRelsDocument
-						.createElementNS(
-								"http://schemas.openxmlformats.org/package/2006/relationships",
-								"Relationship");
-				String relationshipId = "rel-" + UUID.randomUUID().toString();
-				relationshipElement.setAttribute("Id", relationshipId);
-				relationshipElement
-						.setAttribute(
-								"Type",
-								"http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature");
-				String target = FilenameUtils.getName(signatureZipEntryName);
+				final Element relationshipElement = originSignRelsDocument.createElementNS(
+					"http://schemas.openxmlformats.org/package/2006/relationships",
+					"Relationship"
+				);
+				relationshipElement.setAttribute("Id", "rel-" + UUID.randomUUID().toString());
+				relationshipElement.setAttribute(
+					"Type",
+					"http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"
+				);
 
-				relationshipElement.setAttribute("Target", target);
-				originSignRelsDocument.getDocumentElement().appendChild(
-						relationshipElement);
+				relationshipElement.setAttribute("Target", FilenameUtils.getName(signatureZipEntryName));
+				originSignRelsDocument.getDocumentElement().appendChild(relationshipElement);
 
-				writeDocumentNoClosing(originSignRelsDocument, zipOutputStream,
-						false);
-			} else {
+				writeDocumentNoClosing(originSignRelsDocument, zipOutputStream, false);
+			} 
+			else {
 				IOUtils.copy(zipInputStream, zipOutputStream);
 			}
 		}
 
 		if (false == hasOriginSigsRels) {
-			/*
-			 * Add signature relationships document.
-			 */
+			// Add signature relationships document.
 			addOriginSigsRels(signatureZipEntryName, zipOutputStream);
 			addOriginSigs(zipOutputStream);
 		}
 
-		/*
-		 * Return.
-		 */
+		// Return.
 		zipInputStream.close();
 		return zipOutputStream;
 	}
 
-	private void addOriginSigs(ZipOutputStream zipOutputStream)
-			throws IOException {
-		zipOutputStream
-				.putNextEntry(new ZipEntry("_xmlsignatures/origin.sigs"));
+	private void addOriginSigs(final ZipOutputStream zipOutputStream) throws IOException {
+		zipOutputStream.putNextEntry(new ZipEntry("_xmlsignatures/origin.sigs"));
 	}
 
-	private void addOriginSigsRels(String signatureZipEntryName,
-			ZipOutputStream zipOutputStream)
-			throws ParserConfigurationException, IOException,
-			TransformerConfigurationException,
-			TransformerFactoryConfigurationError, TransformerException {
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-				.newInstance();
+	private void addOriginSigsRels(final String signatureZipEntryName,
+			                       final ZipOutputStream zipOutputStream) throws ParserConfigurationException, 
+			                                                                     IOException,
+			                                                                     TransformerConfigurationException,
+			                                                                     TransformerFactoryConfigurationError, 
+			                                                                     TransformerException {
+		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder = documentBuilderFactory
-				.newDocumentBuilder();
-		Document originSignRelsDocument = documentBuilder.newDocument();
+		
+		final Document originSignRelsDocument = documentBuilderFactory.newDocumentBuilder().newDocument();
 
-		Element relationshipsElement = originSignRelsDocument.createElementNS(
-				"http://schemas.openxmlformats.org/package/2006/relationships",
-				"Relationships");
-		relationshipsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns",
-				"http://schemas.openxmlformats.org/package/2006/relationships");
+		final Element relationshipsElement = originSignRelsDocument.createElementNS(
+			"http://schemas.openxmlformats.org/package/2006/relationships",
+			"Relationships"
+		);
+		relationshipsElement.setAttributeNS(
+			Constants.NamespaceSpecNS, 
+			"xmlns",
+			"http://schemas.openxmlformats.org/package/2006/relationships"
+		);
 		originSignRelsDocument.appendChild(relationshipsElement);
 
-		Element relationshipElement = originSignRelsDocument.createElementNS(
-				"http://schemas.openxmlformats.org/package/2006/relationships",
-				"Relationship");
-		String relationshipId = "rel-" + UUID.randomUUID().toString();
+		final Element relationshipElement = originSignRelsDocument.createElementNS(
+			"http://schemas.openxmlformats.org/package/2006/relationships",
+			"Relationship"
+		);
+		final String relationshipId = "rel-" + UUID.randomUUID().toString();
 		relationshipElement.setAttribute("Id", relationshipId);
-		relationshipElement
-				.setAttribute(
-						"Type",
-						"http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature");
-		String target = FilenameUtils.getName(signatureZipEntryName);
+		relationshipElement.setAttribute(
+			"Type",
+			"http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"
+		);
 
-		relationshipElement.setAttribute("Target", target);
+		relationshipElement.setAttribute("Target", FilenameUtils.getName(signatureZipEntryName));
 		relationshipsElement.appendChild(relationshipElement);
 
 		zipOutputStream.putNextEntry(new ZipEntry(
-				"_xmlsignatures/_rels/origin.sigs.rels"));
+			"_xmlsignatures/_rels/origin.sigs.rels"
+		));
 		writeDocumentNoClosing(originSignRelsDocument, zipOutputStream, false);
 	}
 
