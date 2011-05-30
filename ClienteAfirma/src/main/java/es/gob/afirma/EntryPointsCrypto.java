@@ -3580,7 +3580,7 @@ public interface EntryPointsCrypto {
 	/**
 	 * Tras una firma masiva (firma a partir de m&uacute;ltiples hashes),
 	 * devuelve las firmas en base64 separadas unas de otras por '!' (cierre de
-	 * admiraci&oacute;n). Si no hay firmas establecidas <br/>
+	 * admiraci&oacute;n).<br/>
 	 * <b>Advertencia: </b> Una vez se haya recuperado la firma, es aconsejable
 	 * liberar los recursos del applet mediante el m&eacute;todo
 	 * <code>initialize</code>.
