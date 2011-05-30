@@ -72,24 +72,6 @@ public final class AOUIManager {
 
 	private static Image icon;
 
-	static {
-
-		final String lookandfeel = UIManager.getSystemLookAndFeelClassName();
-
-		try {
-			UIManager.setLookAndFeel(lookandfeel);
-		} catch (Exception e) {
-			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-							"No se ha podido establecer el Look&Feel '" + lookandfeel + "', las " + //$NON-NLS-1$ //$NON-NLS-2$
-									"ventanas careceran de decoracion: " + e //$NON-NLS-1$
-					);
-		}
-
-		// Nos aseguramos de que los dialogos salgan decorados
-		JDialog.setDefaultLookAndFeelDecorated(true);
-		javax.swing.JFrame.setDefaultLookAndFeelDecorated(true);
-	}
-
 	/**
 	 * Muestra un di&aacute;logo para que el usuario seleccione entre los
 	 * certificados mostrados.
