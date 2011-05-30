@@ -14,7 +14,7 @@ package es.gob.afirma.cliente;
  * Clase para almacenar la configuraci&oacute;n para el filtrado de certificados
  * en el di&aacute;logo de selecci&oacute;n.
  */
-class CertificateFilterConfiguration {
+final class CertificateFilterConfiguration {
 
 	/**
 	 * Filtro aplicado a los Principal de los certificados.
@@ -65,7 +65,7 @@ class CertificateFilterConfiguration {
 		return keyUsageFilter;
 	}
 
-	void setKeyUsageFilter(Boolean[] keyUsageFilter) {
+	void setKeyUsageFilter(final Boolean[] keyUsageFilter) {
 		this.keyUsageFilter = keyUsageFilter;
 	}
 
@@ -81,7 +81,7 @@ class CertificateFilterConfiguration {
 		return rfc2254IssuerFilter;
 	}
 
-	void setRfc2254IssuerFilter(String rfc2254IssuerFilter) {
+	void setRfc2254IssuerFilter(final String rfc2254IssuerFilter) {
 		this.rfc2254IssuerFilter = rfc2254IssuerFilter;
 	}
 
@@ -89,7 +89,7 @@ class CertificateFilterConfiguration {
 		return rfc2254SubjectFilter;
 	}
 
-	void setRfc2254SubjectFilter(String rfc2254SubjectFilter) {
+	void setRfc2254SubjectFilter(final String rfc2254SubjectFilter) {
 		this.rfc2254SubjectFilter = rfc2254SubjectFilter;
 	}
 
@@ -97,7 +97,7 @@ class CertificateFilterConfiguration {
 		return mandatoryCert;
 	}
 
-	void setMandatoryCert(boolean mandatoryCert) {
+	void setMandatoryCert(final boolean mandatoryCert) {
 		this.mandatoryCert = mandatoryCert;
 	}
 }

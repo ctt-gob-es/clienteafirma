@@ -50,10 +50,8 @@ public final class KeyStoreUtilities {
 	 * @return Fichero con las propiedades de configuracion del proveedor
 	 *         PKCS#11 de Sun para acceder al KeyStore de un token generico.
 	 */
-	static final String createPKCS11ConfigFile(final String lib, String name,
-			final Integer slot) {
-		if (name == null)
-			name = "AFIRMA-PKCS11";
+	static final String createPKCS11ConfigFile(final String lib, String name, final Integer slot) {
+		if (name == null) name = "AFIRMA-PKCS11";
 		final StringBuilder buffer = new StringBuilder("library=");
 
 		// TODO: Ir uno a uno en el ApplicationPath de Java hasta que
@@ -64,8 +62,7 @@ public final class KeyStoreUtilities {
 		// Mozilla devuelve las bibliotecas sin Path
 		if (!new java.io.File(lib).exists()) {
 			String sysLibDir = AOUtil.getSystemLibDir();
-			if (!sysLibDir.endsWith(java.io.File.separator))
-				sysLibDir += java.io.File.separator;
+			if (!sysLibDir.endsWith(java.io.File.separator)) sysLibDir += java.io.File.separator;
 			buffer.append(sysLibDir);
 		}
 
@@ -82,12 +79,12 @@ public final class KeyStoreUtilities {
 		}
 
 		Logger.getLogger("es.gob.afirma").info(
-				"Creada configuracion PKCS#11:\r\n" + buffer.toString());
+			"Creada configuracion PKCS#11:\r\n" + buffer.toString()
+		);
 		return buffer.toString();
 	}
 
-	static void cleanCAPIDuplicateAliases(final KeyStore keyStore)
-			throws Exception {
+	static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws Exception {
 
 		Field field = keyStore.getClass().getDeclaredField("keyStoreSpi");
 		field.setAccessible(true);
@@ -98,13 +95,11 @@ public final class KeyStoreUtilities {
 			String alias, hashCode;
 			X509Certificate[] certificates;
 
-			field = keyStoreVeritable.getClass().getEnclosingClass()
-					.getDeclaredField("entries");
+			field = keyStoreVeritable.getClass().getEnclosingClass().getDeclaredField("entries");
 			field.setAccessible(true);
-			final Collection<?> entries = (Collection<?>) field
-					.get(keyStoreVeritable);
+			final Collection<?> entries = (Collection<?>) field.get(keyStoreVeritable);
 
-			for (Object entry : entries) {
+			for (final Object entry : entries) {
 				field = entry.getClass().getDeclaredField("certChain");
 				field.setAccessible(true);
 				certificates = (X509Certificate[]) field.get(entry);
@@ -155,18 +150,22 @@ public final class KeyStoreUtilities {
 	 *            Filtro seg&uacute;n la RFC2254 para el titular del certificado
 	 * @return Alias seleccionado por el usuario
 	 */
-	public final static Hashtable<String, String> getAlisasesByFriendlyName(
-			final String[] alias, final Vector<KeyStore> kss,
-			final Boolean[] keyUsageFilter, final boolean checkPrivateKeys,
-			final boolean checkValidity, final boolean showExpiredCertificates,
-			final String issuerFilter, final String subjectFilter) {
+	public final static Hashtable<String, String> getAlisasesByFriendlyName(final String[] alias, 
+			                                                                final Vector<KeyStore> kss,
+			                                                                final Boolean[] keyUsageFilter, 
+			                                                                final boolean checkPrivateKeys,
+			                                                                final boolean checkValidity, 
+			                                                                final boolean showExpiredCertificates,
+			                                                                final String issuerFilter, 
+			                                                                final String subjectFilter) {
 
 		final String[] trimmedAliases = alias.clone();
 
 		// Creamos un HashTable con la relacion Alias-Nombre_a_mostrar de los
 		// certificados
-		Hashtable<String, String> aliassesByFriendlyName = new Hashtable<String, String>(
-				trimmedAliases.length);
+		final Hashtable<String, String> aliassesByFriendlyName = new Hashtable<String, String>(
+			trimmedAliases.length
+		);
 		for (String trimmedAlias : trimmedAliases) {
 			aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
 		}
@@ -178,15 +177,15 @@ public final class KeyStoreUtilities {
 		if (kss != null && kss.size() > 0) {
 
 			KeyStore ks = null;
-			for (String al : aliassesByFriendlyName.keySet().toArray(
-					new String[aliassesByFriendlyName.size()])) {
+			for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
 				tmpCert = null;
 
 				// Seleccionamos el KeyStore en donde se encuentra el alias
 				for (KeyStore tmpKs : kss) {
 					try {
 						tmpCert = (X509Certificate) tmpKs.getCertificate(al);
-					} catch (Exception e) {
+					} 
+					catch (final Exception e) {
 						Logger.getLogger("es.gob.afirma").warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 						continue;
 					}
@@ -198,19 +197,18 @@ public final class KeyStoreUtilities {
 
 				// Si no tenemos Store para el alias en curso, pasamos al
 				// siguiente alias
-				if (ks == null)
-					continue;
+				if (ks == null) continue;
 
-				if (tmpCert == null)
-					Logger.getLogger("es.gob.afirma").warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$ //$NON-NLS-2$
+				if (tmpCert == null) Logger.getLogger("es.gob.afirma").warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (!showExpiredCertificates && tmpCert != null) {
 					try {
 						tmpCert.checkValidity();
-					} catch (Exception e) {
+					} 
+					catch (final Exception e) {
 						Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-										"Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
-								);
+							"Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
+						);
 						aliassesByFriendlyName.remove(al);
 						continue;
 					}
@@ -223,39 +221,42 @@ public final class KeyStoreUtilities {
 							try {
 								key = (PrivateKey) ks.getKey(al,
 										"dummy".toCharArray());
-							} catch (final Exception e) {
+							} 
+							catch (final Exception e) {
 								throw new UnsupportedOperationException(
-										"No se ha podido recuperar directamente la clave privada en Mac OS X",
-										e);
+									"No se ha podido recuperar directamente la clave privada en Mac OS X", e
+								);
 							}
-							if (key == null)
-								throw new UnsupportedOperationException(
-										"No se ha podido recuperar directamente la clave privada en Mac OS X");
-						} else if (!(ks.getEntry(al,
+							if (key == null) throw new UnsupportedOperationException(
+								"No se ha podido recuperar directamente la clave privada en Mac OS X"
+							);
+						} 
+						else if (!(ks.getEntry(al,
 								new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
 							aliassesByFriendlyName.remove(al);
 							Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-											"El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
-									);
+								"El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
+							);
 							continue;
 						}
-					} catch (final UnsupportedOperationException e) {
+					} 
+					catch (final UnsupportedOperationException e) {
 						aliassesByFriendlyName.remove(al);
 						Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-										"El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
-								);
+							"El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
+						);
 						continue;
-					} catch (final Exception e) {
+					} 
+					catch (final Exception e) {
 						Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-										"Se ha incluido un certificado (" + al + ") con clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
-								);
+							"Se ha incluido un certificado (" + al + ") con clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
+						);
 					}
 				}
 
 				if (tmpCert != null
 						&& matchesKeyUsageFilter(tmpCert, keyUsageFilter)
-						&& KeyStoreUtilities.filterIssuerByRFC2254(
-								issuerFilter, tmpCert)
+						&& KeyStoreUtilities.filterIssuerByRFC2254(issuerFilter, tmpCert)
 						&& KeyStoreUtilities.filterSubjectByRFC2254(
 								subjectFilter, tmpCert)) {
 					tmpCN = AOUtil.getCN(tmpCert);
@@ -331,10 +332,8 @@ public final class KeyStoreUtilities {
 		return filterRFC2254(filter, cert.getSubjectDN().toString());
 	}
 
-	private static boolean filterIssuerByRFC2254(final String filter,
-			final X509Certificate cert) {
-		if (cert == null || filter == null)
-			return true;
+	private static boolean filterIssuerByRFC2254(final String filter, final X509Certificate cert) {
+		if (cert == null || filter == null) return true;
 		return filterRFC2254(filter, cert.getIssuerDN().toString());
 	}
 
@@ -352,11 +351,13 @@ public final class KeyStoreUtilities {
 	private static boolean filterRFC2254(final String f, final String name) {
 		try {
 			return filterRFC2254(f, new LdapName(name));
-		} catch (final Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning(
-					"No ha sido posible filtrar el certificado (filtro: '" + f
-							+ "', nombre: '" + name
-							+ "'), no se eliminara del listado: " + e);
+				"No ha sido posible filtrar el certificado (filtro: '" + f
+				+ "', nombre: '" + name
+				+ "'), no se eliminara del listado: " + e
+			);
 			return true;
 		}
 	}

@@ -22,7 +22,7 @@ import es.gob.afirma.cliente.utilidades.exp.ComplexCondition;
  * @deprecated
  */
 @Deprecated
-class AOCertFilter {
+final class AOCertFilter {
 
 	/** Expresi&oacute;n del filtro de certificados. **/
 	private String filter = null;
@@ -33,7 +33,7 @@ class AOCertFilter {
 	 * @param filter
 	 *            Expresi&oacute;n del filtro.
 	 */
-	AOCertFilter(String filter) {
+	AOCertFilter(final String filter) {
 		this.setFilter(filter);
 	}
 
@@ -67,7 +67,7 @@ class AOCertFilter {
 	 *            filtro.
 	 * @return Certificados que se ajustan al filtro
 	 */
-	X509Certificate[] filter(X509Certificate[] certs) {
+	X509Certificate[] filter(final X509Certificate[] certs) {
 
 		if (certs == null) {
 			Logger.getLogger("es.gob.afirma")
@@ -85,11 +85,11 @@ class AOCertFilter {
 		// certificados
 		try {
 			return new ComplexCondition(this.filter).eval(certs);
-		} catch (Exception e) {
-			Logger.getLogger("es.gob.afirma")
-					.warning(
-							"Error al aplicar el filtro de certificados, se aceptaran todos los certificados: "
-									+ e);
+		} 
+		catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").warning(
+				"Error al aplicar el filtro de certificados, se aceptaran todos los certificados: " + e
+			);
 		}
 		return certs;
 	}
