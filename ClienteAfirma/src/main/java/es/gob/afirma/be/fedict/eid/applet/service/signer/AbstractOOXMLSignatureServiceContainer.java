@@ -50,25 +50,29 @@ public class AbstractOOXMLSignatureServiceContainer {
 		OOXMLProvider.install();
 	}
 
-	private static class OOXMLTestSignatureService extends AbstractOOXMLSignatureService {
-		
+	private static class OOXMLTestSignatureService extends
+			AbstractOOXMLSignatureService {
+
 		@Override
 		protected String getSignatureDigestAlgorithm() {
 			return digestAlgorithm;
 		}
+
 		private final byte[] ooxml;
 
 		private final String digestAlgorithm;
-		
+
 		public OOXMLTestSignatureService(InputStream ooxmlis, String digestAlgo) {
 			try {
 				this.ooxml = AOUtil.getDataFromInputStream(ooxmlis);
+			} catch (Exception e) {
+				throw new IllegalArgumentException(
+						"No se ha podido leer el OOXML desde el InputStream de entrada");
 			}
-			catch(Throwable e) {
-				throw new IllegalArgumentException("No se ha podido leer el OOXML desde el InputStream de entrada");
-			}
-			if (digestAlgo == null) digestAlgorithm = "SHA1";
-			else digestAlgorithm = digestAlgo;
+			if (digestAlgo == null)
+				digestAlgorithm = "SHA1";
+			else
+				digestAlgorithm = digestAlgo;
 		}
 
 		@Override
@@ -78,41 +82,43 @@ public class AbstractOOXMLSignatureServiceContainer {
 
 	}
 
-	public byte[] sign(InputStream ooxml, 
-			           List<X509Certificate> certChain, 
-			           String digestAlgorithm,
-			           PrivateKey pk,
-			           int signerCount) throws Exception {
+	public byte[] sign(InputStream ooxml, List<X509Certificate> certChain,
+			String digestAlgorithm, PrivateKey pk, int signerCount)
+			throws Exception {
 
 		OOXMLProvider.install();
-		
-		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(ooxml, digestAlgorithm);
+
+		OOXMLTestSignatureService signatureService = new OOXMLTestSignatureService(
+				ooxml, digestAlgorithm);
 
 		// operate
 		byte[] signedXML = signatureService.preSign(null, certChain, pk);
 
-//		// setup: key material, signature value
-//		KeyPair keyPair = PkiTestUtils.generateKeyPair();
-//		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-//		cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
-//		byte[] digestInfoValue = ArrayUtils.addAll(
-//				PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
-//		byte[] signatureValue = cipher.doFinal(digestInfoValue);
-//
-//		DateTime notBefore = new DateTime();
-//		DateTime notAfter = new DateTime(System.currentTimeMillis()+600000000);
-//		X509Certificate certificate = PkiTestUtils.generateCertificate(keyPair
-//				.getPublic(), signerDn, notBefore, notAfter, null, keyPair
-//				.getPrivate(), true, 0, null, null, new KeyUsage(
-//				KeyUsage.nonRepudiation));
-//
-//		// operate: postSign
-//		signatureService.postSign(signatureValue, Collections.singletonList(certificate));
-//
+		// // setup: key material, signature value
+		// KeyPair keyPair = PkiTestUtils.generateKeyPair();
+		// Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		// cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
+		// byte[] digestInfoValue = ArrayUtils.addAll(
+		// PkiTestUtils.SHA1_DIGEST_INFO_PREFIX, digestInfo.digestValue);
+		// byte[] signatureValue = cipher.doFinal(digestInfoValue);
+		//
+		// DateTime notBefore = new DateTime();
+		// DateTime notAfter = new
+		// DateTime(System.currentTimeMillis()+600000000);
+		// X509Certificate certificate =
+		// PkiTestUtils.generateCertificate(keyPair
+		// .getPublic(), signerDn, notBefore, notAfter, null, keyPair
+		// .getPrivate(), true, 0, null, null, new KeyUsage(
+		// KeyUsage.nonRepudiation));
+		//
+		// // operate: postSign
+		// signatureService.postSign(signatureValue,
+		// Collections.singletonList(certificate));
+		//
 		return signatureService.outputSignedOfficeOpenXMLDocument(signedXML);
-		
-//		return null;
+
+		// return null;
 
 	}
-	
+
 }

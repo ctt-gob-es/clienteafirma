@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -40,9 +40,10 @@ import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.cms.SignerIdentifier;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509Name;
 import org.ietf.jgss.Oid;
 
 import sun.security.x509.AlgorithmId;
@@ -53,10 +54,11 @@ import es.gob.afirma.misc.AOCryptoUtil;
 /**
  * Clase que implementa firma digital PKCS#7/CMS SignedAndEnvelopedData basado
  * en las especificaciones de RFC-2315.
- *
+ * 
  * La Estructura del mensaje es la siguiente:<br>
- *
- * <pre><code>
+ * 
+ * <pre>
+ * <code>
  *    SignedAndEnvelopedData ::= SEQUENCE {
  *    version Version,
  *    recipientInfos RecipientInfos,
@@ -68,13 +70,15 @@ import es.gob.afirma.misc.AOCryptoUtil;
  *    crls
  *      [1] IMPLICIT CertificateRevocationLists OPTIONAL,
  *    signerInfos SignerInfos }
- *
- * </code></pre>
  * 
- * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para crear un
- * mensaje SignedAndEnvelopedData de BouncyCastle: <a href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
+ * </code>
+ * </pre>
+ * 
+ * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
+ * para crear un mensaje SignedAndEnvelopedData de BouncyCastle: <a
+ * href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
  */
-public final class CMSSignedAndEnvelopedData  {
+public final class CMSSignedAndEnvelopedData {
 
 	/**
 	 * Clave de cifrado. La almacenamos internamente.
@@ -84,29 +88,46 @@ public final class CMSSignedAndEnvelopedData  {
 
 	/**
 	 * M&eacute;todo que genera la firma de tipo SignedAndEnvelopedData.
-	 *
-	 * @param parameters Par&aacute;metros necesarios para la generaci&oacute;n de este tipo.
-	 * @param config     Configuraci&oacute;n del algoritmo para firmar
-	 * @param certDest   Certificado del destino al cual va dirigido la firma.
-	 * @param dataType          Identifica el tipo del contenido a firmar.
-	 * @param keyEntry   Eatrada a la clave privada para firma
-	 * @param atrib      Conjunto de atributos firmados.
-	 * @param uatrib     Conjunto de atributos no firmados.
-	 *
-	 * @return           La firma de tipo SignedAndEnvelopedData.
-	 * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
-	 * @throws java.security.cert.CertificateEncodingException Si se produce alguna excepci&oacute;n con los certificados de firma.
-	 * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
+	 * 
+	 * @param parameters
+	 *            Par&aacute;metros necesarios para la generaci&oacute;n de este
+	 *            tipo.
+	 * @param config
+	 *            Configuraci&oacute;n del algoritmo para firmar
+	 * @param certDest
+	 *            Certificado del destino al cual va dirigido la firma.
+	 * @param dataType
+	 *            Identifica el tipo del contenido a firmar.
+	 * @param keyEntry
+	 *            Eatrada a la clave privada para firma
+	 * @param atrib
+	 *            Conjunto de atributos firmados.
+	 * @param uatrib
+	 *            Conjunto de atributos no firmados.
+	 * 
+	 * @return La firma de tipo SignedAndEnvelopedData.
+	 * @throws java.io.IOException
+	 *             Si ocurre alg&uacute;n problema leyendo o escribiendo los
+	 *             datos
+	 * @throws java.security.cert.CertificateEncodingException
+	 *             Si se produce alguna excepci&oacute;n con los certificados de
+	 *             firma.
+	 * @throws java.security.NoSuchAlgorithmException
+	 *             Si no se soporta alguno de los algoritmos de firma o huella
+	 *             digital
 	 */
-	public byte[] genSignedAndEnvelopedData(P7ContentSignerParameters parameters,
-			AOCipherConfig config, X509Certificate[] certDest, Oid dataType , 
-			PrivateKeyEntry keyEntry, Map<Oid, byte[]> atrib, Map<Oid, byte[]> uatrib) 
-	throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+	public byte[] genSignedAndEnvelopedData(
+			P7ContentSignerParameters parameters, AOCipherConfig config,
+			X509Certificate[] certDest, Oid dataType, PrivateKeyEntry keyEntry,
+			Map<Oid, byte[]> atrib, Map<Oid, byte[]> uatrib)
+			throws IOException, CertificateEncodingException,
+			NoSuchAlgorithmException {
 
-		this.cipherKey = Utils.initEnvelopedData(config, certDest); 
+		this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
 		// 1. VERSION
-		// la version se mete en el constructor del signedAndEnvelopedData y es 1
+		// la version se mete en el constructor del signedAndEnvelopedData y es
+		// 1
 
 		// 2. DIGESTALGORITM
 		// buscamos que timo de algoritmo es y lo codificamos con su OID
@@ -116,135 +137,135 @@ public final class CMSSignedAndEnvelopedData  {
 		AlgorithmId digestAlgorithmId = null;
 		ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
 		String keyAlgorithm = null;
-		
+
 		try {
 			signatureAlgorithm = parameters.getSignatureAlgorithm();
-			digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(signatureAlgorithm);
+			digestAlgorithm = AOCryptoUtil
+					.getDigestAlgorithmName(signatureAlgorithm);
 			digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-			keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm, digestAlgorithmId);
-			
-			AlgorithmIdentifier digAlgId = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+			keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm,
+					digestAlgorithmId);
+
+			AlgorithmIdentifier digAlgId = makeAlgId(digestAlgorithmId.getOID()
+					.toString(), digestAlgorithmId.getEncodedParams());
 			digestAlgs.add(digAlgId);
-		}
-		catch (final Throwable e) {
+		} catch (final Exception e) {
 			throw new IOException("Error de codificacion: " + e);
 		}
 
 		// LISTA DE CERTIFICADOS: obtenemos la lista de certificados
-		X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
-		ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
+		X509Certificate[] signerCertificateChain = parameters
+				.getSignerCertificateChain();
+		ASN1Set certificates = Utils
+				.fetchCertificatesList(signerCertificateChain);
 
-		// 2.   RECIPIENTINFOS
-		Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+		// 2. RECIPIENTINFOS
+		Info infos = Utils.initVariables(parameters.getContent(), config,
+				certDest, cipherKey);
 
 		// 4. SIGNERINFO
 		// raiz de la secuencia de SignerInfo
 		ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
-		TBSCertificateStructure tbs2 = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+		TBSCertificateStructure tbs2 = TBSCertificateStructure
+				.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0]
+						.getTBSCertificate()));
 
-		IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(tbs2.getIssuer(), tbs2.getSerialNumber().getValue());
+		IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(
+				X500Name.getInstance(tbs2.getIssuer()), tbs2.getSerialNumber()
+						.getValue());
 
 		SignerIdentifier identifier = new SignerIdentifier(encSid);
 
-		//AlgorithmIdentifier
-		AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+		// AlgorithmIdentifier
+		AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(
+				new DERObjectIdentifier(digestAlgorithmId.getOID().toString()),
+				new DERNull());
 
-		//// ATRIBUTOS
-		ASN1Set signedAttr = generateSignerInfo(signerCertificateChain[0],digestAlgorithm, parameters.getContent(), dataType, atrib);
+		// // ATRIBUTOS
+		ASN1Set signedAttr = generateSignerInfo(signerCertificateChain[0],
+				digestAlgorithm, parameters.getContent(), dataType, atrib);
 
 		ASN1Set unSignedAttr = null;
 		unSignedAttr = generateUnsignerInfo(uatrib);
 
-		//digEncryptionAlgorithm
+		// digEncryptionAlgorithm
 		AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
 		AlgorithmIdentifier encAlgId;
 		try {
-			encAlgId = makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
-		}
-		catch (Exception e) {
+			encAlgId = makeAlgId(digestAlgorithmIdEnc.getOID().toString(),
+					digestAlgorithmIdEnc.getEncodedParams());
+		} catch (Exception e) {
 			throw new IOException("Error de codificacion: " + e);
 		}
 
-		ASN1OctetString sign2= null;
+		ASN1OctetString sign2 = null;
 		try {
 			sign2 = Utils.firma(signatureAlgorithm, keyEntry, signedAttr2);
 		} catch (AOException ex) {
-			Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE,
+					null, ex);
 		}
 
-		signerInfos.add(
-				new SignerInfo(
-						identifier,
-						digAlgId,
-						signedAttr,
-						encAlgId,
-						sign2,
-						unSignedAttr//null //unsignedAttr
-				)
-		);
+		signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr,
+				encAlgId, sign2, unSignedAttr// null //unsignedAttr
+				));
 
 		ASN1Set certrevlist = null;
 
 		// construimos el Signed And Enveloped Data y lo devolvemos
-		return new ContentInfo(
-				PKCSObjectIdentifiers.signedAndEnvelopedData,
+		return new ContentInfo(PKCSObjectIdentifiers.signedAndEnvelopedData,
 				new SignedAndEnvelopedData(
-						new DERSet(infos.getRecipientInfos()),
-						new DERSet(digestAlgs),
-						infos.getEncInfo(),
-						certificates,
-						certrevlist,
-						new DERSet(signerInfos)
-				)
-		).getDEREncoded();
+						new DERSet(infos.getRecipientInfos()), new DERSet(
+								digestAlgs), infos.getEncInfo(), certificates,
+						certrevlist, new DERSet(signerInfos))).getDEREncoded();
 	}
 
 	/**
-	 *  M&eacute;todo que genera la parte que contiene la informaci&oacute;n del Usuario.
-	 *  Se generan los atributos que se necesitan para generar la firma.
-	 *
-	 * @param digestAlgorithm   Algoritmo Firmado.
-	 * @param datos             Datos firmados.
-	 * @param dataType          Identifica el tipo del contenido a firmar.
-	 * @param atrib             Conjunto de atributos firmados.
-	 *
-	 * @return      Los datos necesarios para generar la firma referente a los
-	 *              datos del usuario.
-	 *
+	 * M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
+	 * Usuario. Se generan los atributos que se necesitan para generar la firma.
+	 * 
+	 * @param digestAlgorithm
+	 *            Algoritmo Firmado.
+	 * @param datos
+	 *            Datos firmados.
+	 * @param dataType
+	 *            Identifica el tipo del contenido a firmar.
+	 * @param atrib
+	 *            Conjunto de atributos firmados.
+	 * 
+	 * @return Los datos necesarios para generar la firma referente a los datos
+	 *         del usuario.
+	 * 
 	 * @throws java.security.NoSuchAlgorithmException
 	 * @throws java.security.cert.CertificateException
 	 * @throws java.io.IOException
 	 */
-	private ASN1Set generateSignerInfo( X509Certificate cert, String digestAlgorithm, 
-			byte[] datos, Oid dataType, Map<Oid, byte[]> atrib) throws NoSuchAlgorithmException {
-		//// ATRIBUTOS
+	private ASN1Set generateSignerInfo(X509Certificate cert,
+			String digestAlgorithm, byte[] datos, Oid dataType,
+			Map<Oid, byte[]> atrib) throws NoSuchAlgorithmException {
+		// // ATRIBUTOS
 
-		//authenticatedAttributes
-		ASN1EncodableVector ContexExpecific = Utils.initContexExpecific(digestAlgorithm, datos, dataType, null);
+		// authenticatedAttributes
+		ASN1EncodableVector ContexExpecific = Utils.initContexExpecific(
+				digestAlgorithm, datos, dataType, null);
 
-		//Serial Number
+		// Serial Number
 		// comentar lo de abajo para version del rfc 3852
-		ContexExpecific.add(
-				new Attribute(
-						X509Name.SERIALNUMBER,
-						new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))
-				)
-		);
+		ContexExpecific.add(new Attribute(RFC4519Style.serialNumber,
+				new DERSet(new DERPrintableString(cert.getSerialNumber()
+						.toString()))));
 
-		//agregamos la lista de atributos a mayores.
-		if (atrib.size()!=0){
+		// agregamos la lista de atributos a mayores.
+		if (atrib.size() != 0) {
 			Iterator<Map.Entry<Oid, byte[]>> it = atrib.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<Oid, byte[]> e = it.next();
-				ContexExpecific.add(
-						new Attribute(
-								// el oid
-								new DERObjectIdentifier((e.getKey()).toString()),
-								// el array de bytes en formato string
-								new DERSet(new DERPrintableString(e.getValue()))
-						)
-				);
+				ContexExpecific.add(new Attribute(
+				// el oid
+						new DERObjectIdentifier((e.getKey()).toString()),
+						// el array de bytes en formato string
+						new DERSet(new DERPrintableString(e.getValue()))));
 			}
 		}
 
@@ -253,39 +274,35 @@ public final class CMSSignedAndEnvelopedData  {
 		return getAttributeSet(new AttributeTable(ContexExpecific));
 	}
 
-
 	/**
-	 *  M&eacute;todo que genera la parte que contiene la informaci&oacute;n del Usuario.
-	 *  Se generan los atributos no firmados.
-	 *
-	 * @param uatrib    Lista de atributos no firmados que se insertar&aacute;n dentro del archivo de firma.
-	 *
-	 * @return      Los atributos no firmados de la firma.
+	 * M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
+	 * Usuario. Se generan los atributos no firmados.
+	 * 
+	 * @param uatrib
+	 *            Lista de atributos no firmados que se insertar&aacute;n dentro
+	 *            del archivo de firma.
+	 * 
+	 * @return Los atributos no firmados de la firma.
 	 */
-	private ASN1Set generateUnsignerInfo(Map<Oid, byte[]> uatrib){
+	private ASN1Set generateUnsignerInfo(Map<Oid, byte[]> uatrib) {
 
-		//// ATRIBUTOS
+		// // ATRIBUTOS
 
-		//authenticatedAttributes
+		// authenticatedAttributes
 		ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
-
-		//agregamos la lista de atributos a mayores.
-		if (uatrib.size()!=0){
+		// agregamos la lista de atributos a mayores.
+		if (uatrib.size() != 0) {
 			Iterator<Map.Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<Oid, byte[]> e = it.next();
-				ContexExpecific.add(
-						new Attribute(
-								// el oid
-								new DERObjectIdentifier((e.getKey()).toString()),
-								// el array de bytes en formato string
-								new DERSet(new DERPrintableString(e.getValue()))
-						)
-				);
+				ContexExpecific.add(new Attribute(
+				// el oid
+						new DERObjectIdentifier((e.getKey()).toString()),
+						// el array de bytes en formato string
+						new DERSet(new DERPrintableString(e.getValue()))));
 			}
-		}
-		else{
+		} else {
 			return null;
 		}
 

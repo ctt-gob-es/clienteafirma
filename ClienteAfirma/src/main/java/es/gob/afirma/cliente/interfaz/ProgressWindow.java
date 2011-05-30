@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -20,49 +20,57 @@ import javax.swing.WindowConstants;
  * Di&aacute;logo de progreso.
  */
 public final class ProgressWindow extends JFrame {
-	
-    private static final long serialVersionUID = 1L;
 
-    private final ProgressStatus status;
+	private static final long serialVersionUID = 1L;
 
-    private final long max;
+	private final ProgressStatus status;
 
-    private int progreso = 0;
+	private final long max;
 
-    /**
-     * Crea un di&aacute;logo de progreso
-     * @param windowTitle T&iacute;tulo de la ventana
-     * @param statusTitle T&iacute;tulo de la l&iacute;nea de estado
-     * @param max Valor m&aacute;ximo de la barra de progreso
-     * @throws HeadlessException Si no hay interfaz gr&aacute;fico
-     */
-    public ProgressWindow(String windowTitle, String statusTitle, long max) throws HeadlessException {
-        super(windowTitle);
+	private int progreso = 0;
 
-        this.max = max;
-        this.status = new ProgressStatus(statusTitle, "   ");
+	/**
+	 * Crea un di&aacute;logo de progreso
+	 * 
+	 * @param windowTitle
+	 *            T&iacute;tulo de la ventana
+	 * @param statusTitle
+	 *            T&iacute;tulo de la l&iacute;nea de estado
+	 * @param max
+	 *            Valor m&aacute;ximo de la barra de progreso
+	 * @throws HeadlessException
+	 *             Si no hay interfaz gr&aacute;fico
+	 */
+	public ProgressWindow(String windowTitle, String statusTitle, long max)
+			throws HeadlessException {
+		super(windowTitle);
 
-        status.setMaxValue(Integer.MAX_VALUE);
+		this.max = max;
+		this.status = new ProgressStatus(statusTitle, "   ");
 
-        getContentPane().add(status, BorderLayout.CENTER);
-        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-        setSize(400, 150);
-        setLocationRelativeTo(null);
-        setVisible(true);
-    }
+		status.setMaxValue(Integer.MAX_VALUE);
 
-    /**
-     * Incrementa la barra de progreso.
-     * @param amount Cantidad de incremento de la barra de progreso
-     */
-    public void inc(final int amount) {
-        progreso += amount;
+		getContentPane().add(status, BorderLayout.CENTER);
+		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+		setSize(400, 150);
+		setLocationRelativeTo(null);
+		setVisible(true);
+	}
 
-        double ratio = (double) progreso / max;
-        int newVal = (int) (ratio * Integer.MAX_VALUE);
+	/**
+	 * Incrementa la barra de progreso.
+	 * 
+	 * @param amount
+	 *            Cantidad de incremento de la barra de progreso
+	 */
+	public void inc(final int amount) {
+		progreso += amount;
 
-        status.updateValue(newVal);
-        
-        status.paint(status.getGraphics());
-    }
+		double ratio = (double) progreso / max;
+		int newVal = (int) (ratio * Integer.MAX_VALUE);
+
+		status.updateValue(newVal);
+
+		status.paint(status.getGraphics());
+	}
 }

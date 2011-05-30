@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -17,16 +17,18 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 /**
- * Clase de ayuda de compresi&oacute;n.
- * Permite tanto comprimir como descomprimir.
- *
+ * Clase de ayuda de compresi&oacute;n. Permite tanto comprimir como
+ * descomprimir.
+ * 
  */
 final class BinaryUtils {
 
 	/**
 	 * M&eacute;todo que comprime una entrada con un nivel de compresion dado.
-	 * @param input				Entrada a comrpimir.
-	 * @return					Entrada comprimida.
+	 * 
+	 * @param input
+	 *            Entrada a comrpimir.
+	 * @return Entrada comprimida.
 	 */
 	static public byte[] compress(byte[] input) {
 
@@ -63,12 +65,14 @@ final class BinaryUtils {
 
 	/**
 	 * M&eacute;todo que descomprime una entrada.
-	 * @param compressedData Entrada a descomprimir.
-	 * @return				 Entrada descomprimida.
+	 * 
+	 * @param compressedData
+	 *            Entrada a descomprimir.
+	 * @return Entrada descomprimida.
 	 */
-	static public byte[] uncompress(byte[] compressedData){
-		
-		//      Create the decompressor and give it the data to compress
+	static public byte[] uncompress(byte[] compressedData) {
+
+		// Create the decompressor and give it the data to compress
 		Inflater decompressor = new Inflater();
 		decompressor.setInput(compressedData);
 
@@ -82,17 +86,17 @@ final class BinaryUtils {
 			try {
 				int count = decompressor.inflate(buf);
 				bos.write(buf, 0, count);
-			} 
-			catch (final Throwable e) {
-				Logger.getLogger("es.gob.afirma").severe("Error descomprimiendo los datos: " + e);
+			} catch (final Exception e) {
+				Logger.getLogger("es.gob.afirma").severe(
+						"Error descomprimiendo los datos: " + e);
 				break;
 			}
 		}
 		try {
 			bos.close();
-		} 
-		catch (final IOException e) {
-			Logger.getLogger("es.gob.afirma").warning("Error cerrando el flujo binario: " + e);
+		} catch (final IOException e) {
+			Logger.getLogger("es.gob.afirma").warning(
+					"Error cerrando el flujo binario: " + e);
 		}
 
 		// Get the decompressed data
@@ -101,5 +105,5 @@ final class BinaryUtils {
 		return decompressedData;
 
 	}
-	
+
 }

@@ -8,20 +8,20 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 final class EncryptedKeyDatas {
 
 	private byte[] encryptedKey = null;
-    private AlgorithmIdentifier algEncryptedKey = null;
-    
+	private AlgorithmIdentifier algEncryptedKey = null;
+
 	public byte[] getEncryptedKey() {
 		return encryptedKey;
 	}
-	
+
 	public void setEncryptedKey(byte[] encryptedKey) {
 		this.encryptedKey = encryptedKey;
 	}
-	
+
 	public AlgorithmIdentifier getAlgEncryptedKey() {
 		return algEncryptedKey;
 	}
-	
+
 	public void setAlgEncryptedKey(AlgorithmIdentifier algEncryptedKey) {
 		this.algEncryptedKey = algEncryptedKey;
 	}

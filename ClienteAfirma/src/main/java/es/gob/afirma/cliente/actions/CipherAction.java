@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -24,28 +24,33 @@ public final class CipherAction extends BasicPrivilegedAction<Boolean, Void> {
 
 	/** Manejador de cifrado. */
 	private CipherManager cipherManager;
-	
+
 	/** Datos que se desean cifrar. */
 	private byte[] data;
-	
+
 	/**
-	 * Construye la operaci&oacute;n de cifrado de datos. Si se indican datos, se cifraran estos;
-	 * si no se indican se tomar&aacute;n los configurados en el manejador de cifrado.
-	 * @param cipherManager Manejador de cifrado de datos.
-	 * @param data Datos que se desean cifrar, {@code null} si se desean tomar los del manejador.
+	 * Construye la operaci&oacute;n de cifrado de datos. Si se indican datos,
+	 * se cifraran estos; si no se indican se tomar&aacute;n los configurados en
+	 * el manejador de cifrado.
+	 * 
+	 * @param cipherManager
+	 *            Manejador de cifrado de datos.
+	 * @param data
+	 *            Datos que se desean cifrar, {@code null} si se desean tomar
+	 *            los del manejador.
 	 */
 	public CipherAction(CipherManager cipherManager, byte[] data) {
-		
+
 		if (cipherManager == null) {
 			throw new NullPointerException();
 		}
-		
+
 		this.cipherManager = cipherManager;
 		this.data = data;
 	}
-	
+
 	public Boolean run() {
-		
+
 		try {
 			if (data == null) {
 				cipherManager.cipherData();
@@ -68,7 +73,7 @@ public final class CipherAction extends BasicPrivilegedAction<Boolean, Void> {
 			setError("Error durante el proceso de cifrado", e); //$NON-NLS-1$
 			return false;
 		}
-		
+
 		return true;
 	}
 }

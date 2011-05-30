@@ -54,8 +54,10 @@ public class OOXMLProvider extends Provider {
 
 	private OOXMLProvider() {
 		super(NAME, 1.0, "OOXML Security Provider");
-		put("TransformService." + RelationshipTransformService.TRANSFORM_URI, RelationshipTransformService.class.getName());
-		put("TransformService." + RelationshipTransformService.TRANSFORM_URI + " MechanismType", "DOM");
+		put("TransformService." + RelationshipTransformService.TRANSFORM_URI,
+				RelationshipTransformService.class.getName());
+		put("TransformService." + RelationshipTransformService.TRANSFORM_URI
+				+ " MechanismType", "DOM");
 	}
 
 	/**

@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -22,36 +22,39 @@ import es.gob.afirma.misc.AOUtil;
 final class LicenseManager {
 
 	private static String LICENSE_FILE = "/resources/licenses";
-	
-	/**
-	 * recupera el texto de la licencia del Cliente @firma. Si ocurre un error lanza una
-	 * excepci&oacute;n.
-	 * @return Texto de la licencia.
-	 * @throws IOException Cuando no se ha podido recuperar el texto de la licencia.
-	 */
-	public static String getLicenceText() throws IOException {
 
-		InputStream is = 
-			Class.class.getResourceAsStream(
-					LICENSE_FILE + "_" + Locale.getDefault()); //$NON-NLS-1$
+	/**
+	 * recupera el texto de la licencia del Cliente @firma. Si ocurre un error
+	 * lanza una excepci&oacute;n.
+	 * 
+	 * @return Texto de la licencia.
+	 * @throws IOException
+	 *             Cuando no se ha podido recuperar el texto de la licencia.
+	 */
+	static String getLicenceText() throws IOException {
+
+		InputStream is = Class.class.getResourceAsStream(LICENSE_FILE
+				+ "_" + Locale.getDefault()); //$NON-NLS-1$
 
 		if (is == null) {
-			is = Class.class.getResourceAsStream(
-					LICENSE_FILE + "_" + Locale.getDefault().getLanguage()); //$NON-NLS-1$
+			is = Class.class.getResourceAsStream(LICENSE_FILE
+					+ "_" + Locale.getDefault().getLanguage()); //$NON-NLS-1$
 		}
-		
+
 		if (is == null) {
 			is = Class.class.getClass().getResourceAsStream(LICENSE_FILE);
 		}
 
 		try {
 			return new String(AOUtil.getDataFromInputStream(is), "UTF-8"); //$NON-NLS-1$
-		} 
-		catch (final Throwable e) {
-			throw new IOException("No se ha podido recuperar el texto de la licencia:" + e);
-		} 
-		finally {
-			try { is.close(); } catch (Exception e) {}
+		} catch (final Exception e) {
+			throw new IOException(
+					"No se ha podido recuperar el texto de la licencia:" + e);
+		} finally {
+			try {
+				is.close();
+			} catch (final Exception e) {
+			}
 		}
 	}
 }

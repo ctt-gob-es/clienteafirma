@@ -5,14 +5,14 @@ import javax.crypto.SecretKey;
 import es.gob.afirma.ciphers.AOCipherConfig;
 
 /**
- * Clase utilizada en los signers CMS para contener la configuracion
- * y la clave de cifrado
+ * Clase utilizada en los signers CMS para contener la configuracion y la clave
+ * de cifrado
  */
 final class KeyAsigned {
 
 	/**
-	 * Clave de cifrado. La almacenamos internamente porque no hay forma de mostrarla
-	 * directamente al usuario.
+	 * Clave de cifrado. La almacenamos internamente porque no hay forma de
+	 * mostrarla directamente al usuario.
 	 */
 	private SecretKey cipherKey;
 

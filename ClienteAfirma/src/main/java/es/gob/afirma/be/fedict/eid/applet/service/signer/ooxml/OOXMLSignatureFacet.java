@@ -222,7 +222,8 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 				.createElementNS(
 						"http://schemas.openxmlformats.org/package/2006/digital-signature",
 						"mdssi:Value");
-		valueElement.setTextContent(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").format(new Date()));
+		valueElement.setTextContent(new SimpleDateFormat(
+				"yyyy-MM-dd'T'hh:mm:ss'Z'").format(new Date()));
 		signatureTimeElement.appendChild(valueElement);
 
 		List<XMLStructure> signatureTimeContent = new LinkedList<XMLStructure>();
@@ -286,15 +287,17 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			List<Reference> manifestReferences) throws IOException,
 			ParserConfigurationException, SAXException,
 			NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()));
+		ZipInputStream zipInputStream = new ZipInputStream(
+				new ByteArrayInputStream(
+						this.signatureService.getOfficeOpenXMLDocument()));
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
 			if (false == zipEntry.getName().endsWith(".rels")) {
 				continue;
 			}
 			Document relsDocument = loadDocumentNoClose(zipInputStream);
-			addRelationshipsReference(signatureFactory, document, zipEntry
-					.getName(), relsDocument, manifestReferences);
+			addRelationshipsReference(signatureFactory, document,
+					zipEntry.getName(), relsDocument, manifestReferences);
 		}
 	}
 
@@ -367,8 +370,9 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 		List<String> documentResourceNames;
 		try {
-			documentResourceNames = getResourceNames(new ByteArrayInputStream(this.signatureService
-					.getOfficeOpenXMLDocument()), contentType);
+			documentResourceNames = getResourceNames(new ByteArrayInputStream(
+					this.signatureService.getOfficeOpenXMLDocument()),
+					contentType);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -384,9 +388,9 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		}
 	}
 
-	private List<String> getResourceNames(InputStream ooxmldoc, String contentType)
-			throws IOException, ParserConfigurationException, SAXException,
-			TransformerException {
+	private List<String> getResourceNames(InputStream ooxmldoc,
+			String contentType) throws IOException,
+			ParserConfigurationException, SAXException, TransformerException {
 		List<String> signatureResourceNames = new LinkedList<String>();
 		if (null == ooxmldoc) {
 			throw new RuntimeException("OOXML document is null");
@@ -394,11 +398,16 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		ZipInputStream zipInputStream = new ZipInputStream(ooxmldoc);
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
-			if (false == "[Content_Types].xml".equals(zipEntry.getName())) continue;
+			if (false == "[Content_Types].xml".equals(zipEntry.getName()))
+				continue;
 			Document contentTypesDocument = loadDocument(zipInputStream);
 			Element nsElement = contentTypesDocument.createElement("ns");
-			nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/content-types");
-			NodeList nodeList = XPathAPI.selectNodeList(contentTypesDocument, "/tns:Types/tns:Override[@ContentType='" + contentType + "']/@PartName", nsElement);
+			nsElement
+					.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns",
+							"http://schemas.openxmlformats.org/package/2006/content-types");
+			NodeList nodeList = XPathAPI.selectNodeList(contentTypesDocument,
+					"/tns:Types/tns:Override[@ContentType='" + contentType
+							+ "']/@PartName", nsElement);
 			for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
 				String partName = nodeList.item(nodeIdx).getTextContent();
 				partName = partName.substring(1); // remove '/'
@@ -420,7 +429,9 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 
 	protected Document findDocument(String zipEntryName) throws IOException,
 			ParserConfigurationException, SAXException {
-		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()));
+		ZipInputStream zipInputStream = new ZipInputStream(
+				new ByteArrayInputStream(
+						this.signatureService.getOfficeOpenXMLDocument()));
 		ZipEntry zipEntry;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
 			if (false == zipEntryName.equals(zipEntry.getName())) {
@@ -458,5 +469,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
 		return document;
 	}
 
-	public void postSign(Element signatureElement, List<X509Certificate> signingCertificateChain) {}
+	public void postSign(Element signatureElement,
+			List<X509Certificate> signingCertificateChain) {
+	}
 }

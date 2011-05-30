@@ -10,35 +10,41 @@ import es.gob.afirma.exceptions.AOInvalidFormatException;
 import es.gob.afirma.exceptions.AOInvalidRecipientException;
 
 /**
- * Acci&oacute;n privilegiada para el desensobrado de datos. La ejecuci&oacute;n de la acci&oacute;n
- * devuelve {@code true} o {@code false} y el resultado almacenado es un array de bytes.
+ * Acci&oacute;n privilegiada para el desensobrado de datos. La ejecuci&oacute;n
+ * de la acci&oacute;n devuelve {@code true} o {@code false} y el resultado
+ * almacenado es un array de bytes.
  */
 public final class UnwrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
 
 	/** Manejador de ensobrado. */
 	private EnveloperManager enveloperManager;
-	
+
 	/** Envoltorio que se desea desensobrar. */
 	private byte[] envelop;
-	
+
 	/**
-	 * Construye la operaci&oacute;n de desensobrado de datos. Si se indica un sobre, se ensobrara este;
-	 * si no se indica se tomar&aacute; el configurado en el manejador de ensobrado.
-	 * @param enveloperManager Manejador de ensobrado de datos.
-	 * @param envelop Sobre que se desea desensobrar, {@code null} si se desean tomar los del manejador.
+	 * Construye la operaci&oacute;n de desensobrado de datos. Si se indica un
+	 * sobre, se ensobrara este; si no se indica se tomar&aacute; el configurado
+	 * en el manejador de ensobrado.
+	 * 
+	 * @param enveloperManager
+	 *            Manejador de ensobrado de datos.
+	 * @param envelop
+	 *            Sobre que se desea desensobrar, {@code null} si se desean
+	 *            tomar los del manejador.
 	 */
 	public UnwrapAction(EnveloperManager enveloperManager, byte[] envelop) {
-		
+
 		if (enveloperManager == null) {
 			throw new NullPointerException();
 		}
-		
+
 		this.enveloperManager = enveloperManager;
 		this.envelop = envelop;
 	}
-	
+
 	public Boolean run() {
-		
+
 		try {
 			enveloperManager.unwrap(envelop);
 		} catch (AOCancelledOperationException e) {
@@ -63,9 +69,9 @@ public final class UnwrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
 			setError("El certificado del destinatario no es valido", e); //$NON-NLS-1$
 			return false;
 		}
-		
+
 		this.setResult(enveloperManager.getContentData());
-		
+
 		return true;
 	}
 

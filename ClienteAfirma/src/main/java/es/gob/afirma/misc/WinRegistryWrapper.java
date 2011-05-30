@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -20,95 +20,114 @@ import com.sun.deploy.util.WinRegistry;
  */
 public final class WinRegistryWrapper {
 
-    static {
+	static {
 
-        if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-            // Cargamos la libreria nativa 'deploy.dll'
-        	try {
-        		AOUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll");
-        	}
-        	catch(final Throwable e) {
-        		Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll': "+e);
-        	}
-        }
-    }
+		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+			// Cargamos la libreria nativa 'deploy.dll'
+			try {
+				AOUtil.loadNativeLibrary(Platform.getJavaHome()
+						+ "\\bin\\deploy.dll");
+			} catch (final Exception e) {
+				Logger.getLogger("es.gob.afirma").warning(
+						"No se ha podido cargar la libreria de despliegue 'deploy.dll': "
+								+ e);
+			}
+		}
+	}
 
-    /** Carga la DLL <i>deploy.dll</i>, o la original de Java o la propia del Cliente @firma. */  
-    public static void loadDeployDll() {}
-    
-    private WinRegistryWrapper() {}
+	/**
+	 * Carga la DLL <i>deploy.dll</i>, o la original de Java o la propia del
+	 * Cliente @firma.
+	 */
+	public static void loadDeployDll() {
+	}
 
-    /** Clave <i>HKEY_LOCAL_MACHINE</i> del registro de Windows. */
-    public static final int HKEY_LOCAL_MACHINE = 0x80000002;
+	private WinRegistryWrapper() {
+	}
 
-    /** Clave <i>HKEY_CURRENT_USER</i> del registro de Windows. */
-    public static final int HKEY_CURRENT_USER = 0x80000001; 
+	/** Clave <i>HKEY_LOCAL_MACHINE</i> del registro de Windows. */
+	public static final int HKEY_LOCAL_MACHINE = 0x80000002;
 
-    /**
-     * Obtiene una clave del registro de Windows.
-     * @param hKey Ra&iacute;z de la clave a obtener del registro
-     * @param path Ruta de la clave a obtener
-     * @param name Nombre de la clave a obtener
-     * @return Valor de la clave obtenida, <i>null</i> si no se encontr&oacute; la clave o si se produjeron errores
-     *         durante la obtenci&oacute;n
-     */
-    public static Object get(final int hKey, final String path, final String name) {
-        try {
-            return WinRegistry.get(hKey, path, name);
-        }
-        catch(final Throwable e) {
-            Logger.getLogger("es.gob.afirma").severe(
-                "No se ha podido obtener la clave de registro con ruta '" +
-                path + "' y nombre '" + name + "', se devolvera null: " + e 
-            );
-        }
-        return null;
-    }
+	/** Clave <i>HKEY_CURRENT_USER</i> del registro de Windows. */
+	public static final int HKEY_CURRENT_USER = 0x80000001;
 
-    /**
-     * Obtiene una clave de tipo cadena de texto del registro de Windows.
-     * @param hKey Ra&iacute;z de la clave a obtener del registro
-     * @param path Ruta de la clave a obtener
-     * @param name Nombre de la clave a obtener
-     * @return Texto correspondiente a la clave obtenida, <i>null</i> si no se encontr&oacute; la clave o si se produjeron errores
-     *         durante la obtenci&oacute;n
-     */
-    public static String getString(final int hKey, final String path, final String name) {
-        try {
-            return WinRegistry.getString(hKey, path, name);
-        }
-        catch(final Throwable e) {
-            Logger.getLogger("es.gob.afirma").severe(
-                "No se ha podido obtener la clave de registro con ruta '" +
-                path + "' y nombre '" + name + "', se devolvera null: " + e 
-            );
-        }
-        return null;
-    }
+	/**
+	 * Obtiene una clave del registro de Windows.
+	 * 
+	 * @param hKey
+	 *            Ra&iacute;z de la clave a obtener del registro
+	 * @param path
+	 *            Ruta de la clave a obtener
+	 * @param name
+	 *            Nombre de la clave a obtener
+	 * @return Valor de la clave obtenida, <i>null</i> si no se encontr&oacute;
+	 *         la clave o si se produjeron errores durante la obtenci&oacute;n
+	 */
+	public static Object get(final int hKey, final String path,
+			final String name) {
+		try {
+			return WinRegistry.get(hKey, path, name);
+		} catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe(
+					"No se ha podido obtener la clave de registro con ruta '"
+							+ path + "' y nombre '" + name
+							+ "', se devolvera null: " + e);
+		}
+		return null;
+	}
 
-    /**
-     * Establece un valor textual a una clave del registro de Windows.
-     * Si la clave no existe la crea
-     * @param hKey Ra&iacute;z de la clave a establecer en el registro
-     * @param path Ruta de la clave
-     * @param name Nombre de la clave
-     * @param value Valor textual que se desea dar a la clave
-     * @return <code>true</code> si se estableci&oacute; el valor, <code>false</code> si no se pudo establecer
-     */
-    public static boolean setStringValue(final int hKey, 
-    		                             final String path, 
-    		                             final String name, 
-    		                             final String value) {
-        try {
-            return WinRegistry.setStringValue(hKey, path, name, value);
-        }
-        catch(final Throwable e) {
-            Logger.getLogger("es.gob.afirma").severe(
-                "No se ha podido establecer la clave de registro con ruta '" +
-                path + "' y nombre '" + name + "', se devolvera false: " + e 
-            );
-        }
-        return false;
-    }
+	/**
+	 * Obtiene una clave de tipo cadena de texto del registro de Windows.
+	 * 
+	 * @param hKey
+	 *            Ra&iacute;z de la clave a obtener del registro
+	 * @param path
+	 *            Ruta de la clave a obtener
+	 * @param name
+	 *            Nombre de la clave a obtener
+	 * @return Texto correspondiente a la clave obtenida, <i>null</i> si no se
+	 *         encontr&oacute; la clave o si se produjeron errores durante la
+	 *         obtenci&oacute;n
+	 */
+	public static String getString(final int hKey, final String path,
+			final String name) {
+		try {
+			return WinRegistry.getString(hKey, path, name);
+		} catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe(
+					"No se ha podido obtener la clave de registro con ruta '"
+							+ path + "' y nombre '" + name
+							+ "', se devolvera null: " + e);
+		}
+		return null;
+	}
+
+	/**
+	 * Establece un valor textual a una clave del registro de Windows. Si la
+	 * clave no existe la crea
+	 * 
+	 * @param hKey
+	 *            Ra&iacute;z de la clave a establecer en el registro
+	 * @param path
+	 *            Ruta de la clave
+	 * @param name
+	 *            Nombre de la clave
+	 * @param value
+	 *            Valor textual que se desea dar a la clave
+	 * @return <code>true</code> si se estableci&oacute; el valor,
+	 *         <code>false</code> si no se pudo establecer
+	 */
+	public static boolean setStringValue(final int hKey, final String path,
+			final String name, final String value) {
+		try {
+			return WinRegistry.setStringValue(hKey, path, name, value);
+		} catch (final Exception e) {
+			Logger.getLogger("es.gob.afirma").severe(
+					"No se ha podido establecer la clave de registro con ruta '"
+							+ path + "' y nombre '" + name
+							+ "', se devolvera false: " + e);
+		}
+		return false;
+	}
 
 }

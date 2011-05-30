@@ -3,60 +3,59 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
 package es.gob.afirma.cliente;
 
-
 /**
- * Clase para almacenar la configuraci&oacute;n para el filtrado de
- * certificados en el di&aacute;logo de selecci&oacute;n.
+ * Clase para almacenar la configuraci&oacute;n para el filtrado de certificados
+ * en el di&aacute;logo de selecci&oacute;n.
  */
 class CertificateFilterConfiguration {
 
-	/** 
-	 * Filtro aplicado a los Principal de los certificados. 
-	 * @deprecated 
+	/**
+	 * Filtro aplicado a los Principal de los certificados.
+	 * 
+	 * @deprecated
 	 */
 	@Deprecated
-	private es.gob.afirma.cliente.AOCertFilter nameFilter = null; 
-	
+	private es.gob.afirma.cliente.AOCertFilter nameFilter = null;
+
 	/** El KeyUsage m&iacute;nimos que debe cumplir el certificado. */
 	private Boolean[] keyUsageFilter = null;
-	
-	 /** Indicador para que s&oacute;lo se muestren los certificados sin caducar. */ 
+
+	/** Indicador para que s&oacute;lo se muestren los certificados sin caducar. */
 	private boolean showExpiratedCertificates = true;
-	
+
 	/** Filtro RFC2254 para el emisor del certificado. */
 	private String rfc2254IssuerFilter = null;
-	
+
 	/** Filtro RFC2254 para el emisor del certificado. */
 	private String rfc2254SubjectFilter = null;
-	
+
 	/** Indicador para que s&oacute;lo se muestre 1 certificado. */
 	private boolean mandatoryCert = false;
 
-
 	/**
-	 * Inicializa el filtro de certificados. 
+	 * Inicializa el filtro de certificados.
 	 */
 	void initialize() {
-		nameFilter = null; 
+		nameFilter = null;
 		keyUsageFilter = null;
 		rfc2254IssuerFilter = null;
 		rfc2254SubjectFilter = null;
 		showExpiratedCertificates = true;
 		mandatoryCert = false;
 	}
-	
+
 	@Deprecated
 	es.gob.afirma.cliente.AOCertFilter getNameFilter() {
 		return nameFilter;
 	}
-	
+
 	@Deprecated
 	void setNameFilter(es.gob.afirma.cliente.AOCertFilter nameFilter) {
 		this.nameFilter = nameFilter;

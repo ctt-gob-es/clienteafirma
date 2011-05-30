@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -41,10 +41,10 @@ import org.bouncycastle.cms.CMSEnvelopedGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
- * Clase con m&eacute;todos auxiliares obtenidos de Bouncy Castle.
- * Se han extraido los m&eacute;todos de ayuda que son necesarios para generar una firma 
- * de tipo Authenticated-data. 
- * Utilizando estos m&eacute;todos auxiliares se evita retocar en el c&oacute;digo fuente de Bouncy Castle.
+ * Clase con m&eacute;todos auxiliares obtenidos de Bouncy Castle. Se han
+ * extraido los m&eacute;todos de ayuda que son necesarios para generar una
+ * firma de tipo Authenticated-data. Utilizando estos m&eacute;todos auxiliares
+ * se evita retocar en el c&oacute;digo fuente de Bouncy Castle.
  * 
  */
 final class AuthenticatedDataHelper {
@@ -63,34 +63,37 @@ final class AuthenticatedDataHelper {
 		MAC_ALG_NAMES.put(CMSEnvelopedGenerator.AES192_CBC, "AESMac");
 		MAC_ALG_NAMES.put(CMSEnvelopedGenerator.AES256_CBC, "AESMac");
 	}
-	
-	
+
 	/**
- 	 * M&eacute;todo que genera la MAC que se utiliza para cifrar los datos autenticados.
- 	 * 
- 	 * @param encryptionOID		OID del algoritmo que se utilizar&aacute; para generar la MAC.
- 	 * @param content			Contenido que se cifrar&aacute; con dicha MAC.
- 	 * @return					Cifrado MAC.
- 	 */
-	byte[] macGenerator(String encryptionOID, byte[] content, SecretKey cipherKey) throws Exception{
+	 * M&eacute;todo que genera la MAC que se utiliza para cifrar los datos
+	 * autenticados.
+	 * 
+	 * @param encryptionOID
+	 *            OID del algoritmo que se utilizar&aacute; para generar la MAC.
+	 * @param content
+	 *            Contenido que se cifrar&aacute; con dicha MAC.
+	 * @return Cifrado MAC.
+	 */
+	byte[] macGenerator(String encryptionOID, byte[] content,
+			SecretKey cipherKey) throws Exception {
 		MacOutputStream mOut = null;
-					
-		Security.addProvider(new BouncyCastleProvider()); 
+
+		Security.addProvider(new BouncyCastleProvider());
 		Provider provider = Security.getProvider("BC");
-        		
+
 		Mac mac = getMac(encryptionOID, provider);
 
-        AlgorithmParameterSpec params;
+		AlgorithmParameterSpec params;
 
-        params = generateParameterSpec(encryptionOID, cipherKey, provider);
+		params = generateParameterSpec(encryptionOID, cipherKey, provider);
 
-        mac.init(cipherKey, params);
+		mac.init(cipherKey, params);
 
-        ByteArrayOutputStream   bOut = new ByteArrayOutputStream();
-        mOut = new MacOutputStream(bOut, mac);
-        mOut.write(content);
-        
-        return mOut.getMac();
+		ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+		mOut = new MacOutputStream(bOut, mac);
+		mOut.write(content);
+
+		return mOut.getMac();
 	}
 
 	Mac getMac(String macOID, Provider provider)
@@ -115,7 +118,7 @@ final class AuthenticatedDataHelper {
 			throws NoSuchAlgorithmException {
 		if (provider != null) {
 			return Mac.getInstance(algName, provider);
-		} 
+		}
 		return Mac.getInstance(algName);
 	}
 
@@ -158,7 +161,8 @@ final class AuthenticatedDataHelper {
 				// ignore
 			}
 			//
-			// can't try with default provider here as parameters must be from the specified provider.
+			// can't try with default provider here as parameters must be from
+			// the specified provider.
 			//
 			throw e;
 		}
@@ -197,7 +201,8 @@ final class AuthenticatedDataHelper {
 				// ignore
 			}
 			//
-			// can't try with default provider here as parameters must be from the specified provider.
+			// can't try with default provider here as parameters must be from
+			// the specified provider.
 			//
 			throw e;
 		}
@@ -223,58 +228,45 @@ final class AuthenticatedDataHelper {
 		return new AlgorithmIdentifier(new DERObjectIdentifier(encryptionOID),
 				asn1Params);
 	}
-	
-    /**
-     * Clase Auxiliar para el manejo de las MAC.
-     * Es Original de Bouncy Castle
-     */
-	 protected static class MacOutputStream
-     extends OutputStream
- {
-     private final OutputStream out;
-     private Mac mac;
 
-     MacOutputStream(OutputStream out, Mac mac)
-     {
-         this.out = out;
-         this.mac = mac;
-     }
+	/**
+	 * Clase Auxiliar para el manejo de las MAC. Es Original de Bouncy Castle
+	 */
+	protected static class MacOutputStream extends OutputStream {
+		private final OutputStream out;
+		private Mac mac;
 
-     @Override
-	public void write(byte[] buf)
-         throws IOException
-     {
-         mac.update(buf, 0, buf.length);
-         out.write(buf, 0, buf.length);
-     }
+		MacOutputStream(OutputStream out, Mac mac) {
+			this.out = out;
+			this.mac = mac;
+		}
 
-     @Override
-	public void write(byte[] buf, int off, int len)
-         throws IOException
-     {
-         mac.update(buf, off, len);
-         out.write(buf, off, len);
-     }
+		@Override
+		public void write(byte[] buf) throws IOException {
+			mac.update(buf, 0, buf.length);
+			out.write(buf, 0, buf.length);
+		}
 
-     @Override
-	public void write(int i)
-         throws IOException
-     {
-         mac.update((byte)i);
-         out.write(i);
-     }
+		@Override
+		public void write(byte[] buf, int off, int len) throws IOException {
+			mac.update(buf, off, len);
+			out.write(buf, off, len);
+		}
 
-     @Override
-	public void close()
-         throws IOException
-     {
-         out.close();
-     }
-     
-     byte[] getMac()
-     {
-         return mac.doFinal();
-     }
- }
+		@Override
+		public void write(int i) throws IOException {
+			mac.update((byte) i);
+			out.write(i);
+		}
+
+		@Override
+		public void close() throws IOException {
+			out.close();
+		}
+
+		byte[] getMac() {
+			return mac.doFinal();
+		}
+	}
 
 }

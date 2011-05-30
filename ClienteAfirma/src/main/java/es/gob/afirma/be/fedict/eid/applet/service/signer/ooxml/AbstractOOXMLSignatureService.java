@@ -91,7 +91,7 @@ public abstract class AbstractOOXMLSignatureService extends
 	@Override
 	protected final URIDereferencer getURIDereferencer() {
 		return new OOXMLURIDereferencer(getOfficeOpenXMLDocument());
-		//return new CustomDereferencer(null, getOfficeOpenXMLDocument());
+		// return new CustomDereferencer(null, getOfficeOpenXMLDocument());
 	}
 
 	@Override
@@ -107,7 +107,8 @@ public abstract class AbstractOOXMLSignatureService extends
 			try {
 				outputSignedOfficeOpenXMLDocument(this.toByteArray());
 			} catch (Exception e) {
-				throw new IOException("generic error '" + e.getMessage()+"': "+ e);
+				throw new IOException("generic error '" + e.getMessage()
+						+ "': " + e);
 			}
 		}
 	}
@@ -117,17 +118,21 @@ public abstract class AbstractOOXMLSignatureService extends
 	 */
 	abstract protected byte[] getOfficeOpenXMLDocument();
 
-	public byte[] outputSignedOfficeOpenXMLDocument(byte[] signatureData) throws IOException, ParserConfigurationException, SAXException, TransformerException {
+	public byte[] outputSignedOfficeOpenXMLDocument(byte[] signatureData)
+			throws IOException, ParserConfigurationException, SAXException,
+			TransformerException {
 
 		ByteArrayOutputStream signedOOXMLOutputStream = new ByteArrayOutputStream();
 
-		String signatureZipEntryName = "_xmlsignatures/sig-" + UUID.randomUUID().toString() + ".xml";
+		String signatureZipEntryName = "_xmlsignatures/sig-"
+				+ UUID.randomUUID().toString() + ".xml";
 
 		/*
 		 * Copy the original OOXML content to the signed OOXML package. During
 		 * copying some files need to changed.
 		 */
-		ZipOutputStream zipOutputStream = copyOOXMLContent(signatureZipEntryName, signedOOXMLOutputStream);
+		ZipOutputStream zipOutputStream = copyOOXMLContent(
+				signatureZipEntryName, signedOOXMLOutputStream);
 
 		/*
 		 * Add the OOXML XML signature file to the OOXML package.
@@ -136,14 +141,19 @@ public abstract class AbstractOOXMLSignatureService extends
 		zipOutputStream.putNextEntry(zipEntry);
 		IOUtils.write(signatureData, zipOutputStream);
 		zipOutputStream.close();
-		
+
 		return signedOOXMLOutputStream.toByteArray();
 	}
 
 	private ZipOutputStream copyOOXMLContent(String signatureZipEntryName,
-			                                 OutputStream signedOOXMLOutputStream) throws IOException, ParserConfigurationException, SAXException, TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
-		ZipOutputStream zipOutputStream = new ZipOutputStream(signedOOXMLOutputStream);
-		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.getOfficeOpenXMLDocument()));
+			OutputStream signedOOXMLOutputStream) throws IOException,
+			ParserConfigurationException, SAXException,
+			TransformerConfigurationException,
+			TransformerFactoryConfigurationError, TransformerException {
+		ZipOutputStream zipOutputStream = new ZipOutputStream(
+				signedOOXMLOutputStream);
+		ZipInputStream zipInputStream = new ZipInputStream(
+				new ByteArrayInputStream(this.getOfficeOpenXMLDocument()));
 		ZipEntry zipEntry;
 		boolean hasOriginSigsRels = false;
 		while (null != (zipEntry = zipInputStream.getNextEntry())) {
@@ -305,7 +315,8 @@ public abstract class AbstractOOXMLSignatureService extends
 		relationshipElement.setAttribute("Target", target);
 		relationshipsElement.appendChild(relationshipElement);
 
-		zipOutputStream.putNextEntry(new ZipEntry("_xmlsignatures/_rels/origin.sigs.rels"));
+		zipOutputStream.putNextEntry(new ZipEntry(
+				"_xmlsignatures/_rels/origin.sigs.rels"));
 		writeDocumentNoClosing(originSignRelsDocument, zipOutputStream, false);
 	}
 

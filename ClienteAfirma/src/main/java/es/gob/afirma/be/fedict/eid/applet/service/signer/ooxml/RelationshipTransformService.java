@@ -104,7 +104,8 @@ public class RelationshipTransformService extends TransformService {
 	}
 
 	@Override
-	public void init(TransformParameterSpec params) throws InvalidAlgorithmParameterException {
+	public void init(TransformParameterSpec params)
+			throws InvalidAlgorithmParameterException {
 		if (false == params instanceof RelationshipTransformParameterSpec) {
 			throw new InvalidAlgorithmParameterException();
 		}
@@ -121,7 +122,7 @@ public class RelationshipTransformService extends TransformService {
 		DOMStructure domParent = (DOMStructure) parent;
 		Node parentNode = domParent.getNode();
 		try {
-			/*System.out.println("parent: " + */toString(parentNode)/*)*/;
+			/* System.out.println("parent: " + */toString(parentNode)/* ) */;
 		} catch (TransformerException e) {
 			throw new InvalidAlgorithmParameterException();
 		}
@@ -136,11 +137,13 @@ public class RelationshipTransformService extends TransformService {
 			nodeList = XPathAPI.selectNodeList(parentNode,
 					"mdssi:RelationshipReference/@SourceId", nsElement);
 		} catch (TransformerException e) {
-			Logger.getLogger("es.gob.afirma").severe("transformer exception: " + e.getMessage());
+			Logger.getLogger("es.gob.afirma").severe(
+					"transformer exception: " + e.getMessage());
 			throw new InvalidAlgorithmParameterException();
 		}
 		if (0 == nodeList.getLength()) {
-			Logger.getLogger("es.gob.afirma").warning("no RelationshipReference/@SourceId parameters present");
+			Logger.getLogger("es.gob.afirma").warning(
+					"no RelationshipReference/@SourceId parameters present");
 		}
 		for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
 			Node node = nodeList.item(nodeIdx);
@@ -186,8 +189,9 @@ public class RelationshipTransformService extends TransformService {
 			throw new TransformException(e.getMessage(), e);
 		}
 		try {
-			/*System.out.println("relationships document: "
-					+ */toString(relationshipsDocument)/*)*/;
+			/*
+			 * System.out.println("relationships document: " +
+			 */toString(relationshipsDocument)/* ) */;
 		} catch (TransformerException e) {
 			throw new TransformException(e.getMessage(), e);
 		}
@@ -200,7 +204,7 @@ public class RelationshipTransformService extends TransformService {
 		for (int nodeIdx = 0; nodeIdx < childNodes.getLength(); nodeIdx++) {
 			Node childNode = childNodes.item(nodeIdx);
 			if (Node.ELEMENT_NODE != childNode.getNodeType()) {
-				//System.out.println("removing node");
+				// System.out.println("removing node");
 				relationshipsElement.removeChild(childNode);
 				nodeIdx--;
 				continue;
@@ -236,13 +240,15 @@ public class RelationshipTransformService extends TransformService {
 		for (int nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
 			Node relationshipNode = relationshipNodes.item(0);
 			Element relationshipElement = (Element) relationshipNode;
-			//System.out.println("unsorted Id: " + relationshipElement.getAttribute("Id"));
+			// System.out.println("unsorted Id: " +
+			// relationshipElement.getAttribute("Id"));
 			relationshipElements.add(relationshipElement);
 			relationshipsElement.removeChild(relationshipNode);
 		}
 		Collections.sort(relationshipElements, new RelationshipComparator());
 		for (Element relationshipElement : relationshipElements) {
-			//System.out.println("sorted Id: " + relationshipElement.getAttribute("Id"));
+			// System.out.println("sorted Id: " +
+			// relationshipElement.getAttribute("Id"));
 			relationshipsElement.appendChild(relationshipElement);
 		}
 	}
@@ -273,9 +279,10 @@ public class RelationshipTransformService extends TransformService {
 		Transformer transformer = transformerFactory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		transformer.transform(source, result);
-		//System.out.println("result: " + new String(outputStream.toByteArray()));
-		return new OctetStreamData(new ByteArrayInputStream(outputStream
-				.toByteArray()));
+		// System.out.println("result: " + new
+		// String(outputStream.toByteArray()));
+		return new OctetStreamData(new ByteArrayInputStream(
+				outputStream.toByteArray()));
 	}
 
 	private Document loadDocument(InputStream documentInputStream)
@@ -292,12 +299,12 @@ public class RelationshipTransformService extends TransformService {
 
 	public Data transform(Data data, XMLCryptoContext context, OutputStream os)
 			throws TransformException {
-		//System.out.println("transform(data,context,os)");
+		// System.out.println("transform(data,context,os)");
 		return null;
 	}
 
 	public boolean isFeatureSupported(String feature) {
-		//System.out.println("isFeatureSupported(feature)");
+		// System.out.println("isFeatureSupported(feature)");
 		return false;
 	}
 }

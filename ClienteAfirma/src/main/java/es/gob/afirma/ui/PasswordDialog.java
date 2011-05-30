@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -31,10 +31,12 @@ import javax.swing.JPasswordField;
 import es.gob.afirma.Messages;
 
 /**
- * Di&aacute;logo para la creaci&oacute;n de una nueva contrase&ntilde;a.
- * More information about the original class is available from <a target="_top" href=
+ * Di&aacute;logo para la creaci&oacute;n de una nueva contrase&ntilde;a. More
+ * information about the original class is available from <a target="_top" href=
  * "http://ostermiller.org/utils/PasswordDialog.html">ostermiller.org</a>.
- * @author Stephen Ostermiller http://ostermiller.org/contact.pl?regarding=Java+Utilities
+ * 
+ * @author Stephen Ostermiller
+ *         http://ostermiller.org/contact.pl?regarding=Java+Utilities
  */
 public final class PasswordDialog extends JDialog {
 
@@ -45,26 +47,25 @@ public final class PasswordDialog extends JDialog {
 	private JButton okButton;
 	private JButton cancelButton;
 	private JLabel descriptionLabel;
-	
+
 	/**
-	 * Get the password that was entered into the dialog before
-	 * the dialog was closed.
+	 * Get the password that was entered into the dialog before the dialog was
+	 * closed.
+	 * 
 	 * @return the password from the password field.
 	 */
-	public char[] getPass(){
+	public char[] getPass() {
 		return pass2.getPassword();
 	}
 
 	/**
-	 * Finds out if user used the OK button or an equivalent action
-	 * to close the dialog.
-	 * Pressing enter in the password field may be the same as
-	 * 'OK' but closing the dialog and pressing the cancel button
-	 * are not.
-	 *
+	 * Finds out if user used the OK button or an equivalent action to close the
+	 * dialog. Pressing enter in the password field may be the same as 'OK' but
+	 * closing the dialog and pressing the cancel button are not.
+	 * 
 	 * @return true if the the user hit OK, false if the user canceled.
 	 */
-	public boolean okPressed(){
+	public boolean okPressed() {
 		return pressed_OK;
 	}
 
@@ -73,37 +74,49 @@ public final class PasswordDialog extends JDialog {
 
 	/**
 	 * Create this dialog with the given parent and title.
-	 * @param parent window from which this dialog is launched
-	 * @param title the title for the dialog box window
+	 * 
+	 * @param parent
+	 *            window from which this dialog is launched
+	 * @param title
+	 *            the title for the dialog box window
 	 */
 	public PasswordDialog(Dialog parent, String title) {
 		super(parent, title, true);
 		setTitle(title);
-		if (parent != null) setLocationRelativeTo(parent);
+		if (parent != null)
+			setLocationRelativeTo(parent);
 	}
 
 	/**
 	 * Create this dialog with the given parent and the default title.
-	 * @param parent window from which this dialog is launched
+	 * 
+	 * @param parent
+	 *            window from which this dialog is launched
 	 */
 	public PasswordDialog(Dialog parent) {
 		this(parent, null);
 	}
-	
+
 	/**
 	 * Create this dialog with the given parent and title.
-	 * @param parent window from which this dialog is launched
-	 * @param title the title for the dialog box window
+	 * 
+	 * @param parent
+	 *            window from which this dialog is launched
+	 * @param title
+	 *            the title for the dialog box window
 	 */
 	public PasswordDialog(Frame parent, String title) {
 		super(parent, title, true);
 		setTitle(title);
-		if (parent != null) setLocationRelativeTo(parent);
+		if (parent != null)
+			setLocationRelativeTo(parent);
 	}
 
 	/**
 	 * Create this dialog with the given parent and the default title.
-	 * @param parent window from which this dialog is launched
+	 * 
+	 * @param parent
+	 *            window from which this dialog is launched
 	 */
 	public PasswordDialog(Frame parent) {
 		this(parent, null);
@@ -111,32 +124,35 @@ public final class PasswordDialog extends JDialog {
 
 	/** Create this dialog with the default title. */
 	public PasswordDialog() {
-		this((Frame)null, null);
+		this((Frame) null, null);
 	}
 
 	/** Called by constructors to initialize the dialog. */
-	@Override 
-	protected void dialogInit(){
+	@Override
+	protected void dialogInit() {
 
 		pass1 = new JPasswordField("", 20);
 		pass2 = new JPasswordField("", 20);
 		okButton = new JButton(Messages.getString("PasswordDialog.0"));
 		cancelButton = new JButton(Messages.getString("PasswordDialog.3"));
 		descriptionLabel = new JLabel("");
-		final JLabel nameLabel = new JLabel(Messages.getString("PasswordDialog.5"));
-		final JLabel passLabel = new JLabel(Messages.getString("PasswordDialog.6"));
-		
+		final JLabel nameLabel = new JLabel(
+				Messages.getString("PasswordDialog.5"));
+		final JLabel passLabel = new JLabel(
+				Messages.getString("PasswordDialog.6"));
+
 		super.dialogInit();
 
 		KeyListener keyListener = new KeyAdapter() {
-			@Override 
-			public void keyPressed(KeyEvent e){
-				if (e.getKeyCode() == KeyEvent.VK_ESCAPE || 
-				   (e.getSource() == cancelButton && e.getKeyCode() == KeyEvent.VK_ENTER)) {
-						pressed_OK = false;
-						PasswordDialog.this.setVisible(false);
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ESCAPE
+						|| (e.getSource() == cancelButton && e.getKeyCode() == KeyEvent.VK_ENTER)) {
+					pressed_OK = false;
+					PasswordDialog.this.setVisible(false);
 				}
-				if (e.getSource() == okButton && e.getKeyCode() == KeyEvent.VK_ENTER) {
+				if (e.getSource() == okButton
+						&& e.getKeyCode() == KeyEvent.VK_ENTER) {
 					pressed_OK = true;
 					PasswordDialog.this.setVisible(false);
 				}
@@ -145,9 +161,9 @@ public final class PasswordDialog extends JDialog {
 		addKeyListener(keyListener);
 
 		ActionListener actionListener = new ActionListener() {
-			public void actionPerformed(ActionEvent e){
+			public void actionPerformed(ActionEvent e) {
 				Object source = e.getSource();
-				if (source == pass1){
+				if (source == pass1) {
 					// the user pressed enter in the pass1 field.
 					pass1.transferFocus();
 				} else {
@@ -158,32 +174,27 @@ public final class PasswordDialog extends JDialog {
 						if (password.equals(new String(pass1.getPassword()))) {
 							if (password.length() > 1) {
 								PasswordDialog.this.setVisible(false);
-							}
-							else {
+							} else {
 								JOptionPane.showMessageDialog(
-									PasswordDialog.this,
-									Messages.getString("PasswordDialog.7"),
-									Messages.getString("PasswordDialog.8"),
-									JOptionPane.ERROR_MESSAGE
-								);
+										PasswordDialog.this,
+										Messages.getString("PasswordDialog.7"),
+										Messages.getString("PasswordDialog.8"),
+										JOptionPane.ERROR_MESSAGE);
 								pass1.setText("");
 								pass1.grabFocus();
 								pass2.setText("");
 							}
-						}
-						else {
-							JOptionPane.showMessageDialog(
-								PasswordDialog.this,
-								Messages.getString("PasswordDialog.11"),
-								Messages.getString("PasswordDialog.8"),
-								JOptionPane.ERROR_MESSAGE
-							);
+						} else {
+							JOptionPane.showMessageDialog(PasswordDialog.this,
+									Messages.getString("PasswordDialog.11"),
+									Messages.getString("PasswordDialog.8"),
+									JOptionPane.ERROR_MESSAGE);
 							pass1.setText("");
 							pass1.grabFocus();
 							pass2.setText("");
 						}
-					}
-					else PasswordDialog.this.setVisible(false);
+					} else
+						PasswordDialog.this.setVisible(false);
 				}
 			}
 		};
@@ -197,7 +208,7 @@ public final class PasswordDialog extends JDialog {
 		c.weightx = 1.0;
 		c.gridwidth = 2;
 		pane.add(descriptionLabel, c);
-		
+
 		c.gridy = 1;
 		c.weightx = 0.0;
 		c.gridwidth = 1;
@@ -240,18 +251,22 @@ public final class PasswordDialog extends JDialog {
 
 	/**
 	 * Establece el texto a mostrar para la solicitud de contrase&ntilde;a.
-	 * @param descriptionText Texto para la solicitud de contrase&ntilde;a (Unicode)
+	 * 
+	 * @param descriptionText
+	 *            Texto para la solicitud de contrase&ntilde;a (Unicode)
 	 */
 	public void setDescriptionText(String descriptionText) {
-		this.descriptionLabel.setText(descriptionText == null ? "" : descriptionText);
+		this.descriptionLabel.setText(descriptionText == null ? ""
+				: descriptionText);
 		pack();
 	}
-	
+
 	/**
 	 * Shows the dialog and returns true if the user pressed ok.
+	 * 
 	 * @return true if the the user hit OK, false if the user canceled.
 	 */
-	public boolean showDialog(){
+	public boolean showDialog() {
 		setVisible(true);
 		return okPressed();
 	}

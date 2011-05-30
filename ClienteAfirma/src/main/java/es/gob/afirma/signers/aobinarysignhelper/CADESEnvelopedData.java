@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -32,58 +32,77 @@ import es.gob.afirma.ciphers.AOCipherConfig;
 import es.gob.afirma.misc.AOCryptoUtil;
 
 /**
- * Clase que implementa firma digital EnvelopedData en CADES
- * basada en PKCS#7/CMS EnvelopedData.
- * La Estructura del mensaje es la siguiente:<br>
- * <pre><code>
-
- * EnvelopedData ::= SEQUENCE {
- *     version CMSVersion,
- *     originatorInfo [0] IMPLICIT OriginatorInfo OPTIONAL,
- *     recipientInfos RecipientInfos,
- *     encryptedContentInfo EncryptedContentInfo,
- *     unprotectedAttrs [1] IMPLICIT UnprotectedAttributes OPTIONAL
- * }
- *
- *</code></pre>
- * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para crear un
- * mensaje Data de BouncyCastle: <a href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
+ * Clase que implementa firma digital EnvelopedData en CADES basada en
+ * PKCS#7/CMS EnvelopedData. La Estructura del mensaje es la siguiente:<br>
+ * 
+ * <pre>
+ * <code>
+ * 
+ *  EnvelopedData ::= SEQUENCE {
+ *      version CMSVersion,
+ *      originatorInfo [0] IMPLICIT OriginatorInfo OPTIONAL,
+ *      recipientInfos RecipientInfos,
+ *      encryptedContentInfo EncryptedContentInfo,
+ *      unprotectedAttrs [1] IMPLICIT UnprotectedAttributes OPTIONAL
+ *  }
+ * 
+ * </code>
+ * </pre>
+ * 
+ * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
+ * para crear un mensaje Data de BouncyCastle: <a
+ * href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
  */
 
-
-public final class CADESEnvelopedData  {
+public final class CADESEnvelopedData {
 
 	/**
-	 * Clave de cifrado. La almacenamos internamente porque no hay forma de mostrarla
-	 * directamente al usuario.
+	 * Clave de cifrado. La almacenamos internamente porque no hay forma de
+	 * mostrarla directamente al usuario.
 	 */
 	private SecretKey cipherKey;
 
 	/**
 	 * M&eacute;todo que genera la firma de tipo EnvelopedData.
-	 *
-	 * @param parameters  Par&aacute;metros necesarios para la generaci&oacute;n de este tipo.
-	 * @param config      Configuraci&oacute;n del algoritmo para firmar
-	 * @param certDest    Certificado del destino al cual va dirigido la firma.
-	 * @param dataType    Identifica el tipo del contenido a firmar.
 	 * 
-	 * @return            la firma de tipo EnvelopedData.
-	 * @throws java.io.IOException Si ocurre alg&uacute;n problema leyendo o escribiendo los datos
-	 * @throws java.security.cert.CertificateEncodingException Si se produce alguna excepci&oacute;n con los certificados de firma.
-	 * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos de firma o huella digital
+	 * @param parameters
+	 *            Par&aacute;metros necesarios para la generaci&oacute;n de este
+	 *            tipo.
+	 * @param config
+	 *            Configuraci&oacute;n del algoritmo para firmar
+	 * @param certDest
+	 *            Certificado del destino al cual va dirigido la firma.
+	 * @param dataType
+	 *            Identifica el tipo del contenido a firmar.
+	 * 
+	 * @return la firma de tipo EnvelopedData.
+	 * @throws java.io.IOException
+	 *             Si ocurre alg&uacute;n problema leyendo o escribiendo los
+	 *             datos
+	 * @throws java.security.cert.CertificateEncodingException
+	 *             Si se produce alguna excepci&oacute;n con los certificados de
+	 *             firma.
+	 * @throws java.security.NoSuchAlgorithmException
+	 *             Si no se soporta alguno de los algoritmos de firma o huella
+	 *             digital
 	 */
-	public byte[] genEnvelopedData(P7ContentSignerParameters parameters,AOCipherConfig config, X509Certificate[] certDest, Oid dataType) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+	public byte[] genEnvelopedData(P7ContentSignerParameters parameters,
+			AOCipherConfig config, X509Certificate[] certDest, Oid dataType)
+			throws IOException, CertificateEncodingException,
+			NoSuchAlgorithmException {
 
 		this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
-		//Datos previos &uacute;tiles
-		String digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(
-				parameters.getSignatureAlgorithm());
+		// Datos previos &uacute;tiles
+		String digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(parameters
+				.getSignatureAlgorithm());
 
 		// 1. ORIGINATORINFO
 		// obtenemos la lista de certificados
-		X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
-		ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
+		X509Certificate[] signerCertificateChain = parameters
+				.getSignerCertificateChain();
+		ASN1Set certificates = Utils
+				.fetchCertificatesList(signerCertificateChain);
 		ASN1Set certrevlist = null;
 
 		OriginatorInfo origInfo = null;
@@ -92,42 +111,52 @@ public final class CADESEnvelopedData  {
 		}
 
 		// 2. RECIPIENTINFOS
-		Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+		Info infos = Utils.initVariables(parameters.getContent(), config,
+				certDest, cipherKey);
 
 		// 3. ATRIBUTOS
-		ASN1Set unprotectedAttrs = getAttributeSet(new AttributeTable(Utils.initContexExpecific(digestAlgorithm, parameters.getContent(), dataType, null)));
+		ASN1Set unprotectedAttrs = getAttributeSet(new AttributeTable(
+				Utils.initContexExpecific(digestAlgorithm,
+						parameters.getContent(), dataType, null)));
 
 		// construimos el Enveloped Data y lo devolvemos
-		return new ContentInfo(
-				PKCSObjectIdentifiers.envelopedData,
-				new EnvelopedData(
-						origInfo,
-						new DERSet(infos.getRecipientInfos()),
-						infos.getEncInfo(),
-						unprotectedAttrs
-				)
-		).getDEREncoded();
+		return new ContentInfo(PKCSObjectIdentifiers.envelopedData,
+				new EnvelopedData(origInfo, new DERSet(
+						infos.getRecipientInfos()), infos.getEncInfo(),
+						unprotectedAttrs)).getDEREncoded();
 
 	}
 
 	/**
 	 * M&eacute;todo que genera la firma de tipo EnvelopedData.
-	 *
-	 * @param data        Datos binarios a firmar
-	 * @param digestAlg   Algoritmo de hash
-	 * @param config      Configuraci&oacute;n del algoritmo para firmar
-	 * @param certDest    Certificado del destino al cual va dirigido la firma.
-	 * @param dataType    Identifica el tipo del contenido a firmar.
-	 *
-	 * @return            la firma de tipo EnvelopedData.
-	 * @throws java.io.IOException Si hay problemas en la lectura de datos
-	 * @throws java.security.cert.CertificateEncodingException Cuando el certificado proporcionado no est&aacute; codificado adecuadamente
-	 * @throws java.security.NoSuchAlgorithmException Si no se soporta alguno de los algoritmos indicados
+	 * 
+	 * @param data
+	 *            Datos binarios a firmar
+	 * @param digestAlg
+	 *            Algoritmo de hash
+	 * @param config
+	 *            Configuraci&oacute;n del algoritmo para firmar
+	 * @param certDest
+	 *            Certificado del destino al cual va dirigido la firma.
+	 * @param dataType
+	 *            Identifica el tipo del contenido a firmar.
+	 * 
+	 * @return la firma de tipo EnvelopedData.
+	 * @throws java.io.IOException
+	 *             Si hay problemas en la lectura de datos
+	 * @throws java.security.cert.CertificateEncodingException
+	 *             Cuando el certificado proporcionado no est&aacute; codificado
+	 *             adecuadamente
+	 * @throws java.security.NoSuchAlgorithmException
+	 *             Si no se soporta alguno de los algoritmos indicados
 	 */
-	public byte[] genEnvelopedData(byte[] data, String digestAlg, AOCipherConfig config, X509Certificate[] certDest, Oid dataType) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+	public byte[] genEnvelopedData(byte[] data, String digestAlg,
+			AOCipherConfig config, X509Certificate[] certDest, Oid dataType)
+			throws IOException, CertificateEncodingException,
+			NoSuchAlgorithmException {
 		this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
-		//Datos previos &uacute;tiles
+		// Datos previos &uacute;tiles
 		String digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(digestAlg);
 
 		// 1. ORIGINATORINFO
@@ -137,18 +166,13 @@ public final class CADESEnvelopedData  {
 		Info infos = Utils.initVariables(data, config, certDest, cipherKey);
 
 		// 3. ATRIBUTOS
-		ASN1Set unprotectedAttrs = getAttributeSet(new AttributeTable(Utils.initContexExpecific(digestAlgorithm, data, dataType, null)));
+		ASN1Set unprotectedAttrs = getAttributeSet(new AttributeTable(
+				Utils.initContexExpecific(digestAlgorithm, data, dataType, null)));
 
 		// construimos el Enveloped Data y lo devolvemos
-		return new ContentInfo(
-				PKCSObjectIdentifiers.envelopedData,
-				new EnvelopedData(
-						origInfo,
-						new DERSet(infos.getRecipientInfos()),
-						infos.getEncInfo(),
-						unprotectedAttrs
-				)
-		).getDEREncoded();
+		return new ContentInfo(PKCSObjectIdentifiers.envelopedData,
+				new EnvelopedData(origInfo, new DERSet(
+						infos.getRecipientInfos()), infos.getEncInfo(),
+						unprotectedAttrs)).getDEREncoded();
 	}
 }
-

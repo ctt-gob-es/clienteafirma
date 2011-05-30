@@ -3,7 +3,7 @@
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
- * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * Este fichero se distribuye bajo licencia GPL version 3 segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
@@ -28,98 +28,104 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  *       SigPolicyQualifierId  SigPolicyQualifierId,
  *       SigQualifier          ANY DEFINED BY policyQualifierId }
  * </pre>
- *
- * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para crear un
- * Signature Policy qualifiers basandose en BouncyCastle: <a href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
- * de la clase Policy qualifiers.
+ * 
+ * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
+ * para crear un Signature Policy qualifiers basandose en BouncyCastle: <a
+ * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> de la clase
+ * Policy qualifiers.
  */
 final class SigPolicyQualifierInfo extends ASN1Encodable {
-	
-   private DERObjectIdentifier SigPolicyQualifierId;
-   private DEREncodable        SigQualifier;
 
-   /**
-    * Creates a new <code>SigPolicyQualifierInfo</code> instance.
-    *
-    * @param SigPolicyQualifierId Valor <code>PolicyQualifierId</code>
-    * @param SigQualifier Es el calificador, definido en el campo de arriba.
-    */
-   public SigPolicyQualifierInfo(
-       DERObjectIdentifier SigPolicyQualifierId,
-       DEREncodable SigQualifier)
-   {
-      this.SigPolicyQualifierId = SigPolicyQualifierId;
-      this.SigQualifier = SigQualifier;
-   }
+	private DERObjectIdentifier SigPolicyQualifierId;
+	private DEREncodable SigQualifier;
 
-   /**
-    * Crea un nuevo <code>SigPolicyQualifierInfo</code> con su calificador
-    * cPSuri.
-    *
-    * @param cps El CPS (certification practice statement) uri como
-    * <code>String</code>.
-    */
-   public SigPolicyQualifierInfo(
-       String cps) 
-   {
-      SigPolicyQualifierId = PKCSObjectIdentifiers.id_spq_ets_uri;
-      SigQualifier = new DERIA5String (cps);
-   }
+	/**
+	 * Creates a new <code>SigPolicyQualifierInfo</code> instance.
+	 * 
+	 * @param SigPolicyQualifierId
+	 *            Valor <code>PolicyQualifierId</code>
+	 * @param SigQualifier
+	 *            Es el calificador, definido en el campo de arriba.
+	 */
+	public SigPolicyQualifierInfo(DERObjectIdentifier SigPolicyQualifierId,
+			DEREncodable SigQualifier) {
+		this.SigPolicyQualifierId = SigPolicyQualifierId;
+		this.SigQualifier = SigQualifier;
+	}
 
-   /**
-    * Crea una nueva estancia de <code>SigPolicyQualifierInfo</code> .
-    *
-    * @param as Estructura X509 codificada como ASN1Sequence.
-    */
-   public SigPolicyQualifierInfo(
-       ASN1Sequence as)
-   {
-        if (as.size() != 2)
-        {
-            throw new IllegalArgumentException("Bad sequence size: "
-                    + as.size());
-        }
+	/**
+	 * Crea un nuevo <code>SigPolicyQualifierInfo</code> con su calificador
+	 * cPSuri.
+	 * 
+	 * @param cps
+	 *            El CPS (certification practice statement) uri como
+	 *            <code>String</code>.
+	 */
+	public SigPolicyQualifierInfo(String cps) {
+		SigPolicyQualifierId = PKCSObjectIdentifiers.id_spq_ets_uri;
+		SigQualifier = new DERIA5String(cps);
+	}
 
-        SigPolicyQualifierId = DERObjectIdentifier.getInstance(as.getObjectAt(0));
-        SigQualifier = as.getObjectAt(1);
-   }
+	/**
+	 * Crea una nueva estancia de <code>SigPolicyQualifierInfo</code> .
+	 * 
+	 * @param as
+	 *            Estructura X509 codificada como ASN1Sequence.
+	 */
+	public SigPolicyQualifierInfo(ASN1Sequence as) {
+		if (as.size() != 2) {
+			throw new IllegalArgumentException("Bad sequence size: "
+					+ as.size());
+		}
 
-   /**
-    * Devuelve la estancia a partir del objeto pasado por par&aacute;metro
-    * @param as Objeto a estanciar.
-    * @return Estancia a partir del objeto pasado por par&aacute;metro.
-    */
-   public static SigPolicyQualifierInfo getInstance(Object as) {
-        if (as instanceof SigPolicyQualifierInfo) return (SigPolicyQualifierInfo)as;
-        else if (as instanceof ASN1Sequence) return new SigPolicyQualifierInfo((ASN1Sequence)as);
-        throw new IllegalArgumentException("unknown object in getInstance.");
-   }
+		SigPolicyQualifierId = DERObjectIdentifier.getInstance(as
+				.getObjectAt(0));
+		SigQualifier = as.getObjectAt(1);
+	}
 
-   /**
-    * Devuelve el identificador de la estancia.
-    * @return El identificador.
-    */
-   public DERObjectIdentifier getSigPolicyQualifierId() {
-       return SigPolicyQualifierId;
-   }
+	/**
+	 * Devuelve la estancia a partir del objeto pasado por par&aacute;metro
+	 * 
+	 * @param as
+	 *            Objeto a estanciar.
+	 * @return Estancia a partir del objeto pasado por par&aacute;metro.
+	 */
+	public static SigPolicyQualifierInfo getInstance(Object as) {
+		if (as instanceof SigPolicyQualifierInfo)
+			return (SigPolicyQualifierInfo) as;
+		else if (as instanceof ASN1Sequence)
+			return new SigPolicyQualifierInfo((ASN1Sequence) as);
+		throw new IllegalArgumentException("unknown object in getInstance.");
+	}
 
-   /**
-    * Devuelve el Cualificador de la estancia.
-    * @return el Cualificador.
-    */
-   public DEREncodable getSigQualifier() {
-       return SigQualifier;
-   }
-   
-   /**
-    * Devuelve una representaci&oacute;n DER-encodable the esta estancia.
-    * @return un valor <code>DERObject</code>.
-    */
-   @Override
-   public DERObject toASN1Object() {
-      final ASN1EncodableVector dev = new ASN1EncodableVector();
-      dev.add(SigPolicyQualifierId);
-      dev.add(SigQualifier);
-      return new DERSequence(dev);
-   }
+	/**
+	 * Devuelve el identificador de la estancia.
+	 * 
+	 * @return El identificador.
+	 */
+	public DERObjectIdentifier getSigPolicyQualifierId() {
+		return SigPolicyQualifierId;
+	}
+
+	/**
+	 * Devuelve el Cualificador de la estancia.
+	 * 
+	 * @return el Cualificador.
+	 */
+	public DEREncodable getSigQualifier() {
+		return SigQualifier;
+	}
+
+	/**
+	 * Devuelve una representaci&oacute;n DER-encodable the esta estancia.
+	 * 
+	 * @return un valor <code>DERObject</code>.
+	 */
+	@Override
+	public DERObject toASN1Object() {
+		final ASN1EncodableVector dev = new ASN1EncodableVector();
+		dev.add(SigPolicyQualifierId);
+		dev.add(SigQualifier);
+		return new DERSequence(dev);
+	}
 }

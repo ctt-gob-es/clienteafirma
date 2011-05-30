@@ -55,7 +55,8 @@ public interface SignatureService {
 	 * @return the digest to be signed.
 	 * @throws NoSuchAlgorithmException
 	 */
-	byte[] preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain, PrivateKey signingKey)
+	byte[] preSign(List<DigestInfo> digestInfos,
+			List<X509Certificate> signingCertificateChain, PrivateKey signingKey)
 			throws NoSuchAlgorithmException;
 
 	/**
@@ -70,5 +71,7 @@ public interface SignatureService {
 	 * @param signingCertificateChain
 	 *            the optional chain of signing certificates.
 	 */
-	byte[] postSign(byte[] signedXML, List<X509Certificate> signingCertificateChain, String signatureId, byte[] signatureValue);
+	byte[] postSign(byte[] signedXML,
+			List<X509Certificate> signingCertificateChain, String signatureId,
+			byte[] signatureValue);
 }
