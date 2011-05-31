@@ -120,7 +120,7 @@ final class TreePath {
 	 */
 	@Override
 	public String toString() {
-		StringBuffer tempSpot = new StringBuffer("[");
+		final StringBuffer tempSpot = new StringBuffer("[");
 
 		for (int counter = 0, maxCounter = getPathCount(); counter < maxCounter; counter++) {
 			if (counter > 0)

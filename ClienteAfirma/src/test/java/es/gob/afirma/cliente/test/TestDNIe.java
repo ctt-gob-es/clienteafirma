@@ -21,69 +21,74 @@ import es.gob.afirma.misc.Platform;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOXAdESSigner;
 
+/** Pruebas de operaciones comunes con DNIe.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class TestDNIe {
 
-	@Test
-	public void testXADESSignatureDNIe() {
-		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
-		AOSigner signer = new AOXAdESSigner();
-		assertNotNull(signer);
-		byte[] result = null;
-		PrivateKeyEntry pke = null;
-		//for (byte[] content : TEST_CONTENT) {
-		//	for(Properties extraParams : XADES_MODES) {
-				for (String algo : ALGOS) {
-					System.out.println();System.out.println();System.out.println();
-					System.out.println("Prueba DNIe con XAdES, " + algo); 
-					try {
-						pke = TestUtils.getValidKeyEntryFromKeyStore(AOConstants.AOKeyStore.PKCS11);
-						assertNotNull("No hemos encontrado una clave de prueba en DNIe", pke);
-						result = signer.sign(TEST_CONTENT[1], algo, pke, XADES_MODES[0]);
-					}
-					catch(final Throwable e) {
-						result = null;
-						e.printStackTrace();
-					}
-			//	}
-			//}
-		}
-		assertNotNull(result);
-	}
-	
-	
-	@Test
-	public void testPKCS11KeyStore() {
-		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
-		System.out.println("Probando almacen PKCS#11 con DNIe...");
-		String p11lib = null;
-		if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-			if (new File("C:\\Windows\\SysWOW64\\UsrPkcs11.dll").exists()) p11lib = "C:\\Windows\\SysWOW64\\UsrPkcs11.dll";
-			else p11lib = "C:\\Windows\\System32\\UsrPkcs11.dll";
-		}
-//		else if (Platform.OS.LINUX.equals(Platform.getOS())) {
-//			p11lib = null;
-//		}
-//		else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-//			p11lib = null;
-//		}
-		AOKeyStoreManager ksm = null;
-		try {
-			ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-				AOConstants.AOKeyStore.PKCS11,
-				p11lib,
-				null,
-				new UIPasswordCallback("Contrasena del DNIe", null),
-				null
-			);
-		}
-		catch(final Throwable e) {
-			e.printStackTrace();
-		}
-		assertNotNull(ksm);
-		assertTrue(ksm.getKeyStores().size() > 0);
-		assertNotNull(ksm.getKeyStores().get(0));
-		System.out.println();
-	}
+    /** Prueba de firma XAdES con DNIe. */
+    @Test
+    public void testXADESSignatureDNIe() {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
+        AOSigner signer = new AOXAdESSigner();
+        assertNotNull(signer);
+        byte[] result = null;
+        PrivateKeyEntry pke = null;
+        // for (byte[] content : TEST_CONTENT) {
+        // for(Properties extraParams : XADES_MODES) {
+        for (String algo : ALGOS) {
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println("Prueba DNIe con XAdES, " + algo);
+            try {
+                pke = TestUtils.getValidKeyEntryFromKeyStore(AOConstants.AOKeyStore.PKCS11);
+                assertNotNull("No hemos encontrado una clave de prueba en DNIe", pke);
+                result = signer.sign(TEST_CONTENT[1], algo, pke, XADES_MODES[0]);
+            }
+            catch (final Exception e) {
+                result = null;
+                e.printStackTrace();
+            }
+            // }
+            // }
+        }
+        assertNotNull(result);
+    }
 
-	
+    /** Pruebas de m&oacute;dulo PKCS#11 de DNIe. */
+    @Test
+    public void testPKCS11KeyStore() {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
+        System.out.println("Probando almacen PKCS#11 con DNIe...");
+        String p11lib = null;
+        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            if (new File("C:\\Windows\\SysWOW64\\UsrPkcs11.dll").exists()) p11lib = "C:\\Windows\\SysWOW64\\UsrPkcs11.dll";
+            else p11lib = "C:\\Windows\\System32\\UsrPkcs11.dll";
+        }
+        // else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+        // p11lib = null;
+        // }
+        // else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        // p11lib = null;
+        // }
+        AOKeyStoreManager ksm = null;
+        try {
+            ksm =
+                    AOKeyStoreManagerFactory.getAOKeyStoreManager(AOConstants.AOKeyStore.PKCS11,
+                                                                  p11lib,
+                                                                  null,
+                                                                  new UIPasswordCallback("Contrasena del DNIe", null),
+                                                                  null);
+        }
+        catch (final Exception e) {
+            e.printStackTrace();
+        }
+        assertNotNull(ksm);
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
+        System.out.println();
+    }
+
 }
