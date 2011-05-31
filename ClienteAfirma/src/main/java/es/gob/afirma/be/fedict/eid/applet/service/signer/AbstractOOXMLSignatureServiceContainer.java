@@ -81,6 +81,17 @@ public final class AbstractOOXMLSignatureServiceContainer {
 
 	}
 
+	
+	/**
+	 * Firma digitalmente un documento OOXML.
+	 * @param ooxml Documento OOXML
+	 * @param certChain Certificado firmante con su cadena de confianza
+	 * @param digestAlgorithm Algoritmo de huella digital
+	 * @param pk Clave privada
+	 * @param signerCount N&uacute;mero de firma
+	 * @return Documento OOXML firmado
+	 * @throws Exception Cuando ocurre cualquier problema durante el proceso
+	 */
 	public final byte[] sign(final InputStream ooxml, 
 			           final List<X509Certificate> certChain, 
 			           final String digestAlgorithm, 

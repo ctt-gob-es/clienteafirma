@@ -18,16 +18,9 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
-import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttributes;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
-
-import com.sun.jndi.toolkit.dir.SearchFilter;
-
+import es.gob.afirma.cliente.CertificateFilter;
 import es.gob.afirma.misc.AOUtil;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
@@ -122,9 +115,6 @@ public final class KeyStoreUtilities {
      *        ser <code>null</code> si se quiere usar el m&eacute;todo para
      *        seleccionar otra cosa que no sean certificados X.509 (como
      *        claves de cifrado)
-     * @param keyUsageFilter
-     *        Filtro que determina que certificados se van a mostrar
-     *        seg&uacute;n su <code>KeyUsage</code>
      * @param checkPrivateKeys
      *        Indica si se debe comprobar que el certificado tiene clave
      *        privada o no, para no mostrar aquellos que carezcan de ella
@@ -134,19 +124,15 @@ public final class KeyStoreUtilities {
      * @param showExpiredCertificates
      *        Indica si se deben o no mostrar los certificados caducados o
      *        aun no v&aacute;lidos
-     * @param issuerFilter
-     *        Filtro seg&uacute;n la RFC2254 para el emisor del certificado
-     * @param subjectFilter
-     *        Filtro seg&uacute;n la RFC2254 para el titular del certificado
+     * @param certFilters
+     *        Filtros a aplicar sobre los certificados
      * @return Alias seleccionado por el usuario */
     public final static Hashtable<String, String> getAlisasesByFriendlyName(final String[] alias,
-                                                                            final Vector<KeyStore> kss,
-                                                                            final Boolean[] keyUsageFilter,
+                                                                            final List<KeyStore> kss,
                                                                             final boolean checkPrivateKeys,
                                                                             final boolean checkValidity,
                                                                             final boolean showExpiredCertificates,
-                                                                            final String issuerFilter,
-                                                                            final String subjectFilter) {
+                                                                            final List<CertificateFilter> certFilters) {
 
         final String[] trimmedAliases = alias.clone();
 
@@ -204,7 +190,7 @@ public final class KeyStoreUtilities {
                 if (checkPrivateKeys && tmpCert != null) {
                     try {
                         if ("KeychainStore".equals(ks.getType())) {
-                            PrivateKey key = null;
+                            final PrivateKey key;
                             try {
                                 key = (PrivateKey) ks.getKey(al, "dummy".toCharArray());
                             }
@@ -216,7 +202,7 @@ public final class KeyStoreUtilities {
                         else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
                             aliassesByFriendlyName.remove(al);
                             Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                            "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
+                                "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
                             );
                             continue;
                         }
@@ -235,33 +221,38 @@ public final class KeyStoreUtilities {
                     }
                 }
 
-                if (tmpCert != null && matchesKeyUsageFilter(tmpCert, keyUsageFilter)
-                    && KeyStoreUtilities.filterIssuerByRFC2254(issuerFilter, tmpCert)
-                    && KeyStoreUtilities.filterSubjectByRFC2254(subjectFilter, tmpCert)) {
-                    tmpCN = AOUtil.getCN(tmpCert);
-                    issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
-
-                    if (tmpCN != null && issuerTmpCN != null) {
-                        aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+                if (tmpCert != null && certFilters != null) {
+                    boolean allFiltersOK = true;
+                    for (final CertificateFilter cf : certFilters) {
+                        if (!cf.matches(tmpCert)) {
+                            allFiltersOK = false;
+                            break;
+                        }
                     }
+                    if (allFiltersOK) {
+                        tmpCN = AOUtil.getCN(tmpCert);
+                        issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
 
-                    else if (tmpCN != null /* && isValidString(tmpCN) */) {
-                        aliassesByFriendlyName.put(al, tmpCN);
+                        if (tmpCN != null && issuerTmpCN != null) {
+                            aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+                        }
+
+                        else if (tmpCN != null /* && isValidString(tmpCN) */) {
+                            aliassesByFriendlyName.put(al, tmpCN);
+                        }
+                        else {
+                            // Hacemos un trim() antes de insertar, porque los alias de los certificados de las tarjetas
+                            // CERES terminan con un '\r', que se ve como un caracter extrano
+                            aliassesByFriendlyName.put(al, al.trim());
+                        }
                     }
                     else {
-                        // Hacemos un trim() antes de insertar, porque los alias
-                        // de los certificados de las tarjetas
-                        // ceres terminan con un '\r', que se ve como un
-                        // caracter extrano
-                        aliassesByFriendlyName.put(al, al.trim());
+                        // Eliminamos aquellos certificados que no hayan encajado
+                        Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+                            "El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
+                        );
+                        aliassesByFriendlyName.remove(al);
                     }
-                }
-                else {
-                    // Eliminamos aquellos certificados que no hayan encajado
-                    Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                    "El certificado '" + al + "' no se mostrara por no cumplir el filtro de uso" //$NON-NLS-1$ //$NON-NLS-2$
-                    );
-                    aliassesByFriendlyName.remove(al);
                 }
             }
         }
@@ -276,7 +267,7 @@ public final class KeyStoreUtilities {
             // En este bucle usamos la clave tanto como clave como valor porque
             // asi se ha inicializado
             // el HashTable.
-            for (String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
+            for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
                 final String value = aliassesByFriendlyName.get(al);
                 if (value.length() > ALIAS_MAX_LENGTH) {
                     tmpCN = AOUtil.getCN(value);
@@ -296,88 +287,4 @@ public final class KeyStoreUtilities {
 
     }
 
-    private static boolean filterSubjectByRFC2254(final String filter, final X509Certificate cert) {
-        if (cert == null || filter == null) return true;
-        return filterRFC2254(filter, cert.getSubjectDN().toString());
-    }
-
-    private static boolean filterIssuerByRFC2254(final String filter, final X509Certificate cert) {
-        if (cert == null || filter == null) return true;
-        return filterRFC2254(filter, cert.getIssuerDN().toString());
-    }
-
-    /** Indica si un nombres LDAP se ajusta a los requisitos de un filtro.
-     * @param f
-     *        Filtro seg&uacute;n la RFC2254.
-     * @param name
-     *        Nombre LDAP al que se debe aplicar el filtro.
-     * @return <code>true</code> si el nombre LDAP es nulo o se adec&uacute;a al
-     *         filtro o este &uacute;ltimo es nulo, <code>false</code> en caso
-     *         contrario */
-    private static boolean filterRFC2254(final String f, final String name) {
-        try {
-            return filterRFC2254(f, new LdapName(name));
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No ha sido posible filtrar el certificado (filtro: '" + f
-                                                      + "', nombre: '"
-                                                      + name
-                                                      + "'), no se eliminara del listado: "
-                                                      + e);
-            return true;
-        }
-    }
-
-    /** Indica si un nombres LDAP se ajusta a los requisitos de un filtro.
-     * @param f
-     *        Filtro seg&uacute;n la RFC2254.
-     * @param name
-     *        Nombre LDAP al que se debe aplicar el filtro.
-     * @return <code>true</code> si el nombre LDAP es nulo o se adec&uacute;a al
-     *         filtro o este &uacute;ltimo es nulo, <code>false</code> en caso
-     *         contrario */
-    private static boolean filterRFC2254(final String f, final LdapName name) {
-        if (f == null || name == null) return true;
-        try {
-            final List<Rdn> rdns = name.getRdns();
-            if (rdns == null || (rdns.isEmpty())) {
-                Logger.getLogger("es.gob.afirma")
-                      .warning("El nombre proporcionado para filtrar no contiene atributos, no se mostrara el certificado en el listado");
-                return false;
-            }
-            final Attributes attrs = new BasicAttributes(true);
-            for (final Rdn rdn : rdns)
-                attrs.put(rdn.getType(), rdn.getValue());
-            return new SearchFilter(f).check(attrs);
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No ha sido posible filtrar el certificado (filtro: '" + f
-                                                      + "', nombre: '"
-                                                      + name
-                                                      + "'), no se eliminara del listado: "
-                                                      + e);
-            return true;
-        }
-    }
-
-    /** Comprueba si el uso un certificado concuerda con un filtro dado.
-     * @param cert
-     *        Certificado X.509 que queremos comprobar
-     * @param filter
-     *        Filtro con los bits de uso (<i>KeyUsage</i>) a verificar
-     * @return <code>true</code> si el certificado concuerda con el filtro, <code>false</code> en caso contrario */
-    public final static boolean matchesKeyUsageFilter(final X509Certificate cert, final Boolean[] filter) {
-        if (filter == null) return true;
-        if (cert == null) return false;
-        if (filter.length == 9) {
-            boolean[] certUsage = cert.getKeyUsage();
-            if (certUsage != null) {
-                for (int j = 0; j < certUsage.length; j++) {
-                    if (filter[j] != null && filter[j].booleanValue() != certUsage[j]) return false;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
 }

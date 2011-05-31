@@ -14,9 +14,7 @@ import java.awt.Component;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Hashtable;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JOptionPane;
@@ -73,15 +71,15 @@ final class KeyStoreConfigurationManager {
      * certificados. */
     private boolean showLoadingWarning = false;
 
-    /** Configuraci&oacute;n para el filtrado de certificados en el
-     * di6aacute;logo de selecci&oacute;n. */
-    private CertificateFilterConfiguration filterConfig = null;
+    private boolean showExpiratedCertificates = false;
+    private boolean mandatoryCert = false;
+    private Vector<CertificateFilter> certFilters = new Vector<CertificateFilter>(); 
 
     /** Construye la configuraci&oacute;n por defecto para el Cliente, pudiendo
      * variar el almac&eacute;n seg&uacute;n el sistema operativo:
      * <ul>
      * <li><b>Windows:</b> Almac&eacute;n de Windows/Internet Explorer.</li>
-     * <li><b>Sistemas Unix:</b> Almac&eacute;n Mozilla.</li>
+     * <li><b>Sistemas UNIX:</b> Almac&eacute;n Mozilla.</li>
      * <li><b>Mac OS X:</b> Almac&eacute;n de Apple Mac OS X.</li>
      * <li><b>Otros:</b> Almac&eacute;n PKCS#12/PFX.</li>
      * </ul>
@@ -105,9 +103,8 @@ final class KeyStoreConfigurationManager {
      * </ul>
      * @param keyStore
      *        Almac&eacute;n de claves por defecto. */
-    private KeyStoreConfigurationManager(AOKeyStore keyStore) {
+    private KeyStoreConfigurationManager(final AOKeyStore keyStore) {
         this.ks = this.defaultKeyStore = (keyStore != null ? keyStore : getDefaultKeyStore());
-        this.filterConfig = new CertificateFilterConfiguration();
     }
 
     /** Recupera el almac&eacute;n de claves por defecto para el sistema
@@ -122,6 +119,14 @@ final class KeyStoreConfigurationManager {
         return AOKeyStore.PKCS12;
     }
 
+    void resetFilters() {
+        certFilters.removeAllElements();
+    }
+    
+    void addCertFilter(final CertificateFilter certFilter) {
+        if (certFilter != null) certFilters.add(certFilter);
+    }
+    
     /** Reestablece el almac&eacute;n de certificados por defecto y reinicia su
      * configuraci&oacute;n. */
     void initialize() {
@@ -131,7 +136,7 @@ final class KeyStoreConfigurationManager {
         this.errorMessage = null;
         this.ke = null;
         this.showLoadingWarning = false;
-        this.filterConfig.initialize();
+        this.resetFilters();
     }
 
     /** Inicializa el repositorio de certificados establecido.
@@ -382,88 +387,15 @@ final class KeyStoreConfigurationManager {
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
     private String showCertSelectionDialog(final String[] certAlias, final boolean checkPrivateKey) throws AOCertificatesNotFoundException,
                                                                                                    AOCancelledOperationException {
-        final String[] optionAlias = this.filtCert(certAlias, this.filterConfig.getNameFilter());
-        if (optionAlias.length == 0) {
-            throw new AOCertificatesNotFoundException("No se ha encontrado ning\u00FAn certificado que cumpla el patr\u00F3n requerido. Se cancelar\u00E1 la operaci\u00F3n." //$NON-NLS-1$
-            );
-        }
-
-        return AOUIManager.showCertSelectionDialog(optionAlias, // Aliases
+        return AOUIManager.showCertSelectionDialog(certAlias, // Aliases
                                                    (this.ksManager == null) ? null : this.ksManager.getKeyStores(), // KeyStores
-                                                   this.filterConfig.getKeyUsageFilter(), // Filtro por
-                                                                                          // KeyUsage
                                                    this.parent, // Panel sobre el que mostrar el dialogo
-                                                   checkPrivateKey, // Comprobar accesibilidad de claves
-                                                                    // privadas
+                                                   checkPrivateKey, // Comprobar accesibilidad de claves privadas
                                                    true, // Advierte si el certificado esta caducado
-                                                   this.filterConfig.isShowExpiratedCertificates(), // Muestra
-                                                                                                    // certificados
-                                                                                                    // caducados
-                                                   this.filterConfig.getRfc2254IssuerFilter(), // Filtro
-                                                                                               // RFC2254
-                                                                                               // para el
-                                                                                               // Ussuer
-                                                   this.filterConfig.getRfc2254SubjectFilter(), // Filtro
-                                                                                                // RFC2254
-                                                                                                // para
-                                                                                                // el
-                                                                                                // Subject
-                                                   this.filterConfig.isMandatoryCert() // Solo se admite un
-                                                                                       // certificado
+                                                   this.showExpiratedCertificates, // Muestra certificados caducados
+                                                   this.certFilters, // Filtros para los certificados
+                                                   this.isMandatoryCert() // Solo se admite un certificado
         );
-    }
-
-    /** Recupera los alias de los certificados del KeyStore establecido que
-     * coincidan con alguno de los alias del array introducido y cumplan la
-     * condicion del filtro existente. Si no hay un filtro establecido se
-     * devolver&aacute;n todos los alias que pertenezcan a un certificado del
-     * KeyStore. Si no hay establecido un KeyStore se devolvera un array
-     * vac&iacute;o.
-     * @param aliasList
-     *        Alias de los certificados a comprobar.
-     * @param certFilter
-     *        Filtro con las condiciones que debe cumplir el Principal del
-     *        certificado.
-     * @return Alias de los certificados que pasan el filtro.
-     * @see #setCertFilter(String) Establece el filtro de certificados.
-     * @deprecated */
-    @Deprecated
-    private String[] filtCert(final String[] aliasList, final es.gob.afirma.cliente.AOCertFilter certFilter) {
-
-        if (aliasList == null || aliasList.length == 0) {
-            return new String[0];
-        }
-
-        // Si no hay establecido un filtro, todos los alias son validos
-        if (certFilter == null) {
-            return aliasList;
-        }
-
-        Certificate tmpCert;
-        Hashtable<X509Certificate, String> currentCerts = new Hashtable<X509Certificate, String>();
-        for (final String alias : aliasList) {
-            try {
-                tmpCert = this.ksManager.getCertificate(alias);
-                if (tmpCert != null) {
-                    currentCerts.put((X509Certificate) tmpCert, alias);
-                }
-            }
-            catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").info("Eliminado el alias '" + alias + "' en el filtrado por expresion: " + e); //$NON-NLS-1$ //$NON-NLS-2$  //$NON-NLS-3$
-            }
-        }
-
-        final X509Certificate[] acceptedCerts = certFilter.filter(currentCerts.keySet().toArray(new X509Certificate[0]));
-
-        // Recuperamos los alias de los certificados que han pasado el filtro
-        Vector<String> acceptedAlias = new Vector<String>();
-        String tmpAl;
-        for (final X509Certificate c : acceptedCerts) {
-            tmpAl = currentCerts.get(c);
-            if (tmpAl != null) acceptedAlias.add(tmpAl);
-        }
-
-        return acceptedAlias.toArray(new String[0]);
     }
 
     /** Recupera el PasswordCallback apropiado para los certificados del
@@ -491,7 +423,7 @@ final class KeyStoreConfigurationManager {
      * @return Certificado seleccionado o nulo si no hab&iacute;a ninguno. */
     X509Certificate getSelectedCertificate() {
         if (this.ke != null) {
-            Certificate cert = ke.getCertificate();
+            final Certificate cert = ke.getCertificate();
             if (cert instanceof X509Certificate) return (X509Certificate) cert;
         }
         if (this.selectedAlias != null) return this.ksManager.getCertificate(this.selectedAlias);
@@ -507,7 +439,7 @@ final class KeyStoreConfigurationManager {
     /** Establece el alias del certificado que debe utilizarse.
      * @param selectedAlias
      *        Alias del certificado. */
-    void setSelectedAlias(String selectedAlias) {
+    void setSelectedAlias(final String selectedAlias) {
         if (this.selectedAlias != null && !this.selectedAlias.equals(selectedAlias)) {
             this.ke = null;
         }
@@ -517,14 +449,14 @@ final class KeyStoreConfigurationManager {
     /** Establece la contrase&ntilde; para el almac&eacute;n de claves.
      * @param password
      *        Contrase&ntilde;a para el almac&eacute;n */
-    void setKsPassword(String password) {
+    void setKsPassword(final String password) {
         this.ksPassword = password;
     }
 
     /** Establece la ruta del almac&eacute;n de claves.
      * @param path
      *        Ruta absoluta del almac&eacute;n. */
-    void setKsPath(String path) {
+    void setKsPath(final String path) {
         this.ksPath = (path == null || path.trim().equals("")) ? null : path; //$NON-NLS-1$
     }
 
@@ -532,70 +464,14 @@ final class KeyStoreConfigurationManager {
      * firma.
      * @return Devuelve {@code true} si autoselecciona el certificado. */
     boolean isMandatoryCert() {
-        return this.filterConfig.isMandatoryCert();
-    }
-
-    /** Establece el filtro seg&uacute;n usos permitidos del certificado. El
-     * par&acute;metro recibido puede ser {@code null}, para eliminar el filtro,
-     * o un array de 8 elementos.<br/>
-     * Cada certificado puede permitir simult&aacute;neamente cualquiera de
-     * estos 8 usos:<br/>
-     * <ol>
-     * <li><b>digitalSignature</b></li>
-     * <li><b>nonRepudiation</b></li>
-     * <li><b>keyEncipherment</b></li>
-     * <li><b>dataEncipherment</b></li>
-     * <li><b>keyAgreement</b></li>
-     * <li><b>keyCertSign</b></li>
-     * <li><b>cRLSign</b></li>
-     * <li><b>encipherOnly</b></li>
-     * <li><b>decipherOnly</b></li>
-     * </ol>
-     * Cada uno de los elementos del array designan en orden a uno de estos 8
-     * usos. El valor de cada elemento puede ser:
-     * <ul>
-     * <li>{@code null}: No establece un filtro para ese uso del certificado.</li>
-     * <li>{@code false}: El certificado no debe tener permitido ese uso.</li>
-     * <li>{@code true}: El certificado debe tener permitido ese uso.</li>
-     * </ul>
-     * @param keyUsageFilter
-     *        Usos permitidos del certificado. */
-    void setFilterByKeyUsage(Boolean[] keyUsageFilter) {
-        this.filterConfig.setKeyUsageFilter(keyUsageFilter);
-    }
-
-    /** NO SE RECOMIENDA EL USO DE ESTA FUNCI&Oacute;N. Establece una
-     * expresi&oacute;n regular para el filtrado de certificados a partir de su
-     * principal.
-     * @param nameFilter
-     *        Filtro para el principal del certificado.
-     * @deprecated */
-    @Deprecated
-    void setFilterByName(String nameFilter) {
-        this.filterConfig.setNameFilter(new es.gob.afirma.cliente.AOCertFilter(nameFilter));
-    }
-
-    /** Establece el filtro seg&uacute;n la RFC2254 para el Subject del
-     * certificado.
-     * @param rfc2254SubjectFilter
-     *        Filtro RFC2254. */
-    void setFilterBySubject(String rfc2254SubjectFilter) {
-        this.filterConfig.setRfc2254SubjectFilter(rfc2254SubjectFilter);
-    }
-
-    /** Establece el filtro seg&uacute;n la RFC2254 para el emisor del
-     * certificado.
-     * @param rfc2254IssuerFilter
-     *        Filtro RFC2254. */
-    void setFilterByIssuer(String rfc2254IssuerFilter) {
-        this.filterConfig.setRfc2254IssuerFilter(rfc2254IssuerFilter);
+        return this.mandatoryCert;
     }
 
     /** Establece si deben mostrarse los certificados caducados.
      * @param showExpiratedCertificates
      *        {@code true} para mostrar los certificados caducados. */
-    void setShowExpiratedCertificates(boolean showExpiratedCertificates) {
-        this.filterConfig.setShowExpiratedCertificates(showExpiratedCertificates);
+    void setShowExpiratedCertificates(final boolean showExpiratedCerts) {
+        this.showExpiratedCertificates = showExpiratedCerts;
     }
 
     /** Establece que se seleccione autom&aacute;ticamente el certificado cuando
@@ -605,8 +481,8 @@ final class KeyStoreConfigurationManager {
      * @param mandatoryCert
      *        {@code true} para indicar que se seleccione
      *        autom&aacute;ticamente el certificado. */
-    void setMandatoryCert(boolean mandatoryCert) {
-        this.filterConfig.setMandatoryCert(mandatoryCert);
+    void setMandatoryCert(final boolean mCert) {
+        this.mandatoryCert = mCert;
     }
 
     /** Establece que se muestre o no, antes de cargar un almac&eacute;n de
@@ -615,7 +491,7 @@ final class KeyStoreConfigurationManager {
      * .
      * @param showWarning
      *        Si es {@code true} se mostrar&aacute; la advertencia. */
-    void setLoadingWarning(boolean showWarning) {
+    void setLoadingWarning(final boolean showWarning) {
         this.showLoadingWarning = showWarning;
     }
 

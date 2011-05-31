@@ -21,6 +21,7 @@ import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -846,8 +847,8 @@ public class AOKeyStoreManager {
 	 * 
 	 * @return Almac&eacute;n de claves (<code>KeyStore</code>) actual
 	 */
-	public Vector<KeyStore> getKeyStores() {
-		final Vector<KeyStore> ret = new Vector<KeyStore>(1);
+	public List<KeyStore> getKeyStores() {
+		final List<KeyStore> ret = new Vector<KeyStore>(1);
 		ret.add(ks);
 		return ret;
 	}
