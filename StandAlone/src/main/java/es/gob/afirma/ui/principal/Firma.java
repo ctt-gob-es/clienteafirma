@@ -1,0 +1,481 @@
+/*
+ * Este fichero forma parte del Cliente @firma.
+ * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este
+ * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ */
+package es.gob.afirma.ui.principal;
+
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.security.auth.callback.PasswordCallback;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import es.gob.afirma.callbacks.NullPasswordCallback;
+import es.gob.afirma.callbacks.UIPasswordCallback;
+import es.gob.afirma.exceptions.AOCancelledOperationException;
+import es.gob.afirma.exceptions.AOCertificateKeyException;
+import es.gob.afirma.exceptions.AOException;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.KeyStoreConfiguration;
+import es.gob.afirma.misc.AOConstants;
+import es.gob.afirma.misc.AOCryptoUtil;
+import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.signers.AOSigner;
+import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
+import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.GeneralConfig;
+import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.KeyStoreLoader;
+import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SelectionDialog;
+
+/**
+ * Clase que muestra los elementos necesarios para realizar una firma.
+ */
+public class Firma extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+
+	static Logger logger = Logger.getLogger(Firma.class.getName());
+	
+	// Nombres de los diferentes formatos de firmado
+	private List<String> formatosL = new ArrayList<String>(Arrays.asList(
+			"Firma est\u00E1ndar (XAdES Detached)",
+			"CAdES",
+			"PAdES"
+	));
+	
+	// Constantes de los diferentes formatos de firmado
+	private List<String> formatosV = new ArrayList<String>(Arrays.asList(
+			AOConstants.SIGN_FORMAT_XADES_DETACHED,
+			AOConstants.SIGN_FORMAT_CADES,
+			AOConstants.SIGN_FORMAT_PDF
+	));
+
+	public Firma() {
+		initComponents();
+	}
+	
+	/**
+	 * Inicializacion de los componentes
+	 */
+	private void initComponents() {
+		setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(13, 13, 0, 13);
+		c.weightx = 1.0;
+		c.gridwidth = 2;
+		c.gridx = 0;
+		
+		// Etiqueta fichero a firmar digitalmente
+		JLabel etiquetaFichero = new JLabel();
+		etiquetaFichero.setText(Messages.getString("Firma.buscar")); // NOI18N
+		etiquetaFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.description")); // NOI18N
+		add(etiquetaFichero, c);
+		
+		c.insets = new Insets(0, 13, 0, 0);
+		c.gridwidth = 1;
+		c.weightx = 1.0;
+		c.gridy	= 1;
+		
+		// Campo donde se guarda el nombre del fichero a firmar
+		final JTextField campoFichero = new JTextField();
+		campoFichero.setToolTipText(Messages.getString("Firma.buscar.caja.description")); // NOI18N
+		campoFichero.setMinimumSize(new Dimension(6, 18));
+		campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
+		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
+		campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Firma.buscar.caja")); // NOI18N
+		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N
+		add(campoFichero, c);
+		
+		c.insets = new Insets(0, 10, 0, 13);
+		c.weightx = 0.0;
+		c.gridx = 1;
+		
+		// Boton examinar
+		JButton examinar = new JButton();
+		examinar.setMnemonic(KeyEvent.VK_E);
+		examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
+		examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
+		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
+		examinar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				examinarActionPerformed(campoFichero);
+			}
+		});
+		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+		add(examinar, c);
+		
+		c.insets = new Insets(13, 13, 0, 13);
+		c.weightx = 1.0;
+		c.gridwidth = 2;
+		c.gridx = 0;
+		c.gridy	= 2;
+		
+		// Etiqueta para el Almacen / repositorio
+		JLabel etiquetaAlmacen = new JLabel();
+		etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N
+		add(etiquetaAlmacen, c);
+
+		c.insets = new Insets(0, 13, 0, 13);
+		c.weightx = 1.0;
+		c.gridy = 3;
+		
+		// Combo con las opciones del almacen o repositorio
+		final JComboBox comboAlmacen = new JComboBox();
+		comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
+		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
+		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
+		comboAlmacen.getAccessibleContext().setAccessibleName(Messages.getString("Firma.almacen.certificados")); // NOI18N
+		comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
+		cargarComboAlmacen(comboAlmacen);
+		add(comboAlmacen, c);
+		
+		c.insets = new Insets(13, 13, 0, 13);
+		c.weightx = 1.0;
+		c.gridy = 4;
+		
+		// Etiqueta formato / formato
+		JLabel etiquetaFormato = new JLabel();
+		etiquetaFormato.setText(Messages.getString("Firma.formato")); // NOI18N
+		add(etiquetaFormato, c);
+
+		c.insets = new Insets(0, 13, 0, 13);
+		c.weightx = 1.0;
+		c.gridy = 5;
+		
+		// Combo con los diferentes formatos de firma
+		final JComboBox comboFormato = new JComboBox();
+		comboFormato.setToolTipText(Messages.getString("Firma.formato.description")); // NOI18N
+		comboFormato.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status")));
+		comboFormato.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status")));
+		comboFormato.getAccessibleContext().setAccessibleName(Messages.getString("Firma.formato")); // NOI18N
+		comboFormato.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.formato.description")); // NOI18N
+		if(GeneralConfig.isAvanzados()) {
+			// XAdES Enveloping (Solo en la vista avanzada)
+			formatosL.add("XAdES Enveloping");
+			// XAdES Enveloped (Solo en la vista avanzada)
+			formatosL.add("XAdES Enveloped");
+			formatosV.add(AOConstants.SIGN_FORMAT_XADES_ENVELOPING);
+			formatosV.add(AOConstants.SIGN_FORMAT_XADES_ENVELOPED);
+		}
+		comboFormato.setModel(new DefaultComboBoxModel(formatosL.toArray()));
+		add(comboFormato, c);
+		
+		c.weighty = 1.0;
+		c.gridy = 6;
+		
+		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
+		JPanel emptyPanel = new JPanel();
+		add(emptyPanel, c);
+		
+		// Panel con los botones
+		JPanel panelBotones = new JPanel(new GridBagLayout());
+		
+		GridBagConstraints cons = new GridBagConstraints();
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.ipadx = 15;
+		cons.gridx = 0;
+		
+		// Etiqueta para rellenar a la izquierda
+		JLabel label = new JLabel();
+		panelBotones.add(label, cons);
+		
+		// Boton firmar
+		JButton firmar = new JButton();
+		firmar.setMnemonic(KeyEvent.VK_R);
+		firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N
+		firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
+		firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
+		firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
+		firmar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				firmarActionPerformed(comboAlmacen, comboFormato, campoFichero);
+			}
+		});
+		firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
+
+		cons.ipadx = 0;
+		cons.gridx = 1;
+		cons.weightx = 1.0;
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.add(firmar, BorderLayout.CENTER);
+		panelBotones.add(buttonPanel, cons);
+
+		cons.ipadx = 15;
+		cons.weightx = 0.0;
+		cons.gridx = 2;
+		
+		// Boton ayuda
+		JLabel botonAyuda = HelpUtils.fechButton("firma");
+		panelBotones.add(botonAyuda, cons);
+		
+		c.gridwidth	= 2;
+        c.insets = new Insets(13,13,13,13);
+        c.weighty = 0.0;
+        c.gridy = 7;
+		
+		add(panelBotones, c);
+		
+		// Accesos rapidos al menu de ayuda
+		HelpUtils.enableHelpKey(campoFichero, "firma.fichero");
+		HelpUtils.enableHelpKey(examinar, "firma.fichero");
+		HelpUtils.enableHelpKey(comboAlmacen, "firma.almacen");
+		HelpUtils.enableHelpKey(comboFormato, "firma.formato");
+		HelpUtils.enableHelpKey(firmar,"firma");
+	}
+
+	/**
+	 * Pulsar boton examinar: Muestra una ventana para seleccinar un archivo.
+	 * Modifica el valor de la caja con el nombre del archivo seleccionado
+	 * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
+	 */
+	private void examinarActionPerformed(JTextField campoFichero) {
+		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
+		if (selectedFile != null) {
+			campoFichero.setText(selectedFile.getAbsolutePath());
+		}
+	}
+
+	/**
+	 * Firma el fichero seleccionado
+	 * @param comboAlmacen		Combo con el almacen / repositorio de certificados
+	 * @param comboFormato		Combo con los formatos de firmado
+	 * @param campoFichero		Campo con el nombre del archivo a firmar
+	 */
+	private void firmarActionPerformed(JComboBox comboAlmacen, JComboBox comboFormato, JTextField campoFichero) {//GEN-FIRST:event_firmarActionPerformed
+		// Obtenemos la constante del formato a utilizar
+		String formato = formatosV.get(comboFormato.getSelectedIndex());
+		
+		// Keystore
+		AOKeyStoreManager keyStoreManager = null;
+		
+		// Obtenemos la ruta del fichero a firmar
+		if (campoFichero.getText() == null || campoFichero.getText().equals(""))
+			JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		else {
+			try {
+				PasswordCallback pssCallback;
+				KeyStoreConfiguration kssc = (KeyStoreConfiguration)comboAlmacen.getSelectedItem();
+				AOConstants.AOKeyStore store = kssc.getType();
+				if (store == AOConstants.AOKeyStore.WINDOWS || store == AOConstants.AOKeyStore.WINROOT ||
+						store == AOConstants.AOKeyStore.SINGLE) 
+					pssCallback = new NullPasswordCallback();
+				else
+					pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null); //$NON-NLS-1$
+
+				keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+						store,
+						kssc.getLib(),
+						kssc.toString(),
+						pssCallback,
+						this
+				);
+
+				// Seleccionamos un certificado
+				String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), null, this, true, true, true);
+
+				// Comprobamos si se ha cancelado la seleccion
+				if (selectedcert == null) 
+					throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
+
+				// Recuperamos la clave del certificado
+				PrivateKeyEntry privateKeyEntry = null;
+				try {
+					privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, AOCryptoUtil.getCertificatePC(store, this));
+				}
+				catch (AOCertificateKeyException e) {
+					throw e;
+				}
+				catch (AOCancelledOperationException e) {
+					// Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
+					// Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
+					// que las relanza en forma de AOException
+					throw e;
+				}
+				catch (Throwable e) {
+					e.printStackTrace();
+					logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e);
+					throw new AOException("No se ha podido recuperar el certificado seleccionado");
+				}
+
+				if (privateKeyEntry == null) {
+					throw new AOCertificateKeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero"); //$NON-NLS-1$
+				}
+
+				// Firmamos los datos
+				AOSigner signer = null;
+				try {
+					signer = AOCryptoUtil.getSigner(formato);
+				}
+				catch (Throwable e) {
+					logger.warning("Formato de firma no soportado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					return;
+				}
+
+				URI uri = null;
+				try {
+					uri = AOUtil.createURI(campoFichero.getText());
+				} catch (Exception e) {
+					logger.severe("La ruta del fichero de datos no es v\u00E1lida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.ruta"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					return;
+				}
+
+				byte[] fileData;
+				InputStream fileIn = null;
+				try {
+					fileIn = AOUtil.loadFile(uri, this, true);
+					fileData = AOUtil.getDataFromInputStream(fileIn);					
+				}
+				catch (FileNotFoundException e) {
+					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.fichero.noencontrado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				catch (IOException e) {
+					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.fichero.leer"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				catch (AOException e) {
+					throw e;
+				} finally {
+					setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					if (fileIn != null) {
+						try { fileIn.close(); } catch (Throwable e) { }
+					}
+				}
+
+				// En el caso de firma CAdES, preguntamos al usuario si desea incluir el documento que
+				// se firma en la propia firma. El documento se incluirá en la firma, salvo que se indique
+				// los contrario
+				String modoFirma = AOConstants.SIGN_MODE_IMPLICIT;
+				if (formato.equals(AOConstants.SIGN_FORMAT_CADES)){ 
+					int incluir = JOptionPane.showConfirmDialog(
+						this,
+					    Messages.getString("Firma.incluir.original"),
+					    "Firma",
+					    JOptionPane.YES_NO_OPTION);
+					
+					modoFirma = (incluir == JOptionPane.NO_OPTION ? AOConstants.SIGN_MODE_EXPLICIT : AOConstants.SIGN_MODE_IMPLICIT);
+				}
+				
+				Properties prop = GeneralConfig.getSignConfig();
+
+				prop.setProperty("format", formato); //$NON-NLS-1$
+				prop.setProperty("mode", modoFirma); //$NON-NLS-1$
+				prop.setProperty("uri", uri.toASCIIString()); //$NON-NLS-1$
+				
+				for (String key : prop.keySet().toArray(new String[0])) {
+					System.out.println(key + ": " + prop.getProperty(key));
+				}
+				System.out.println("---");
+				
+				byte[] signedData = null;
+				try {
+					signedData = signer.sign(
+							fileData,
+							GeneralConfig.getSignAlgorithm(),
+							privateKeyEntry,
+							prop
+					);
+				} catch (AOException e) {
+					logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return;
+				} catch (Throwable e) {
+					logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				// Si el proceso de firma devuelve una firma nula o vacia, lanzamos una excepcion
+				if (signedData == null || signedData.length == 0) {
+					throw new AOException("La firma generada esta vacia"); //$NON-NLS-1$
+				}
+
+				// Guardamos la firma en fichero
+				final String saveDataToFile = AOUIManager.saveDataToFile(this, signedData,
+						new File(AOUIManager.getOutFileName(this.getFilename(campoFichero.getText()), formato)), AOUIManager.getOutFileFilter(formato)
+				);
+
+				if (saveDataToFile!= null)
+					JOptionPane.showMessageDialog(
+						this,
+						Messages.getString("Firma.msg.ok"),  //$NON-NLS-1$
+						Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"),  //$NON-NLS-1$
+						JOptionPane.INFORMATION_MESSAGE
+					);
+
+
+			} catch (AOCancelledOperationException e) {
+				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				logger.severe("Operacion cancelada por el usuario");
+			} catch (AOException e) {
+				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				logger.severe("Error: "+e.getMessage());
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Firma", JOptionPane.ERROR_MESSAGE);
+			} catch(Throwable e) {
+				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				logger.severe("Ocurrio un error al generar la firma electronica: "+e);
+			}
+		}
+	}
+
+	/**
+	 * Obtiene el nombre del archivo desde el path
+	 * @param path	Path del archivo
+	 * @return		Nombre del archivo
+	 */
+	private String getFilename(String path) {
+		int i = path.lastIndexOf(System.getProperty("file.separator")); //$NON-NLS-1$
+		if (i > 0 && i <path.length()-1) 
+			return path.substring(i+1);
+		return path;
+	}
+
+	/**
+	 * Carga el combo de almacen y repositorios
+	 * @param comboAlmacen	Combo donde se guarda la lista
+	 */
+	private void cargarComboAlmacen(JComboBox comboAlmacen){
+		comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
+	}
+}

@@ -1,0 +1,339 @@
+/*
+ * Este fichero forma parte del Cliente @firma.
+ * El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ * Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ * condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este
+ * fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ */
+package es.gob.afirma.ui.wizardmultifirmacofirma;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.util.List;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import es.gob.afirma.exceptions.AOException;
+import es.gob.afirma.keystores.AOKeyStoreManager;
+import es.gob.afirma.keystores.KeyStoreConfiguration;
+import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.signers.AOSigner;
+import es.gob.afirma.signers.AOSignerFactory;
+import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.ui.utils.GeneralConfig;
+import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.MultisignUtils;
+import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
+import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
+import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+
+/**
+ * Clase que muestra el contenido principal de multifirmas - cofirma.
+ */
+public class PanelCofirma extends JDialogWizard {
+
+	private static final long serialVersionUID = 1L;
+
+	static Logger logger = Logger.getLogger(PanelCofirma.class.getName());
+
+	/**
+	 * Configuracion del KeyStore
+	 */
+	private KeyStoreConfiguration kssc = null;
+
+	/**
+	 * Guarda todas las ventanas del asistente para poder controlar la botonera
+	 * @param ventanas	Listado con todas las paginas del asistente
+	 */
+	public void setVentanas(List<JDialogWizard> ventanas) {
+		Botonera botonera = new Botonera(ventanas, 1);
+		getContentPane().add(botonera, BorderLayout.PAGE_END);
+	}
+
+	public PanelCofirma(KeyStoreConfiguration kssc) {
+		this.kssc = kssc;
+		initComponents();
+	}
+
+	// Campo donde se guarda el nombre del fichero de datos
+	private JTextField campoDatos = new JTextField();
+	// Campo donde se guarda el nombre del fichero de firma
+	private JTextField campoFirma = new JTextField();
+
+	/**
+	 * Inicializacion de componentes
+	 */
+	private void initComponents() {
+		// Titulo de la ventana
+    	setTitulo(Messages.getString("Wizard.multifirma.simple.cofirma.titulo"));
+		
+		// Panel con la cabecera
+		CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.ventana1.titulo", "Wizard.multifirma.simple.ventana1.titulo.descripcion", null, true);
+		getContentPane().add(panelSuperior, BorderLayout.NORTH);
+
+		// Panel central
+		JPanel panelCentral = new JPanel();
+		panelCentral.setMinimumSize(new Dimension(603, 289));
+		panelCentral.setLayout(new GridBagLayout());
+
+		// Configuramos el layout
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(20, 20, 0, 20);
+        c.gridwidth = 2;
+		c.weightx = 1.0;
+		c.gridx = 0;
+		
+		// Etiqueta "Fichero de datos:"
+		JLabel etiquetaDatos = new JLabel();
+		etiquetaDatos.setText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos"));
+		panelCentral.add(etiquetaDatos, c);
+
+		c.insets = new Insets(0, 20, 0, 0);
+		c.gridwidth = 1;
+		c.gridy	= 1;
+		
+		// Caja de texto donde se guarda el nombre del archivo de datos
+		campoDatos.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description"));
+		panelCentral.add(campoDatos, c);
+
+		c.insets = new Insets(0, 10, 0, 20);
+		c.weightx = 0.0;
+		c.gridx = 1;
+		
+		// Boton examinar (fichero datos)
+		JButton	examinarDatos = new JButton();
+		examinarDatos.setMnemonic(KeyEvent.VK_E);
+		examinarDatos.setText(Messages.getString("PrincipalGUI.Examinar"));
+		examinarDatos.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); 
+		examinarDatos.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				examinarDatosActionPerformed();
+			}
+		});
+		panelCentral.add(examinarDatos, c);
+
+		c.insets = new Insets(20, 20, 0, 20);
+		c.gridwidth = 2;
+		c.gridy	= 2;
+		c.gridx = 0;
+		
+		// Etiqueta "Fichero de firma:"
+		JLabel etiquetaFirma = new JLabel();
+		etiquetaFirma.setText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma"));
+		panelCentral.add(etiquetaFirma, c);
+
+		c.insets = new Insets(0, 20, 0, 0);
+		c.gridwidth = 1;
+		c.gridy	= 3;
+		
+		// Caja de texto donde se guarda el nombre del archivo de la firma
+		campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma.description")); // NOI18N
+		panelCentral.add(campoFirma, c);
+
+		c.insets = new Insets(0, 10, 0, 20);
+		c.gridx = 1;
+		
+		// Boton examinar (fichero firma)
+		JButton examinarFirma = new JButton();
+		examinarFirma.setMnemonic(KeyEvent.VK_E);
+		examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar"));
+		examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+		examinarFirma.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				examinarFirmaActionPerformed();
+			}
+		});
+		panelCentral.add(examinarFirma, c);
+		
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = new Insets(20, 20, 0, 20);
+		c.gridwidth = 2;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+		c.gridx = 0;
+		c.gridy = 4;
+		
+		// Panel introducido para poder mantener la linea superior correcta
+		Panel panelVacio = new Panel();
+		panelCentral.add(panelVacio, c);
+
+		getContentPane().add(panelCentral, BorderLayout.CENTER);
+
+		// Accesos rapidos al menu de ayuda
+		HelpUtils.enableHelpKey(campoDatos, "multifirma.wizard.ficherodatos");
+		HelpUtils.enableHelpKey(campoFirma, "multifirma.wizard.ficherofirma");
+	}
+
+	/**
+	 * Examina si se ha seleccionado un archivo correcto y guarda el nombre en su caja
+	 */
+	private void examinarDatosActionPerformed() {
+		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
+		if (selectedFile != null) {
+			campoDatos.setText(selectedFile.getAbsolutePath());
+		}
+	}
+
+	/**
+	 * Examina si el archivo seleccionado es un archivo de firma y guarda el nombre en su caja
+	 */
+	private void examinarFirmaActionPerformed() {
+		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
+		if (selectedFile != null) {
+			campoFirma.setText(selectedFile.getAbsolutePath());
+		}  
+	}
+
+	/**
+	 * Botonera con funciones para la pagina panel de multifirma - cofirma
+	 */
+	private class Botonera extends BotoneraInferior {
+
+		private static final long serialVersionUID = 1L;
+
+		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+			super(ventanas, posicion);
+		}
+
+		@Override
+		protected void siguienteActionPerformed(JButton anterior,
+				JButton siguiente, JButton finalizar) {
+
+			Boolean continuar = true;
+			continuar = cofirmaFichero();
+
+			if (continuar.equals(true))
+				super.siguienteActionPerformed(anterior, siguiente, finalizar);
+		}
+	}
+
+	/**
+	 * Cofirma un fichero dado
+	 * @return	true o false indicando si se ha cofirmado correctamente
+	 */
+	public Boolean cofirmaFichero() {
+		//comprobación de la ruta de fichero de entrada.
+		String ficheroDatos = campoDatos.getText();
+		String ficheroFirma = campoFirma.getText();
+
+		if (ficheroDatos == null || ficheroDatos.equals("")){
+			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		else if (!new File(ficheroDatos).exists() && !new File(ficheroDatos).isFile()) {
+			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		else if (ficheroFirma == null || ficheroFirma.equals("")){
+			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		else if (!new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){
+			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		else {
+			InputStream dataIs = null;
+			InputStream signIs = null;
+			try {
+				String intText = ".cosign";
+				byte[] coSignedData = null;
+				byte[] data = null;
+				byte[] sign = null;
+				MultisignUtils msUtils = new MultisignUtils();
+				AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(kssc,this);
+
+				// Recuperamos la clave del certificado
+				PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(kssc, keyStoreManager, this);
+
+				dataIs = new FileInputStream(ficheroDatos);
+				data = AOUtil.getDataFromInputStream(dataIs);
+				
+				signIs = new FileInputStream(ficheroFirma);
+				sign = AOUtil.getDataFromInputStream(signIs);
+				
+				AOSigner signer = AOSignerFactory.getSigner(sign);
+				if (signer == null) {
+					JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.manejador"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				if (!signer.isValidDataFile(data)) {
+					JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				if (!signer.isSign(sign)) {
+					JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.soportado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				try {
+					coSignedData = cosignOperation(signer, data, sign, keyEntry, ficheroDatos);
+				} catch (AOException e) {
+					logger.severe(e.toString());
+					JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.cofirma.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					return false;
+				}
+				
+				String path = AOUIManager.saveDataToFile(this, coSignedData, new File(signer.getSignedName(ficheroDatos, intText)), null);
+				// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
+				if (path == null) {
+					return false;
+				}
+				
+			} catch (Exception e) {
+				logger.severe(e.toString());
+				JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+				return false;
+			} finally {
+				if (dataIs != null) {
+					try { dataIs.close(); } catch (Exception e) {}
+				}
+				if (signIs != null) {
+					try { signIs.close(); } catch (Exception e) {}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Cofirma de un fichero de datos.
+	 * @param dataFile Fichero de datos a firma.
+	 * @param keyEntry Clave de firma.
+	 * @param filepath Ruta del fichero firmado.
+	 * @return Contenido de la firma.
+	 * @throws FileNotFoundException No se encuentra el fichero de datos.
+	 * @throws AOException Ocurrio un error durante el proceso de firma.
+	 */
+	private byte[] cosignOperation(AOSigner signer, byte[] data, byte[] sign, PrivateKeyEntry keyEntry, String filepath) throws FileNotFoundException, AOException {
+		
+		Properties prop = GeneralConfig.getSignConfig();
+		prop.setProperty("uri", filepath);
+
+		// Realizamos la cofirma
+		return signer.cosign(data, sign, GeneralConfig.getSignAlgorithm(),	keyEntry, prop);
+	}
+}
