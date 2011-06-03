@@ -60,7 +60,7 @@ public class Validacion extends JPanel {
 
 		// Etiqueta con el icono de VALIDE
 		JLabel etiquetaValide = new JLabel();
-		etiquetaValide.setIcon(new ImageIcon(getClass().getResource("/images/logo_VALIDe.png"))); // NOI18N
+		etiquetaValide.setIcon(new ImageIcon(getClass().getResource("/resources/images/logo_VALIDe.png"))); // NOI18N
 //		etiquetaValide.setBounds(171, 10, 140, 50);
 		add(etiquetaValide, c);
 

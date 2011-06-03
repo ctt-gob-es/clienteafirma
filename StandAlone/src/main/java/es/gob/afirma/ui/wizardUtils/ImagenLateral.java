@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 public class ImagenLateral extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private String rutaImagen = "/images/nubes.png";
+	private String rutaImagen = "/resources/images/nubes.png";
 	private Dimension dimensiones = new Dimension(145, 388);
 
 	public ImagenLateral() {

@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
  */
 public class Messages {
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle("properties/Idioma", Locale.getDefault());
+	private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma", Locale.getDefault());
 	
 	public static String getString(String codeString) {
 		try {

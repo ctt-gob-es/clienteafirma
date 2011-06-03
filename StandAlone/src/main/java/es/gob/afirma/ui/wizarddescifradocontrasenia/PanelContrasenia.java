@@ -181,7 +181,7 @@ public class PanelContrasenia extends JDialogWizard {
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			dispose();
 			return false;
-		} catch (Throwable ex) {
+		} catch (Exception ex) {
 			logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
@@ -199,7 +199,7 @@ public class PanelContrasenia extends JDialogWizard {
 			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.contrasenia"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
-		} catch (Throwable ex) {
+		} catch (Exception ex) {
 			logger.severe("Error al descifrar: " + ex);
 			ex.printStackTrace();
 			JOptionPane.showMessageDialog(this,

@@ -57,7 +57,7 @@ public class Descifrado extends JPanel {
 
     // Algoritmos para mecanismo clave de cifrado
     final static List<String> algoritmoLr = new ArrayList<String>(Arrays.asList("Advanced Encryption Standard (AES)","Alleged RC4","Blowfish","Data Encryption Standard (DES)","Triple DES (3DES)","RC2"));
-    final static List<String> algoritmoVr = new ArrayList<String>(Arrays.asList("AES","ARCFOUR","Blowfish"," DES","DESede","RC2"));
+    final static List<String> algoritmoVr = new ArrayList<String>(Arrays.asList("AES","ARCFOUR","Blowfish","DES","DESede","RC2"));
 
     public Descifrado() {
         initComponents();

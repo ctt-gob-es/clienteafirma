@@ -53,7 +53,7 @@ public class Acercade extends JFrame {
 			setBounds((screenSize.width - 380) / 2, (screenSize.height-320) / 2, 380, 320);			
 		
 		// Icono de @firma
-		setIconImage(new ImageIcon(getClass().getResource("/images/afirma_ico.png")).getImage());
+		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
 		
 		// Configuracion de la ventana Acerca de
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -70,7 +70,7 @@ public class Acercade extends JFrame {
 		
 		// Logotipo de la ventana
 		JLabel logotipo = new JLabel();
-		logotipo.setIcon(new ImageIcon(getClass().getResource("/images/logo_cliente.png"))); // NOI18N
+		logotipo.setIcon(new ImageIcon(getClass().getResource("/resources/images/logo_cliente.png"))); // NOI18N
 		getContentPane().add(logotipo, c);
 
 		c.fill = GridBagConstraints.BOTH;
@@ -132,7 +132,7 @@ public class Acercade extends JFrame {
 		Properties p = new Properties();
 		try {
 			p.load(this.getClass().getResourceAsStream("/version.properties")); //$NON-NLS-1$
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			Logger.getLogger(PanelContrasenia.class.getName()).warning(
 					"No se han podido obtener los datos de version del cliente de firma"); //$NON-NLS-1$
 		}

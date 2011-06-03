@@ -385,7 +385,7 @@ class PanelMultifirmaMasiva extends JDialogWizard {
         			pssCallback, this);
 
         	// Seleccionamos un certificado
-        	String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), null, this, true, true, true);
+        	String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
 
         	// Comprobamos si se ha cancelado la seleccion
         	if (selectedcert == null) 
@@ -402,7 +402,7 @@ class PanelMultifirmaMasiva extends JDialogWizard {
         		// que las relanza en forma de AOException
         		throw e;
         	}
-        	catch (Throwable e) {
+        	catch (Exception e) {
         		logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e);
         		throw new AOException("No se ha podido extraer el certificado seleccionado.");
         	}

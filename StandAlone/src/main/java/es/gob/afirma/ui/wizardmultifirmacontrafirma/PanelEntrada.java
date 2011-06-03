@@ -256,7 +256,7 @@ public class PanelEntrada extends JDialogWizard {
 			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.generar.firma"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.generar.firma"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;

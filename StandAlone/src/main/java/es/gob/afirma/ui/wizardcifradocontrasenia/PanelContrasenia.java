@@ -209,7 +209,7 @@ public class PanelContrasenia extends JDialogWizard {
 				logger.severe("No se cumplen con los requisitos de contrase\u00F1a del algoritmo: " + ex);
 				JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 				return false;
-			} catch (Throwable ex) {
+			} catch (Exception ex) {
 				logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex);
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.cifrado"),
 						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -234,7 +234,7 @@ public class PanelContrasenia extends JDialogWizard {
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				this.dispose();
 				return false;
-			} catch (Throwable ex) {
+			} catch (Exception ex) {
 				logger.warning("Ocurrio un error al leer el fichero: " + ex);
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				this.dispose();
@@ -248,7 +248,7 @@ public class PanelContrasenia extends JDialogWizard {
 				logger.severe("No se cumplen con los requisitos de contrase\u00F1a del algoritmo: " + ex);
 				JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 				return false;
-			} catch (Throwable ex) {
+			} catch (Exception ex) {
 				logger.warning("Error al cifrar: " + ex);
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.operacion"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				

@@ -471,7 +471,7 @@ public class PanelRemitentes extends JDialogWizard {
     		JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura.generico"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
-    	}  catch(Throwable e){
+    	}  catch(Exception e){
     		logger.warning("Ocurrio un error durante la desenvoltura: "+e);
     		JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.desenvoltura"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);

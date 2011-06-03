@@ -79,7 +79,7 @@ public class PanelFinalizar extends JDialogWizard {
     	
     	// Imagen de DNIe
     	JLabel etiquetaDNIe = new JLabel();
-    	etiquetaDNIe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/dnie.png")));
+    	etiquetaDNIe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/dnie.png")));
         panelCentral.add(etiquetaDNIe, c);
         
         c.weighty = 1.0;

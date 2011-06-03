@@ -392,7 +392,7 @@ public class PanelRemitentes extends JDialogWizard {
     		JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura.generico"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
-    	} catch(Throwable e){
+    	} catch(Exception e){
     		logger.warning("Ocurrio un error durante el proceso de añadir un nuevo remitente: "+e);
     		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);

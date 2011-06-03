@@ -92,7 +92,7 @@ public class PrincipalGUI extends JFrame {
 		getContentPane().setLayout(new BorderLayout(11, 7));
 
 		// Icono de @firma
-		setIconImage(new ImageIcon(getClass().getResource("/images/afirma_ico.png")).getImage());
+		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
 
 		// Carga del contorno principal
 		panelPest = new JTabbedPane();
@@ -176,12 +176,12 @@ public class PrincipalGUI extends JFrame {
 			File fileDirectory =  new File(baseDirectory.toURI());
 			if (fileDirectory.isFile())
 				fileDirectory = fileDirectory.getParentFile();
-			languagesDirectory  = new File (fileDirectory,"languages");
+			languagesDirectory  = new File (fileDirectory, "languages");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}        	
 
-		// Inicialmente introducimos el español
+		// Inicialmente introducimos el espanol
 		List<String> languages = new ArrayList<String>();
 		languages.add(DEFAULT_LOCALE);
 		
@@ -339,7 +339,7 @@ public class PrincipalGUI extends JFrame {
 		JPanel panelFirma = new Firma();
 		panelFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
 		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"),
-				new ImageIcon(getClass().getResource("/images/firma_mini_ico.png")),
+				new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")),
 				panelFirma,
 				Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
 
@@ -347,7 +347,7 @@ public class PrincipalGUI extends JFrame {
 		JPanel panelMultifirmaSimple = new MultifirmaSimple();
 		panelMultifirmaSimple.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
 		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma"),
-				new ImageIcon(getClass().getResource("/images/firma_mini_ico.png")),
+				new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")),
 				panelMultifirmaSimple,
 				Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
 
@@ -358,7 +358,7 @@ public class PrincipalGUI extends JFrame {
 			panelMultifirmaMasiva =  new MultifirmaMasiva();
 			panelMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
 			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"),
-					new ImageIcon(getClass().getResource("/images/multi_mini_ico.png")),
+					new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")),
 					panelMultifirmaMasiva,
 					Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description"));
 		}
@@ -367,7 +367,7 @@ public class PrincipalGUI extends JFrame {
 		JPanel panelValidacion = new Validacion();
 		panelValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
 		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion"),
-				new ImageIcon(getClass().getResource("/images/validate_mini_ico.png")),
+				new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")),
 				panelValidacion,
 				Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
 
@@ -375,7 +375,7 @@ public class PrincipalGUI extends JFrame {
 		JPanel panelCifrado = new Cifrado();
 		panelCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description"));
 		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado"),
-				new ImageIcon(getClass().getResource("/images/cifrado_mini_ico.png")),
+				new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png")),
 				panelCifrado,
 				Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description"));
 
@@ -383,7 +383,7 @@ public class PrincipalGUI extends JFrame {
 		JPanel panelDescifrado = new Descifrado();
 		panelDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description"));
 		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado"),
-				new ImageIcon(getClass().getResource("/images/descifrado_mini_ico.png")),
+				new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png")),
 				panelDescifrado,
 				Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description"));
 
@@ -393,7 +393,7 @@ public class PrincipalGUI extends JFrame {
 			panelEnsobrado = new Ensobrado();
 			panelEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description"));
 			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"),
-					new ImageIcon(getClass().getResource("/images/sobre_mini_ico.png")),
+					new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png")),
 					panelEnsobrado,
 					Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description"));
 		}
@@ -404,7 +404,7 @@ public class PrincipalGUI extends JFrame {
 			panelDesensobrado = new Desensobrado();
 			panelDesensobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description"));
 			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"),
-					new ImageIcon(getClass().getResource("/images/desensobrado_mini_ico.png")),
+					new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png")),
 					panelDesensobrado,
 					Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description"));
 		}

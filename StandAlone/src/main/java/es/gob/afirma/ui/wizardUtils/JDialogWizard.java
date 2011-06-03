@@ -41,7 +41,7 @@ public class JDialogWizard extends JDialog implements ComponentListener {
         addComponentListener(this);
         
         // Icono de @firma
-		setIconImage(new ImageIcon(getClass().getResource("/images/afirma_ico.png")).getImage());
+		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
         
         // Dimensiones de la ventana
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

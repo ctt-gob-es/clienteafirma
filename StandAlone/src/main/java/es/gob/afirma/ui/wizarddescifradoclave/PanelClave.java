@@ -79,7 +79,7 @@ public class PanelClave extends JDialogWizard {
     }
     
 	// Campo donde se guarda la contrasenia
-    private JTextField campoContrasenia = new JTextField();
+    private JTextField campoClave = new JTextField();
 	
     /**
      * Inicializacion de componentes
@@ -115,8 +115,8 @@ public class PanelClave extends JDialogWizard {
 		c.gridy	= 1;
 		
         // Caja de texto donde se guarda la clave
-        campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.clave.contrasenia.description")); // NOI18N
-        panelCentral.add(campoContrasenia, c);
+        campoClave.setToolTipText(Messages.getString("WizardDescifrado.clave.contrasenia.description")); // NOI18N
+        panelCentral.add(campoClave, c);
         
         c.insets = new Insets(20, 10, 0, 20);
 		c.weightx = 0.0;
@@ -150,7 +150,7 @@ public class PanelClave extends JDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoContrasenia, "descifrado.wizard.clave");
+        HelpUtils.enableHelpKey(campoClave, "descifrado.wizard.clave");
     }
 
     /**
@@ -166,13 +166,13 @@ public class PanelClave extends JDialogWizard {
 
     	// Mostramos la clave de cifrado recuperada del almacen
     	try {
-    		campoContrasenia.setText(getKeyFromCipherKeyStore());
+    		campoClave.setText(getKeyFromCipherKeyStore());
     	} catch (AOCancelledOperationException e) {
     		logger.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen.");
     	} catch (AOException e) {
     		JOptionPane.showMessageDialog(this, Messages.getString("WizardDescifrado.msg.error.clave"), 
     				Messages.getString("WizardDescifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
-    	} catch (Throwable e) {
+    	} catch (Exception e) {
     		JOptionPane.showMessageDialog(this, Messages.getString("WizardDescifrado.msg.error.clave"), 
     				Messages.getString("WizardDescifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
     	}		
@@ -195,17 +195,17 @@ public class PanelClave extends JDialogWizard {
     		);
     	} catch (AOCancelledOperationException e) {
     		throw e;
-    	} catch (Throwable e) {
+    	} catch (Exception e) {
     		throw new AOException("Error al abrir el repositorio de claves del usuario", e); //$NON-NLS-1$
     	}
 
     	// Si no se establecio el alias de la clave de cifrado, se la pedimos al usuario
     	String alias = null;
     	try {
-    		alias = AOUIManager.showCertSelectionDialog(cKs.getAliases(), null, null, this, true, true, true);
+    		alias = AOUIManager.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true);
     	} catch (AOCancelledOperationException e) {
     		throw e;
-    	} catch (Throwable e) {
+    	} catch (Exception e) {
     		throw new AOException("Error seleccionar la clave de cifrado", e); //$NON-NLS-1$
     	}
 
@@ -240,10 +240,10 @@ public class PanelClave extends JDialogWizard {
 	 * @return	true o false indicando si se ha descifrado correctamente
 	 */
     public Boolean descifrarFichero() {
-    	// Recuperamos la contrasenia
-    	String contrasenia = campoContrasenia.getText();
+    	// Recuperamos la clave
+    	String clave = campoClave.getText();
 
-    	if (contrasenia == null || contrasenia.equals("")) {
+    	if (clave == null || clave.equals("")) {
     		JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	} else {
@@ -268,7 +268,7 @@ public class PanelClave extends JDialogWizard {
     					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     			dispose();
     			return false;
-    		} catch (Throwable ex) {
+    		} catch (Exception ex) {
     			logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
     			ex.printStackTrace();
     			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
@@ -279,7 +279,7 @@ public class PanelClave extends JDialogWizard {
 
     		byte[] result = null;
     		try {
-    			Key tmpKey = cipherConfig.getCipher().decodeKey(contrasenia, cipherConfig.getConfig(), null);
+    			Key tmpKey = cipherConfig.getCipher().decodeKey(clave, cipherConfig.getConfig(), null);
     			result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
     		} catch (AOInvalidKeyException e) {
     			logger.severe("Clave no valida: " + e);
@@ -292,7 +292,7 @@ public class PanelClave extends JDialogWizard {
     					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     			dispose();
     			return false;
-    		} catch (Throwable ex) {
+    		} catch (Exception ex) {
     			logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
     			ex.printStackTrace();
     			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.operacion"), 

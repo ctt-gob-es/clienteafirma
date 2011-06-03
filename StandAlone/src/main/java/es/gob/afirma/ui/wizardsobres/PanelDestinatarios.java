@@ -77,7 +77,7 @@ public class PanelDestinatarios extends JDialogWizard {
 	}
 	
 	// Lista con los destinatarios
-	private JList<?> listaDestinatarios = new JList();
+	private JList listaDestinatarios = new JList();
 	
 	/**
 	 * Inicializacion de componentes
@@ -138,7 +138,7 @@ public class PanelDestinatarios extends JDialogWizard {
 		anadir.setAutoscrolls(true);
 		anadir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				anadirActionPerformed(comboDestinatarios, (DefaultListModel<?>) listaDestinatarios.getModel(), 
+				anadirActionPerformed(comboDestinatarios, (DefaultListModel) listaDestinatarios.getModel(), 
 						eliminar);
 			}
 		});
@@ -214,6 +214,7 @@ public class PanelDestinatarios extends JDialogWizard {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
 		} catch (Exception e) {
+		    //e.printStackTrace();
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
 			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.abrir.almacen"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -246,7 +247,7 @@ public class PanelDestinatarios extends JDialogWizard {
 	 * @param listaModel	Modelo de la lista de destinatarios
 	 * @param eliminar 		Boton eliminar
 	 */
-	private void eliminarActionPerformed(DefaultListModel<?> listaModel, JButton eliminar) {
+	private void eliminarActionPerformed(DefaultListModel listaModel, JButton eliminar) {
 		for (int i=0; i<listaCertificados.size(); i++)
 			if (listaCertificados.get(i).getAlias().equals(listaDestinatarios.getSelectedValue())) {
 				listaCertificados.remove(listaCertificados.get(i));
@@ -312,7 +313,7 @@ public class PanelDestinatarios extends JDialogWizard {
 	 * @return	True o false segun la verificacion
 	 */
 	public Boolean verificarCertificados() {
-		DefaultListModel<?> listModel = (DefaultListModel<?>) listaDestinatarios.getModel();
+		DefaultListModel listModel = (DefaultListModel) listaDestinatarios.getModel();
 		if (listModel.isEmpty()){
             JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return false;

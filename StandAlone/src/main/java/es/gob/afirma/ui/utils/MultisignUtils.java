@@ -64,7 +64,7 @@ public class MultisignUtils {
 	            padre
 	        );
         }
-        catch(final Throwable e) {
+        catch(final Exception e) {
         	throw new AOException("Error inicializando el almacen", e);
         }
         
@@ -83,7 +83,7 @@ public class MultisignUtils {
         PrivateKeyEntry privateKeyEntry = null;
         
         // Seleccionamos un certificado
-        String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), null, padre, true, true, true);
+        String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), padre, true, true, true);
 
         // Comprobamos si se ha cancelado la seleccion
         if (selectedcert == null) 
@@ -102,7 +102,7 @@ public class MultisignUtils {
                 // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
                 // que las relanza en forma de AOException
                 throw e;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e);
                 throw new AOException(e.getMessage());
             }

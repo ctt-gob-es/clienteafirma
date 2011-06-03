@@ -355,14 +355,14 @@ public class Desensobrado extends JPanel {
 	    			this
 	    	);
     	}
-    	catch(final Throwable e) {
+    	catch(final Exception e) {
     		throw new AOException("Error al inicializar el almacen", e);
     	}
     }
 
     private PrivateKeyEntry getPrivateKeyEntry(AOKeyStoreManager keyStoreManager, JComboBox comboAlmacen) throws AOException {
     	// Seleccionamos un certificado
-    	String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), null, this, true, true, true);
+    	String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
 
     	// Comprobamos si se ha cancelado la seleccion
     	if (selectedcert == null) 

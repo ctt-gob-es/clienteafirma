@@ -56,8 +56,8 @@ public class CertificateDestiny {
 	public CertificateDestiny(AOKeyStoreManager keyStoreManager, JDialogWizard dialogo) {
 		try {
 			// Seleccionamos un certificado
-			String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(),
-					null, dialogo, false, true, true);
+			String selectedcert = AOUIManager.showCertSelectionDialog(
+			        keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), dialogo, false, true, true);
 
 			// Comprobamos si se ha cancelado la seleccion
 			if (selectedcert == null) 

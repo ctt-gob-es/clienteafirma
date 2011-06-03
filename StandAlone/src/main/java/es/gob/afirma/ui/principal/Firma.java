@@ -72,6 +72,8 @@ public class Firma extends JPanel {
 	// Nombres de los diferentes formatos de firmado
 	private List<String> formatosL = new ArrayList<String>(Arrays.asList(
 			"Firma est\u00E1ndar (XAdES Detached)",
+//			"XAdES Enveloping",
+//			"XAdES Enveloped",
 			"CAdES",
 			"PAdES"
 	));
@@ -79,6 +81,8 @@ public class Firma extends JPanel {
 	// Constantes de los diferentes formatos de firmado
 	private List<String> formatosV = new ArrayList<String>(Arrays.asList(
 			AOConstants.SIGN_FORMAT_XADES_DETACHED,
+//			AOConstants.SIGN_FORMAT_XADES_ENVELOPING,
+//			AOConstants.SIGN_FORMAT_XADES_ENVELOPED,
 			AOConstants.SIGN_FORMAT_CADES,
 			AOConstants.SIGN_FORMAT_PDF
 	));
@@ -308,7 +312,7 @@ public class Firma extends JPanel {
 				);
 
 				// Seleccionamos un certificado
-				String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), null, this, true, true, true);
+				String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
 
 				// Comprobamos si se ha cancelado la seleccion
 				if (selectedcert == null) 
@@ -328,7 +332,7 @@ public class Firma extends JPanel {
 					// que las relanza en forma de AOException
 					throw e;
 				}
-				catch (Throwable e) {
+				catch (Exception e) {
 					e.printStackTrace();
 					logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e);
 					throw new AOException("No se ha podido recuperar el certificado seleccionado");
@@ -343,7 +347,7 @@ public class Firma extends JPanel {
 				try {
 					signer = AOCryptoUtil.getSigner(formato);
 				}
-				catch (Throwable e) {
+				catch (Exception e) {
 					logger.warning("Formato de firma no soportado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 					setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -379,7 +383,7 @@ public class Firma extends JPanel {
 				} finally {
 					setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 					if (fileIn != null) {
-						try { fileIn.close(); } catch (Throwable e) { }
+						try { fileIn.close(); } catch (Exception e) { }
 					}
 				}
 
@@ -418,9 +422,10 @@ public class Firma extends JPanel {
 					);
 				} catch (AOException e) {
 					logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					e.printStackTrace();
 					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 					return;
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 					return;
@@ -452,7 +457,7 @@ public class Firma extends JPanel {
 				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				logger.severe("Error: "+e.getMessage());
 				JOptionPane.showMessageDialog(this, e.getMessage(), "Firma", JOptionPane.ERROR_MESSAGE);
-			} catch(Throwable e) {
+			} catch(Exception e) {
 				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				logger.severe("Ocurrio un error al generar la firma electronica: "+e);
 			}

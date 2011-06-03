@@ -45,6 +45,7 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOFormatFileException;
 import es.gob.afirma.exceptions.AOInvalidFormatException;
@@ -74,7 +75,7 @@ public class PanelMultifirma extends JDialogWizard {
 	/**
 	 * Modelo de la lista
 	 */
-	private AbstractListModel<?> modeloLista;
+	private AbstractListModel modeloLista;
 
 	/**
 	 * Ruta del fichero a multifirmar
@@ -140,7 +141,7 @@ public class PanelMultifirma extends JDialogWizard {
 		try {
 			for (int i=0; i<root.getChildCount(); i++)
 				getSigners((DefaultMutableTreeNode)root.getChildAt(i), signersSet);
-		} catch(Throwable e) {
+		} catch(Exception e) {
 			logger.warning("El arbol introducido contiene elementos no validos: " + e);
 			return false;
 		}
@@ -263,7 +264,7 @@ public class PanelMultifirma extends JDialogWizard {
 		// Icono para el arbol
 		ImageIcon leafIcon = null;
 		try {
-			leafIcon = new ImageIcon(getClass().getResource("/images/firma_mini_ico.png"));
+			leafIcon = new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png"));
 		} catch (Exception e) {
 			logger.warning("No se ha podido cargar la imagen para los nodos del arbol de firmantes: "+e);
 		}
@@ -408,7 +409,11 @@ public class PanelMultifirma extends JDialogWizard {
 			if (path == null) {
 				return false;
 			}
+		} catch (AOCancelledOperationException e){
+		    logger.warning("Operacion cancelada por el usuario: " + e);
+		    return false;
 		} catch (Exception e){
+		    e.printStackTrace();
 			logger.severe(e.toString());
 			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);

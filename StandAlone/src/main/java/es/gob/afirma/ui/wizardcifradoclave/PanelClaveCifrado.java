@@ -225,7 +225,7 @@ public class PanelClaveCifrado extends JDialogWizard {
     		logger.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen.");
     	} catch (AOException e) {
     		JOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE);
-    	} catch (Throwable e) {
+    	} catch (Exception e) {
     		JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.almacen.error.clave"), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE);
     	}
 	}
@@ -247,17 +247,17 @@ public class PanelClaveCifrado extends JDialogWizard {
     		);
     	} catch (AOCancelledOperationException e) {
     		throw e;
-    	} catch (Throwable e) {
+    	} catch (Exception e) {
     		throw new AOException(Messages.getString("WizardCifrado.almacen.error.abrir"), e); //$NON-NLS-1$
     	}
 
     	// Si no se establecio el alias de la clave de cifrado, se la pedimos al usuario
     	String alias = null;
     	try {
-    		alias = AOUIManager.showCertSelectionDialog(cKs.getAliases(), null, null, this, true, true, true);
+    		alias = AOUIManager.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true);
     	} catch (AOCancelledOperationException e) {
     		throw e;
-    	} catch (Throwable e) {
+    	} catch (Exception e) {
     		throw new AOException(Messages.getString("WizardCifrado.almacen.error.seleccionar"), e); //$NON-NLS-1$
     	}
     	return AOCryptoUtil.encodeBase64(cKs.getKey(alias).getEncoded(), false);
@@ -334,7 +334,7 @@ public class PanelClaveCifrado extends JDialogWizard {
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clave"),
 						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 				return false;
-			} catch (Throwable ex) {
+			} catch (Exception ex) {
 				logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex);
 				JOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.cifrado"), 
 						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -355,7 +355,7 @@ public class PanelClaveCifrado extends JDialogWizard {
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				dispose();
 				return false;
-			} catch (Throwable ex) {
+			} catch (Exception ex) {
 				logger.warning("Ocurrio un error al leer el fichero: " + ex);
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				dispose();
@@ -371,7 +371,7 @@ public class PanelClaveCifrado extends JDialogWizard {
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clave"), 
 						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 				return false;
-			} catch (Throwable ex) {
+			} catch (Exception ex) {
 				logger.warning("Error al cifrar: " + ex);
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.operacion"), 
 						Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -460,7 +460,7 @@ public class PanelClaveCifrado extends JDialogWizard {
     	} catch (AOException e) {
     		JOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.clavecifrar"),
     				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE);
-    	} catch(Throwable e) {
+    	} catch(Exception e) {
     		JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clavecifrar"),
     				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE );
     	}

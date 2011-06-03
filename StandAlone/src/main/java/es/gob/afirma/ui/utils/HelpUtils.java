@@ -114,7 +114,7 @@ public class HelpUtils {
 	 * @return			Bot&oacute;n de ayuda
 	 */
 	public static JLabel fechButton(final String pagina) { 
-		JLabel botonAyuda = new JLabel(new ImageIcon(HelpUtils.class.getResource("/images/help.png")));
+		JLabel botonAyuda = new JLabel(new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")));
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		botonAyuda.addMouseListener(new MouseListener() {
