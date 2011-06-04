@@ -38,7 +38,7 @@ import es.gob.afirma.misc.AOUtil;
  * <code>KeyStore</code> para el manejo de certificados en disco en formato
  * PKCS#7 o X.509 en Base64.
  */
-final class SingleCertKeyStore extends KeyStoreSpi {
+public final class SingleCertKeyStore extends KeyStoreSpi {
 
 	private Hashtable<String, X509Certificate> certificates = new Hashtable<String, X509Certificate>();
 
