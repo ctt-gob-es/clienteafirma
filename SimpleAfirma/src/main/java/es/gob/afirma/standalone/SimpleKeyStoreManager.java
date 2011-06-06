@@ -102,6 +102,21 @@ public final class SimpleKeyStoreManager {
 			}
 		}
 		
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			try {
+				return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+					AOKeyStore.APPLE, 
+					null, 
+					null, 
+					new NullPasswordCallback(), 
+					parent
+				);
+			}
+			catch(final Exception e) {
+				throw new AOKeyStoreManagerException("No se ha podido incializar el Llavero de Mac OS X", e);
+			}
+		}
+		
 		return null;
 	}
 	

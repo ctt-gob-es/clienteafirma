@@ -9,11 +9,11 @@ import es.gob.afirma.misc.tree.TreeNode;
  * Operaciones para la gesti&oacute;n de objetos TreeModel.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class TreeModelManager {
+public final class TreeModelManager {
 
-    private TreeModel tree;
+    private final TreeModel tree;
     
-    public TreeModelManager(TreeModel tree) {
+    public TreeModelManager(final TreeModel tree) {
         this.tree = tree;
     }
     
@@ -24,7 +24,7 @@ public class TreeModelManager {
      */
     public DefaultMutableTreeNode getSwingTree() {
         
-        DefaultMutableTreeNode swingTreeRoot = new DefaultMutableTreeNode();
+        final DefaultMutableTreeNode swingTreeRoot = new DefaultMutableTreeNode();
         copyBranch((TreeNode) this.tree.getRoot(), swingTreeRoot);
         
         return swingTreeRoot;
@@ -36,7 +36,7 @@ public class TreeModelManager {
      * @param swingTreeNode Nodo al que se desea copiar
      * @return Nodo replicado.
      */
-    private DefaultMutableTreeNode copyBranch(TreeNode treeNode, DefaultMutableTreeNode swingTreeNode) {
+    private DefaultMutableTreeNode copyBranch(final TreeNode treeNode, final DefaultMutableTreeNode swingTreeNode) {
         swingTreeNode.setUserObject(treeNode.getUserObject());
         DefaultMutableTreeNode newChild;
         for (int i = 0; i < treeNode.getChildCount(); i++) {

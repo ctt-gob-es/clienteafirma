@@ -60,10 +60,10 @@ public class SignDetailPanel extends JPanel {
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.png";
     
     /** Contenedor padre de la ventana. */
-    private Container parent; 
+    private final Container parent; 
     
     /** Configuraci&oacute;n general para la ventana. */
-    private Properties config;
+    private final Properties config;
 
     /** Firma electr&oacute;nica que se desea visualizar. */
     private byte[] sign = null;
@@ -79,7 +79,7 @@ public class SignDetailPanel extends JPanel {
      * @param parent Componente padre sobre el que se muestra el panel.
      * @param configuration Configuraci&oacute;n a aplicar a la interfaz.
      */
-    public SignDetailPanel(Container parent, Properties configuration) throws IOException {
+    public SignDetailPanel(final Container parent, final Properties configuration) throws IOException {
         this(parent, configuration, null);
     }
     
@@ -89,7 +89,7 @@ public class SignDetailPanel extends JPanel {
      * @param configuration Configuraci&oacute;n a aplicar a la interfaz.
      * @param sign Firma electr&oacute;nica que se desea visualizar.
      */
-    public SignDetailPanel(Container parent, Properties configuration, byte[] sign) throws IOException {
+    public SignDetailPanel(final Container parent, final Properties configuration, final byte[] sign) throws IOException {
         this.parent = parent;
         this.config = configuration;
         this.sign = sign;
@@ -108,12 +108,12 @@ public class SignDetailPanel extends JPanel {
         
         this.setBackground(SimpleAfirma.WINDOW_COLOR);
         
-        JPanel infoPanel = createResultMessagePanel();
-        JPanel componentPanel = createSignDataPanel();
+        final JPanel infoPanel = createResultMessagePanel();
+        final JPanel componentPanel = createSignDataPanel();
         
         setLayout(new GridBagLayout());
         
-        GridBagConstraints c = new GridBagConstraints();
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.insets = new Insets(11, 11, 0, 11);
@@ -124,9 +124,9 @@ public class SignDetailPanel extends JPanel {
         add(componentPanel, c);
     }
    
-    JSVGCanvas resultOperationIcon;
-    JLabel resultTextLabel;
-    JLabel descTextLabel;
+    private JSVGCanvas resultOperationIcon;
+    private JLabel resultTextLabel;
+    private JLabel descTextLabel;
     
     private JPanel createResultMessagePanel() {
         resultOperationIcon = new JSVGCanvas();
@@ -135,10 +135,10 @@ public class SignDetailPanel extends JPanel {
         descTextLabel = new JLabel();
         descTextLabel.setVerticalAlignment(SwingConstants.TOP);
 
-        JPanel infoPanel = new JPanel(new GridBagLayout());
+        final JPanel infoPanel = new JPanel(new GridBagLayout());
         infoPanel.setBackground(new Color(0, 0, 0, 0));
         
-        GridBagConstraints c = new GridBagConstraints();
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
         c.weighty = 0.0;
@@ -186,7 +186,7 @@ public class SignDetailPanel extends JPanel {
         filePath.setFont(this.getFont().deriveFont(this.getFont().getSize() + 2));
         filePath.setBorder(BorderFactory.createEmptyBorder());
         filePath.setEditable(false);
-        JButton showFileButton = new JButton("Ver Fichero Firmado");
+        final JButton showFileButton = new JButton("Ver Fichero Firmado");
         
         filePathPanel = new JPanel();
         filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -230,10 +230,10 @@ public class SignDetailPanel extends JPanel {
         final JLabel detailPanelText = new JLabel("Datos de la firma:");
         detailPanelText.setLabelFor(detailPanel);
 
-        JPanel certDataPanel = new JPanel(new GridBagLayout());
+        final JPanel certDataPanel = new JPanel(new GridBagLayout());
         certDataPanel.setBackground(new Color(0, 0, 0, 0));
         
-        GridBagConstraints c = new GridBagConstraints();
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         c.gridy = 0;
@@ -264,7 +264,7 @@ public class SignDetailPanel extends JPanel {
      * Establece la firma que se desea visualizar.
      * @param sign Firma que se desea visualizar.
      */
-    public void setSign(byte[] sign) {
+    public void setSign(final byte[] sign) {
         this.sign = sign;
     }
 
@@ -273,21 +273,21 @@ public class SignDetailPanel extends JPanel {
      * @param signPath Ruta del fichero de firma.
      * @throws IOException Cuando ocurre un error al cargar el fichero de firma.
      */
-    public void setSign(String signPath) throws IOException {
+    public void setSign(final String signPath) throws IOException {
         
         if (signPath == null)
             throw new NullPointerException("No se ha indicado la ruta del fichero de firma");
         
-        URI uri = null;
-        InputStream is;
+        final URI uri;
+        final InputStream is;
         try {
             uri = AOUtil.createURI(signPath);
             is = AOUtil.loadFile(uri, this, true);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new IOException("Error en la carga del fichero de firma", e);
         }
         this.sign = AOUtil.getDataFromInputStream(is);
-        try { is.close(); } catch (Exception e) { }
+        try { is.close(); } catch (final Exception e) { }
     }
     
     
@@ -295,7 +295,7 @@ public class SignDetailPanel extends JPanel {
      * Establece el certificado utilizado para la firma.
      * @param certificate Certificado de firma.
      */
-    public void setCertificate(X509Certificate certificate) {
+    public void setCertificate(final X509Certificate certificate) {
         this.cert = certificate;
     }
     
@@ -303,7 +303,7 @@ public class SignDetailPanel extends JPanel {
      * Establece el certificado utilizado para la firma.
      * @param certificate Certificado de firma.
      */
-    public void setDataFilePath(String path) {
+    public void setDataFilePath(final String path) {
         this.dataFilePath = path;
     }
 
@@ -317,10 +317,10 @@ public class SignDetailPanel extends JPanel {
             throw new NullPointerException("No se configur&oacute; la firma electronica que se desea visualizar");
         
         
-        CompleteSignInfo signInfo;
+        final CompleteSignInfo signInfo;
         try {
             signInfo = this.getSignInfo(this.sign);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             this.showOperationResult(false);
             return;
         }
@@ -334,17 +334,17 @@ public class SignDetailPanel extends JPanel {
      * @param signData Firma.
      * @return Informaci&oacute;n de la firma.
      */
-    private CompleteSignInfo getSignInfo(byte[] signData) {
-        CompleteSignInfo signInfo = new CompleteSignInfo();
+    private CompleteSignInfo getSignInfo(final byte[] signData) {
+        final CompleteSignInfo signInfo = new CompleteSignInfo();
         signInfo.setSignData(signData);
         
-        AOSigner signer = AOSignerFactory.getSigner(signData);
+        final AOSigner signer = AOSignerFactory.getSigner(signData);
         if (signer == null) {
             Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido");
         } else {
             try {
                 signInfo.setSignInfo(signer.getSignInfo(signData));
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e);
             }
             signInfo.setSignsTree(signer.getSignersStructure(signData, true));
@@ -357,12 +357,12 @@ public class SignDetailPanel extends JPanel {
      * Muestra la cabecera correspondiente al resultado de an&aacute;lisis de la firma.
      * @param isOK Resultado de la operaci&oacute;n.
      */
-    private void showOperationResult(boolean isOK) {
+    private void showOperationResult(final boolean isOK) {
         
      // Imagen central
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Document docum = null;
+        final Document docum;
         try {
             docum = dbf.newDocumentBuilder().parse(
                 this.getClass().getResourceAsStream(
@@ -397,14 +397,14 @@ public class SignDetailPanel extends JPanel {
      * Muestra los datos extra&iacute;dos de la firma en el panel.
      * @param signInfo Informaci&oacute;n extra&iacute;da de la firma.
      */
-    private void showInfo(CompleteSignInfo signInfo) {
+    private void showInfo(final CompleteSignInfo signInfo) {
         
         if (this.dataFilePath != null) {
             this.filePath.setText(this.dataFilePath);
             
             try {
-                InputStream is = AOUtil.loadFile(AOUtil.createURI(this.dataFilePath), null, false);
-                byte[] data = AOUtil.getDataFromInputStream(is);
+                final InputStream is = AOUtil.loadFile(AOUtil.createURI(this.dataFilePath), null, false);
+                final byte[] data = AOUtil.getDataFromInputStream(is);
                 try { is.close(); } catch (Exception e) { }
 
                 String iconPath;
@@ -414,7 +414,7 @@ public class SignDetailPanel extends JPanel {
                 
                 fileIcon.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
                         this.getClass().getResource(iconPath))));
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 Logger.getLogger("Error al leer el fichero de datos, se omitira esta informacion: " + e);
                 this.dataFilePath = null;
             }
@@ -443,7 +443,7 @@ public class SignDetailPanel extends JPanel {
         detailPanel.setViewportView(this.getSignDataTree(signInfo));
     }
     
-    private JTree getSignDataTree(CompleteSignInfo signInfo) {
+    private JTree getSignDataTree(final CompleteSignInfo signInfo) {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         
         final DefaultMutableTreeNode signInfoBranch = new DefaultMutableTreeNode("Formato de firma");
