@@ -45,6 +45,7 @@ public class HelpUtils {
 	 * @return	Ventana con el panel de ayuda
 	 */
 	private static HelpBroker getHelp() {
+	    
 		if (helpBroker == null) {
 			try {
 				// Cargamos el archivo de datos de la ayuda
@@ -58,13 +59,13 @@ public class HelpUtils {
 				JFrame helpwindow = (JFrame) wp.getHelpWindow();
 				
 				// Introducimos el icono en la ventana
-				Image icon = Toolkit.getDefaultToolkit().createImage(HelpUtils.class.getClassLoader().getResource("images/afirma_ico.png"));
+				Image icon = Toolkit.getDefaultToolkit().createImage(HelpUtils.class.getClassLoader().getResource("resources/images/afirma_ico.png"));
 				helpwindow.setIconImage(icon);	
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
-
+		
 		return helpBroker;
 	}
 
@@ -105,7 +106,7 @@ public class HelpUtils {
 	 */
 	public static void visualize() {
 		getHelp().setDisplayed(true);
-		getHelp().setCurrentID("introduccion");		
+		getHelp().setCurrentID("introduccion");
 	}
 	
 	/**
@@ -113,7 +114,8 @@ public class HelpUtils {
 	 * @param pagina	P&aacute;gina a mostrar cuando se pulse el bot&oacute;n
 	 * @return			Bot&oacute;n de ayuda
 	 */
-	public static JLabel fechButton(final String pagina) { 
+	public static JLabel fechButton(final String pagina) {
+
 		JLabel botonAyuda = new JLabel(new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")));
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
