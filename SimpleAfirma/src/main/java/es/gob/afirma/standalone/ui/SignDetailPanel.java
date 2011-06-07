@@ -74,6 +74,23 @@ public final class SignDetailPanel extends JPanel {
     /** Ruta del fichero firmado. */
     private String dataFilePath = null;
     
+    private JSVGCanvas resultOperationIcon;
+    private JLabel resultTextLabel;
+    private JLabel descTextLabel;
+    private JLabel filePathText;
+    private JPanel filePathPanel;
+    private JLabel fileIcon;
+    private JTextField filePath;
+    
+    private JLabel certDescText;
+    private JPanel certDescPanel;
+    private JLabel certIcon;
+    private JLabel certDescription;
+    private JButton validateCertButton;
+    
+    private JScrollPane detailPanel;
+    
+    
     /**
      * Construye el panel para mostrar el detalle de una firma electr&oacute;nica.
      * @param parent Componente padre sobre el que se muestra el panel.
@@ -123,10 +140,6 @@ public final class SignDetailPanel extends JPanel {
         c.insets = new Insets(11, 11, 11, 11);
         add(componentPanel, c);
     }
-   
-    private JSVGCanvas resultOperationIcon;
-    private JLabel resultTextLabel;
-    private JLabel descTextLabel;
     
     private JPanel createResultMessagePanel() {
         resultOperationIcon = new JSVGCanvas();
@@ -159,19 +172,6 @@ public final class SignDetailPanel extends JPanel {
         
         return infoPanel;
     }
-
-    private JLabel filePathText;
-    private JPanel filePathPanel;
-    private JLabel fileIcon;
-    private JTextField filePath;
-    
-    private JLabel certDescText;
-    private JPanel certDescPanel;
-    private JLabel certIcon;
-    private JLabel certDescription;
-    private JButton validateCertButton;
-    
-    private JScrollPane detailPanel;
     
     /**
      * Crea el panel que almacenar&aacute; la informaci&oacute;n de la firma
@@ -183,10 +183,17 @@ public final class SignDetailPanel extends JPanel {
         // Panel con la ruta del fichero
         fileIcon = new JLabel();
         filePath = new JTextField();
+        filePath.getAccessibleContext().setAccessibleName("Fichero de firma");
+        filePath.getAccessibleContext().setAccessibleDescription("Ruta del fichero de firma analizado");
+        filePath.setFocusable(false);
         filePath.setFont(this.getFont().deriveFont(this.getFont().getSize() + 2));
         filePath.setBorder(BorderFactory.createEmptyBorder());
         filePath.setEditable(false);
-        final JButton showFileButton = new JButton("Ver Fichero Firmado");
+        
+        final JButton showFileButton = new JButton("Abrir Fichero Firmado");
+        showFileButton.setToolTipText("Abre el fichero firmado con la aplicaci\u00F3n configurada en su sistema");
+        showFileButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para abrir los datos firmados");
+        showFileButton.getAccessibleContext().setAccessibleDescription("Abre el documento firmado con la aplicaci\u00F3n configurada en el sistema");
         
         filePathPanel = new JPanel();
         filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -207,6 +214,9 @@ public final class SignDetailPanel extends JPanel {
         certIcon = new JLabel();
         certDescription = new JLabel();
         validateCertButton = new JButton("Comprobar validez");
+        validateCertButton.setToolTipText("Comprueba la validez del certificado contra el OCSP del su autoridad de certificaci\u00F3n");
+        validateCertButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para validar el certificado");
+        validateCertButton.getAccessibleContext().setAccessibleDescription("Comprueba la validez del certificado contra el OCSP de su autoridad de certificaci&oacute;n");
         
         certDescPanel = new JPanel();
         certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -438,7 +448,6 @@ public final class SignDetailPanel extends JPanel {
         }
         this.certDescText.setVisible(this.cert != null);
         this.certDescPanel.setVisible(this.cert != null);
-
 
         detailPanel.setViewportView(this.getSignDataTree(signInfo));
     }
