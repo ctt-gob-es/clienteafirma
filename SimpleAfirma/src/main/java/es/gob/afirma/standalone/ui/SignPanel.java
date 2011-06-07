@@ -1,7 +1,5 @@
 package es.gob.afirma.standalone.ui;
 
-import static es.gob.afirma.misc.AOConstants.SIGN_CERT_USAGE;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -367,7 +365,7 @@ public final class SignPanel extends JPanel {
 				public void actionPerformed(ActionEvent arg0) {
 					String fileToLoad;
 					
-					if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+					if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 						if (currentDir == null) currentDir = new File(Platform.getUserHome());
 						final FileDialog fd = new FileDialog((Frame)null, "Seleccione el fichero a firmar");
 						fd.setDirectory(currentDir.getAbsolutePath());
@@ -538,14 +536,14 @@ public final class SignPanel extends JPanel {
 		    this.setBorder(BorderFactory.createLineBorder(Color.black));
 		    this.setLayout(new GridBagLayout());
 		    
-		    JLabel pathLabel = new JLabel(filePath);
+		    final JLabel pathLabel = new JLabel(filePath);
 		    pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 4f));
-		    JLabel descLabel = new JLabel("Tipo de fichero: " + fileDescription);
-		    JLabel dateLabel = new JLabel("Fecha \u00FAltima modificaci\u00F3n: " + 
+		    final JLabel descLabel = new JLabel("Tipo de fichero: " + fileDescription);
+		    final JLabel dateLabel = new JLabel("Fecha \u00FAltima modificaci\u00F3n: " + 
 		            new SimpleDateFormat("dd/MMMMM/yyyy").format(fileLastModified));
-		    JLabel sizeLabel = new JLabel("Tama\u00F1o: " + fileSize + " KB");
+		    final JLabel sizeLabel = new JLabel("Tama\u00F1o: " + fileSize + " KB");
 		    
-		    JPanel detailPanel = new JPanel();
+		    final JPanel detailPanel = new JPanel();
 		    detailPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
 		    detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
 		    detailPanel.add(pathLabel);
@@ -555,10 +553,10 @@ public final class SignPanel extends JPanel {
 		    detailPanel.add(Box.createRigidArea(new Dimension(0,8)));
 		    detailPanel.add(sizeLabel);
 		    
-		    JButton openFileButton = new JButton("Ver Fichero");
+		    final JButton openFileButton = new JButton("Ver Fichero");
 		    openFileButton.setMnemonic('v');
 		    
-		    GridBagConstraints c = new GridBagConstraints();
+		    final GridBagConstraints c = new GridBagConstraints();
 		    c.fill = GridBagConstraints.BOTH;
 		    c.weightx = 0.0;
 		    c.weighty = 1.0;
@@ -686,7 +684,7 @@ public final class SignPanel extends JPanel {
 		final String fDescription = filterDescription;
 		final String[] fExtensions = filterExtensions;
 		        
-        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             if (currentDir == null) currentDir = new File(Platform.getUserHome());
             final FileDialog fd = new FileDialog(window, "Guardar como", FileDialog.SAVE);
             fd.setDirectory(currentDir.getAbsolutePath());

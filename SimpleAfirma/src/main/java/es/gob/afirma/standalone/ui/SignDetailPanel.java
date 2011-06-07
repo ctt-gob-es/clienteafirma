@@ -50,7 +50,7 @@ import es.gob.afirma.standalone.crypto.CertificateAnalizer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 
-public class SignDetailPanel extends JPanel {
+public final class SignDetailPanel extends JPanel {
 
     /** Serial ID */
     private static final long serialVersionUID = 7567869419737753210L;
@@ -160,13 +160,13 @@ public class SignDetailPanel extends JPanel {
         return infoPanel;
     }
 
-    JLabel filePathText;
-    JPanel filePathPanel;
+    private JLabel filePathText;
+    private JPanel filePathPanel;
     private JLabel fileIcon;
     private JTextField filePath;
     
-    JLabel certDescText;
-    JPanel certDescPanel;
+    private JLabel certDescText;
+    private JPanel certDescPanel;
     private JLabel certIcon;
     private JLabel certDescription;
     private JButton validateCertButton;

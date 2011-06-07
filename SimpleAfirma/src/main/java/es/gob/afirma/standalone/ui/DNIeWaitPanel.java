@@ -132,12 +132,7 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 	 */
 	public DNIeWaitPanel(final KeyListener kl, final ActionListener al) {
 		super(true);
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				createUI(kl, al);
-			}
-		});
+		createUI(kl, al);
 	}
 
 	public void itemStateChanged(ItemEvent e) {
