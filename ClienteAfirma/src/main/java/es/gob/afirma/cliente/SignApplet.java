@@ -2281,11 +2281,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public String getSignCertificateBase64Encoded() {
         logger.info("Invocando getSignCertificateBase64Encoded"); //$NON-NLS-1$
-        if (!ksConfigManager.isMandatoryCert()) {
-            logger.warning("No se dispone del certificado de firma, se devolvera una cadena vacia"); //$NON-NLS-1$
-            return ""; //$NON-NLS-1$
-        }
-
         final byte[] certEnconded;
         try {
             certEnconded = ksConfigManager.getSelectedCertificate().getEncoded();
@@ -3716,7 +3711,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     }
 
     public X509Certificate getSignCertificate() {
-        logger.info("Invocando getSignCertificateBase64Encoded"); //$NON-NLS-1$
+        logger.info("Invocando getSignCertificate"); //$NON-NLS-1$
         final X509Certificate cert = this.ksConfigManager.getSelectedCertificate();
         if (cert == null) {
             logger.warning("No se dispone del certificado de firma, se nulo"); //$NON-NLS-1$
