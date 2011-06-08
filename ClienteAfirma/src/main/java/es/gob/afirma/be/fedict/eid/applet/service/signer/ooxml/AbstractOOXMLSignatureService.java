@@ -215,7 +215,7 @@ public abstract class AbstractOOXMLSignatureService extends
 				);
 				final NodeList nodeList = XPathAPI.selectNodeList(
 					relsDocument,
-					"/tns:Relationships/tns:Relationship[@Target='_xmlsignatures/origin.sigs']",
+					"/tns:Relationships/tns:Relationship[@Type='http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin']",
 					nsElement
 				);
 				if (0 == nodeList.getLength()) {
@@ -242,7 +242,7 @@ public abstract class AbstractOOXMLSignatureService extends
 
 				writeDocumentNoClosing(relsDocument, zipOutputStream, false);
 			} 
-			else if ("_xmlsignatures/_rels/origin.sigs.rels".equals(zipEntry.getName())) {
+			else if (zipEntry.getName().startsWith("_xmlsignatures/_rels/") && zipEntry.getName().endsWith(".rels")) {
 				
 				hasOriginSigsRels = true;
 				final Document originSignRelsDocument = loadDocumentNoClose(zipInputStream);
