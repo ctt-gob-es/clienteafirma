@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -365,6 +366,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	public void loadResultsPanel(final byte[] sign, final String fileName, final X509Certificate signingCert) {
 		final JPanel newPanel = new SignDetailPanel(sign, fileName, signingCert, SignDetailPanel.SIGN_DETAIL_TYPE.GENERATED, null);
 		this.container.add(newPanel, BorderLayout.CENTER);
+		if (this.window != null && fileName != null) {
+			this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName));
+			this.window.setTitle(this.window.getTitle().substring(0, this.window.getTitle().indexOf('-')) + "- " + new File(fileName).getName());
+		}
 		if (this.currentPanel != null) {
 			this.currentPanel.setVisible(false);
 			this.currentPanel.setFocusable(false);
@@ -372,6 +377,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 		}
 		this.container.repaint();
 		this.currentPanel = newPanel;
+		this.window.repaint();
 	}
 	
 	

@@ -172,7 +172,6 @@ public final class SignPanel extends JPanel {
 		
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-
 		try {
 			this.fileTypeVectorIcon.setDocument(dbf.newDocumentBuilder().parse(
 				this.getClass().getResourceAsStream(iconPath)
@@ -183,6 +182,7 @@ public final class SignPanel extends JPanel {
 				"No se ha podido cargar el icono del tipo de fichero/firma, este no se mostrara: " + e
 			);
 		}
+		this.fileTypeVectorIcon.setFocusable(false);
 		
 		final long fileSize = file.length();
 		final long fileLastModified = file.lastModified();
