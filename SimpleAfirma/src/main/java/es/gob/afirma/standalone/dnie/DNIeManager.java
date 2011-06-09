@@ -40,19 +40,19 @@ public final class DNIeManager {
 	 * @throws DNIeManagerException cuando ocurre alg&uacute;n problema relacionado con <code>SmartCardIO</code>
 	 */
 	public DNIeManager(final PropertyChangeListener pcl) throws DNIeManagerException {
-		pcListener = pcl;
+		this.pcListener = pcl;
 		try {
-			terminals = TerminalFactory.getDefault().terminals().list();
+			this.terminals = TerminalFactory.getDefault().terminals().list();
 		}
 		catch(final CardException e) {
 			throw new DNIeManagerException(
 				"No se ha podido obtener la lista de lectores de tarjetas", e
 			);
 		}
-		if (terminals.isEmpty()) throw new DNIeManagerException(
+		if (this.terminals.isEmpty()) throw new DNIeManagerException(
 			"No se ha detectado ningun lector de tarjetas"
 		);
-		for (final CardTerminal terminal : terminals) {
+		for (final CardTerminal terminal : this.terminals) {
 			Logger.getLogger("es.gob.afirma").info("Detectado lector de tarjetas: " + terminal.getName());
 		}
 	}
@@ -63,9 +63,9 @@ public final class DNIeManager {
 	 * o ocurre alg&uacute;n error relacionado con <code>SmartCardIO</code> 
 	 */
 	public void waitForDnie() {
-		if (pcListener == null) return;
-		for (final CardTerminal cardTerminal : terminals) {
-			new CardTerminalMonitor(cardTerminal, pcListener).startMonitoring();
+		if (this.pcListener == null) return;
+		for (final CardTerminal cardTerminal : this.terminals) {
+			new CardTerminalMonitor(cardTerminal, this.pcListener).startMonitoring();
 		}
 	}
 	
@@ -115,25 +115,25 @@ public final class DNIeManager {
 		 
 		 CardTerminalMonitor(final CardTerminal terminal, PropertyChangeListener pcl) {
 			 if (pcl != null) this.addPropertyChangeListener(pcl);
-			 cardTerminal = terminal;
+			 this.cardTerminal = terminal;
 		 }
 
 		 void startMonitoring() {
-			 if (cardTerminal == null) return;
+			 if (this.cardTerminal == null) return;
 			 Card card;
 			 while(true) {
 				 try {
-					 cardTerminal.waitForCardPresent(0);
+					 this.cardTerminal.waitForCardPresent(0);
 					 if (SimpleAfirma.DEBUG) {
-						 System.out.println("Tarjeta insertada en el lector '" + cardTerminal.getName() + "'");
+						 System.out.println("Tarjeta insertada en el lector '" + this.cardTerminal.getName() + "'");
 					 }
-					 card = cardTerminal.connect("*");
+					 card = this.cardTerminal.connect("*");
 				 }
 				 catch(final CardException e) {
 					 if (SimpleAfirma.DEBUG) {
 						 e.printStackTrace();
 					 }
-					 firePropertyChange(CARD_EXCEPTION, "", cardTerminal.getName());
+					 firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName());
 					 return;
 				 }
 				 //firePropertyChange("CardInserted", false, true);
@@ -142,12 +142,12 @@ public final class DNIeManager {
 						 if (SimpleAfirma.DEBUG) {
 							 System.out.println("Detectada tarjeta extraña");
 						 }
-						 firePropertyChange(NOT_DNI_INSERTED, "", cardTerminal.getName());
+						 firePropertyChange(NOT_DNI_INSERTED, "", this.cardTerminal.getName());
 						 try {
-							 cardTerminal.waitForCardAbsent(0);
+							 this.cardTerminal.waitForCardAbsent(0);
 						 }
 						 catch(final CardException e) {
-							 firePropertyChange(CARD_EXCEPTION, "", cardTerminal.getName());
+							 firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName());
 							 return; 
 						 }
 					 }
@@ -155,7 +155,7 @@ public final class DNIeManager {
 						 if (SimpleAfirma.DEBUG) {
 							 System.out.println("Detectado DNIe");
 						 }
-						 firePropertyChange(DNI_INSERTED, "", cardTerminal.getName());
+						 firePropertyChange(DNI_INSERTED, "", this.cardTerminal.getName());
 						 return;
 					 }
 				 }

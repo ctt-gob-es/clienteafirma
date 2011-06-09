@@ -22,7 +22,6 @@ import javax.swing.SwingUtilities;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
-import org.w3c.dom.Document;
 
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
@@ -35,8 +34,10 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 
 	private static final long serialVersionUID = -8543615798397861866L;
 	
-	JButton noDNIButton = null;
-	JPanel noDNIPanel = null;
+	private final JButton noDNIButton = new JButton();
+	private final JPanel noDNIPanel = new JPanel();
+	
+	private final SimpleAfirma saf;
 	
 	private void createUI(final KeyListener kl, final ActionListener al) {
 		this.setBackground(SimpleAfirma.WINDOW_COLOR);
@@ -44,21 +45,20 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 		this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
 		// Boton para saltar de pantalla
-		noDNIPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		noDNIPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-		noDNIButton = new JButton("No deseo usar DNIe");
-		//noDNIButton = new JButton(Messages.getString("SimpleAFirma.1"));
-		if (al != null) noDNIButton.addActionListener(al);
-		noDNIButton.setMnemonic('n');
-		noDNIButton.getAccessibleContext().setAccessibleDescription(
+		this.noDNIPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		this.noDNIPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
+		this.noDNIButton.setText("No deseo usar DNIe");
+		if (al != null) this.noDNIButton.addActionListener(al);
+		this.noDNIButton.setMnemonic('n');
+		this.noDNIButton.getAccessibleContext().setAccessibleDescription(
 			"Pulse este bot\u00F3n para omitir la espera de inserci\u00F3n de DNIe y permitir seleccionar un certificado cualquiera desde el almac\u00E9n de claves y certificados del sistema operativo"
 		);
-		noDNIButton.getAccessibleContext().setAccessibleName(
+		this.noDNIButton.getAccessibleContext().setAccessibleName(
 			"Bot\u00F3n de omisi\u00F3n de espera para inserci\u00F3n de DNIe"
 		);
-		if (kl != null) noDNIButton.addKeyListener(kl);
-		noDNIButton.requestFocus();
-		noDNIPanel.add(noDNIButton);
+		if (kl != null) this.noDNIButton.addKeyListener(kl);
+		this.noDNIButton.requestFocus();
+		this.noDNIPanel.add(this.noDNIButton);
 		
 		// Texto informativo
 		ResizingTextPanel textPanel = new ResizingTextPanel(
@@ -68,36 +68,22 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 		textPanel.setFocusable(false);
         
 		// Imagen central
+		final JSVGCanvas vectorDNIeHelpPicture = new JSVGCanvas();
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-		Document docum = null;
 		try {
-			docum = dbf.newDocumentBuilder().parse(
+			 vectorDNIeHelpPicture.setDocument(dbf.newDocumentBuilder().parse(
 				this.getClass().getResourceAsStream("/resources/lectordnie.svg")
-			);
+			));
 		}
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning(
 				"No se ha podido cargar la imagen explicativa de insercion de DNIe, esta no se mostrara: " + e
 			);
-			return;
 		}
-		final JSVGCanvas vectorDNIeHelpPicture = new JSVGCanvas();
-		vectorDNIeHelpPicture.setDocument(docum);
 		vectorDNIeHelpPicture.setFocusable(false);
-		
-		// Listado de idiomas disponibles
-		JComboBox languagesList = null;
-		Locale[] locales = SimpleAfirma.getAvailableLocales();
-		if (locales != null && locales.length > 1) {
-		    languagesList = new JComboBox(locales);
-		    languagesList.setRenderer(new LocaleCellRenderer());
-		    languagesList.setSelectedItem(Locale.getDefault());
-		    languagesList.addItemListener(this);
-		    if (kl != null) languagesList.addKeyListener(kl);
-		}
-		
-		GridBagConstraints c = new GridBagConstraints();
+				
+		final GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
@@ -116,12 +102,21 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
         c.gridy = 2;
         c.ipady = 0;
         c.anchor = GridBagConstraints.WEST;
-        this.add(noDNIPanel, c);
-        if (locales.length > 1) {
-            c.gridx = 1;
-            c.anchor = GridBagConstraints.EAST;
-            this.add(languagesList, c);
-        }
+        this.add(this.noDNIPanel, c);
+        
+		// Listado de idiomas disponibles
+		final Locale[] locales = SimpleAfirma.getAvailableLocales();
+		if (locales != null && locales.length > 1) {
+		    final JComboBox languagesList = new JComboBox(locales);
+		    languagesList.setRenderer(new LocaleCellRenderer());
+		    languagesList.setSelectedItem(Locale.getDefault());
+		    languagesList.addItemListener(this);
+		    if (kl != null) languagesList.addKeyListener(kl);
+		    c.gridx = 1;
+		    c.anchor = GridBagConstraints.EAST;
+		    this.add(languagesList, c);
+		}
+
 	}
 	
 	/**
@@ -130,16 +125,24 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 	 *           cierre del aplicativo y F1 para mostrar la ayuda
 	 * @param al ActionListener para el control de los botones
 	 */
-	public DNIeWaitPanel(final KeyListener kl, final ActionListener al) {
+	public DNIeWaitPanel(final KeyListener kl, final ActionListener al, final SimpleAfirma safirma) {
 		super(true);
-		createUI(kl, al);
+		this.saf = safirma;
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				createUI(kl, al);
+			}
+		});
 	}
 
-	public void itemStateChanged(ItemEvent e) {
+	@Override
+	public void itemStateChanged(final ItemEvent e) {
 	    if (e.getStateChange() == ItemEvent.SELECTED) {
 	        try {
-	            SimpleAfirma.setDefaultLocale((Locale) e.getItem());
-	        } catch (Exception ex) {
+	        	this.saf.setDefaultLocale((Locale) e.getItem());
+	        } 
+	        catch (final Exception ex) {
 	            Logger.getLogger("es.gob.afirma").warning(
 	                    "No se ha podido cambiar el idioma de la interfaz: " + ex
 	            );
@@ -149,13 +152,14 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 	}
 	
 	private class LocaleCellRenderer extends DefaultListCellRenderer {
-        private static final long serialVersionUID = 1L;
 
-        @Override
-	    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		private static final long serialVersionUID = -6516072256082631760L;
+
+		@Override
+	    public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
 	        String language = null;
 	        if (value instanceof Locale) {
-	            Locale locale = (Locale) value;
+	            final Locale locale = (Locale) value;
 	            language = locale.getDisplayName(locale).substring(0, 1).toUpperCase() + 
 	                       locale.getDisplayName(locale).substring(1);
 	        }

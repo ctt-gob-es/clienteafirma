@@ -15,31 +15,31 @@ final class ResizingTextPanel extends JPanel {
 	private Font font;
 
 	private void changeInternalFont() {
-		FontMetrics fm = getFontMetrics(font);
+		FontMetrics fm = getFontMetrics(this.font);
 		while (true) {
-			if (getWidth() <= fm.stringWidth(text) + (MARGIN * 3)) break;
-			font = font.deriveFont((float)font.getSize()+1);
-			fm = getFontMetrics(font);
+			if (getWidth() <= fm.stringWidth(this.text) + (MARGIN * 3)) break;
+			this.font = this.font.deriveFont((float)this.font.getSize()+1);
+			fm = getFontMetrics(this.font);
 		}
 		while (true) {
-			if (getWidth() > fm.stringWidth(text) + (MARGIN * 3)) break;
-			font = font.deriveFont((float)font.getSize()-1);
-			fm = getFontMetrics(font);
+			if (getWidth() > fm.stringWidth(this.text) + (MARGIN * 3)) break;
+			this.font = this.font.deriveFont((float)this.font.getSize()-1);
+			fm = getFontMetrics(this.font);
 		}
 	}
 	
 	ResizingTextPanel(final String txt) {
 		super(true);
-		text = txt;
-		font = this.getFont();
+		this.text = txt;
+		this.font = this.getFont();
 	}
 	
 	@Override
 	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
 		changeInternalFont();
-		g.setFont(font);
-		g.drawString(text, MARGIN, getSize().height/2);
+		g.setFont(this.font);
+		g.drawString(this.text, MARGIN, getSize().height/2);
 	}
 
 }

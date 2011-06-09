@@ -6,8 +6,8 @@ import java.awt.Image;
  * Informaci&oacute;n para la visualizaci&oacute;n y validaci&oacute;n del certificado.
  * @author Carlos gamuci Mill&aacute;n
  */
-public class CertificateInfo {
-
+public final class CertificateInfo {
+ 
     /** Configuraci&oacute;n del OCSP para la validaci&oacute;n del certificado. */
     private OCSPConfig ocspConfig = null;
     
@@ -21,15 +21,17 @@ public class CertificateInfo {
      * Construye el objeto con la informaci&oacute;n del certificado.
      * @param description Texto descriptivo del certificado.
      */
-    public CertificateInfo(String description) {
-        if (description == null)
-            throw new NullPointerException("Debe introducirse un texto descriptor del certificado");
-        
-        this.descriptionText = description;
+    public CertificateInfo(final String description) {
+        if (description == null) {
+        	this.descriptionText = "Certificado X509v3";
+        }
+        else{
+        	this.descriptionText = description;
+        }
     }
 
     public OCSPConfig getOcspConfig() {
-        return ocspConfig;
+        return this.ocspConfig;
     }
 
     public void setOcspConfig(OCSPConfig ocspConfig) {
@@ -37,7 +39,7 @@ public class CertificateInfo {
     }
 
     public Image getIcon() {
-        return icon;
+        return this.icon;
     }
 
     public void setIcon(Image icon) {
@@ -45,6 +47,6 @@ public class CertificateInfo {
     }
 
     public String getDescriptionText() {
-        return descriptionText;
+        return this.descriptionText;
     }
 }

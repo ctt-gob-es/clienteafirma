@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
@@ -70,7 +71,7 @@ import es.gob.afirma.ui.AOUIManager;
 
 /**
  * Panel de selecci&oacute;n y firma del fichero objetivo.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s 
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class SignPanel extends JPanel {
 
@@ -123,7 +124,7 @@ public final class SignPanel extends JPanel {
 			errorMessage = "No se tienen permisos de lectura para el fichero seleccionado.\nSeleccione otro fichero o habilite los permisos de lectura para este.";
 		}
 		else if (file.length() < 1) {
-			errorMessage = "El fichero seleccionado está vacío.\nNo es posible firmar ficheros vacíos.";
+			errorMessage = "El fichero seleccionado est‡ vac’o.\nNo es posible firmar ficheros vac’os.";
 		}
 		if (errorMessage != null) {
 			JOptionPane.showOptionDialog(
@@ -145,7 +146,7 @@ public final class SignPanel extends JPanel {
 		if (data == null || data.length < 1) {
 			throw new IOException("No se ha podido leer el fichero");
 		}
-		dataToSign = data;
+		this.dataToSign = data;
 		
 		try {
 			fis.close();
@@ -156,17 +157,17 @@ public final class SignPanel extends JPanel {
 		if (new AOPDFSigner().isValidDataFile(data)) {
 			iconPath = FILE_ICON_PDF;
 			fileDescription = "Documento Adobe PDF";
-			signer = new AOPDFSigner();
+			this.signer = new AOPDFSigner();
 		}
 		else if (isXML(data)) {
 			iconPath = FILE_ICON_XML;
 			fileDescription = "Documento XML";
-			signer = new AOXAdESSigner();
+			this.signer = new AOXAdESSigner();
 		}
 		else {
 			iconPath = FILE_ICON_BINARY;
 			fileDescription = "Documento binario gen\u00E9rico";
-			signer = new AOCAdESSigner();
+			this.signer = new AOCAdESSigner();
 		}
 		
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -184,30 +185,30 @@ public final class SignPanel extends JPanel {
 		}
 		
 		if (doc != null) {
-			fileTypeVectorIcon.setDocument(doc);
+			this.fileTypeVectorIcon.setDocument(doc);
 		}
 		final long fileSize = file.length();
 		final long fileLastModified = file.lastModified();
 
-		lowerPanel.remove(filePanel);
-		filePanel = new FilePanel(
-			fileTypeVectorIcon, 
+		this.lowerPanel.remove(this.filePanel);
+		this.filePanel = new FilePanel(
+			this.fileTypeVectorIcon, 
 			NumberFormat.getInstance().format(fileSize), 
 			filename, 
 			fileDescription, 
 			new Date(fileLastModified)
 		);
-		lowerPanel.add(filePanel);
-		lowerPanel.revalidate();
+		this.lowerPanel.add(this.filePanel);
+		this.lowerPanel.revalidate();
 		
-		if (window != null) {
-			window.getRootPane().putClientProperty("Window.documentFile", new File(filename));
-			window.setTitle(window.getTitle() + " - " + new File(filename).getName());
+		if (this.window != null) {
+			this.window.getRootPane().putClientProperty("Window.documentFile", new File(filename));
+			this.window.setTitle(this.window.getTitle() + " - " + new File(filename).getName());
 		}
 		
-		currentFile = file;
+		this.currentFile = file;
 		
-		signButton.setEnabled(true);
+		this.signButton.setEnabled(true);
 		
 		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
@@ -216,10 +217,10 @@ public final class SignPanel extends JPanel {
 		this.setBackground(SimpleAfirma.WINDOW_COLOR);
 		this.setLayout(new GridLayout(2, 1));
 		this.add(new UpperPanel(al));
-		lowerPanel = new LowerPanel(al);
-		this.add(lowerPanel);
-		dropTarget = new DropTarget(
-			filePanel, 
+		this.lowerPanel = new LowerPanel(al);
+		this.add(this.lowerPanel);
+		this.dropTarget = new DropTarget(
+			this.filePanel, 
 			DnDConstants.ACTION_COPY, 
 			new DropTargetListener() {
 			
@@ -296,7 +297,7 @@ public final class SignPanel extends JPanel {
 							try {
 								loadFile(fileName);
 							}
-							catch(IOException e) {
+							catch(final IOException e) {
 								Logger.getLogger("es.gob.afirma").warning(
 									"Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e
 								);
@@ -331,8 +332,8 @@ public final class SignPanel extends JPanel {
 	 */
 	public SignPanel(final JFrame win, final SimpleAfirma sa) {
 		super(true);
-		window = win;
-		saf = sa;
+		this.window = win;
+		this.saf = sa;
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -354,10 +355,10 @@ public final class SignPanel extends JPanel {
 			if (al != null) selectButton.addActionListener(al);
 			selectButton.setMnemonic('S');
 			selectButton.getAccessibleContext().setAccessibleDescription(
-				"Pulse este botón para iniciar el proceso de selección de fichero a firmar"
+				"Pulse este botón para iniciar el proceso de selecci—n de fichero a firmar"
 			);
 			selectButton.getAccessibleContext().setAccessibleName(
-				"Botón de selección de fichero a firmar"
+				"Bot—n de selecci—n de fichero a firmar"
 			);
 			selectButton.requestFocusInWindow();
 			selectButton.addActionListener(new ActionListener() {
@@ -366,19 +367,19 @@ public final class SignPanel extends JPanel {
 					String fileToLoad;
 					
 					if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-						if (currentDir == null) currentDir = new File(Platform.getUserHome());
+						if (SignPanel.this.currentDir == null) SignPanel.this.currentDir = new File(Platform.getUserHome());
 						final FileDialog fd = new FileDialog((Frame)null, "Seleccione el fichero a firmar");
-						fd.setDirectory(currentDir.getAbsolutePath());
+						fd.setDirectory(SignPanel.this.currentDir.getAbsolutePath());
 						fd.setVisible(true);
 						if (fd.getFile() == null) return;
-						currentDir = new File(fd.getDirectory());
+						SignPanel.this.currentDir = new File(fd.getDirectory());
 						fileToLoad = fd.getDirectory() + fd.getFile();
 					}
 					else {
 						final JFileChooser fc = new JFileChooser();
-						if (currentDir != null) fc.setCurrentDirectory(currentDir);
+						if (SignPanel.this.currentDir != null) fc.setCurrentDirectory(SignPanel.this.currentDir);
 						if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(UpperPanel.this)) {
-							currentDir = fc.getCurrentDirectory();
+							SignPanel.this.currentDir = fc.getCurrentDirectory();
 							fileToLoad = fc.getSelectedFile().getAbsolutePath();
 						}
 						else return;
@@ -407,7 +408,7 @@ public final class SignPanel extends JPanel {
 				}
 			});
 			
-			final JLabel welcomeLabel = new JLabel("Bienvenido a \"Firma electrónica fácil con @Firma\"");
+			final JLabel welcomeLabel = new JLabel("Bienvenido a \"Firma electr—nica f‡cil con @Firma\"");
 			welcomeLabel.setFocusable(false);
 			welcomeLabel.setFont(welcomeLabel.getFont().deriveFont(Font.PLAIN, 26));
 			welcomeLabel.setLabelFor(selectButton);
@@ -471,33 +472,33 @@ public final class SignPanel extends JPanel {
 			this.setLayout(new BorderLayout(5,5));
 			this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 			
-			filePanel = new ResizingTextPanel(
+			SignPanel.this.filePanel = new ResizingTextPanel(
 				"Pulse el bot\u00F3n o arrastre un fichero en este \u00E1rea"
 			);
-			filePanel.setBackground(Color.DARK_GRAY);
-			filePanel.setForeground(Color.LIGHT_GRAY);
-			filePanel.getAccessibleContext().setAccessibleDescription(
+			SignPanel.this.filePanel.setBackground(Color.DARK_GRAY);
+			SignPanel.this.filePanel.setForeground(Color.LIGHT_GRAY);
+			SignPanel.this.filePanel.getAccessibleContext().setAccessibleDescription(
 				"Arrastre un fichero a este \u00E1rea para seleccionarlo para poder firmarlo electr\u00F3nicamente"
 			);
-			filePanel.getAccessibleContext().setAccessibleName(
+			SignPanel.this.filePanel.getAccessibleContext().setAccessibleName(
 				"Panel arratre fichero"
 			);
-			filePanel.setToolTipText(
-				"Arrastre un fichero a este área para seleccionarlo y poder firmarlo electrónicamente"
+			SignPanel.this.filePanel.setToolTipText(
+				"Arrastre un fichero a este ‡rea para seleccionarlo y poder firmarlo electr—nicamente"
 			);
-			filePanel.setFocusable(false);
-			filePanel.setDropTarget(dropTarget);
+			SignPanel.this.filePanel.setFocusable(false);
+			SignPanel.this.filePanel.setDropTarget(SignPanel.this.dropTarget);
 			
-			this.add(filePanel,BorderLayout.CENTER);
+			this.add(SignPanel.this.filePanel,BorderLayout.CENTER);
 			
 			final JPanel signPanel = new JPanel(true);
 			signPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-			signButton = new JButton("Firmar fichero");
-			signButton.setMnemonic('F');
-			if (al != null) signButton.addActionListener(al);
-			signButton.setEnabled(false);
-			signPanel.add(signButton);
-			signButton.addActionListener(new ActionListener() {
+			SignPanel.this.signButton = new JButton("Firmar fichero");
+			SignPanel.this.signButton.setMnemonic('F');
+			if (al != null) SignPanel.this.signButton.addActionListener(al);
+			SignPanel.this.signButton.setEnabled(false);
+			signPanel.add(SignPanel.this.signButton);
+			SignPanel.this.signButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					sign();
@@ -555,6 +556,27 @@ public final class SignPanel extends JPanel {
 		    
 		    final JButton openFileButton = new JButton("Ver Fichero");
 		    openFileButton.setMnemonic('v');
+		    openFileButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent ae) {
+					try {
+						Desktop.getDesktop().open(new File(filePath));
+					}
+					catch(final IOException e) {
+						JOptionPane.showOptionDialog(
+							FilePanel.this, 
+							"Error",
+							"No se ha podido abrir el fichero,\ncompruebe que no ha sido manipulado mientras se ejecutaba esta aplicaci—n",
+							JOptionPane.OK_OPTION,
+							JOptionPane.ERROR_MESSAGE,
+							null,
+							new Object[] { "Cerrar "},
+							null
+						);
+						return;
+					}
+				}
+			});
 		    
 		    final GridBagConstraints c = new GridBagConstraints();
 		    c.fill = GridBagConstraints.BOTH;
@@ -584,11 +606,10 @@ public final class SignPanel extends JPanel {
 	
 	private void sign() {
 		this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-		if (signer == null || dataToSign == null || saf == null) {
+		if (this.signer == null || this.dataToSign == null || this.saf == null) {
 			return;
 		}
-		final AOKeyStoreManager ksm = saf.getAOKeyStoreManager();
-		System.out.println(ksm.getKeyStores().get(0).getProvider().getName());
+		final AOKeyStoreManager ksm = this.saf.getAOKeyStoreManager();
 		final String alias;
 		
         //TODO: Filtrar por KeyUsage de firma
@@ -606,7 +627,7 @@ public final class SignPanel extends JPanel {
 		catch(final AOCertificatesNotFoundException e) {
 			JOptionPane.showOptionDialog(
 				this, 
-				"No se ha encontrado ningún certificado para firmar,\nCompruebe su almacén de claves e importe uno si es necesario",
+				"No se ha encontrado ningœn certificado para firmar,\nCompruebe su almacén de claves e importe uno si es necesario",
 				"Advertencia",
 				JOptionPane.OK_OPTION,
 				JOptionPane.WARNING_MESSAGE,
@@ -631,8 +652,8 @@ public final class SignPanel extends JPanel {
 		
 		final byte[] signResult;
 		try {
-			signResult = signer.sign(
-				dataToSign, 
+			signResult = this.signer.sign(
+				this.dataToSign, 
 				"SHA1withRSA", 
 				ksm.getKeyEntry(
 					alias, 
@@ -654,15 +675,16 @@ public final class SignPanel extends JPanel {
 				null
 			);
 			return; 
-		} finally {
+		} 
+		finally {
 		    this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}
-		signButton.setEnabled(false);
+		this.signButton.setEnabled(false);
 		
-		String newFileName = currentFile.getName();
+		String newFileName = this.currentFile.getName();
 		String[] filterExtensions;
 		String filterDescription;
-		if (signer instanceof AOPDFSigner) {
+		if (this.signer instanceof AOPDFSigner) {
 			if (!newFileName.toLowerCase().endsWith(".pdf")) {
 				newFileName = newFileName + ".pdf";
 			}
@@ -670,7 +692,7 @@ public final class SignPanel extends JPanel {
 			filterExtensions = new String[] { ".pdf" };
 			filterDescription = "Documentos Adobe PDF (*.pdf)";
 		}
-		else if (signer instanceof AOXMLDSigSigner || signer instanceof AOXAdESSigner) {
+		else if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner) {
 			newFileName = newFileName + ".xsig";
 			filterExtensions = new String[] { ".xsig", ".xml" };
 			filterDescription = "Firmas XML (*.xml, *.xsig)";
@@ -684,13 +706,18 @@ public final class SignPanel extends JPanel {
 		final String fDescription = filterDescription;
 		final String[] fExtensions = filterExtensions;
 		        
+		// Para las comprobaciones de si el usuario ha teclado la etension o espera que
+		// la aplicacion la anada sola
+		boolean nameMissingExtension = true;
+		
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            if (currentDir == null) currentDir = new File(Platform.getUserHome());
-            final FileDialog fd = new FileDialog(window, "Guardar como", FileDialog.SAVE);
-            fd.setDirectory(currentDir.getAbsolutePath());
+            if (this.currentDir == null) this.currentDir = new File(Platform.getUserHome());
+            final FileDialog fd = new FileDialog(this.window, "Guardar como", FileDialog.SAVE);
+            fd.setDirectory(this.currentDir.getAbsolutePath());
+            fd.setFile(newFileName);
             fd.setFilenameFilter(new FilenameFilter() {
                 @Override
-                public boolean accept(File dir, String name) {
+                public boolean accept(final File dir, final String name) {
                     for (final String ext : fExtensions) {
                         if (name.endsWith(ext)) {
                             return true;
@@ -701,12 +728,12 @@ public final class SignPanel extends JPanel {
             });
             fd.setVisible(true);
             if (fd.getFile() == null) return;
-            currentDir = new File(fd.getDirectory());
+            this.currentDir = new File(fd.getDirectory());
             newFileName = fd.getDirectory() + fd.getFile();
         }
         else {
             final JFileChooser fc = new JFileChooser();
-            if (currentDir != null) fc.setCurrentDirectory(currentDir);
+            if (this.currentDir != null) fc.setCurrentDirectory(this.currentDir);
             fc.setSelectedFile(new File(newFileName));
             fc.setFileFilter(new FileFilter() {
                 @Override
@@ -723,20 +750,37 @@ public final class SignPanel extends JPanel {
                     return fDescription;
                 }
             });
-            if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(window)) {
-                currentDir = fc.getCurrentDirectory();
-                boolean nameMissingExtension = true;
-                for (final String ext : fExtensions) {
-                    if (fc.getSelectedFile().getName().toLowerCase().endsWith(ext)) {
-                        nameMissingExtension = false;
-                    }
-                }
-                newFileName = fc.getSelectedFile().getAbsolutePath() +
-                                (nameMissingExtension ? "" : fExtensions[0]);             
+            if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(this.window)) {
+                this.currentDir = fc.getCurrentDirectory();
+                newFileName = fc.getSelectedFile().getAbsolutePath();
             }
-            else return;
+            else {
+            	return;
+            }
         }
-
+        
+        // Anadimos la extension si es necesario
+        for (final String ext : fExtensions) {
+            if (newFileName.toLowerCase().endsWith(ext)) {
+                nameMissingExtension = false;
+            }
+        }
+        newFileName = newFileName + (nameMissingExtension ? fExtensions[0] : "");         
+        
+        final File outputFile = new File(newFileName);
+        if (outputFile.exists()) {
+        	if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(
+    			SignPanel.this,
+    			"Ya existe un fichero con ese nombre,\nÀDesea sobreescribirlo?",
+    			"Advertencia",
+    			JOptionPane.YES_NO_OPTION,
+    			JOptionPane.WARNING_MESSAGE
+			)) {
+        		this.signButton.setEnabled(true);
+        		return;
+        	}
+        }
+        
         FileOutputStream fos = null;
         BufferedOutputStream bos = null;
         try {
@@ -758,6 +802,7 @@ public final class SignPanel extends JPanel {
                     new Object[] { "Cerrar "},
                     null
             );
+            this.signButton.setEnabled(true);
         }
         finally {
             try {
@@ -778,14 +823,8 @@ public final class SignPanel extends JPanel {
             catch(final Exception e) {}
         }
 		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
+		this.saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
 	}
 	
-	private boolean isDNIeProvider(final String providerName) {
-		if (providerName.toLowerCase().contains("usrpkcs11")) return true;
-		//if (providerName.toLowerCase().contains("autbiopkcs11")) return true;
-		if (providerName.contains("dnie")) return true;
-		return false;
-	}
 
 }

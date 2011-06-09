@@ -3,7 +3,7 @@ package es.gob.afirma.standalone.crypto;
 import es.gob.afirma.misc.tree.TreeModel;
 import es.gob.afirma.signers.beans.AOSignInfo;
 
-public class CompleteSignInfo {
+public final class CompleteSignInfo {
 
     private byte[] signData;
 
@@ -12,7 +12,7 @@ public class CompleteSignInfo {
     private TreeModel signsTree;
 
     public byte[] getSignData() {
-        return signData;
+        return this.signData;
     }
 
     public void setSignData(byte[] signData) {
@@ -20,7 +20,7 @@ public class CompleteSignInfo {
     }
 
     public AOSignInfo getSignInfo() {
-        return signInfo;
+        return this.signInfo;
     }
 
     public void setSignInfo(AOSignInfo signInfo) {
@@ -28,7 +28,7 @@ public class CompleteSignInfo {
     }
 
     public TreeModel getSignsTree() {
-        return signsTree;
+        return this.signsTree;
     }
 
     public void setSignsTree(TreeModel signsTree) {

@@ -10,8 +10,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.apple.eawt.event.GestureUtilities;
+import com.apple.eawt.event.MagnificationEvent;
+import com.apple.eawt.event.MagnificationListener;
+
+import es.gob.afirma.misc.Platform;
 import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.ui.AOUIManager;
 
 /**
  * Pantalla principal de la aplicaci&oacute;n de Firma F&aacute;cil con AFirma.
@@ -50,11 +54,28 @@ public final class MainScreen extends JFrame {
 		
 		try {
 			setIconImage(
-				Toolkit.getDefaultToolkit().getImage(AOUIManager.class.getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
+				Toolkit.getDefaultToolkit().getImage(MainScreen.class.getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
 			);
 		}
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de la aplicacion: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		// Propiedades especificas para Mac OS X
+		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+			com.apple.eawt.Application.getApplication().setDockIconImage(Toolkit.getDefaultToolkit().getImage(SimpleAfirma.class.getResource("/resources/afirma_ico.png"))); //$NON-NLS-1$);
+			GestureUtilities.addGestureListenerTo(this.getRootPane(), new MagnificationListener() {
+				@Override
+				public void magnify(final MagnificationEvent me) {
+					final int inc = 3;
+					if(me.getMagnification() > 0) {
+						MainScreen.this.setBounds(MainScreen.this.getX()-inc, MainScreen.this.getY()-inc, MainScreen.this.getWidth()+(inc*2), MainScreen.this.getHeight()+(inc*2));
+                    } 
+					else if (me.getMagnification() < 0) {
+                    	MainScreen.this.setBounds(MainScreen.this.getX()+inc, MainScreen.this.getY()+inc, MainScreen.this.getWidth()-(inc*2), MainScreen.this.getHeight()-(inc*2));
+                     }
+				}
+			});
 		}
 		
 		this.setVisible(true);

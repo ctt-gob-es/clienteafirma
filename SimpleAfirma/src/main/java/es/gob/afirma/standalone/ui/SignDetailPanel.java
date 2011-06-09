@@ -1,57 +1,68 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.sf.jmimemagic.Magic;
+
 import org.apache.batik.swing.JSVGCanvas;
-import org.w3c.dom.Document;
 
 import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.signers.AOPDFSigner;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.crypto.CertificateAnalizer;
-import es.gob.afirma.standalone.crypto.CertificateInfo;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 
+/**
+ * Panel con detalles de una firma electr&oacute;nica.
+ */
 public final class SignDetailPanel extends JPanel {
 
+	/** Tipo del resultado de la firma. */
+	public enum SIGN_DETAIL_TYPE {
+		/** Firma v&aacute;lida. */
+		OK,
+		/** Firma inv&aacute;lida. */
+		KO,
+		/** Firma generada en la misma aplicaci&oacute;n, se considera siempre v&aacute;lida. */
+		GENERATED
+	}
+ 
     /** Serial ID */
     private static final long serialVersionUID = 7567869419737753210L;
 
@@ -59,28 +70,10 @@ public final class SignDetailPanel extends JPanel {
     private static final String FILE_ICON_XML = "/resources/icon_xml.png";
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.png";
     
-    /** Contenedor padre de la ventana. */
-    private final Container parent; 
-    
-    /** Configuraci&oacute;n general para la ventana. */
-    private final Properties config;
-
-    /** Firma electr&oacute;nica que se desea visualizar. */
-    private byte[] sign = null;
-    
-    /** Certificado utilizado para firmar el documento. */
-    private X509Certificate cert = null;
-    
-    /** Ruta del fichero firmado. */
-    private String dataFilePath = null;
-    
-    private JSVGCanvas resultOperationIcon;
-    private JLabel resultTextLabel;
-    private JLabel descTextLabel;
+    private final JLabel resultTextLabel = new JLabel();
+    private final JEditorPane descTextLabel = new JEditorPane();
     private JLabel filePathText;
-    private JPanel filePathPanel;
-    private JLabel fileIcon;
-    private JTextField filePath;
+    private final JLabel fileIcon = new JLabel();
     
     private JLabel certDescText;
     private JPanel certDescPanel;
@@ -90,30 +83,25 @@ public final class SignDetailPanel extends JPanel {
     
     private JScrollPane detailPanel;
     
-    
     /**
      * Construye el panel para mostrar el detalle de una firma electr&oacute;nica.
-     * @param parent Componente padre sobre el que se muestra el panel.
-     * @param configuration Configuraci&oacute;n a aplicar a la interfaz.
+     * @param sig Firma electr&oacute;nica que se desea visualizar
+     * @param sigPath Ruta del fichero de firma, si no se proporciona la firma en s&iacute; se
+     *                usa para cargarla
+     * @param signingCert Certificado usado para generar la &uacute;ltima firma
+     * @param panelType Tipo de panel informativo de cabecera
+     * @param fileTypeIcon Icono vectorial indicativo del tipo de contenido. Si es <code>null</code>
+     *                     se determina al vuelo y se usa una version <i>raster</i>
      */
-    public SignDetailPanel(final Container parent, final Properties configuration) throws IOException {
-        this(parent, configuration, null);
-    }
-    
-    /**
-     * Construye el panel para mostrar el detalle de una firma electr&oacute;nica.
-     * @param parent Componente padre sobre el que se muestra el panel.
-     * @param configuration Configuraci&oacute;n a aplicar a la interfaz.
-     * @param sign Firma electr&oacute;nica que se desea visualizar.
-     */
-    public SignDetailPanel(final Container parent, final Properties configuration, final byte[] sign) throws IOException {
-        this.parent = parent;
-        this.config = configuration;
-        this.sign = sign;
+    public SignDetailPanel(final byte[] sig,
+    					   final String sigPath,
+    		               final X509Certificate signingCert,
+    		               final SignDetailPanel.SIGN_DETAIL_TYPE panelType,
+    		               final JSVGCanvas fileTypeIcon) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createUI();
+                createUI(sig, sigPath, signingCert, panelType, fileTypeIcon);
             }
         });
     }
@@ -121,12 +109,44 @@ public final class SignDetailPanel extends JPanel {
     /**
      * Agrega el contenido gr&aacute;fico al panel. 
      */
-    private void createUI() {
+    private void createUI(byte[] sig, 
+			   final String sigPath,
+               final X509Certificate signingCert,
+               final SignDetailPanel.SIGN_DETAIL_TYPE panelType,
+               final JSVGCanvas fileTypeIcon) {
         
         this.setBackground(SimpleAfirma.WINDOW_COLOR);
         
-        final JPanel infoPanel = createResultMessagePanel();
-        final JPanel componentPanel = createSignDataPanel();
+        // Cargamos los datos de firma si no nos los proporcionaron en el constructor
+        if (sig == null && sigPath != null) {
+        	final File signFile = new File(sigPath);
+        	if (!signFile.exists()) {
+        		Logger.getLogger("es.gob.afirma").severe("La ruta de firma proporcionada no corresponde a ningun fichero");
+        	}
+        	else if (signFile.canRead()) {
+        		Logger.getLogger("es.gob.afirma").severe("No se tienen permisos de lectura del fichero indicado");
+        	}
+        	else {
+        		InputStream fis = null;
+        		InputStream bis = null;
+        		try {
+        			fis = new FileInputStream(signFile);
+        			bis = new BufferedInputStream(fis);
+        			sig = AOUtil.getDataFromInputStream(bis);
+        		}
+        		catch(final IOException e) {
+        			Logger.getLogger("es.gob.afirma").severe("No se ha podido leer el fichero de firma: " + e);
+    			}
+        		finally {
+        			try { if (fis != null) fis.close(); } catch(final Exception e) {}
+        			try { if (bis != null) bis.close(); } catch(final Exception e) {}
+        		}
+    		}
+        }
+        
+        
+        final JPanel infoPanel = createResultMessagePanel(panelType);
+        final JPanel componentPanel = createSignDataPanel(sigPath, sig);
         
         setLayout(new GridBagLayout());
         
@@ -139,17 +159,76 @@ public final class SignDetailPanel extends JPanel {
         c.gridy = 1;
         c.insets = new Insets(11, 11, 11, 11);
         add(componentPanel, c);
+        
     }
     
-    private JPanel createResultMessagePanel() {
-        resultOperationIcon = new JSVGCanvas();
-        resultTextLabel = new JLabel();
-        resultTextLabel.setFont(this.getFont().deriveFont(Font.BOLD, this.getFont().getSize() + 8));
-        descTextLabel = new JLabel();
-        descTextLabel.setVerticalAlignment(SwingConstants.TOP);
-
+    private JPanel createResultMessagePanel(final SIGN_DETAIL_TYPE type) {
+    	
+    	final JSVGCanvas resultOperationIcon = new JSVGCanvas();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        try {
+            resultOperationIcon.setDocument(dbf.newDocumentBuilder().parse(
+                    this.getClass().getResourceAsStream(
+                            "/resources/" + (type.equals(SIGN_DETAIL_TYPE.KO) ? "ko_icon.svg" : "ok_icon.svg"))
+                ));
+        }
+        catch(final Exception e) {
+            Logger.getLogger("es.gob.afirma").warning(
+                "No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e
+            );
+        }
+         
+    	this.descTextLabel.setContentType("text/html");
+        this.descTextLabel.addHyperlinkListener(new HyperlinkListener() {
+			@Override
+			public void hyperlinkUpdate(final HyperlinkEvent he) {
+				if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType())) {
+					try {
+						Desktop.getDesktop().browse(he.getURL().toURI());
+					}
+					catch(final Exception e) {
+						JOptionPane.showOptionDialog(
+								SignDetailPanel.this, 
+								"Error",
+								"No ha sido posible recuperar la informaci—n adicional,\n,pruebe a abrir la siguiente URL desde un navegador Web:\n" + he.getURL(),
+								JOptionPane.OK_OPTION,
+								JOptionPane.ERROR_MESSAGE,
+								null,
+								new Object[] { "Cerrar "},
+								null
+							);
+					}
+				}
+			}
+		});
+        this.descTextLabel.setEditable(false);
+        this.descTextLabel.setOpaque(false);
+        
+        switch(type) {
+		case GENERATED:
+        	this.resultTextLabel.setText("Proceso de firma completado satisfactoriamente");
+        	this.descTextLabel.setText(
+                "<html><p>La firma cumple con los requisitos del esquema nacional de interoperabilidad en cuanto a firmas digitales y documentos firmados. <a href=\"http://www.google.com/\">M&aacute;s informaci&oacute;n</a>.</p></html>"
+            );
+			break;
+		case KO:
+			this.resultTextLabel.setText("La firma no es v‡lida o no es una firma compatible con @firma");
+        	this.descTextLabel.setText(
+                "<html><p>Blah, blah, blah</p></html>"
+            );
+			break;
+		case OK:
+			this.resultTextLabel.setText("La firma es v‡lida");
+        	this.descTextLabel.setText(
+                "<html><p>Para determinar la completa validez legal debe comprobar adem‡s la validez de los certificados usados para firmar</p></html>"
+            );
+			break;
+        }
+    	this.resultTextLabel.setFont(this.getFont().deriveFont(Font.BOLD, this.getFont().getSize() + 8));
+    	
         final JPanel infoPanel = new JPanel(new GridBagLayout());
-        infoPanel.setBackground(new Color(0, 0, 0, 0));
+        infoPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
         
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -164,11 +243,11 @@ public final class SignDetailPanel extends JPanel {
         c.gridx = 1;
         c.gridheight = 1;
         c.insets = new Insets(11, 6, 0, 11);
-        infoPanel.add(resultTextLabel, c);
+        infoPanel.add(this.resultTextLabel, c);
         c.weighty = 1.0;
         c.gridy = 1;
         c.insets = new Insets(0, 6, 5, 11);
-        infoPanel.add(descTextLabel, c);
+        infoPanel.add(this.descTextLabel, c);
         
         return infoPanel;
     }
@@ -178,67 +257,116 @@ public final class SignDetailPanel extends JPanel {
      * electr&oacute;nica.
      * @return Panel para almacenar la informaci&oacute;n de la firma.
      */
-    private JPanel createSignDataPanel() {
+    private JPanel createSignDataPanel(final String path, final byte[] sign) {
         
         // Panel con la ruta del fichero
-        fileIcon = new JLabel();
-        filePath = new JTextField();
-        filePath.getAccessibleContext().setAccessibleName("Fichero de firma");
-        filePath.getAccessibleContext().setAccessibleDescription("Ruta del fichero de firma analizado");
-        filePath.setFocusable(false);
-        filePath.setFont(this.getFont().deriveFont(this.getFont().getSize() + 2));
-        filePath.setBorder(BorderFactory.createEmptyBorder());
-        filePath.setEditable(false);
         
-        final JButton showFileButton = new JButton("Abrir Fichero Firmado");
-        showFileButton.setToolTipText("Abre el fichero firmado con la aplicaci\u00F3n configurada en su sistema");
-        showFileButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para abrir los datos firmados");
-        showFileButton.getAccessibleContext().setAccessibleDescription("Abre el documento firmado con la aplicaci\u00F3n configurada en el sistema");
+    	// Texto con la ruta del fichero 
+    	final JTextField filePath = new JTextField();
+    	filePath.getAccessibleContext().setAccessibleName("Fichero de firma");
+    	filePath.getAccessibleContext().setAccessibleDescription("Ruta del fichero de firma analizado");
+    	filePath.setFocusable(path != null);
+    	filePath.setFont(this.getFont().deriveFont(this.getFont().getSize() + 2));
+    	filePath.setBorder(BorderFactory.createEmptyBorder());
+    	filePath.setEditable(false);
+    	filePath.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+    	filePath.setText((path != null) ? path : "Fichero de firma en memoria");
         
-        filePathPanel = new JPanel();
+    	// Etiqueta encima del cuadro con la ruta de fichero
+        this.filePathText = new JLabel("Fichero firmado:");
+        this.filePathText.setLabelFor(filePath);
+        
+        // Boton de apertura del fichero firmado
+        final JButton openFileButton = new JButton("Abrir Fichero Firmado");
+        openFileButton.setToolTipText("Abre el fichero firmado con la aplicaci\u00F3n configurada en su sistema operativo");
+        openFileButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para abrir los datos firmados");
+        openFileButton.getAccessibleContext().setAccessibleDescription("Abre el documento firmado con la aplicaci\u00F3n configurada en el sistema");
+        openFileButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent ae) {
+				File openFile = null;
+				if (path != null) {
+					openFile = new File(path);
+				}
+				if (!(openFile != null && openFile.exists())) {
+					//TODO: Detectar extension, crear el temporal y actualizar openFile
+					String extension = "txt";
+					try {
+						extension = Magic.getMagicMatch(sign).getExtension();
+					}
+					catch(final Exception e) {
+						Logger.getLogger("es.gob.afirma").warning("No se ha podido determinar el tipo de fichero, se considerara textual: " + e);
+					}
+					try {
+						openFile = File.createTempFile("afirma", extension);
+						openFile.deleteOnExit();
+					}
+					catch(final Exception e) {
+						
+					}
+					System.out.println("POR HACER!!!");
+				}
+				
+				try {
+					Desktop.getDesktop().open(openFile);
+				}
+				catch(final Exception e) {
+					JOptionPane.showOptionDialog(
+						SignDetailPanel.this, 
+						"Error",
+						"No se ha podido abrir el fichero,\ncompruebe que no ha sido manipulado mientras se ejecutaba esta aplicaci—n",
+						JOptionPane.OK_OPTION,
+						JOptionPane.ERROR_MESSAGE,
+						null,
+						new Object[] { "Cerrar "},
+						null
+					);
+				}
+			}
+		});
+        
+        final JPanel filePathPanel = new JPanel();
         filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         filePathPanel.setLayout(new BoxLayout(filePathPanel, BoxLayout.X_AXIS));
         filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
         filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-        filePathPanel.add(fileIcon);
+        filePathPanel.add(this.fileIcon);
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         filePathPanel.add(filePath);
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-        filePathPanel.add(showFileButton);
+        filePathPanel.add(openFileButton);
         filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         
-        filePathText = new JLabel("Fichero firmado:");
-        filePathText.setLabelFor(filePathPanel);
 
         // Panel con los datos del certificado
-        certIcon = new JLabel();
-        certDescription = new JLabel();
-        validateCertButton = new JButton("Comprobar validez");
-        validateCertButton.setToolTipText("Comprueba la validez del certificado contra el OCSP del su autoridad de certificaci\u00F3n");
-        validateCertButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para validar el certificado");
-        validateCertButton.getAccessibleContext().setAccessibleDescription("Comprueba la validez del certificado contra el OCSP de su autoridad de certificaci&oacute;n");
+        this.certIcon = new JLabel();
+        this.certDescription = new JLabel();
+        this.validateCertButton = new JButton("Comprobar validez");
+        this.validateCertButton.setToolTipText("Comprueba la validez del certificado contra el OCSP del su autoridad de certificaci\u00F3n");
+        this.validateCertButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para validar el certificado");
+        this.validateCertButton.getAccessibleContext().setAccessibleDescription("Comprueba la validez del certificado contra el OCSP de su autoridad de certificaci&oacute;n");
         
-        certDescPanel = new JPanel();
-        certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        certDescPanel.setLayout(new BoxLayout(certDescPanel, BoxLayout.X_AXIS));
-        certDescPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-        certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-        certDescPanel.add(certIcon);
-        certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-        certDescPanel.add(certDescription);
-        certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-        certDescPanel.add(validateCertButton);
-        certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        this.certDescPanel = new JPanel();
+        this.certDescPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        this.certDescPanel.setLayout(new BoxLayout(this.certDescPanel, BoxLayout.X_AXIS));
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        this.certDescPanel.add(this.certIcon);
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
+        this.certDescPanel.add(this.certDescription);
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
+        this.certDescPanel.add(this.validateCertButton);
+        this.certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         
-        certDescText = new JLabel("Certificado de firma utilizado:");
-        certDescText.setLabelFor(certDescPanel);
+        this.certDescText = new JLabel("Certificado de firma utilizado:");
+        this.certDescText.setLabelFor(this.certDescPanel);
         
         // Panel el detalle de la firma
-        detailPanel = new JScrollPane();
+        this.detailPanel = new JScrollPane();
         
         
         final JLabel detailPanelText = new JLabel("Datos de la firma:");
-        detailPanelText.setLabelFor(detailPanel);
+        detailPanelText.setLabelFor(this.detailPanel);
 
         final JPanel certDataPanel = new JPanel(new GridBagLayout());
         certDataPanel.setBackground(new Color(0, 0, 0, 0));
@@ -248,16 +376,16 @@ public final class SignDetailPanel extends JPanel {
         c.weightx = 1.0;
         c.gridy = 0;
         c.insets = new Insets(11, 0, 0, 0);
-        certDataPanel.add(filePathText, c);
+        certDataPanel.add(this.filePathText, c);
         c.gridy = 1;
         c.insets = new Insets(0, 0, 0, 0);
         certDataPanel.add(filePathPanel, c);
         c.gridy = 2;
         c.insets = new Insets(11, 0, 0, 0);
-        certDataPanel.add(certDescText, c);
+        certDataPanel.add(this.certDescText, c);
         c.gridy = 3;
         c.insets = new Insets(0, 0, 0, 0);
-        certDataPanel.add(certDescPanel, c);
+        certDataPanel.add(this.certDescPanel, c);
         c.gridy = 4;
         c.insets = new Insets(11, 0, 0, 0);
         certDataPanel.add(detailPanelText, c);
@@ -265,219 +393,89 @@ public final class SignDetailPanel extends JPanel {
         c.weighty = 1.0;
         c.gridy = 5;
         c.insets = new Insets(0, 0, 0, 0);
-        certDataPanel.add(detailPanel, c);
+        certDataPanel.add(this.detailPanel, c);
         
         return certDataPanel;
     }
     
-    /**
-     * Establece la firma que se desea visualizar.
-     * @param sign Firma que se desea visualizar.
-     */
-    public void setSign(final byte[] sign) {
-        this.sign = sign;
-    }
-
-    /**
-     * Establece la ruta de la firma que se desea visualizar.
-     * @param signPath Ruta del fichero de firma.
-     * @throws IOException Cuando ocurre un error al cargar el fichero de firma.
-     */
-    public void setSign(final String signPath) throws IOException {
-        
-        if (signPath == null)
-            throw new NullPointerException("No se ha indicado la ruta del fichero de firma");
-        
-        final URI uri;
-        final InputStream is;
-        try {
-            uri = AOUtil.createURI(signPath);
-            is = AOUtil.loadFile(uri, this, true);
-        } catch (final Exception e) {
-            throw new IOException("Error en la carga del fichero de firma", e);
-        }
-        this.sign = AOUtil.getDataFromInputStream(is);
-        try { is.close(); } catch (final Exception e) { }
-    }
+    
+//    /**
+//     * Recupera la informaci&oacute;n de la firma indicada.
+//     * @param signData Firma.
+//     * @return Informaci&oacute;n de la firma.
+//     */
+//    private CompleteSignInfo getSignInfo(final byte[] signData) {
+//        final CompleteSignInfo signInfo = new CompleteSignInfo();
+//        signInfo.setSignData(signData);
+//        
+//        final AOSigner signer = AOSignerFactory.getSigner(signData);
+//        if (signer == null) {
+//            Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido");
+//        } else {
+//            try {
+//                signInfo.setSignInfo(signer.getSignInfo(signData));
+//            } catch (final Exception e) {
+//                Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e);
+//            }
+//            signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+//        }
+//        
+//        return signInfo;
+//    }
     
     
-    /**
-     * Establece el certificado utilizado para la firma.
-     * @param certificate Certificado de firma.
-     */
-    public void setCertificate(final X509Certificate certificate) {
-        this.cert = certificate;
-    }
+//    /**
+//     * Muestra los datos extra&iacute;dos de la firma en el panel.
+//     * @param signInfo Informaci&oacute;n extra&iacute;da de la firma.
+//     */
+//    private void showInfo(final CompleteSignInfo signInfo) {
+//                
+//        if (this.cert != null) {
+//            final CertificateInfo certInfo = CertificateAnalizer.getCertInformation(this.cert);
+//            this.certDescription.setText(certInfo.getDescriptionText());
+//            this.certIcon.setIcon(new ImageIcon(certInfo.getIcon()));
+//            if (certInfo.getOcspConfig() != null) {
+//                this.validateCertButton.addActionListener(new ActionListener() {
+//                    @Override
+//                    public void actionPerformed(ActionEvent e) {
+//                        certInfo.getOcspConfig();
+//                    }
+//                });
+//            }
+//            this.validateCertButton.setVisible(certInfo.getOcspConfig() != null);
+//        }
+//        this.certDescText.setVisible(this.cert != null);
+//        this.certDescPanel.setVisible(this.cert != null);
+//
+//        this.detailPanel.setViewportView(this.getSignDataTree(signInfo));
+//    }
     
-    /**
-     * Establece el certificado utilizado para la firma.
-     * @param certificate Certificado de firma.
-     */
-    public void setDataFilePath(final String path) {
-        this.dataFilePath = path;
-    }
-
-    /**
-     * Carga en los distintos campos del panel, la informaci&oacute;n de la firma
-     * establecida.
-     * @throws NullPointerException Si no se configur&oacute; una firma electr&oacute;nica. 
-     */
-    public void loadSignData() {
-        if (this.sign == null)
-            throw new NullPointerException("No se configur&oacute; la firma electronica que se desea visualizar");
-        
-        
-        final CompleteSignInfo signInfo;
-        try {
-            signInfo = this.getSignInfo(this.sign);
-        } catch (final Exception e) {
-            this.showOperationResult(false);
-            return;
-        }
-        
-        this.showOperationResult(true);
-        this.showInfo(signInfo);
-    }
-    
-    /**
-     * Recupera la informaci&oacute;n de la firma indicada.
-     * @param signData Firma.
-     * @return Informaci&oacute;n de la firma.
-     */
-    private CompleteSignInfo getSignInfo(final byte[] signData) {
-        final CompleteSignInfo signInfo = new CompleteSignInfo();
-        signInfo.setSignData(signData);
-        
-        final AOSigner signer = AOSignerFactory.getSigner(signData);
-        if (signer == null) {
-            Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido");
-        } else {
-            try {
-                signInfo.setSignInfo(signer.getSignInfo(signData));
-            } catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e);
-            }
-            signInfo.setSignsTree(signer.getSignersStructure(signData, true));
-        }
-        
-        return signInfo;
-    }
-    
-    /**
-     * Muestra la cabecera correspondiente al resultado de an&aacute;lisis de la firma.
-     * @param isOK Resultado de la operaci&oacute;n.
-     */
-    private void showOperationResult(final boolean isOK) {
-        
-     // Imagen central
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        final Document docum;
-        try {
-            docum = dbf.newDocumentBuilder().parse(
-                this.getClass().getResourceAsStream(
-                        "/resources/" + (isOK ? "ok_icon.svg" : "ko_icon.svg"))
-            );
-        }
-        catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning(
-                "No se ha podido cargar la imagen explicativa de insercion de DNIe, esta no se mostrara: " + e
-            );
-            return;
-        }
-        
-        
-        if (isOK) {
-            resultOperationIcon.setDocument(docum);
-            resultTextLabel.setText("Proceso de firma completado satisfactoriamente");
-            descTextLabel.setText(
-                "<html><p>La firma cumple con los requisitos del esquema nacional de interoperabilidad en cuanto a firmas digitales y documentos firmados. <a href='#'>M&aacute;s informaci&oacute;n</a>"
-            );
-        } else {
-            resultOperationIcon.setDocument(docum);
-            resultTextLabel.setText("No se reconoce el formato de firma");
-            descTextLabel.setText(
-                "<html><p>No ha sido posible identificar el formato de la firma introducida."
-            );
-        }
-
-    }
-    
-    /**
-     * Muestra los datos extra&iacute;dos de la firma en el panel.
-     * @param signInfo Informaci&oacute;n extra&iacute;da de la firma.
-     */
-    private void showInfo(final CompleteSignInfo signInfo) {
-        
-        if (this.dataFilePath != null) {
-            this.filePath.setText(this.dataFilePath);
-            
-            try {
-                final InputStream is = AOUtil.loadFile(AOUtil.createURI(this.dataFilePath), null, false);
-                final byte[] data = AOUtil.getDataFromInputStream(is);
-                try { is.close(); } catch (Exception e) { }
-
-                String iconPath;
-                if (new AOPDFSigner().isValidDataFile(data)) iconPath = FILE_ICON_PDF;
-                else if (isXML(data)) iconPath = FILE_ICON_XML;
-                else iconPath = FILE_ICON_BINARY;
-                
-                fileIcon.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
-                        this.getClass().getResource(iconPath))));
-            } catch (final Exception e) {
-                Logger.getLogger("Error al leer el fichero de datos, se omitira esta informacion: " + e);
-                this.dataFilePath = null;
-            }
-        }
-        this.filePathText.setVisible(this.dataFilePath != null);
-        this.filePathPanel.setVisible(this.dataFilePath != null);
-        
-        if (this.cert != null) {
-            final CertificateInfo certInfo = CertificateAnalizer.getCertInformation(this.cert);
-            this.certDescription.setText(certInfo.getDescriptionText());
-            this.certIcon.setIcon(new ImageIcon(certInfo.getIcon()));
-            if (certInfo.getOcspConfig() != null) {
-                this.validateCertButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        certInfo.getOcspConfig();
-                    }
-                });
-            }
-            this.validateCertButton.setVisible(certInfo.getOcspConfig() != null);
-        }
-        this.certDescText.setVisible(this.cert != null);
-        this.certDescPanel.setVisible(this.cert != null);
-
-        detailPanel.setViewportView(this.getSignDataTree(signInfo));
-    }
-    
-    private JTree getSignDataTree(final CompleteSignInfo signInfo) {
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        
-        final DefaultMutableTreeNode signInfoBranch = new DefaultMutableTreeNode("Formato de firma");
-        signInfoBranch.add(new DefaultMutableTreeNode(signInfo.getSignInfo().getFormat()));
-        root.add(signInfoBranch);
-        
-        final TreeModelManager treeManager = new TreeModelManager(signInfo.getSignsTree());
-        final DefaultMutableTreeNode signersBranch = treeManager.getSwingTree();
-        signersBranch.setUserObject("Árbol de firmas del documento");
-        root.add(signersBranch);
-        
-        final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
-        treeRenderer.setLeafIcon(null);
-        treeRenderer.setClosedIcon(null);
-        treeRenderer.setOpenIcon(null);
-        
-        final JTree tree = new JTree(root);
-        tree.setCellRenderer(treeRenderer);
-        tree.setRootVisible(false);
-        tree.putClientProperty("JTree.lineStyle", "None");
-        tree.getSelectionModel().setSelectionMode(
-                TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
-        return tree;
-    }
+//    private JTree getSignDataTree(final CompleteSignInfo signInfo) {
+//        final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+//        
+//        final DefaultMutableTreeNode signInfoBranch = new DefaultMutableTreeNode("Formato de firma");
+//        signInfoBranch.add(new DefaultMutableTreeNode(signInfo.getSignInfo().getFormat()));
+//        root.add(signInfoBranch);
+//        
+//        final TreeModelManager treeManager = new TreeModelManager(signInfo.getSignsTree());
+//        final DefaultMutableTreeNode signersBranch = treeManager.getSwingTree();
+//        signersBranch.setUserObject("Árbol de firmas del documento");
+//        root.add(signersBranch);
+//        
+//        final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
+//        treeRenderer.setLeafIcon(null);
+//        treeRenderer.setClosedIcon(null);
+//        treeRenderer.setOpenIcon(null);
+//        
+//        final JTree tree = new JTree(root);
+//        tree.setCellRenderer(treeRenderer);
+//        tree.setRootVisible(false);
+//        tree.putClientProperty("JTree.lineStyle", "None");
+//        tree.getSelectionModel().setSelectionMode(
+//                TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+//        for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
+//        return tree;
+//    }
 
     private boolean isXML(final byte[] data) {
         try {
@@ -489,24 +487,4 @@ public final class SignDetailPanel extends JPanel {
         return true;
     }
     
-    public static void main(String[] args) throws Exception {
-
-        JDialog dialog = new JDialog();
-
-        InputStream certIs = AOUtil.loadFile(AOUtil.createURI("C:/pruebas/cert.cer"), null, false);
-        X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X509").generateCertificate(certIs);
-        try { certIs.close(); } catch (Exception e) { }
-        
-        SignDetailPanel detailPanel = new SignDetailPanel(dialog, null);
-        detailPanel.setSign("C:/salida/Entrada.odp.signed.csig");
-        detailPanel.setDataFilePath("C:/pruebas/Entrada.pdf");
-        detailPanel.setCertificate(cert);
-        detailPanel.loadSignData();
-        
-        dialog.add(detailPanel);
-        
-        dialog.pack();
-        
-        dialog.setVisible(true);
-    }
 }

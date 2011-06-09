@@ -15,20 +15,20 @@ final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
 	private AOKeyStoreManager ksm;
 	
 	SimpleKeyStoreManagerWorker(final SimpleAfirma saf, final Component p, final boolean dni) {
-		simpleAFirma = saf;
-		parent = p;
-		dnie = dni;
+		this.simpleAFirma = saf;
+		this.parent = p;
+		this.dnie = dni;
 	}
 	
 	@Override
 	protected Void doInBackground() throws Exception {
-		ksm = SimpleKeyStoreManager.getKeyStore(dnie, parent);
+		this.ksm = SimpleKeyStoreManager.getKeyStore(this.dnie, this.parent);
 		return null;
 	}
 
 	@Override
     protected void done() {
-		if (simpleAFirma != null) simpleAFirma.setKeyStoreManager(ksm);
+		if (this.simpleAFirma != null) this.simpleAFirma.setKeyStoreManager(this.ksm);
 	}
 	
 }

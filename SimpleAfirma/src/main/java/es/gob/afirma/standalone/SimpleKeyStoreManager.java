@@ -4,20 +4,17 @@ import java.awt.Component;
 import java.io.File;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 import es.gob.afirma.callbacks.NullPasswordCallback;
 import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOKeyStoreManagerException;
 import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
+import es.gob.afirma.exceptions.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreUtilities;
 import es.gob.afirma.misc.AOConstants.AOKeyStore;
 import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.misc.Platform;
-import es.gob.afirma.misc.AOConstants;
 
 /**
  * Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe
@@ -43,6 +40,7 @@ public final class SimpleKeyStoreManager {
 			if (new File("/Library/OpenSC/lib/libopensc-dnie.dylib").exists()) return "/Library/OpenSC/lib/libopensc-dnie.dylib";
 			if (new File("/Library/OpenSC/lib/opensc-pkcs11.so").exists()) return "/Library/OpenSC/lib/opensc-pkcs11.so";
 			if (new File("/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib").exists()) return "/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib";
+			if (new File("/usr/lib/opensc-pkcs11.so" ).exists()) return "/usr/lib/opensc-pkcs11.so";
 			throw new AOKeyStoreManagerException(
 				"No hay controlador PKCS#11 de DNIe instalado en este sistema Mac OS X"
 			);
