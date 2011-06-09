@@ -53,7 +53,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
-import org.w3c.dom.Document;
 
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
@@ -93,7 +92,8 @@ public final class SignPanel extends JPanel {
 	
 	private final JFrame window;
 	
-	private JButton signButton;
+	private final JButton signButton = new JButton();
+	private final JButton selectButton = new JButton();
 	
 	private final SimpleAfirma saf;
 	
@@ -172,11 +172,11 @@ public final class SignPanel extends JPanel {
 		
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-		Document doc = null;
+
 		try {
-			doc = dbf.newDocumentBuilder().parse(
+			this.fileTypeVectorIcon.setDocument(dbf.newDocumentBuilder().parse(
 				this.getClass().getResourceAsStream(iconPath)
-			);
+			));
 		}
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").warning(
@@ -184,9 +184,6 @@ public final class SignPanel extends JPanel {
 			);
 		}
 		
-		if (doc != null) {
-			this.fileTypeVectorIcon.setDocument(doc);
-		}
 		final long fileSize = file.length();
 		final long fileLastModified = file.lastModified();
 
@@ -211,6 +208,7 @@ public final class SignPanel extends JPanel {
 		this.signButton.setEnabled(true);
 		
 		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		this.signButton.requestFocusInWindow();
 	}
 	
 	private void createUI(final ActionListener al) {
@@ -334,12 +332,7 @@ public final class SignPanel extends JPanel {
 		super(true);
 		this.window = win;
 		this.saf = sa;
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				createUI(null);
-			}
-		});
+		createUI(null);
 	}
 	
 	private final class UpperPanel extends JPanel {
@@ -351,17 +344,17 @@ public final class SignPanel extends JPanel {
 			this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 			this.setBackground(SimpleAfirma.WINDOW_COLOR);
 						
-			final JButton selectButton = new JButton("Seleccionar fichero a firmar");
-			if (al != null) selectButton.addActionListener(al);
-			selectButton.setMnemonic('S');
-			selectButton.getAccessibleContext().setAccessibleDescription(
+			SignPanel.this.selectButton.setText("Seleccionar fichero a firmar");
+			if (al != null) SignPanel.this.selectButton.addActionListener(al);
+			SignPanel.this.selectButton.setMnemonic('S');
+			SignPanel.this.selectButton.getAccessibleContext().setAccessibleDescription(
 				"Pulse este botón para iniciar el proceso de selecci—n de fichero a firmar"
 			);
-			selectButton.getAccessibleContext().setAccessibleName(
+			SignPanel.this.selectButton.getAccessibleContext().setAccessibleName(
 				"Bot—n de selecci—n de fichero a firmar"
 			);
-			selectButton.requestFocusInWindow();
-			selectButton.addActionListener(new ActionListener() {
+			SignPanel.this.selectButton.requestFocusInWindow();
+			SignPanel.this.selectButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					String fileToLoad;
@@ -411,7 +404,7 @@ public final class SignPanel extends JPanel {
 			final JLabel welcomeLabel = new JLabel("Bienvenido a \"Firma electr—nica f‡cil con @Firma\"");
 			welcomeLabel.setFocusable(false);
 			welcomeLabel.setFont(welcomeLabel.getFont().deriveFont(Font.PLAIN, 26));
-			welcomeLabel.setLabelFor(selectButton);
+			welcomeLabel.setLabelFor(SignPanel.this.selectButton);
 			welcomeLabel.setForeground(new Color(3399));
 			this.add(welcomeLabel, BorderLayout.PAGE_START);
 			
@@ -423,9 +416,8 @@ public final class SignPanel extends JPanel {
 				"Consulte las pol&iacute;ticas de seguridad y protecci&oacute;n de datos de los receptores de los " +
 				"ficheros firmados antes en eviarlos o distribuirlos.<br>"
 			;
-			
 			final JLabel introText = new JLabel(intro);
-			introText.setLabelFor(selectButton);
+			introText.setLabelFor(SignPanel.this.selectButton);
 			introText.setFocusable(false);
 			
 			final JPanel introPanel = new JPanel(new BorderLayout());
@@ -436,19 +428,14 @@ public final class SignPanel extends JPanel {
 			
 			final JPanel selectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT), true);
 			selectPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-			selectPanel.add(selectButton);
+			selectPanel.add(SignPanel.this.selectButton);
 			this.add(selectPanel, BorderLayout.PAGE_END);
 			
 		}
 		
 		private UpperPanel(final ActionListener al) {
 			super(true);
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					createUI(al);
-				}
-			});
+			createUI(al);
 		}
 		
 	}
@@ -493,7 +480,7 @@ public final class SignPanel extends JPanel {
 			
 			final JPanel signPanel = new JPanel(true);
 			signPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-			SignPanel.this.signButton = new JButton("Firmar fichero");
+			SignPanel.this.signButton.setText("Firmar fichero");
 			SignPanel.this.signButton.setMnemonic('F');
 			if (al != null) SignPanel.this.signButton.addActionListener(al);
 			SignPanel.this.signButton.setEnabled(false);
