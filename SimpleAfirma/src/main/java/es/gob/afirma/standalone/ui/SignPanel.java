@@ -359,7 +359,7 @@ public final class SignPanel extends JPanel {
 				public void actionPerformed(ActionEvent arg0) {
 					String fileToLoad;
 					
-					if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+					if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
 						if (SignPanel.this.currentDir == null) SignPanel.this.currentDir = new File(Platform.getUserHome());
 						final FileDialog fd = new FileDialog((Frame)null, "Seleccione el fichero a firmar");
 						fd.setDirectory(SignPanel.this.currentDir.getAbsolutePath());
@@ -697,7 +697,7 @@ public final class SignPanel extends JPanel {
 		// la aplicacion la anada sola
 		boolean nameMissingExtension = true;
 		
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
             if (this.currentDir == null) this.currentDir = new File(Platform.getUserHome());
             final FileDialog fd = new FileDialog(this.window, "Guardar como", FileDialog.SAVE);
             fd.setDirectory(this.currentDir.getAbsolutePath());
@@ -737,7 +737,7 @@ public final class SignPanel extends JPanel {
                     return fDescription;
                 }
             });
-            if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(this.window)) {
+            if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(this.window)) {
                 this.currentDir = fc.getCurrentDirectory();
                 newFileName = fc.getSelectedFile().getAbsolutePath();
             }
