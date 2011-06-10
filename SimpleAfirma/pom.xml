@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
   <packaging>jar</packaging>
   <groupId>es.gob.afirma</groupId>
-  <artifactId>afirma-client-standalone</artifactId>
+  <artifactId>afirma-client-simple</artifactId>
   <version>3.2.0</version>
-  <name>afirma-client-standalone</name>
+  <name>afirma-client-simple</name>
 
   <repositories>
     <repository>
@@ -18,15 +18,21 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.apple</groupId>
+      <artifactId>applejavaextensions</artifactId>
+      <version>1.5.4</version>
+    </dependency>
+
+    <dependency>
       <groupId>es.gob.afirma</groupId>
       <artifactId>afirma-client</artifactId>
       <version>3.2.0</version>
     </dependency>
 
     <dependency>
-      <groupId>javax.help</groupId>
-      <artifactId>javahelp</artifactId>
-      <version>2.0.05</version>
+      <groupId>batik</groupId>
+      <artifactId>batik-swing</artifactId>
+      <version>1.6-1</version>
     </dependency>
   </dependencies>
 

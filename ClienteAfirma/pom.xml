@@ -11,8 +11,8 @@
 
   <repositories>
     <repository>
-      <id>forjauji</id>
-      <url>http://maven.forja.uji.es/</url>
+      <id>uji</id>
+      <url>http://devel.uji.es/nexus/content/groups/public/</url>
     </repository>
   </repositories>
 
