@@ -436,7 +436,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	 * @param defaultValue Valor por defecto.
 	 * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida.
 	 */
-	public String getPreference(String key, String defaultValue) {
+	public String getPreference(final String key, final String defaultValue) {
 	    return this.preferences.get(key, defaultValue);
 	}
 	
@@ -445,7 +445,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	 * @param key Clave de la preferencia.
 	 * @param value Valor asignado.
 	 */
-	public void setPreference(String key, String value) {
+	public void setPreference(final String key, final String value) {
         this.preferences.put(key, value);
     }
 	
