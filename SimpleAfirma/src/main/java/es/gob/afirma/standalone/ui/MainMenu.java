@@ -1,14 +1,18 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Component;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.Locale;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -27,6 +31,7 @@ import com.apple.eawt.AppEvent.PreferencesEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 
 import es.gob.afirma.misc.Platform;
+import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /**
@@ -80,43 +85,74 @@ public final class MainMenu extends JMenuBar {
 	
 	private void createUI() {
 		
-		this.menuArchivo = new JMenu("Archivo");
+		this.menuArchivo = new JMenu(Messages.getString("MainMenu.0")); //$NON-NLS-1$
 		this.menuArchivo.setMnemonic(KeyEvent.VK_A);
 		this.menuArchivo.getAccessibleContext().setAccessibleDescription(
-			"Menú con operaciones de apertura y firma de archivos"
+			Messages.getString("MainMenu.1") //$NON-NLS-1$
 		);
 		this.menuArchivo.setEnabled(true);
 		
-		final JMenuItem abrirMenuItem = new JMenuItem("Abrir archivo");
+		final JMenuItem abrirMenuItem = new JMenuItem(Messages.getString("MainMenu.2")); //$NON-NLS-1$
 		abrirMenuItem.setAccelerator(
 			KeyStroke.getKeyStroke(KeyEvent.VK_A,
 		    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
 	    );
 		abrirMenuItem.getAccessibleContext().setAccessibleDescription(
-			"Abre un fichero para permitir su posterior firma"
+			Messages.getString("MainMenu.3") //$NON-NLS-1$
 		);
+		abrirMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent ae) {
+                String fileToLoad;
+                if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
+                    if (saf.getCurrentDir() == null) saf.setCurrentDir(new File(Platform.getUserHome()));
+                    final FileDialog fd = new FileDialog((Frame)null, Messages.getString("MainMenu.4")); //$NON-NLS-1$
+                    fd.setDirectory(saf.getCurrentDir().getAbsolutePath());
+                    fd.setVisible(true);
+                    if (fd.getFile() == null) return;
+                    saf.setCurrentDir(new File(fd.getDirectory()));
+                    fileToLoad = fd.getDirectory() + fd.getFile();
+                }
+                else {
+                    final JFileChooser fc = new JFileChooser();
+                    if (saf.getCurrentDir() != null) fc.setCurrentDirectory(saf.getCurrentDir());
+                    if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(MainMenu.this)) {
+                        saf.setCurrentDir(fc.getCurrentDirectory());
+                        fileToLoad = fc.getSelectedFile().getAbsolutePath();
+                    }
+                    else return;
+                }
+                saf.loadFileToSign(fileToLoad);
+            }
+        });
 		this.menuArchivo.add(abrirMenuItem);
 		
-		this.firmarMenuItem = new JMenuItem("Firmar archivo");
+		this.firmarMenuItem = new JMenuItem(Messages.getString("MainMenu.5")); //$NON-NLS-1$
 		this.firmarMenuItem.setAccelerator(
 			KeyStroke.getKeyStroke(KeyEvent.VK_F,
 		    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
 	    );
 		this.firmarMenuItem.getAccessibleContext().setAccessibleDescription(
-			"Abre un fichero para permitir su posterior firma"
+			Messages.getString("MainMenu.6") //$NON-NLS-1$
 		);
 		this.firmarMenuItem.setEnabled(false);
+		this.firmarMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MainMenu.this.saf.signLoadedFile();
+            }
+        });		
 		this.menuArchivo.add(this.firmarMenuItem);
 		
 		// En Mac OS X el salir lo gestiona el propio OS
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
 			this.menuArchivo.addSeparator();
-			final JMenuItem salirMenuItem = new JMenuItem("Salir de @firma");
+			final JMenuItem salirMenuItem = new JMenuItem(Messages.getString("MainMenu.7")); //$NON-NLS-1$
 			salirMenuItem.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK)
 			);
 			salirMenuItem.getAccessibleContext().setAccessibleDescription(
-				"Abre un fichero para permitir su posterior firma"
+				Messages.getString("MainMenu.8") //$NON-NLS-1$
 			);
 			salirMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -128,21 +164,21 @@ public final class MainMenu extends JMenuBar {
 			this.menuArchivo.add(salirMenuItem);
 		}		
 		
-		final JMenu menuAyuda = new JMenu("Ayuda");
+		final JMenu menuAyuda = new JMenu(Messages.getString("MainMenu.9")); //$NON-NLS-1$
 		menuAyuda.setMnemonic(KeyEvent.VK_Y);
 		menuAyuda.getAccessibleContext().setAccessibleDescription(
-			"Menú con operaciones relacionadas con la ayuda de la aplicación"
+			Messages.getString("MainMenu.10") //$NON-NLS-1$
 		);
 		
-		final JMenuItem ayudaMenuItem = new JMenuItem("Ayuda de @firma");
-		ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1"));
+		final JMenuItem ayudaMenuItem = new JMenuItem(Messages.getString("MainMenu.11")); //$NON-NLS-1$
+		ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
 		ayudaMenuItem.getAccessibleContext().setAccessibleDescription(
-			"Carga la ayuda de la aplicación en una nueva ventana"
+			Messages.getString("MainMenu.13") //$NON-NLS-1$
 		);
 		ayudaMenuItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Carga de la ayuda desde menu");
+				System.out.println(Messages.getString("MainMenu.14")); //$NON-NLS-1$
 			}
 		});
 		menuAyuda.add(ayudaMenuItem);
@@ -151,10 +187,10 @@ public final class MainMenu extends JMenuBar {
 		// En Mac OS X el Acerca de lo gestiona el propio OS
 		if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
 			menuAyuda.addSeparator();
-			final JMenuItem acercaMenuItem = new JMenuItem("Acerca de Firma Fácil con @firma");
-			acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1"));
+			final JMenuItem acercaMenuItem = new JMenuItem(Messages.getString("MainMenu.15")); //$NON-NLS-1$
+			acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
 			acercaMenuItem.getAccessibleContext().setAccessibleDescription(
-				"Muestra información adicional acera de Firma Fácil con @firma"
+				Messages.getString("MainMenu.17") //$NON-NLS-1$
 			);
 			acercaMenuItem.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_R,
@@ -175,15 +211,15 @@ public final class MainMenu extends JMenuBar {
 		final Locale[] locales = SimpleAfirma.getAvailableLocales();
 		if (locales != null && locales.length > 1) {
 			if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-			    final JMenu menuOpciones = new JMenu("Opciones");
+			    final JMenu menuOpciones = new JMenu(Messages.getString("MainMenu.18")); //$NON-NLS-1$
 		        menuOpciones.setMnemonic(KeyEvent.VK_O);
 		        menuOpciones.getAccessibleContext().setAccessibleDescription(
-		            "Menú con las opciones configurables de la aplicación"
+		            Messages.getString("MainMenu.19") //$NON-NLS-1$
 		        );
 		        
-		        final JMenu idiomaMenu = new JMenu("Idiomas");
+		        final JMenu idiomaMenu = new JMenu(Messages.getString("MainMenu.20")); //$NON-NLS-1$
 		        idiomaMenu.getAccessibleContext().setAccessibleDescription(
-		                "Listado de idiomas disponibles"
+		                Messages.getString("MainMenu.21") //$NON-NLS-1$
 		        );
 		        menuOpciones.add(idiomaMenu);
 		        
@@ -193,7 +229,7 @@ public final class MainMenu extends JMenuBar {
 		            final String localeText = locale.getDisplayName(locale);
 		            item = new JRadioButtonMenuItem(localeText.substring(0, 1).toUpperCase() +
 		                    localeText.substring(1));
-		            item.setSelected(locale.equals(this.saf.getDefaultLocale()));
+		            item.setSelected(locale.equals(Locale.getDefault()));
 		            item.addActionListener(new ActionListener() {
 	                    @Override public void actionPerformed(final ActionEvent ae) {
 	                        MainMenu.this.saf.setDefaultLocale(locale);
@@ -216,8 +252,8 @@ public final class MainMenu extends JMenuBar {
 						}
 						final Object o = JOptionPane.showInputDialog(
 							MainMenu.this.parent,
-							"Seleccione el idioma para la aplicaci—n",
-							"Preferencias de idioma",
+							Messages.getString("MainMenu.22"), //$NON-NLS-1$
+							Messages.getString("MainMenu.23"), //$NON-NLS-1$
 							JOptionPane.PLAIN_MESSAGE,
 							null,
 							localesDescs,
@@ -286,8 +322,8 @@ public final class MainMenu extends JMenuBar {
 	private void showAbout() {
 		JOptionPane.showMessageDialog(
 			(this.parent == null) ? MainMenu.this : this.parent,
-			"Firma f\u00E1cil con @firma V1.0",
-			"Acerca de Firma f\u00E1cil con @firma",
+			Messages.getString("MainMenu.24"), //$NON-NLS-1$
+			Messages.getString("MainMenu.25"), //$NON-NLS-1$
 			JOptionPane.INFORMATION_MESSAGE
 		);
 	}
@@ -295,8 +331,8 @@ public final class MainMenu extends JMenuBar {
 	private boolean exitApplication() {
 		if (JOptionPane.showConfirmDialog(
 			this.parent, 
-			"¿Desea cerrar la aplicación de firma?",
-			"Advertencia",
+			Messages.getString("MainMenu.26"), //$NON-NLS-1$
+			Messages.getString("MainMenu.27"), //$NON-NLS-1$
 			JOptionPane.YES_NO_OPTION, 
 			JOptionPane.WARNING_MESSAGE
 		) == JOptionPane.YES_OPTION) {

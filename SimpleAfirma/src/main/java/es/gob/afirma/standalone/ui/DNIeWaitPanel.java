@@ -47,14 +47,14 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 		// Boton para saltar de pantalla
 		this.noDNIPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.noDNIPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-		this.noDNIButton.setText("No deseo usar DNIe");
+		this.noDNIButton.setText(Messages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
 		if (al != null) this.noDNIButton.addActionListener(al);
 		this.noDNIButton.setMnemonic('n');
 		this.noDNIButton.getAccessibleContext().setAccessibleDescription(
-			"Pulse este bot\u00F3n para omitir la espera de inserci\u00F3n de DNIe y permitir seleccionar un certificado cualquiera desde el almac\u00E9n de claves y certificados del sistema operativo"
+			Messages.getString("DNIeWaitPanel.1") //$NON-NLS-1$
 		);
 		this.noDNIButton.getAccessibleContext().setAccessibleName(
-			"Bot\u00F3n de omisi\u00F3n de espera para inserci\u00F3n de DNIe"
+			Messages.getString("DNIeWaitPanel.2") //$NON-NLS-1$
 		);
 		if (kl != null) this.noDNIButton.addKeyListener(kl);
 		this.noDNIButton.requestFocus();
@@ -62,7 +62,7 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 		
 		// Texto informativo
 		ResizingTextPanel textPanel = new ResizingTextPanel(
-		        Messages.getString("SimpleAFirma.9")
+            Messages.getString("DNIeWaitPanel.3") //$NON-NLS-1$
 		);
 		textPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
 		textPanel.setFocusable(false);
@@ -73,12 +73,12 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 		dbf.setNamespaceAware(true);
 		try {
 			 vectorDNIeHelpPicture.setDocument(dbf.newDocumentBuilder().parse(
-				this.getClass().getResourceAsStream("/resources/lectordnie.svg")
+				this.getClass().getResourceAsStream("/resources/lectordnie.svg") //$NON-NLS-1$
 			));
 		}
 		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning(
-				"No se ha podido cargar la imagen explicativa de insercion de DNIe, esta no se mostrara: " + e
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"No se ha podido cargar la imagen explicativa de insercion de DNIe, esta no se mostrara: " + e //$NON-NLS-1$
 			);
 		}
 		vectorDNIeHelpPicture.setFocusable(false);
@@ -143,8 +143,8 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
 	        	this.saf.setDefaultLocale((Locale) e.getItem());
 	        } 
 	        catch (final Exception ex) {
-	            Logger.getLogger("es.gob.afirma").warning(
-	                    "No se ha podido cambiar el idioma de la interfaz: " + ex
+	            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+	                    "No se ha podido cambiar el idioma de la interfaz: " + ex //$NON-NLS-1$
 	            );
 	            return;
 	        }

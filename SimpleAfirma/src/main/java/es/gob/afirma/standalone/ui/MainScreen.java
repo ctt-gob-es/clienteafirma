@@ -15,6 +15,7 @@ import com.apple.eawt.event.MagnificationEvent;
 import com.apple.eawt.event.MagnificationListener;
 
 import es.gob.afirma.misc.Platform;
+import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /**
@@ -46,7 +47,7 @@ public final class MainScreen extends JFrame {
 		this.setSize(new Dimension(700,500));
 		this.setLayout(new BorderLayout());
 		this.setLocationRelativeTo(null);
-		this.setTitle("Firma electr\u00F3nica f\u00E1cil con @firma");
+		this.setTitle(Messages.getString("MainScreen.0")); //$NON-NLS-1$
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		if (wlist != null) this.addWindowListener(wlist);
 		

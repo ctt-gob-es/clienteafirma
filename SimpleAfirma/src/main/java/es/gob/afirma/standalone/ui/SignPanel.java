@@ -34,8 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -67,6 +67,7 @@ import es.gob.afirma.signers.AOPDFSigner;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOXAdESSigner;
 import es.gob.afirma.signers.AOXMLDSigSigner;
+import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.ui.AOUIManager;
 
@@ -80,12 +81,12 @@ public final class SignPanel extends JPanel {
 	
 	private final JSVGCanvas fileTypeVectorIcon = new JSVGCanvas();
 	
-	private static final String FILE_ICON_PDF = "/resources/icon_pdf.svg";
-	private static final String FILE_ICON_XML = "/resources/icon_xml.svg";
-	private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg";
+	private static final String FILE_ICON_PDF = "/resources/icon_pdf.svg"; //$NON-NLS-1$
+	private static final String FILE_ICON_XML = "/resources/icon_xml.svg"; //$NON-NLS-1$
+	private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg"; //$NON-NLS-1$
 	
 	private AOSigner signer;
-	private byte[] dataToSign;
+	private byte[] dataToSign = null;
 	
 	private JPanel filePanel;
 	private JPanel lowerPanel;
@@ -99,8 +100,9 @@ public final class SignPanel extends JPanel {
 	
 	private final SimpleAfirma saf;
 	
-	private File currentDir = null;
 	private File currentFile = null;
+	
+	private boolean keyStoreReady = false;
 	
 	private boolean isXML(final byte[] data) {
 		try {
@@ -112,7 +114,7 @@ public final class SignPanel extends JPanel {
 		return true;
 	}
 	
-	private void loadFile(final String filename) throws IOException {
+	public void loadFile(final String filename) throws IOException {
 		
 		this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
@@ -120,23 +122,23 @@ public final class SignPanel extends JPanel {
 		
 		String errorMessage = null;
 		if (!file.exists()) {
-			errorMessage = "El fichero seleccionado no existe, y por lo tanto no puede firmarse.";
+			errorMessage = Messages.getString("SignPanel.3"); //$NON-NLS-1$
 		}
 		else if (!file.canRead()) {
-			errorMessage = "No se tienen permisos de lectura para el fichero seleccionado.\nSeleccione otro fichero o habilite los permisos de lectura para este.";
+			errorMessage = Messages.getString("SignPanel.4"); //$NON-NLS-1$
 		}
 		else if (file.length() < 1) {
-			errorMessage = "El fichero seleccionado est‡ vac’o.\nNo es posible firmar ficheros vac’os.";
+			errorMessage = Messages.getString("SignPanel.5"); //$NON-NLS-1$
 		}
 		if (errorMessage != null) {
 			JOptionPane.showOptionDialog(
 				SignPanel.this, 
 				errorMessage,
-				"Error",
+				Messages.getString("SignPanel.25"), //$NON-NLS-1$
 				JOptionPane.OK_OPTION,
 				JOptionPane.ERROR_MESSAGE,
 				null,
-				new Object[] { "Cerrar "},
+				new Object[] { Messages.getString("SignPanel.20")}, //$NON-NLS-1$
 				null
 			);
 			return;
@@ -146,7 +148,7 @@ public final class SignPanel extends JPanel {
 		
 		final byte[] data = AOUtil.getDataFromInputStream(fis);
 		if (data == null || data.length < 1) {
-			throw new IOException("No se ha podido leer el fichero");
+			throw new IOException("No se ha podido leer el fichero"); //$NON-NLS-1$
 		}
 		this.dataToSign = data;
 		
@@ -158,17 +160,17 @@ public final class SignPanel extends JPanel {
 		String iconPath;
 		if (new AOPDFSigner().isValidDataFile(data)) {
 			iconPath = FILE_ICON_PDF;
-			fileDescription = "Documento Adobe PDF";
+			fileDescription = Messages.getString("SignPanel.9"); //$NON-NLS-1$
 			this.signer = new AOPDFSigner();
 		}
 		else if (isXML(data)) {
 			iconPath = FILE_ICON_XML;
-			fileDescription = "Documento XML";
+			fileDescription = Messages.getString("SignPanel.10"); //$NON-NLS-1$
 			this.signer = new AOXAdESSigner();
 		}
 		else {
 			iconPath = FILE_ICON_BINARY;
-			fileDescription = "Documento binario gen\u00E9rico";
+			fileDescription = Messages.getString("SignPanel.11"); //$NON-NLS-1$
 			this.signer = new AOCAdESSigner();
 		}
 		
@@ -180,8 +182,8 @@ public final class SignPanel extends JPanel {
 			));
 		}
 		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").warning(
-				"No se ha podido cargar el icono del tipo de fichero/firma, este no se mostrara: " + e
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"No se ha podido cargar el icono del tipo de fichero/firma, este no se mostrara: " + e //$NON-NLS-1$
 			);
 		}
 		this.fileTypeVectorIcon.setFocusable(false);
@@ -201,13 +203,15 @@ public final class SignPanel extends JPanel {
 		this.lowerPanel.revalidate();
 		
 		if (this.window != null) {
-			this.window.getRootPane().putClientProperty("Window.documentFile", new File(filename));
-			this.window.setTitle(this.window.getTitle() + " - " + new File(filename).getName());
+			this.window.getRootPane().putClientProperty("Window.documentFile", new File(filename)); //$NON-NLS-1$
+			this.window.setTitle(this.window.getTitle() + " - " + new File(filename).getName()); //$NON-NLS-1$
 		}
 		
 		this.currentFile = file;
 		
-		this.signButton.setEnabled(true);
+		if (this.keyStoreReady) {
+		    setSignCommandEnabled(true);
+		}
 		
 		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		this.signButton.requestFocusInWindow();
@@ -239,8 +243,8 @@ public final class SignPanel extends JPanel {
 							transData = tr.getTransferData(DataFlavor.javaFileListFlavor);
 						}
 						catch(final Exception e) {
-							Logger.getLogger("es.gob.afirma").warning(
-								"Ha fallado la operacion de arrastrar y soltar: " + e
+							Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+								"Ha fallado la operacion de arrastrar y soltar: " + e //$NON-NLS-1$
 							);
 							dtde.dropComplete(false);
 							return;
@@ -255,40 +259,40 @@ public final class SignPanel extends JPanel {
 							if (fileList.size() > 1) {
 								JOptionPane.showOptionDialog(
 									SignPanel.this, 
-									"Ha arrastrado varios ficheros a la vez, pero solo se soporta la firma individual de archivos.\nSólo se firmará el primero",
-									"Advertencia",
+									Messages.getString("SignPanel.18"), //$NON-NLS-1$
+									Messages.getString("SignPanel.19"), //$NON-NLS-1$
 									JOptionPane.OK_OPTION,
 									JOptionPane.WARNING_MESSAGE,
 									null,
-									new Object[] { "Cerrar "},
+									new Object[] { Messages.getString("SignPanel.20")}, //$NON-NLS-1$
 									null
 								);
 							}
 							String fileName = fileList.get(0).toString();
-							if (fileName.startsWith("http://") ||
-								fileName.startsWith("https://") ||
-								fileName.startsWith("ftp://")
+							if (fileName.startsWith("http://") || //$NON-NLS-1$
+								fileName.startsWith("https://") || //$NON-NLS-1$
+								fileName.startsWith("ftp://") //$NON-NLS-1$
 							) {
 								JOptionPane.showOptionDialog(
 									SignPanel.this, 
-									"No se soporta la firma de ficheros remotos con esta aplicación,\nseleccione un fichero local para firmarlo", 
-									"Error",
+									Messages.getString("SignPanel.24"),  //$NON-NLS-1$
+									Messages.getString("SignPanel.25"), //$NON-NLS-1$
 									JOptionPane.OK_OPTION,
 									JOptionPane.ERROR_MESSAGE,
 									null,
-									new Object[] { "Cerrar "},
+									new Object[] { Messages.getString("SignPanel.20")}, //$NON-NLS-1$
 									null
 								);
 								dtde.dropComplete(false);
 								return;
 							}
-							else if (fileName.startsWith("file://")) {
+							else if (fileName.startsWith("file://")) { //$NON-NLS-1$
 								try {
 									fileName = new File(new URI(fileName)).getPath();
 								}
 								catch(final Exception e) {
-									Logger.getLogger("es.gob.afirma").warning(
-										"Ha fallado la operacion de arrastrar y soltar al obtener la ruta del fichero arrastrado: " + e
+									Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+										"Ha fallado la operacion de arrastrar y soltar al obtener la ruta del fichero arrastrado: " + e //$NON-NLS-1$
 									);
 									dtde.dropComplete(false);
 									return;
@@ -298,8 +302,8 @@ public final class SignPanel extends JPanel {
 								loadFile(fileName);
 							}
 							catch(final IOException e) {
-								Logger.getLogger("es.gob.afirma").warning(
-									"Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e
+								Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+									"Ha fallado la operacion de arrastrar y soltar al cargar el fichero arrastrado: " + e //$NON-NLS-1$
 								);
 								dtde.dropComplete(false);
 							}
@@ -346,35 +350,36 @@ public final class SignPanel extends JPanel {
 			this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 			this.setBackground(SimpleAfirma.WINDOW_COLOR);
 						
-			SignPanel.this.selectButton.setText("Seleccionar fichero a firmar");
+			SignPanel.this.selectButton.setText(Messages.getString("SignPanel.32")); //$NON-NLS-1$
 			if (al != null) SignPanel.this.selectButton.addActionListener(al);
 			SignPanel.this.selectButton.setMnemonic('S');
 			SignPanel.this.selectButton.getAccessibleContext().setAccessibleDescription(
-				"Pulse este botón para iniciar el proceso de selecci—n de fichero a firmar"
+				Messages.getString("SignPanel.33") //$NON-NLS-1$
 			);
 			SignPanel.this.selectButton.getAccessibleContext().setAccessibleName(
-				"Bot—n de selecci—n de fichero a firmar"
+				Messages.getString("SignPanel.34") //$NON-NLS-1$
 			);
 			SignPanel.this.selectButton.requestFocusInWindow();
 			SignPanel.this.selectButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
+				    
 					String fileToLoad;
 					
 					if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-						if (SignPanel.this.currentDir == null) SignPanel.this.currentDir = new File(Platform.getUserHome());
-						final FileDialog fd = new FileDialog((Frame)null, "Seleccione el fichero a firmar");
-						fd.setDirectory(SignPanel.this.currentDir.getAbsolutePath());
+						if (saf.getCurrentDir() == null) saf.setCurrentDir(new File(Platform.getUserHome()));
+						final FileDialog fd = new FileDialog((Frame)null, Messages.getString("SignPanel.35")); //$NON-NLS-1$
+						fd.setDirectory(saf.getCurrentDir().getAbsolutePath());
 						fd.setVisible(true);
 						if (fd.getFile() == null) return;
-						SignPanel.this.currentDir = new File(fd.getDirectory());
+						saf.setCurrentDir(new File(fd.getDirectory()));
 						fileToLoad = fd.getDirectory() + fd.getFile();
 					}
 					else {
 						final JFileChooser fc = new JFileChooser();
-						if (SignPanel.this.currentDir != null) fc.setCurrentDirectory(SignPanel.this.currentDir);
+						if (saf.getCurrentDir() != null) fc.setCurrentDirectory(saf.getCurrentDir());
 						if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(UpperPanel.this)) {
-							SignPanel.this.currentDir = fc.getCurrentDirectory();
+						    saf.setCurrentDir(fc.getCurrentDirectory());
 							fileToLoad = fc.getSelectedFile().getAbsolutePath();
 						}
 						else return;
@@ -387,15 +392,12 @@ public final class SignPanel extends JPanel {
 					catch(final Exception e) {
 						JOptionPane.showOptionDialog(
 							UpperPanel.this, 
-							"No se ha podido leer el contenido del fichero a firmar,\n" +
-								"compruebe que no esta abierto por otra aplicación y\n" +
-								"si está en almacenamiento extraible pruebe a expulsarlo\n" +
-								"e insertarlo de nuevo",
-							"Error",
+							Messages.getString("SignPanel.36"), //$NON-NLS-1$
+							Messages.getString("SignPanel.25"), //$NON-NLS-1$
 							JOptionPane.OK_OPTION,
 							JOptionPane.ERROR_MESSAGE,
 							null,
-							new Object[] { "Cerrar "},
+							new Object[] { Messages.getString("SignPanel.20")}, //$NON-NLS-1$
 							null
 						);
 					}
@@ -403,7 +405,7 @@ public final class SignPanel extends JPanel {
 				}
 			});
 			
-			final JLabel welcomeLabel = new JLabel("Bienvenido a \"Firma electr—nica f‡cil con @Firma\"");
+			final JLabel welcomeLabel = new JLabel(Messages.getString("SignPanel.39")); //$NON-NLS-1$
 			welcomeLabel.setFocusable(false);
 			welcomeLabel.setFont(welcomeLabel.getFont().deriveFont(Font.PLAIN, 26));
 			welcomeLabel.setLabelFor(SignPanel.this.selectButton);
@@ -411,12 +413,7 @@ public final class SignPanel extends JPanel {
 			this.add(welcomeLabel, BorderLayout.PAGE_START);
 			
 			final String intro = 
-				"<html><p>En esta pantalla puede firmar elect&oacute;nicamente un fichero que se encuentre en su disco duro.<br>" +
-				"Cuando firma electr&oacute;nicamente un fichero pueden incorporarse a este ciertos datos personales, entre los que " +
-				"pueden encontrarse su número de DNI, su nombre y apellidos o incluso informaci&oacute;n " +
-				"sobre su situaci&oacute;n laboral si utiliza un certificado profesional. " +
-				"Consulte las pol&iacute;ticas de seguridad y protecci&oacute;n de datos de los receptores de los " +
-				"ficheros firmados antes en eviarlos o distribuirlos.<br>"
+				Messages.getString("SignPanel.40") //$NON-NLS-1$
 			;
 			final JLabel introText = new JLabel(intro);
 			introText.setLabelFor(SignPanel.this.selectButton);
@@ -462,18 +459,18 @@ public final class SignPanel extends JPanel {
 			this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 			
 			SignPanel.this.filePanel = new ResizingTextPanel(
-				"Pulse el bot\u00F3n o arrastre un fichero en este \u00E1rea"
+				Messages.getString("SignPanel.41") //$NON-NLS-1$
 			);
 			SignPanel.this.filePanel.setBackground(Color.DARK_GRAY);
 			SignPanel.this.filePanel.setForeground(Color.LIGHT_GRAY);
 			SignPanel.this.filePanel.getAccessibleContext().setAccessibleDescription(
-				"Arrastre un fichero a este \u00E1rea para seleccionarlo para poder firmarlo electr\u00F3nicamente"
+				Messages.getString("SignPanel.42") //$NON-NLS-1$
 			);
 			SignPanel.this.filePanel.getAccessibleContext().setAccessibleName(
-				"Panel arratre fichero"
+				Messages.getString("SignPanel.43") //$NON-NLS-1$
 			);
 			SignPanel.this.filePanel.setToolTipText(
-				"Arrastre un fichero a este ‡rea para seleccionarlo y poder firmarlo electr—nicamente"
+				Messages.getString("SignPanel.42") //$NON-NLS-1$
 			);
 			SignPanel.this.filePanel.setFocusable(false);
 			SignPanel.this.filePanel.setDropTarget(SignPanel.this.dropTarget);
@@ -482,7 +479,7 @@ public final class SignPanel extends JPanel {
 			
 			final JPanel signPanel = new JPanel(true);
 			signPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-			SignPanel.this.signButton.setText("Firmar fichero");
+			SignPanel.this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
 			SignPanel.this.signButton.setMnemonic('F');
 			if (al != null) SignPanel.this.signButton.addActionListener(al);
 			SignPanel.this.signButton.setEnabled(false);
@@ -528,10 +525,12 @@ public final class SignPanel extends JPanel {
 		    
 		    final JLabel pathLabel = new JLabel(filePath);
 		    pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 4f));
-		    final JLabel descLabel = new JLabel("Tipo de fichero: " + fileDescription);
-		    final JLabel dateLabel = new JLabel("Fecha \u00FAltima modificaci\u00F3n: " + 
-		            new SimpleDateFormat("dd/MMMMM/yyyy").format(fileLastModified));
-		    final JLabel sizeLabel = new JLabel("Tama\u00F1o: " + fileSize + " KB");
+		    
+		    final JLabel descLabel = new JLabel(Messages.getString("SignPanel.46") + fileDescription); //$NON-NLS-1$
+		    final JLabel dateLabel = new JLabel(Messages.getString("SignPanel.47") +  //$NON-NLS-1$
+		        DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(fileLastModified));
+		    
+		    final JLabel sizeLabel = new JLabel(Messages.getString("SignPanel.49") + fileSize + " KB"); //$NON-NLS-1$ //$NON-NLS-2$
 		    
 		    final JPanel detailPanel = new JPanel();
 		    detailPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
@@ -543,7 +542,7 @@ public final class SignPanel extends JPanel {
 		    detailPanel.add(Box.createRigidArea(new Dimension(0,8)));
 		    detailPanel.add(sizeLabel);
 		    
-		    final JButton openFileButton = new JButton("Ver Fichero");
+		    final JButton openFileButton = new JButton(Messages.getString("SignPanel.51")); //$NON-NLS-1$
 		    openFileButton.setMnemonic('v');
 		    openFileButton.addActionListener(new ActionListener() {
 				@Override
@@ -554,12 +553,12 @@ public final class SignPanel extends JPanel {
 					catch(final IOException e) {
 						JOptionPane.showOptionDialog(
 							FilePanel.this, 
-							"Error",
-							"No se ha podido abrir el fichero,\ncompruebe que no ha sido manipulado mientras se ejecutaba esta aplicaci—n",
+							Messages.getString("SignPanel.25"), //$NON-NLS-1$
+							Messages.getString("SignPanel.53"), //$NON-NLS-1$
 							JOptionPane.OK_OPTION,
 							JOptionPane.ERROR_MESSAGE,
 							null,
-							new Object[] { "Cerrar "},
+							new Object[] { Messages.getString("SignPanel.20")}, //$NON-NLS-1$
 							null
 						);
 						return;
@@ -593,7 +592,7 @@ public final class SignPanel extends JPanel {
 		}
 	}
 	
-	private void sign() {
+	public void sign() {
 		this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		if (this.signer == null || this.dataToSign == null || this.saf == null) {
 			return;
@@ -616,12 +615,12 @@ public final class SignPanel extends JPanel {
 		catch(final AOCertificatesNotFoundException e) {
 			JOptionPane.showOptionDialog(
 				this, 
-				"No se ha encontrado ningœn certificado para firmar,\nCompruebe su almacén de claves e importe uno si es necesario",
-				"Advertencia",
+				Messages.getString("SignPanel.55"), //$NON-NLS-1$
+				Messages.getString("SignPanel.19"), //$NON-NLS-1$
 				JOptionPane.OK_OPTION,
 				JOptionPane.WARNING_MESSAGE,
 				null,
-				new Object[] { "Cerrar "},
+				new Object[] { Messages.getString("SignPanel.20")}, //$NON-NLS-1$
 				null
 			);
 			return;
@@ -634,8 +633,8 @@ public final class SignPanel extends JPanel {
 		}
 		
 		final Properties p = new Properties();
-		p.put("signingCertificateV2", "true");
-		p.put("ignoreStyleSheets", "false");
+		p.put("signingCertificateV2", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+		p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		
@@ -643,7 +642,7 @@ public final class SignPanel extends JPanel {
 		try {
 			signResult = this.signer.sign(
 				this.dataToSign, 
-				"SHA1withRSA", 
+				"SHA1withRSA",  //$NON-NLS-1$
 				ksm.getKeyEntry(
 					alias, 
 					AOCryptoUtil.getPreferredPCB(ksm.getType(), this)
@@ -652,15 +651,15 @@ public final class SignPanel extends JPanel {
 			);
 		}
 		catch(final Exception e) {
-			Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma: " + e);
+			Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			JOptionPane.showOptionDialog(
 				SignPanel.this, 
-				"Ocurrió un problema durante el proceso de firma, pruebe a reintentar\nla firma reiniciando la aplicación",
-				"Error",
+				Messages.getString("SignPanel.65"), //$NON-NLS-1$
+				Messages.getString("SignPanel.25"), //$NON-NLS-1$
 				JOptionPane.OK_OPTION,
 				JOptionPane.ERROR_MESSAGE,
 				null,
-				new Object[] { "Cerrar "},
+				new Object[] { Messages.getString("SignPanel.20")}, //$NON-NLS-1$
 				null
 			);
 			return; 
@@ -668,28 +667,28 @@ public final class SignPanel extends JPanel {
 		finally {
 		    this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}
-		this.signButton.setEnabled(false);
+		setSignCommandEnabled(false);
 		
 		String newFileName = this.currentFile.getName();
 		String[] filterExtensions;
 		String filterDescription;
 		if (this.signer instanceof AOPDFSigner) {
-			if (!newFileName.toLowerCase().endsWith(".pdf")) {
-				newFileName = newFileName + ".pdf";
+			if (!newFileName.toLowerCase().endsWith(".pdf")) { //$NON-NLS-1$
+				newFileName = newFileName + ".pdf"; //$NON-NLS-1$
 			}
-			newFileName = newFileName.substring(0, newFileName.length()-4) + ".signed.pdf";
-			filterExtensions = new String[] { ".pdf" };
-			filterDescription = "Documentos Adobe PDF (*.pdf)";
+			newFileName = newFileName.substring(0, newFileName.length()-4) + ".signed.pdf"; //$NON-NLS-1$
+			filterExtensions = new String[] { ".pdf" }; //$NON-NLS-1$
+			filterDescription = Messages.getString("SignPanel.72"); //$NON-NLS-1$
 		}
 		else if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner) {
-			newFileName = newFileName + ".xsig";
-			filterExtensions = new String[] { ".xsig", ".xml" };
-			filterDescription = "Firmas XML (*.xml, *.xsig)";
+			newFileName = newFileName + ".xsig"; //$NON-NLS-1$
+			filterExtensions = new String[] { ".xsig", ".xml" }; //$NON-NLS-1$ //$NON-NLS-2$
+			filterDescription = Messages.getString("SignPanel.76"); //$NON-NLS-1$
 		}
 		else {
-			newFileName = newFileName + ".csig";
-			filterExtensions = new String[] { ".csig", ".p7s" };
-			filterDescription = "Firmas binarias (*.csig, *.p7s)";
+			newFileName = newFileName + ".csig"; //$NON-NLS-1$
+			filterExtensions = new String[] { ".csig", ".p7s" }; //$NON-NLS-1$ //$NON-NLS-2$
+			filterDescription = Messages.getString("SignPanel.80"); //$NON-NLS-1$
 		}
 		
 		final String fDescription = filterDescription;
@@ -700,10 +699,11 @@ public final class SignPanel extends JPanel {
 		boolean nameMissingExtension = true;
 		
         if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            if (this.currentDir == null) this.currentDir = new File(Platform.getUserHome());
-            final FileDialog fd = new FileDialog(this.window, "Guardar como", FileDialog.SAVE);
-            fd.setDirectory(this.currentDir.getAbsolutePath());
+            if (saf.getCurrentDir() == null) this.saf.setCurrentDir(new File(Platform.getUserHome()));
+            final FileDialog fd = new FileDialog(this.window, Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
+            fd.setDirectory(saf.getCurrentDir().getAbsolutePath());
             fd.setFile(newFileName);
+            fd.setTitle(Messages.getString("SignPanel.81")); //$NON-NLS-1$
             fd.setFilenameFilter(new FilenameFilter() {
                 @Override
                 public boolean accept(final File dir, final String name) {
@@ -717,12 +717,12 @@ public final class SignPanel extends JPanel {
             });
             fd.setVisible(true);
             if (fd.getFile() == null) return;
-            this.currentDir = new File(fd.getDirectory());
+            saf.setCurrentDir(new File(fd.getDirectory()));
             newFileName = fd.getDirectory() + fd.getFile();
         }
         else {
             final JFileChooser fc = new JFileChooser();
-            if (this.currentDir != null) fc.setCurrentDirectory(this.currentDir);
+            if (saf.getCurrentDir() != null) fc.setCurrentDirectory(saf.getCurrentDir());
             fc.setSelectedFile(new File(newFileName));
             fc.setFileFilter(new FileFilter() {
                 @Override
@@ -740,7 +740,7 @@ public final class SignPanel extends JPanel {
                 }
             });
             if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(this.window)) {
-                this.currentDir = fc.getCurrentDirectory();
+                saf.setCurrentDir(fc.getCurrentDirectory());
                 newFileName = fc.getSelectedFile().getAbsolutePath();
             }
             else {
@@ -754,44 +754,50 @@ public final class SignPanel extends JPanel {
                 nameMissingExtension = false;
             }
         }
-        newFileName = newFileName + (nameMissingExtension ? fExtensions[0] : "");         
+        newFileName = newFileName + (nameMissingExtension ? fExtensions[0] : "");          //$NON-NLS-1$
+        
+        // Cuando se usa un FileDialog la confirmacion de sobreescritura la gestiona
+        // el sistema operativo, pero en Mac hay comportamiento extrano con la extension
         
         final File outputFile = new File(newFileName);
-        if (outputFile.exists()) {
-        	if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(
-    			SignPanel.this,
-    			"Ya existe un fichero con ese nombre,\nÀDesea sobreescribirlo?",
-    			"Advertencia",
-    			JOptionPane.YES_NO_OPTION,
-    			JOptionPane.WARNING_MESSAGE
-			)) {
-        		this.signButton.setEnabled(true);
-        		return;
-        	}
+        
+        if (!Platform.OS.WINDOWS.equals(Platform.OS.WINDOWS)) {
+            if (outputFile.exists()) {
+            	if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(
+        			SignPanel.this,
+        			Messages.getString("SignPanel.84"), //$NON-NLS-1$
+        			Messages.getString("SignPanel.19"), //$NON-NLS-1$
+        			JOptionPane.YES_NO_OPTION,
+        			JOptionPane.WARNING_MESSAGE
+    			)) {
+            		setSignCommandEnabled(true);
+            		return;
+            	}
+            }
         }
         
         OutputStream fos = null;
         OutputStream bos = null;
         try {
-            fos = new FileOutputStream(new File(newFileName));
+            fos = new FileOutputStream(outputFile);
             bos = new BufferedOutputStream(fos);
             bos.write(signResult);
         }
         catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe(
-                    "No se ha podido guardar el resultado de la firma: " + e
+            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+                    "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
             );
             JOptionPane.showOptionDialog(
                     this, 
-                    "No se ha podido guardar el resultado de la firma, aseguresé de\nque el fichero seleccionado no está abierto por otra aplicación y\nde que cuenta con los permisos adecuados y reintente la operación",
-                    "Error",
+                    Messages.getString("SignPanel.88"), //$NON-NLS-1$
+                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
                     JOptionPane.OK_OPTION,
                     JOptionPane.ERROR_MESSAGE,
                     null,
-                    new Object[] { "Cerrar "},
+                    new Object[] { Messages.getString("SignPanel.20")}, //$NON-NLS-1$
                     null
             );
-            this.signButton.setEnabled(true);
+            setSignCommandEnabled(true);
         }
         finally {
             try {
@@ -815,5 +821,16 @@ public final class SignPanel extends JPanel {
 		this.saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
 	}
 	
-
+	public void notifyStoreReady() {
+	    this.keyStoreReady = true;
+	    if (this.dataToSign != null) {
+	        setSignCommandEnabled(true);
+	    }
+	}
+	
+	private void setSignCommandEnabled(final boolean e) {
+        this.signButton.setEnabled(true);
+        this.saf.setSignMenuCommandEnabled(e);
+	}
+	
 }

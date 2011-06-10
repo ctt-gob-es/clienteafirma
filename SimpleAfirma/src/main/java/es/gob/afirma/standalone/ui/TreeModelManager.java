@@ -23,10 +23,8 @@ public final class TreeModelManager {
      * @return &Aacute;rbol Swing.
      */
     public DefaultMutableTreeNode getSwingTree() {
-        
         final DefaultMutableTreeNode swingTreeRoot = new DefaultMutableTreeNode();
         copyBranch((TreeNode) this.tree.getRoot(), swingTreeRoot);
-        
         return swingTreeRoot;
     }
     
@@ -40,9 +38,9 @@ public final class TreeModelManager {
         swingTreeNode.setUserObject(treeNode.getUserObject());
         DefaultMutableTreeNode newChild;
         for (int i = 0; i < treeNode.getChildCount(); i++) {
-        newChild = new DefaultMutableTreeNode();
-        copyBranch(treeNode.getChildAt(i), newChild);
-        swingTreeNode.add(newChild);
+            newChild = new DefaultMutableTreeNode();
+            copyBranch(treeNode.getChildAt(i), newChild);
+            swingTreeNode.add(newChild);
         }
         return swingTreeNode;
     } 

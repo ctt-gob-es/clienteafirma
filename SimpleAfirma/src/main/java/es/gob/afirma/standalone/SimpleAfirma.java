@@ -53,7 +53,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                                                            WindowListener {
 
     /** Clave de la preferencia para el guardado del idioma por defecto. */ 
-    public static final String PREFERENCES_LOCALE = "default.locale";
+    public static final String PREFERENCES_LOCALE = "default.locale"; //$NON-NLS-1$
     
 	/** Modo de depuraci&oacute;n para toda la aplicaci&oacute;n. */
 	public static final boolean DEBUG = true;
@@ -65,11 +65,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	
 	private JFrame window;
 	private Container container;
-	
 	private JPanel currentPanel;
 	
+	private File currentDir;
+	
 	/** Color de fondo por defecto para los JPanel, JFrame y Applet. */
-	public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB());
+	public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB()); //$NON-NLS-1$
 	
 	/** Construye la aplicaci&oacute;n principal y establece el <i>Look&Field</i>. */
 	public SimpleAfirma() {
@@ -77,10 +78,16 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	}
 	
 	private AOKeyStoreManager ksManager;
+	private MainMenu mainMenu;
 	
 	synchronized void setKeyStoreManager(final AOKeyStoreManager ksm) {
-		Logger.getLogger("es.gob.afirma").info("Establecido KeyStoreManager: " + ksm);
-		if (ksm != null) this.ksManager = ksm;
+		Logger.getLogger("es.gob.afirma").info("Establecido KeyStoreManager: " + ksm); //$NON-NLS-1$ //$NON-NLS-2$
+		if (ksm != null) {
+		    this.ksManager = ksm;
+		    if (this.currentPanel instanceof SignPanel) {
+		        ((SignPanel)this.currentPanel).notifyStoreReady();
+		    }
+		}
 	}
 	
 	private void initialize(final boolean asApplet) {
@@ -98,8 +105,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 			dniManager = new DNIeManager(this);
 		}
 		catch(final DNIeManagerException e) {
-			Logger.getLogger("es.gob.afirma").warning(
-				"Se omite la pantalla de insercion de DNIe: " + e
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"Se omite la pantalla de insercion de DNIe: " + e //$NON-NLS-1$
 			);
 			showDNIeScreen = false;
 		}
@@ -131,12 +138,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 			closeAndContinue();
 			JOptionPane.showOptionDialog(
 				this.container, 
-				Messages.getString("SimpleAfirma.4"), //$NON-NLS-1$
-				Messages.getString("SimpleAfirma.3"), //$NON-NLS-1$,
+				Messages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+				Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 				JOptionPane.OK_OPTION,
 				JOptionPane.ERROR_MESSAGE,
 				null,
-				new Object[] { "Cerrar "},
+				new Object[] { Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
 				null
 			);
 			return;
@@ -151,12 +158,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 				);
 				JOptionPane.showOptionDialog(
 					this.container, 
-					Messages.getString("SimpleAfirma.8"), //$NON-NLS-1$
-					Messages.getString("SimpleAfirma.3"), //$NON-NLS-1$
+					Messages.getString("SimpleAfirma.9"), //$NON-NLS-1$
+					Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 					JOptionPane.OK_OPTION,
 					JOptionPane.ERROR_MESSAGE,
 					null,
-					new Object[] { "Cerrar "},
+					new Object[] { Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
 					null
 				);
 				closeApplication(-1);
@@ -166,12 +173,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 		else if (DNIeManager.NOT_DNI_INSERTED.equals(evt.getPropertyName())) {
 			JOptionPane.showOptionDialog(
 				this.container, 
-				Messages.getString("SimpleAfirma.10"), //$NON-NLS-1$
-				Messages.getString("SimpleAfirma.11"), //$NON-NLS-1$
+				Messages.getString("SimpleAfirma.12"), //$NON-NLS-1$
+				Messages.getString("SimpleAfirma.13"), //$NON-NLS-1$
 				JOptionPane.OK_OPTION,
 				JOptionPane.WARNING_MESSAGE,
 				null,
-				new Object[] { "Cerrar "},
+				new Object[] { Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
 				null
 			);
 			return;
@@ -197,18 +204,19 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	}
 	
 	private void loadMainApp() {
+	    mainMenu = new MainMenu(this.window, this);
 		if (this.window != null)  {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				try {
-					com.apple.eawt.Application.getApplication().setDefaultMenuBar(new MainMenu(this.window, this));
+					com.apple.eawt.Application.getApplication().setDefaultMenuBar(mainMenu);
 				}
 				catch(final Exception e) {
-					Logger.getLogger("es.gob.afirma").warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e);
+					Logger.getLogger("es.gob.afirma").warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 					this.window.setJMenuBar(new MainMenu(this.window, this));
 				}
 			}
 			else {
-				this.window.setJMenuBar(new MainMenu(this.window, this));
+				this.window.setJMenuBar(mainMenu);
 			}
 		}
 		final JPanel newPanel = new SignPanel(
@@ -227,50 +235,50 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
 	private void setLookAndFeel() {
 		
-		UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
-		UIManager.put("OptionPane.background", SimpleAfirma.WINDOW_COLOR);
+		UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
+		UIManager.put("OptionPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
 
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JDialog.setDefaultLookAndFeelDecorated(true);
 		
 		// Propiedades especificas para Mac OS X
 		if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-			System.setProperty("apple.awt.brushMetalLook", "true");
-			System.setProperty("apple.awt.antialiasing", "true");
-			System.setProperty("apple.awt.textantialiasing", "true");
-			System.setProperty("apple.awt.rendering", "quality");
-			System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-			System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true");
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
+			System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty("apple.awt.antialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty("apple.awt.textantialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty("apple.awt.rendering", "quality"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty("apple.awt.graphics.EnableQ2DX", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+			System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			try {
 			    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-			        if ("Nimbus".equals(info.getName())) {
+			        if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
 			            UIManager.setLookAndFeel(info.getClassName());
-			            Logger.getLogger("es.gob.afirma").info(
-		            		"Establecido 'Look&Feel' Nimbus"
+			            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+		            		"Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
 	            		);
 			            return;
 			        }
 			    }
 			} 
 			catch (final Exception e) {
-				Logger.getLogger("es.gob.afirma").warning(
-					"No se ha podido establecer el 'Look&Feel' Nimbus: " + e
+				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+					"No se ha podido establecer el 'Look&Feel' Nimbus: " + e //$NON-NLS-1$
 				);
 			}
 		}
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			Logger.getLogger("es.gob.afirma").info(
-				"Establecido 'Look&Feel' " + UIManager.getLookAndFeel().getName()
+			Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+				"Establecido 'Look&Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
 			);
 		} 
 		catch (final Exception e2) {
-			Logger.getLogger("es.gob.afirma").warning(
-				"No se ha podido establecer ningun 'Look&Feel': " + e2
+			Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+				"No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
 			);
 		}
 
@@ -287,12 +295,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 			);
 			JOptionPane.showOptionDialog(
 				this.container, 
-				Messages.getString("SimpleAFirma.16"), //$NON-NLS-1$    //TODO: Falta la clave
-				Messages.getString("SimpleAFirma.3"), //$NON-NLS-1$     //TODO: Falta la clave
+				Messages.getString("SimpleAfirma.42"), //$NON-NLS-1$
+				Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
 				JOptionPane.CLOSED_OPTION,
 				JOptionPane.ERROR_MESSAGE,
 				null,
-				new Object[] { "Cerrar "},
+				new Object[] { Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
 				null
 			);
 			closeApplication(-2);
@@ -314,7 +322,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 			closeAndContinue();
 		}
 		else if (ke != null && ke.getKeyCode() == KeyEvent.VK_F1) {
-			System.out.println("Carga de la ayuda: " + this.currentPanel.getClass() + ", " + getLocale());
+			System.out.println("Carga de la ayuda: " + this.currentPanel.getClass() + ", " + getLocale()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 	
@@ -322,8 +330,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	public void windowClosing(final WindowEvent we) {
 		if (JOptionPane.showConfirmDialog(
 			this.container, 
-			"ÀDesea cerrar la aplicaci\u00F3n de firma?",
-			"Advertencia",
+			Messages.getString("SimpleAfirma.47"), //$NON-NLS-1$
+			Messages.getString("SimpleAfirma.48"), //$NON-NLS-1$
 			JOptionPane.YES_NO_OPTION, 
 			JOptionPane.WARNING_MESSAGE
 		) == JOptionPane.YES_OPTION) {
@@ -368,8 +376,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 		final JPanel newPanel = new SignDetailPanel(sign, fileName, signingCert, SignDetailPanel.SIGN_DETAIL_TYPE.GENERATED, null);
 		this.container.add(newPanel, BorderLayout.CENTER);
 		if (this.window != null && fileName != null) {
-			this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName));
-			this.window.setTitle(this.window.getTitle().substring(0, this.window.getTitle().indexOf('-')) + "- " + new File(fileName).getName());
+			this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName)); //$NON-NLS-1$
+			this.window.setTitle(this.window.getTitle().substring(0, this.window.getTitle().indexOf('-')) + "- " + new File(fileName).getName()); //$NON-NLS-1$
 		}
 		if (this.currentPanel != null) {
 			this.currentPanel.setVisible(false);
@@ -378,12 +386,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 		}
 		this.container.repaint();
 		this.currentPanel = newPanel;
-		this.window.repaint();
+		if (this.window != null) this.window.repaint();
 	}
 	
 	
 	private Locale buildLocale(final String locale) {
-	    final String[] frags = locale.split("_");
+	    final String[] frags = locale.split("_"); //$NON-NLS-1$
 	    if (frags.length == 1) {
 	        return new Locale(frags[0]);
 	    } 
@@ -400,7 +408,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	 */
 	private static Locale[] locales = new Locale[] {
 	    Locale.getDefault(),
-	    new Locale("en")
+	    new Locale("en") //$NON-NLS-1$
 	};
 	
 	/**
@@ -422,15 +430,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 		    Messages.changeLocale();
 		}
 	}
-	
-	/**
-	 * Devuelve el idioma actualmente establecido en la aplicaci&oacute;n.
-	 * @return Locale actual de la aplicaci&oacute;n
-	 */
-	public Locale getDefaultLocale() {
-		return Locale.getDefault();
-	}
-	
+		
 	/**
 	 * Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
 	 * @param key Clave de la preferencia.
@@ -449,6 +449,46 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	public void setPreference(final String key, final String value) {
         this.preferences.put(key, value);
     }
+	
+	public void setSignMenuCommandEnabled(final boolean e) {
+	    if (mainMenu != null) {
+	        mainMenu.setEnabledSignCommand(e);
+	    }
+	}
+	
+	public void setCurrentDir(final File dir) {
+	    currentDir = dir;
+	}
+	
+	public File getCurrentDir() {
+	    return currentDir;
+	}
+	
+	public void signLoadedFile() {
+	    if (this.currentPanel instanceof SignPanel) {
+	        ((SignPanel)this.currentPanel).sign();
+	    }
+	}
+	
+	public void loadFileToSign(final String filePath) {
+	    if (this.currentPanel instanceof SignPanel) {
+	        try {
+	            ((SignPanel)this.currentPanel).loadFile(filePath);
+	        }
+	        catch(final Exception e) {
+                JOptionPane.showOptionDialog(
+                    this.currentPanel, 
+                    Messages.getString("SimpleAfirma.0"), //$NON-NLS-1$
+                    Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                    JOptionPane.OK_OPTION,
+                    JOptionPane.ERROR_MESSAGE,
+                    null,
+                    new Object[] { Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
+                    null
+                );
+            }
+	    }
+	}
 	
 	//***********************************************
 	//***** APLICACION COMO APPLET ******************
