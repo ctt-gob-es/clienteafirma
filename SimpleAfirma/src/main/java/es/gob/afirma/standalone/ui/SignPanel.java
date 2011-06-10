@@ -1,3 +1,13 @@
+/*
+ * Este fichero forma parte del Cliente @firma. 
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ */
+
 package es.gob.afirma.standalone.ui;
 
 import java.awt.BorderLayout;
@@ -102,8 +112,6 @@ public final class SignPanel extends JPanel {
 	
 	private File currentFile = null;
 	
-	private boolean keyStoreReady = false;
-	
 	private boolean isXML(final byte[] data) {
 		try {
 			DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
@@ -114,6 +122,11 @@ public final class SignPanel extends JPanel {
 		return true;
 	}
 	
+	/**
+	 * Carga el fichero a firmar.
+	 * @param filename Nombre (ruta completa incuida) del fichero a firmar
+	 * @throws IOException Si ocurre alg&uacute;n problema durante la apertura o lectura del fichero
+	 */
 	public void loadFile(final String filename) throws IOException {
 		
 		this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -209,7 +222,7 @@ public final class SignPanel extends JPanel {
 		
 		this.currentFile = file;
 		
-		if (this.keyStoreReady) {
+		if (this.saf.isKeyStoreReady()) {
 		    setSignCommandEnabled(true);
 		}
 		
@@ -367,19 +380,19 @@ public final class SignPanel extends JPanel {
 					String fileToLoad;
 					
 					if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-						if (saf.getCurrentDir() == null) saf.setCurrentDir(new File(Platform.getUserHome()));
+						if (SignPanel.this.saf.getCurrentDir() == null) SignPanel.this.saf.setCurrentDir(new File(Platform.getUserHome()));
 						final FileDialog fd = new FileDialog((Frame)null, Messages.getString("SignPanel.35")); //$NON-NLS-1$
-						fd.setDirectory(saf.getCurrentDir().getAbsolutePath());
+						fd.setDirectory(SignPanel.this.saf.getCurrentDir().getAbsolutePath());
 						fd.setVisible(true);
 						if (fd.getFile() == null) return;
-						saf.setCurrentDir(new File(fd.getDirectory()));
+						SignPanel.this.saf.setCurrentDir(new File(fd.getDirectory()));
 						fileToLoad = fd.getDirectory() + fd.getFile();
 					}
 					else {
 						final JFileChooser fc = new JFileChooser();
-						if (saf.getCurrentDir() != null) fc.setCurrentDirectory(saf.getCurrentDir());
+						if (SignPanel.this.saf.getCurrentDir() != null) fc.setCurrentDirectory(SignPanel.this.saf.getCurrentDir());
 						if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(UpperPanel.this)) {
-						    saf.setCurrentDir(fc.getCurrentDirectory());
+						    SignPanel.this.saf.setCurrentDir(fc.getCurrentDirectory());
 							fileToLoad = fc.getSelectedFile().getAbsolutePath();
 						}
 						else return;
@@ -592,6 +605,9 @@ public final class SignPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * Firma el fichero actualmente cargado.
+	 */
 	public void sign() {
 		this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 		if (this.signer == null || this.dataToSign == null || this.saf == null) {
@@ -699,9 +715,9 @@ public final class SignPanel extends JPanel {
 		boolean nameMissingExtension = true;
 		
         if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            if (saf.getCurrentDir() == null) this.saf.setCurrentDir(new File(Platform.getUserHome()));
+            if (this.saf.getCurrentDir() == null) this.saf.setCurrentDir(new File(Platform.getUserHome()));
             final FileDialog fd = new FileDialog(this.window, Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
-            fd.setDirectory(saf.getCurrentDir().getAbsolutePath());
+            fd.setDirectory(this.saf.getCurrentDir().getAbsolutePath());
             fd.setFile(newFileName);
             fd.setTitle(Messages.getString("SignPanel.81")); //$NON-NLS-1$
             fd.setFilenameFilter(new FilenameFilter() {
@@ -717,12 +733,12 @@ public final class SignPanel extends JPanel {
             });
             fd.setVisible(true);
             if (fd.getFile() == null) return;
-            saf.setCurrentDir(new File(fd.getDirectory()));
+            this.saf.setCurrentDir(new File(fd.getDirectory()));
             newFileName = fd.getDirectory() + fd.getFile();
         }
         else {
             final JFileChooser fc = new JFileChooser();
-            if (saf.getCurrentDir() != null) fc.setCurrentDirectory(saf.getCurrentDir());
+            if (this.saf.getCurrentDir() != null) fc.setCurrentDirectory(this.saf.getCurrentDir());
             fc.setSelectedFile(new File(newFileName));
             fc.setFileFilter(new FileFilter() {
                 @Override
@@ -740,7 +756,7 @@ public final class SignPanel extends JPanel {
                 }
             });
             if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(this.window)) {
-                saf.setCurrentDir(fc.getCurrentDirectory());
+                this.saf.setCurrentDir(fc.getCurrentDirectory());
                 newFileName = fc.getSelectedFile().getAbsolutePath();
             }
             else {
@@ -821,8 +837,10 @@ public final class SignPanel extends JPanel {
 		this.saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
 	}
 	
+	/**
+	 * M&eacute;todo para indicar a la clase que el <code>AOKeyStoreManager</code> est&aacute; listo para usarse.
+	 */
 	public void notifyStoreReady() {
-	    this.keyStoreReady = true;
 	    if (this.dataToSign != null) {
 	        setSignCommandEnabled(true);
 	    }

@@ -1,3 +1,13 @@
+/*
+ * Este fichero forma parte del Cliente @firma. 
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ */
+
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Component;
@@ -52,7 +62,7 @@ public final class MainMenu extends JMenuBar {
 	 * Construye la barra de men&uacute; de la aplicaci&oacute;n.
 	 * @param p Componente padre para la modalidad
 	 * @param s Aplicaci&oacute;n padre, para determinar el n&uacute;mero de
-	 *            locales
+	 *            locales e invocar a ciertos comandos de men&uacute;
 	 */
 	public MainMenu(final Component p, final SimpleAfirma s) {
 		this.saf = s;
@@ -105,24 +115,24 @@ public final class MainMenu extends JMenuBar {
             public void actionPerformed(final ActionEvent ae) {
                 String fileToLoad;
                 if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                    if (saf.getCurrentDir() == null) saf.setCurrentDir(new File(Platform.getUserHome()));
+                    if (MainMenu.this.saf.getCurrentDir() == null) MainMenu.this.saf.setCurrentDir(new File(Platform.getUserHome()));
                     final FileDialog fd = new FileDialog((Frame)null, Messages.getString("MainMenu.4")); //$NON-NLS-1$
-                    fd.setDirectory(saf.getCurrentDir().getAbsolutePath());
+                    fd.setDirectory(MainMenu.this.saf.getCurrentDir().getAbsolutePath());
                     fd.setVisible(true);
                     if (fd.getFile() == null) return;
-                    saf.setCurrentDir(new File(fd.getDirectory()));
+                    MainMenu.this.saf.setCurrentDir(new File(fd.getDirectory()));
                     fileToLoad = fd.getDirectory() + fd.getFile();
                 }
                 else {
                     final JFileChooser fc = new JFileChooser();
-                    if (saf.getCurrentDir() != null) fc.setCurrentDirectory(saf.getCurrentDir());
+                    if (MainMenu.this.saf.getCurrentDir() != null) fc.setCurrentDirectory(MainMenu.this.saf.getCurrentDir());
                     if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(MainMenu.this)) {
-                        saf.setCurrentDir(fc.getCurrentDirectory());
+                        MainMenu.this.saf.setCurrentDir(fc.getCurrentDirectory());
                         fileToLoad = fc.getSelectedFile().getAbsolutePath();
                     }
                     else return;
                 }
-                saf.loadFileToSign(fileToLoad);
+                MainMenu.this.saf.loadFileToSign(fileToLoad);
             }
         });
 		this.menuArchivo.add(abrirMenuItem);

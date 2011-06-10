@@ -13,7 +13,7 @@ import javax.smartcardio.TerminalFactory;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /**
- * Gestor de almac&eacute;n (<code>KeyStore</code>) <DNIe v&iacute;a PKCS#11 y JSR-268.
+ * Gestor de almac&eacute;n (<code>KeyStore</code>) DNIe v&iacute;a PKCS#11 y JSR-268.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class DNIeManager {

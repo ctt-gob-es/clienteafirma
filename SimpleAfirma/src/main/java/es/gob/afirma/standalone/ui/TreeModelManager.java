@@ -1,3 +1,13 @@
+/*
+ * Este fichero forma parte del Cliente @firma. 
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ */
+
 package es.gob.afirma.standalone.ui;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -12,7 +22,11 @@ import es.gob.afirma.misc.tree.TreeNode;
 public final class TreeModelManager {
 
     private final TreeModel tree;
-    
+     
+    /**
+     * Construye una clase de gesti&oacute;n de &aacute;rboles <code>Swing</code>
+     * @param tree &Aacute;rbol <code>Swing</code> a gestionar
+     */
     public TreeModelManager(final TreeModel tree) {
         this.tree = tree;
     }

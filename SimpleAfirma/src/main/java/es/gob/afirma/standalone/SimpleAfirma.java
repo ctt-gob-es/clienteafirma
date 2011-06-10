@@ -1,3 +1,13 @@
+/*
+ * Este fichero forma parte del Cliente @firma. 
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde www.ctt.map.es.
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ */
+
 package es.gob.afirma.standalone;
 
 import java.awt.BorderLayout;
@@ -79,6 +89,14 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	
 	private AOKeyStoreManager ksManager;
 	private MainMenu mainMenu;
+	
+	/**
+	 * Indica si el <code>AOKeyStoreManager</code> ha terminado de inicializarse y est&aacute; listo para su uso.
+	 * @return <code>true</code> si el <code>AOKeyStoreManager</code> est&aacute; listo para usarse, <code>false</code> en caso contrario
+	 */
+	public boolean isKeyStoreReady() {
+		return (this.ksManager != null);
+	}
 	
 	synchronized void setKeyStoreManager(final AOKeyStoreManager ksm) {
 		Logger.getLogger("es.gob.afirma").info("Establecido KeyStoreManager: " + ksm); //$NON-NLS-1$ //$NON-NLS-2$
@@ -204,11 +222,11 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	}
 	
 	private void loadMainApp() {
-	    mainMenu = new MainMenu(this.window, this);
+	    this.mainMenu = new MainMenu(this.window, this);
 		if (this.window != null)  {
 			if (Platform.OS.MACOSX.equals(Platform.getOS())) {
 				try {
-					com.apple.eawt.Application.getApplication().setDefaultMenuBar(mainMenu);
+					com.apple.eawt.Application.getApplication().setDefaultMenuBar(this.mainMenu);
 				}
 				catch(final Exception e) {
 					Logger.getLogger("es.gob.afirma").warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -216,7 +234,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 				}
 			}
 			else {
-				this.window.setJMenuBar(mainMenu);
+				this.window.setJMenuBar(this.mainMenu);
 			}
 		}
 		final JPanel newPanel = new SignPanel(
@@ -449,27 +467,46 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	public void setPreference(final String key, final String value) {
         this.preferences.put(key, value);
     }
-	
+		
+	/**
+	 * Habilita o desabilita el men&uacute; <i>Archivo</i> de la barra de men&uacute;.
+	 * @param e <code>true</code> para habilitar el men&uacute; <i>Archivo</i>, <code>false</code> para deshabilitarlo
+	 */
 	public void setSignMenuCommandEnabled(final boolean e) {
-	    if (mainMenu != null) {
-	        mainMenu.setEnabledSignCommand(e);
+	    if (this.mainMenu != null) {
+	        this.mainMenu.setEnabledSignCommand(e);
 	    }
 	}
 	
+	/**
+	 * Establece el directorio actual para la lectura y guardado de ficheros.
+	 * @param dir Directorio actual, incluyendo su ruta completa
+	 */
 	public void setCurrentDir(final File dir) {
-	    currentDir = dir;
+	    this.currentDir = dir;
 	}
 	
+	/**
+	 * Obtiene el directorio actual para la lectura y guardado de ficheros.
+	 * @return Directorio actual para la lectura y guardado de ficheros.
+	 */
 	public File getCurrentDir() {
-	    return currentDir;
+	    return this.currentDir;
 	}
 	
+	/**
+	 * Firma el fichero actualmente cargado. Este m&eacute;todo se situa aqu&iacute; para permitir su acceso desde la barra de men&uacute;
+	 */
 	public void signLoadedFile() {
 	    if (this.currentPanel instanceof SignPanel) {
 	        ((SignPanel)this.currentPanel).sign();
 	    }
 	}
 	
+	/**
+	 * Carga el fichero a firmar. Este m&eacute;todo se situa aqu&iacute; para permitir su acceso desde la barra de men&uacute;
+	 * @param filePath Fichero a firmar, incluyendo su ruta completa
+	 */
 	public void loadFileToSign(final String filePath) {
 	    if (this.currentPanel instanceof SignPanel) {
 	        try {
