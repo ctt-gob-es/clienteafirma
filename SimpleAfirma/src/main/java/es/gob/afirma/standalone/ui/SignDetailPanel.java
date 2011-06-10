@@ -336,8 +336,8 @@ public final class SignDetailPanel extends JPanel {
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         filePathPanel.add(openFileButton);
         filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        filePathPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
         
-
         // Panel con los datos del certificado
         this.certIcon = new JLabel();
         this.certDescription = new JLabel();
@@ -357,6 +357,7 @@ public final class SignDetailPanel extends JPanel {
         this.certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         this.certDescPanel.add(this.validateCertButton);
         this.certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        this.certDescPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
         
         this.certDescText = new JLabel("Certificado de firma utilizado:");
         this.certDescText.setLabelFor(this.certDescPanel);
@@ -477,14 +478,14 @@ public final class SignDetailPanel extends JPanel {
 //        return tree;
 //    }
 
-    private boolean isXML(final byte[] data) {
-        try {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
-        }
-        catch(final Exception e) {
-            return false;
-        }
-        return true;
-    }
+//    private boolean isXML(final byte[] data) {
+//        try {
+//            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
+//        }
+//        catch(final Exception e) {
+//            return false;
+//        }
+//        return true;
+//    }
     
 }

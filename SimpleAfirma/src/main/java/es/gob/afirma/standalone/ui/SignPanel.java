@@ -31,6 +31,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -140,7 +142,7 @@ public final class SignPanel extends JPanel {
 			return;
 		}
 		
-		final FileInputStream fis = new FileInputStream(file);
+		final InputStream fis = new FileInputStream(file);
 		
 		final byte[] data = AOUtil.getDataFromInputStream(fis);
 		if (data == null || data.length < 1) {
@@ -487,7 +489,7 @@ public final class SignPanel extends JPanel {
 			signPanel.add(SignPanel.this.signButton);
 			SignPanel.this.signButton.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent arg0) {
+				public void actionPerformed(final ActionEvent ae) {
 					sign();
 				}
 			});
@@ -768,8 +770,8 @@ public final class SignPanel extends JPanel {
         	}
         }
         
-        FileOutputStream fos = null;
-        BufferedOutputStream bos = null;
+        OutputStream fos = null;
+        OutputStream bos = null;
         try {
             fos = new FileOutputStream(new File(newFileName));
             bos = new BufferedOutputStream(fos);

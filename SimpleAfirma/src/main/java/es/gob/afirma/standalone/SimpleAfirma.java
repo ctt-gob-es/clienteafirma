@@ -228,6 +228,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 	private void setLookAndFeel() {
 		
 		UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
+		UIManager.put("OptionPane.background", SimpleAfirma.WINDOW_COLOR);
 
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		JDialog.setDefaultLookAndFeelDecorated(true);
