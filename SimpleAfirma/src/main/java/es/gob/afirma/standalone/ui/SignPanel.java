@@ -777,7 +777,7 @@ public final class SignPanel extends JPanel {
         
         final File outputFile = new File(newFileName);
         
-        if (!Platform.OS.WINDOWS.equals(Platform.OS.WINDOWS)) {
+        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
             if (outputFile.exists()) {
             	if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(
         			SignPanel.this,
