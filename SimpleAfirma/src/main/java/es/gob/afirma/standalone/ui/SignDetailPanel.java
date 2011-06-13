@@ -20,6 +20,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -271,7 +274,14 @@ public final class SignDetailPanel extends JPanel {
         filePath.setEditable(false);
         filePath.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         filePath.setText((path != null) ? path : "Fichero de firma en memoria");
-        
+        filePath.addMouseListener(new MouseAdapter() {
+        	@Override
+			public void mousePressed(final MouseEvent me) {
+        		if (me.isPopupTrigger()) {
+        			new CopyMenuItem(filePath).show(me.getComponent(), me.getX(), me.getY());
+        		}
+        	}
+		});
 
         // Etiqueta encima del cuadro con la ruta de fichero
         this.filePathText = new JLabel("Fichero firmado:");
