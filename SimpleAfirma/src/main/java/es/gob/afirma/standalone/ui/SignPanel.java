@@ -184,7 +184,7 @@ public final class SignPanel extends JPanel {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         try {
-            this.fileTypeVectorIcon.setDocument(dbf.newDocumentBuilder().parse(this.getClass().getClassLoader().getResourceAsStream(iconPath)));
+            this.fileTypeVectorIcon.setDocument(dbf.newDocumentBuilder().parse(this.getClass().getResourceAsStream(iconPath)));
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$

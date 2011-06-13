@@ -30,7 +30,7 @@ public final class GenericCertAnalizer extends CertificateAnalizer {
 
         final CertificateInfo certInfo = new CertificateInfo(AOUtil.getCN(cert));
         try {
-            certInfo.setIcon(Toolkit.getDefaultToolkit().getImage(this.getClass().getClassLoader().getResource("/resources/default_cert_ico.png")));
+            certInfo.setIcon(Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/default_cert_ico.png")));
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se pudo cargar el icono por defecto para los certificados");
