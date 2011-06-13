@@ -271,6 +271,7 @@ public final class SignDetailPanel extends JPanel {
         filePath.setEditable(false);
         filePath.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         filePath.setText((path != null) ? path : "Fichero de firma en memoria");
+        
 
         // Etiqueta encima del cuadro con la ruta de fichero
         this.filePathText = new JLabel("Fichero firmado:");
