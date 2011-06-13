@@ -6,50 +6,42 @@ import java.util.logging.Logger;
 public abstract class CertificateAnalizer {
 
     private static final String[] analizers = new String[] {
-      "es.gob.afirma.standalone.crypto.DnieCertAnalizer",
-      "es.gob.afirma.standalone.crypto.GenericCertAnalizer"
+            "es.gob.afirma.standalone.crypto.DnieCertAnalizer", "es.gob.afirma.standalone.crypto.GenericCertAnalizer"
     };
-    
-    /**
-     * Recupera la informaci&oacute;n necesaria para la visualizaci&oacute;n y
+
+    /** Recupera la informaci&oacute;n necesaria para la visualizaci&oacute;n y
      * el tratamiento del certificado.
      * @param cert Certificado.
-     * @return Informaci&oacute;n del certificado.
-     */
+     * @return Informaci&oacute;n del certificado. */
     public static CertificateInfo getCertInformation(X509Certificate cert) {
-        
+
         CertificateInfo certInfo = null;
         for (String analizerClassName : analizers) {
             try {
                 Class<?> analizerClass = Class.forName(analizerClassName);
-                CertificateAnalizer analizer = CertificateAnalizer.class.cast(
-                        analizerClass.newInstance());
+                CertificateAnalizer analizer = CertificateAnalizer.class.cast(analizerClass.newInstance());
 
                 if (analizer.isValidCert(cert)) {
                     certInfo = analizer.analizeCert(cert);
                     break;
                 }
-            } catch (Exception e) {
-                Logger.getLogger("es.gob.afirma").warning(
-                        "No se pudo cargar el analizador de certificados del DNIe: " + e);
+            }
+            catch (Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("No se pudo cargar el analizador de certificados del DNIe: " + e);
             }
         }
-        
+
         return certInfo;
     }
-    
-    /**
-     * Indica si el analizador es capaz de identificar el tipo de certificado.
+
+    /** Indica si el analizador es capaz de identificar el tipo de certificado.
      * @param cert Certificado del que queremos saber si podemos analizar.
      * @return {@code true} si el analizador puede obtener la informaci&oacute;n necesaria
-     * de este certificado. 
-     */ 
+     *         de este certificado. */
     public abstract boolean isValidCert(X509Certificate cert);
-    
-    /**
-     * Recupera la informaci&oacute;n necesaria para mostrar el certificado y validarlo.
+
+    /** Recupera la informaci&oacute;n necesaria para mostrar el certificado y validarlo.
      * @param cert Certificado que queremos analizar.
-     * @return Informaci&oacute;n visual y de validaci&oacute;n del certificado.
-     */
+     * @return Informaci&oacute;n visual y de validaci&oacute;n del certificado. */
     public abstract CertificateInfo analizeCert(X509Certificate cert);
 }

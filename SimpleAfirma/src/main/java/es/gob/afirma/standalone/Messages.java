@@ -16,32 +16,27 @@ import java.util.ResourceBundle;
 
 /** Gesti&oacute;n de mensajes del aplicativo. */
 public class Messages {
-	
-	private static final String BUNDLE_NAME = "es.gob.afirma.standalone.messages"; //$NON-NLS-1$
 
-	private static ResourceBundle bundle = ResourceBundle
-			.getBundle(BUNDLE_NAME, Locale.getDefault());
+    private static final String BUNDLE_NAME = "es.gob.afirma.standalone.messages"; //$NON-NLS-1$
 
-	private Messages() {}
+    private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
 
-	/**
-	 * Obtiene un mensaje.
-	 * @param key Clave del mensaje
-	 * @return Mensaje correspondiente a la clave
-	 */
-	public static String getString(final String key) {
-		try {
-			return bundle.getString(key);
-		} 
-		catch (final MissingResourceException e) {
-			return '!' + key + '!';
-		}
-	}
-	
-	/**
-	 * Cambia la localizaci&oacute;n a la establecida por defecto.
-	 */
-	public static void changeLocale () {
-	    bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
-	}
+    private Messages() {}
+
+    /** Obtiene un mensaje.
+     * @param key Clave del mensaje
+     * @return Mensaje correspondiente a la clave */
+    public static String getString(final String key) {
+        try {
+            return bundle.getString(key);
+        }
+        catch (final MissingResourceException e) {
+            return '!' + key + '!';
+        }
+    }
+
+    /** Cambia la localizaci&oacute;n a la establecida por defecto. */
+    public static void changeLocale() {
+        bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+    }
 }
