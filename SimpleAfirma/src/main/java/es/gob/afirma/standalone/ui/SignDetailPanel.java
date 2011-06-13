@@ -181,7 +181,7 @@ public final class SignDetailPanel extends JPanel {
         dbf.setNamespaceAware(true);
         try {
             resultOperationIcon.setDocument(dbf.newDocumentBuilder()
-                                               .parse(this.getClass()
+                                               .parse(this.getClass().getClassLoader()
                                                           .getResourceAsStream("/resources/" + (type.equals(SIGN_DETAIL_TYPE.KO)
                                                                                                                                 ? "ko_icon.svg"
                                                                                                                                 : "ok_icon.svg"))));

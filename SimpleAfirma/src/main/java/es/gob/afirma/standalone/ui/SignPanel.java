@@ -184,7 +184,7 @@ public final class SignPanel extends JPanel {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         try {
-            this.fileTypeVectorIcon.setDocument(dbf.newDocumentBuilder().parse(this.getClass().getResourceAsStream(iconPath)));
+            this.fileTypeVectorIcon.setDocument(dbf.newDocumentBuilder().parse(this.getClass().getClassLoader().getResourceAsStream(iconPath)));
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
@@ -739,8 +739,8 @@ public final class SignPanel extends JPanel {
 
         final File outputFile = new File(newFileName);
 
-        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            if (outputFile.exists()) {
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            if (newFileName.toLowerCase().endsWith(".pdf") && outputFile.exists()) {
                 if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(SignPanel.this, Messages.getString("SignPanel.84"), //$NON-NLS-1$
                                                                            Messages.getString("SignPanel.19"), //$NON-NLS-1$
                                                                            JOptionPane.YES_NO_OPTION,

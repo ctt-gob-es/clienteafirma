@@ -59,7 +59,7 @@ public final class MainScreen extends JFrame {
         this.add(firstPanel, BorderLayout.CENTER);
 
         try {
-            setIconImage(Toolkit.getDefaultToolkit().getImage(MainScreen.class.getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
+            setIconImage(Toolkit.getDefaultToolkit().getImage(MainScreen.class.getClassLoader().getResource("/resources/afirma_ico.png")) //$NON-NLS-1$
             );
         }
         catch (final Exception e) {
@@ -70,7 +70,7 @@ public final class MainScreen extends JFrame {
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             com.apple.eawt.Application.getApplication()
                                       .setDockIconImage(Toolkit.getDefaultToolkit()
-                                                               .getImage(SimpleAfirma.class.getResource("/resources/afirma_ico.png"))); //$NON-NLS-1$);
+                                                               .getImage(SimpleAfirma.class.getClassLoader().getResource("/resources/afirma_ico.png"))); //$NON-NLS-1$);
             GestureUtilities.addGestureListenerTo(this.getRootPane(), new MagnificationListener() {
                 @Override
                 public void magnify(final MagnificationEvent me) {
