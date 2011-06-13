@@ -30,15 +30,15 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 				}
 			}
 		});
-		
+		add(copyItem);
 	}
 	
 	CopyMenuItem(final JTextComponent tc) {
 		this.textComponent = tc;
-		
+        createUI();
 	}
 
 	@Override
-	public void lostOwnership(Clipboard clipboard, Transferable contents) {}
+	public void lostOwnership(final Clipboard clipboard, final Transferable contents) {}
 	
 }

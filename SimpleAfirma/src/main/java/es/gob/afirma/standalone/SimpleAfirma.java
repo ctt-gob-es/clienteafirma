@@ -249,6 +249,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         UIManager.put("InternalFrameTitlePane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
         UIManager.put("InternalFrame.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
         UIManager.put("Panel.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+        UIManager.put("Label.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+        UIManager.put("PopupMenuSeparator.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
 
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);

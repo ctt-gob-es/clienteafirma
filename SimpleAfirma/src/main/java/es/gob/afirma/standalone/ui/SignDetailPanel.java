@@ -277,7 +277,8 @@ public final class SignDetailPanel extends JPanel {
         filePath.addMouseListener(new MouseAdapter() {
         	@Override
 			public void mousePressed(final MouseEvent me) {
-        		if (me.isPopupTrigger()) {
+        	    // me.isPopupTrigger() depende del Look & Feel y no se puede usar
+        		if (me.getButton() == MouseEvent.BUTTON3 && me.getClickCount() == 1) {
         			new CopyMenuItem(filePath).show(me.getComponent(), me.getX(), me.getY());
         		}
         	}
