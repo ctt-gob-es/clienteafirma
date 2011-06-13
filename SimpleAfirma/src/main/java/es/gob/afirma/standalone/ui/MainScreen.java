@@ -70,7 +70,7 @@ public final class MainScreen extends JFrame {
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             com.apple.eawt.Application.getApplication()
                                       .setDockIconImage(Toolkit.getDefaultToolkit()
-                                                               .getImage(SimpleAfirma.class.getClassLoader().getResource("/resources/afirma_ico.png"))); //$NON-NLS-1$);
+                                                               .getImage(SimpleAfirma.class.getClassLoader().getResource("/resources/logo_cliente_256.png"))); //$NON-NLS-1$);
             GestureUtilities.addGestureListenerTo(this.getRootPane(), new MagnificationListener() {
                 @Override
                 public void magnify(final MagnificationEvent me) {
