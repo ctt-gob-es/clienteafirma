@@ -219,7 +219,7 @@ public final class SignDetailPanel extends JPanel {
         switch (type) {
             case GENERATED:
                 this.resultTextLabel.setText("Proceso de firma completado satisfactoriamente");
-                this.descTextLabel.setText("<html><p>La firma cumple con los requisitos del esquema nacional de interoperabilidad en cuanto a firmas digitales y documentos firmados. <a href=\"http://www.google.com/\">M&aacute;s informaci&oacute;n</a>.</p></html>");
+                this.descTextLabel.setText("<html><p>La firma cumple con los requisitos del esquema nacional de interoperabilidad en cuanto a firmas digitales y documentos firmados. <a href=\"http://www.google.com/\">M&aacute;s informaci&oacute;n en la Web</a>.</p></html>");
                 break;
             case KO:
                 this.resultTextLabel.setText("La firma no es v‡lida o no es una firma compatible con @firma");
