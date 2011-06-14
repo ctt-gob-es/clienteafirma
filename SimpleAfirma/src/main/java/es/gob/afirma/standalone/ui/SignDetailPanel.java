@@ -164,9 +164,10 @@ public final class SignDetailPanel extends JPanel {
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
+        c.weighty = 0.5;
         c.insets = new Insets(11, 11, 0, 11);
         add(infoPanel, c);
-        c.weighty = 1.0;
+//        c.weighty = 1.0;
         c.gridy = 1;
         c.insets = new Insets(11, 11, 11, 11);
         add(componentPanel, c);
@@ -233,17 +234,16 @@ public final class SignDetailPanel extends JPanel {
 
         final JPanel infoPanel = new JPanel(new GridBagLayout());
         infoPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-
+        
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;
-        c.weighty = 0.0;
-        c.ipadx = 20;
-        c.ipady = 20;
+        c.weighty = 1.0;
         c.gridheight = 2;
         c.insets = new Insets(11, 11, 11, 5);
         infoPanel.add(resultOperationIcon, c);
         c.weightx = 1.0;
+        c.weighty = 0.0;
         c.gridx = 1;
         c.gridheight = 1;
         c.insets = new Insets(11, 6, 0, 11);
@@ -380,7 +380,6 @@ public final class SignDetailPanel extends JPanel {
         final JLabel detailPanelText = new JLabel("Datos de la firma:");
         detailPanelText.setLabelFor(this.detailPanel);
 
-        
         final JPanel certDataPanel = new JPanel(new GridBagLayout());
         certDataPanel.setBackground(new Color(0, 0, 0, 0));
 
@@ -494,6 +493,9 @@ public final class SignDetailPanel extends JPanel {
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
+        
+        tree.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        
         return tree;
     }
 

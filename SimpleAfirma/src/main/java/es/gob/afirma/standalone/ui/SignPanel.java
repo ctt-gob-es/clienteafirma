@@ -574,7 +574,7 @@ public final class SignPanel extends JPanel {
             c.gridx = 1;
             c.ipadx = 0;
             c.ipady = 0;
-            c.insets = new Insets(11, 0, 11, 5);
+            c.insets = new Insets(14, 0, 11, 5);
             c.anchor = GridBagConstraints.NORTH;
             this.add(detailPanel, c);
             c.fill = GridBagConstraints.HORIZONTAL;
