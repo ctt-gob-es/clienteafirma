@@ -515,7 +515,7 @@ public final class SignPanel extends JPanel {
             this.setBackground(SimpleAfirma.WINDOW_COLOR);
             this.setBorder(BorderFactory.createLineBorder(Color.black));
             this.setLayout(new GridBagLayout());
-
+            
             final JLabel pathLabel = new JLabel(filePath);
             pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 4f));
 
@@ -557,6 +557,10 @@ public final class SignPanel extends JPanel {
                 }
             });
 
+            // Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
+            this.setDropTarget(SignPanel.this.dropTarget);
+            
+            
             final GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH;
             c.weightx = 0.0;

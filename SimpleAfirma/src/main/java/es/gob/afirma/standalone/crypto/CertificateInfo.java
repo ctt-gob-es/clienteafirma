@@ -10,7 +10,7 @@
 
 package es.gob.afirma.standalone.crypto;
 
-import java.awt.Image;
+import javax.swing.Icon;
 
 /** Informaci&oacute;n para la visualizaci&oacute;n y validaci&oacute;n del certificado.
  * @author Carlos gamuci Mill&aacute;n */
@@ -20,7 +20,7 @@ public final class CertificateInfo {
     private OCSPConfig ocspConfig = null;
 
     /** Icono ilustrativo del Certificado. */
-    private Image icon = null;
+    private Icon icon = null;
 
     /** Texto descriptivo del certificado. */
     private String descriptionText;
@@ -44,11 +44,11 @@ public final class CertificateInfo {
         this.ocspConfig = ocspConfig;
     }
 
-    public Image getIcon() {
+    public Icon getIcon() {
         return this.icon;
     }
 
-    public void setIcon(Image icon) {
+    public void setIcon(Icon icon) {
         this.icon = icon;
     }
 

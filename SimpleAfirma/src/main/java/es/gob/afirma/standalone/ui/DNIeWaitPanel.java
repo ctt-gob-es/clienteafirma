@@ -11,7 +11,6 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -53,22 +52,22 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
         this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         // Boton para saltar de pantalla
-        this.noDNIPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        //this.noDNIPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        this.noDNIPanel.setLayout(new GridBagLayout());
         this.noDNIPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
+        
         this.noDNIButton.setText(Messages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
         if (al != null) this.noDNIButton.addActionListener(al);
         this.noDNIButton.setMnemonic('n');
-        this.noDNIButton.getAccessibleContext().setAccessibleDescription(Messages.getString("DNIeWaitPanel.1") //$NON-NLS-1$
-                        );
-        this.noDNIButton.getAccessibleContext().setAccessibleName(Messages.getString("DNIeWaitPanel.2") //$NON-NLS-1$
-                        );
+        this.noDNIButton.getAccessibleContext().setAccessibleDescription(Messages.getString("DNIeWaitPanel.1")); //$NON-NLS-1$
+        this.noDNIButton.getAccessibleContext().setAccessibleName(Messages.getString("DNIeWaitPanel.2")); //$NON-NLS-1$
         if (kl != null) this.noDNIButton.addKeyListener(kl);
         this.noDNIButton.requestFocus();
         this.noDNIPanel.add(this.noDNIButton);
 
         // Texto informativo
-        ResizingTextPanel textPanel = new ResizingTextPanel(Messages.getString("DNIeWaitPanel.3") //$NON-NLS-1$
-                );
+        ResizingTextPanel textPanel = new ResizingTextPanel(Messages.getString("DNIeWaitPanel.3")); //$NON-NLS-1$
+                
         textPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
         textPanel.setFocusable(false);
 
@@ -99,13 +98,10 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
         c.gridy = 1;
         c.ipady = 60;
         this.add(textPanel, c);
-        c.fill = GridBagConstraints.VERTICAL;
-        c.weightx = 0.0;
-        c.weighty = 0.0;
+        c.weightx = 1.0;
         c.insets = new Insets(0, 0, 0, 0);
         c.gridy = 2;
         c.ipady = 0;
-        c.anchor = GridBagConstraints.WEST;
         this.add(this.noDNIPanel, c);
 
         // Listado de idiomas disponibles
@@ -116,9 +112,11 @@ public final class DNIeWaitPanel extends JPanel implements ItemListener {
             languagesList.setSelectedItem(Locale.getDefault());
             languagesList.addItemListener(this);
             if (kl != null) languagesList.addKeyListener(kl);
+            c.fill = GridBagConstraints.NONE;
             c.gridx = 1;
+            c.gridy = 0;
             c.anchor = GridBagConstraints.EAST;
-            this.add(languagesList, c);
+            this.noDNIPanel.add(languagesList, c);
         }
 
     }
