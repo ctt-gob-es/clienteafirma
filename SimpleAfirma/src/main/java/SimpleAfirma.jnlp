@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="6.0+" href="SimpleAfirma.jnlp" version="1.0">
+<jnlp spec="6.0+" version="1.0">
   <information>
     <title>Firma Facil con @firma</title>
-    <vendor>Gobierno de España</vendor>
-    <icon href="resources/logo_cliente_256.png" kind="default" width="256" height="256" depth="4" />
-    <icon href="resources/splash.gif" kind="splash" />
+    <vendor>Gobierno de Espana</vendor>
+    <icon href="logo_cliente_256.png" kind="default" width="256" height="256" depth="4" />
+    <icon href="splash.gif" kind="splash" />
     <homepage href="http://forja-ctt.administracionelectronica.gob.es/" />
     <description="Firma electronica de ficheros de forma facil e intuitiva" />   
     <offline-allowed/>
-    <association extensions="xsig csig" />
+    <association mime-type="application-x/ades-signature" extensions="xsig csig" />
     <shortcut online="false">
-     <desktop/>
-     <menu submenu="Cliente @firma"/>
+     <desktop />
+     <menu submenu="Cliente @firma" />
     </shortcut>
     <related-content href="license.txt" /> 
   </information>
   <security>
-    <all-permissions/>
+    <all-permissions />
   </security>
   <resources>
     <property name="jnlp.packEnabled" value="true"/>
     <property name="jnlp.versionEnabled" value="true"/>
-    <java href="http://java.sun.com/products/autodl/javase" version="1.5+" initial-heap-size="256m" java-vm-args="-Xdock:name=&quot;Firma fácil con @firma&quot;" />
-    <jar href="SimpleAfirma.jar" main="true" version="1.0"/>
-    <jar href="COMPLETA_j6_afirma5_core.jar" version="3.2"/>
+    <!-- <j2se href="http://java.sun.com/products/autodl/javase" version="1.6+" initial-heap-size="256m" java-vm-args="-Xdock:name=&quot;Firma facil con @firma&quot;" /> -->
+    <jar href="SimpleAfirma.jar" main="true" version="1.0" />
+    <jar href="COMPLETA_j6_afirma5_core.jar" <!-- version="3.2  --> />
+    <jar href="lib/AppleJavaExtensions.jar" />
+    <jar href="lib/batik-anim.jar" />
+    <jar href="lib/batik-awt-util.jar" />
+    <jar href="lib/batik-bridge.jar" />
+    <jar href="lib/batik-dom.jar" />
+    <jar href="lib/batik-ext.jar" />
+    <jar href="lib/batik-gvt.jar" />
+    <jar href="lib/batik-parser.jar" />
+    <jar href="lib/batik-script.jar" />
+    <jar href="lib/batik-svg-dom.jar" />
+    <jar href="lib/batik-swing.jar" />
+    <jar href="lib/batik-util.jar" />
+    <jar href="lib/batik-xml.jar" />
+    <jar href="lib/xml-apis-ext.jar " />
+    <jar href="lib/batik-css.jar " />
   </resources>
-  <application-desc 
-  	main-class="es.gob.afirma.standalone.SimpleAfirma"
-  	name="Firma Facil con @firma" />
-  <applet-desc
-    main-class="com.mysite.MyApplet"
-    name="SimpleAfirma"
-    width="500"
-    height="500" />
   <update check="background" policy="always" />
+  <application-desc main-class="es.gob.afirma.standalone.SimpleAfirma" name="Firma Facil con @firma" />
+  <applet-desc main-class="com.mysite.MyApplet" name="SimpleAfirma" width="500" height="500" />
 </jnlp>
