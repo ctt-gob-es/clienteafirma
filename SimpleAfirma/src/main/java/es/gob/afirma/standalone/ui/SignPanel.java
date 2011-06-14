@@ -54,6 +54,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -215,6 +216,10 @@ public final class SignPanel extends JPanel {
 
         if (this.saf.isKeyStoreReady()) {
             setSignCommandEnabled(true);
+        }
+        else {
+            signButton.setText(""); //$NON-NLS-1$
+            signButton.setIcon(new ImageIcon(this.getClass().getResource("/resources/progress.gif")));
         }
 
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -539,8 +544,8 @@ public final class SignPanel extends JPanel {
                         Desktop.getDesktop().open(new File(filePath));
                     }
                     catch (final IOException e) {
-                        JOptionPane.showOptionDialog(FilePanel.this, Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                                     Messages.getString("SignPanel.53"), //$NON-NLS-1$
+                        JOptionPane.showOptionDialog(FilePanel.this, Messages.getString("SignPanel.53"), //$NON-NLS-1$
+                                                     Messages.getString("SignPanel.25"), //$NON-NLS-1$
                                                      JOptionPane.OK_OPTION,
                                                      JOptionPane.ERROR_MESSAGE,
                                                      null,
@@ -802,7 +807,11 @@ public final class SignPanel extends JPanel {
     }
 
     private void setSignCommandEnabled(final boolean e) {
-        this.signButton.setEnabled(true);
+        if (e) {
+            this.signButton.setIcon(null);
+            this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
+        }
+        this.signButton.setEnabled(e);
         this.saf.setSignMenuCommandEnabled(e);
     }
 
