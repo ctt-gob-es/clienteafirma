@@ -45,6 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -57,6 +58,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.batik.swing.JSVGCanvas;
 
 import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.misc.Platform;
 import es.gob.afirma.signers.AOPDFSigner;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
@@ -376,6 +378,11 @@ public final class SignDetailPanel extends JPanel {
         // Panel el detalle de la firma
         CompleteSignInfo signInfo = this.getSignInfo(sign);
         this.detailPanel = new JScrollPane(this.getSignDataTree(signInfo));
+        // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+        	this.detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        	this.detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        }
 
         final JLabel detailPanelText = new JLabel("Datos de la firma:");
         detailPanelText.setLabelFor(this.detailPanel);
