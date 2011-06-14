@@ -166,10 +166,9 @@ public final class SignDetailPanel extends JPanel {
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
-        c.weighty = 0.5;
         c.insets = new Insets(11, 11, 0, 11);
         add(infoPanel, c);
-//        c.weighty = 1.0;
+        c.weighty = 1.0;
         c.gridy = 1;
         c.insets = new Insets(11, 11, 11, 11);
         add(componentPanel, c);
@@ -381,7 +380,7 @@ public final class SignDetailPanel extends JPanel {
         // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
         	this.detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        	this.detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        	this.detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         }
 
         final JLabel detailPanelText = new JLabel("Datos de la firma:");
@@ -468,6 +467,8 @@ public final class SignDetailPanel extends JPanel {
         treeRenderer.setOpenIcon(null);
         
         final JTree tree = new JTree(root);
+        tree.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        
         tree.addMouseListener(new MouseListener() {
             @Override public void mouseReleased(MouseEvent e) {}
             @Override public void mouseExited(MouseEvent e) { }
@@ -500,8 +501,6 @@ public final class SignDetailPanel extends JPanel {
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
-        
-        tree.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         
         return tree;
     }
