@@ -217,9 +217,9 @@ public final class SignPanel extends JPanel {
         if (this.saf.isKeyStoreReady()) {
             setSignCommandEnabled(true);
         }
-        else {
-            signButton.setText(""); //$NON-NLS-1$
-            signButton.setIcon(new ImageIcon(this.getClass().getResource("/resources/progress.gif")));
+        else { 
+            this.signButton.setText(""); //$NON-NLS-1$
+            this.signButton.setIcon(new ImageIcon(this.getClass().getResource("/resources/progress.gif")));
         }
 
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
