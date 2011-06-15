@@ -28,11 +28,11 @@ public final class CertificateInfo {
     /** Construye el objeto con la informaci&oacute;n del certificado.
      * @param description Texto descriptivo del certificado. */
     public CertificateInfo(final String description) {
-        if (description == null) {
+        if (description == null || "".equals(description)) {
             this.descriptionText = "Certificado X509v3";
         }
         else {
-            this.descriptionText = description;
+            this.descriptionText = "<html><table><tr><td valign=\"middle\"><a href=\"http://certinfo\">" + description + "</a></td></tr></table></html>";
         }
     }
 

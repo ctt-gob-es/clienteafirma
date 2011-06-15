@@ -50,8 +50,9 @@ public final class MainMenu extends JMenuBar {
 
     private static final long serialVersionUID = -8361808353554036015L;
 
-    private JMenu menuArchivo;
-    private JMenuItem firmarMenuItem;
+    private final JMenu menuArchivo = new JMenu();
+    private final JMenuItem firmarMenuItem = new JMenuItem();
+    private final JMenuItem abrirMenuItem = new JMenuItem();
 
     private final Component parent;
     private final SimpleAfirma saf;
@@ -91,13 +92,13 @@ public final class MainMenu extends JMenuBar {
 
     private void createUI() {
 
-        this.menuArchivo = new JMenu(Messages.getString("MainMenu.0")); //$NON-NLS-1$
+        this.menuArchivo.setText(Messages.getString("MainMenu.0")); //$NON-NLS-1$
         this.menuArchivo.setMnemonic(KeyEvent.VK_A);
         this.menuArchivo.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.1") //$NON-NLS-1$
                         );
         this.menuArchivo.setEnabled(true);
 
-        final JMenuItem abrirMenuItem = new JMenuItem(Messages.getString("MainMenu.2")); //$NON-NLS-1$
+        abrirMenuItem.setText(Messages.getString("MainMenu.2")); //$NON-NLS-1$
         abrirMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         abrirMenuItem.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.3") //$NON-NLS-1$
                      );
@@ -128,7 +129,7 @@ public final class MainMenu extends JMenuBar {
         });
         this.menuArchivo.add(abrirMenuItem);
 
-        this.firmarMenuItem = new JMenuItem(Messages.getString("MainMenu.5")); //$NON-NLS-1$
+        this.firmarMenuItem.setText(Messages.getString("MainMenu.5")); //$NON-NLS-1$
         this.firmarMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         this.firmarMenuItem.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.6") //$NON-NLS-1$
                            );
@@ -285,8 +286,8 @@ public final class MainMenu extends JMenuBar {
 
     /** Habilita o deshabilita el men&uacute; de operaciones sobre ficheros.
      * @param en <code>true</code> para habilitar las operaciones sobre ficheros, <code>false</code> para deshabilitarlas */
-    public void setEnabledFileCommands(final boolean en) {
-        if (this.menuArchivo != null) this.menuArchivo.setEnabled(en);
+    public void setEnabledOpenCommand(final boolean en) {
+        if (this.abrirMenuItem != null) this.abrirMenuItem.setEnabled(en);
     }
 
     /** Habilita o deshabilita el elemento de men&uacute; de firma de fichero.
