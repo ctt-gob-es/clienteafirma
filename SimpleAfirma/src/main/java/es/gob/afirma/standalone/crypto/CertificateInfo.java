@@ -44,18 +44,32 @@ public final class CertificateInfo {
         this.iconTooltip = iTooltip;
     }
 
+    /**
+     * Obtiene la configuraci&oacute;n OCSP para validar el certificado.
+     * @return Configuraci&oacute;n OCSP para validar el certificado
+     */
     public OCSPConfig getOcspConfig() {
         return this.ocspConfig;
     }
 
+    
+    /** Obtiene el icono del certificado.
+     * @return Icono del certificado
+     */
     public Icon getIcon() {
         return this.icon;
     }
     
+    /** Obtiene el texto del <i>tooltip</i> para el icono del certificado.
+     * @return Texto del <i>tooltip</i> para el icono del certificado.
+     */
     public String getIconTooltip() {
-    	return iconTooltip;
+    	return this.iconTooltip;
     }
 
+    /** Obtiene un texto descriptivo del certificado.
+     * @return Descripci&oacute;n del certificado
+     */
     public String getDescriptionText() {
         return this.descriptionText;
     }

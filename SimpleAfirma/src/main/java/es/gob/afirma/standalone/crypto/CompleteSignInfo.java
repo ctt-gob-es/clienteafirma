@@ -25,7 +25,7 @@ public final class CompleteSignInfo {
         return this.signData;
     }
 
-    public void setSignData(byte[] signData) {
+    public void setSignData(final byte[] signData) {
         this.signData = signData;
     }
 
@@ -33,7 +33,7 @@ public final class CompleteSignInfo {
         return this.signInfo;
     }
 
-    public void setSignInfo(AOSignInfo signInfo) {
+    public void setSignInfo(final AOSignInfo signInfo) {
         this.signInfo = signInfo;
     }
 
@@ -41,7 +41,7 @@ public final class CompleteSignInfo {
         return this.signsTree;
     }
 
-    public void setSignsTree(TreeModel signsTree) {
+    public void setSignsTree(final TreeModel signsTree) {
         this.signsTree = signsTree;
     }
 }

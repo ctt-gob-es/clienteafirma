@@ -10,6 +10,6 @@
 
 package es.gob.afirma.standalone.crypto;
 
-public class OCSPConfig {
+public final class OCSPConfig {
 
 }

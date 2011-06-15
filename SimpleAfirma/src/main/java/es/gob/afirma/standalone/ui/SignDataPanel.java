@@ -168,7 +168,7 @@ final class SignDataPanel extends JPanel {
         
         // Panel con los datos del certificado
         if (cert != null) {
-            CertificateInfo certInfo = CertificateAnalizer.getCertInformation(cert);
+            final CertificateInfo certInfo = CertificateAnalizer.getCertInformation(cert);
             this.certIcon.setIcon(certInfo.getIcon());
             this.certIcon.setToolTipText(certInfo.getIconTooltip());
 
@@ -184,7 +184,7 @@ final class SignDataPanel extends JPanel {
                 public void hyperlinkUpdate(final HyperlinkEvent he) {
                     if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType())) {
                         try {
-                            File tmp = File.createTempFile("afirma", ".cer");
+                            final File tmp = File.createTempFile("afirma", ".cer");
                             tmp.deleteOnExit();
                             final OutputStream fos = new FileOutputStream(tmp);
                             final OutputStream bos = new BufferedOutputStream(fos);
@@ -346,16 +346,13 @@ final class SignDataPanel extends JPanel {
             }
         });
         tree.addTreeSelectionListener(new TreeSelectionListener() {
-            
             @Override
             public void valueChanged(TreeSelectionEvent e) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-
                 if (node == null) {
                     return;
                 }
-
-                Object nodeInfo = node.getUserObject();
+                final Object nodeInfo = node.getUserObject();
                 System.out.println(nodeInfo);
             }
         });
