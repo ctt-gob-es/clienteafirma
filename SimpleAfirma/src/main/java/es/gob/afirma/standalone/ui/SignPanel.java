@@ -166,18 +166,22 @@ public final class SignPanel extends JPanel {
 
         String fileDescription;
         String iconPath;
+        String iconTooltip;
         if (new AOPDFSigner().isValidDataFile(data)) {
             iconPath = FILE_ICON_PDF;
+            iconTooltip = "Fichero de tipo Portable Document Format (PDF)";
             fileDescription = Messages.getString("SignPanel.9"); //$NON-NLS-1$
             this.signer = new AOPDFSigner();
         }
         else if (isXML(data)) {
             iconPath = FILE_ICON_XML;
+            iconTooltip = "Fichero de tipo XML";
             fileDescription = Messages.getString("SignPanel.10"); //$NON-NLS-1$
             this.signer = new AOXAdESSigner();
         }
         else {
             iconPath = FILE_ICON_BINARY;
+            iconTooltip = "Fichero binario genérico";
             fileDescription = Messages.getString("SignPanel.11"); //$NON-NLS-1$
             this.signer = new AOCAdESSigner();
         }
@@ -193,6 +197,7 @@ public final class SignPanel extends JPanel {
             );
         }
         this.fileTypeVectorIcon.setFocusable(false);
+        this.fileTypeVectorIcon.setToolTipText(iconTooltip);
 
         final long fileSize = file.length();
         final long fileLastModified = file.lastModified();

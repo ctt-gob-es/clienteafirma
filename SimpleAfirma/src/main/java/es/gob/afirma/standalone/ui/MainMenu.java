@@ -98,11 +98,11 @@ public final class MainMenu extends JMenuBar {
                         );
         this.menuArchivo.setEnabled(true);
 
-        abrirMenuItem.setText(Messages.getString("MainMenu.2")); //$NON-NLS-1$
-        abrirMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        abrirMenuItem.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.3") //$NON-NLS-1$
+        this.abrirMenuItem.setText(Messages.getString("MainMenu.2")); //$NON-NLS-1$
+        this.abrirMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        this.abrirMenuItem.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.3") //$NON-NLS-1$
                      );
-        abrirMenuItem.addActionListener(new ActionListener() {
+        this.abrirMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent ae) {
                 String fileToLoad;
@@ -127,7 +127,7 @@ public final class MainMenu extends JMenuBar {
                 MainMenu.this.saf.loadFileToSign(fileToLoad);
             }
         });
-        this.menuArchivo.add(abrirMenuItem);
+        this.menuArchivo.add(this.abrirMenuItem);
 
         this.firmarMenuItem.setText(Messages.getString("MainMenu.5")); //$NON-NLS-1$
         this.firmarMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -260,7 +260,7 @@ public final class MainMenu extends JMenuBar {
         // Los mnemonicos en elementos de menu violan las normas de interfaz de Apple,
         // asi que prescindimos de ellos en Mac OS X
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-            abrirMenuItem.setMnemonic(KeyEvent.VK_B);
+            this.abrirMenuItem.setMnemonic(KeyEvent.VK_B);
             ayudaMenuItem.setMnemonic(KeyEvent.VK_U);
             this.firmarMenuItem.setMnemonic(KeyEvent.VK_I);
         }
@@ -294,6 +294,12 @@ public final class MainMenu extends JMenuBar {
      * @param en <code>true</code> para habilitar el elemento de men&uacute; de firma de fichero, <code>false</code> para deshabilitarlo */
     public void setEnabledSignCommand(final boolean en) {
         if (this.firmarMenuItem != null) this.firmarMenuItem.setEnabled(en);
+    }
+    
+    /** Habilita o deshabilita el men&uacute; de fichero.
+     * @param en <code>true</code> para habilitar el men&uacute; de fichero, <code>false</code> para deshabilitarlo */
+    public void setEnabledFileMenu(final boolean en) {
+    	if (this.menuArchivo != null) this.menuArchivo.setEnabled(en);
     }
 
     private void showAbout() {

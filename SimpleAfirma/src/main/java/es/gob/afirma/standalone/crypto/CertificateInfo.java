@@ -17,39 +17,43 @@ import javax.swing.Icon;
 public final class CertificateInfo {
 
     /** Configuraci&oacute;n del OCSP para la validaci&oacute;n del certificado. */
-    private OCSPConfig ocspConfig = null;
+    private final OCSPConfig ocspConfig;
 
     /** Icono ilustrativo del Certificado. */
-    private Icon icon = null;
+    private final Icon icon;
+    
+    private final String iconTooltip;
 
     /** Texto descriptivo del certificado. */
     private String descriptionText;
 
     /** Construye el objeto con la informaci&oacute;n del certificado.
-     * @param description Texto descriptivo del certificado. */
-    public CertificateInfo(final String description) {
+     * @param description Texto descriptivo del certificado. 
+     * @param ocsp Configuraci&oacute;n de OCSP para la validaci&oacute;n del certificado
+     * @param i Icono para el certificado
+     * @param iTooltip <i>Tooltip</i> para el icono del certificado */
+    public CertificateInfo(final String description, final OCSPConfig ocsp, final Icon i, final String iTooltip) {
         if (description == null || "".equals(description)) {
-            this.descriptionText = "Certificado X509v3";
+            this.descriptionText = "Certificado generico X.509v3";
         }
         else {
             this.descriptionText = "<html><br><a href=\"http://certinfo\">" + description + "</a></html>";
         }
+        this.ocspConfig = ocsp;
+        this.icon = i;
+        this.iconTooltip = iTooltip;
     }
 
     public OCSPConfig getOcspConfig() {
         return this.ocspConfig;
     }
 
-    public void setOcspConfig(OCSPConfig ocspConfig) {
-        this.ocspConfig = ocspConfig;
-    }
-
     public Icon getIcon() {
         return this.icon;
     }
-
-    public void setIcon(Icon icon) {
-        this.icon = icon;
+    
+    public String getIconTooltip() {
+    	return iconTooltip;
     }
 
     public String getDescriptionText() {

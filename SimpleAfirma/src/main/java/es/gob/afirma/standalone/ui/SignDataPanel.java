@@ -170,6 +170,7 @@ final class SignDataPanel extends JPanel {
         if (cert != null) {
             CertificateInfo certInfo = CertificateAnalizer.getCertInformation(cert);
             this.certIcon.setIcon(certInfo.getIcon());
+            this.certIcon.setToolTipText(certInfo.getIconTooltip());
 
             this.certDescription.setEditable(false);
             this.certDescription.setContentType("text/html");

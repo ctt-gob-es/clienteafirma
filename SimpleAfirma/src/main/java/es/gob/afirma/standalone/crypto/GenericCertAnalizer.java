@@ -11,7 +11,6 @@
 package es.gob.afirma.standalone.crypto;
 
 import java.security.cert.X509Certificate;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
@@ -28,14 +27,11 @@ public final class GenericCertAnalizer extends CertificateAnalizer {
 
     @Override
     public CertificateInfo analizeCert(final X509Certificate cert) {
-
-        final CertificateInfo certInfo = new CertificateInfo(AOUtil.getCN(cert));
-        try {
-            certInfo.setIcon(new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png")));
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se pudo cargar el icono por defecto para los certificados");
-        }
-        return certInfo;
+    	return new CertificateInfo(
+			AOUtil.getCN(cert), 
+			null, 
+			new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png")), 
+			"Certificado X.509v3 generico"
+		);
     }
 }

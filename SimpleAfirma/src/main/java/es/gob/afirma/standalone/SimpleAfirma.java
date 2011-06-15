@@ -397,6 +397,11 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * @param signingCert
      *        Certificado usado para la firma */
     public void loadResultsPanel(final byte[] sign, final String fileName, final X509Certificate signingCert) {
+    	this.mainMenu.setEnabledSignCommand(false);
+    	this.mainMenu.setEnabledOpenCommand(false);
+    	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+    		this.mainMenu.setEnabledFileMenu(false);
+    	}
         final JPanel newPanel = new SignDetailPanel(sign, fileName, signingCert, SignDetailPanel.SIGN_DETAIL_TYPE.GENERATED, null);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.window != null && fileName != null) {

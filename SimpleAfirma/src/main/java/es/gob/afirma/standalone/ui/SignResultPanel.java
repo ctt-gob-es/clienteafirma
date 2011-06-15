@@ -79,21 +79,27 @@ final class SignResultPanel extends JPanel {
         });
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
-
+ 
+        String resultOperationIconTooltip;
         switch (type) {
             case GENERATED:
                 this.resultTextLabel.setText("Proceso de firma completado satisfactoriamente");
                 this.descTextLabel.setText("<html><p>La firma cumple con los requisitos del esquema nacional de interoperabilidad en cuanto a firmas digitales y documentos firmados. <a href=\"http://www.google.com/\">M&aacute;s informaci&oacute;n en la Web</a>.</p></html>");
+                resultOperationIconTooltip = "Se ha generado correctamente una firma electronica";
                 break;
             case KO:
                 this.resultTextLabel.setText("La firma no es v‡lida o no es una firma compatible con @firma");
                 this.descTextLabel.setText("<html><p>Blah, blah, blah</p></html>");
+                resultOperationIconTooltip = "La firma electronica seleccionada no es valida o no es compatible con @firma";
                 break;
-            case OK:
+            default:
                 this.resultTextLabel.setText("La firma es v‡lida");
                 this.descTextLabel.setText("<html><p>Para determinar la completa validez legal debe comprobar adem‡s la validez de los certificados usados para firmar</p></html>");
+                resultOperationIconTooltip = "La firma electr—nica es valida en cuanto a estructura";
                 break;
         }
+        resultOperationIcon.setToolTipText(resultOperationIconTooltip);
+        
         this.resultTextLabel.setFont(this.getFont().deriveFont(Font.BOLD, this.getFont().getSize() + 8));
 
         this.setLayout(new GridBagLayout());
