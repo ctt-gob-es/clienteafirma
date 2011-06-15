@@ -32,7 +32,7 @@ public final class CertificateInfo {
             this.descriptionText = "Certificado X509v3";
         }
         else {
-            this.descriptionText = "<html><table><tr><td valign=\"middle\"><a href=\"http://certinfo\">" + description + "</a></td></tr></table></html>";
+            this.descriptionText = "<html><br><a href=\"http://certinfo\">" + description + "</a></html>";
         }
     }
 

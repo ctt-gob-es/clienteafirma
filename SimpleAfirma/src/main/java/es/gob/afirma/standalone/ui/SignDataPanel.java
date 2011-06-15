@@ -139,16 +139,22 @@ final class SignDataPanel extends JPanel {
         } 
         else {
             String fileIcon;
+            String fileTooltip;
             if (new AOPDFSigner().isValidDataFile(sign)) {
                 fileIcon = FILE_ICON_PDF;
+                fileTooltip = "Fichero de tipo Portable Document Format (PDF)";
             }
             else if (DataAnalizerUtil.isXML(sign)) {
                 fileIcon = FILE_ICON_XML;
+                fileTooltip = "Fichero de tipo XML";
             }
             else {
                 fileIcon = FILE_ICON_BINARY;
+                fileTooltip = "Fichero binario genŽrico";
             }
-            filePathPanel.add(new JLabel(new ImageIcon(SignDetailPanel.class.getResource(fileIcon))));
+            final JLabel iconLabel = new JLabel(new ImageIcon(SignDetailPanel.class.getResource(fileIcon)));
+            iconLabel.setToolTipText(fileTooltip);
+            filePathPanel.add(iconLabel);
         }
         
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
@@ -169,7 +175,7 @@ final class SignDataPanel extends JPanel {
             this.certDescription.setContentType("text/html");
             this.certDescription.setOpaque(false);
             this.certDescription.setText(certInfo.getDescriptionText());
-            this.certDescription.setToolTipText("Pulse en la descripción del certificado para obtener información adicional sobre él");
+            this.certDescription.setToolTipText("Pulse en la descripción del certificado para obtener información adicional sobre él o anadirla al almacen de certificados de su sistema operativo");
             this.certDescription.getAccessibleContext().setAccessibleName("Descripción del certificado");
             this.certDescription.getAccessibleContext().setAccessibleDescription("Información resumida del certificado, pulse sobre esta para abrir una nueva ventana con información adicional");
             this.certDescription.addHyperlinkListener(new HyperlinkListener() {
@@ -205,7 +211,7 @@ final class SignDataPanel extends JPanel {
             });
 
             if (certInfo.getOcspConfig() != null) {
-                validateCertButton = new JButton();
+                this.validateCertButton = new JButton();
                 this.validateCertButton.setText("Comprobar validez");
                 this.validateCertButton.setMnemonic('c');
                 this.validateCertButton.setToolTipText("Comprueba la validez del certificado contra el OCSP del su autoridad de certificaci\u00F3n");

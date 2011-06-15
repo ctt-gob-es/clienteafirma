@@ -702,7 +702,10 @@ public final class SignPanel extends JPanel {
                 }
             });
             fd.setVisible(true);
-            if (fd.getFile() == null) return;
+            if (fd.getFile() == null) {
+            	setSignCommandEnabled(true);
+            	return;
+            }
             this.saf.setCurrentDir(new File(fd.getDirectory()));
             newFileName = fd.getDirectory() + fd.getFile();
         }
