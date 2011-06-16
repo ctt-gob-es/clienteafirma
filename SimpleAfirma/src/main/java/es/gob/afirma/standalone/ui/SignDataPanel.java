@@ -176,7 +176,7 @@ final class SignDataPanel extends JPanel {
             this.certDescription.setContentType("text/html");
             this.certDescription.setOpaque(false);
             this.certDescription.setText(certInfo.getDescriptionText());
-            this.certDescription.setToolTipText("Pulse en la descripción del certificado para obtener información adicional sobre él o anadirla al almacen de certificados de su sistema operativo");
+            this.certDescription.setToolTipText("Pulse en la descripción del certificado para obtener información adicional sobre él o anadirlo al almacen de certificados de su sistema operativo");
             this.certDescription.getAccessibleContext().setAccessibleName("Descripción del certificado");
             this.certDescription.getAccessibleContext().setAccessibleDescription("Información resumida del certificado, pulse sobre esta para abrir una nueva ventana con información adicional");
             this.certDescription.addHyperlinkListener(new HyperlinkListener() {

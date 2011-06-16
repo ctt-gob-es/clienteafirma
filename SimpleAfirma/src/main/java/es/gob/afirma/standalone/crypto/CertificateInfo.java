@@ -12,6 +12,8 @@ package es.gob.afirma.standalone.crypto;
 
 import javax.swing.Icon;
 
+import es.gob.afirma.misc.Platform;
+
 /** Informaci&oacute;n para la visualizaci&oacute;n y validaci&oacute;n del certificado.
  * @author Carlos gamuci Mill&aacute;n */
 public final class CertificateInfo {
@@ -37,7 +39,7 @@ public final class CertificateInfo {
             this.descriptionText = "Certificado generico X.509v3";
         }
         else {
-            this.descriptionText = "<html><br><a href=\"http://certinfo\">" + description + "</a></html>";
+            this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + description + "</html>";
         }
         this.ocspConfig = ocsp;
         this.icon = i;

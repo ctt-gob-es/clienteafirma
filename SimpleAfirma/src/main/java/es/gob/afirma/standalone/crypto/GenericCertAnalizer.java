@@ -28,7 +28,7 @@ public final class GenericCertAnalizer extends CertificateAnalizer {
     @Override
     public CertificateInfo analizeCert(final X509Certificate cert) {
     	return new CertificateInfo(
-			AOUtil.getCN(cert), 
+			"Titular del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert) + "</a>. Emisor del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>", 
 			null, 
 			new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png")), 
 			"Certificado X.509v3 generico"
