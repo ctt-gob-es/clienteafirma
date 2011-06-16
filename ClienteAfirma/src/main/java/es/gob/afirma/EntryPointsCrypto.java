@@ -113,7 +113,6 @@ public interface EntryPointsCrypto {
      * </dl>
      * <br>
      * <br>
-     * @see #setMandatoryCertificateCondition(String)
      * @see #setCertFilterRFC2254(String, String, boolean)
      * @see #setData(String)
      * @see #setFileuri(String)
@@ -301,10 +300,6 @@ public interface EntryPointsCrypto {
      * <li>{@link #setElectronicSignatureFile(String)}</li>
      * </ul>
      * <li><b>Certificado de firma (excluyentes): </b></li>
-     * <ul>
-     * <li>{@link #setMandatoryCertificateCondition(String)}</li>
-     * <li>{@link #setCertFilterRFC2254(String, String, boolean)}</li>
-     * </ul>
      * <li><b>Configuraci&oacute;n de firma: </b></li>
      * <ul>
      * <li>{@link #setSignatureAlgorithm(String)}</li>
@@ -336,10 +331,6 @@ public interface EntryPointsCrypto {
      * <li>{@link #setElectronicSignatureFile(String)}</li>
      * </ul>
      * <li><b>Signature certificate (exclusive): </b></li>
-     * <ul>
-     * <li>{@link #setMandatoryCertificateCondition(String)}</li>
-     * <li>{@link #setCertFilterRFC2254(String, String, boolean)}</li>
-     * </ul>
      * <li><b>Signature configuration: </b></li>
      * <ul>
      * <li>{@link #setSignatureAlgorithm(String)}</li>
@@ -530,7 +521,6 @@ public interface EntryPointsCrypto {
      * 
      * <br>
      * <br>
-     * @see #setMandatoryCertificateCondition(String)
      * @see #setCertFilterRFC2254(String, String, boolean)
      * @see #setData(String)
      * @see #setFileuri(String)
@@ -684,7 +674,6 @@ public interface EntryPointsCrypto {
      *         correctamente, false en caso contrario. <br>
      *         Returns <codetrue</code> if operation ends successfully. Else,
      *         false.
-     * @see #setMandatoryCertificateCondition(String)
      * @see #setCertFilterRFC2254(String, String, boolean)
      * @see #setData(String)
      * @see #setFileuri(String)
@@ -817,7 +806,6 @@ public interface EntryPointsCrypto {
      * <br>
      * @return true si se ha ejecutado correctamente <br>
      *         true if succesful.
-     * @see #setMandatoryCertificateCondition(String)
      * @see #setCertFilterRFC2254(String, String, boolean)
      * @see #setData(String)
      * @see #setFileuri(String)
@@ -952,7 +940,6 @@ public interface EntryPointsCrypto {
      * <br>
      * @return true si se ha ejecutado correctamente <br>
      *         true if succesful.
-     * @see #setMandatoryCertificateCondition(String)
      * @see #setCertFilterRFC2254(String, String, boolean)
      * @see #setData(String)
      * @see #setFileuri(String)
