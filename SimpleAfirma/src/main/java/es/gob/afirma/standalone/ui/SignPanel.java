@@ -69,6 +69,8 @@ import org.apache.batik.swing.JSVGCanvas;
 
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
+import es.gob.afirma.exceptions.AOException;
+import es.gob.afirma.exceptions.AOInvalidFormatException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.misc.AOCryptoUtil;
 import es.gob.afirma.misc.AOUtil;
@@ -76,8 +78,10 @@ import es.gob.afirma.misc.Platform;
 import es.gob.afirma.signers.AOCAdESSigner;
 import es.gob.afirma.signers.AOPDFSigner;
 import es.gob.afirma.signers.AOSigner;
+import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.signers.AOXAdESSigner;
 import es.gob.afirma.signers.AOXMLDSigSigner;
+import es.gob.afirma.signers.beans.AOSignInfo;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.ui.AOUIManager;
@@ -109,6 +113,9 @@ public final class SignPanel extends JPanel {
 
     private final SimpleAfirma saf;
 
+    /** Indica si la operaci&oacute;n a realizar es una cofirma. */
+    private boolean cosign = false;
+    
     private File currentFile = null;
 
     private boolean isXML(final byte[] data) {
@@ -167,21 +174,41 @@ public final class SignPanel extends JPanel {
         String fileDescription;
         String iconPath;
         String iconTooltip;
+        this.cosign = false;
+        // Comprobamos si es un fichero PDF
         if (new AOPDFSigner().isValidDataFile(data)) {
             iconPath = FILE_ICON_PDF;
             iconTooltip = "Fichero de tipo Portable Document Format (PDF)";
             fileDescription = Messages.getString("SignPanel.9"); //$NON-NLS-1$
             this.signer = new AOPDFSigner();
         }
+        // Comprobamos si es un fichero de firma (los PDF pasaran por la condicion anterior)
+        else if ((this.signer = AOSignerFactory.getSigner(data)) != null) {
+            AOSignInfo info = null;
+            try {
+                info = signer.getSignInfo(data);
+            } catch (Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("no se pudo extraer la informacion de firma: " + e);
+            }
+            if (signer instanceof AOXMLDSigSigner || signer instanceof AOXAdESSigner)
+                iconPath = FILE_ICON_XML;
+            else
+                iconPath = FILE_ICON_BINARY;
+            iconTooltip = "Fichero de firma " + (info != null ? info.getFormat() : "");
+            fileDescription = "Documento de firma"; //$NON-NLS-1$
+            this.cosign = true;
+        }
+        // Comprobamos si es un fichero XML
         else if (isXML(data)) {
             iconPath = FILE_ICON_XML;
             iconTooltip = "Fichero de tipo XML";
             fileDescription = Messages.getString("SignPanel.10"); //$NON-NLS-1$
             this.signer = new AOXAdESSigner();
         }
+        // Cualquier otro tipo de fichero
         else {
             iconPath = FILE_ICON_BINARY;
-            iconTooltip = "Fichero binario genérico";
+            iconTooltip = "Fichero binario gen\u00E9rico";
             fileDescription = Messages.getString("SignPanel.11"); //$NON-NLS-1$
             this.signer = new AOCAdESSigner();
         }
@@ -199,7 +226,7 @@ public final class SignPanel extends JPanel {
         this.fileTypeVectorIcon.setFocusable(false);
         this.fileTypeVectorIcon.setToolTipText(iconTooltip);
 
-        final long fileSize = file.length();
+        final double fileSize = file.length() / 1024;
         final long fileLastModified = file.lastModified();
 
         this.lowerPanel.remove(this.filePanel);
@@ -491,7 +518,6 @@ public final class SignPanel extends JPanel {
 
             this.add(signPanel, BorderLayout.PAGE_END);
         }
-
     }
 
     private final class FilePanel extends JPanel {
@@ -636,9 +662,15 @@ public final class SignPanel extends JPanel {
 
         final byte[] signResult;
         try {
-            signResult = this.signer.sign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
+            if (cosign) {
+                signResult = this.signer.cosign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
                                           ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), this)),
                                           p);
+            } else {
+                signResult = this.signer.sign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
+                        ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), this)),
+                        p);
+            }
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$

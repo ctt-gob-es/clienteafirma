@@ -212,7 +212,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     }
 
-    private void loadMainApp() {
+    public void loadMainApp() {
         this.mainMenu = new MainMenu(this.window, this);
         if (this.window != null) {
             if (Platform.OS.MACOSX.equals(Platform.getOS())) {

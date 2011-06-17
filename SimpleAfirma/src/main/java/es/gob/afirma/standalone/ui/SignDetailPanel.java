@@ -12,6 +12,7 @@ package es.gob.afirma.standalone.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -26,6 +27,7 @@ import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -119,11 +121,13 @@ public final class SignDetailPanel extends JPanel {
         final JPanel infoPanel = new SignResultPanel(panelType);
         final JPanel componentPanel = new SignDataPanel(sigPath, sig, fileTypeIcon, signingCert);
 
-        final JPanel returnPanel = new JPanel(new BorderLayout(5, 5), true);
+        final JPanel returnPanel = new JPanel(true);
+        returnPanel.setLayout(new BoxLayout(returnPanel, BoxLayout.Y_AXIS)); 
         returnPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
         this.returnButton.setText("Nueva firma");
         this.returnButton.setMnemonic('n');
-        returnPanel.add(this.returnButton, BorderLayout.PAGE_END);
+        this.returnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        returnPanel.add(this.returnButton);
         this.returnButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent ae) {
@@ -131,27 +135,25 @@ public final class SignDetailPanel extends JPanel {
             }
         });
 
-        
         setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.insets = new Insets(11, 11, 11, 11);
-        infoPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         add(infoPanel, c);
         c.weighty = 1.0;
         c.gridy = 1;
-        c.insets = new Insets(11, 0, 11, 11);
+        c.insets = new Insets(0, 11, 11, 11);
         add(componentPanel, c);
-        componentPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        c.weighty = 0.0;
         c.gridy = 2;
+        c.insets = new Insets(0, 11, 11, 11);
         add(returnPanel, c);
     }
     
     /** Vuelve a la pantalla de selecci&oacute;n de fichero para la firma. */
     private void goToBack() {
-        
-        //this.saf.loadMainPanel();
+        this.saf.loadMainApp();
     }
 }

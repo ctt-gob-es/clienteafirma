@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -334,14 +333,7 @@ final class SignDataPanel extends JPanel {
         
         final JTree tree = new JTree(root);
         tree.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        
-        tree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-//                ((JTree) e.getSource()).get
-//              System.out.println("Clicamos elemento en: " + .);   
-            }
-        });
+
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
@@ -350,7 +342,8 @@ final class SignDataPanel extends JPanel {
                     return;
                 }
                 final Object nodeInfo = node.getUserObject();
-                System.out.println(nodeInfo);
+                System.out.println("Node object: " + nodeInfo);
+                System.out.println("---");
             }
         });
         tree.setCellRenderer(treeRenderer);
