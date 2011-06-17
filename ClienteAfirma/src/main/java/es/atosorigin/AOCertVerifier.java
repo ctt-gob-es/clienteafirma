@@ -203,6 +203,7 @@
  */
 package es.atosorigin;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.Security;
@@ -225,6 +226,18 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.naming.ldap.LdapName;
+
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERIA5String;
+import org.bouncycastle.asn1.DERObject;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DEROutputStream;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.X509CertificateStructure;
 
 import es.gob.afirma.Messages;
 import es.gob.afirma.exceptions.AOException;
@@ -269,7 +282,7 @@ import es.gob.afirma.misc.AOUtil;
 
 public final class AOCertVerifier {
 
-	private Set<TrustAnchor> tas = new HashSet<TrustAnchor>();
+	private final Set<TrustAnchor> tas = new HashSet<TrustAnchor>();
 
 	private boolean checkValidity = true;
 
@@ -286,7 +299,7 @@ public final class AOCertVerifier {
 	 * @param c
 	 *            Certificado ra&iacute;z
 	 */
-	public void addRootCertificate(X509Certificate c) {
+	public void addRootCertificate(final X509Certificate c) {
 		if (c == null) {
 			Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
 					"No se pueden anadir certificados nulos" //$NON-NLS-1$
@@ -303,7 +316,7 @@ public final class AOCertVerifier {
 	 * @param url
 	 *            Ruta hacia el certificado ra&iacute;z
 	 */
-	public void addRootCertificate(URL url) {
+	public void addRootCertificate(final URL url) {
 		if (url == null) {
 			Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
 					"No se pueden anadir certificados desde una URL nula" //$NON-NLS-1$
@@ -314,7 +327,8 @@ public final class AOCertVerifier {
 			tas.add(new TrustAnchor((X509Certificate) CertificateFactory
 					.getInstance("X509").generateCertificate( //$NON-NLS-1$
 							AOUtil.loadFile(url.toURI(), null, false)), null));
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.atosorigin").severe( //$NON-NLS-1$
 							"No se pudo crear el certificado desde la URL '" + url.toString() + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
 					);
@@ -329,7 +343,7 @@ public final class AOCertVerifier {
 	 * @param cert
 	 *            Flujo para la lectura del certificado ra&iacute;z
 	 */
-	public void addRootCertificate(InputStream cert) {
+	public void addRootCertificate(final InputStream cert) {
 		if (cert == null) {
 			Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
 					"No se pueden anadir certificados nulos" //$NON-NLS-1$
@@ -337,11 +351,12 @@ public final class AOCertVerifier {
 			return;
 		}
 
-		X509Certificate ca;
+		final X509Certificate ca;
 		try {
 			ca = (X509Certificate) CertificateFactory
 					.getInstance("X509").generateCertificate(cert); //$NON-NLS-1$
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.atosorigin").severe( //$NON-NLS-1$
 					"No se pudo crear el certificado: " + e //$NON-NLS-1$
 			);
@@ -384,7 +399,8 @@ public final class AOCertVerifier {
 			}
 			try {
 				port = Integer.parseInt(tmpPort);
-			} catch (Exception e) {
+			} 
+			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
 								"El puerto proporcionado (" + tmpPort + ") no es un numero: " + e //$NON-NLS-1$ //$NON-NLS-2$
 						);
@@ -393,21 +409,23 @@ public final class AOCertVerifier {
 		}
 		if (server.contains("/"))server = server.substring(0, server.indexOf("/")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		CertStore cs;
+		final CertStore cs;
 		try {
 			cs = CertStore.getInstance("LDAP", //$NON-NLS-1$
 					new LDAPCertStoreParameters(server, port));
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
 							"No se pudo anadir la configuracion del servidor LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
 					);
 			return;
 		}
 
-		X509CertSelector xcs = new X509CertSelector();
+		final X509CertSelector xcs = new X509CertSelector();
 		try {
 			xcs.setSubject(location.toString());
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
 							"No se pudo anadir la configuracion de la localizacion LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
 					);
@@ -415,10 +433,11 @@ public final class AOCertVerifier {
 		}
 
 		try {
-			for (Certificate f : cs.getCertificates(xcs)) {
+			for (final Certificate f : cs.getCertificates(xcs)) {
 				tas.add(new TrustAnchor((X509Certificate) f, null));
 			}
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
 					"No se pudieron anadir certificados desde el LDAP: " + e //$NON-NLS-1$
 			);
@@ -434,7 +453,7 @@ public final class AOCertVerifier {
 	 *            <code>true</code> si se desea comprobar la validez temporal
 	 *            del certificado, <code>false</code> en caso contrario
 	 */
-	public void setCheckValidity(boolean c) {
+	public void setCheckValidity(final boolean c) {
 		checkValidity = c;
 	}
 
@@ -458,8 +477,8 @@ public final class AOCertVerifier {
 	 *            N&uacute;mero de serie del certificado del <i>responder</i>
 	 *            OCSP (puede ser <code>null</code>)
 	 */
-	public void enableOCSP(URL responderURL, LdapName responderCertSubjectName,
-			LdapName responderCertIssuerName, String responderCertSerialNumber) {
+	public void enableOCSP(final URL responderURL, final LdapName responderCertSubjectName,
+			final LdapName responderCertIssuerName, final String responderCertSerialNumber) {
 		Security.setProperty("ocsp.enable", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (responderURL != null)
 			Security.setProperty("ocsp.responderURL", responderURL.toString()); //$NON-NLS-1$
@@ -486,22 +505,25 @@ public final class AOCertVerifier {
 	 *             Cuando falla la validaci&oacute;n, el mensaje de la
 	 *             excepci&oacute;n indica el motivo
 	 */
-	public void checkCertificate(Certificate[] certChain,
-			boolean verifyRevocation) throws AOException {
+	public void checkCertificate(final Certificate[] certChain,
+			final boolean verifyRevocation) throws AOException {
 
 		errorMessage = null;
 
 		if (checkValidity || !verifyRevocation)
-			for (Certificate c : certChain) {
+			for (final Certificate c : certChain) {
 				try {
 					((X509Certificate) c).checkValidity();
-				} catch (CertificateExpiredException e) {
+				} 
+				catch (final CertificateExpiredException e) {
 					errorMessage = Messages.getString("AOCertVerifier.0"); //$NON-NLS-1$
 					throw new AOException(errorMessage, e);
-				} catch (CertificateNotYetValidException e) {
+				} 
+				catch (final CertificateNotYetValidException e) {
 					errorMessage = Messages.getString("AOCertVerifier.1"); //$NON-NLS-1$
 					throw new AOException(errorMessage, e);
-				} catch (Exception e) {
+				} 
+				catch (final Exception e) {
 					errorMessage = Messages.getString("AOCertVerifier.2"); //$NON-NLS-1$
 					throw new AOException(errorMessage, e);
 				}
@@ -510,39 +532,43 @@ public final class AOCertVerifier {
 		if (!verifyRevocation)
 			return;
 
-		List<X509Certificate> cplist = new ArrayList<X509Certificate>();
-		for (Certificate c : certChain) {
+		final List<X509Certificate> cplist = new ArrayList<X509Certificate>();
+		for (final Certificate c : certChain) {
 			cplist.add((X509Certificate) c);
 		}
-		CertPath cp;
+		final CertPath cp;
 		try {
 			cp = CertificateFactory
 					.getInstance("X509").generateCertPath(cplist); //$NON-NLS-1$
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			errorMessage = Messages.getString("AOCertVerifier.3"); //$NON-NLS-1$
 			throw new AOException(errorMessage, e);
 		}
 
-		PKIXParameters pp;
+		final PKIXParameters pp;
 		try {
 			pp = new PKIXParameters(tas);
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			errorMessage = Messages.getString("AOCertVerifier.4"); //$NON-NLS-1$
 			throw new AOException("Error creando los parametros PKIX", e); //$NON-NLS-1$
 		}
 		pp.setRevocationEnabled(true);
 
-		CertPathValidator cpv;
+		final CertPathValidator cpv;
 		try {
 			cpv = CertPathValidator.getInstance("PKIX"); //$NON-NLS-1$
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			errorMessage = Messages.getString("AOCertVerifier.5"); //$NON-NLS-1$
 			throw new AOException("Error obteniendo un validador PKIX", e); //$NON-NLS-1$
 		}
 
 		try {
 			cpv.validate(cp, pp);
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			errorMessage = Messages.getString("AOCertVerifier.6"); //$NON-NLS-1$
 			throw new AOException("El certificado no ha sido validado.", e); //$NON-NLS-1$
 		}
@@ -558,4 +584,33 @@ public final class AOCertVerifier {
 	public String getErrorMessage() {
 		return errorMessage;
 	}
+	
+
+	
+//	public static AOCertVerifier getCertVerifier(final X509Certificate cert) {
+//		if (cert == null) return null;
+//		final URL ocspURL;
+//		try {
+//			final DEROctetString oct = (DEROctetString) ASN1Object.fromByteArray(cert.getExtensionValue("1.3.6.1.5.5.7.1.1")).getDERObject();
+//			final AuthorityInformationAccess authorityInformationAccess = new AuthorityInformationAccess((ASN1Sequence) new ASN1InputStream(oct.getOctets()).readObject());
+//			final AccessDescription[] accessDescriptions = authorityInformationAccess.getAccessDescriptions();
+//			
+//			if (accessDescriptions == null || accessDescriptions.length == 0) {
+//				return null;
+//			}
+//			if (accessDescriptions.length > 1) {
+//				Logger.getLogger("es.gob.afirma").warning("El certificado declara varios servidores OCSP, se utilizara unicamente el primero");
+//			}
+//	        
+//	        ocspURL = new URL(accessDescriptions[0].getAccessLocation().getName().toString());
+//		}
+//		catch(final Exception e) {
+//			Logger.getLogger("es.gob.afirma").severe("No se ha podido extraer la informacion de los servidores OCSP del certificado: " + e);
+//			return null;
+//		}
+//		final AOCertVerifier v = new AOCertVerifier();
+//		v.enableOCSP(ocspURL, null, null, null);
+//		return v;
+//		
+//	}
 }

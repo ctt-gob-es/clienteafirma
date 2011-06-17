@@ -20,7 +20,6 @@ import es.gob.afirma.misc.Platform;
 
 /** Pruebas de almacenes de claves y certificados.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-@SuppressWarnings("null")
 public final class TestKeyStores {
 
     /** Prueba el almac&eacute;n MY de MS-CAPI en Windows. */
