@@ -9,7 +9,7 @@ import javax.naming.ldap.LdapName;
 import es.atosorigin.AOCertVerifier;
 
 
-class DnieCertAnalizer extends CertAnalyzer {
+class DnieCertAnalyzer extends CertAnalyzer {
 
 	@Override
 	public boolean isValidCert(final X509Certificate cert) {
@@ -18,7 +18,7 @@ class DnieCertAnalizer extends CertAnalyzer {
 	}
 
 	@Override
-	public CertificateInfo analizeCert(final X509Certificate cert) {
+	public CertificateInfo analyzeCert(final X509Certificate cert) {
 		// TODO Auto-generated method stub
 		return null;
 	}

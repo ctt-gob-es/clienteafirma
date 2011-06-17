@@ -22,7 +22,7 @@ public final class GenericCertAnalizer extends CertAnalyzer {
     }
 
     @Override
-    public CertificateInfo analizeCert(final X509Certificate cert) {
+    public CertificateInfo analyzeCert(final X509Certificate cert) {
     	return new CertificateInfo(
     		cert,
 			null, 
