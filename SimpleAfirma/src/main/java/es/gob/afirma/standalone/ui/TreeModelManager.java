@@ -17,20 +17,20 @@ import es.gob.afirma.misc.tree.TreeNode;
 
 /** Operaciones para la gesti&oacute;n de objetos TreeModel.
  * @author Carlos Gamuci Mill&aacute;n */
-public final class TreeModelManager {
+final class TreeModelManager {
 
     private final TreeModel tree;
 
     /** Construye una clase de gesti&oacute;n de &aacute;rboles <code>Swing</code>
      * @param tree &Aacute;rbol <code>Swing</code> a gestionar */
-    public TreeModelManager(final TreeModel tree) {
+    TreeModelManager(final TreeModel tree) {
         this.tree = tree;
     }
 
     /** Recupera un &aacute;rbol Swing a partir de un TreeModel con los certificados
      * del Cliente @firma.
      * @return &Aacute;rbol Swing. */
-    public DefaultMutableTreeNode getSwingTree() {
+    DefaultMutableTreeNode getSwingTree() {
         final DefaultMutableTreeNode swingTreeRoot = new DefaultMutableTreeNode();
         copyBranch((TreeNode) this.tree.getRoot(), swingTreeRoot);
         return swingTreeRoot;

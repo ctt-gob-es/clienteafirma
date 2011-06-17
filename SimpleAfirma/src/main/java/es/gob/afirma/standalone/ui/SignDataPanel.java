@@ -327,8 +327,8 @@ final class SignDataPanel extends JPanel {
 
         final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
         treeRenderer.setLeafIcon(null);
-        treeRenderer.setClosedIcon(null);
-        treeRenderer.setOpenIcon(null);
+        treeRenderer.setClosedIcon(javax.swing.UIManager.getDefaults().getIcon("Tree.collapsedIcon"));
+        treeRenderer.setOpenIcon(javax.swing.UIManager.getDefaults().getIcon("Tree.expandedIcon"));
         
         final JTree tree = new JTree(root);
         tree.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
@@ -357,11 +357,10 @@ final class SignDataPanel extends JPanel {
             }
         });
         tree.setCellRenderer(treeRenderer);
-        
         tree.setRootVisible(false);
         tree.putClientProperty("JTree.lineStyle", "None");
         tree.getSelectionModel().setSelectionMode(
-                TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+                TreeSelectionModel.SINGLE_TREE_SELECTION);
         for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
         
         return tree;
