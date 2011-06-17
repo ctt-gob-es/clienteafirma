@@ -21,7 +21,7 @@ public abstract class CertAnalyzer {
 
     private static final String[] analyzers = new String[] {
             "es.gob.afirma.standalone.crypto.DnieCertAnalyzer", 
-            "es.gob.afirma.standalone.crypto.GenericCertAnalizer"
+            "es.gob.afirma.standalone.crypto.GenericCertAnalyzer"
     };
 
     /** Recupera la informaci&oacute;n necesaria para la visualizaci&oacute;n y

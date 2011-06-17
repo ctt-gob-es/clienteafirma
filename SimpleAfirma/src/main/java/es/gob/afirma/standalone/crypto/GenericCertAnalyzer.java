@@ -14,7 +14,7 @@ import java.security.cert.X509Certificate;
 
 /** Analizador gen&eacute;rico de certificados.
  * @author Carlos Gamuci Mill&aacute;n */
-public final class GenericCertAnalizer extends CertAnalyzer {
+public final class GenericCertAnalyzer extends CertAnalyzer {
 
     @Override
     public boolean isValidCert(final X509Certificate cert) {
