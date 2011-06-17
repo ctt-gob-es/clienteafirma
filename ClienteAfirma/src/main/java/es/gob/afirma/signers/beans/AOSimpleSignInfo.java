@@ -11,7 +11,10 @@
 package es.gob.afirma.signers.beans;
 
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
 import java.util.Date;
+
+import es.gob.afirma.misc.AOUtil;
 
 /**
  * Clase dise&ntilde;ada para almacenar la informaci&oacute;n m&iacute;nima
@@ -125,5 +128,16 @@ public final class AOSimpleSignInfo {
 	 */
 	public void setPkcs1(byte[] pkcs1) {
 		this.pkcs1 = pkcs1;
+	}
+	
+	@Override
+	public String toString() {
+	    String desc = AOUtil.getCN(certs[0]); 
+	    if (timestampingTime != null && timestampingTime.length > 0 && timestampingTime[0] != null)
+	        desc += " (TimeStamp: " + DateFormat.getDateInstance(DateFormat.DEFAULT).format(signingTime) + ")";
+	    else if (signingTime != null)
+	        desc += " (" + DateFormat.getDateInstance(DateFormat.DEFAULT).format(signingTime) + ")";  
+
+	    return desc;
 	}
 }
