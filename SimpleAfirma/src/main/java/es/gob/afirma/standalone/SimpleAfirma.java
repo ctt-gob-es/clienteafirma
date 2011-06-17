@@ -212,16 +212,19 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     }
 
+    /** Carga el panel de firma en el interfaz. */
     public void loadMainApp() {
-        this.mainMenu = new MainMenu(this.window, this);
+        if (this.mainMenu == null) this.mainMenu = new MainMenu(this.window, this);
         if (this.window != null) {
+        	this.window.setTitle(Messages.getString("MainScreen.0")); //$NON-NLS-1$
             if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            	this.window.getRootPane().putClientProperty("Window.documentFile", null); //$NON-NLS-1$
                 try {
                     com.apple.eawt.Application.getApplication().setDefaultMenuBar(this.mainMenu);
                 }
                 catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                    this.window.setJMenuBar(new MainMenu(this.window, this));
+                    this.window.setJMenuBar(this.mainMenu);
                 }
             }
             else {

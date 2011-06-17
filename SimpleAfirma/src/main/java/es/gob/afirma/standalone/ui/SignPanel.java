@@ -69,8 +69,6 @@ import org.apache.batik.swing.JSVGCanvas;
 
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.exceptions.AOInvalidFormatException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.misc.AOCryptoUtil;
 import es.gob.afirma.misc.AOUtil;
@@ -186,14 +184,16 @@ public final class SignPanel extends JPanel {
         else if ((this.signer = AOSignerFactory.getSigner(data)) != null) {
             AOSignInfo info = null;
             try {
-                info = signer.getSignInfo(data);
-            } catch (Exception e) {
+                info = this.signer.getSignInfo(data);
+            } 
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("no se pudo extraer la informacion de firma: " + e);
             }
-            if (signer instanceof AOXMLDSigSigner || signer instanceof AOXAdESSigner)
+            if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner)
                 iconPath = FILE_ICON_XML;
-            else
+            else {
                 iconPath = FILE_ICON_BINARY;
+            }
             iconTooltip = "Fichero de firma " + (info != null ? info.getFormat() : "");
             fileDescription = "Documento de firma"; //$NON-NLS-1$
             this.cosign = true;
@@ -662,11 +662,12 @@ public final class SignPanel extends JPanel {
 
         final byte[] signResult;
         try {
-            if (cosign) {
+            if (this.cosign) {
                 signResult = this.signer.cosign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
                                           ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), this)),
                                           p);
-            } else {
+            } 
+            else {
                 signResult = this.signer.sign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
                         ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), this)),
                         p);

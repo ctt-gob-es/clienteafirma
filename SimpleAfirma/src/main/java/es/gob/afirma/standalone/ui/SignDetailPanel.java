@@ -10,8 +10,6 @@
 
 package es.gob.afirma.standalone.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -26,14 +24,12 @@ import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Panel con detalles de una firma electr&oacute;nica. */
@@ -59,6 +55,7 @@ public final class SignDetailPanel extends JPanel {
     private JButton returnButton = new JButton();
     
     /** Construye el panel para mostrar el detalle de una firma electr&oacute;nica.
+     * @param saf Referencia a la misma aplicaci&oacute;n
      * @param sig Firma electr&oacute;nica que se desea visualizar
      * @param sigPath Ruta del fichero de firma, si no se proporciona la firma en s&iacute; se
      *        usa para cargarla
@@ -124,8 +121,8 @@ public final class SignDetailPanel extends JPanel {
         final JPanel returnPanel = new JPanel(true);
         returnPanel.setLayout(new BoxLayout(returnPanel, BoxLayout.Y_AXIS)); 
         returnPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-        this.returnButton.setText("Nueva firma");
-        this.returnButton.setMnemonic('n');
+        this.returnButton.setText("Firmar otro fichero");
+        this.returnButton.setMnemonic('m');
         this.returnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         returnPanel.add(this.returnButton);
         this.returnButton.addActionListener(new ActionListener() {
