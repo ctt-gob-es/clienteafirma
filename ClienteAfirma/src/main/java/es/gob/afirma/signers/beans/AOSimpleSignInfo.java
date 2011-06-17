@@ -134,9 +134,9 @@ public final class AOSimpleSignInfo {
 	public String toString() {
 	    String desc = AOUtil.getCN(certs[0]); 
 	    if (timestampingTime != null && timestampingTime.length > 0 && timestampingTime[0] != null)
-	        desc += " (TimeStamp: " + DateFormat.getDateInstance(DateFormat.DEFAULT).format(signingTime) + ")";
+	        desc += " (TimeStamp: " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(signingTime) + ")";
 	    else if (signingTime != null)
-	        desc += " (" + DateFormat.getDateInstance(DateFormat.DEFAULT).format(signingTime) + ")";  
+	        desc += " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(signingTime) + ")";  
 
 	    return desc;
 	}
