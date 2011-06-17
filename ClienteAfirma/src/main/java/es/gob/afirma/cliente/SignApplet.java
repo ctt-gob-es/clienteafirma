@@ -2492,38 +2492,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             return null;
         }
 
-        final String base64 = fileBase64 ? new String(fileContent) : AOCryptoUtil.encodeBase64(fileContent, false);
-
-        logger.info("Ya en Base64"); //$NON-NLS-1$
-
-        JOptionPane.showMessageDialog(this, "Ya en Base64"); //$NON-NLS-1$
-
-        this.save(base64);
-
-        JOptionPane.showMessageDialog(this, "Salvado"); //$NON-NLS-1$
-
-        return base64;
-    }
-
-    private void save(final String text) {
-        AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-            public Void run() {
-                try {
-                    FileOutputStream fos = new FileOutputStream("C:\\Users\\A122466\\Desktop\\Borrar\\pruebatamano"); //$NON-NLS-1$
-                    fos.write(text.getBytes());
-                    try {
-                        fos.close();
-                    }
-                    catch (final Exception e) {}
-                    JOptionPane.showMessageDialog(SignApplet.this, "OK guardado"); //$NON-NLS-1$
-                }
-                catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").severe(e.toString()); //$NON-NLS-1$
-                    JOptionPane.showMessageDialog(SignApplet.this, "Error"); //$NON-NLS-1$
-                }
-                return null;
-            }
-        });
+        return fileBase64 ? new String(fileContent) : AOCryptoUtil.encodeBase64(fileContent, false);
     }
 
     public String getFileHashBase64Encoded(final boolean showProgress) {
