@@ -48,7 +48,7 @@ import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.crypto.CertificateAnalizer;
+import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
 
@@ -169,58 +169,74 @@ final class SignDataPanel extends JPanel {
         
         // Panel con los datos del certificado
         if (cert != null) {
-            final CertificateInfo certInfo = CertificateAnalizer.getCertInformation(cert);
-            this.certIcon.setIcon(certInfo.getIcon());
-            this.certIcon.setToolTipText(certInfo.getIconTooltip());
-
-            this.certDescription.setEditable(false);
-            this.certDescription.setContentType("text/html");
-            this.certDescription.setOpaque(false);
-            this.certDescription.setText(certInfo.getDescriptionText());
-            this.certDescription.setToolTipText("Pulse en la descripción del certificado para obtener información adicional sobre él o anadirlo al almacen de certificados de su sistema operativo");
-            this.certDescription.getAccessibleContext().setAccessibleName("Descripción del certificado");
-            this.certDescription.getAccessibleContext().setAccessibleDescription("Información resumida del certificado, pulse sobre esta para abrir una nueva ventana con información adicional");
-            this.certDescription.addHyperlinkListener(new HyperlinkListener() {
-                @Override
-                public void hyperlinkUpdate(final HyperlinkEvent he) {
-                    if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType())) {
-                        try {
-                            final File tmp = File.createTempFile("afirma", ".cer");
-                            tmp.deleteOnExit();
-                            final OutputStream fos = new FileOutputStream(tmp);
-                            final OutputStream bos = new BufferedOutputStream(fos);
-                            bos.write(cert.getEncoded());
-                            try { bos.flush(); } catch(final Exception e) {}
-                            try { bos.close(); } catch(final Exception e) {}
-                            try { fos.close(); } catch(final Exception e) {}
-                            Desktop.getDesktop().open(tmp);
-                        }
-                        catch(final Exception e) {
-                            JOptionPane.showOptionDialog(SignDataPanel.this,
-                                 "No se ha podido abrir el fichero,\ncompruebe que de una aplicación instalada para visualizar Certificados X.509",
-                                 "Error",
-                                 JOptionPane.OK_OPTION,
-                                 JOptionPane.ERROR_MESSAGE,
-                                 null,
-                                 new Object[] {
-                                     "Cerrar"
-                                 },
-                                 null
-                             );
-                        }
-                    }
-                }
-            });
-
-            if (certInfo.getOcspConfig() != null) {
-                this.validateCertButton = new JButton();
-                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
-                this.validateCertButton.setText("Comprobar validez");
-                this.validateCertButton.setMnemonic('c');
-                this.validateCertButton.setToolTipText("Comprueba la validez del certificado contra el OCSP del su autoridad de certificaci\u00F3n");
-                this.validateCertButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para validar el certificado");
-                this.validateCertButton.getAccessibleContext()
-                .setAccessibleDescription("Comprueba la validez del certificado contra el OCSP de su autoridad de certificaci&oacute;n");
+            final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
+            
+            if (certInfo != null) {
+            	
+	            this.certIcon.setIcon(certInfo.getIcon());
+	            this.certIcon.setToolTipText(certInfo.getIconTooltip());
+	
+	            this.certDescription.setEditable(false);
+	            this.certDescription.setContentType("text/html");
+	            this.certDescription.setOpaque(false);
+	            this.certDescription.setText(certInfo.getDescriptionText());
+	            this.certDescription.setToolTipText("Pulse en la descripción del certificado para obtener información adicional sobre él o anadirlo al almacen de certificados de su sistema operativo");
+	            this.certDescription.getAccessibleContext().setAccessibleName("Descripción del certificado");
+	            this.certDescription.getAccessibleContext().setAccessibleDescription("Información resumida del certificado, pulse sobre esta para abrir una nueva ventana con información adicional");
+	            this.certDescription.addHyperlinkListener(new HyperlinkListener() {
+	                @Override
+	                public void hyperlinkUpdate(final HyperlinkEvent he) {
+	                    if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType())) {
+	                        try {
+	                            final File tmp = File.createTempFile("afirma", ".cer");
+	                            tmp.deleteOnExit();
+	                            final OutputStream fos = new FileOutputStream(tmp);
+	                            final OutputStream bos = new BufferedOutputStream(fos);
+	                            bos.write(cert.getEncoded());
+	                            try { bos.flush(); } catch(final Exception e) {}
+	                            try { bos.close(); } catch(final Exception e) {}
+	                            try { fos.close(); } catch(final Exception e) {}
+	                            Desktop.getDesktop().open(tmp);
+	                        }
+	                        catch(final Exception e) {
+	                            JOptionPane.showOptionDialog(SignDataPanel.this,
+	                                 "No se ha podido abrir el fichero,\ncompruebe que de una aplicación instalada para visualizar Certificados X.509",
+	                                 "Error",
+	                                 JOptionPane.OK_OPTION,
+	                                 JOptionPane.ERROR_MESSAGE,
+	                                 null,
+	                                 new Object[] {
+	                                     "Cerrar"
+	                                 },
+	                                 null
+	                             );
+	                        }
+	                    }
+	                }
+	            });
+	
+	            if (certInfo.getCertVerifier() != null) {
+	                this.validateCertButton = new JButton();
+	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
+	                this.validateCertButton.setText("Comprobar validez");
+	                this.validateCertButton.setMnemonic('c');
+	                this.validateCertButton.setToolTipText("Comprueba la validez del certificado contra el OCSP del su autoridad de certificaci\u00F3n");
+	                this.validateCertButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para validar el certificado");
+	                this.validateCertButton.getAccessibleContext()
+	                .setAccessibleDescription("Comprueba la validez del certificado contra el OCSP de su autoridad de certificaci&oacute;n");
+	                this.validateCertButton.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent ae) {
+							try {
+								certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
+							}
+							catch(final Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+	            }
+	            
             }
 
             certDescPanel = new JPanel();

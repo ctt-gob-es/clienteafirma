@@ -216,7 +216,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     public void loadMainApp() {
         if (this.mainMenu == null) this.mainMenu = new MainMenu(this.window, this);
         if (this.window != null) {
-        	this.window.setTitle(Messages.getString("MainScreen.0")); //$NON-NLS-1$
+        	this.window.setTitle(Messages.getString("SimpleAfirma.10")); //$NON-NLS-1$
             if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             	this.window.getRootPane().putClientProperty("Window.documentFile", null); //$NON-NLS-1$
                 try {

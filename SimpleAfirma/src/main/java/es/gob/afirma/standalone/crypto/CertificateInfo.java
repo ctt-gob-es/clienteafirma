@@ -10,8 +10,13 @@
 
 package es.gob.afirma.standalone.crypto;
 
-import javax.swing.Icon;
+import java.security.cert.X509Certificate;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
+import es.atosorigin.AOCertVerifier;
+import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.misc.Platform;
 
 /** Informaci&oacute;n para la visualizaci&oacute;n y validaci&oacute;n del certificado.
@@ -19,7 +24,7 @@ import es.gob.afirma.misc.Platform;
 public final class CertificateInfo {
 
     /** Configuraci&oacute;n del OCSP para la validaci&oacute;n del certificado. */
-    private final OCSPConfig ocspConfig;
+    private final AOCertVerifier ocspConfig;
 
     /** Icono ilustrativo del Certificado. */
     private final Icon icon;
@@ -30,27 +35,48 @@ public final class CertificateInfo {
     private String descriptionText;
 
     /** Construye el objeto con la informaci&oacute;n del certificado.
+     * @param cert Certificado al cual se refierre la informaci&oacute;n
      * @param description Texto descriptivo del certificado. 
      * @param ocsp Configuraci&oacute;n de OCSP para la validaci&oacute;n del certificado
      * @param i Icono para el certificado
      * @param iTooltip <i>Tooltip</i> para el icono del certificado */
-    public CertificateInfo(final String description, final OCSPConfig ocsp, final Icon i, final String iTooltip) {
-        if (description == null || "".equals(description)) {
-            this.descriptionText = "Certificado generico X.509v3";
+    public CertificateInfo(final X509Certificate cert, final String description, final AOCertVerifier ocsp, final Icon i, final String iTooltip) {
+        
+    	if (description == null || "".equals(description)) {
+        	if (cert == null) {
+        		this.descriptionText = "Certificado generico X.509v3";
+        	}
+        	else {
+        		this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + "Titular del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert) + "</a>. Emisor del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>" + "</html>";
+        	}
         }
         else {
-            this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + description + "</html>";
+            this.descriptionText = description;
         }
-        this.ocspConfig = ocsp;
-        this.icon = i;
-        this.iconTooltip = iTooltip;
+        
+    	this.ocspConfig = ocsp;
+        
+        if (i == null) {
+        	this.icon = new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png"));
+        }
+        else {
+        	this.icon = i;
+        }
+        
+        if (iTooltip == null) {
+        	this.iconTooltip = "Certificado X.509v3 generico";
+        }
+        else {
+        	this.iconTooltip = iTooltip;
+        }
+        
     }
 
     /**
      * Obtiene la configuraci&oacute;n OCSP para validar el certificado.
      * @return Configuraci&oacute;n OCSP para validar el certificado
      */
-    public OCSPConfig getOcspConfig() {
+    public AOCertVerifier getCertVerifier() {
         return this.ocspConfig;
     }
 

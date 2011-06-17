@@ -13,10 +13,15 @@ package es.gob.afirma.standalone.crypto;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
-public abstract class CertificateAnalizer {
+/**
+ * Analizador de certificados para visualizaci—n de detalles en pantalla.
+ *
+ */
+public abstract class CertAnalyzer {
 
     private static final String[] analizers = new String[] {
-            "es.gob.afirma.standalone.crypto.DnieCertAnalizer", "es.gob.afirma.standalone.crypto.GenericCertAnalizer"
+            "es.gob.afirma.standalone.crypto.DnieCertAnalizer", 
+            "es.gob.afirma.standalone.crypto.GenericCertAnalizer"
     };
 
     /** Recupera la informaci&oacute;n necesaria para la visualizaci&oacute;n y
@@ -24,24 +29,19 @@ public abstract class CertificateAnalizer {
      * @param cert Certificado.
      * @return Informaci&oacute;n del certificado. */
     public static CertificateInfo getCertInformation(X509Certificate cert) {
-
-        CertificateInfo certInfo = null;
-        for (String analizerClassName : analizers) {
+        for (final String analizerClassName : analizers) {
             try {
-                Class<?> analizerClass = Class.forName(analizerClassName);
-                CertificateAnalizer analizer = CertificateAnalizer.class.cast(analizerClass.newInstance());
-
+                final Class<?> analizerClass = Class.forName(analizerClassName);
+                final CertAnalyzer analizer = CertAnalyzer.class.cast(analizerClass.newInstance());
                 if (analizer.isValidCert(cert)) {
-                    certInfo = analizer.analizeCert(cert);
-                    break;
+                    return analizer.analizeCert(cert);
                 }
             }
-            catch (Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se pudo cargar el analizador de certificados del DNIe: " + e);
+            catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("No se pudo cargar un analizador de certificados: " + e);
             }
         }
-
-        return certInfo;
+        return null;
     }
 
     /** Indica si el analizador es capaz de identificar el tipo de certificado.
