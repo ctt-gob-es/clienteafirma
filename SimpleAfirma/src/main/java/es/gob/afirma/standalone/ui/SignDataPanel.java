@@ -34,6 +34,7 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -104,6 +105,7 @@ final class SignDataPanel extends JPanel {
 
         // Boton de apertura del fichero firmado
         final JButton openFileButton = new JButton("Ver fichero");
+        openFileButton.setPreferredSize(new Dimension(150, 24));
         openFileButton.setMnemonic('v');
         openFileButton.setToolTipText("Abre el fichero firmado con la aplicaci\u00F3n configurada en su sistema operativo");
         openFileButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para abrir los datos firmados");
@@ -213,6 +215,7 @@ final class SignDataPanel extends JPanel {
 
             if (certInfo.getOcspConfig() != null) {
                 this.validateCertButton = new JButton();
+                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
                 this.validateCertButton.setText("Comprobar validez");
                 this.validateCertButton.setMnemonic('c');
                 this.validateCertButton.setToolTipText("Comprueba la validez del certificado contra el OCSP del su autoridad de certificaci\u00F3n");
@@ -279,7 +282,6 @@ final class SignDataPanel extends JPanel {
         c.gridy = 5;
         c.insets = new Insets(0, 0, 0, 0);
         this.add(detailPanel, c);
-    
     }
 
     /**
@@ -327,18 +329,13 @@ final class SignDataPanel extends JPanel {
 
         final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
         treeRenderer.setLeafIcon(null);
-        treeRenderer.setClosedIcon(javax.swing.UIManager.getDefaults().getIcon("Tree.collapsedIcon"));
-        treeRenderer.setOpenIcon(javax.swing.UIManager.getDefaults().getIcon("Tree.expandedIcon"));
+        treeRenderer.setClosedIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.collapsedIcon"));
+        treeRenderer.setOpenIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon"));
         
         final JTree tree = new JTree(root);
         tree.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         
-        tree.addMouseListener(new MouseListener() {
-            @Override public void mouseReleased(MouseEvent e) {}
-            @Override public void mouseExited(MouseEvent e) { }
-            @Override public void mouseEntered(MouseEvent e) { }
-            @Override public void mouseClicked(MouseEvent e) { }
-            
+        tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
 //                ((JTree) e.getSource()).get

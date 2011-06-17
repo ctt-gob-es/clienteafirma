@@ -402,7 +402,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
     		this.mainMenu.setEnabledFileMenu(false);
     	}
-        final JPanel newPanel = new SignDetailPanel(sign, fileName, signingCert, SignDetailPanel.SIGN_DETAIL_TYPE.GENERATED, null);
+        final JPanel newPanel = new SignDetailPanel(this, sign, fileName, signingCert, SignDetailPanel.SIGN_DETAIL_TYPE.GENERATED, null);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.window != null && fileName != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName)); //$NON-NLS-1$
