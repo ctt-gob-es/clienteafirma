@@ -140,7 +140,7 @@ public final class SignPanel extends JPanel {
             errorMessage = Messages.getString("SignPanel.3"); //$NON-NLS-1$
         }
         else if (!file.canRead()) {
-            errorMessage = Messages.getString("SignPanel.4"); //$NON-NLS-1$
+            errorMessage = ""; //$NON-NLS-1$
         }
         else if (file.length() < 1) {
             errorMessage = Messages.getString("SignPanel.5"); //$NON-NLS-1$
@@ -176,7 +176,7 @@ public final class SignPanel extends JPanel {
         // Comprobamos si es un fichero PDF
         if (new AOPDFSigner().isValidDataFile(data)) {
             iconPath = FILE_ICON_PDF;
-            iconTooltip = "Fichero de tipo Portable Document Format (PDF)";
+            iconTooltip = Messages.getString("SignPanel.0"); //$NON-NLS-1$
             fileDescription = Messages.getString("SignPanel.9"); //$NON-NLS-1$
             this.signer = new AOPDFSigner();
         }
@@ -187,28 +187,28 @@ public final class SignPanel extends JPanel {
                 info = this.signer.getSignInfo(data);
             } 
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("no se pudo extraer la informacion de firma: " + e);
+                Logger.getLogger("es.gob.afirma").warning("no se pudo extraer la informacion de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
             if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner)
                 iconPath = FILE_ICON_XML;
             else {
                 iconPath = FILE_ICON_BINARY;
             }
-            iconTooltip = "Fichero de firma " + (info != null ? info.getFormat() : "");
+            iconTooltip = Messages.getString("SignPanel.6") + (info != null ? info.getFormat() : ""); //$NON-NLS-1$ //$NON-NLS-2$
             fileDescription = "Documento de firma"; //$NON-NLS-1$
             this.cosign = true;
         }
         // Comprobamos si es un fichero XML
         else if (isXML(data)) {
             iconPath = FILE_ICON_XML;
-            iconTooltip = "Fichero de tipo XML";
+            iconTooltip = Messages.getString("SignPanel.8"); //$NON-NLS-1$
             fileDescription = Messages.getString("SignPanel.10"); //$NON-NLS-1$
             this.signer = new AOXAdESSigner();
         }
         // Cualquier otro tipo de fichero
         else {
             iconPath = FILE_ICON_BINARY;
-            iconTooltip = "Fichero binario gen\u00E9rico";
+            iconTooltip = Messages.getString("SignPanel.12"); //$NON-NLS-1$
             fileDescription = Messages.getString("SignPanel.11"); //$NON-NLS-1$
             this.signer = new AOCAdESSigner();
         }
@@ -251,17 +251,17 @@ public final class SignPanel extends JPanel {
         }
         else { 
             this.signButton.setText(""); //$NON-NLS-1$
-            this.signButton.setIcon(new ImageIcon(this.getClass().getResource("/resources/progress.gif")));
+            this.signButton.setIcon(new ImageIcon(this.getClass().getResource("/resources/progress.gif"))); //$NON-NLS-1$
         }
 
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         this.signButton.requestFocusInWindow();
     }
 
-    private void createUI(final ActionListener al) {
+    private void createUI(final ActionListener al, final boolean firstTime) {
         this.setBackground(SimpleAfirma.WINDOW_COLOR);
         this.setLayout(new GridLayout(2, 1));
-        this.add(new UpperPanel(al));
+        this.add(new UpperPanel(al, firstTime));
         this.lowerPanel = new LowerPanel(al);
         this.add(this.lowerPanel);
         this.dropTarget = new DropTarget(this.filePanel, DnDConstants.ACTION_COPY, new DropTargetListener() {
@@ -369,18 +369,18 @@ public final class SignPanel extends JPanel {
      * @param win Ventana de primer nivel, para el cambio de t&iacute;tulo en la carga de fichero
      * @param sa Clase principal, para proporcionar el <code>AOKeyStoreManager</code> necesario para
      *        realizar las firmas y cambiar de panel al finalizar una firma */
-    public SignPanel(final JFrame win, final SimpleAfirma sa) {
+    public SignPanel(final JFrame win, final SimpleAfirma sa, final boolean firstTime) {
         super(true);
         this.window = win;
         this.saf = sa;
-        createUI(null);
+        createUI(null, firstTime);
     }
 
     private final class UpperPanel extends JPanel {
 
         private static final long serialVersionUID = 533243192995645135L;
 
-        private void createUI(final ActionListener al) {
+        private void createUI(final ActionListener al, final boolean firstTime) {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
             this.setBackground(SimpleAfirma.WINDOW_COLOR);
@@ -435,7 +435,7 @@ public final class SignPanel extends JPanel {
                 }
             });
 
-            final JLabel welcomeLabel = new JLabel(Messages.getString("SignPanel.39")); //$NON-NLS-1$
+            final JLabel welcomeLabel = new JLabel(((firstTime) ? (Messages.getString("SignPanel.14") + " ") : ("")) + Messages.getString("SignPanel.39")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             welcomeLabel.setFocusable(false);
             welcomeLabel.setFont(welcomeLabel.getFont().deriveFont(Font.PLAIN, 26));
             welcomeLabel.setLabelFor(SignPanel.this.selectButton);
@@ -461,9 +461,9 @@ public final class SignPanel extends JPanel {
 
         }
 
-        private UpperPanel(final ActionListener al) {
+        private UpperPanel(final ActionListener al, final boolean firstTime) {
             super(true);
-            createUI(al);
+            createUI(al, firstTime);
         }
 
     }
@@ -790,7 +790,7 @@ public final class SignPanel extends JPanel {
         final File outputFile = new File(newFileName);
 
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            if (newFileName.toLowerCase().endsWith(".pdf") && outputFile.exists()) {
+            if (newFileName.toLowerCase().endsWith(".pdf") && outputFile.exists()) { //$NON-NLS-1$
                 if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(SignPanel.this, Messages.getString("SignPanel.84"), //$NON-NLS-1$
                                                                            Messages.getString("SignPanel.19"), //$NON-NLS-1$
                                                                            JOptionPane.YES_NO_OPTION,

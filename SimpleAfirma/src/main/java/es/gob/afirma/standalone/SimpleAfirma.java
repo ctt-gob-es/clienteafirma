@@ -139,32 +139,36 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             dniManager.waitForDnie();
         }
         else {
-          this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-          try {
-              new SimpleKeyStoreManagerWorker(this, null, false).execute();
-          }
-          catch (final Exception e) {
-              Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-              "No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
-              );
-              JOptionPane.showOptionDialog(
-                   this.container, Messages.getString("SimpleAfirma.42"), //$NON-NLS-1$
-                   Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                   JOptionPane.CLOSED_OPTION,
-                   JOptionPane.ERROR_MESSAGE,
-                   null,
-                   new Object[] {
-                       Messages.getString("SimpleAfirma.8") //$NON-NLS-1$
-                   },
-                   null
-              );
-              closeApplication(-2);
-          }
-          finally {
-              this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-          }
+            loadDefaultKeyStore();
         }
-        loadMainApp();
+        loadMainApp(true);
+    }
+    
+    private void loadDefaultKeyStore() {
+        this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        try {
+            new SimpleKeyStoreManagerWorker(this, null, false).execute();
+        }
+        catch (final Exception e) {
+            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+            "No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
+            );
+            JOptionPane.showOptionDialog(
+                 this.container, Messages.getString("SimpleAfirma.42"), //$NON-NLS-1$
+                 Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                 JOptionPane.CLOSED_OPTION,
+                 JOptionPane.ERROR_MESSAGE,
+                 null,
+                 new Object[] {
+                     Messages.getString("SimpleAfirma.8") //$NON-NLS-1$
+                 },
+                 null
+            );
+            closeApplication(-2);
+        }
+        finally {
+            this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
     }
 
     /** Punto de entrada de la aplicaci&oacute;n.
@@ -178,7 +182,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     public void propertyChange(final PropertyChangeEvent evt) {
         if (DNIeManager.BLOWN_DNI_INSERTED.equals(evt.getPropertyName())) {
             if (DEBUG) System.out.println("Recibido evento de BLOWN DNI INSERTED");
-            loadMainApp();
+            loadDefaultKeyStore();
+            loadMainApp(true);
             JOptionPane.showOptionDialog(
                  this.container, 
                  Messages.getString("SimpleAfirma.6"), //$NON-NLS-1$
@@ -243,18 +248,18 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
                 "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
                 );
-                loadMainApp();
+                loadDefaultKeyStore();
             }
             finally {
                 this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
-            loadMainApp();
+            loadMainApp(true);
         }
 
     }
 
     /** Carga el panel de firma en el interfaz. */
-    public void loadMainApp() {
+    public void loadMainApp(final boolean firstTime) {
         if (this.mainMenu == null) this.mainMenu = new MainMenu(this.window, this);
         if (this.window != null) {
         	this.window.setTitle(Messages.getString("SimpleAfirma.10")); //$NON-NLS-1$
@@ -272,7 +277,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 this.window.setJMenuBar(this.mainMenu);
             }
         }
-        final JPanel newPanel = new SignPanel(this.window, this);
+        final JPanel newPanel = new SignPanel(this.window, this, firstTime);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.currentPanel != null) {
             this.currentPanel.setVisible(false);
@@ -344,13 +349,15 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     @Override
     public void actionPerformed(final ActionEvent ae) {
-        loadMainApp();
+        loadDefaultKeyStore();
+        loadMainApp(true);
     }
 
     @Override
     public void keyPressed(final KeyEvent ke) {
         if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            loadMainApp();
+            loadDefaultKeyStore();
+            loadMainApp(true);
         }
         else if (ke != null && ke.getKeyCode() == KeyEvent.VK_F1) {
             System.out.println("Carga de la ayuda: " + this.currentPanel.getClass() + ", " + getLocale()); //$NON-NLS-1$ //$NON-NLS-2$
