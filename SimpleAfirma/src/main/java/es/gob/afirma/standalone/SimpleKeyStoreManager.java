@@ -70,10 +70,10 @@ public final class SimpleKeyStoreManager {
         if (dnie) {
             try {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.PKCS11,
-                                                                     lib,
-                                                                     "DNIe",
-                                                                     new UIPasswordCallback("PIN del DNIe", parent),
-                                                                     parent);
+                     lib,
+                     "DNIe",
+                     new UIPasswordCallback("PIN del DNIe", parent),
+                     parent);
             }
             catch (final Exception e) {
                 throw new AOKeyStoreManagerException("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + ")", e);

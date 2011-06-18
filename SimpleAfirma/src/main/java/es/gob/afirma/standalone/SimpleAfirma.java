@@ -133,11 +133,38 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             this.currentPanel = new DNIeWaitPanel(this, this, this);
             this.container = new MainScreen(this, this.currentPanel);
             this.window = (JFrame) this.container;
+            this.window.setTitle(Messages.getString("SimpleAfirma.10")); //$NON-NLS-1$
         }
         if (showDNIeScreen && dniManager != null) {
             dniManager.waitForDnie();
         }
-        closeAndContinue();
+        else {
+          this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+          try {
+              new SimpleKeyStoreManagerWorker(this, null, false).execute();
+          }
+          catch (final Exception e) {
+              Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+              "No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
+              );
+              JOptionPane.showOptionDialog(
+                   this.container, Messages.getString("SimpleAfirma.42"), //$NON-NLS-1$
+                   Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                   JOptionPane.CLOSED_OPTION,
+                   JOptionPane.ERROR_MESSAGE,
+                   null,
+                   new Object[] {
+                       Messages.getString("SimpleAfirma.8") //$NON-NLS-1$
+                   },
+                   null
+              );
+              closeApplication(-2);
+          }
+          finally {
+              this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+          }
+        }
+        loadMainApp();
     }
 
     /** Punto de entrada de la aplicaci&oacute;n.
@@ -150,49 +177,64 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
         if (DNIeManager.BLOWN_DNI_INSERTED.equals(evt.getPropertyName())) {
-            closeAndContinue();
-            JOptionPane.showOptionDialog(this.container, Messages.getString("SimpleAfirma.6"), //$NON-NLS-1$
-                                         Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                         JOptionPane.OK_OPTION,
-                                         JOptionPane.ERROR_MESSAGE,
-                                         null,
-                                         new Object[] {
-                                             Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
-                                         null);
+            if (DEBUG) System.out.println("Recibido evento de BLOWN DNI INSERTED");
+            loadMainApp();
+            JOptionPane.showOptionDialog(
+                 this.container, 
+                 Messages.getString("SimpleAfirma.6"), //$NON-NLS-1$
+                 Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                 JOptionPane.OK_OPTION,
+                 JOptionPane.ERROR_MESSAGE,
+                 null,
+                 new Object[] {
+                     Messages.getString("SimpleAfirma.8") //$NON-NLS-1$
+                 },
+                 null
+            );
             return;
         }
         else if (DNIeManager.CARD_EXCEPTION.equals(evt.getPropertyName())) {
+            if (DEBUG) System.out.println("Recibido evento de CARD EXCEPTION");
             try {
                 new SimpleKeyStoreManagerWorker(this, null, false).execute();
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-                "Fallo la JSR-268, y no se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
+                     "Fallo la JSR-268, y no se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
                 );
-                JOptionPane.showOptionDialog(this.container, Messages.getString("SimpleAfirma.9"), //$NON-NLS-1$
-                                             Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                             JOptionPane.OK_OPTION,
-                                             JOptionPane.ERROR_MESSAGE,
-                                             null,
-                                             new Object[] {
-                                                 Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
-                                             null);
+                JOptionPane.showOptionDialog(
+                     this.container, 
+                     Messages.getString("SimpleAfirma.9"), //$NON-NLS-1$
+                     Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
+                     JOptionPane.OK_OPTION,
+                     JOptionPane.ERROR_MESSAGE,
+                     null,
+                     new Object[] {
+                           Messages.getString("SimpleAfirma.8") //$NON-NLS-1$
+                     },
+                     null
+                );
                 closeApplication(-1);
             }
             return;
         }
         else if (DNIeManager.NOT_DNI_INSERTED.equals(evt.getPropertyName())) {
-            JOptionPane.showOptionDialog(this.container, Messages.getString("SimpleAfirma.12"), //$NON-NLS-1$
-                                         Messages.getString("SimpleAfirma.13"), //$NON-NLS-1$
-                                         JOptionPane.OK_OPTION,
-                                         JOptionPane.WARNING_MESSAGE,
-                                         null,
-                                         new Object[] {
-                                             Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
-                                         null);
+            if (DEBUG) System.out.println("Recibido evento de NOT DNI INSERTED");
+            JOptionPane.showOptionDialog(
+                 this.container, Messages.getString("SimpleAfirma.12"), //$NON-NLS-1$
+                 Messages.getString("SimpleAfirma.13"), //$NON-NLS-1$
+                 JOptionPane.OK_OPTION,
+                 JOptionPane.WARNING_MESSAGE,
+                 null,
+                 new Object[] {
+                       Messages.getString("SimpleAfirma.8") //$NON-NLS-1$
+                 },
+                 null
+            );
             return;
         }
         else if (DNIeManager.DNI_INSERTED.equals(evt.getPropertyName())) {
+            if (DEBUG) System.out.println("Recibido evento de DNI INSERTED");
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             try {
                 new SimpleKeyStoreManagerWorker(this, null, true).execute();
@@ -201,12 +243,11 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
                 "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
                 );
-                closeAndContinue();
+                loadMainApp();
             }
             finally {
                 this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
-            this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             loadMainApp();
         }
 
@@ -301,40 +342,15 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     }
 
-    private void closeAndContinue() {
-        this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        try {
-            new SimpleKeyStoreManagerWorker(this, null, false).execute();
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
-            );
-            JOptionPane.showOptionDialog(this.container, Messages.getString("SimpleAfirma.42"), //$NON-NLS-1$
-                                         Messages.getString("SimpleAfirma.7"), //$NON-NLS-1$
-                                         JOptionPane.CLOSED_OPTION,
-                                         JOptionPane.ERROR_MESSAGE,
-                                         null,
-                                         new Object[] {
-                                             Messages.getString("SimpleAfirma.8")}, //$NON-NLS-1$
-                                         null);
-            closeApplication(-2);
-        }
-        finally {
-            this.container.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        }
-        loadMainApp();
-    }
-
     @Override
     public void actionPerformed(final ActionEvent ae) {
-        closeAndContinue();
+        loadMainApp();
     }
 
     @Override
     public void keyPressed(final KeyEvent ke) {
         if (ke != null && ke.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            closeAndContinue();
+            loadMainApp();
         }
         else if (ke != null && ke.getKeyCode() == KeyEvent.VK_F1) {
             System.out.println("Carga de la ayuda: " + this.currentPanel.getClass() + ", " + getLocale()); //$NON-NLS-1$ //$NON-NLS-2$
