@@ -240,12 +240,13 @@ if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
 //          menuAyuda.addSeparator();
             final JMenuItem acercaMenuItem = new JMenuItem(Messages.getString("MainMenu.15")); //$NON-NLS-1$
             acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
-            acercaMenuItem.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.17") //$NON-NLS-1$
-                          );
+            acercaMenuItem.getAccessibleContext().setAccessibleDescription(
+        		Messages.getString("MainMenu.17") //$NON-NLS-1$
+            );
             acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             acercaMenuItem.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent arg0) {
+                public void actionPerformed(final ActionEvent ae) {
                     showAbout();
                 }
             });
