@@ -368,8 +368,9 @@ public final class SignPanel extends JPanel {
     /** Construye el panel de firma, en el que se selecciona y se firma un fichero.
      * @param win Ventana de primer nivel, para el cambio de t&iacute;tulo en la carga de fichero
      * @param sa Clase principal, para proporcionar el <code>AOKeyStoreManager</code> necesario para
-     *        realizar las firmas y cambiar de panel al finalizar una firma */
-    public SignPanel(final JFrame win, final SimpleAfirma sa, final boolean firstTime) {
+     *        realizar las firmas y cambiar de panel al finalizar una firma 
+     * @param firstTime <code>true</code> si se la primera vez que se muestra este panel en la aplicaci&oacute;n, <code>en caso contrario</code>*/
+    public SignPanel(final JFrame win, final SimpleAfirma sa, final boolean firstTime) { 
         super(true);
         this.window = win;
         this.saf = sa;

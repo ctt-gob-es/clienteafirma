@@ -258,8 +258,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     }
 
-    /** Carga el panel de firma en el interfaz. */
-    public void loadMainApp(final boolean firstTime) {
+    /** Carga el panel de firma en el interfaz. 
+     * @param firstTime <code>true</code> si se la primera vez que se carga, <code>en caso contrario</code>
+     */
+    public void loadMainApp(final boolean firstTime) { 
         if (this.mainMenu == null) this.mainMenu = new MainMenu(this.window, this);
         if (this.window != null) {
         	this.window.setTitle(Messages.getString("SimpleAfirma.10")); //$NON-NLS-1$
