@@ -5,20 +5,21 @@ import java.awt.Dimension;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
 import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.Messages;
 
 public final class DNIePasswordCallback extends PasswordCallback {
 
     private static final long serialVersionUID = -3568711790506952344L;
 
     public DNIePasswordCallback(Component c) {
-        super("", false);
+        super("DNI", false); //$NON-NLS-1$
         parent = c;
     }
     /**
@@ -29,25 +30,24 @@ public final class DNIePasswordCallback extends PasswordCallback {
     
     @Override
     public char[] getPassword() {
-        final String text = "Introduzca el PIN de su DNI electrónico";
+        final String text = Messages.getString("DNIePasswordCallback.1"); //$NON-NLS-1$
         final JPasswordField pwd = new JPasswordField(10);
         final JLabel lbText = new JLabel(text);
         lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
-        panel.setBackground(SimpleAfirma.WINDOW_COLOR);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(lbText);
         panel.add(pwd);
         
-        final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) {
+        final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, new ImageIcon(this.getClass().getResource("/resources/dnie_logo.png"))) { //$NON-NLS-1$
             private static final long serialVersionUID = -3012522768561175760L;
             @Override
             public void selectInitialValue() {
                 pwd.requestFocusInWindow();
             }
         };
-        pane.createDialog(parent, "Introduzca el PIN de su DNIe").setVisible(true);
+        pane.createDialog(parent, Messages.getString("DNIePasswordCallback.3")).setVisible(true); //$NON-NLS-1$
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) {

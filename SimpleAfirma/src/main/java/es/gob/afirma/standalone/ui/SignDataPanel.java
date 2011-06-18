@@ -227,11 +227,16 @@ final class SignDataPanel extends JPanel {
 	                this.validateCertButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent ae) {
+						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 							try {
 								certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
+								JOptionPane.showMessageDialog(SignDataPanel.this, "El certificado es válido", "Respuesta del servidor de validación", JOptionPane.INFORMATION_MESSAGE);
 							}
 							catch(final Exception e) {
 								e.printStackTrace();
+							}
+							finally {
+							    SignDataPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 							}
 						}
 					});

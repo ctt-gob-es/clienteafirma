@@ -88,7 +88,7 @@ final class SignResultPanel extends JPanel {
                 resultOperationIconTooltip = "Se ha generado correctamente una firma electronica";
                 break;
             case KO:
-                this.resultTextLabel.setText("La firma no es v‡lida o no es una firma compatible con @firma");
+                this.resultTextLabel.setText("La firma no es válida o no es una firma compatible con @firma");
                 this.descTextLabel.setText("<html><p>Blah, blah, blah</p></html>");
                 resultOperationIconTooltip = "La firma electronica seleccionada no es valida o no es compatible con @firma";
                 break;

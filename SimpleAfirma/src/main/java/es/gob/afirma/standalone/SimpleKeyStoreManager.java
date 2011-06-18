@@ -12,11 +12,14 @@ package es.gob.afirma.standalone;
 
 import java.awt.Component;
 import java.io.File;
+import java.util.logging.Logger;
 
 import es.gob.afirma.callbacks.NullPasswordCallback;
+import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.AOKeystoreAlternativeException;
 import es.gob.afirma.misc.AOConstants.AOKeyStore;
 import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.misc.Platform;
@@ -61,9 +64,8 @@ public final class SimpleKeyStoreManager {
      * @throws AOKeyStoreManagerException Si ocurre cualquier problema durante la obtenci&oacute;n del <code>KeyStore</code> */
     public static AOKeyStoreManager getKeyStore(final boolean dnie, final Component parent) throws AOKeyStoreManagerException {
 
-        final String lib = getPKCS11DNIeLib();
-
         if (dnie) {
+            final String lib = getPKCS11DNIeLib();
             try {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.PKCS11,
                      lib,
@@ -72,8 +74,10 @@ public final class SimpleKeyStoreManager {
                      parent
                  );
             }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + ")", e);
+            catch(final AOCancelledOperationException e) {}
+            catch(final AOKeystoreAlternativeException e) {}
+            catch(final Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + "): " + e);
             }
         }
 

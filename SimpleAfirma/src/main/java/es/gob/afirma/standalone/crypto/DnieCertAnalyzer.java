@@ -78,11 +78,11 @@ class DnieCertAnalyzer extends CertAnalyzer {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el certificado CA 003 del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 		
-		// Anadimos un certificado raiz desde disco LDAP (DNIe VA)
+		// Anadimos los certificados raiz de las VA desde LDAP
 		try {
             v.addRootCertificatesFromLdap(
                 "ldap.dnie.es",  //$NON-NLS-1$
-                new LdapName("CN=AV DNIE FNMT,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES") //$NON-NLS-1$
+                new LdapName("CN=AV DNIE FNMT,OU=FNMT, OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES") //$NON-NLS-1$
             );
         }
         catch(final Exception e) {
@@ -93,9 +93,9 @@ class DnieCertAnalyzer extends CertAnalyzer {
 		try {
 			v.enableOCSP(
 				new URL("http://ocsp.dnielectronico.es:80"),  //$NON-NLS-1$
-				new LdapName("CN=AV DNIE FNMT,OU=FNMT,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES"), //$NON-NLS-1$
-				new LdapName("CN=AC DNIE 001,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES"), //$NON-NLS-1$
-				"34:23:43:b8:af:dd:e6:fd:4a:16:97:3f:bc:90:cc:b3" //$NON-NLS-1$
+				null,
+				null,
+				null
 			);
 		}
 		catch(final Exception e) {
