@@ -80,7 +80,7 @@ final class SignResultPanel extends JPanel {
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
  
-        String resultOperationIconTooltip;
+        final String resultOperationIconTooltip;
         switch (type) {
             case GENERATED:
                 this.resultTextLabel.setText("Proceso de firma completado satisfactoriamente");
