@@ -469,7 +469,7 @@ public final class AOUIManager {
                 pwd.requestFocusInWindow();
             }
         };
-        pane.createDialog(null, Messages.getString("AOUIManager.24")).setVisible(true);
+        pane.createDialog(c, Messages.getString("AOUIManager.24")).setVisible(true);
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) return new char[0];
