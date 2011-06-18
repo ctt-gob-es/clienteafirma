@@ -12,19 +12,15 @@ package es.gob.afirma.standalone;
 
 import java.awt.Component;
 import java.io.File;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.util.Enumeration;
 
 import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
 import es.gob.afirma.exceptions.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.misc.AOConstants.AOKeyStore;
 import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.misc.Platform;
+import es.gob.afirma.standalone.ui.DNIePasswordCallback;
 
 /** Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe
  * v&iacute;a PKCS#11 o el <code>KeyStore</code> por defecto del sistema operativo
@@ -72,8 +68,9 @@ public final class SimpleKeyStoreManager {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.PKCS11,
                      lib,
                      "DNIe",
-                     new UIPasswordCallback("PIN del DNIe", parent),
-                     parent);
+                     new DNIePasswordCallback(parent),
+                     parent
+                 );
             }
             catch (final Exception e) {
                 throw new AOKeyStoreManagerException("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + ")", e);
@@ -99,26 +96,6 @@ public final class SimpleKeyStoreManager {
         }
 
         return null;
-    }
-
-    /** Selecciona el primer certificado del <code>KeyStore</code> proporcionado que cuente con
-     * un <i>KeyUsage</i> apto para firma electr&oacute;nica.
-     * @param ks <code>KeyStore</code> sobre el que buscar los certificados
-     * @return Alias del primer certificado encontrado con <i>KeyUsage</i> apto para firma electr&oacute;nica
-     * @throws AOCertificatesNotFoundException Si no se encuentra ning&uacute;n certificado apto para firma en el almac&eacute;n
-     * @throws KeyStoreException Si ocurre cualquier error en el tratamiento del <code>KeyStore</code> */
-    public static String autoSelectSignCert(final KeyStore ks) throws AOCertificatesNotFoundException, KeyStoreException {
-        if (ks == null) throw new NullPointerException("El KeyStore proporcionado no puede ser nulo");
-        String alias;
-        final Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-            alias = aliases.nextElement();
-            // TODO: Filtrar por KeyUsage de firma
-            // if (KeyStoreUtilities.matchesKeyUsageFilter((X509Certificate) ks.getCertificate(alias), AOConstants.SIGN_CERT_USAGE)) {
-            return alias;
-            // }
-        }
-        throw new AOCertificatesNotFoundException("El almacen seleccionado no contiene certificados validos para firma electronica");
     }
 
 }

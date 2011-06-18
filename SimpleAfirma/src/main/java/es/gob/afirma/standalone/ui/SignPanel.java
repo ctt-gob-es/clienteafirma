@@ -92,6 +92,7 @@ public final class SignPanel extends JPanel {
 
     private final JSVGCanvas fileTypeVectorIcon = new JSVGCanvas();
 
+    private static final String DNIE_SIGNATURE_ALIAS = "CertFirmaDigital";
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_XML = "/resources/icon_xml.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg"; //$NON-NLS-1$
@@ -626,33 +627,40 @@ public final class SignPanel extends JPanel {
             return;
         }
         final AOKeyStoreManager ksm = this.saf.getAOKeyStoreManager();
-        final String alias;
+        String alias = null;
 
-        // TODO: Filtrar por KeyUsage de firma
         try {
-            alias = AOUIManager.showCertSelectionDialog(ksm.getAliases(), ksm.getKeyStores(),
-            // isDNIeProvider(ksm.getKeyStores().get(0).getProvider().getName()) ? SIGN_CERT_USAGE : null,
-                                                        this,
-                                                        true,
-                                                        true,
-                                                        false);
+            if (ksm.getKeyStores().get(0).containsAlias(DNIE_SIGNATURE_ALIAS) || ksm.getCertificate(DNIE_SIGNATURE_ALIAS).getIssuerX500Principal().toString().contains("DNIE")) {
+                alias = DNIE_SIGNATURE_ALIAS;
+            }
         }
-        catch (final AOCertificatesNotFoundException e) {
-            JOptionPane.showOptionDialog(this, Messages.getString("SignPanel.55"), //$NON-NLS-1$
-                                         Messages.getString("SignPanel.19"), //$NON-NLS-1$
-                                         JOptionPane.OK_OPTION,
-                                         JOptionPane.WARNING_MESSAGE,
-                                         null,
-                                         new Object[] {
-                                             Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                         null);
-            return;
-        }
-        catch (final AOCancelledOperationException e) {
-            return;
-        }
-        finally {
-            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        catch(final Exception e) {}
+        
+        if (alias == null) {
+            try {
+                alias = AOUIManager.showCertSelectionDialog(ksm.getAliases(), ksm.getKeyStores(),
+                                                            this,
+                                                            true,
+                                                            true,
+                                                            false);
+            }
+            catch (final AOCertificatesNotFoundException e) {
+                JOptionPane.showOptionDialog(this, Messages.getString("SignPanel.55"), //$NON-NLS-1$
+                                             Messages.getString("SignPanel.19"), //$NON-NLS-1$
+                                             JOptionPane.OK_OPTION,
+                                             JOptionPane.WARNING_MESSAGE,
+                                             null,
+                                             new Object[] {
+                                                 Messages.getString("SignPanel.20")}, //$NON-NLS-1$
+                                             null);
+                return;
+            }
+            catch (final AOCancelledOperationException e) {
+                return;
+            }
+            finally {
+                this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         }
 
         final Properties p = new Properties();
