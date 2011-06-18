@@ -154,43 +154,6 @@ public final class MainMenu extends JMenuBar {
             this.menuArchivo.add(salirMenuItem);
         }
 
-        final JMenu menuAyuda = new JMenu(Messages.getString("MainMenu.9")); //$NON-NLS-1$
-        menuAyuda.setMnemonic(KeyEvent.VK_Y);
-        menuAyuda.getAccessibleContext().setAccessibleDescription(
-              Messages.getString("MainMenu.10") //$NON-NLS-1$
-        );
-        
-//        final JMenuItem ayudaMenuItem = new JMenuItem(Messages.getString("MainMenu.11")); //$NON-NLS-1$
-//        ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
-//        ayudaMenuItem.getAccessibleContext().setAccessibleDescription(
-//              Messages.getString("MainMenu.13") //$NON-NLS-1$
-//        );
-//        ayudaMenuItem.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(final ActionEvent e) {
-//                System.out.println(Messages.getString("MainMenu.14")); //$NON-NLS-1$
-//            }
-//        });
-//        menuAyuda.add(ayudaMenuItem);
-
-        // En Mac OS X el Acerca de lo gestiona el propio OS
-        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-//            menuAyuda.addSeparator();
-            final JMenuItem acercaMenuItem = new JMenuItem(Messages.getString("MainMenu.15")); //$NON-NLS-1$
-            acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
-            acercaMenuItem.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.17") //$NON-NLS-1$
-                          );
-            acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-            acercaMenuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    showAbout();
-                }
-            });
-            acercaMenuItem.setMnemonic(KeyEvent.VK_R);
-            menuAyuda.add(acercaMenuItem);
-        }
-
         this.add(this.menuArchivo);
 
 //        final Locale[] locales = SimpleAfirma.getAvailableLocales();
@@ -252,8 +215,47 @@ public final class MainMenu extends JMenuBar {
         // Separador para que la ayuda quede a la derecha, se ignora en Mac OS X
         this.add(Box.createHorizontalGlue());
 
-        this.add(menuAyuda);
+if (!Platform.OS.MACOSX.equals(Platform.getOS())) {        
+        final JMenu menuAyuda = new JMenu(Messages.getString("MainMenu.9")); //$NON-NLS-1$
+        menuAyuda.setMnemonic(KeyEvent.VK_Y);
+        menuAyuda.getAccessibleContext().setAccessibleDescription(
+              Messages.getString("MainMenu.10") //$NON-NLS-1$
+        );
+            
+//            final JMenuItem ayudaMenuItem = new JMenuItem(Messages.getString("MainMenu.11")); //$NON-NLS-1$
+//            ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
+//            ayudaMenuItem.getAccessibleContext().setAccessibleDescription(
+//                  Messages.getString("MainMenu.13") //$NON-NLS-1$
+//            );
+//            ayudaMenuItem.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(final ActionEvent e) {
+//                    System.out.println(Messages.getString("MainMenu.14")); //$NON-NLS-1$
+//                }
+//            });
+//            menuAyuda.add(ayudaMenuItem);
 
+        // En Mac OS X el Acerca de lo gestiona el propio OS
+        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+//          menuAyuda.addSeparator();
+            final JMenuItem acercaMenuItem = new JMenuItem(Messages.getString("MainMenu.15")); //$NON-NLS-1$
+            acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
+            acercaMenuItem.getAccessibleContext().setAccessibleDescription(Messages.getString("MainMenu.17") //$NON-NLS-1$
+                          );
+            acercaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            acercaMenuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    showAbout();
+                }
+            });
+            acercaMenuItem.setMnemonic(KeyEvent.VK_R);
+            menuAyuda.add(acercaMenuItem);
+        }
+ 
+        this.add(menuAyuda);
+}
+        
         // Los mnemonicos en elementos de menu violan las normas de interfaz de Apple,
         // asi que prescindimos de ellos en Mac OS X
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
