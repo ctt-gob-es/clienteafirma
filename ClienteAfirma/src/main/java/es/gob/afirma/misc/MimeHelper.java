@@ -134,7 +134,7 @@ public final class MimeHelper {
 	}
 
 	/**
-	 * Recupera el MimeType de lso datos analizados, <code>null</code> si no se
+	 * Recupera el MimeType de los datos analizados, <code>null</code> si no se
 	 * pudo detectar.
 	 * 
 	 * @return MimeType de los datos.
@@ -171,6 +171,40 @@ public final class MimeHelper {
 		return mimeType;
 	}
 
+	/**
+     * Recupera la extensi&oacute;n com&uacute;n para un fichero con los datos analizados,
+     * {@code null} si no se conoce. La extensi&oacute;n se devuelve sin el punto separador.
+     * @return Extensi&oacute;n para un fichero de datos.
+     */
+    public String getExtension() {
+
+        String extension = null;
+        // Comprobamos si ya se calculo previamente el tipo de datos
+        if (extension == null) {
+
+            // Probamos a pasear los datos como si fuesen un XML, si no lanzan
+            // una excepcion, entonces son datos XML.
+            try {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                        .parse(new ByteArrayInputStream(data));
+                extension = "xml";
+            } catch (final Exception e) { }
+
+            if (extension == null && match != null) {
+                extension = match.getExtension();
+            }
+
+            // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
+            // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
+            // estructura concreta)
+            if (extension != null && extension.equals("zip")) {
+                extension = OfficeXMLAnalizer.getExtension(data);
+            }
+        }
+
+        return extension;
+    }
+	
 	/**
 	 * Recupera la descripcion de los datos analizados, <code>null</code> si no
 	 * se pudo detectar.

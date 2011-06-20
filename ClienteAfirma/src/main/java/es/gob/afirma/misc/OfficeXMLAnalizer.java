@@ -11,7 +11,9 @@
 package es.gob.afirma.misc;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.ZipException;
@@ -38,6 +40,9 @@ public final class OfficeXMLAnalizer {
 	/** MimeTypes reconocidos del formato ODF. */
 	private static final Set<String> ODF_MIMETYPES = new HashSet<String>(15);
 
+	/** Extensiones de fichero asignadas a cada uno de los mimetypes. */
+	private static final Map<String, String> FILE_EXTENSIONS = new HashMap<String, String>();
+	
 	static {
 		// MimeTypes reconocidos del formato OOXML
 		OOXML_MIMETYPES.add("application/vnd.ms-word.document.macroEnabled.12");
@@ -90,16 +95,33 @@ public final class OfficeXMLAnalizer {
 		ODF_MIMETYPES.add("application/vnd.oasis.opendocument.database");
 		ODF_MIMETYPES.add("application/vnd.oasis.opendocument.image");
 		ODF_MIMETYPES.add("application/vnd.openofficeorg.extension");
+		
+		// Extensiones de fichero
+		FILE_EXTENSIONS.put("application/zip", "zip");
+		
+	    FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
+	    FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx");
+	    FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.spreadsheet", "xslx");
+	    
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text", "odt");
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.presentation", "odp");
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.spreadsheet", "ods");
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.graphics", "odg");
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.chart", "odc");
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.formula", "odf");
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.database", "odb");
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.image", "odi");
+		FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text-master", "odm");
 	}
 
 	/**
 	 * Devuelve el MimeType correspondiente al documento ofim&aacute;tico
 	 * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
-	 * de ellos per es un Zip se devolvolvera el MimeType del Zip
-	 * (application/zip) y si no es Zip se devolver&aacute; <code>null</code>
+	 * de ellos pero es un Zip se devolver&aacute; el MimeType del Zip
+	 * (application/zip) y si no es Zip se devolver&aacute; {@code null}.
 	 * 
 	 * @param zipData
-	 *            Fichero OOXML
+	 *            Fichero ODF u OOXML
 	 * @return MimeType.
 	 */
 	public static String getMimeType(byte[] zipData) {
@@ -129,13 +151,29 @@ public final class OfficeXMLAnalizer {
 			}
 			if (tempMimetype != null)
 				mimetype = tempMimetype;
-		} catch (Exception e) {
-		}
+		} catch (Exception e) { }
 
 		return mimetype;
-
 	}
 
+	/**
+     * Devuelve la extensi&oacute;n correspondiente al documento ofim&aacute;tico
+     * proporcionado (ODF u OOXML). Si el fichero no se corresponde con ninguno
+     * de ellos pero es un Zip se devolver&aacute; la extensi&oacute;n "zip"
+     * y si no es Zip se devolver&aacute; {@code null}.
+     * 
+     * @param zipData
+     *            Fichero ODF u OOXML
+     * @return Extensi&oacute;n.
+     */
+    public static String getExtension(byte[] zipData) {
+        String mimetype = getMimeType(zipData);
+        if (mimetype == null)
+            return null;
+        
+        return FILE_EXTENSIONS.get(mimetype);
+    }
+	
 	/**
 	 * Indica si un fichero tiene la estructura de un documento OOXML.
 	 * 
