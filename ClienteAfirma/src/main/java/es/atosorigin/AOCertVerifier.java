@@ -204,6 +204,7 @@
 package es.atosorigin;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.Security;
 import java.security.cert.CertPath;
@@ -220,6 +221,7 @@ import java.security.cert.TrustAnchor;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -567,10 +569,25 @@ public final class AOCertVerifier {
         catch (final CertPathValidatorException e) {
             errorMessage = Messages.getString("AOCertVerifier.7"); //$NON-NLS-1$
          
+            // Este metodo permite detectar, tanto en Javad 6 como 7, si la causa de que
+            // el certificado no sea valido es que este revocado. En Java 7, la clase
+            // CertificateRevokedException es publica y permite recuperar la fecha y el motivo
+            // de la revocacion
             Throwable cause = e.getCause();
             Class<? extends Throwable> exceptionClass = cause != null ? cause.getClass() : e.getClass();
             if (exceptionClass.getSimpleName().equals("CertificateRevokedException")) {
-                throw new AOCertificateRevokedException(Messages.getString("AOCertVerifier.8"), e);
+                AOCertificateRevokedException cre
+                    = new AOCertificateRevokedException(Messages.getString("AOCertVerifier.8"), e);
+                try {
+                    Method getRevocationDateMethod = exceptionClass.getMethod("getRevocationDate", (Class[]) null);
+                    cre.setRevocationDate((Date) getRevocationDateMethod.invoke(cause, (Object[]) null));
+                    
+                    Method getRevocationReasonMethod = exceptionClass.getMethod("getRevocationReason", (Class[]) null);
+                    cre.setRevocationReason((String) getRevocationReasonMethod.invoke(cause, (Object[]) null));
+                } catch (Exception e2) {
+                    // En java 6 estos metodos no existiran
+                }
+                throw cre;
             }
             throw e;
         }
