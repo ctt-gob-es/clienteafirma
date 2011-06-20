@@ -208,6 +208,7 @@ import java.net.URL;
 import java.security.Security;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
+import java.security.cert.CertPathValidatorException;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
@@ -248,7 +249,6 @@ import es.gob.afirma.misc.AOUtil;
  *      // Anadimos un par de certificados raiz desde disco duro (DNIe VA)
  *      v.addRootCertificate(new FileInputStream(new File("c:\\AVDNIEFNMTSHA1.cer")));
  *      v.addRootCertificate(new FileInputStream(new File("c:\\AVDNIEFNMTSHA2.cer")));
- *      
  *      // Habilitamos el OCSP (DNIe SHA-1)
  *      v.enableOCSP(
  *          new URL("http://ocsp.dnielectronico.es:80"), 
@@ -492,8 +492,16 @@ public final class AOCertVerifier {
      * @throws AOException
      *             Cuando falla la validaci&oacute;n, el mensaje de la
      *             excepci&oacute;n indica el motivo
+     * @throws CertificateExpiredException
+     *              Cuando el certificado est&aacute; caducado.
+     * @throws CertificateNotYetValidException
+     *              Cuando el certificado a&uacute;n no es v&aacute;lido. 
+     * @throws CertPathValidatorException 
+     *              Cuando no se ha podido validar la cadena de certificaci&oacute;n completa.
+     * @throws AOCertificateRevokedException
+     *              Cuando el certificado de usuario est&aacute; revocado.
      */
-    public void checkCertificate(final Certificate[] certChain, final boolean verifyRevocation) throws AOException {
+    public void checkCertificate(final Certificate[] certChain, final boolean verifyRevocation) throws AOException, CertificateExpiredException, CertificateNotYetValidException, CertPathValidatorException, AOCertificateRevokedException {
 
         errorMessage = null;
 
@@ -501,14 +509,14 @@ public final class AOCertVerifier {
             for (Certificate c : certChain) {
                 try {
                     ((X509Certificate) c).checkValidity();
-                } 
+                }
                 catch (final CertificateExpiredException e) {
                     errorMessage = Messages.getString("AOCertVerifier.0"); //$NON-NLS-1$
-                    throw new AOException(errorMessage, e);
+                    throw e;
                 } 
                 catch (final CertificateNotYetValidException e) {
                     errorMessage = Messages.getString("AOCertVerifier.1"); //$NON-NLS-1$
-                    throw new AOException(errorMessage, e);
+                    throw e;
                 } 
                 catch (final Exception e) {
                     errorMessage = Messages.getString("AOCertVerifier.2"); //$NON-NLS-1$
@@ -555,7 +563,17 @@ public final class AOCertVerifier {
 
         try {
             cpv.validate(cp, pp);
-        } 
+        }
+        catch (final CertPathValidatorException e) {
+            errorMessage = Messages.getString("AOCertVerifier.7"); //$NON-NLS-1$
+         
+            Throwable cause = e.getCause();
+            Class<? extends Throwable> exceptionClass = cause != null ? cause.getClass() : e.getClass();
+            if (exceptionClass.getSimpleName().equals("CertificateRevokedException")) {
+                throw new AOCertificateRevokedException(Messages.getString("AOCertVerifier.8"), e);
+            }
+            throw e;
+        }
         catch (final Exception e) {
             errorMessage = Messages.getString("AOCertVerifier.6"); //$NON-NLS-1$
             throw new AOException("El certificado no ha sido validado", e); //$NON-NLS-1$
