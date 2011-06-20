@@ -19,6 +19,9 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.KeyStore;
+import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -52,6 +55,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import es.atosorigin.AOCertVerifier;
+import es.atosorigin.AOCertificateRevokedException;
 import es.gob.afirma.Messages;
 import es.gob.afirma.cliente.CertificateFilter;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
@@ -217,23 +221,46 @@ public final class AOUIManager {
                     final AOCertVerifier cv = new AOCertVerifier();
                     for (KeyStore ks : kss) {
                         try {
-                            if (ks.containsAlias(al)) {
-                                try {
-                                    cv.checkCertificate(new java.security.cert.Certificate[] {
-                                        ks.getCertificate(al)
-                                    }, false);
-                                }
-                                catch (final Exception t) {
-                                    Logger.getLogger("es.gob.afirma").warning(t.getMessage());
-                                    if (JOptionPane.showConfirmDialog(parentComponent, cv.getErrorMessage() + Messages.getString("AOUIManager.8"), //$NON-NLS-1$
-                                                                      Messages.getString("AOUIManager.5"), //$NON-NLS-1$
-                                                                      JOptionPane.YES_NO_OPTION,
-                                                                      JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) return al;
-                                    rejected = true;
-                                }
-                            }
+                            if (!ks.containsAlias(al)) continue;
+                        } catch (Exception e) { continue; }
+                        
+                        String errorMessage = null;
+                        try {
+                            cv.checkCertificate(new java.security.cert.Certificate[] {
+                                    ks.getCertificate(al)
+                            }, false);
                         }
-                        catch (Exception e) {}
+                        catch (final CertificateExpiredException e) {
+                            errorMessage = "Puede que el certificado haya caducado. "
+                                + Messages.getString("AOUIManager.8") //$NON-NLS-1$
+                                + "\r\n" + Messages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                        }
+                        catch (final CertificateNotYetValidException e) {
+                            errorMessage = "Puede que el certificado aun no sea v\u00E1lido. "
+                                + Messages.getString("AOUIManager.8") //$NON-NLS-1$
+                                + "\r\n" + Messages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                        }
+                        catch (final CertPathValidatorException e) {
+                            errorMessage = "No se ha podido validar la cadena de certificaci\u00F3n del certificado.\r\nEs posible que su certificado no tenga correctamente declarada la cadena de\r\ncertificaci\u00F3n o que los certificados de esta no est\u00E1n importados en su almac\u00E9n\r\nde autoridades de confianza."
+                            + "\r\n" + Messages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                        }
+                        catch (final AOCertificateRevokedException e) {
+                            errorMessage = "Su certificado est\u00E1 revocado.\r\nLas firmas electr\u00F3nicas generadas con \u00E9l no ser\u00E1n v\u00E1lidas.\r\n\u00BFDesea continuar con la operaci\u00F3n?";
+                        }
+                        catch (final Exception e) {
+                            e.printStackTrace();
+                            errorMessage = Messages.getString("Ocurrio un error durante la validacion del certificado.");
+                        }
+
+                        if (errorMessage != null) {
+                            Logger.getLogger("es.gob.afirma").warning("Error durante la validacion: " + errorMessage);
+                            if (JOptionPane.showConfirmDialog(parentComponent, cv.getErrorMessage() + Messages.getString("AOUIManager.8"), //$NON-NLS-1$
+                                    Messages.getString("AOUIManager.5"), //$NON-NLS-1$
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) return al;
+                            rejected = true;
+                        }
+
                         if (rejected) throw new AOCancelledOperationException("Se ha reusado un certificado probablemente no valido"); //$NON-NLS-1$
                     }
                 }
