@@ -6,6 +6,9 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.standalone.Messages;
 
+/**
+ * Utilidades generales para los interfaces gr&aacute;ficos.
+ */
 public class UIUtils {
 
     public static void showErrorMessage(final Component parent, final Object message, final String title, final int messageType) {
