@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.misc.MimeHelper;
-import es.gob.afirma.standalone.Messages;
 
 /**
  * Enlace para la apetura/guardado de un fichero.

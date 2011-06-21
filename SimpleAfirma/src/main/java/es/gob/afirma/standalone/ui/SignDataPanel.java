@@ -15,7 +15,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
@@ -40,20 +39,14 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
 
-import sun.swing.DefaultLookup;
-
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.exceptions.AOInvalidFormatException;
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.signers.AOPDFSigner;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.standalone.DataAnalizerUtil;
-import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
