@@ -14,13 +14,22 @@ import javax.swing.JPasswordField;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.standalone.Messages;
 
+/**
+ * Di&aacute;logo para solicitar el PIN del DNIe.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ *
+ */
 public final class DNIePasswordCallback extends PasswordCallback {
 
     private static final long serialVersionUID = -3568711790506952344L;
 
+    /**
+     * Contruye un di&aacute;logo para solicitar el PIN del DNIe.
+     * @param c Componente padre para la modalidad
+     */
     public DNIePasswordCallback(Component c) {
         super("DNI", false); //$NON-NLS-1$
-        parent = c;
+        this.parent = c;
     }
     /**
      * Componente padre sobre el que se mostrar&aacute; el di&aacute;logo para
@@ -47,7 +56,7 @@ public final class DNIePasswordCallback extends PasswordCallback {
                 pwd.requestFocusInWindow();
             }
         };
-        pane.createDialog(parent, Messages.getString("DNIePasswordCallback.3")).setVisible(true); //$NON-NLS-1$
+        pane.createDialog(this.parent, Messages.getString("DNIePasswordCallback.3")).setVisible(true); //$NON-NLS-1$
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) {
