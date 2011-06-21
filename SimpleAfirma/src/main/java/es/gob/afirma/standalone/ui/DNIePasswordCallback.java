@@ -27,7 +27,7 @@ public final class DNIePasswordCallback extends PasswordCallback {
      * Contruye un di&aacute;logo para solicitar el PIN del DNIe.
      * @param c Componente padre para la modalidad
      */
-    public DNIePasswordCallback(Component c) {
+    public DNIePasswordCallback(final Component c) {
         super("DNI", false); //$NON-NLS-1$
         this.parent = c;
     }
