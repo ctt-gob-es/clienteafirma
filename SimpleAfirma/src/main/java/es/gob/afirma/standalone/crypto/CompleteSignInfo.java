@@ -16,6 +16,8 @@ import es.gob.afirma.signers.beans.AOSignInfo;
 public final class CompleteSignInfo {
 
     private byte[] signData;
+    
+    private byte[] data;
 
     private AOSignInfo signInfo;
 
@@ -43,5 +45,13 @@ public final class CompleteSignInfo {
 
     public void setSignsTree(final TreeModel signsTree) {
         this.signsTree = signsTree;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 }

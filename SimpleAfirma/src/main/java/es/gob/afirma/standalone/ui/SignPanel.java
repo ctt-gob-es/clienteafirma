@@ -147,13 +147,12 @@ public final class SignPanel extends JPanel {
             errorMessage = Messages.getString("SignPanel.5"); //$NON-NLS-1$
         }
         if (errorMessage != null) {
-            JOptionPane.showOptionDialog(SignPanel.this, errorMessage, Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                         JOptionPane.OK_OPTION,
-                                         JOptionPane.ERROR_MESSAGE,
-                                         null,
-                                         new Object[] {
-                                             Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                         null);
+            UIUtils.showErrorMessage(
+                    SignPanel.this,
+                    errorMessage,
+                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+            );
             return;
         }
 
@@ -301,28 +300,24 @@ public final class SignPanel extends JPanel {
                             return;
                         }
                         if (fileList.size() > 1) {
-                            JOptionPane.showOptionDialog(SignPanel.this, Messages.getString("SignPanel.18"), //$NON-NLS-1$
-                                                         Messages.getString("SignPanel.19"), //$NON-NLS-1$
-                                                         JOptionPane.OK_OPTION,
-                                                         JOptionPane.WARNING_MESSAGE,
-                                                         null,
-                                                         new Object[] {
-                                                             Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                                         null);
+                            UIUtils.showErrorMessage(
+                                    SignPanel.this,
+                                    Messages.getString("SignPanel.18"), //$NON-NLS-1$
+                                    Messages.getString("SignPanel.19"), //$NON-NLS-1$
+                                    JOptionPane.WARNING_MESSAGE
+                            );
                         }
                         String fileName = fileList.get(0).toString();
                         if (fileName.startsWith("http://") || //$NON-NLS-1$
                             fileName.startsWith("https://") || //$NON-NLS-1$
                             fileName.startsWith("ftp://") //$NON-NLS-1$
                         ) {
-                            JOptionPane.showOptionDialog(SignPanel.this, Messages.getString("SignPanel.24"), //$NON-NLS-1$
-                                                         Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                                         JOptionPane.OK_OPTION,
-                                                         JOptionPane.ERROR_MESSAGE,
-                                                         null,
-                                                         new Object[] {
-                                                             Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                                         null);
+                            UIUtils.showErrorMessage(
+                                    SignPanel.this,
+                                    Messages.getString("SignPanel.24"), //$NON-NLS-1$
+                                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                                    JOptionPane.ERROR_MESSAGE
+                            );
                             dtde.dropComplete(false);
                             return;
                         }
@@ -370,7 +365,9 @@ public final class SignPanel extends JPanel {
      * @param win Ventana de primer nivel, para el cambio de t&iacute;tulo en la carga de fichero
      * @param sa Clase principal, para proporcionar el <code>AOKeyStoreManager</code> necesario para
      *        realizar las firmas y cambiar de panel al finalizar una firma 
-     * @param firstTime <code>true</code> si se la primera vez que se muestra este panel en la aplicaci&oacute;n, <code>en caso contrario</code>*/
+     * @param firstTime <code>true</code> si se la primera vez que se muestra este panel en la
+     * aplicaci&oacute;n, <code>false</code> en caso contrario
+     */
     public SignPanel(final JFrame win, final SimpleAfirma sa, final boolean firstTime) { 
         super(true);
         this.window = win;
@@ -424,14 +421,12 @@ public final class SignPanel extends JPanel {
                         loadFile(fileToLoad);
                     }
                     catch (final Exception e) {
-                        JOptionPane.showOptionDialog(UpperPanel.this, Messages.getString("SignPanel.36"), //$NON-NLS-1$
-                                                     Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                                     JOptionPane.OK_OPTION,
-                                                     JOptionPane.ERROR_MESSAGE,
-                                                     null,
-                                                     new Object[] {
-                                                         Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                                     null);
+                        UIUtils.showErrorMessage(
+                                UpperPanel.this,
+                                Messages.getString("SignPanel.36"), //$NON-NLS-1$
+                                Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                                JOptionPane.ERROR_MESSAGE
+                        );
                     }
 
                 }
@@ -577,14 +572,12 @@ public final class SignPanel extends JPanel {
                         Desktop.getDesktop().open(new File(filePath));
                     }
                     catch (final IOException e) {
-                        JOptionPane.showOptionDialog(FilePanel.this, Messages.getString("SignPanel.53"), //$NON-NLS-1$
-                                                     Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                                     JOptionPane.OK_OPTION,
-                                                     JOptionPane.ERROR_MESSAGE,
-                                                     null,
-                                                     new Object[] {
-                                                         Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                                     null);
+                        UIUtils.showErrorMessage(
+                                FilePanel.this,
+                                Messages.getString("SignPanel.53"), //$NON-NLS-1$
+                                Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                                JOptionPane.ERROR_MESSAGE
+                        );
                         return;
                     }
                 }
@@ -645,14 +638,12 @@ public final class SignPanel extends JPanel {
                                                             false);
             }
             catch (final AOCertificatesNotFoundException e) {
-                JOptionPane.showOptionDialog(this, Messages.getString("SignPanel.55"), //$NON-NLS-1$
-                                             Messages.getString("SignPanel.19"), //$NON-NLS-1$
-                                             JOptionPane.OK_OPTION,
-                                             JOptionPane.WARNING_MESSAGE,
-                                             null,
-                                             new Object[] {
-                                                 Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                             null);
+                UIUtils.showErrorMessage(
+                        this,
+                        Messages.getString("SignPanel.55"), //$NON-NLS-1$
+                        Messages.getString("SignPanel.19"), //$NON-NLS-1$
+                        JOptionPane.WARNING_MESSAGE
+                );
                 return;
             }
             catch (final AOCancelledOperationException e) {
@@ -664,6 +655,7 @@ public final class SignPanel extends JPanel {
         }
 
         final Properties p = new Properties();
+        p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
         p.put("signingCertificateV2", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -684,14 +676,12 @@ public final class SignPanel extends JPanel {
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            JOptionPane.showOptionDialog(SignPanel.this, Messages.getString("SignPanel.65"), //$NON-NLS-1$
-                                         Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                         JOptionPane.OK_OPTION,
-                                         JOptionPane.ERROR_MESSAGE,
-                                         null,
-                                         new Object[] {
-                                             Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                         null);
+            UIUtils.showErrorMessage(
+                    SignPanel.this,
+                    Messages.getString("SignPanel.65"), //$NON-NLS-1$
+                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+            );
             return;
         }
         finally {
@@ -727,7 +717,7 @@ public final class SignPanel extends JPanel {
         final String fDescription = filterDescription;
         final String[] fExtensions = filterExtensions;
 
-        // Para las comprobaciones de si el usuario ha teclado la etension o espera que
+        // Para las comprobaciones de si el usuario ha teclado la extension o espera que
         // la aplicacion la anada sola
         boolean nameMissingExtension = true;
 
@@ -736,7 +726,6 @@ public final class SignPanel extends JPanel {
             final FileDialog fd = new FileDialog(this.window, Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
             fd.setDirectory(this.saf.getCurrentDir().getAbsolutePath());
             fd.setFile(newFileName);
-            fd.setTitle(Messages.getString("SignPanel.81")); //$NON-NLS-1$
             fd.setFilenameFilter(new FilenameFilter() {
                 @Override
                 public boolean accept(final File dir, final String name) {
@@ -821,14 +810,12 @@ public final class SignPanel extends JPanel {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
             "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
             );
-            JOptionPane.showOptionDialog(this, Messages.getString("SignPanel.88"), //$NON-NLS-1$
-                                         Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                         JOptionPane.OK_OPTION,
-                                         JOptionPane.ERROR_MESSAGE,
-                                         null,
-                                         new Object[] {
-                                             Messages.getString("SignPanel.20")}, //$NON-NLS-1$
-                                         null);
+            UIUtils.showErrorMessage(
+                    this,
+                    Messages.getString("SignPanel.88"), //$NON-NLS-1$
+                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+            );
             setSignCommandEnabled(true);
         }
         finally {

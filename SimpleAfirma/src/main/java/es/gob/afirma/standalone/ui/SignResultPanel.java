@@ -62,17 +62,12 @@ final class SignResultPanel extends JPanel {
                         Desktop.getDesktop().browse(he.getURL().toURI());
                     }
                     catch (final Exception e) {
-                        JOptionPane.showOptionDialog(SignResultPanel.this,
-                             "No ha sido posible recuperar la informaci\u00F3n adicional,\n,pruebe a abrir la siguiente URL desde un navegador Web:\n" + he.getURL(),
-                             "Error",
-                             JOptionPane.OK_OPTION,
-                             JOptionPane.ERROR_MESSAGE,
-                             null,
-                             new Object[] {
-                                 "Cerrar "
-                             },
-                             null
-                         );
+                        UIUtils.showErrorMessage(
+                                SignResultPanel.this,
+                                "No ha sido posible recuperar la informaci\u00F3n adicional,\n,pruebe a abrir la siguiente URL desde un navegador Web:\n" + he.getURL(),
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
                     }
                 }
             }
@@ -85,17 +80,17 @@ final class SignResultPanel extends JPanel {
             case GENERATED:
                 this.resultTextLabel.setText("Proceso de firma completado satisfactoriamente");
                 this.descTextLabel.setText("<html><p>La firma cumple con los requisitos del esquema nacional de interoperabilidad en cuanto a firmas digitales y documentos firmados. <a href=\"http://www.google.com/\">M&aacute;s informaci&oacute;n en la Web</a>.</p></html>");
-                resultOperationIconTooltip = "Se ha generado correctamente una firma electronica";
+                resultOperationIconTooltip = "Se ha generado correctamente una firma electr\u00F3nica";
                 break;
             case KO:
-                this.resultTextLabel.setText("La firma no es válida o no es una firma compatible con @firma");
-                this.descTextLabel.setText("<html><p>Blah, blah, blah</p></html>");
-                resultOperationIconTooltip = "La firma electronica seleccionada no es valida o no es compatible con @firma";
+                this.resultTextLabel.setText("La firma no es v\u00E1lida o no es una firma compatible con @firma");
+                this.descTextLabel.setText("<html><p>La firma electr\u00F3nica seleccionada no es v\u00E1lida o no es compatible con @firma.</p></html>");
+                resultOperationIconTooltip = "La firma electr\u00F3nica seleccionada no es v\u00E1lida o no es compatible con @firma";
                 break;
             default:
-                this.resultTextLabel.setText("La firma es v‡lida");
-                this.descTextLabel.setText("<html><p>Para determinar la completa validez legal debe comprobar adem‡s la validez de los certificados usados para firmar</p></html>");
-                resultOperationIconTooltip = "La firma electr—nica es valida en cuanto a estructura";
+                this.resultTextLabel.setText("La firma es v\u00E1lida");
+                this.descTextLabel.setText("<html><p>Para determinar la completa validez legal debe comprobar adem\u00E1s la validez de los certificados usados para firmar</p></html>");
+                resultOperationIconTooltip = "La firma electr\u00F3nica es v\u00E1lida en cuanto a estructura";
                 break;
         }
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);

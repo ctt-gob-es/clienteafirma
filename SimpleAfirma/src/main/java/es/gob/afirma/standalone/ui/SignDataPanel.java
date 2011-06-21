@@ -15,6 +15,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
@@ -42,11 +43,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
 
+import sun.swing.DefaultLookup;
+
+import es.gob.afirma.exceptions.AOException;
+import es.gob.afirma.exceptions.AOInvalidFormatException;
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.signers.AOPDFSigner;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
+import es.gob.afirma.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.standalone.DataAnalizerUtil;
+import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
@@ -116,16 +123,12 @@ final class SignDataPanel extends JPanel {
                     Desktop.getDesktop().open(new File(path));
                 }
                 catch (final Exception e) {
-                    JOptionPane.showOptionDialog(SignDataPanel.this,
-                         "No se ha podido abrir el fichero,\ncompruebe que no ha sido manipulado mientras se ejecutaba esta aplicaci\u00F3n\ny que dispone de una aplicación instalada para visualizarlo",
-                         "Error",
-                         JOptionPane.OK_OPTION,
-                         JOptionPane.ERROR_MESSAGE,
-                         null,
-                         new Object[] {
-                             "Cerrar"
-                         },
-                         null);
+                    UIUtils.showErrorMessage(
+                            SignDataPanel.this,
+                            "No se ha podido abrir el fichero,\ncompruebe que no ha sido manipulado mientras se ejecutaba esta aplicaci\u00F3n\ny que dispone de una aplicación instalada para visualizarlo",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -151,7 +154,7 @@ final class SignDataPanel extends JPanel {
             }
             else {
                 fileIcon = FILE_ICON_BINARY;
-                fileTooltip = "Fichero binario genŽrico";
+                fileTooltip = "Fichero binario gen\u00E9rico";
             }
             final JLabel iconLabel = new JLabel(new ImageIcon(SignDetailPanel.class.getResource(fileIcon)));
             iconLabel.setToolTipText(fileTooltip);
@@ -187,30 +190,7 @@ final class SignDataPanel extends JPanel {
 	                @Override
 	                public void hyperlinkUpdate(final HyperlinkEvent he) {
 	                    if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType())) {
-	                        try {
-	                            final File tmp = File.createTempFile("afirma", ".cer");
-	                            tmp.deleteOnExit();
-	                            final OutputStream fos = new FileOutputStream(tmp);
-	                            final OutputStream bos = new BufferedOutputStream(fos);
-	                            bos.write(cert.getEncoded());
-	                            try { bos.flush(); } catch(final Exception e) {}
-	                            try { bos.close(); } catch(final Exception e) {}
-	                            try { fos.close(); } catch(final Exception e) {}
-	                            Desktop.getDesktop().open(tmp);
-	                        }
-	                        catch(final Exception e) {
-	                            JOptionPane.showOptionDialog(SignDataPanel.this,
-	                                 "No se ha podido abrir el fichero,\ncompruebe que de una aplicación instalada para visualizar Certificados X.509",
-	                                 "Error",
-	                                 JOptionPane.OK_OPTION,
-	                                 JOptionPane.ERROR_MESSAGE,
-	                                 null,
-	                                 new Object[] {
-	                                     "Cerrar"
-	                                 },
-	                                 null
-	                             );
-	                        }
+	                        openCertificate(cert);
 	                    }
 	                }
 	            });
@@ -304,6 +284,28 @@ final class SignDataPanel extends JPanel {
         this.add(detailPanel, c);
     }
 
+    private void openCertificate(X509Certificate cert) {
+        try {
+            final File tmp = File.createTempFile("afirma", ".cer");
+            tmp.deleteOnExit();
+            final OutputStream fos = new FileOutputStream(tmp);
+            final OutputStream bos = new BufferedOutputStream(fos);
+            bos.write(cert.getEncoded());
+            try { bos.flush(); } catch(final Exception e) {}
+            try { bos.close(); } catch(final Exception e) {}
+            try { fos.close(); } catch(final Exception e) {}
+            Desktop.getDesktop().open(tmp);
+        }
+        catch(final Exception e) {
+            UIUtils.showErrorMessage(
+                    SignDataPanel.this,
+                    "No se ha podido abrir el fichero,\ncompruebe que de una aplicación instalada para visualizar Certificados X.509",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+    
     /**
      * Recupera la informaci&oacute;n de la firma indicada.
      * @param signData Firma.
@@ -324,6 +326,11 @@ final class SignDataPanel extends JPanel {
                 Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e);
             }
             signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+            try {
+                signInfo.setData(signer.getData(signData));
+            } catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("Error al extraer los datos firmados: " + e);
+            }
         }
         return signInfo;
     }
@@ -338,7 +345,11 @@ final class SignDataPanel extends JPanel {
 
         // Datos firmados
         final DefaultMutableTreeNode dataInfoBranch = new DefaultMutableTreeNode("Datos firmados");
-        dataInfoBranch.add(new DefaultMutableTreeNode("Ver datos de firma"));
+        if (signInfo.getData() == null) {
+            dataInfoBranch.add(new DefaultMutableTreeNode("La firma no contiene los datos firmados"));
+        } else {
+            dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction("Ver datos firmados", signInfo.getData())));
+        }
         root.add(dataInfoBranch);
 
         // Arbol de firmantes
@@ -347,10 +358,18 @@ final class SignDataPanel extends JPanel {
         signersBranch.setUserObject("\u00C1rbol de firmas del documento");
         root.add(signersBranch);
 
-        final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
+        //final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
+        final LinksTreeCellRenderer treeRenderer = new LinksTreeCellRenderer();
         treeRenderer.setLeafIcon(null);
         treeRenderer.setClosedIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.collapsedIcon"));
         treeRenderer.setOpenIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon"));
+
+//        // Modificamos la propiedad interna de la clase que imprime el fondo de los elementos
+//        try {
+//            Field field = treeRenderer.getClass().getField("fillBackground");
+//            field.setAccessible(true);
+//            field.setBoolean(treeRenderer, false);
+//        } catch (Exception e) { }
         
         final JTree tree = new JTree(root);
         tree.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
@@ -363,6 +382,11 @@ final class SignDataPanel extends JPanel {
                     return;
                 }
                 final Object nodeInfo = node.getUserObject();
+                if (nodeInfo instanceof AOSimpleSignInfo) {
+                    openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0]);
+                } else if (nodeInfo instanceof ShowFileLinkAction) {
+                    ((ShowFileLinkAction) nodeInfo).action();
+                }
                 System.out.println("Node object: " + nodeInfo);
                 System.out.println("---");
             }
@@ -370,6 +394,7 @@ final class SignDataPanel extends JPanel {
         tree.setCellRenderer(treeRenderer);
         tree.setRootVisible(false);
         tree.putClientProperty("JTree.lineStyle", "None");
+        
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.SINGLE_TREE_SELECTION);
         for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);

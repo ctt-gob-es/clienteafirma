@@ -113,27 +113,37 @@ public final class DNIeManager {
 
         void startMonitoring() {
             if (this.cardTerminal == null) return;
-            Card card;
+            Card card = null;
+            boolean validCard = true;
             while (true) {
-                try {
-                    this.cardTerminal.waitForCardPresent(0);
-                    if (SimpleAfirma.DEBUG) {
-                        System.out.println("Tarjeta insertada en el lector '" + this.cardTerminal.getName() + "'");
+                do {
+                    try {
+                        this.cardTerminal.waitForCardPresent(0);
+                        if (SimpleAfirma.DEBUG) {
+                            System.out.println("Tarjeta insertada en el lector '" + this.cardTerminal.getName() + "'");
+                        }
+                        card = this.cardTerminal.connect("*");
+                        validCard = true;
                     }
-                    card = this.cardTerminal.connect("*");
-                }
-                catch (final CardException e) {
-                    if (SimpleAfirma.DEBUG) {
-                        e.printStackTrace();
+                    catch (final CardException e) {
+                        if (SimpleAfirma.DEBUG) {
+                            e.printStackTrace();
+                        }
+                        validCard = false;
+                        firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName());
+                        
+                        try {
+                            this.cardTerminal.waitForCardAbsent(0);
+                        }
+                        catch (final CardException e2) { }
+                        //return;
                     }
-                    firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName());
-                    return;
-                }
+                } while (!validCard);
                 // firePropertyChange("CardInserted", false, true);
                 try {
                     if (!itsDNIe(card.getATR().getBytes())) {
                         if (SimpleAfirma.DEBUG) {
-                            System.out.println("Detectada tarjeta extraña");
+                            System.out.println("Detectada tarjeta extra\u00F1a");
                         }
                         firePropertyChange(NOT_DNI_INSERTED, "", this.cardTerminal.getName());
                         try {
