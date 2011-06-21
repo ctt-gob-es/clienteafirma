@@ -66,7 +66,7 @@ final class SignDataPanel extends JPanel {
     private final JEditorPane certDescription = new JEditorPane();
     private JButton validateCertButton = null;
     
-    public SignDataPanel(final String path, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
+    SignDataPanel(final String path, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

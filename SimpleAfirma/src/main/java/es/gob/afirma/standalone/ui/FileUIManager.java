@@ -16,7 +16,7 @@ import javax.swing.filechooser.FileFilter;
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.standalone.Messages;
 
-public class FileUIManager {
+final class FileUIManager {
 
     /**
      * Muestra un di&aacute;logo para el guardado de datos y los almacena en el
@@ -26,7 +26,7 @@ public class FileUIManager {
      * @param currentDir Directorio actual.
      * @return Fichero guardado. Si no se almacen&oacute; se devuelve {@code null}.
      */
-    public static File saveFile(final Frame parent, final byte[] data, final File currentDir, final String[] exts, final String description, final String title) {
+    static File saveFile(final Frame parent, final byte[] data, final File currentDir, final String[] exts, final String description, final String title) {
         
         String newFileName = null;
         if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
@@ -147,7 +147,7 @@ public class FileUIManager {
         if (exts != null) {
             filter = new FilenameFilter() {
                 @Override
-                public boolean accept(File dir, String name) {
+                public boolean accept(final File dir, final String name) {
                     for (String ext : exts) {
                         if (name.endsWith(ext)) {
                             return true;
@@ -165,7 +165,8 @@ public class FileUIManager {
             if (filter != null) fd.setFilenameFilter(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    for (String ext : exts) {
+                	if (exts == null) return true;
+                    for (final String ext : exts) {
                         if (name.endsWith(ext)) {
                             return true;
                         }
@@ -177,24 +178,25 @@ public class FileUIManager {
             if (fd.getFile() == null) return null;
             return new File(fd.getDirectory(), fd.getFile());
         }
-        else {
-            final JFileChooser fc = new JFileChooser(currentDir);
-            if (filter != null) fc.setFileFilter(new FileFilter() {
-                @Override public String getDescription() {
-                    return null;
-                }
-                
-                @Override public boolean accept(File f) {
-                    for (String ext : exts) {
-                        if (f.getName().endsWith(ext)) {
-                            return true;
-                        }
+
+        final JFileChooser fc = new JFileChooser(currentDir);
+        if (filter != null) fc.setFileFilter(new FileFilter() {
+            @Override public String getDescription() {
+                return null;
+            }
+            
+            @Override public boolean accept(File f) {
+            	if (exts == null) return true;
+                for (final String ext : exts) {
+                    if (f.getName().endsWith(ext)) {
+                        return true;
                     }
-                    return false;
                 }
-            });
-            if (JFileChooser.APPROVE_OPTION != fc.showOpenDialog(parent)) return null;
-            return new File(fc.getSelectedFile().getAbsolutePath());
-        }
+                return false;
+            }
+        });
+        if (JFileChooser.APPROVE_OPTION != fc.showOpenDialog(parent)) return null;
+        return new File(fc.getSelectedFile().getAbsolutePath());
+
     }
 }

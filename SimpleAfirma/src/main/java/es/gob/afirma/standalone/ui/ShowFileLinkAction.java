@@ -14,23 +14,23 @@ import es.gob.afirma.misc.MimeHelper;
  * Enlace para la apetura/guardado de un fichero.
  * @author Carlos Gamuci
  */
-public class ShowFileLinkAction {
+final class ShowFileLinkAction {
 
     private String text;
     private byte[] data;
     
-    public ShowFileLinkAction(String text, byte[] data) {
+    ShowFileLinkAction(final String text, final byte[] data) {
         this.text = text;
         this.data = data;
     }
 
-    public void action() {
+    void action() {
         
-        if (data == null) {
+        if (this.data == null) {
             return;
         }
         
-        String ext = this.getCommonDataExtension(data);
+        String ext = this.getCommonDataExtension(this.data);
         
         // Si conocemos la extension, intentamos abrir el fichero. Si no, permitimos
         // guardarlo con la extension que se desee.
@@ -40,7 +40,7 @@ public class ShowFileLinkAction {
                 tmp.deleteOnExit();
                 final OutputStream fos = new FileOutputStream(tmp);
                 final OutputStream bos = new BufferedOutputStream(fos);
-                bos.write(data);
+                bos.write(this.data);
                 try { bos.flush(); } catch(final Exception e) {}
                 try { bos.close(); } catch(final Exception e) {}
                 try { fos.close(); } catch(final Exception e) {}
@@ -54,10 +54,11 @@ public class ShowFileLinkAction {
                         JOptionPane.ERROR_MESSAGE
                 );
             }
-        } else {
+        } 
+        else {
             FileUIManager.saveFile(
                     null,
-                    data,
+                    this.data,
                     null,
                     null,
                     null,
@@ -66,8 +67,8 @@ public class ShowFileLinkAction {
         }
     }
     
-    private String getCommonDataExtension(byte[] data) {
-        return new MimeHelper(data).getExtension();
+    private String getCommonDataExtension(final byte[] dat) {
+        return new MimeHelper(dat).getExtension();
     }
     
     @Override

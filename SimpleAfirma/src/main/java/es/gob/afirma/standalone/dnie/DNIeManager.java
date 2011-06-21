@@ -141,7 +141,7 @@ public final class DNIeManager {
                 } while (!validCard);
                 // firePropertyChange("CardInserted", false, true);
                 try {
-                    if (!itsDNIe(card.getATR().getBytes())) {
+                    if (card != null && (!itsDNIe(card.getATR().getBytes()))) {
                         if (SimpleAfirma.DEBUG) {
                             System.out.println("Detectada tarjeta extra\u00F1a");
                         }
