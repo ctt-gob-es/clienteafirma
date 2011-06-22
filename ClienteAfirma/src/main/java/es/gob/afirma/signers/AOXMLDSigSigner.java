@@ -211,7 +211,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     private static final String CSURI = "http://uri.etsi.org/01903#CountersignedSignature";
     private static final String AFIRMA = "AFIRMA";
-    private static final String XML_SIGNATURE_PREFIX = "dsig";
+    private static final String XML_SIGNATURE_PREFIX = "ds";
     private static final String SIGNATURE_NODE_NAME =
             (XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? "" : XML_SIGNATURE_PREFIX + ":") + "Signature";
     private static final String DETACHED_CONTENT_ELEMENT_NAME = "CONTENT";
@@ -252,7 +252,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         if (algorithm.equalsIgnoreCase("RSA")) algorithm = SIGN_ALGORITHM_SHA1WITHRSA;
         else if (algorithm.equalsIgnoreCase("DSA")) algorithm = SIGN_ALGORITHM_SHA1WITHDSA;
 
-        String algoUri = SIGN_ALGOS_URI.get(algorithm);
+        final String algoUri = SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'");
         }
@@ -357,7 +357,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                         }
                     }
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").info("No se ha encontrado ninguna hoja de estilo asociada al XML a firmar");
                 }
 
@@ -506,7 +506,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             if (digestValue == null || digestValue.length < 1) throw new AOException("Error al obtener la huella SHA1 de los datos");
 
-            Document docFile;
+            final Document docFile;
             try {
                 docFile = dbf.newDocumentBuilder().newDocument();
             }
@@ -569,7 +569,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         final List<Reference> referenceList = new ArrayList<Reference>();
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-        DigestMethod digestMethod;
+        final DigestMethod digestMethod;
         try {
             digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
         }
@@ -1299,11 +1299,11 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         // convierte el documento de firmas en un InputStream
-        ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
         XMLUtils.writeXML(baosSig, rootSig, false);
 
         // convierte el documento a firmar en un InputStream
-        ByteArrayOutputStream baosData = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baosData = new ByteArrayOutputStream();
         XMLUtils.writeXML(baosData, rootData, false);
 
         return cosign(baosData.toByteArray(), baosSig.toByteArray(), algorithm, keyEntry, extraParams);
@@ -1332,11 +1332,11 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
 
         // se carga el documento XML y su raiz
-        Hashtable<String, String> originalXMLProperties = new Hashtable<String, String>();
+        final Hashtable<String, String> originalXMLProperties = new Hashtable<String, String>();
         Element root;
         try {
             doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
@@ -1409,10 +1409,10 @@ public final class AOXMLDSigSigner implements AOSigner {
                                  final String canonicalizationAlgorithm) throws AOException {
 
         // obtiene todas las firmas
-        NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
+        final NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
         int numSignatures = signatures.getLength();
 
-        Element[] nodes = new Element[numSignatures];
+        final Element[] nodes = new Element[numSignatures];
         for (int i = 0; i < numSignatures; i++)
             nodes[i] = (Element) signatures.item(i);
 
@@ -1421,10 +1421,10 @@ public final class AOXMLDSigSigner implements AOSigner {
             for (int i = 0; i < numSignatures; i++)
                 this.cs(nodes[i], keyEntry, refsDigestMethod, canonicalizationAlgorithm);
         }
-        catch (UnsupportedOperationException e) {
+        catch (final UnsupportedOperationException e) {
             throw e;
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new AOException("No se ha podido realizar la contrafirma", e);
         }
     }
@@ -1440,8 +1440,8 @@ public final class AOXMLDSigSigner implements AOSigner {
                                   final String canonicalizationAlgorithm) throws AOException {
 
         // obtiene todas las firmas y las referencias
-        NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
-        NodeList references = root.getElementsByTagNameNS(DSIGNNS, "Reference");
+        final NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
+        final NodeList references = root.getElementsByTagNameNS(DSIGNNS, "Reference");
 
         int numSignatures = signatures.getLength();
         int numReferences = references.getLength();
@@ -1449,8 +1449,8 @@ public final class AOXMLDSigSigner implements AOSigner {
         // comprueba cuales son hojas
         try {
             for (int i = 0; i < numSignatures; i++) {
-                Element signature = (Element) signatures.item(i);
-                String refURI = "#" + signature.getAttribute("Id") + "Value";
+                final Element signature = (Element) signatures.item(i);
+                final String refURI = "#" + signature.getAttribute("Id") + "Value";
 
                 boolean isLeaf = true;
 
@@ -1489,35 +1489,35 @@ public final class AOXMLDSigSigner implements AOSigner {
                                   final String canonicalizationAlgorithm) throws AOException {
 
         // descarta las posiciones que esten repetidas
-        List<Integer> targetsList = new ArrayList<Integer>();
+        final List<Integer> targetsList = new ArrayList<Integer>();
         for (int i = 0; i < targets.length; i++) {
             if (!targetsList.contains(targets[i])) targetsList.add((Integer) targets[i]);
         }
         targets = targetsList.toArray();
 
-        TreeNode tree = new TreeNode("AFIRMA");
+        final TreeNode tree = new TreeNode("AFIRMA");
 
         // obtiene todas las firmas
-        NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
+        final NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
 
         int numSignatures = signatures.getLength();
 
-        String[] arrayIds = new String[numSignatures];
-        String[] arrayRef = new String[numSignatures];
+        final String[] arrayIds = new String[numSignatures];
+        final String[] arrayRef = new String[numSignatures];
         TreeNode[] arrayNodes = new TreeNode[numSignatures];
 
         // genera un arbol con las firmas para conocer su posicion
         for (int i = 0; i < numSignatures; i++) {
-            Element signature = (Element) signatures.item(i);
-            String sigId = signature.getAttribute("Id");
+            final Element signature = (Element) signatures.item(i);
+            final String sigId = signature.getAttribute("Id");
 
-            TreeNode node = new TreeNode(signature);
+            final TreeNode node = new TreeNode(signature);
             arrayIds[i] = sigId;
             arrayNodes[i] = node;
 
-            String typeReference = ((Element) signature.getElementsByTagNameNS(DSIGNNS, "Reference").item(0)).getAttribute("Type");
+            final String typeReference = ((Element) signature.getElementsByTagNameNS(DSIGNNS, "Reference").item(0)).getAttribute("Type");
             if (typeReference.equals(CSURI)) {
-                String uri = ((Element) signature.getElementsByTagNameNS(DSIGNNS, "Reference").item(0)).getAttribute("URI");
+                final String uri = ((Element) signature.getElementsByTagNameNS(DSIGNNS, "Reference").item(0)).getAttribute("URI");
                 arrayRef[i] = uri.substring(1, uri.length() - 5);
             }
             else arrayRef[i] = "";
@@ -1533,14 +1533,14 @@ public final class AOXMLDSigSigner implements AOSigner {
             if (arrayRef[i] == "") tree.add(arrayNodes[i]);
 
         // introduce en una lista los nodos del arbol recorrido en preorden
-        List<Element> listNodes = new ArrayList<Element>();
-        Enumeration<TreeNode> enumTree = tree.preorderEnumeration();
+        final List<Element> listNodes = new ArrayList<Element>();
+        final Enumeration<TreeNode> enumTree = tree.preorderEnumeration();
         enumTree.nextElement();
         while (enumTree.hasMoreElements())
             listNodes.add((Element) enumTree.nextElement().getUserObject());
 
         // obtiene los nodos indicados en targets
-        Element[] nodes = new Element[targets.length];
+        final Element[] nodes = new Element[targets.length];
         try {
             for (int i = 0; i < targets.length; i++)
                 nodes[i] = listNodes.get((Integer) targets[i]);
@@ -1581,22 +1581,22 @@ public final class AOXMLDSigSigner implements AOSigner {
                                     final String canonicalizationAlgorithm) throws AOException {
 
         // obtiene todas las firmas
-        NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
+        final NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
         int numSignatures = signatures.getLength();
 
-        List<Object> signers = Arrays.asList(targets);
-        List<Element> nodes = new ArrayList<Element>();
+        final List<Object> signers = Arrays.asList(targets);
+        final List<Element> nodes = new ArrayList<Element>();
 
         // obtiene los nodos de los firmantes indicados en targets
         for (int i = 0; i < numSignatures; i++) {
-            Element node = (Element) signatures.item(i);
+            final Element node = (Element) signatures.item(i);
             if (signers.contains(AOUtil.getCN(Utils.getCertificate(node.getElementsByTagNameNS(DSIGNNS, "X509Certificate").item(0))))) {
                 nodes.add(node);
             }
         }
 
         // y crea sus contrafirmas
-        Iterator<Element> i = nodes.iterator();
+        final Iterator<Element> i = nodes.iterator();
         while (i.hasNext()) {
             this.cs(i.next(), keyEntry, refsDigestMethod, canonicalizationAlgorithm);
         }
@@ -1610,27 +1610,24 @@ public final class AOXMLDSigSigner implements AOSigner {
     private void cs(final Element signature, final PrivateKeyEntry keyEntry, final String refsDigestMethod, final String canonicalizationAlgorithm) throws AOException {
 
         // obtiene el nodo SignatureValue
-        Element signatureValue = (Element) signature.getElementsByTagNameNS(DSIGNNS, "SignatureValue").item(0);
+        final Element signatureValue = (Element) signature.getElementsByTagNameNS(DSIGNNS, "SignatureValue").item(0);
 
         // crea la referencia a la firma que se contrafirma
-        List<Reference> referenceList = new ArrayList<Reference>();
-        XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-        DigestMethod digestMethod;
+        final List<Reference> referenceList = new ArrayList<Reference>();
+        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+        final DigestMethod digestMethod;
         try {
             digestMethod = fac.newDigestMethod(refsDigestMethod, null);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + refsDigestMethod + "'", e);
         }
-        String referenceId = "Reference-" + UUID.randomUUID().toString();
+        final String referenceId = "Reference-" + UUID.randomUUID().toString();
 
         try {
             // Transformada para la canonicalizacion inclusiva con comentarios
-            List<Transform> transformList = new ArrayList<Transform>();
-            TransformParameterSpec nullParams = null;
-            Transform trCanonicalization = fac.newTransform(canonicalizationAlgorithm, nullParams);
-            transformList.add(trCanonicalization);
-
+            final List<Transform> transformList = new ArrayList<Transform>();
+            transformList.add(fac.newTransform(canonicalizationAlgorithm, (TransformParameterSpec) null));
             referenceList.add(fac.newReference("#" + signatureValue.getAttribute("Id"), digestMethod, transformList, CSURI, referenceId));
         }
         catch (final Exception e) {
@@ -1638,42 +1635,39 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         // definicion de identificadores
-        String id = UUID.randomUUID().toString();
-        String signatureId = "Signature-" + id;
-        String signatureValueId = "SignatureValue-" + id;
-        String keyInfoId = "KeyInfo-" + id;
+        final String id = UUID.randomUUID().toString();
+        final String signatureId = "Signature-" + id;
+        final String signatureValueId = "SignatureValue-" + id;
+        final String keyInfoId = "KeyInfo-" + id;
 
         try {
-
-            // CanonicalizationMethod
-            CanonicalizationMethod cm = fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null);
 
             // se anade una referencia a KeyInfo
             referenceList.add(fac.newReference("#" + keyInfoId, digestMethod));
 
-            // SignatureMethod
-            SignatureMethod sm = fac.newSignatureMethod(SIGN_ALGOS_URI.get(algo), null);
-
-            // SignedInfo
-            SignedInfo si = fac.newSignedInfo(cm, sm, referenceList);
-
             // KeyInfo
-            X509Data cerData;
             KeyInfoFactory kif = fac.getKeyInfoFactory();
-            List<Object> x509Content = new ArrayList<Object>();
+            final List<Object> x509Content = new ArrayList<Object>();
             final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
             x509Content.add(cert);
-            cerData = kif.newX509Data(x509Content);
 
-            List<Object> content = new ArrayList<Object>();
+            final List<Object> content = new ArrayList<Object>();
             content.add(kif.newKeyValue(cert.getPublicKey()));
-            content.add(cerData);
+            content.add(kif.newX509Data(x509Content));
 
-            KeyInfo ki = kif.newKeyInfo(content, keyInfoId);
+            final XMLSignature sign = fac.newXMLSignature(
+        		fac.newSignedInfo(
+            		fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null), 
+            		fac.newSignatureMethod(SIGN_ALGOS_URI.get(algo), null), 
+            		referenceList
+        		), 
+        		kif.newKeyInfo(content, keyInfoId), 
+        		null, 
+        		signatureId, 
+        		signatureValueId
+    		);
 
-            XMLSignature sign = fac.newXMLSignature(si, ki, null, signatureId, signatureValueId);
-
-            DOMSignContext signContext = new DOMSignContext(keyEntry.getPrivateKey(), signature.getOwnerDocument().getDocumentElement());
+            final DOMSignContext signContext = new DOMSignContext(keyEntry.getPrivateKey(), signature.getOwnerDocument().getDocumentElement());
             signContext.putNamespacePrefix(DSIGNNS, XML_SIGNATURE_PREFIX);
 
             sign.sign(signContext);
@@ -1689,10 +1683,10 @@ public final class AOXMLDSigSigner implements AOSigner {
     public TreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo) {
 
         // recupera la raiz del documento de firmas
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Element root = null;
-        String completePrefix = null;
+        Element root;
+        final String completePrefix;
         try {
             doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
             root = doc.getDocumentElement();
@@ -1711,25 +1705,25 @@ public final class AOXMLDSigSigner implements AOSigner {
                 root = doc.getDocumentElement();
             }
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("Se ha producido un error al obtener la estructura de firmas. " + e);
             return null;
         }
 
-        TreeNode tree = new TreeNode("Datos");
+        final TreeNode tree = new TreeNode("Datos");
 
         // Obtenemos todas las firmas y los signature value
-        NodeList signatures = root.getElementsByTagName(completePrefix + "Signature");
-        NodeList signatureValues = root.getElementsByTagName(completePrefix + "SignatureValue");
+        final NodeList signatures = root.getElementsByTagName(completePrefix + "Signature");
+        final NodeList signatureValues = root.getElementsByTagName(completePrefix + "SignatureValue");
 
         int numSignatures = signatures.getLength();
-        String[] arrayIds = new String[numSignatures];
-        String[] arrayRef = new String[numSignatures];
-        TreeNode[] arrayNodes = new TreeNode[numSignatures];
+        final String[] arrayIds = new String[numSignatures];
+        final String[] arrayRef = new String[numSignatures];
+        final TreeNode[] arrayNodes = new TreeNode[numSignatures];
 
         for (int i = 0; i < numSignatures; i++) {
 
-            Element signature = (Element) signatures.item(i);
+            final Element signature = (Element) signatures.item(i);
 
             arrayIds[i] = signature.getAttribute("Id");
 
@@ -1737,7 +1731,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // Recogemos el identificador de la firma a la que se referencia (si
             // no es contrafirma sera cadena vacia)
-            String typeReference = ((Element) signature.getElementsByTagNameNS(DSIGNNS, "Reference").item(0)).getAttribute("Type");
+            final String typeReference = ((Element) signature.getElementsByTagNameNS(DSIGNNS, "Reference").item(0)).getAttribute("Type");
             if (typeReference.equals(CSURI)) arrayRef[i] = Utils.getCounterSignerReferenceId(signature, signatureValues);
             else arrayRef[i] = "";
         }
@@ -1763,22 +1757,15 @@ public final class AOXMLDSigSigner implements AOSigner {
      * @param arrayRef
      *        Array de referencias
      * @return Array de objetos TreeNode */
-    private TreeNode[] generaArbol(int i, int j, TreeNode arrayNodes[], String arrayIds[], String arrayRef[]) {
-
-        int max = arrayIds.length;
-
+    private TreeNode[] generaArbol(final int i, final int j, final TreeNode arrayNodes[], final String arrayIds[], final String arrayRef[]) {
+        final int max = arrayIds.length;
         if (i < max && j > 0) {
             if (arrayIds[i].equals(arrayRef[j])) generaArbol(i + 1, j - 1, arrayNodes, arrayIds, arrayRef);
-
             if (i < j) generaArbol(i, j - 1, arrayNodes, arrayIds, arrayRef);
-
             if (!arrayIds[i].equals(arrayRef[j])) return arrayNodes;
-
             generaArbol(j, max - 1, arrayNodes, arrayIds, arrayRef);
-
             arrayNodes[i].add(arrayNodes[j]);
         }
-
         return arrayNodes;
     }
 
@@ -1793,10 +1780,10 @@ public final class AOXMLDSigSigner implements AOSigner {
             // Carga el documento a validar
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setNamespaceAware(true);
-            Document signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-            Element rootNode = signDoc.getDocumentElement();
+            final Document signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+            final Element rootNode = signDoc.getDocumentElement();
 
-            ArrayList<Node> signNodes = new ArrayList<Node>();
+            final ArrayList<Node> signNodes = new ArrayList<Node>();
             if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
                 signNodes.add(rootNode);
             }
@@ -1843,7 +1830,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return true;
     }
 
-    public boolean isValidDataFile(byte[] data) {
+    public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
             return false;
@@ -1851,7 +1838,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return true;
     }
 
-    public String getSignedName(String originalName, String inText) {
+    public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".xsig";
     }
 
@@ -1861,11 +1848,11 @@ public final class AOXMLDSigSigner implements AOSigner {
      *        Documento que estar&aacute; contenido en el nuevo documento
      * @return Documento con ra&iacute;z "AFIRMA"
      * @throws ParserConfigurationException */
-    private Document insertarNodoAfirma(Document docu) throws ParserConfigurationException {
+    private Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
 
         // Crea un nuevo documento con la raiz "AFIRMA"
@@ -1879,19 +1866,19 @@ public final class AOXMLDSigSigner implements AOSigner {
         return docAfirma;
     }
 
-    public AOSignInfo getSignInfo(byte[] sign) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
         if (sign == null) throw new NullPointerException("No se han introducido datos para analizar");
 
         if (!isSign(sign)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
         }
 
-        AOSignInfo signInfo = new AOSignInfo(SIGN_FORMAT_XMLDSIG);
+        final AOSignInfo signInfo = new AOSignInfo(SIGN_FORMAT_XMLDSIG);
 
         // Analizamos mas en profundidad la firma para obtener el resto de datos
 
         // Tomamos la raiz del documento
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Element rootSig = null;
         try {
@@ -1922,7 +1909,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return signInfo;
     }
 
-    public String getDataMimeType(byte[] sign) throws AOUnsupportedSignFormatException {
+    public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
 
         String mType = null;
 
@@ -1935,7 +1922,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
 
         // Obtiene el documento y su raiz
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Document tmpDoc = null;
         Element rootSig = null;
@@ -1977,8 +1964,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
             // si es detached
             else if (isDetached(rootSig)) {
-                Element content = (Element) rootSig.getFirstChild();
-                mType = content.getAttribute("MimeType");
+                mType = ((Element) rootSig.getFirstChild()).getAttribute("MimeType");
             }
         }
 
