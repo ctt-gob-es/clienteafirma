@@ -9,7 +9,7 @@ import es.gob.afirma.standalone.Messages;
 /**
  * Utilidades generales para los interfaces gr&aacute;ficos.
  */
-public class UIUtils {
+public final class UIUtils {
 
     /**
      * Muestra un di&aacute;logo de error de forma modal. Difiere del normal mostrado con <code>JOptionPane</code>

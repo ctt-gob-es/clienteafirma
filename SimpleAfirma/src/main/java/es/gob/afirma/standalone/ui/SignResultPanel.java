@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
 
+import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.ui.SignDetailPanel.SIGN_DETAIL_TYPE;
 
@@ -64,8 +65,8 @@ final class SignResultPanel extends JPanel {
                     catch (final Exception e) {
                         UIUtils.showErrorMessage(
                                 SignResultPanel.this,
-                                "No ha sido posible recuperar la informaci\u00F3n adicional,\n,pruebe a abrir la siguiente URL desde un navegador Web:\n" + he.getURL(),
-                                "Error",
+                                Messages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
+                                Messages.getString("SignResultPanel.1"), //$NON-NLS-1$
                                 JOptionPane.ERROR_MESSAGE
                         );
                     }
@@ -78,19 +79,19 @@ final class SignResultPanel extends JPanel {
         final String resultOperationIconTooltip;
         switch (type) {
             case GENERATED:
-                this.resultTextLabel.setText("Proceso de firma completado satisfactoriamente");
-                this.descTextLabel.setText("<html><p>La firma cumple con los requisitos del esquema nacional de interoperabilidad en cuanto a firmas digitales y documentos firmados. <a href=\"http://www.google.com/\">M&aacute;s informaci&oacute;n en la Web</a>.</p></html>");
-                resultOperationIconTooltip = "Se ha generado correctamente una firma electr\u00F3nica";
+                this.resultTextLabel.setText(Messages.getString("SignResultPanel.2")); //$NON-NLS-1$
+                this.descTextLabel.setText(Messages.getString("SignResultPanel.3")); //$NON-NLS-1$
+                resultOperationIconTooltip = Messages.getString("SignResultPanel.4"); //$NON-NLS-1$
                 break;
             case KO:
-                this.resultTextLabel.setText("La firma no es v\u00E1lida o no es una firma compatible con @firma");
-                this.descTextLabel.setText("<html><p>La firma electr\u00F3nica seleccionada no es v\u00E1lida o no es compatible con @firma.</p></html>");
-                resultOperationIconTooltip = "La firma electr\u00F3nica seleccionada no es v\u00E1lida o no es compatible con @firma";
+                this.resultTextLabel.setText(Messages.getString("SignResultPanel.5")); //$NON-NLS-1$
+                this.descTextLabel.setText(Messages.getString("SignResultPanel.6")); //$NON-NLS-1$
+                resultOperationIconTooltip = Messages.getString("SignResultPanel.7"); //$NON-NLS-1$
                 break;
             default:
-                this.resultTextLabel.setText("La firma es v\u00E1lida");
-                this.descTextLabel.setText("<html><p>Para determinar la completa validez legal debe comprobar adem\u00E1s la validez de los certificados usados para firmar</p></html>");
-                resultOperationIconTooltip = "La firma electr\u00F3nica es v\u00E1lida en cuanto a estructura";
+                this.resultTextLabel.setText(Messages.getString("SignResultPanel.8")); //$NON-NLS-1$
+                this.descTextLabel.setText(Messages.getString("SignResultPanel.9")); //$NON-NLS-1$
+                resultOperationIconTooltip = Messages.getString("SignResultPanel.10"); //$NON-NLS-1$
                 break;
         }
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);

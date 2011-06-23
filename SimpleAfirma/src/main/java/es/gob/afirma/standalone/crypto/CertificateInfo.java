@@ -18,6 +18,7 @@ import javax.swing.ImageIcon;
 import es.atosorigin.AOCertVerifier;
 import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.misc.Platform;
+import es.gob.afirma.standalone.Messages;
 
 /** Informaci&oacute;n para la visualizaci&oacute;n y validaci&oacute;n del certificado.
  * @author Carlos gamuci Mill&aacute;n */
@@ -44,10 +45,10 @@ public final class CertificateInfo {
         
     	if (description == null || "".equals(description)) {  //$NON-NLS-1$
         	if (cert == null) {
-        		this.descriptionText = "Certificado generico X.509v3";
+        		this.descriptionText = Messages.getString("CertificateInfo.0"); //$NON-NLS-1$
         	}
         	else {
-        		this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + "Titular del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert) + "</a>. Emisor del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        		this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + Messages.getString("CertificateInfo.1") + ": <a href=\"http://certinfo\">" + AOUtil.getCN(cert) + "</a>. " + Messages.getString("CertificateInfo.2") + ": <a href=\"http://certinfo\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
         	}
         }
         else {
@@ -64,7 +65,7 @@ public final class CertificateInfo {
         }
         
         if (iTooltip == null) {
-        	this.iconTooltip = "Certificado X.509v3 generico";
+        	this.iconTooltip = Messages.getString("CertificateInfo.3"); //$NON-NLS-1$
         }
         else {
         	this.iconTooltip = iTooltip;

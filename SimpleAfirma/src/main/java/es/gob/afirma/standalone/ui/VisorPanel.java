@@ -35,6 +35,7 @@ import es.gob.afirma.signature.ValidateXMLSignature;
 import es.gob.afirma.signers.aobinarysignhelper.ValidateCADES;
 import es.gob.afirma.signers.aobinarysignhelper.ValidateCMS;
 import es.gob.afirma.standalone.DataAnalizerUtil;
+import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.ui.SignDetailPanel.SIGN_DETAIL_TYPE;
 
@@ -72,7 +73,7 @@ public final class VisorPanel extends JPanel {
     }
 
     private void openFile() {
-        final File signFile = FileUIManager.openFile(this.parent, null, null, "Abrir");
+        final File signFile = FileUIManager.openFile(this.parent, null, null, Messages.getString("VisorPanel.0")); //$NON-NLS-1$
         if (signFile == null) {
             return;
         }
@@ -112,7 +113,7 @@ public final class VisorPanel extends JPanel {
         final JPanel returnPanel = new JPanel(true);
         returnPanel.setLayout(new BoxLayout(returnPanel, BoxLayout.Y_AXIS));
         returnPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-        this.openSign.setText("Abrir firma");
+        this.openSign.setText(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
         this.openSign.setMnemonic('a');
         this.openSign.setAlignmentX(Component.CENTER_ALIGNMENT);
         returnPanel.add(this.openSign);
@@ -163,7 +164,7 @@ public final class VisorPanel extends JPanel {
     
     public static void main(String[] args) {
         
-        File signFile = new File("C:/Users/A122466/Desktop/Escritorio/Firma.csig");
+        File signFile = new File("C:/Users/A122466/Desktop/Escritorio/Firma.csig"); //$NON-NLS-1$
         
         JPanel currentPanel = new VisorPanel(signFile, null, null, null, null);
         Container container = new MainScreen(null, currentPanel);

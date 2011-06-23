@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.misc.MimeHelper;
+import es.gob.afirma.standalone.Messages;
 
 /**
  * Enlace para la apetura/guardado de un fichero.
@@ -36,7 +37,7 @@ final class ShowFileLinkAction {
         // guardarlo con la extension que se desee.
         if (ext != null) {
             try {
-                final File tmp = File.createTempFile("afirma", "." + ext);
+                final File tmp = File.createTempFile("afirma", "." + ext);   //$NON-NLS-1$//$NON-NLS-2$
                 tmp.deleteOnExit();
                 final OutputStream fos = new FileOutputStream(tmp);
                 final OutputStream bos = new BufferedOutputStream(fos);
@@ -49,8 +50,8 @@ final class ShowFileLinkAction {
             catch(final Exception e) {
                 UIUtils.showErrorMessage(
                         null,
-                        "No se ha podido abrir el fichero,\ncompruebe que dispone de una aplicaci\u00F3n instalada para visualizar ficheros '." + ext + "'",
-                        "Error",
+                        Messages.getString("ShowFileLinkAction.2") + " '" + ext + "'",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+                        Messages.getString("ShowFileLinkAction.0"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
                 );
             }
@@ -62,7 +63,7 @@ final class ShowFileLinkAction {
                     null,
                     null,
                     null,
-                    "Guardar datos"
+                    Messages.getString("ShowFileLinkAction.1") //$NON-NLS-1$
             );
         }
     }

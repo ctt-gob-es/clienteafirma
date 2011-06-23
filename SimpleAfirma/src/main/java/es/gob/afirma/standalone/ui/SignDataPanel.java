@@ -49,6 +49,7 @@ import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.standalone.DataAnalizerUtil;
+import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
@@ -61,6 +62,11 @@ final class SignDataPanel extends JPanel {
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";  //$NON-NLS-1$
     private static final String FILE_ICON_XML = "/resources/icon_xml.png"; //$NON-NLS-1$
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.png"; //$NON-NLS-1$
+    
+    // Como los cursores los usamos dentro de un MouseMotionListener los precreamos para
+    // evitar que se creen objetos solo por mover el raton
+    private static final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
+    private static final Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
     
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
@@ -83,8 +89,8 @@ final class SignDataPanel extends JPanel {
         
         // Texto con la ruta del fichero
         final JTextField filePath = new JTextField();
-        filePath.getAccessibleContext().setAccessibleName("Fichero de firma");
-        filePath.getAccessibleContext().setAccessibleDescription("Ruta del fichero de firma analizado");
+        filePath.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.0")); //$NON-NLS-1$
+        filePath.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.1")); //$NON-NLS-1$
         filePath.setFont(this.getFont().deriveFont(this.getFont().getSize() + 2));
         filePath.setBorder(BorderFactory.createEmptyBorder());
         filePath.setEditable(false);
@@ -101,16 +107,16 @@ final class SignDataPanel extends JPanel {
         });
 
         // Etiqueta encima del cuadro con la ruta de fichero
-        this.filePathText.setText("Fichero firmado:");
+        this.filePathText.setText(Messages.getString("SignDataPanel.2")); //$NON-NLS-1$
         this.filePathText.setLabelFor(filePath);
 
         // Boton de apertura del fichero firmado
-        final JButton openFileButton = new JButton("Ver fichero");
+        final JButton openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
         openFileButton.setPreferredSize(new Dimension(150, 24));
         openFileButton.setMnemonic('v');
-        openFileButton.setToolTipText("Abre el fichero firmado con la aplicaci\u00F3n configurada en su sistema operativo");
-        openFileButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para abrir los datos firmados");
-        openFileButton.getAccessibleContext().setAccessibleDescription("Abre el documento firmado con la aplicaci\u00F3n configurada en el sistema");
+        openFileButton.setToolTipText(Messages.getString("SignDataPanel.4")); //$NON-NLS-1$
+        openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.5")); //$NON-NLS-1$
+        openFileButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.6")); //$NON-NLS-1$
         openFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent ae) {
@@ -120,8 +126,8 @@ final class SignDataPanel extends JPanel {
                 catch (final Exception e) {
                     UIUtils.showErrorMessage(
                             SignDataPanel.this,
-                            "No se ha podido abrir el fichero,\ncompruebe que no ha sido manipulado mientras se ejecutaba esta aplicaci\u00F3n\ny que dispone de una aplicación instalada para visualizarlo",
-                            "Error",
+                            Messages.getString("SignDataPanel.7"), //$NON-NLS-1$
+                            Messages.getString("SignDataPanel.8"), //$NON-NLS-1$
                             JOptionPane.ERROR_MESSAGE
                     );
                 }
@@ -141,15 +147,15 @@ final class SignDataPanel extends JPanel {
             String fileTooltip;
             if (new AOPDFSigner().isValidDataFile(sign)) {
                 fileIcon = FILE_ICON_PDF;
-                fileTooltip = "Fichero de tipo Portable Document Format (PDF)";
+                fileTooltip = Messages.getString("SignDataPanel.9"); //$NON-NLS-1$
             }
             else if (DataAnalizerUtil.isXML(sign)) {
                 fileIcon = FILE_ICON_XML;
-                fileTooltip = "Fichero de tipo XML";
+                fileTooltip = Messages.getString("SignDataPanel.10"); //$NON-NLS-1$
             }
             else {
                 fileIcon = FILE_ICON_BINARY;
-                fileTooltip = "Fichero binario gen\u00E9rico";
+                fileTooltip = Messages.getString("SignDataPanel.11"); //$NON-NLS-1$
             }
             final JLabel iconLabel = new JLabel(new ImageIcon(SignDetailPanel.class.getResource(fileIcon)));
             iconLabel.setToolTipText(fileTooltip);
@@ -178,9 +184,9 @@ final class SignDataPanel extends JPanel {
 	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
 	            this.certDescription.setOpaque(false);
 	            this.certDescription.setText(certInfo.getDescriptionText());
-	            this.certDescription.setToolTipText("Pulse en la descripción del certificado para obtener información adicional sobre él o anadirlo al almacen de certificados de su sistema operativo");
-	            this.certDescription.getAccessibleContext().setAccessibleName("Descripción del certificado");
-	            this.certDescription.getAccessibleContext().setAccessibleDescription("Información resumida del certificado, pulse sobre esta para abrir una nueva ventana con información adicional");
+	            this.certDescription.setToolTipText(Messages.getString("SignDataPanel.12")); //$NON-NLS-1$
+	            this.certDescription.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.13")); //$NON-NLS-1$
+	            this.certDescription.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.14")); //$NON-NLS-1$
 	            this.certDescription.addHyperlinkListener(new HyperlinkListener() {
 	                @Override
 	                public void hyperlinkUpdate(final HyperlinkEvent he) {
@@ -193,19 +199,19 @@ final class SignDataPanel extends JPanel {
 	            if (certInfo.getCertVerifier() != null) {
 	                this.validateCertButton = new JButton();
 	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
-	                this.validateCertButton.setText("Comprobar validez");
+	                this.validateCertButton.setText(Messages.getString("SignDataPanel.15")); //$NON-NLS-1$
 	                this.validateCertButton.setMnemonic('c');
-	                this.validateCertButton.setToolTipText("Comprueba la validez del certificado contra el OCSP del su autoridad de certificaci\u00F3n");
-	                this.validateCertButton.getAccessibleContext().setAccessibleName("Bot\u00F3n para validar el certificado");
+	                this.validateCertButton.setToolTipText(Messages.getString("SignDataPanel.16")); //$NON-NLS-1$
+	                this.validateCertButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.17")); //$NON-NLS-1$
 	                this.validateCertButton.getAccessibleContext()
-	                .setAccessibleDescription("Comprueba la validez del certificado contra el OCSP de su autoridad de certificaci&oacute;n");
+	                .setAccessibleDescription(Messages.getString("SignDataPanel.18")); //$NON-NLS-1$
 	                this.validateCertButton.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent ae) {
 						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 							try {
 								certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
-								JOptionPane.showMessageDialog(SignDataPanel.this, "El certificado es válido", "Respuesta del servidor de validación", JOptionPane.INFORMATION_MESSAGE);
+								JOptionPane.showMessageDialog(SignDataPanel.this, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 							}
 							catch(final Exception e) {
 								e.printStackTrace();
@@ -234,7 +240,7 @@ final class SignDataPanel extends JPanel {
             }
             certDescPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
 
-            this.certDescText.setText("Certificado de firma utilizado:");
+            this.certDescText.setText(Messages.getString("SignDataPanel.21")); //$NON-NLS-1$
             this.certDescText.setLabelFor(this.certDescription);
         }
 
@@ -247,7 +253,7 @@ final class SignDataPanel extends JPanel {
             detailPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         }
 
-        final JLabel detailPanelText = new JLabel("Datos de la firma:");
+        final JLabel detailPanelText = new JLabel(Messages.getString("SignDataPanel.22")); //$NON-NLS-1$
         detailPanelText.setLabelFor(detailPanel);
 
         this.setLayout(new GridBagLayout());
@@ -294,8 +300,8 @@ final class SignDataPanel extends JPanel {
         catch(final Exception e) {
             UIUtils.showErrorMessage(
                     SignDataPanel.this,
-                    "No se ha podido abrir el fichero,\ncompruebe que de una aplicación instalada para visualizar Certificados X.509",
-                    "Error",
+                    Messages.getString("SignDataPanel.23"), //$NON-NLS-1$
+                    Messages.getString("SignDataPanel.8"), //$NON-NLS-1$
                     JOptionPane.ERROR_MESSAGE
             );
         }
@@ -334,24 +340,24 @@ final class SignDataPanel extends JPanel {
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 
         // Formato de firma
-        final DefaultMutableTreeNode signInfoBranch = new DefaultMutableTreeNode("Formato de firma");
+        final DefaultMutableTreeNode signInfoBranch = new DefaultMutableTreeNode(Messages.getString("SignDataPanel.25")); //$NON-NLS-1$
         signInfoBranch.add(new DefaultMutableTreeNode(signInfo.getSignInfo().getFormat()));
         root.add(signInfoBranch);
 
         // Datos firmados
-        final DefaultMutableTreeNode dataInfoBranch = new DefaultMutableTreeNode("Datos firmados");
+        final DefaultMutableTreeNode dataInfoBranch = new DefaultMutableTreeNode(Messages.getString("SignDataPanel.26")); //$NON-NLS-1$
         if (signInfo.getData() == null) {
-            dataInfoBranch.add(new DefaultMutableTreeNode("La firma no contiene los datos firmados"));
+            dataInfoBranch.add(new DefaultMutableTreeNode(Messages.getString("SignDataPanel.27"))); //$NON-NLS-1$
         } 
         else {
-            dataInfoBranch.add(new LinkTreeNode(new ShowFileLinkAction("Ver datos firmados", signInfo.getData())));
+            dataInfoBranch.add(new LinkTreeNode(new ShowFileLinkAction(Messages.getString("SignDataPanel.28"), signInfo.getData()))); //$NON-NLS-1$
         }
         root.add(dataInfoBranch);
 
         // Arbol de firmantes
         final TreeModelManager treeManager = new TreeModelManager(signInfo.getSignsTree());
         final DefaultMutableTreeNode signersBranch = treeManager.getSwingTree();
-        signersBranch.setUserObject("\u00C1rbol de firmas del documento");
+        signersBranch.setUserObject(Messages.getString("SignDataPanel.29")); //$NON-NLS-1$
         root.add(signersBranch);
 
         //final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
@@ -384,8 +390,8 @@ final class SignDataPanel extends JPanel {
                 else if (nodeInfo instanceof ShowFileLinkAction) {
                     ((ShowFileLinkAction) nodeInfo).action();
                 }
-                System.out.println("Node object: " + nodeInfo);
-                System.out.println("---");
+                System.out.println("Node object: " + nodeInfo); //$NON-NLS-1$
+                System.out.println("---"); //$NON-NLS-1$
             }
         });
         tree.setCellRenderer(treeRenderer);
@@ -399,14 +405,14 @@ final class SignDataPanel extends JPanel {
 				TreePath path = tree.getPathForLocation((int) e.getPoint().getX(), (int) e.getPoint().getY());
 				if (path != null) {
 					if (path.getLastPathComponent() instanceof LinkTreeNode) {
-						tree.setCursor(new Cursor(Cursor.HAND_CURSOR));
+						tree.setCursor(HAND_CURSOR);
 					}
 					else {
-						tree.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+						tree.setCursor(DEFAULT_CURSOR);
 					}
 				}
 				else {
-					tree.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					tree.setCursor(DEFAULT_CURSOR);
 				}
 			}
 			@Override
@@ -419,7 +425,10 @@ final class SignDataPanel extends JPanel {
     }
     
     private static final class LinkTreeNode extends DefaultMutableTreeNode {
-    	LinkTreeNode(final Object userObject) {
+
+		private static final long serialVersionUID = -1448841261171448277L;
+
+		LinkTreeNode(final Object userObject) {
     		super(userObject);
     	}
     }
