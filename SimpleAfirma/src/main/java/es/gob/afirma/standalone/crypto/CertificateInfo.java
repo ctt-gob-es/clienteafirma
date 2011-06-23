@@ -48,11 +48,11 @@ public final class CertificateInfo {
         		this.descriptionText = Messages.getString("CertificateInfo.0"); //$NON-NLS-1$
         	}
         	else {
-        		this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + Messages.getString("CertificateInfo.1") + ": <a href=\"http://certinfo\">" + AOUtil.getCN(cert) + "</a>. " + Messages.getString("CertificateInfo.2") + ": <a href=\"http://certinfo\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+        		this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + Messages.getString("CertificateInfo.1") + ": <a href=\"#\">" + AOUtil.getCN(cert) + "</a>. " + Messages.getString("CertificateInfo.2") + ": <a href=\"#\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
         	}
         }
         else {
-            this.descriptionText = description;
+            this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + "<a href=\"#\">" + description + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         }
         
     	this.ocspConfig = ocsp;
