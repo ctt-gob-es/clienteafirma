@@ -5,6 +5,7 @@ import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.swing.ImageIcon;
 
 import es.atosorigin.AOCertVerifier;
@@ -25,7 +26,28 @@ class DnieCertAnalyzer extends CertAnalyzer {
 
 	@Override
 	public CertificateInfo analyzeCert(final X509Certificate cert) {
-		return new CertificateInfo(cert, Messages.getString("DnieCertAnalyzer.2"), getDNIeCertVerifier(), new ImageIcon(this.getClass().getResource("/resources/dnie_cert_ico.png")), Messages.getString("DnieCertAnalyzer.4")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	    String titular = null;
+	    try {
+	        final LdapName dniSubject = new LdapName(cert.getSubjectX500Principal().toString());
+	        String nombre = null;
+	        String apellido = null;
+	        for(final Rdn rdn : dniSubject.getRdns()) {
+	            if (rdn.getType().equalsIgnoreCase("GIVENNAME")) nombre = rdn.getValue().toString(); //$NON-NLS-1$
+	            else if (rdn.getType().equalsIgnoreCase("SURNAME")) apellido = rdn.getValue().toString(); //$NON-NLS-1$
+	        }
+	        if (nombre != null || apellido != null) {
+	            if (nombre != null) titular = nombre;
+	            if (apellido != null) {
+	                if (titular != null) titular = titular + " " + apellido; //$NON-NLS-1$
+	                else titular = apellido;
+	            }
+	        }
+	    }
+	    catch(final Exception e) {
+	        Logger.getLogger("es.gob.afirma").warning("No se ha podido obtener el nombre del titular del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+	    }
+	    System.out.println();
+		return new CertificateInfo(cert, Messages.getString("DnieCertAnalyzer.2") + ((titular != null) ? (" " + "de" + " " + titular) : ""), getDNIeCertVerifier(), new ImageIcon(this.getClass().getResource("/resources/dnie_cert_ico.png")), Messages.getString("DnieCertAnalyzer.4")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 	}
 	
 	/**
