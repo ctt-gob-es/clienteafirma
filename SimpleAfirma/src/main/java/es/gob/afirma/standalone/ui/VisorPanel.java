@@ -72,10 +72,10 @@ public final class VisorPanel extends JPanel {
     }
 
     private void openFile() {
-        File signFile = FileUIManager.openFile(this.parent, null, null, "Abrir");
-        if (signFile == null)
+        final File signFile = FileUIManager.openFile(this.parent, null, null, "Abrir");
+        if (signFile == null) {
             return;
-        
+        }
         this.openSign(signFile, null);
     }
     
@@ -89,9 +89,10 @@ public final class VisorPanel extends JPanel {
                 try {
                     FileInputStream fis = new FileInputStream(signFile);
                     sign = AOUtil.getDataFromInputStream(fis);
-                    try { fis.close(); } catch (Exception e) { }
-                } catch (Exception e) {
-                    Logger.getLogger("No se ha podido cargar el fichero de firma: " + e);
+                    try { fis.close(); } catch (final Exception e) { }
+                } 
+                catch (final Exception e) {
+                    Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar el fichero de firma: " + e);  //$NON-NLS-1$//$NON-NLS-2$
                 }
             }
         }

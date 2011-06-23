@@ -189,7 +189,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
         if (DNIeManager.BLOWN_DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG) System.out.println("Recibido evento de BLOWN DNI INSERTED");
+            if (DEBUG) System.out.println("Recibido evento de BLOWN DNI INSERTED");  //$NON-NLS-1$
             loadDefaultKeyStore();
             loadMainApp(true);
             UIUtils.showErrorMessage(
@@ -201,17 +201,17 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             return;
         }
         else if (DNIeManager.CARD_EXCEPTION.equals(evt.getPropertyName())) {
-            if (DEBUG) System.out.println("Recibido evento de CARD EXCEPTION");
+            if (DEBUG) System.out.println("Recibido evento de CARD EXCEPTION"); //$NON-NLS-1$
             UIUtils.showErrorMessage(
                     this.container,
-                    "Ha insertado una tarjeta no compatible o estropeada. Si se trata de un DNIe, acuda a una comisar\u00EDa de polic\u00EDa para renovarlo.",
+                    Messages.getString("SimpleAfirma.1"), //$NON-NLS-1$
                     Messages.getString("SimpleAfirma.13"), //$NON-NLS-1$
                     JOptionPane.WARNING_MESSAGE
             );
             return;
         }
         else if (DNIeManager.NOT_DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG) System.out.println("Recibido evento de NOT DNI INSERTED");
+            if (DEBUG) System.out.println("Recibido evento de NOT DNI INSERTED"); //$NON-NLS-1$
             UIUtils.showErrorMessage(
                     this.container,
                     Messages.getString("SimpleAfirma.12"), //$NON-NLS-1$
@@ -221,7 +221,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             return;
         }
         else if (DNIeManager.DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG) System.out.println("Recibido evento de DNI INSERTED");
+            if (DEBUG) System.out.println("Recibido evento de DNI INSERTED"); //$NON-NLS-1$
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             try {
                 new SimpleKeyStoreManagerWorker(this, null, true).execute();

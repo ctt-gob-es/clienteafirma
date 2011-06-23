@@ -92,7 +92,7 @@ public final class SignPanel extends JPanel {
 
     private final JSVGCanvas fileTypeVectorIcon = new JSVGCanvas();
 
-    private static final String DNIE_SIGNATURE_ALIAS = "CertFirmaDigital";
+    private static final String DNIE_SIGNATURE_ALIAS = "CertFirmaDigital"; //$NON-NLS-1$
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_XML = "/resources/icon_xml.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg"; //$NON-NLS-1$
@@ -623,8 +623,8 @@ public final class SignPanel extends JPanel {
         String alias = null;
 
         try {
-            if (ksm.getKeyStores().get(0).containsAlias(DNIE_SIGNATURE_ALIAS) || ksm.getCertificate(DNIE_SIGNATURE_ALIAS).getIssuerX500Principal().toString().contains("DNIE")) {
-                alias = DNIE_SIGNATURE_ALIAS;
+            if (ksm.getKeyStores().get(0).containsAlias(DNIE_SIGNATURE_ALIAS) || ksm.getCertificate(DNIE_SIGNATURE_ALIAS).getIssuerX500Principal().toString().contains("DNIE")) { //$NON-NLS-1$
+                alias = DNIE_SIGNATURE_ALIAS; 
             }
         }
         catch(final Exception e) {}

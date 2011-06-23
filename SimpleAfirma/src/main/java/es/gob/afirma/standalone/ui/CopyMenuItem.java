@@ -12,6 +12,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
 
+import es.gob.afirma.standalone.Messages;
+
 final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 
 	private static final long serialVersionUID = 1750985678317829383L;
@@ -19,7 +21,7 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 	private final JTextComponent textComponent;
 	
 	private void createUI() {
-		final JMenuItem copyItem = new JMenuItem("Copiar");
+		final JMenuItem copyItem = new JMenuItem(Messages.getString("CopyMenuItem.0")); //$NON-NLS-1$
 		copyItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {

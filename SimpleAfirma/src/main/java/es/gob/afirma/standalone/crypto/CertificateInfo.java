@@ -42,12 +42,12 @@ public final class CertificateInfo {
      * @param iTooltip <i>Tooltip</i> para el icono del certificado */
     public CertificateInfo(final X509Certificate cert, final String description, final AOCertVerifier ocsp, final Icon i, final String iTooltip) {
         
-    	if (description == null || "".equals(description)) {
+    	if (description == null || "".equals(description)) {  //$NON-NLS-1$
         	if (cert == null) {
         		this.descriptionText = "Certificado generico X.509v3";
         	}
         	else {
-        		this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + "Titular del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert) + "</a>. Emisor del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>" + "</html>";
+        		this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + "Titular del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert) + "</a>. Emisor del certificado: <a href=\"http://certinfo\">" + AOUtil.getCN(cert.getIssuerX500Principal().toString()) + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         	}
         }
         else {
@@ -57,7 +57,7 @@ public final class CertificateInfo {
     	this.ocspConfig = ocsp;
         
         if (i == null) {
-        	this.icon = new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png"));
+        	this.icon = new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png")); //$NON-NLS-1$
         }
         else {
         	this.icon = i;

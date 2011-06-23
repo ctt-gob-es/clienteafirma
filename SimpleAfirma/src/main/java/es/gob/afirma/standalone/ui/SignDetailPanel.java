@@ -30,6 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Panel con detalles de una firma electr&oacute;nica. */
@@ -86,10 +87,10 @@ public final class SignDetailPanel extends JPanel {
         if (sig == null && sigPath != null) {
             final File signFile = new File(sigPath);
             if (!signFile.exists()) {
-                Logger.getLogger("es.gob.afirma").severe("La ruta de firma proporcionada no corresponde a ningun fichero");
+                Logger.getLogger("es.gob.afirma").severe("La ruta de firma proporcionada no corresponde a ningun fichero");  //$NON-NLS-1$ //$NON-NLS-2$
             }
             else if (signFile.canRead()) {
-                Logger.getLogger("es.gob.afirma").severe("No se tienen permisos de lectura del fichero indicado");
+                Logger.getLogger("es.gob.afirma").severe("No se tienen permisos de lectura del fichero indicado");  //$NON-NLS-1$//$NON-NLS-2$
             }
             else {
                 InputStream fis = null;
@@ -100,7 +101,7 @@ public final class SignDetailPanel extends JPanel {
                     sig = AOUtil.getDataFromInputStream(bis);
                 }
                 catch (final IOException e) {
-                    Logger.getLogger("es.gob.afirma").severe("No se ha podido leer el fichero de firma: " + e);
+                    Logger.getLogger("es.gob.afirma").severe("No se ha podido leer el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 finally {
                     try {
@@ -121,7 +122,7 @@ public final class SignDetailPanel extends JPanel {
         final JPanel returnPanel = new JPanel(true);
         returnPanel.setLayout(new BoxLayout(returnPanel, BoxLayout.Y_AXIS)); 
         returnPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-        this.returnButton.setText("Firmar otro fichero");
+        this.returnButton.setText(Messages.getString("SignDetailPanel.0")); //$NON-NLS-1$
         this.returnButton.setMnemonic('m');
         this.returnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         returnPanel.add(this.returnButton);

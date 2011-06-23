@@ -47,16 +47,16 @@ public final class ValidateXMLSignature {
 
         // Find Signature element
         final NodeList nl = 
-            doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+            doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
-            throw new Exception("Cannot find Signature element");
+            throw new Exception("No se puede encontrar el elemento Signature"); //$NON-NLS-1$
         }
 
         // Create a DOM XMLSignatureFactory that will be used to unmarshal the 
         // document containing the XMLSignature 
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM",
+        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", //$NON-NLS-1$
                 (Provider) Class.forName(System.getProperty
-                        ("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI")).newInstance());
+                        ("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI")).newInstance()); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Create a DOMValidateContext and specify a KeyValue KeySelector
         // and document context
@@ -81,7 +81,7 @@ public final class ValidateXMLSignature {
                 final XMLCryptoContext context)
         throws KeySelectorException {
             if (keyInfo == null) {
-                throw new KeySelectorException("Null KeyInfo object!");
+                throw new KeySelectorException("Objeto KeyInfo nulo"); //$NON-NLS-1$
             }
             final List<?> list = keyInfo.getContent();
 
@@ -101,16 +101,16 @@ public final class ValidateXMLSignature {
                     }
                 }
             }
-            throw new KeySelectorException("No KeyValue element found!");
+            throw new KeySelectorException("No se ha encontrado el elemento KeyValue"); //$NON-NLS-1$
         }
 
         //@@@FIXME: this should also work for key types other than DSA/RSA
         static boolean algEquals(final String algURI, final String algName) {
-            if (algName.equalsIgnoreCase("DSA") &&
+            if (algName.equalsIgnoreCase("DSA") && //$NON-NLS-1$
                     algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)) {
                 return true;
             } 
-            else if (algName.equalsIgnoreCase("RSA") &&
+            else if (algName.equalsIgnoreCase("RSA") && //$NON-NLS-1$
                     algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1)) {
                 return true;
             } 

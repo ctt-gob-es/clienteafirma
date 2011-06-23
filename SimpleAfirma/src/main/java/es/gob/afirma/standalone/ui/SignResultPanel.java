@@ -45,15 +45,15 @@ final class SignResultPanel extends JPanel {
         try {
             resultOperationIcon.setDocument(dbf.newDocumentBuilder()
                .parse(this.getClass()
-                          .getResourceAsStream("/resources/" + (type.equals(SIGN_DETAIL_TYPE.KO)
-                                ? "ko_icon.svg"
-                                : "ok_icon.svg"))));
+                          .getResourceAsStream("/resources/" + (type.equals(SIGN_DETAIL_TYPE.KO)  //$NON-NLS-1$
+                                ? "ko_icon.svg" //$NON-NLS-1$
+                                : "ok_icon.svg")))); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e);
+            Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        this.descTextLabel.setContentType("text/html");
+        this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
         this.descTextLabel.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(final HyperlinkEvent he) {

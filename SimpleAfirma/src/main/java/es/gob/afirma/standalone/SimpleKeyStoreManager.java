@@ -35,25 +35,25 @@ public final class SimpleKeyStoreManager {
     private static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final String lib = AOUtil.getSystemLibDir();
-            if (new File(lib + "\\UsrPkcs11.dll").exists()) return lib + "\\UsrPkcs11.dll";
+            if (new File(lib + "\\UsrPkcs11.dll").exists()) return lib + "\\UsrPkcs11.dll";  //$NON-NLS-1$ //$NON-NLS-2$
             // if (new File(lib + "\\AutBioPkcs11.dll").exists()) lib = lib + "\\AutBioPkcs11.dll";
-            if (new File(lib + "\\opensc-pkcs11.dll").exists()) return lib + "\\opensc-pkcs11.dll";
-            throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Windows");
+            if (new File(lib + "\\opensc-pkcs11.dll").exists()) return lib + "\\opensc-pkcs11.dll";  //$NON-NLS-1$//$NON-NLS-2$
+            throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Windows"); //$NON-NLS-1$
         }
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            if (new File("/Library/OpenSC/lib/libopensc-dnie.dylib").exists()) return "/Library/OpenSC/lib/libopensc-dnie.dylib";
-            if (new File("/Library/OpenSC/lib/opensc-pkcs11.so").exists()) return "/Library/OpenSC/lib/opensc-pkcs11.so";
-            if (new File("/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib").exists()) return "/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib";
-            if (new File("/usr/lib/opensc-pkcs11.so").exists()) return "/usr/lib/opensc-pkcs11.so";
-            throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Mac OS X");
+            if (new File("/Library/OpenSC/lib/libopensc-dnie.dylib").exists()) return "/Library/OpenSC/lib/libopensc-dnie.dylib";  //$NON-NLS-1$//$NON-NLS-2$
+            if (new File("/Library/OpenSC/lib/opensc-pkcs11.so").exists()) return "/Library/OpenSC/lib/opensc-pkcs11.so"; //$NON-NLS-1$ //$NON-NLS-2$
+            if (new File("/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib").exists()) return "/Library/OpenSC/lib/libopensc-dnie.1.0.3.dylib";  //$NON-NLS-1$//$NON-NLS-2$
+            if (new File("/usr/lib/opensc-pkcs11.so").exists()) return "/usr/lib/opensc-pkcs11.so";  //$NON-NLS-1$//$NON-NLS-2$
+            throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema Mac OS X"); //$NON-NLS-1$
         }
-        if (new File("/usr/local/lib/libopensc-dnie.so").exists()) return "/usr/local/lib/libopensc-dnie.so";
-        if (new File("/usr/lib/libopensc-dnie.so").exists()) return "/usr/lib/libopensc-dnie.so";
-        if (new File("/lib/libopensc-dnie.so").exists()) return "/lib/libopensc-dnie.so";
-        if (new File("/usr/lib/opensc-pkcs11.so").exists()) return "/usr/lib/opensc-pkcs11.so";
-        if (new File("/lib/opensc-pkcs11.so").exists()) return "/lib/opensc-pkcs11.so";
-        if (new File("/usr/local/lib/opensc-pkcs11.so").exists()) return "/usr/local/lib/opensc-pkcs11.so";
-        throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema");
+        if (new File("/usr/local/lib/libopensc-dnie.so").exists()) return "/usr/local/lib/libopensc-dnie.so"; //$NON-NLS-1$ //$NON-NLS-2$
+        if (new File("/usr/lib/libopensc-dnie.so").exists()) return "/usr/lib/libopensc-dnie.so"; //$NON-NLS-1$ //$NON-NLS-2$
+        if (new File("/lib/libopensc-dnie.so").exists()) return "/lib/libopensc-dnie.so"; //$NON-NLS-1$ //$NON-NLS-2$
+        if (new File("/usr/lib/opensc-pkcs11.so").exists()) return "/usr/lib/opensc-pkcs11.so";  //$NON-NLS-1$//$NON-NLS-2$
+        if (new File("/lib/opensc-pkcs11.so").exists()) return "/lib/opensc-pkcs11.so";  //$NON-NLS-1$//$NON-NLS-2$
+        if (new File("/usr/local/lib/opensc-pkcs11.so").exists()) return "/usr/local/lib/opensc-pkcs11.so"; //$NON-NLS-1$ //$NON-NLS-2$
+        throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema"); //$NON-NLS-1$
     }
 
     /** Obtiene un <code>KeyStore</code>.
@@ -69,7 +69,7 @@ public final class SimpleKeyStoreManager {
             try {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.PKCS11,
                      lib,
-                     "DNIe",
+                     "DNIe", //$NON-NLS-1$
                      new DNIePasswordCallback(parent),
                      parent
                  );
@@ -77,7 +77,7 @@ public final class SimpleKeyStoreManager {
             catch(final AOCancelledOperationException e) {}
             catch(final AOKeystoreAlternativeException e) {}
             catch(final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + "): " + e);
+                Logger.getLogger("es.gob.afirma").warning("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
             }
         }
 
@@ -86,7 +86,7 @@ public final class SimpleKeyStoreManager {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.WINDOWS, null, null, new NullPasswordCallback(), parent);
             }
             catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido inicializar SunMSCAPI", e);
+                throw new AOKeyStoreManagerException("No se ha podido inicializar SunMSCAPI", e); //$NON-NLS-1$
             }
         }
 
@@ -95,7 +95,7 @@ public final class SimpleKeyStoreManager {
                 return AOKeyStoreManagerFactory.getAOKeyStoreManager(AOKeyStore.APPLE, null, null, new NullPasswordCallback(), parent);
             }
             catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido incializar el Llavero de Mac OS X", e);
+                throw new AOKeyStoreManagerException("No se ha podido incializar el Llavero de Mac OS X", e); //$NON-NLS-1$
             }
         }
 

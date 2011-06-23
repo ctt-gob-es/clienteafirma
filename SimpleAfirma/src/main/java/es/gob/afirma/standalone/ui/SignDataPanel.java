@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,6 +40,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import es.gob.afirma.misc.Platform;
@@ -56,9 +58,9 @@ final class SignDataPanel extends JPanel {
 
     private static final long serialVersionUID = 4956746943438652928L;
     
-    private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";
-    private static final String FILE_ICON_XML = "/resources/icon_xml.png";
-    private static final String FILE_ICON_BINARY = "/resources/icon_binary.png";
+    private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";  //$NON-NLS-1$
+    private static final String FILE_ICON_XML = "/resources/icon_xml.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_BINARY = "/resources/icon_binary.png"; //$NON-NLS-1$
     
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
@@ -173,7 +175,7 @@ final class SignDataPanel extends JPanel {
 	            this.certIcon.setToolTipText(certInfo.getIconTooltip());
 	
 	            this.certDescription.setEditable(false);
-	            this.certDescription.setContentType("text/html");
+	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
 	            this.certDescription.setOpaque(false);
 	            this.certDescription.setText(certInfo.getDescriptionText());
 	            this.certDescription.setToolTipText("Pulse en la descripción del certificado para obtener información adicional sobre él o anadirlo al almacen de certificados de su sistema operativo");
@@ -279,7 +281,7 @@ final class SignDataPanel extends JPanel {
 
     private void openCertificate(X509Certificate cert) {
         try {
-            final File tmp = File.createTempFile("afirma", ".cer");
+            final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
             tmp.deleteOnExit();
             final OutputStream fos = new FileOutputStream(tmp);
             final OutputStream bos = new BufferedOutputStream(fos);
@@ -309,20 +311,20 @@ final class SignDataPanel extends JPanel {
         signInfo.setSignData(signData);
         final AOSigner signer = AOSignerFactory.getSigner(signData);
         if (signer == null) {
-            Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido");
+            Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido"); //$NON-NLS-1$ //$NON-NLS-2$
         } 
         else {
             try {
                 signInfo.setSignInfo(signer.getSignInfo(signData));
             } 
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e);
+                Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
             signInfo.setSignsTree(signer.getSignersStructure(signData, true));
             try {
                 signInfo.setData(signer.getData(signData));
             } catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("Error al extraer los datos firmados: " + e);
+                Logger.getLogger("es.gob.afirma").warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$//$NON-NLS-2$
             }
         }
         return signInfo;
@@ -340,8 +342,9 @@ final class SignDataPanel extends JPanel {
         final DefaultMutableTreeNode dataInfoBranch = new DefaultMutableTreeNode("Datos firmados");
         if (signInfo.getData() == null) {
             dataInfoBranch.add(new DefaultMutableTreeNode("La firma no contiene los datos firmados"));
-        } else {
-            dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction("Ver datos firmados", signInfo.getData())));
+        } 
+        else {
+            dataInfoBranch.add(new LinkTreeNode(new ShowFileLinkAction("Ver datos firmados", signInfo.getData())));
         }
         root.add(dataInfoBranch);
 
@@ -354,8 +357,8 @@ final class SignDataPanel extends JPanel {
         //final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
         final LinksTreeCellRenderer treeRenderer = new LinksTreeCellRenderer();
         treeRenderer.setLeafIcon(null);
-        treeRenderer.setClosedIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.collapsedIcon"));
-        treeRenderer.setOpenIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon"));
+        treeRenderer.setClosedIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.collapsedIcon")); //$NON-NLS-1$
+        treeRenderer.setOpenIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon")); //$NON-NLS-1$
 
 //        // Modificamos la propiedad interna de la clase que imprime el fondo de los elementos
 //        try {
@@ -369,7 +372,7 @@ final class SignDataPanel extends JPanel {
 
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
-            public void valueChanged(TreeSelectionEvent e) {
+            public void valueChanged(final TreeSelectionEvent e) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
                 if (node == null) {
                     return;
@@ -377,7 +380,8 @@ final class SignDataPanel extends JPanel {
                 final Object nodeInfo = node.getUserObject();
                 if (nodeInfo instanceof AOSimpleSignInfo) {
                     openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0]);
-                } else if (nodeInfo instanceof ShowFileLinkAction) {
+                } 
+                else if (nodeInfo instanceof ShowFileLinkAction) {
                     ((ShowFileLinkAction) nodeInfo).action();
                 }
                 System.out.println("Node object: " + nodeInfo);
@@ -386,13 +390,38 @@ final class SignDataPanel extends JPanel {
         });
         tree.setCellRenderer(treeRenderer);
         tree.setRootVisible(false);
-        tree.putClientProperty("JTree.lineStyle", "None");
-        
+        tree.putClientProperty("JTree.lineStyle", "None"); //$NON-NLS-1$ //$NON-NLS-2$        
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.addMouseMotionListener(new MouseMotionListener() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				TreePath path = tree.getPathForLocation((int) e.getPoint().getX(), (int) e.getPoint().getY());
+				if (path != null) {
+					if (path.getLastPathComponent() instanceof LinkTreeNode) {
+						tree.setCursor(new Cursor(Cursor.HAND_CURSOR));
+					}
+					else {
+						tree.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+					}
+				}
+				else {
+					tree.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				}
+			}
+			@Override
+			public void mouseDragged(MouseEvent e) {}
+		});
+        
         for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
         
         return tree;
+    }
+    
+    private static final class LinkTreeNode extends DefaultMutableTreeNode {
+    	LinkTreeNode(final Object userObject) {
+    		super(userObject);
+    	}
     }
     
 }

@@ -16,7 +16,7 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, focus);
         if (value instanceof DefaultMutableTreeNode) {
             if (!(((DefaultMutableTreeNode) value).getUserObject() instanceof String)) {
-                setText("<html><a href='#'>" + getText() + "</a>");
+                setText("<html><a href='#'>" + getText() + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
         return this;

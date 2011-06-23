@@ -11,6 +11,7 @@
 package es.gob.afirma.standalone.dnie;
 
 import java.awt.Frame;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.logging.Logger;
@@ -27,20 +28,20 @@ import es.gob.afirma.standalone.SimpleAfirma;
 public final class DNIeManager {
 
     /** Evento que indica que se ha insertado un DNIe. */
-    public static final String DNI_INSERTED = "DniInserted";
+    public static final String DNI_INSERTED = "DniInserted"; //$NON-NLS-1$
 
     /** Evento que indica ha ocurrido un error relacionado con <code>SmartCardIO</code>. */
-    public static final String CARD_EXCEPTION = "CardException";
+    public static final String CARD_EXCEPTION = "CardException"; //$NON-NLS-1$
 
     /** Evento que indica que se ha insertado una tarjeta que no es un DNIe. */
-    public static final String NOT_DNI_INSERTED = "NotDniInterted";
+    public static final String NOT_DNI_INSERTED = "NotDniInterted"; //$NON-NLS-1$
 
     /** Evento que indica que se ha insertado un DNIe con su memoria vol&aacute;til borrada. */
-    public static final String BLOWN_DNI_INSERTED = "BlownDniInserted";
+    public static final String BLOWN_DNI_INSERTED = "BlownDniInserted"; //$NON-NLS-1$
 
     private final List<CardTerminal> terminals;
 
-    final PropertyChangeListener pcListener;
+    private final PropertyChangeListener pcListener;
 
     /** Construye un gestor de almac&eacute;n (<code>KeyStore</code>) <DNIe v&iacute;a PKCS#11 y JSR-268.
      * @param pcl Clase a la que se notificar&aacute;n los eventos relacionados con la inserci&oacute;n y extracci&oacute;n de tarjetas en los
@@ -52,11 +53,11 @@ public final class DNIeManager {
             this.terminals = TerminalFactory.getDefault().terminals().list();
         }
         catch (final CardException e) {
-            throw new DNIeManagerException("No se ha podido obtener la lista de lectores de tarjetas", e);
+            throw new DNIeManagerException("No se ha podido obtener la lista de lectores de tarjetas", e); //$NON-NLS-1$
         }
-        if (this.terminals.isEmpty()) throw new DNIeManagerException("No se ha detectado ningun lector de tarjetas");
+        if (this.terminals.isEmpty()) throw new DNIeManagerException("No se ha detectado ningun lector de tarjetas"); //$NON-NLS-1$
         for (final CardTerminal terminal : this.terminals) {
-            Logger.getLogger("es.gob.afirma").info("Detectado lector de tarjetas: " + terminal.getName());
+            Logger.getLogger("es.gob.afirma").info("Detectado lector de tarjetas: " + terminal.getName());  //$NON-NLS-1$//$NON-NLS-2$
         }
     }
 
@@ -64,7 +65,18 @@ public final class DNIeManager {
      * La espera termina cuando se inserta un DNIe, se detecta un DNIe con su memoria vol&aacute;til borrada
      * o ocurre alg&uacute;n error relacionado con <code>SmartCardIO</code> */
     public void waitForDnie() {
-        if (this.pcListener == null) return;
+        if (this.pcListener == null) {
+        	return;
+        }
+        if (this.terminals == null || this.terminals.size() < 1) {
+        	return;
+        }
+        // El error de Java http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6963006 hace que no funcione
+        // la monitorizacion de multi-hilo en JRE anteriores a la 6u25. No tratamos directamente este error,
+        // pero usamos un monitor sin hilos si solo hay un lector de tarjetas, que es el caso mas comun
+        if (this.terminals.size() == 1) {
+        	new SingleThreadCardTerminalMonitor(this.terminals.get(0), this.pcListener).startMonitoring();
+        }
         for (final CardTerminal cardTerminal : this.terminals) {
             new CardTerminalMonitor(cardTerminal, this.pcListener).startMonitoring();
         }
@@ -100,13 +112,107 @@ public final class DNIeManager {
         return false;
     }
 
+    private static final class SingleThreadCardTerminalMonitor {
+    	
+    	private final CardTerminal cardTerminal;
+    	private final PropertyChangeListener pcl;
+    	
+    	SingleThreadCardTerminalMonitor(final CardTerminal terminal, final PropertyChangeListener p) {
+    		this.cardTerminal = terminal;
+    		this.pcl = p;
+    	}
+    	
+    	void startMonitoring() {
+    		if (this.cardTerminal == null || this.pcl == null) return;
+    		Card card = null;
+    		boolean validCard = true;
+            while (true) {
+                do {
+                    try {
+                        this.cardTerminal.waitForCardPresent(0);
+                        if (SimpleAfirma.DEBUG) {
+                            System.out.println("Tarjeta insertada en el lector '" + this.cardTerminal.getName() + "'");  //$NON-NLS-1$//$NON-NLS-2$
+                        }
+                        card = this.cardTerminal.connect("*"); //$NON-NLS-1$
+                        validCard = true;
+                    }
+                    catch (final CardException e) {
+                        if (SimpleAfirma.DEBUG) {
+                            e.printStackTrace();
+                        }
+                        validCard = false;
+                        this.pcl.propertyChange(new PropertyChangeEvent(
+                    		this, // Source 
+                    		CARD_EXCEPTION, // Property name
+                    		"", // oldVaue //$NON-NLS-1$
+                    		"" // new Value //$NON-NLS-1$
+                		));
+                        
+                        try {
+                            this.cardTerminal.waitForCardAbsent(0);
+                        }
+                        catch (final CardException ce) { }
+                    }
+                } while (!validCard);
+
+                try {
+                    if (card != null && (!itsDNIe(card.getATR().getBytes()))) {
+                        if (SimpleAfirma.DEBUG) {
+                            System.out.println("Detectada tarjeta extrana"); //$NON-NLS-1$
+                        }
+                        this.pcl.propertyChange(new PropertyChangeEvent(
+                    		this, // Source 
+                    		NOT_DNI_INSERTED, // Property name
+                    		"", // oldVaue //$NON-NLS-1$
+                    		"" // new Value //$NON-NLS-1$
+                		));
+                        try {
+                            this.cardTerminal.waitForCardAbsent(0);
+                        }
+                        catch (final CardException e) {
+                        	this.pcl.propertyChange(new PropertyChangeEvent(
+                        		this, // Source 
+                        		CARD_EXCEPTION, // Property name
+                        		"", // oldVaue //$NON-NLS-1$
+                        		"" // new Value //$NON-NLS-1$
+                    		));
+                            return;
+                        }
+                    }
+                    else {
+                        if (SimpleAfirma.DEBUG) {
+                            System.out.println("Detectado DNIe"); //$NON-NLS-1$
+                        }
+                        this.pcl.propertyChange(new PropertyChangeEvent(
+                    		this, // Source 
+                    		DNI_INSERTED, // Property name
+                    		"", // oldVaue //$NON-NLS-1$
+                    		"" // new Value //$NON-NLS-1$
+                		));
+                        return;
+                    }
+                }
+                catch (final BlownDNIeException e) {
+                	this.pcl.propertyChange(new PropertyChangeEvent(
+                		this, // Source 
+                		BLOWN_DNI_INSERTED, // Property name
+                		"", // oldVaue //$NON-NLS-1$
+                		"" // new Value //$NON-NLS-1$
+            		));
+                    return;
+                }
+            }
+        }
+
+    }
+    
     private static final class CardTerminalMonitor extends Frame {
 
         private static final long serialVersionUID = 3311217290591616359L;
 
         private final CardTerminal cardTerminal;
 
-        CardTerminalMonitor(final CardTerminal terminal, PropertyChangeListener pcl) {
+        CardTerminalMonitor(final CardTerminal terminal, final PropertyChangeListener pcl) {
             if (pcl != null) this.addPropertyChangeListener(pcl);
             this.cardTerminal = terminal;
         }
@@ -120,9 +226,9 @@ public final class DNIeManager {
                     try {
                         this.cardTerminal.waitForCardPresent(0);
                         if (SimpleAfirma.DEBUG) {
-                            System.out.println("Tarjeta insertada en el lector '" + this.cardTerminal.getName() + "'");
+                            System.out.println("Tarjeta insertada en el lector '" + this.cardTerminal.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
                         }
-                        card = this.cardTerminal.connect("*");
+                        card = this.cardTerminal.connect("*"); //$NON-NLS-1$
                         validCard = true;
                     }
                     catch (final CardException e) {
@@ -130,12 +236,12 @@ public final class DNIeManager {
                             e.printStackTrace();
                         }
                         validCard = false;
-                        firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName());
+                        firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName()); //$NON-NLS-1$
                         
                         try {
                             this.cardTerminal.waitForCardAbsent(0);
                         }
-                        catch (final CardException e2) { }
+                        catch (final CardException ce) { }
                         //return;
                     }
                 } while (!validCard);
@@ -143,27 +249,27 @@ public final class DNIeManager {
                 try {
                     if (card != null && (!itsDNIe(card.getATR().getBytes()))) {
                         if (SimpleAfirma.DEBUG) {
-                            System.out.println("Detectada tarjeta extra\u00F1a");
+                            System.out.println("Detectada tarjeta extrana"); //$NON-NLS-1$
                         }
-                        firePropertyChange(NOT_DNI_INSERTED, "", this.cardTerminal.getName());
+                        firePropertyChange(NOT_DNI_INSERTED, "", this.cardTerminal.getName()); //$NON-NLS-1$
                         try {
                             this.cardTerminal.waitForCardAbsent(0);
                         }
                         catch (final CardException e) {
-                            firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName());
+                            firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName()); //$NON-NLS-1$
                             return;
                         }
                     }
                     else {
                         if (SimpleAfirma.DEBUG) {
-                            System.out.println("Detectado DNIe");
+                            System.out.println("Detectado DNIe"); //$NON-NLS-1$
                         }
-                        firePropertyChange(DNI_INSERTED, "", this.cardTerminal.getName());
+                        firePropertyChange(DNI_INSERTED, "", this.cardTerminal.getName()); //$NON-NLS-1$
                         return;
                     }
                 }
                 catch (final BlownDNIeException e) {
-                    firePropertyChange("BlownDniInserted", false, true);
+                    firePropertyChange(BLOWN_DNI_INSERTED, false, true);
                     return;
                 }
             }

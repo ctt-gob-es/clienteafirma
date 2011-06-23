@@ -140,7 +140,7 @@ final class FileUIManager {
     public static File openFile(final Frame parent, File currentDir, final String[] exts, final String title) {
 
         if (currentDir == null) {
-            currentDir = new File(".");
+            currentDir = new File("."); //$NON-NLS-1$
         }
         
         FilenameFilter filter = null;
@@ -159,7 +159,7 @@ final class FileUIManager {
         }
         
         if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final FileDialog fd = new FileDialog(parent, title); //$NON-NLS-1$
+            final FileDialog fd = new FileDialog(parent, title);
             fd.setDirectory(currentDir.getAbsolutePath());
             
             if (filter != null) fd.setFilenameFilter(new FilenameFilter() {

@@ -20,8 +20,8 @@ import java.util.logging.Logger;
 public abstract class CertAnalyzer {
 
     private static final String[] analyzers = new String[] {
-            "es.gob.afirma.standalone.crypto.DnieCertAnalyzer", 
-            "es.gob.afirma.standalone.crypto.GenericCertAnalyzer"
+            "es.gob.afirma.standalone.crypto.DnieCertAnalyzer",   //$NON-NLS-1$
+            "es.gob.afirma.standalone.crypto.GenericCertAnalyzer" //$NON-NLS-1$
     };
 
     /** Recupera la informaci&oacute;n necesaria para la visualizaci&oacute;n y
@@ -38,7 +38,7 @@ public abstract class CertAnalyzer {
                 }
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se pudo cargar un analizador de certificados: " + e);
+                Logger.getLogger("es.gob.afirma").warning("No se pudo cargar un analizador de certificados: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
         return null;
