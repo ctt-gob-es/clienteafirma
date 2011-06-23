@@ -73,12 +73,14 @@ public final class DNIeManager {
         }
         // El error de Java http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6963006 hace que no funcione
         // la monitorizacion de multi-hilo en JRE anteriores a la 6u25. No tratamos directamente este error,
-        // pero usamos un monitor sin hilos si solo hay un lector de tarjetas, que es el caso mas comun
+        // pero usamos un monitor sin hilos si solo hay un lector de tarjetas, que es el caso mas comun.
         if (this.terminals.size() == 1) {
         	new SingleThreadCardTerminalMonitor(this.terminals.get(0), this.pcListener).startMonitoring();
         }
-        for (final CardTerminal cardTerminal : this.terminals) {
-            new CardTerminalMonitor(cardTerminal, this.pcListener).startMonitoring();
+        else {
+            for (final CardTerminal cardTerminal : this.terminals) {
+                new CardTerminalMonitor(cardTerminal, this.pcListener).startMonitoring();
+            }
         }
     }
 
