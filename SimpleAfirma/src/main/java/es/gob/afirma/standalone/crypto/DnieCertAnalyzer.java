@@ -47,7 +47,7 @@ class DnieCertAnalyzer extends CertAnalyzer {
 	        Logger.getLogger("es.gob.afirma").warning("No se ha podido obtener el nombre del titular del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 	    }
 	    System.out.println();
-		return new CertificateInfo(cert, Messages.getString("DnieCertAnalyzer.2") + ((titular != null) ? (" " + "de" + " " + titular) : ""), getDNIeCertVerifier(), new ImageIcon(this.getClass().getResource("/resources/dnie_cert_ico.png")), Messages.getString("DnieCertAnalyzer.4")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+		return new CertificateInfo(cert, Messages.getString("DnieCertAnalyzer.2") + ((titular != null) ? (" " + Messages.getString("DnieCertAnalyzer.0") + " " + titular) : ""), getDNIeCertVerifier(), new ImageIcon(this.getClass().getResource("/resources/dnie_cert_ico.png")), Messages.getString("DnieCertAnalyzer.4")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 	}
 	
 	/**

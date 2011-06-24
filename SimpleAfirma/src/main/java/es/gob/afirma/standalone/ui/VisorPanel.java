@@ -39,7 +39,7 @@ import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.ui.SignDetailPanel.SIGN_DETAIL_TYPE;
 
-/** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
+/** Panel para la vista de detalles de firmas electr&oacute;nicas.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * @author Carlos Gamuci
  */
@@ -48,7 +48,7 @@ public final class VisorPanel extends JPanel {
     /** Version ID */
     private static final long serialVersionUID = 8309157734617505338L;
 
-    private Frame parent = null;
+    private final Frame parent;
     
     private final JButton openSign = new JButton();
     
@@ -57,7 +57,7 @@ public final class VisorPanel extends JPanel {
      * @param kl KeyListener para la detecci&oacute;n de la tecla ESC para el
      *        cierre del aplicativo y F1 para mostrar la ayuda
      * @param al ActionListener para el control de los botones
-     * @param safirma SimpleAfirma para establecer el <code>Locale</code> seleccionado en el men&uacute; desplegable */
+     */
     public VisorPanel(final File signFile, final byte[] sign, final KeyListener kl, final ActionListener al, final Frame parent) {
         super(true);
         this.parent = parent;
@@ -68,7 +68,6 @@ public final class VisorPanel extends JPanel {
         this.setBackground(SimpleAfirma.WINDOW_COLOR);
         this.setLayout(new GridBagLayout());
         this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        
         openSign(signFile, sign);
     }
 
@@ -154,9 +153,11 @@ public final class VisorPanel extends JPanel {
         }
         else if (DataAnalizerUtil.isXML(sign)) {
             return ValidateXMLSignature.validate(sign);
-        } else if (new ValidateCMS().isCMSSignedData(sign)) {
+        } 
+        else if (new ValidateCMS().isCMSSignedData(sign)) {
             return true;
-        } else if (new ValidateCADES().isCADESSignedData(sign)) {
+        } 
+        else if (new ValidateCADES().isCADESSignedData(sign)) {
             return true;
         }
         return false;

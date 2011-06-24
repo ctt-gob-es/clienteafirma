@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import es.gob.afirma.callbacks.NullPasswordCallback;
+import es.gob.afirma.callbacks.UIPasswordCallback;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -98,8 +99,21 @@ public final class SimpleKeyStoreManager {
                 throw new AOKeyStoreManagerException("No se ha podido incializar el Llavero de Mac OS X", e); //$NON-NLS-1$
             }
         }
+        
+        // Linux y Solaris 
+    	try {
+            return AOKeyStoreManagerFactory.getAOKeyStoreManager(
+        		AOKeyStore.MOZ_UNI, 
+        		null, 
+        		null, 
+        		new UIPasswordCallback(Messages.getString("SimpleKeyStoreManager.0"), parent),  //$NON-NLS-1$
+        		parent
+    		);
+        }
+        catch (final Exception e) {
+            throw new AOKeyStoreManagerException("No se ha podido incializar el almacen de Mozilla", e); //$NON-NLS-1$
+        }
 
-        return null;
     }
 
 }

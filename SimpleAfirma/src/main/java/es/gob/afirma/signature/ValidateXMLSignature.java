@@ -26,9 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
 /**
- * This is a simple example of validating an XML 
- * Signature using the JSR 105 API. It assumes the key needed to
- * validate the signature is contained in a KeyValue KeyInfo. 
+ * Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105.
  */
 public final class ValidateXMLSignature {
 
@@ -120,9 +118,9 @@ public final class ValidateXMLSignature {
         }
     }
 
-    private static class SimpleKeySelectorResult implements KeySelectorResult {
+    private static final class SimpleKeySelectorResult implements KeySelectorResult {
         private PublicKey pk;
-        SimpleKeySelectorResult(PublicKey pk) {
+        SimpleKeySelectorResult(final PublicKey pk) {
             this.pk = pk;
         }
 

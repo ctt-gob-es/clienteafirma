@@ -684,6 +684,16 @@ public final class SignPanel extends JPanel {
             );
             return;
         }
+        catch(final OutOfMemoryError ooe) {
+            Logger.getLogger("es.gob.afirma").severe("Falta de memoria en el proceso de firma: " + ooe); //$NON-NLS-1$ //$NON-NLS-2$
+            UIUtils.showErrorMessage(
+                SignPanel.this,
+                Messages.getString("SignPanel.1"), //$NON-NLS-1$
+                Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
         finally {
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
@@ -696,19 +706,19 @@ public final class SignPanel extends JPanel {
             if (!newFileName.toLowerCase().endsWith(".pdf")) { //$NON-NLS-1$
                 newFileName = newFileName + ".pdf"; //$NON-NLS-1$
             }
-            newFileName = newFileName.substring(0, newFileName.length() - 4) + ".signed.pdf"; //$NON-NLS-1$
+            newFileName = newFileName.substring(0, newFileName.length() - 4).replace(".", "_") + "_signed.pdf"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             filterExtensions = new String[] {
                 ".pdf"}; //$NON-NLS-1$
             filterDescription = Messages.getString("SignPanel.72"); //$NON-NLS-1$
         }
         else if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner) {
-            newFileName = newFileName + ".xsig"; //$NON-NLS-1$
+            newFileName = newFileName.replace(".", "_") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             filterExtensions = new String[] {
                     ".xsig", ".xml"}; //$NON-NLS-1$ //$NON-NLS-2$
             filterDescription = Messages.getString("SignPanel.76"); //$NON-NLS-1$
         }
         else {
-            newFileName = newFileName + ".csig"; //$NON-NLS-1$
+            newFileName = newFileName.replace(".", "_") + ".csig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             filterExtensions = new String[] {
                     ".csig", ".p7s"}; //$NON-NLS-1$ //$NON-NLS-2$
             filterDescription = Messages.getString("SignPanel.80"); //$NON-NLS-1$

@@ -350,7 +350,7 @@ final class SignDataPanel extends JPanel {
             dataInfoBranch.add(new DefaultMutableTreeNode(Messages.getString("SignDataPanel.27"))); //$NON-NLS-1$
         } 
         else {
-            dataInfoBranch.add(new LinkTreeNode(new ShowFileLinkAction(Messages.getString("SignDataPanel.28"), signInfo.getData()))); //$NON-NLS-1$
+            dataInfoBranch.add(new DefaultMutableTreeNode(new ShowFileLinkAction(Messages.getString("SignDataPanel.28"), signInfo.getData()))); //$NON-NLS-1$
         }
         root.add(dataInfoBranch);
 
@@ -379,7 +379,7 @@ final class SignDataPanel extends JPanel {
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(final TreeSelectionEvent e) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+                final DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
                 if (node == null) {
                     return;
                 }
@@ -404,8 +404,14 @@ final class SignDataPanel extends JPanel {
 			public void mouseMoved(MouseEvent e) {
 				TreePath path = tree.getPathForLocation((int) e.getPoint().getX(), (int) e.getPoint().getY());
 				if (path != null) {
-					if (path.getLastPathComponent() instanceof LinkTreeNode) {
-						tree.setCursor(HAND_CURSOR);
+					if (path.getLastPathComponent() instanceof DefaultMutableTreeNode) {
+						final Object o = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+						if (o instanceof ShowFileLinkAction || o instanceof AOSimpleSignInfo) {
+							tree.setCursor(HAND_CURSOR);
+						}
+						else {
+							tree.setCursor(DEFAULT_CURSOR);
+						}
 					}
 					else {
 						tree.setCursor(DEFAULT_CURSOR);
@@ -422,15 +428,6 @@ final class SignDataPanel extends JPanel {
         for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
         
         return tree;
-    }
-    
-    private static final class LinkTreeNode extends DefaultMutableTreeNode {
-
-		private static final long serialVersionUID = -1448841261171448277L;
-
-		LinkTreeNode(final Object userObject) {
-    		super(userObject);
-    	}
     }
     
 }
