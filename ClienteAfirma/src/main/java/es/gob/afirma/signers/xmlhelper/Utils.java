@@ -113,7 +113,7 @@ public final class Utils {
         private static final long serialVersionUID = 8076672806350530425L;
     }
 
-    /** Dereferencia una joja de estilo en forma de Documento DOM
+    /** Dereferencia una joja de estilo en forma de Documento DOM.
      * @param id
      *        Identificador de la hoja de estilo
      * @param headLess
@@ -138,13 +138,15 @@ public final class Utils {
         // Intentamos dereferenciar directamente, cosa que funciona con
         // http://, https:// y file://
         try {
-            xml = AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(id), null, false));
+            final URI styleURI = AOUtil.createURI(id);
+            if (styleURI.getScheme().equals("file")) throw new UnsupportedOperationException("No se aceptan dereferenciaciones directas con file://");
+            xml = AOUtil.getDataFromInputStream(AOUtil.loadFile(styleURI, null, false));
         }
         catch (final Exception e) {
 
             // Si no dereferencia puede ser por tres cosas, porque es una
             // referencia interna,
-            // porque es una referencia local local
+            // porque es una referencia local
             // o porque directamente no se puede dereferenciar
 
             // Miramos si la referencia es local
@@ -173,8 +175,9 @@ public final class Utils {
                             return Messages.getString("Utils.8") + fileName + Messages.getString("Utils.9"); //$NON-NLS-1$ //$NON-NLS-2$
                         }
                     });
-                    if (fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo" //$NON-NLS-1$
-                    );
+                    if (fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+                        throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo"); //$NON-NLS-1$
+                    }
                     try {
                         final InputStream is = new FileInputStream(fc.getSelectedFile());
                         xml = AOUtil.getDataFromInputStream(is);
@@ -188,12 +191,15 @@ public final class Utils {
                     }
                 }
             }
-            else throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo: " + id //$NON-NLS-1$
-            );
+            else {
+                throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo: " + id); //$NON-NLS-1$
+            }
         }
 
         try {
-            if (xml != null) return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(xml));
+            if (xml != null) {
+                return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(xml));
+            }
             throw new CannotDereferenceException("No se ha dereferenciado la hoja de estilo"); //$NON-NLS-1$
         }
         catch (final Exception e) {
@@ -211,14 +217,19 @@ public final class Utils {
      * @return XML con la cabecera de declaraci&oacute;n de hoja de estilo
      *         a&ntilde;adida */
     public static String addStyleSheetHeader(final String xml, String type, final String href) {
-        if (href == null) return xml;
-        if (type == null) type = "text/xsl"; //$NON-NLS-1$
-        if (xml == null || "".equals(xml)) return //$NON-NLS-1$
-        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><?xml-stylesheet type=\"" + //$NON-NLS-1$
+        if (href == null) {
+            return xml;
+        }
+        if (type == null) {
+            type = "text/xsl"; //$NON-NLS-1$
+        }
+        if (xml == null || "".equals(xml)) { //$NON-NLS-1$
+            return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><?xml-stylesheet type=\"" + //$NON-NLS-1$
                 type
                 + "\" href=\"" + //$NON-NLS-1$
                 href
                 + "\"?>"; //$NON-NLS-1$
+        }
         return xml.replaceFirst(">", //$NON-NLS-1$
                                 ">\r\n<?xml-stylesheet type=\"" + //$NON-NLS-1$
                                         type
@@ -237,9 +248,13 @@ public final class Utils {
      *         estilo */
     public static Properties getStyleSheetHeader(String xml) {
         final Properties ret = new Properties();
-        if (xml == null) return ret;
+        if (xml == null) {
+            return ret;
+        }
         final int startPos = xml.indexOf("<?xml-stylesheet "); //$NON-NLS-1$
-        if (startPos == -1) return ret;
+        if (startPos == -1) {
+            return ret;
+        }
         xml = xml.substring(startPos);
         xml =
                 xml.substring(0, xml.indexOf('>') + 1)
@@ -249,7 +264,7 @@ public final class Utils {
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "No se ha podido analizar correctamente la cabecera de definicion de la hora de estilo del XML: " + e //$NON-NLS-1$
+              "No se ha podido analizar correctamente la cabecera de definicion de la hora de estilo del XML: " + e //$NON-NLS-1$
             );
         }
         return ret;
@@ -267,8 +282,12 @@ public final class Utils {
     public static void addCustomTransforms(List<Transform> transformList, Properties extraParams, String xmlSignaturePrefix) {
 
         XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-        if (transformList == null) transformList = new ArrayList<Transform>();
-        if (extraParams == null) extraParams = new Properties();
+        if (transformList == null) {
+            transformList = new ArrayList<Transform>();
+        }
+        if (extraParams == null) {
+            extraParams = new Properties();
+        }
 
         // primero compruebo si hay transformaciones a medida
         int numTransforms = Integer.parseInt(extraParams.getProperty("xmlTransforms", "0")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -286,7 +305,7 @@ public final class Utils {
                 try {
                     transformParam = new XPathFilterParameterSpec(transformBody, Collections.singletonMap(xmlSignaturePrefix, XMLSignature.XMLNS));
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
                     "No se han podido crear los parametros para una transformacion XPATH, se omitira: " + e //$NON-NLS-1$
                     );
@@ -296,18 +315,22 @@ public final class Utils {
             else if (Transform.XPATH2.equals(transformType) && transformBody != null) {
                 transformSubtype = extraParams.getProperty("xmlTransform" + Integer.toString(i) + "Subtype"); //$NON-NLS-1$ //$NON-NLS-2$
                 if ("subtract".equals(transformSubtype)) xPath2TransformFilter = Filter.SUBTRACT; //$NON-NLS-1$
-                else if ("intersect".equals(transformSubtype)) xPath2TransformFilter = Filter.INTERSECT; //$NON-NLS-1$
-                else if ("union".equals(transformSubtype)) xPath2TransformFilter = Filter.UNION; //$NON-NLS-1$
+                else if ("intersect".equals(transformSubtype)) { //$NON-NLS-1$
+                    xPath2TransformFilter = Filter.INTERSECT;
+                }
+                else if ("union".equals(transformSubtype)) { //$NON-NLS-1$
+                    xPath2TransformFilter = Filter.UNION;
+                }
                 else {
                     Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                    "Se ha solicitado aplicar una transformacion XPATH2 de un tipo no soportado: " + transformSubtype //$NON-NLS-1$
+                      "Se ha solicitado aplicar una transformacion XPATH2 de un tipo no soportado: " + transformSubtype //$NON-NLS-1$
                     );
                     continue;
                 }
                 try {
                     transformParam = new XPathFilter2ParameterSpec(Collections.singletonList(new XPathType(transformBody, xPath2TransformFilter)));
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
                     "No se han podido crear los parametros para una transformacion XPATH2, se omitira: " + e //$NON-NLS-1$
                     );
@@ -324,7 +347,7 @@ public final class Utils {
                 }
                 catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                    "No se han podido crear los parametros para una transformacion XSLT, se omitira: " + e //$NON-NLS-1$
+                      "No se han podido crear los parametros para una transformacion XSLT, se omitira: " + e //$NON-NLS-1$
                     );
                     continue;
                 }
@@ -347,7 +370,7 @@ public final class Utils {
             try {
                 transformList.add(fac.newTransform(transformType, transformParam));
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido aplicar la transformacion '" + transformType + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
 
@@ -368,23 +391,23 @@ public final class Utils {
      * @throws NoSuchAlgorithmException
      *         Cuando se encuentre un algoritmo de transformaci&oacurte;n no
      *         soportado. */
-    public static Vector<Transform> getObjectReferenceTransforms(Node referenceNode, String namespacePrefix) throws NoSuchAlgorithmException,
+    public static Vector<Transform> getObjectReferenceTransforms(final Node referenceNode, final String namespacePrefix) throws NoSuchAlgorithmException,
                                                                                                             InvalidAlgorithmParameterException {
 
-        Vector<Transform> transformList = new Vector<Transform>();
+        final Vector<Transform> transformList = new Vector<Transform>();
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 
         // El nodo de referencia puede contener un nodo "Transforms" que a su
         // vez contiene
         // las distintas transformaciones
-        NodeList tmpNodeList = referenceNode.getChildNodes();
+        final NodeList tmpNodeList = referenceNode.getChildNodes();
 
         for (int i = 0; i < tmpNodeList.getLength(); i++) {
 
             // Buscamos el nodo Transforms a secas o precedido por el namespace
             if ("Transforms".equals(tmpNodeList.item(i).getNodeName()) || (namespacePrefix + ":Transforms").equals(tmpNodeList.item(i).getNodeName())) {
 
-                NodeList transformsNodeList = tmpNodeList.item(i).getChildNodes();
+                final NodeList transformsNodeList = tmpNodeList.item(i).getChildNodes();
 
                 for (int j = 0; j < transformsNodeList.getLength(); j++) {
 
@@ -404,15 +427,15 @@ public final class Utils {
      * @param transformNode
      *        Nodo de transformaci&oacute;n.
      * @return Algoritmo de transformaci&oacute;n. */
-    private static String getTransformAlgorithm(Node transformNode) {
-
-        String algorithm = null;
-        Node algorithmNode = transformNode.getAttributes().getNamedItem("Algorithm");
-        if (algorithmNode != null) {
-            algorithm = algorithmNode.getNodeValue();
+    private static String getTransformAlgorithm(final Node transformNode) {
+        if (transformNode == null) {
+            return null;
         }
-
-        return algorithm;
+        final Node algorithmNode = transformNode.getAttributes().getNamedItem("Algorithm");
+        if (algorithmNode != null) {
+            return algorithmNode.getNodeValue();
+        }
+        return null;
     }
 
     /** Recupera los par&aacute;metros de una transformaci&opacute;n. En el caso
@@ -427,10 +450,10 @@ public final class Utils {
      * @throws InvalidAlgorithmParameterException
      *         Cuando no se especifiquen correctamente los
      *         par&aacute;mnetros de las transformaciones XPATH y XPATH2. */
-    private static TransformParameterSpec getTransformParameterSpec(Node transformNode, String namespacePrefix) throws InvalidAlgorithmParameterException {
+    private static TransformParameterSpec getTransformParameterSpec(final Node transformNode, final String namespacePrefix) throws InvalidAlgorithmParameterException {
 
         TransformParameterSpec params = null;
-        String algorithm = getTransformAlgorithm(transformNode);
+        final String algorithm = getTransformAlgorithm(transformNode);
 
         // Comprobamos que la transformacion sea de tipo XPATH o XPATH2, unicos
         // casos en los que
@@ -440,9 +463,9 @@ public final class Utils {
             // Si es una transformacion XPATH solo tenemos que recoger el cuerpo
             if (Transform.XPATH.equals(algorithm)) {
 
-                NodeList xpathTransforms = transformNode.getChildNodes();
+                final NodeList xpathTransforms = transformNode.getChildNodes();
                 for (int i = 0; i < xpathTransforms.getLength(); i++) {
-                    Node xpathTransformNode = xpathTransforms.item(i);
+                    final Node xpathTransformNode = xpathTransforms.item(i);
 
                     // Probamos a encontrar un nodo XPath sin namespace y con el
                     // namespace indicado
@@ -470,22 +493,24 @@ public final class Utils {
             // subtipo
             else if (Transform.XPATH2.equals(algorithm)) {
 
-                NodeList xpathTransforms = transformNode.getChildNodes();
+                final NodeList xpathTransforms = transformNode.getChildNodes();
                 for (int i = 0; i < xpathTransforms.getLength(); i++) {
-                    Node xpathTransformNode = xpathTransforms.item(i);
+                    final Node xpathTransformNode = xpathTransforms.item(i);
                     if ("XPath".equals(xpathTransformNode.getNodeName()) || (namespacePrefix + ":XPath").equals(xpathTransformNode.getNodeName())) {
 
-                        Filter filter = null;
-                        Node filterNode = xpathTransformNode.getAttributes().getNamedItem("Filter");
+                        Filter filter;
+                        final Node filterNode = xpathTransformNode.getAttributes().getNamedItem("Filter");
                         if (filterNode != null) {
-                            String filterName = filterNode.getNodeValue();
+                            final String filterName = filterNode.getNodeValue();
                             if (filterName.equals("subtract")) filter = Filter.SUBTRACT;
                             else if (filterName.equals("intersect")) filter = Filter.INTERSECT;
                             else if (filterName.equals("union")) filter = Filter.UNION;
                             else throw new InvalidAlgorithmParameterException("El subtipo '" + filterName
                                                                               + "' de la transformacion XPATH2 no es valido");
                         }
-                        else throw new InvalidAlgorithmParameterException("No se ha declarado un subtipo para la transformacion XPATH2");
+                        else {
+                            throw new InvalidAlgorithmParameterException("No se ha declarado un subtipo para la transformacion XPATH2");
+                        }
 
                         params = new XPathFilter2ParameterSpec(Collections.singletonList(new XPathType(xpathTransformNode.getTextContent(), filter)));
                         break;
@@ -580,11 +605,11 @@ public final class Utils {
         final String xades132 = "\"http://uri.etsi.org/01903/v1.3.2#\""; //$NON-NLS-1$
         final String xades141 = "\"http://uri.etsi.org/01903/v1.4.1#\""; //$NON-NLS-1$
 
-        String signatureText = new String(writeXML(el, null, null, null));
+        final String signatureText = new String(writeXML(el, null, null, null));
 
-        int numLatest = countSubstring(signatureText, latest);
-        int numXades132 = countSubstring(signatureText, xades132);
-        int numXades141 = countSubstring(signatureText, xades141);
+        final int numLatest = countSubstring(signatureText, latest);
+        final int numXades132 = countSubstring(signatureText, xades132);
+        final int numXades141 = countSubstring(signatureText, xades141);
 
         // Prioridad: xades132 > latest > xades141
         if (numXades132 >= numLatest && numXades132 >= numXades141) return xades132.replace("\"", "");
@@ -601,12 +626,12 @@ public final class Utils {
      * @return URL de la declaraci&oacute;n del espacio de nombres */
     public static String guessXMLDSigNamespaceURL(final Element el) {
 
-        String signatureText = new String(writeXML(el, null, null, null));
+        final String signatureText = new String(writeXML(el, null, null, null));
 
         // Por defecto "http://www.w3.org/2000/09/xmldsig#"
 
-        int numXmlDsig = countSubstring(signatureText, "http://www.w3.org/2000/09/xmldsig#");
-        int numXmlDsig11 = countSubstring(signatureText, "http://www.w3.org/2009/xmldsig11#");
+        final int numXmlDsig = countSubstring(signatureText, "http://www.w3.org/2000/09/xmldsig#");
+        final int numXmlDsig11 = countSubstring(signatureText, "http://www.w3.org/2009/xmldsig11#");
 
         return numXmlDsig >= numXmlDsig11 ? "http://www.w3.org/2000/09/xmldsig#" : "http://www.w3.org/2009/xmldsig11#";
     }
@@ -617,19 +642,26 @@ public final class Utils {
      * @return Prefijo del espacio de nombres */
     public static String guessXMLDSigNamespacePrefix(final Element el) {
 
-        String signatureText = new String(writeXML(el, null, null, null));
+        final String signatureText = new String(writeXML(el, null, null, null));
 
-        int numEmpty = countSubstring(signatureText, "<Signature");
-        int numDs = countSubstring(signatureText, "<ds:Signature");
-        int numDsig = countSubstring(signatureText, "<dsig:Signature");
-        int numDsig11 = countSubstring(signatureText, "<dsig11:Signature");
+        final int numEmpty = countSubstring(signatureText, "<Signature");
+        final int numDs = countSubstring(signatureText, "<ds:Signature");
+        final int numDsig = countSubstring(signatureText, "<dsig:Signature");
+        final int numDsig11 = countSubstring(signatureText, "<dsig11:Signature");
 
         // Prioridad: ds > "" > dsig > dsig11
-        if (numDs >= numEmpty && numDs >= numDsig && numDs >= numDsig11) return "ds";
-        if (numEmpty >= numDs && numEmpty >= numDsig && numEmpty >= numDsig11) return "";
-        if (numDsig >= numEmpty && numDsig >= numDs && numDsig >= numDsig11) return "dsig";
-        if (numDsig11 >= numEmpty && numDsig11 >= numDsig && numDsig11 >= numDs) return "dsig11";
-
+        if (numDs >= numEmpty && numDs >= numDsig && numDs >= numDsig11) {
+            return "ds";
+        }
+        if (numEmpty >= numDs && numEmpty >= numDsig && numEmpty >= numDsig11) {
+            return "";
+        }
+        if (numDsig >= numEmpty && numDsig >= numDs && numDsig >= numDsig11) {
+            return "dsig";
+        }
+        if (numDsig11 >= numEmpty && numDsig11 >= numDsig && numDsig11 >= numDs) {
+            return "dsig11";
+        }
         return "ds";
     }
 
@@ -641,7 +673,6 @@ public final class Utils {
      *        Subcadena que deseamos buscar.
      * @return N&uacute;mero de coincidencias. */
     private static int countSubstring(final String text, final String substring) {
-
         int count = 0;
         for (int i = 0; i <= (text.length() - substring.length()); i++) {
             if (substring.charAt(0) == text.charAt(i)) {
@@ -667,14 +698,14 @@ public final class Utils {
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
         boolean needsReconReference;
 
-        for (Reference r : referenceList) {
+        for (final Reference r : referenceList) {
             if (r.getId() == null) {
                 // Por cada referencia guardamos sus transformaciones que no son
                 // Base64 por si hay que
                 // reconstruirla
                 trans = null;
                 needsReconReference = false;
-                for (Object t : r.getTransforms()) {
+                for (final Object t : r.getTransforms()) {
                     if (t instanceof Transform) {
                         if (!"http://www.w3.org/2000/09/xmldsig#base64".equals(((Transform) t).getAlgorithm())) {
                             // Si el ID es nulo y hay una transformacion Base64
@@ -699,7 +730,9 @@ public final class Utils {
                     newList.add(r);
                 }
             }
-            else newList.add(r);
+            else {
+                newList.add(r);
+            }
         }
         return newList;
     }
@@ -751,7 +784,7 @@ public final class Utils {
         try {
             docum = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma")
                   .severe("No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e);
             return baos.toByteArray();
@@ -782,13 +815,13 @@ public final class Utils {
     }
 
     private final static void writeXMLwithXALAN(final Writer writer, final Node node, final String xmlEncoding) {
-        Document document = node.getOwnerDocument();
-        DOMImplementationLS domImplLS = (DOMImplementationLS) document.getImplementation();
-        LSSerializer serializer = domImplLS.createLSSerializer();
+        final LSSerializer serializer = ((DOMImplementationLS) node.getOwnerDocument().getImplementation()).createLSSerializer();
         serializer.getDomConfig().setParameter("namespaces", false);
-        DOMOutputImpl output = new DOMOutputImpl();
+        final DOMOutputImpl output = new DOMOutputImpl();
         output.setCharacterStream(writer);
-        if (xmlEncoding != null) output.setEncoding(xmlEncoding);
+        if (xmlEncoding != null) {
+            output.setEncoding(xmlEncoding);
+        }
         serializer.write(node, output);
     }
 
@@ -822,7 +855,7 @@ public final class Utils {
      * @param signature
      *        Nodo de firma.
      * @return Objeto descriptor de firma. */
-    public static AOSimpleSignInfo getSimpleSignInfoNode(String namespace, Element signature) {
+    public static AOSimpleSignInfo getSimpleSignInfoNode(final String namespace, final Element signature) {
 
         // Recupera la fecha de firma
         Date signingTime = null;
@@ -832,7 +865,7 @@ public final class Utils {
                         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(((Element) signature.getElementsByTagNameNS(namespace, "SigningTime")
                                                                                                 .item(0)).getTextContent());
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido recuperar la fecha de firma: " + e);
             }
         }
@@ -859,7 +892,7 @@ public final class Utils {
      * @param signature
      *        Nodo de firma.
      * @return CN del certificado de firma. */
-    public static String getStringInfoNode(Element signature) {
+    public static String getStringInfoNode(final Element signature) {
         return AOUtil.getCN(Utils.getCertificate(signature.getElementsByTagNameNS(DSIGNNS, "X509Certificate").item(0)));
     }
 
@@ -867,7 +900,7 @@ public final class Utils {
      * @param certificateNode
      *        Nodo "X509Certificate" de la firma.
      * @return Certificado de firma. */
-    public static X509Certificate getCertificate(Node certificateNode) {
+    public static X509Certificate getCertificate(final Node certificateNode) {
         return AOCryptoUtil.createCert(certificateNode.getTextContent().trim().replace("\r", "").replace("\n", "").replace(" ", "").replace("\t", ""));
     }
 
@@ -879,13 +912,13 @@ public final class Utils {
      * @param signatureValues
      *        Listado con todos los SignatureValue del documento de firma.
      * @return Identificador de la firma (Signature) referenciada. */
-    public static String getCounterSignerReferenceId(Element signature, NodeList signatureValues) {
+    public static String getCounterSignerReferenceId(final Element signature, final NodeList signatureValues) {
         // Tomamos la URI de la primera referencia (la del objeto firmado),
         // evitando el primer caracter de la URI que sera la almohadilla (#)
-        String uri = ((Element) signature.getElementsByTagNameNS(DSIGNNS, "Reference").item(0)).getAttribute("URI").substring(1);
+        final String uri = ((Element) signature.getElementsByTagNameNS(DSIGNNS, "Reference").item(0)).getAttribute("URI").substring(1);
         String signatureId = "";
         for (int j = 0; j < signatureValues.getLength(); j++) {
-            Element signatureValue = (Element) signatureValues.item(j);
+            final Element signatureValue = (Element) signatureValues.item(j);
             if (signatureValue.getAttribute("Id").equals(uri)) {
                 signatureId = ((Element) signatureValue.getParentNode()).getAttribute("Id");
                 break;
