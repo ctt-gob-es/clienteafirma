@@ -117,7 +117,7 @@ public final class SignDetailPanel extends JPanel {
         }
 
         final JPanel infoPanel = new SignResultPanel(panelType);
-        final JPanel componentPanel = new SignDataPanel(sigPath, sig, fileTypeIcon, signingCert);
+        final JPanel componentPanel = new SignDataPanel(new File(sigPath), sig, fileTypeIcon, signingCert);
 
         final JPanel returnPanel = new JPanel(true);
         returnPanel.setLayout(new BoxLayout(returnPanel, BoxLayout.Y_AXIS)); 

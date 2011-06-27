@@ -16,7 +16,7 @@ import javax.swing.filechooser.FileFilter;
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.standalone.Messages;
 
-final class FileUIManager {
+public final class FileUIManager {
 
     /**
      * Muestra un di&aacute;logo para el guardado de datos y los almacena en el

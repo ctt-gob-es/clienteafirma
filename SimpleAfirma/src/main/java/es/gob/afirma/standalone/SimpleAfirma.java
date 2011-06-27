@@ -170,20 +170,20 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      *        Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
         
-//        boolean executeVisor = false;
-//        if (args != null && args.length > 0) {
-//            File signFile = new File(args[0]);
-//            if (signFile.exists() && signFile.isFile()) {
-//                executeVisor = true;
-//            }
-//        }
-//        if (executeVisor) {
-//            VisorFirma visor = new VisorFirma(new File(args[0]));
-//            //visor.initialize(false);
-//        }
-//        else {
+        boolean executeVisor = false;
+        if (args != null && args.length > 0) {
+            File signFile = new File(args[0]);
+            if (signFile.exists() && signFile.isFile()) {
+                executeVisor = true;
+            }
+        }
+        if (executeVisor) {
+            VisorFirma visor = new VisorFirma(new File(args[0]));
+            visor.initialize(false, null);
+        }
+        else {
             new SimpleAfirma().initialize(false);
-//        }
+        }
     }
 
     @Override

@@ -74,16 +74,16 @@ final class SignDataPanel extends JPanel {
     private final JEditorPane certDescription = new JEditorPane();
     private JButton validateCertButton = null;
     
-    SignDataPanel(final String path, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
+    SignDataPanel(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createUI(path, sign, fileTypeIcon, cert);
+                createUI(signFile, sign, fileTypeIcon, cert);
             }
         });
     }
     
-    private void createUI(final String path, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
+    private void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
 
         setBackground(SimpleAfirma.WINDOW_COLOR);
         
@@ -95,7 +95,7 @@ final class SignDataPanel extends JPanel {
         filePath.setBorder(BorderFactory.createEmptyBorder());
         filePath.setEditable(false);
         filePath.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-        filePath.setText(path);
+        filePath.setText(signFile == null ? "Datos en memoria" : signFile.getAbsolutePath());
         filePath.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(final MouseEvent me) {
@@ -111,29 +111,32 @@ final class SignDataPanel extends JPanel {
         this.filePathText.setLabelFor(filePath);
 
         // Boton de apertura del fichero firmado
-        final JButton openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
-        openFileButton.setPreferredSize(new Dimension(150, 24));
-        openFileButton.setMnemonic('v');
-        openFileButton.setToolTipText(Messages.getString("SignDataPanel.4")); //$NON-NLS-1$
-        openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.5")); //$NON-NLS-1$
-        openFileButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.6")); //$NON-NLS-1$
-        openFileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent ae) {
-                try {
-                    Desktop.getDesktop().open(new File(path));
+        JButton openFileButton = null;
+        if (signFile == null) {
+            openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
+            openFileButton.setPreferredSize(new Dimension(150, 24));
+            openFileButton.setMnemonic('v');
+            openFileButton.setToolTipText(Messages.getString("SignDataPanel.4")); //$NON-NLS-1$
+            openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.5")); //$NON-NLS-1$
+            openFileButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.6")); //$NON-NLS-1$
+            openFileButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent ae) {
+                    try {
+                        Desktop.getDesktop().open(signFile);
+                    }
+                    catch (final Exception e) {
+                        UIUtils.showErrorMessage(
+                                SignDataPanel.this,
+                                Messages.getString("SignDataPanel.7"), //$NON-NLS-1$
+                                Messages.getString("SignDataPanel.8"), //$NON-NLS-1$
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                    }
                 }
-                catch (final Exception e) {
-                    UIUtils.showErrorMessage(
-                            SignDataPanel.this,
-                            Messages.getString("SignDataPanel.7"), //$NON-NLS-1$
-                            Messages.getString("SignDataPanel.8"), //$NON-NLS-1$
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                }
-            }
-        });
-
+            });
+        }
+        
         final JPanel filePathPanel = new JPanel();
         filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         filePathPanel.setLayout(new BoxLayout(filePathPanel, BoxLayout.X_AXIS));
@@ -165,8 +168,10 @@ final class SignDataPanel extends JPanel {
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         filePathPanel.add(filePath);
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
-        filePathPanel.add(openFileButton);
-        filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        if (openFileButton != null) {
+            filePathPanel.add(openFileButton);
+            filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        }
         filePathPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
 
         JPanel certDescPanel = null;
