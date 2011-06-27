@@ -165,27 +165,6 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
     }
 
-    /** Punto de entrada de la aplicaci&oacute;n.
-     * @param args
-     *        Par&aacute;metros en l&iacute;nea de comandos */
-    public static void main(final String[] args) {
-        
-        boolean executeVisor = false;
-        if (args != null && args.length > 0) {
-            File signFile = new File(args[0]);
-            if (signFile.exists() && signFile.isFile()) {
-                executeVisor = true;
-            }
-        }
-        if (executeVisor) {
-            VisorFirma visor = new VisorFirma(new File(args[0]));
-            visor.initialize(false, null);
-        }
-        else {
-            new SimpleAfirma().initialize(false);
-        }
-    }
-
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
         if (DNIeManager.BLOWN_DNI_INSERTED.equals(evt.getPropertyName())) {
@@ -358,29 +337,15 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
     }
 
-    @Override
-    public void keyTyped(final KeyEvent ke) {}
+    @Override public void keyTyped(final KeyEvent ke) {}
+    @Override public void keyReleased(final KeyEvent ke) {}
 
-    @Override
-    public void keyReleased(final KeyEvent ke) {}
-
-    @Override
-    public void windowOpened(final WindowEvent we) {}
-
-    @Override
-    public void windowClosed(final WindowEvent we) {}
-
-    @Override
-    public void windowActivated(final WindowEvent we) {}
-
-    @Override
-    public void windowIconified(final WindowEvent we) {}
-
-    @Override
-    public void windowDeiconified(final WindowEvent we) {}
-
-    @Override
-    public void windowDeactivated(final WindowEvent we) {}
+    @Override public void windowOpened(final WindowEvent we) {}
+    @Override public void windowClosed(final WindowEvent we) {}
+    @Override public void windowActivated(final WindowEvent we) {}
+    @Override public void windowIconified(final WindowEvent we) {}
+    @Override public void windowDeiconified(final WindowEvent we) {}
+    @Override public void windowDeactivated(final WindowEvent we) {}
 
     /** Cierra la aplicaci&oacute;n.
      * @param exitCode
@@ -562,4 +527,26 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     // ***** FIN APLICACION COMO APPLET **************
     // ***********************************************
 
+
+    /** Punto de entrada de la aplicaci&oacute;n.
+     * @param args
+     *        Par&aacute;metros en l&iacute;nea de comandos */
+    public static void main(final String[] args) {
+        
+        boolean executeVisor = false;
+        if (args != null && args.length > 0) {
+            File signFile = new File(args[0]);
+            if (signFile.exists() && signFile.isFile()) {
+                executeVisor = true;
+            }
+        }
+        if (executeVisor) {
+            VisorFirma visor = new VisorFirma(new File(args[0]));
+            visor.initialize(false, null);
+        }
+        else {
+            new SimpleAfirma().initialize(false);
+        }
+    }
+    
 }

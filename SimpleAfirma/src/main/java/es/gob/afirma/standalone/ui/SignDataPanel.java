@@ -93,6 +93,7 @@ final class SignDataPanel extends JPanel {
         filePath.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.1")); //$NON-NLS-1$
         filePath.setFont(this.getFont().deriveFont(this.getFont().getSize() + 2));
         filePath.setBorder(BorderFactory.createEmptyBorder());
+        filePath.setBackground(SimpleAfirma.WINDOW_COLOR);
         filePath.setEditable(false);
         filePath.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         filePath.setText(signFile == null ? "Datos en memoria" : signFile.getAbsolutePath());
@@ -112,7 +113,7 @@ final class SignDataPanel extends JPanel {
 
         // Boton de apertura del fichero firmado
         JButton openFileButton = null;
-        if (signFile == null) {
+        if (signFile != null) {
             openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
             openFileButton.setPreferredSize(new Dimension(150, 24));
             openFileButton.setMnemonic('v');
@@ -395,8 +396,6 @@ final class SignDataPanel extends JPanel {
                 else if (nodeInfo instanceof ShowFileLinkAction) {
                     ((ShowFileLinkAction) nodeInfo).action();
                 }
-                System.out.println("Node object: " + nodeInfo); //$NON-NLS-1$
-                System.out.println("---"); //$NON-NLS-1$
             }
         });
         tree.setCellRenderer(treeRenderer);

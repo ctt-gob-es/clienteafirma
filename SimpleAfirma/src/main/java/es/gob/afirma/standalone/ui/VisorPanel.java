@@ -11,7 +11,6 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Component;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -42,8 +41,6 @@ public final class VisorPanel extends JPanel {
 
     /** Version ID */
     private static final long serialVersionUID = 8309157734617505338L;
-
-    private Frame parent = null;
     
     private final JButton openSign = new JButton();
     
@@ -53,10 +50,9 @@ public final class VisorPanel extends JPanel {
     /** Construye un panel de espera a insercci&oacute;n de DNIe.
      * @param al ActionListener para el control de los botones
      * @param safirma SimpleAfirma para establecer el <code>Locale</code> seleccionado en el men&uacute; desplegable */
-    public VisorPanel(final File signFile, final byte[] sign, final ActionListener al, final Frame parent) {
+    public VisorPanel(final File signFile, final byte[] sign, final ActionListener al) {
         super(true);
         this.actionListener = al;
-        this.parent = parent;
         createUI(signFile, sign);
     }
     
