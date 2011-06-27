@@ -14,7 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 /**
- * Analizador de certificados para visualizaci—n de detalles en pantalla.
+ * Analizador de certificados para visualizaci&oacute;n de detalles en pantalla.
  *
  */
 public abstract class CertAnalyzer {
