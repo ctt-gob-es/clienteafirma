@@ -19,31 +19,26 @@ El Gobierno de España retiene los Derechos de Propiedad Intelectual sobre el CL
 
 6. El CLIENTe @firma incluye o puede incluir porciones o componentes de software de los siguientes productos, cubiertos por las siguientes licencias:
 
-Java - http://java.net/
-  Java Research License - http://www.java.net/jrl.csp
-  GNU General Public License Version 2 (GPLv2) - http://www.gnu.org/licenses/gpl-2.0.html
-
-OpenJDK - http://openjdk.java.net/
-  GNU General Public License Version 2, with the Classpath Exception - http://openjdk.java.net/legal/gplv2+ce.html
-
-JXAdES - https://xades.dev.java.net/
-  GNU General Public License - http://www.gnu.org/copyleft/gpl.html
-
-iText - http://itextpdf.com/
-  GNU Lesser General Public License - http://www.gnu.org/copyleft/lesser.html
-  Mozilla Public License - http://www.mozilla.org/MPL/
-
+JXAdES:
+	GNU General Public License Version 2 (GPLv2) - http://www.gnu.org/licenses/gpl-2.0.html
+Java (JDK / OpenJDK) - http://jdk7.java.net/ - http://openjdk.java.net/
+	GNU General Public License Version 2, with the Classpath Exception - http://openjdk.java.net/legal/gplv2+ce.html
+iText (2.1.7) - http://itextpdf.com/
+	Affero General Public License v3 - http://www.gnu.org/licenses/agpl.html
+	Mozilla Public License - http://www.mozilla.org/MPL/
 The Legion of the Bouncy Castle - http://www.bouncycastle.org/
-  The Legion of the Bouncy Castle License - http://www.bouncycastle.org/csharp/licence.html
-
+	The Legion of the Bouncy Castle License (based on MIT X11 License)- http://www.bouncycastle.org/licence.html
 Apache Jakarta-ORO - http://jakarta.apache.org/oro/
-  Apache License 2.0 - http://svn.apache.org/repos/asf/jakarta/oro/trunk/LICENSE
-  
-Apache Commons-IO / Apache Commons-Codec - http://commons.apache.org/  Apache License 2.0 - http://svn.apache.org/repos/asf/jakarta/oro/trunk/LICENSE
-  
+	Apache License 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
+Apache Commons-IO / Apache Commons-Codec - http://commons.apache.org/
+	Apache License 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
 jMimeMagic - http://sourceforge.net/projects/jmimemagic/
-  GNU Lesser General Public License - http://www.gnu.org/copyleft/lesser.html
-
+	GNU Lesser General Public License - http://www.gnu.org/copyleft/lesser.html
+Mozilla Network Security Services (NSS) - http://www.mozilla.org/projects/security/pki/nss/
+	Mozilla Public License - http://www.mozilla.org/MPL/
+	GNU General Public License - http://www.gnu.org/licenses/gpl.html
+	GNU Lesser General Public License - http://www.gnu.org/copyleft/lesser.html
+	
 Puede consultar las respectivas licencias en sus correspondientes URL. En todo caso, las bibliotecas mencionadas, hayan sido modificadas o no como parte de este proyecto, se proporcionan sin ninguna garantía explícita o implícita hasta el extremo permitido por la Ley.
 Se declina toda responsabilidad por cualquier daño pérdida provocada por este código, aunque hubiese sido previamente advertido de la posibilidad de que ocurriese el mismo.
 
