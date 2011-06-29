@@ -25,13 +25,15 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.signature.SignValidity;
+import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signature.ValidateBinarySignature;
 import es.gob.afirma.signature.ValidateXMLSignature;
-import es.gob.afirma.signers.aobinarysignhelper.ValidateCADES;
-import es.gob.afirma.signers.aobinarysignhelper.ValidateCMS;
+import es.gob.afirma.signers.AOCAdESSigner;
+import es.gob.afirma.signers.AOCMSSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.ui.SignDetailPanel.SIGN_DETAIL_TYPE;
 
 /** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
@@ -83,16 +85,16 @@ public final class VisorPanel extends JPanel {
             }
         }
         
-        SIGN_DETAIL_TYPE panelType = SIGN_DETAIL_TYPE.KO;
+        SignValidity validity = new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
         if (sign != null) {
             try {
-                panelType = validateSign(sign) ? SIGN_DETAIL_TYPE.OK : SIGN_DETAIL_TYPE.KO;
+                validity = validateSign(sign);
             } catch (Exception e) {
-                panelType = SIGN_DETAIL_TYPE.KO;
+                validity = new SignValidity(SIGN_DETAIL_TYPE.KO, null);
             }
         }
         
-        final JPanel resultPanel = new SignResultPanel(panelType);
+        final JPanel resultPanel = new SignResultPanel(validity);
         final JPanel dataPanel = new SignDataPanel(signFile, sign, null, null);
 
         final JPanel bottonPanel = new JPanel(true);
@@ -129,19 +131,16 @@ public final class VisorPanel extends JPanel {
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
      * @throws Exception Cuando los datos introducidos no se corresponden con una firma.
      */
-    private boolean validateSign(byte[] sign) throws Exception {
+    private SignValidity validateSign(byte[] sign) throws Exception {
         
         if (DataAnalizerUtil.isPDF(sign)) {
-            return true;
-        }
-        else if (DataAnalizerUtil.isXML(sign)) {
+            return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+        } else if (DataAnalizerUtil.isXML(sign)) {
             return ValidateXMLSignature.validate(sign);
-        } else if (new ValidateCMS().isCMSSignedData(sign)) {
-            return true;
-        } else if (new ValidateCADES().isCADESSignedData(sign)) {
-            return true;
+        } else if(new AOCMSSigner().isSign(sign) || new AOCAdESSigner().isSign(sign)) {
+            return ValidateBinarySignature.validate(sign);
         }
-        return false;
+        return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
     }
     
 //    public static void main(String[] args) {

@@ -18,9 +18,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
 
+import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
-import es.gob.afirma.standalone.ui.SignDetailPanel.SIGN_DETAIL_TYPE;
 
 final class SignResultPanel extends JPanel {
 
@@ -29,26 +29,38 @@ final class SignResultPanel extends JPanel {
     private final JEditorPane descTextLabel = new JEditorPane();
     private final JLabel resultTextLabel = new JLabel();
     
-    SignResultPanel(final SIGN_DETAIL_TYPE type) {
+    SignResultPanel(final SignValidity validity) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createUI(type);
+                createUI(validity);
             }
         });
     }
     
-    private void createUI(final SIGN_DETAIL_TYPE type) {
+    private void createUI(final SignValidity validity) {
 
         final JSVGCanvas resultOperationIcon = new JSVGCanvas();
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         try {
+            String iconFilename;
+            switch (validity.getValidity()) {
+            case KO:
+                iconFilename = "ko_icon.svg"; //$NON-NLS-1$
+                break;
+            case OK:
+                iconFilename = "ok_icon.svg"; //$NON-NLS-1$
+                break;
+            case GENERATED:
+                iconFilename = "ok_icon.svg"; //$NON-NLS-1$
+                break;
+            default:
+                iconFilename = "unknown_icon.svg"; //$NON-NLS-1$
+            }
             resultOperationIcon.setDocument(dbf.newDocumentBuilder()
                .parse(this.getClass()
-                          .getResourceAsStream("/resources/" + (type.equals(SIGN_DETAIL_TYPE.KO)  //$NON-NLS-1$
-                                ? "ko_icon.svg" //$NON-NLS-1$
-                                : "ok_icon.svg")))); //$NON-NLS-1$
+                          .getResourceAsStream("/resources/" + iconFilename))); //$NON-NLS-1$
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -76,22 +88,38 @@ final class SignResultPanel extends JPanel {
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
  
+        String errorMessage;
         final String resultOperationIconTooltip;
-        switch (type) {
+        switch (validity.getValidity()) {
             case GENERATED:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.2")); //$NON-NLS-1$
                 this.descTextLabel.setText(Messages.getString("SignResultPanel.3")); //$NON-NLS-1$
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.4"); //$NON-NLS-1$
                 break;
-            case KO:
-                this.resultTextLabel.setText(Messages.getString("SignResultPanel.5")); //$NON-NLS-1$
-                this.descTextLabel.setText(Messages.getString("SignResultPanel.6")); //$NON-NLS-1$
-                resultOperationIconTooltip = Messages.getString("SignResultPanel.7"); //$NON-NLS-1$
-                break;
-            default:
+            case OK:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.8")); //$NON-NLS-1$
                 this.descTextLabel.setText(Messages.getString("SignResultPanel.9")); //$NON-NLS-1$
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.10"); //$NON-NLS-1$
+                break;
+            case KO:
+                this.resultTextLabel.setText(Messages.getString("SignResultPanel.5")); //$NON-NLS-1$
+                switch (validity.getError()) {
+                case CORRUPTED_SIGN: errorMessage = Messages.getString("SignResultPanel.14"); break; //$NON-NLS-1$
+                default:
+                    errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
+                }
+                this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                resultOperationIconTooltip = Messages.getString("SignResultPanel.7"); //$NON-NLS-1$
+                break;
+            default:
+                this.resultTextLabel.setText(Messages.getString("SignResultPanel.11")); //$NON-NLS-1$
+                switch (validity.getError()) {
+                case NO_DATA: errorMessage = Messages.getString("SignResultPanel.15"); break; //$NON-NLS-1$
+                default:
+                    errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
+                }
+                this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                resultOperationIconTooltip = Messages.getString("SignResultPanel.13"); //$NON-NLS-1$
                 break;
         }
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);

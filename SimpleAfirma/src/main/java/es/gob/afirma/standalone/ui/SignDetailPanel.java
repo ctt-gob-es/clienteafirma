@@ -30,21 +30,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Panel con detalles de una firma electr&oacute;nica. */
 public final class SignDetailPanel extends JPanel {
-
-    /** Tipo del resultado de la firma. */
-    public enum SIGN_DETAIL_TYPE {
-        /** Firma v&aacute;lida. */
-        OK,
-        /** Firma inv&aacute;lida. */
-        KO,
-        /** Firma generada en la misma aplicaci&oacute;n, se considera siempre v&aacute;lida. */
-        GENERATED
-    }
 
     /** Serial ID */
     private static final long serialVersionUID = 7567869419737753210L;
@@ -61,24 +52,24 @@ public final class SignDetailPanel extends JPanel {
      * @param sigPath Ruta del fichero de firma, si no se proporciona la firma en s&iacute; se
      *        usa para cargarla
      * @param signingCert Certificado usado para generar la &uacute;ltima firma
-     * @param panelType Tipo de panel informativo de cabecera
+     * @param signValidity Tipo de panel informativo de cabecera
      * @param fileTypeIcon Icono vectorial indicativo del tipo de contenido. Si es <code>null</code> se determina al vuelo y se usa una version
      *        <i>raster</i> */
     public SignDetailPanel(final SimpleAfirma saf,
                            final byte[] sig,
                            final String sigPath,
                            final X509Certificate signingCert,
-                           final SignDetailPanel.SIGN_DETAIL_TYPE panelType,
+                           final SignValidity signValidity,
                            final JComponent fileTypeIcon) {
         this.saf = saf;
-        createUI(sig, sigPath, signingCert, panelType, fileTypeIcon);
+        createUI(sig, sigPath, signingCert, signValidity, fileTypeIcon);
     }
 
     /** Agrega el contenido gr&aacute;fico al panel. */
     private void createUI(byte[] sig,
                           final String sigPath,
                           final X509Certificate signingCert,
-                          final SignDetailPanel.SIGN_DETAIL_TYPE panelType,
+                          final SignValidity signValidity,
                           final JComponent fileTypeIcon) {
 
         this.setBackground(SimpleAfirma.WINDOW_COLOR);
@@ -116,7 +107,7 @@ public final class SignDetailPanel extends JPanel {
             }
         }
 
-        final JPanel infoPanel = new SignResultPanel(panelType);
+        final JPanel infoPanel = new SignResultPanel(signValidity);
         final JPanel componentPanel = new SignDataPanel(new File(sigPath), sig, fileTypeIcon, signingCert);
 
         final JPanel returnPanel = new JPanel(true);

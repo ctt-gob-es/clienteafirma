@@ -25,6 +25,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
+import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
+
 /**
  * Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105.
  */
@@ -34,35 +37,44 @@ public final class ValidateXMLSignature {
      * Valida una firma XML.
      * @param sign Firma a validar
      * @return <code>true</code> si la firma es v&aacute;lida, <code>false</code> en caso contrario
-     * @throws Exception Si ocurre cualquier problema durante la validaci&oacute;n
      */
-    public static boolean validate(final byte[] sign) throws Exception {
+    public static SignValidity validate(final byte[] sign) {
         // Instantiate the document to be validated
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        final Document doc =
-            dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        Document doc;
+        try {
+            doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        } catch (Exception e) {
+            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN);
+        }
 
         // Find Signature element
         final NodeList nl = 
             doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
-            throw new Exception("No se puede encontrar el elemento Signature"); //$NON-NLS-1$
+            return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
         }
 
-        // Create a DOM XMLSignatureFactory that will be used to unmarshal the 
-        // document containing the XMLSignature 
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", //$NON-NLS-1$
-                (Provider) Class.forName(System.getProperty
-                        ("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI")).newInstance()); //$NON-NLS-1$ //$NON-NLS-2$
+        try {
+            // Create a DOM XMLSignatureFactory that will be used to unmarshal the 
+            // document containing the XMLSignature
+            final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", //$NON-NLS-1$
+                    (Provider) Class.forName(System.getProperty
+                            ("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI")).newInstance()); //$NON-NLS-1$ //$NON-NLS-2$
 
-        // Create a DOMValidateContext and specify a KeyValue KeySelector
-        // and document context
-        final DOMValidateContext valContext = new DOMValidateContext
-        (new KeyValueKeySelector(), nl.item(0));
+            // Create a DOMValidateContext and specify a KeyValue KeySelector
+            // and document context
+            final DOMValidateContext valContext = new DOMValidateContext
+            (new KeyValueKeySelector(), nl.item(0));
 
-        // Validate the XMLSignature (generated above)
-        return fac.unmarshalXMLSignature(valContext).validate(valContext);
+            // Validate the XMLSignature (generated above)
+            return fac.unmarshalXMLSignature(valContext).validate(valContext) ?
+                    new SignValidity(SIGN_DETAIL_TYPE.OK, null) :
+                    new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+        } catch (Exception e) {
+            return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
+        }
     }
     
     /**

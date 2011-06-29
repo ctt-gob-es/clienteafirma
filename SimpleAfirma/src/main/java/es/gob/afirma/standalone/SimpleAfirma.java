@@ -40,6 +40,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.misc.Platform;
+import es.gob.afirma.signature.SignValidity;
+import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.dnie.DNIeManager;
 import es.gob.afirma.standalone.dnie.DNIeManagerException;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
@@ -377,7 +379,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     	if (Platform.OS.MACOSX.equals(Platform.getOS())) {
     		this.mainMenu.setEnabledFileMenu(false);
     	}
-        final JPanel newPanel = new SignDetailPanel(this, sign, fileName, signingCert, SignDetailPanel.SIGN_DETAIL_TYPE.GENERATED, null);
+        final JPanel newPanel = new SignDetailPanel(this, sign, fileName, signingCert, new SignValidity(SIGN_DETAIL_TYPE.GENERATED, null), null);
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.window != null && fileName != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName)); //$NON-NLS-1$
