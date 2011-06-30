@@ -301,10 +301,12 @@ public final class AOXAdESSigner implements AOSigner {
 			throws AOException {
 
 		// Algoritmos de firma con nombres alternativos
-		if (algorithm.equalsIgnoreCase("RSA"))
+		if (algorithm.equalsIgnoreCase("RSA")) {
 			algorithm = SIGN_ALGORITHM_SHA1WITHRSA;
-		else if (algorithm.equalsIgnoreCase("DSA"))
+		}
+		else if (algorithm.equalsIgnoreCase("DSA")) {
 			algorithm = SIGN_ALGORITHM_SHA1WITHDSA;
+		}
 
 		String algoUri = SIGN_ALGOS_URI.get(algorithm);
 		if (algoUri == null) {
@@ -418,60 +420,70 @@ public final class AOXAdESSigner implements AOSigner {
 								styleElement = tmpDoc.getDocumentElement();
 
 							styleEncoding = tmpDoc.getXmlEncoding();
-						} catch (final IsInnerlException ex) {
+						} 
+						catch (final IsInnerlException ex) {
 							Logger.getLogger("es.gob.afirma")
 									.info("La hoja de estilo esta referenciada internamente, por lo que no se necesita dereferenciar");
-						} catch (final ReferenceIsNotXMLException ex) {
+						} 
+						catch (final ReferenceIsNotXMLException ex) {
 							Logger.getLogger("es.gob.afirma")
 									.warning(
 											"La hoja de estilo referenciada no es XML o no se ha dereferenciado apropiadamente");
-						} catch (final CannotDereferenceException ex) {
+						} 
+						catch (final CannotDereferenceException ex) {
 							Logger.getLogger("es.gob.afirma")
 									.warning(
 											"La hoja de estilo no ha podido dereferenciar, probablemente sea un enlace relativo local");
-						} catch (final Exception ex) {
+						} 
+						catch (final Exception ex) {
 							Logger.getLogger("es.gob.afirma").severe(
 									"Error intentando dereferenciar la hoja de estilo: "
 											+ ex);
 						}
 					}
-				} catch (final Exception e) {
+				} 
+				catch (final Exception e) {
 					Logger.getLogger("es.gob.afirma")
 							.info("No se ha encontrado ninguna hoja de estilo asociada al XML a firmar");
 				}
 
 				// Si no hay asignado un MimeType o es el por defecto
 				// establecemos el de XML
-				if (mimeType == null || DEFAULT_MIMETYPE.equals(mimeType))
+				if (mimeType == null || DEFAULT_MIMETYPE.equals(mimeType)) {
 					mimeType = "text/xml";
+				}
 
 				// Obtenemos el encoding del documento original
-				if (encoding == null)
+				if (encoding == null) {
 					encoding = docum.getXmlEncoding();
+				}
 
 				// Hacemos la comprobacion del base64 por si se establecido
 				// desde fuera
 				if (encoding != null
-						&& !AOConstants.BASE64_ENCODING.equals(encoding))
+						&& !AOConstants.BASE64_ENCODING.equals(encoding)) {
 					originalXMLProperties.put(OutputKeys.ENCODING, encoding);
+				}
 
 				String tmpXmlProp = docum.getXmlVersion();
-				if (tmpXmlProp != null)
+				if (tmpXmlProp != null) {
 					originalXMLProperties.put(OutputKeys.VERSION, tmpXmlProp);
+				}
 				final DocumentType dt = docum.getDoctype();
 				if (dt != null) {
 					tmpXmlProp = dt.getSystemId();
-					if (tmpXmlProp != null)
+					if (tmpXmlProp != null) {
 						originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM,
 								tmpXmlProp);
+					}
 				}
 
 				if (format.equals(SIGN_FORMAT_XADES_DETACHED)) {
 					dataElement = docum
 							.createElement(DETACHED_CONTENT_ELEMENT_NAME);
-					dataElement.setAttribute("Id", contentId);
-					dataElement.setAttribute("MimeType", mimeType);
-					dataElement.setAttribute("Encoding", encoding);
+					dataElement.setAttributeNS(null, "Id", contentId);
+					dataElement.setAttributeNS(null, "MimeType", mimeType);
+					dataElement.setAttributeNS(null, "Encoding", encoding);
 					dataElement.appendChild(docum.getDocumentElement());
 
 					// Tambien el estilo
@@ -479,18 +491,17 @@ public final class AOXAdESSigner implements AOSigner {
 						try {
 							final Element tmpStyleElement = docum
 									.createElement(DETACHED_STYLE_ELEMENT_NAME);
-							tmpStyleElement.setAttribute("Id", styleId);
-							if (styleType != null)
-								tmpStyleElement.setAttribute("MimeType",
-										styleType);
-							tmpStyleElement.setAttribute("Encoding",
-									styleEncoding);
+							tmpStyleElement.setAttributeNS(null, "Id", styleId);
+							if (styleType != null) {
+								tmpStyleElement.setAttributeNS(null, "MimeType", styleType);
+							}
+							tmpStyleElement.setAttributeNS(null, "Encoding", styleEncoding);
 
-							tmpStyleElement.appendChild(docum
-									.adoptNode(styleElement.cloneNode(true)));
+							tmpStyleElement.appendChild(docum.adoptNode(styleElement.cloneNode(true)));
 
 							styleElement = tmpStyleElement;
-						} catch (final Exception e) {
+						} 
+						catch (final Exception e) {
 							Logger.getLogger("es.gob.afirma")
 									.warning(
 											"No ha sido posible crear el elemento DOM para incluir la hoja de estilo del XML como Internally Detached: "
@@ -498,8 +509,10 @@ public final class AOXAdESSigner implements AOSigner {
 							styleElement = null;
 						}
 					}
-				} else
+				} 
+				else {
 					dataElement = docum.getDocumentElement();
+				}
 
 			}
 			// captura de error en caso de no ser un documento xml
@@ -522,11 +535,12 @@ public final class AOXAdESSigner implements AOSigner {
 							.createElement(DETACHED_CONTENT_ELEMENT_NAME);
 					uri = null;
 					encoding = AOConstants.BASE64_ENCODING;
-					if (mimeType == null)
+					if (mimeType == null) {
 						mimeType = DEFAULT_MIMETYPE;
+					}
 
-					dataElement.setAttribute("Id", contentId);
-					dataElement.setAttribute("Encoding", encoding);
+					dataElement.setAttributeNS(null, "Id", contentId);
+					dataElement.setAttributeNS(null, "Encoding", encoding);
 
 					// Si es base 64, lo firmamos indicando como contenido el
 					// dato pero, ya que puede
@@ -549,23 +563,25 @@ public final class AOXAdESSigner implements AOSigner {
 								.getMimeType();
 						mimeType = tempMimeType != null ? tempMimeType
 								: DEFAULT_MIMETYPE;
-						dataElement.setAttribute("MimeType", mimeType);
+						dataElement.setAttributeNS(null, "MimeType", mimeType);
 
 						dataElement.setTextContent(AOCryptoUtil.encodeBase64(
 								decodedData, true));
-					} else {
+					} 
+					else {
 						Logger.getLogger("es.gob.afirma")
 								.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion");
 
 						// Usamos el MimeType identificado
-						dataElement.setAttribute("MimeType", mimeType);
+						dataElement.setAttributeNS(null, "MimeType", mimeType);
 
 						dataElement.setTextContent(AOCryptoUtil.encodeBase64(
 								data, true));
 						wasEncodedToBase64 = true;
 					}
 					isBase64 = true;
-				} catch (final Exception ex) {
+				} 
+				catch (final Exception ex) {
 					throw new AOException(
 							"Error al convertir los datos a base64", ex);
 				}
@@ -585,7 +601,8 @@ public final class AOXAdESSigner implements AOSigner {
 				try {
 					tmpData = AOUtil.getDataFromInputStream(AOUtil.loadFile(
 							uri, null, false));
-				} catch (final Exception e) {
+				} 
+				catch (final Exception e) {
 					throw new AOException(
 							"No se han podido obtener los datos de la URI externa '"
 									+ uri + "'", e);
@@ -595,7 +612,8 @@ public final class AOXAdESSigner implements AOSigner {
 					try {
 						digestValue = MessageDigest.getInstance("SHA1").digest(
 								tmpData);
-					} catch (final Exception e) {
+					} 
+					catch (final Exception e) {
 						throw new AOException(
 								"No se ha podido obtener el SHA1 de los datos de la URI externa",
 								e);
@@ -615,7 +633,8 @@ public final class AOXAdESSigner implements AOSigner {
 				try {
 					digestValue = MessageDigest.getInstance("SHA1")
 							.digest(data);
-				} catch (final Exception e) {
+				} 
+				catch (final Exception e) {
 					throw new AOException(
 							"No se ha podido obtener el SHA1 de los datos proporcionados",
 							e);
@@ -649,16 +668,18 @@ public final class AOXAdESSigner implements AOSigner {
 				mimeType = "hash/" + precalculatedHashAlgorithm.toLowerCase();
 				hashAlgoUri = AOConstants.MESSAGEDIGEST_ALGOS_URI
 						.get(precalculatedHashAlgorithm.toLowerCase());
-			} else {
+			} 
+			else {
 				mimeType = "hash/sha1";
 				hashAlgoUri = AOConstants.MESSAGEDIGEST_ALGOS_URI.get("sha1");
 			}
 
-			dataElement.setAttribute("Id", contentId);
-			dataElement.setAttribute("MimeType", mimeType);
-			dataElement.setAttribute("Encoding", encoding);
-			if (hashAlgoUri != null)
-				dataElement.setAttribute("hashAlgorithm", hashAlgoUri);
+			dataElement.setAttributeNS(null, "Id", contentId);
+			dataElement.setAttributeNS(null, "MimeType", mimeType);
+			dataElement.setAttributeNS(null, "Encoding", encoding);
+			if (hashAlgoUri != null) {
+				dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri);
+			}
 			dataElement.setTextContent(AOCryptoUtil.encodeBase64(digestValue,
 					false));
 			isBase64 = true;
@@ -678,10 +699,12 @@ public final class AOXAdESSigner implements AOSigner {
 			docSignature = dbf.newDocumentBuilder().newDocument();
 			if (format.equals(SIGN_FORMAT_XADES_ENVELOPED)) {
 				docSignature.appendChild(docSignature.adoptNode(dataElement));
-			} else {
+			} 
+			else {
 				docSignature.appendChild(docSignature.createElement(AFIRMA));
 			}
-		} catch (final Exception e) {
+		} 
+		catch (final Exception e) {
 			throw new AOException("Error al crear la firma en formato "
 					+ format + ", modo " + mode, e);
 		}
@@ -691,7 +714,8 @@ public final class AOXAdESSigner implements AOSigner {
 		DigestMethod digestMethod;
 		try {
 			digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
-		} catch (final Exception e) {
+		} 
+		catch (final Exception e) {
 			throw new AOException(
 					"No se ha podido obtener un generador de huellas digitales para el algoritmo '"
 							+ digestMethodAlgorithm + "'", e);
