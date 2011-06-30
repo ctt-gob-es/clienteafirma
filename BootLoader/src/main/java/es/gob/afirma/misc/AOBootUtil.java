@@ -41,7 +41,9 @@ public final class AOBootUtil {
      * @throws AOException cuando ocurre cualquier problema creando la URI */
     public static URI createURI(String filename) throws AOException {
 
-        if (filename == null) throw new AOException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
+        if (filename == null) {
+            throw new AOException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
+        }
 
         // Cambiamos los caracteres Windows
         filename = filename.replace('\\', '/');
@@ -205,7 +207,9 @@ public final class AOBootUtil {
         try {
             // TODO: Tratar el caso de urls con caracteres especiales
             String codeBase = urlBase.toString();
-            if (!codeBase.endsWith("/") && !codeBase.endsWith("\\")) codeBase = codeBase + "/"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (!codeBase.endsWith("/") && !codeBase.endsWith("\\")) { //$NON-NLS-1$ //$NON-NLS-2$
+                codeBase = codeBase + "/"; //$NON-NLS-1$
+            }
             return AOBootUtil.createURI(codeBase + filename).toURL();
         }
         catch (final Exception e) {

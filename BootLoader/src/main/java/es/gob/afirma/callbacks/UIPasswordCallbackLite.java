@@ -55,7 +55,9 @@ public final class UIPasswordCallbackLite extends PasswordCallback {
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws AOCancelledOperationException Cuando el usuario cancela o cierra el di&aacute;logo */
     private final static char[] getPassword(String text, final Component c) throws AOCancelledOperationException {
-        if (text == null) text = "Introduzca la contrase\u00F1a";
+        if (text == null) {
+            text = "Introduzca la contrase\u00F1a";
+        }
         final JPasswordField pwd = new JPasswordField(10);
         final JLabel lbText = new JLabel(text);
         lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
@@ -65,8 +67,9 @@ public final class UIPasswordCallbackLite extends PasswordCallback {
         panel.add(lbText);
         panel.add(pwd);
         final int action = JOptionPane.showConfirmDialog(c, panel, "Contrase\u00F1a", JOptionPane.OK_CANCEL_OPTION);
-        if (!(action == JOptionPane.OK_OPTION)) throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario" //$NON-NLS-1$
-        );
+        if (!(action == JOptionPane.OK_OPTION)) {
+            throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario"); //$NON-NLS-1$
+        }
         return pwd.getPassword();
     }
 

@@ -37,7 +37,9 @@ public final class AfirmaBootLoader extends JApplet {
         logger.info("BootLoader de @firma iniciado"); //$NON-NLS-1$
         logger.info("Arquitectura del JRE: " + Platform.getJavaArch());
         logger.info("Arquitectura del sistema operativo: " + Platform.getOsArch());
-        if (DEBUG) logger.warning("Modo de depuracion activado");
+        if (DEBUG) {
+            logger.warning("Modo de depuracion activado");
+        }
     }
 
     /** Establece la URL desde la cual se bajar&aacute;n los ficheros para instalar.
@@ -117,7 +119,7 @@ public final class AfirmaBootLoader extends JApplet {
     /** Recupera la versi&oacute;n del BootLoader.
      * @return Versi&oacute;n del BootLoader. */
     public String getVersion() {
-        InputStream is = AfirmaBootLoader.class.getResourceAsStream("/version.properties"); //$NON-NLS-1$
+        final InputStream is = AfirmaBootLoader.class.getResourceAsStream("/version.properties"); //$NON-NLS-1$
         final String idVersion = AOBootUtil.getVersion(is);
         try {
             is.close();

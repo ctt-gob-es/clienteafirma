@@ -31,7 +31,9 @@ enum SigningCA {
                 throw new UnsupportedOperationException("No se ha podido cargar el certificado firmante: " + sigCertificatePath, e);
             }
         }
-        else sgCert = null;
+        else {
+            sgCert = null;
+        }
     }
 
     private final X509Certificate caCert;

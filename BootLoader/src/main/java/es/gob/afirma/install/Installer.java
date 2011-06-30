@@ -136,21 +136,6 @@ final class Installer {
         boolean licenciaMostrada = false;
 
         try {
-            if (enviromentInstaller.isEndorsedApacheXMLSecNeeded()) {
-                if (!prepareInstall()) return;
-                licenciaMostrada = true;
-                Logger.getLogger("es.gob.afirma").info("Instalando Apache XML Security..."); //$NON-NLS-1$ //$NON-NLS-2$
-                enviromentInstaller.installEndorsedApacheXMLSec();
-            }
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "Error instalando Apache XML Security, la ejecucion sobre Java 7 puede fallar: " + e //$NON-NLS-1$
-            );
-            allOK = false;
-        }
-
-        try {
             if (enviromentInstaller.isEndorsedJava5AFirmaDependenciesNeeded()) {
                 if (!licenciaMostrada && !prepareInstall()) return;
                 licenciaMostrada = true;

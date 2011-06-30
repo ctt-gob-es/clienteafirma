@@ -29,28 +29,30 @@ public final class WinRegistry {
     static native void initIDs();
 
     /** Los valores del registro se componen de un tipo y de unos datos. */
-    final static class KeyValue {
+    private final static class KeyValue {
         private final int type;
         private final byte[] data;
 
-        KeyValue(final int type, final byte[] data) {
+        private KeyValue(final int type, final byte[] data) {
             this.type = type;
-            this.data = data;
+            this.data = data.clone();
         }
 
         /** Retorna el valor del par-valor
          * @return Valor como array de bytes del par-valor */
-        public byte[] getData() {
+        private byte[] getData() {
             return this.data;
         }
 
         /** Retorna el valor tras realizar el casting al objeto java adecuado, ya sea este un entero,
          * una cadena o en su defecto un array de bytes.
          * @return Valor actual */
-        public Object getValue() {
+        private Object getValue() {
             switch (this.type) {
                 case REG_SZ:
-                    if (this.data.length <= 0) return null;
+                    if (this.data.length <= 0) {
+                        return null;
+                    }
                     return new String(this.data, 0, this.data.length - 1);
 
                 case REG_DWORD: {
@@ -72,7 +74,7 @@ public final class WinRegistry {
      * @param path Ruta
      * @param name Nombre de clave a buscar
      * @return Valor de la clave del registro */
-    public static Object get(final int hKey, final String path, final String name) {
+    private static Object get(final int hKey, final String path, final String name) {
         final int key = sysOpenKey(hKey, path, KEY_READ);
         if (key != 0) {
             KeyValue keyValue = sysQueryKey(key, name);

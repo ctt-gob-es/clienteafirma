@@ -40,14 +40,16 @@ public final class LicenceDialogPanel {
         String licenseText;
         InputStream licenseIs = this.getClass().getResourceAsStream("/resources/licenses_" + Locale.getDefault() + ".txt" //$NON-NLS-1$ //$NON-NLS-2$
         );
-        if (licenseIs == null) licenseIs = this.getClass().getResourceAsStream("/resources/licenses_" + Locale.getDefault().getLanguage() + ".txt" //$NON-NLS-1$ //$NON-NLS-2$
-        );
-        if (licenseIs == null) licenseIs = this.getClass().getResourceAsStream("/resources/licenses.txt" //$NON-NLS-1$
-        );
+        if (licenseIs == null) {
+            licenseIs = this.getClass().getResourceAsStream("/resources/licenses_" + Locale.getDefault().getLanguage() + ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        
+        if (licenseIs == null) {
+            licenseIs = this.getClass().getResourceAsStream("/resources/licenses.txt"); //$NON-NLS-1$
+        }
 
         try {
-            licenseText = new String(AOBootUtil.getDataFromInputStream(licenseIs), "UTF-8" //$NON-NLS-1$
-            );
+            licenseText = new String(AOBootUtil.getDataFromInputStream(licenseIs), "UTF-8"); //$NON-NLS-1$
         }
         catch (final Exception e2) {
             licenseText = Messages.getString("LicenceDialogPanel.2"); //$NON-NLS-1$

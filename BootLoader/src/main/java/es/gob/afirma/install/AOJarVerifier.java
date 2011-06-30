@@ -59,9 +59,13 @@ final class AOJarVerifier {
      *         problema durante la verificaci&oacute;n */
     void verifyJar(final String jarName, final X509Certificate caCert, final X509Certificate signerCert) throws SecurityException {
 
-        if (jarName == null || "".equals(jarName)) throw new SecurityException("El fichero proporcionado es nulo o vacio, y por lo tanto no esta firmado");
+        if (jarName == null || "".equals(jarName)) {
+            throw new SecurityException("El fichero proporcionado es nulo o vacio, y por lo tanto no esta firmado");
+        }
 
-        if (caCert == null) throw new SecurityException("Es obligatorio proporcionar un certificado CA para comprobar las firmas");
+        if (caCert == null) {
+            throw new SecurityException("Es obligatorio proporcionar un certificado CA para comprobar las firmas");
+        }
 
         final PublicKey pkCA = caCert.getPublicKey();
 
@@ -112,39 +116,58 @@ final class AOJarVerifier {
                     hasUnsignedEntry |= !je.isDirectory() && !isSigned && !signatureRelated(name);
 
                     if (isSigned && signers != null) {
-                        for (CodeSigner cs : signers) {
+                        for (final CodeSigner cs : signers) {
                             final Certificate cert = cs.getSignerCertPath().getCertificates().get(0);
                             if (cert instanceof X509Certificate) {
                                 long notAfter = ((X509Certificate) cert).getNotAfter().getTime();
-                                if (notAfter < now) hasExpiredCert = true;
-                                else if (notAfter < now + SIX_MONTHS) hasExpiringCert = true;
-                                else if (((X509Certificate) cert).getNotBefore().getTime() > now) notYetValidCert = true;
+                                if (notAfter < now) {
+                                    hasExpiredCert = true;
+                                }
+                                else if (notAfter < now + SIX_MONTHS) {
+                                    hasExpiringCert = true;
+                                }
+                                else if (((X509Certificate) cert).getNotBefore().getTime() > now) {
+                                    notYetValidCert = true;
+                                }
                                 ((X509Certificate) cert).verify(pkCA);
                                 if (signerCert != null) {
                                     // No me fio del .equals directo del PublicKey
-                                    if (!Arrays.equals(signerCert.getPublicKey().getEncoded(), cert.getPublicKey().getEncoded())) throw new SecurityException("El certificado firmante era de una CA valida, pero no se corresponde con el indicado");
+                                    if (!Arrays.equals(signerCert.getPublicKey().getEncoded(), cert.getPublicKey().getEncoded())) {
+                                        throw new SecurityException("El certificado firmante era de una CA valida, pero no se corresponde con el indicado");
+                                    }
                                 }
                             }
-                            else throw new SecurityException("El codigo se ha firmado con un certificado que no cumple la norma X.509");
+                            else {
+                                throw new SecurityException("El codigo se ha firmado con un certificado que no cumple la norma X.509");
+                            }
                         }
                     } // if isSigned
 
                 } // while
             } // if man != null
-            else throw new SecurityException("No se encontro manifest en el fichero ZIP/JAR");
+            else {
+                throw new SecurityException("No se encontro manifest en el fichero ZIP/JAR");
+            }
 
-            if (!anySigned) throw new SecurityException("El fichero ZIP/JAR no esta firmado (faltan firmas o no son procesables)");
+            if (!anySigned) {
+                throw new SecurityException("El fichero ZIP/JAR no esta firmado (faltan firmas o no son procesables)");
+            }
 
-            if (hasUnsignedEntry) throw new SecurityException("Hay entradas sin firmar en el fichero ZIP/JAR");
+            if (hasUnsignedEntry) {
+                throw new SecurityException("Hay entradas sin firmar en el fichero ZIP/JAR");
+            }
 
-            if (hasExpiringCert) Logger.getLogger("es.gob.afirma")
-                                       .warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses");
+            if (hasExpiringCert) {
+                Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses");
+            }
 
-            if (hasExpiredCert) Logger.getLogger("es.gob.afirma")
-                                      .warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado");
+            if (hasExpiredCert) {
+                Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado");
+            }
 
-            if (notYetValidCert) Logger.getLogger("es.gob.afirma")
-                                       .warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido");
+            if (notYetValidCert) {
+                Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido");
+            }
 
         }
         catch (final Exception e) {

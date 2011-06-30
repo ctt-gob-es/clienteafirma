@@ -37,7 +37,9 @@ final class AOInstallUtils {
         String jarFilename = pack200Filename + ".jar";
         if (pack200Filename.endsWith(".pack") || pack200Filename.endsWith(".pack.gz")) {
             jarFilename = pack200Filename.substring(0, pack200Filename.lastIndexOf(".pack"));
-            if (!jarFilename.endsWith(".jar")) jarFilename += ".jar";
+            if (!jarFilename.endsWith(".jar")) {
+                jarFilename += ".jar";
+            }
         }
 
         // Desempaquetamos
@@ -49,8 +51,12 @@ final class AOInstallUtils {
      * @param targetJarFilename Nombre del fichero de salida, incluyendo ruta
      * @throws AOException Cuando ocurre un error durante el desempaquetado. */
     static void unpack(final String pack200Filename, String targetJarFilename) throws AOException {
-        if (pack200Filename == null) throw new NullPointerException("El Pack200 origen no puede ser nulo");
-        if (targetJarFilename == null) throw new NullPointerException("El JAR de destino no puede ser nulo");
+        if (pack200Filename == null) {
+            throw new NullPointerException("El Pack200 origen no puede ser nulo");
+        }
+        if (targetJarFilename == null) {
+            throw new NullPointerException("El JAR de destino no puede ser nulo");
+        }
         createDirectory(new File(targetJarFilename).getParentFile());
         try {
             unpack200gunzip(AOBootUtil.loadFile(AOBootUtil.createURI(pack200Filename), null, false),
@@ -73,10 +79,12 @@ final class AOInstallUtils {
      * @param jar JAR resultante del desempaquetado
      * @throws Exception Si ocurre cualquier problema durante la descompresi&oacute;n */
     private static void unpack200gunzip(final InputStream packgz, final OutputStream jar) throws Exception {
-        if (packgz == null) throw new NullPointerException("El pack.gz es nulo");
-        InputStream is = new GZIPInputStream(packgz);
-        Unpacker u = java.util.jar.Pack200.newUnpacker();
-        JarOutputStream jos = new JarOutputStream(jar);
+        if (packgz == null) {
+            throw new NullPointerException("El pack.gz es nulo");
+        }
+        final InputStream is = new GZIPInputStream(packgz);
+        final Unpacker u = java.util.jar.Pack200.newUnpacker();
+        final JarOutputStream jos = new JarOutputStream(jar);
         u.unpack(is, jos);
         jos.flush();
         jos.close();
@@ -94,29 +102,42 @@ final class AOInstallUtils {
      * @throws IOException El nombre de directorio indicado coincide con el de un fichero */
     private static void unzip(final ZipFile zipFile, File destDirectory) throws AOException, IOException {
 
-        if (zipFile == null) throw new NullPointerException("El fichero Zip no puede ser nulo"); //$NON-NLS-1$
-        if (destDirectory == null) destDirectory = new File("."); //$NON-NLS-1$
+        if (zipFile == null) {
+            throw new NullPointerException("El fichero Zip no puede ser nulo"); //$NON-NLS-1$
+        }
+        if (destDirectory == null) {
+            destDirectory = new File("."); //$NON-NLS-1$
+        }
 
         // Si no existe el directorio de destino, lo creamos
-        if (!destDirectory.exists()) destDirectory.mkdirs();
-        else if (destDirectory.isFile()) throw new IOException("Ya existe un fichero con el nombre indicado para el directorio de salida"); //$NON-NLS-1$
-        else if (!destDirectory.canRead()) throw new IOException("No se dispone de permisos suficientes para almacenar ficheros en el directorio destino: " + destDirectory); //$NON-NLS-1$
+        if (!destDirectory.exists()) {
+            destDirectory.mkdirs();
+        }
+        else if (destDirectory.isFile()) {
+            throw new IOException("Ya existe un fichero con el nombre indicado para el directorio de salida"); //$NON-NLS-1$
+        }
+        else if (!destDirectory.canRead()) {
+            throw new IOException("No se dispone de permisos suficientes para almacenar ficheros en el directorio destino: " + destDirectory); //$NON-NLS-1$
+        }
 
         // Descomprimimos los ficheros
         final byte[] buffer = new byte[1024];
-        for (Enumeration<? extends ZipEntry> zipEntries = zipFile.entries(); zipEntries.hasMoreElements();) {
+        for (final Enumeration<? extends ZipEntry> zipEntries = zipFile.entries(); zipEntries.hasMoreElements();) {
             final ZipEntry entry = zipEntries.nextElement();
             try {
                 // Creamos el arbol de directorios para el fichero
                 final File outputFile = new File(destDirectory, entry.getName());
-                if (!outputFile.getParentFile().exists()) outputFile.getParentFile().mkdirs();
+                if (!outputFile.getParentFile().exists()) {
+                    outputFile.getParentFile().mkdirs();
+                }
 
                 // Descomprimimos el fichero
                 final InputStream zeis = zipFile.getInputStream(entry);
                 final FileOutputStream fos = new FileOutputStream(outputFile);
                 int nBytes;
-                while ((nBytes = zeis.read(buffer)) != -1)
+                while ((nBytes = zeis.read(buffer)) != -1) {
                     fos.write(buffer, 0, nBytes);
+                }
                 try {
                     fos.flush();
                 }

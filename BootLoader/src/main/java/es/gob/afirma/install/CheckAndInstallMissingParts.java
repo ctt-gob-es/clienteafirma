@@ -41,12 +41,6 @@ final class CheckAndInstallMissingParts {
     /** Archivo zip con las librerias Xalan en formato JAR necesarias para la firma XML en JDK 5. */
     private static final String XALAN_JARLIBRARY_ZIP = "xalanjar.zip";
 
-    /** Archivo zip con las librerias Apache XMLSec en formato PACK200 necesarias para la firma XML en JDK 7. */
-    private static final String XMLSEC_LIBRARY_ZIP = "xmlsec.zip";
-
-    /** Archivo zip con las librerias Apache XMLSec en formato JAR necesarias para la firma XML en JDK 7. */
-    private static final String XMLSEC_JARLIBRARY_ZIP = "xmlsecjar.zip";
-
     private final String build;
 
     private final OS os;
@@ -117,47 +111,6 @@ final class CheckAndInstallMissingParts {
         }
     }
 
-    /** Instala las bibliotecas Apache XMLSec para la generaci&oacute;n de firmas XML desde Java 7.
-     * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar. */
-    void installEndorsedApacheXMLSec() throws Exception {
-        File tempDir = null;
-        try {
-            tempDir = AOInstallUtils.createTempFile(true);
-            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_LIBRARY_ZIP), tempDir, SigningCA.INTEGRATOR);
-
-            String filename;
-            for (final File file : tempDir.listFiles()) {
-                filename = file.getName();
-                if (filename.endsWith(".pack.gz")) { //$NON-NLS-1$
-                    AOInstallUtils.unpack(file.getAbsolutePath(),
-                                          Platform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz")));
-                }
-            }
-
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma")
-                  .warning("No se ha podido instalar la version PACK200 de Apache XMLSec, se intentara la version JAR: " + e);
-            if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
-            }
-            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_JARLIBRARY_ZIP),
-                                      new File(getEndorsedDir()),
-                                      SigningCA.INTEGRATOR);
-        }
-        finally {
-            if (tempDir != null) {
-                try {
-                    for (File file : tempDir.listFiles())
-                        file.delete();
-                    AOInstallUtils.deleteDir(tempDir);
-                }
-                catch (final Exception e) {}
-            }
-        }
-
-    }
-
     /** Instala el proveedor de seguridad SunMSCAPI.
      * @param installFilesCodeBase Localizaci&oacute;n de los ficheros necesarios para la instalaci&oacute;n */
     void installSunMSCAPI() throws Exception {
@@ -213,7 +166,9 @@ final class CheckAndInstallMissingParts {
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e);
-            if (AfirmaBootLoader.DEBUG) e.printStackTrace();
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
             AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XALAN_JARLIBRARY_ZIP),
                                       new File(getEndorsedDir()),
                                       SigningCA.INTEGRATOR);
@@ -221,8 +176,9 @@ final class CheckAndInstallMissingParts {
         finally {
             if (tempDir != null) {
                 try {
-                    for (File file : tempDir.listFiles())
+                    for (File file : tempDir.listFiles()) {
                         file.delete();
+                    }
                     AOInstallUtils.deleteDir(tempDir);
                 }
                 catch (final Exception e) {}
@@ -337,7 +293,9 @@ final class CheckAndInstallMissingParts {
             System.load(nssLibDir + "libsoftokn3.dylib");
         }
         catch (final Exception e) {
-            if (AfirmaBootLoader.DEBUG) e.printStackTrace();
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
             throw new AOException("La configuracion de NSS para Mac OS X ha fallado");
         }
 
@@ -639,22 +597,15 @@ final class CheckAndInstallMissingParts {
                                                                                                                                                                                                  + "xml-apis-1.3.03.jar").exists()));
     }
 
-    /** Comprueba si los paquetes Apache XMLSec son necesarios en el directorio endorsed del JRE
-     * configurado.
-     * @return Devuelve <code>true</code> si se necesita Apache XMLSec, <code>false</code> en caso contrario. */
-    boolean isEndorsedApacheXMLSecNeeded() {
-        if (!Platform.JREVER.J7.equals(jreVersion)) {
-            return false;
-        }
-        return !(new File(getEndorsedDir() + File.separator + "xmlsec-1.4.4.jar").exists() && new File(getEndorsedDir() + File.separator
-                                                                                                       + "commons-logging-api-1.1.jar").exists());
-    }
-
     /** Comprueba si se necesitan las dependencias para la compatibilidad del Cliente AFirma con Java 5.
      * @return <code>true</code> si se necesita instalar las dependencias, <code>false</code> en caso contrario. */
     boolean isEndorsedJava5AFirmaDependenciesNeeded() {
-        if (jreVersion.equals(JREVER.J6) || jreVersion.equals(JREVER.J7)) return false;
-        if (new File(getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR).exists()) return false;
+        if (jreVersion.equals(JREVER.J6) || jreVersion.equals(JREVER.J7)) {
+            return false;
+        }
+        if (new File(getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR).exists()) {
+            return false;
+        }
         return true;
     }
 
@@ -772,26 +723,11 @@ final class CheckAndInstallMissingParts {
             }
         }
 
-        if (nssLibDir == null) throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X");
+        if (nssLibDir == null) {
+            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X");
+        }
 
         return nssLibDir;
     }
 
-    // public static void main(String args[]) throws Exception {
-    // CheckAndInstallMissingParts cmp = new CheckAndInstallMissingParts(
-    // Platform.getOS(),
-    // Platform.getJavaVersion(),
-    // "LITE",
-    // new URL("http://null.com")
-    // );
-    // System.out.println(getEndorsedDir());
-    // System.out.println(System.getProperty("java.home"));
-    // System.out.println("XMLSec: " + cmp.isEndorsedApacheXMLSecNeeded());
-    // System.out.println("XALAN: " + cmp.isEndorsedXalanNeeded());
-    // System.out.println("Java 5: " + cmp.isEndorsedJava5AFirmaDependenciesNeeded());
-    // System.out.println("NSS Conf: " + cmp.isNSSConfigurationNeeded());
-    // System.out.println("NSS: " + cmp.isNSSNeeded());
-    // System.out.println("CAPI: " + cmp.isSunMSCAPINeeded());
-    // System.out.println("P11: " + cmp.isSunPKCS11Needed());
-    // }
 }

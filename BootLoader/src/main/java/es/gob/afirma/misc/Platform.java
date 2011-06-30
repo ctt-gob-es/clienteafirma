@@ -89,7 +89,7 @@ public final class Platform {
         try {
             userHome = System.getProperty("user.home");
             javaLibraryPath = System.getProperty("java.library.path");
-            String osName = System.getProperty("os.name");
+            final String osName = System.getProperty("os.name");
 
             if (osName.contains("indows")) {
                 os = OS.WINDOWS;
