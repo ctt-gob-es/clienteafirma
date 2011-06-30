@@ -5,23 +5,22 @@ import java.util.ResourceBundle;
 
 /** Gestor de mensajes del BootLoader. */
 public final class Messages {
-	
-	private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+    private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 
-	private Messages() {}
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
-	/**
-	 * Obtiene un mensaje de usuario.
-	 * @param key Clave del mensaje a obtener
-	 * @return Mensaje obtenido
-	 */
-	public static String getString(final String key) {
-		try {
-			return RESOURCE_BUNDLE.getString(key);
-		} catch (final MissingResourceException e) {
-			return '!' + key + '!';
-		}
-	}
+    private Messages() {}
+
+    /** Obtiene un mensaje de usuario.
+     * @param key Clave del mensaje a obtener
+     * @return Mensaje obtenido */
+    public static String getString(final String key) {
+        try {
+            return RESOURCE_BUNDLE.getString(key);
+        }
+        catch (final MissingResourceException e) {
+            return '!' + key + '!';
+        }
+    }
 }
