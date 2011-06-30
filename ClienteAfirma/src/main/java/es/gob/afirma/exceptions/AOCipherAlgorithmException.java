@@ -10,22 +10,17 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar que se ha indicado un algoritmo de cifrado no
- * soportado.
- */
+/** Excepci&oacute;n para notificar que se ha indicado un algoritmo de cifrado no
+ * soportado. */
 public final class AOCipherAlgorithmException extends AOException {
 
-	private static final long serialVersionUID = 7108060731888267988L;
+    private static final long serialVersionUID = 7108060731888267988L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOCipherAlgorithmException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOCipherAlgorithmException(String msg) {
+        super(msg);
+    }
 
 }

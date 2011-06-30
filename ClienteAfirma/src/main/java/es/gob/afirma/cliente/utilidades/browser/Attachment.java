@@ -15,27 +15,26 @@ import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 
 class Attachment {
-	final String url;
+    final String url;
 
-	// public final byte[] bytes;
+    // public final byte[] bytes;
 
-	Attachment(String url) {
-		this.url = url;
-		// this.bytes= bytes;
-	}
+    Attachment(String url) {
+        this.url = url;
+        // this.bytes= bytes;
+    }
 
-	String getName() {
-		int p1 = url.lastIndexOf(File.pathSeparatorChar);
-		return p1 < url.length() ? url.substring(p1 + 1) : "";
-	}
+    String getName() {
+        int p1 = url.lastIndexOf(File.pathSeparatorChar);
+        return p1 < url.length() ? url.substring(p1 + 1) : "";
+    }
 
-	File getFile() {
-		return new File(url);
-	}
+    File getFile() {
+        return new File(url);
+    }
 
-	GraphicalFileInputStream getContentInputStream()
-			throws FileNotFoundException {
-		Logger.getLogger("es.gob.afirma").info(url);
-		return new GraphicalFileInputStream(new File(url));
-	}
+    GraphicalFileInputStream getContentInputStream() throws FileNotFoundException {
+        Logger.getLogger("es.gob.afirma").info(url);
+        return new GraphicalFileInputStream(new File(url));
+    }
 }

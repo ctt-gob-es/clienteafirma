@@ -10,21 +10,16 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar que no se han podido guardar datos.
- */
+/** Excepci&oacute;n para notificar que no se han podido guardar datos. */
 public final class AOCantSaveDataException extends AOException {
 
-	private static final long serialVersionUID = -7566417065515232066L;
+    private static final long serialVersionUID = -7566417065515232066L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOCantSaveDataException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOCantSaveDataException(String msg) {
+        super(msg);
+    }
 
 }

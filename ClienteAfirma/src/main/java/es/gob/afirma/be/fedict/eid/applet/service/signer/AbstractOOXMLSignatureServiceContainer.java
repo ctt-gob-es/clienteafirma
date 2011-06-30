@@ -46,69 +46,59 @@ import es.gob.afirma.misc.AOUtil;
 
 public final class AbstractOOXMLSignatureServiceContainer {
 
-	public final static void setUp() {
-		OOXMLProvider.install();
-	}
+    public final static void setUp() {
+        OOXMLProvider.install();
+    }
 
-	private static final class OOXMLSignatureService extends AbstractOOXMLSignatureService {
+    private static final class OOXMLSignatureService extends AbstractOOXMLSignatureService {
 
-		@Override
-		protected final String getSignatureDigestAlgorithm() {
-			return digestAlgorithm;
-		}
+        @Override
+        protected final String getSignatureDigestAlgorithm() {
+            return digestAlgorithm;
+        }
 
-		private final byte[] ooxml;
+        private final byte[] ooxml;
 
-		private final String digestAlgorithm;
+        private final String digestAlgorithm;
 
-		public OOXMLSignatureService(final InputStream ooxmlis, final String digestAlgo) {
-			try {
-				this.ooxml = AOUtil.getDataFromInputStream(ooxmlis);
-			} 
-			catch (final Exception e) {
-				throw new IllegalArgumentException(
-					"No se ha podido leer el OOXML desde el InputStream de entrada"
-				);
-			}
-			if (digestAlgo == null) digestAlgorithm = "SHA1";
-			else digestAlgorithm = digestAlgo;
-		}
+        public OOXMLSignatureService(final InputStream ooxmlis, final String digestAlgo) {
+            try {
+                this.ooxml = AOUtil.getDataFromInputStream(ooxmlis);
+            }
+            catch (final Exception e) {
+                throw new IllegalArgumentException("No se ha podido leer el OOXML desde el InputStream de entrada");
+            }
+            if (digestAlgo == null) digestAlgorithm = "SHA1";
+            else digestAlgorithm = digestAlgo;
+        }
 
-		@Override
-		protected final byte[] getOfficeOpenXMLDocument() {
-			return this.ooxml;
-		}
+        @Override
+        protected final byte[] getOfficeOpenXMLDocument() {
+            return this.ooxml;
+        }
 
-	}
+    }
 
-	
-	/**
-	 * Firma digitalmente un documento OOXML.
-	 * @param ooxml Documento OOXML
-	 * @param certChain Certificado firmante con su cadena de confianza
-	 * @param digestAlgorithm Algoritmo de huella digital
-	 * @param pk Clave privada
-	 * @param signerCount N&uacute;mero de firma
-	 * @return Documento OOXML firmado
-	 * @throws Exception Cuando ocurre cualquier problema durante el proceso
-	 */
-	public final byte[] sign(final InputStream ooxml, 
-			           final List<X509Certificate> certChain, 
-			           final String digestAlgorithm, 
-			           final PrivateKey pk, 
-			           final int signerCount) throws Exception {
+    /** Firma digitalmente un documento OOXML.
+     * @param ooxml Documento OOXML
+     * @param certChain Certificado firmante con su cadena de confianza
+     * @param digestAlgorithm Algoritmo de huella digital
+     * @param pk Clave privada
+     * @param signerCount N&uacute;mero de firma
+     * @return Documento OOXML firmado
+     * @throws Exception Cuando ocurre cualquier problema durante el proceso */
+    public final byte[] sign(final InputStream ooxml,
+                             final List<X509Certificate> certChain,
+                             final String digestAlgorithm,
+                             final PrivateKey pk,
+                             final int signerCount) throws Exception {
 
-		OOXMLProvider.install();
+        OOXMLProvider.install();
 
-		OOXMLSignatureService signatureService = new OOXMLSignatureService(
-			ooxml, 
-			digestAlgorithm
-		);
+        OOXMLSignatureService signatureService = new OOXMLSignatureService(ooxml, digestAlgorithm);
 
-		return signatureService.outputSignedOfficeOpenXMLDocument(
-			signatureService.preSign(null, certChain, pk)
-		);
+        return signatureService.outputSignedOfficeOpenXMLDocument(signatureService.preSign(null, certChain, pk));
 
-	}
+    }
 
 }

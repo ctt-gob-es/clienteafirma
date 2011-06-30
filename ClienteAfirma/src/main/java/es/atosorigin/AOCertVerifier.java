@@ -233,8 +233,7 @@ import es.gob.afirma.Messages;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOUtil;
 
-/**
- * Clase para la verificaci&oacute;n de certificados X.509. Ejemplo de uso:<br>
+/** Clase para la verificaci&oacute;n de certificados X.509. Ejemplo de uso:<br>
  * <code><pre>
  *      // Instanciamos la clase verificadora
  *      AOCertVerifier v = new AOCertVerifier();
@@ -264,10 +263,8 @@ import es.gob.afirma.misc.AOUtil;
  *              myKeyStore.getCertificateChain("myAlias")
  *      );
  * </pre></code>
- * 
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- * @version 0.1
- */
+ * @version 0.1 */
 
 public final class AOCertVerifier {
 
@@ -275,79 +272,66 @@ public final class AOCertVerifier {
 
     private boolean checkValidity = true;
 
-    /**
-     * Mensaje de error devuelto por la &uacute;ltima operaci&oacute;n de
-     * validaci&oacute;n.
-     */
+    /** Mensaje de error devuelto por la &uacute;ltima operaci&oacute;n de
+     * validaci&oacute;n. */
     private String errorMessage = null;
 
-    /**
-     * A&ntilde;ade un certificado ra&iacute;z como parte de la cadena de
+    /** A&ntilde;ade un certificado ra&iacute;z como parte de la cadena de
      * confianza.
-     * 
      * @param c
-     *            Certificado ra&iacute;z
-     */
+     *        Certificado ra&iacute;z */
     public void addRootCertificate(final X509Certificate c) {
         if (c == null) {
             Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
-                    "No se pueden anadir certificados nulos" //$NON-NLS-1$
+            "No se pueden anadir certificados nulos" //$NON-NLS-1$
             );
             return;
         }
         tas.add(new TrustAnchor(c, null));
     }
 
-    /**
-     * A&ntilde;ade un certificado ra&iacute;z como parte de la cadena de
+    /** A&ntilde;ade un certificado ra&iacute;z como parte de la cadena de
      * confianza.
-     * 
      * @param url
-     *            Ruta hacia el certificado ra&iacute;z
-     */
+     *        Ruta hacia el certificado ra&iacute;z */
     public void addRootCertificate(final URL url) {
         if (url == null) {
             Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
-                    "No se pueden anadir certificados desde una URL nula" //$NON-NLS-1$
+            "No se pueden anadir certificados desde una URL nula" //$NON-NLS-1$
             );
             return;
         }
         try {
-            tas.add(new TrustAnchor((X509Certificate) CertificateFactory
-                    .getInstance("X509").generateCertificate( //$NON-NLS-1$
-                            AOUtil.loadFile(url.toURI(), null, false)), null));
-        } 
+            tas.add(new TrustAnchor((X509Certificate) CertificateFactory.getInstance("X509").generateCertificate( //$NON-NLS-1$
+            AOUtil.loadFile(url.toURI(), null, false)), null));
+        }
         catch (final Exception e) {
             Logger.getLogger("es.atosorigin").severe( //$NON-NLS-1$
-                "No se pudo crear el certificado desde la URL '" + url.toString() + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+            "No se pudo crear el certificado desde la URL '" + url.toString() + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
             );
             return;
         }
     }
 
-    /**
-     * A&ntilde;ade un certificado ra&iacute;z como parte de la cadena de
+    /** A&ntilde;ade un certificado ra&iacute;z como parte de la cadena de
      * confianza.
-     * 
      * @param cert
-     *            Flujo para la lectura del certificado ra&iacute;z
-     */
+     *        Flujo para la lectura del certificado ra&iacute;z */
     public void addRootCertificate(final InputStream cert) {
         if (cert == null) {
             Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
-                    "No se pueden anadir certificados nulos" //$NON-NLS-1$
+            "No se pueden anadir certificados nulos" //$NON-NLS-1$
             );
             return;
         }
 
         final X509Certificate ca;
         try {
-            ca = (X509Certificate) CertificateFactory
-                    .getInstance("X509").generateCertificate(cert); //$NON-NLS-1$
-        } 
+            ca = (X509Certificate) CertificateFactory.getInstance("X509").generateCertificate(cert); //$NON-NLS-1$
+        }
         catch (final Exception e) {
             Logger.getLogger("es.atosorigin").severe( //$NON-NLS-1$
-                "No se pudo crear el certificado: " + e //$NON-NLS-1$
+            "No se pudo crear el certificado: " + e //$NON-NLS-1$
             );
             return;
         }
@@ -355,29 +339,25 @@ public final class AOCertVerifier {
 
     }
 
-    /**
-     * A&ntilde;ade certificados ra&iacute;z como parte de la cadena de
+    /** A&ntilde;ade certificados ra&iacute;z como parte de la cadena de
      * confianza.
-     * 
      * @param server
-     *            Servidor LDAP donde se encuentran los certificados
+     *        Servidor LDAP donde se encuentran los certificados
      * @param location
-     *            Ruta hacia los certificados dentro del servidor LDAP
-     */
+     *        Ruta hacia los certificados dentro del servidor LDAP */
     public void addRootCertificatesFromLdap(String server, final LdapName location) {
         if (server == null || "".equals(server) || location == null) { //$NON-NLS-1$
             Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
-                "No se pueden anadir certificados desde un servidor o una localizacion nula o vacia" //$NON-NLS-1$
+            "No se pueden anadir certificados desde un servidor o una localizacion nula o vacia" //$NON-NLS-1$
             );
             return;
         }
 
         // Comprobamos que el nombre sea correcto
-        if (server.startsWith("ldap://"))server = server.replace("ldap://", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        if (server.startsWith("ldap://")) server = server.replace("ldap://", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         int port = 389;
         if (server.contains(":")) { //$NON-NLS-1$
-            String tmpPort = server.substring(
-                server.indexOf(":") + 1, server.length() //$NON-NLS-1$
+            String tmpPort = server.substring(server.indexOf(":") + 1, server.length() //$NON-NLS-1$
             );
             server = server.substring(0, server.indexOf(":")); //$NON-NLS-1$
             String tmpRoot = null;
@@ -389,24 +369,24 @@ public final class AOCertVerifier {
             }
             try {
                 port = Integer.parseInt(tmpPort);
-            } 
+            }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-                    "El puerto proporcionado (" + tmpPort + ") no es un numero: " + e //$NON-NLS-1$ //$NON-NLS-2$
+                "El puerto proporcionado (" + tmpPort + ") no es un numero: " + e //$NON-NLS-1$ //$NON-NLS-2$
                 );
             }
             server = tmpRoot;
         }
-        if (server.contains("/"))server = server.substring(0, server.indexOf("/")); //$NON-NLS-1$ //$NON-NLS-2$
+        if (server.contains("/")) server = server.substring(0, server.indexOf("/")); //$NON-NLS-1$ //$NON-NLS-2$
 
         final CertStore cs;
         try {
             cs = CertStore.getInstance("LDAP", //$NON-NLS-1$
-                    new LDAPCertStoreParameters(server, port));
-        } 
+                                       new LDAPCertStoreParameters(server, port));
+        }
         catch (final Exception e) {
             Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
-                "No se pudo anadir la configuracion del servidor LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
+            "No se pudo anadir la configuracion del servidor LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
             );
             return;
         }
@@ -414,10 +394,10 @@ public final class AOCertVerifier {
         final X509CertSelector xcs = new X509CertSelector();
         try {
             xcs.setSubject(location.toString());
-        } 
+        }
         catch (final Exception e) {
             Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
-                "No se pudo anadir la configuracion de la localizacion LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
+            "No se pudo anadir la configuracion de la localizacion LDAP, no se anadiran certificados: " + e //$NON-NLS-1$
             );
             return;
         }
@@ -426,23 +406,20 @@ public final class AOCertVerifier {
             for (final Certificate f : cs.getCertificates(xcs)) {
                 tas.add(new TrustAnchor((X509Certificate) f, null));
             }
-        } 
+        }
         catch (final Exception e) {
             Logger.getLogger("es.atosorigin").warning( //$NON-NLS-1$
-                "No se pudieron anadir certificados desde el LDAP: " + e //$NON-NLS-1$
+            "No se pudieron anadir certificados desde el LDAP: " + e //$NON-NLS-1$
             );
         }
 
     }
 
-    /**
-     * Establece si se debe comprobar o no si el certificado est&aacute; dentro
+    /** Establece si se debe comprobar o no si el certificado est&aacute; dentro
      * de su periodo de validez.
-     * 
      * @param c
-     *            <code>true</code> si se desea comprobar la validez temporal
-     *            del certificado, <code>false</code> en caso contrario
-     */
+     *        <code>true</code> si se desea comprobar la validez temporal
+     *        del certificado, <code>false</code> en caso contrario */
     public void setCheckValidity(boolean c) {
         checkValidity = c;
     }
@@ -452,22 +429,22 @@ public final class AOCertVerifier {
         Security.setProperty("ocsp.enable", "false"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    /**
-     * Habilita las comprobaciones de revocaci&oacute;n por OCSP.
-     * 
+    /** Habilita las comprobaciones de revocaci&oacute;n por OCSP.
      * @param responderURL
-     *            URL del <i>responder</i> OCSP
+     *        URL del <i>responder</i> OCSP
      * @param responderCertSubjectName
-     *            Nombre del titular del certificado del <i>responder</i> OCSP
-     *            (puede ser <code>null</code>)
+     *        Nombre del titular del certificado del <i>responder</i> OCSP
+     *        (puede ser <code>null</code>)
      * @param responderCertIssuerName
-     *            Nombre del emisor del certificado del <i>responder</i> OCSP
-     *            (puede ser <code>null</code>)
+     *        Nombre del emisor del certificado del <i>responder</i> OCSP
+     *        (puede ser <code>null</code>)
      * @param responderCertSerialNumber
-     *            N&uacute;mero de serie del certificado del <i>responder</i>
-     *            OCSP (puede ser <code>null</code>)
-     */
-    public void enableOCSP(final URL responderURL, final LdapName responderCertSubjectName, final LdapName responderCertIssuerName, final String responderCertSerialNumber) {
+     *        N&uacute;mero de serie del certificado del <i>responder</i>
+     *        OCSP (puede ser <code>null</code>) */
+    public void enableOCSP(final URL responderURL,
+                           final LdapName responderCertSubjectName,
+                           final LdapName responderCertIssuerName,
+                           final String responderCertSerialNumber) {
         Security.setProperty("ocsp.enable", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         if (responderURL != null) {
             Security.setProperty("ocsp.responderURL", responderURL.toString()); //$NON-NLS-1$
@@ -483,48 +460,48 @@ public final class AOCertVerifier {
         }
     }
 
-    /**
-     * Comprueba la validez de un certificado dentro de una cadena de confianza.
-     * 
+    /** Comprueba la validez de un certificado dentro de una cadena de confianza.
      * @param certChain
-     *            Cadena de confianza a verificar
+     *        Cadena de confianza a verificar
      * @param verifyRevocation
-     *            <code>true</code> si deseamos que se compruebe la
-     *            revocaci&oacute;n, <code>false</code> en caso contrario
+     *        <code>true</code> si deseamos que se compruebe la
+     *        revocaci&oacute;n, <code>false</code> en caso contrario
      * @throws AOException
-     *             Cuando falla la validaci&oacute;n, el mensaje de la
-     *             excepci&oacute;n indica el motivo
+     *         Cuando falla la validaci&oacute;n, el mensaje de la
+     *         excepci&oacute;n indica el motivo
      * @throws CertificateExpiredException
-     *              Cuando el certificado est&aacute; caducado.
+     *         Cuando el certificado est&aacute; caducado.
      * @throws CertificateNotYetValidException
-     *              Cuando el certificado a&uacute;n no es v&aacute;lido. 
-     * @throws CertPathValidatorException 
-     *              Cuando no se ha podido validar la cadena de certificaci&oacute;n completa.
+     *         Cuando el certificado a&uacute;n no es v&aacute;lido.
+     * @throws CertPathValidatorException
+     *         Cuando no se ha podido validar la cadena de certificaci&oacute;n completa.
      * @throws AOCertificateRevokedException
-     *              Cuando el certificado de usuario est&aacute; revocado.
-     */
-    public void checkCertificate(final Certificate[] certChain, final boolean verifyRevocation) throws AOException, CertificateExpiredException, CertificateNotYetValidException, CertPathValidatorException, AOCertificateRevokedException {
+     *         Cuando el certificado de usuario est&aacute; revocado. */
+    public void checkCertificate(final Certificate[] certChain, final boolean verifyRevocation) throws AOException,
+                                                                                               CertificateExpiredException,
+                                                                                               CertificateNotYetValidException,
+                                                                                               CertPathValidatorException,
+                                                                                               AOCertificateRevokedException {
 
         errorMessage = null;
 
-        if (checkValidity || !verifyRevocation)
-            for (Certificate c : certChain) {
-                try {
-                    ((X509Certificate) c).checkValidity();
-                }
-                catch (final CertificateExpiredException e) {
-                    errorMessage = Messages.getString("AOCertVerifier.0"); //$NON-NLS-1$
-                    throw e;
-                } 
-                catch (final CertificateNotYetValidException e) {
-                    errorMessage = Messages.getString("AOCertVerifier.1"); //$NON-NLS-1$
-                    throw e;
-                } 
-                catch (final Exception e) {
-                    errorMessage = Messages.getString("AOCertVerifier.2"); //$NON-NLS-1$
-                    throw new AOException(errorMessage, e);
-                }
+        if (checkValidity || !verifyRevocation) for (Certificate c : certChain) {
+            try {
+                ((X509Certificate) c).checkValidity();
             }
+            catch (final CertificateExpiredException e) {
+                errorMessage = Messages.getString("AOCertVerifier.0"); //$NON-NLS-1$
+                throw e;
+            }
+            catch (final CertificateNotYetValidException e) {
+                errorMessage = Messages.getString("AOCertVerifier.1"); //$NON-NLS-1$
+                throw e;
+            }
+            catch (final Exception e) {
+                errorMessage = Messages.getString("AOCertVerifier.2"); //$NON-NLS-1$
+                throw new AOException(errorMessage, e);
+            }
+        }
 
         if (!verifyRevocation) {
             return;
@@ -536,9 +513,8 @@ public final class AOCertVerifier {
         }
         final CertPath cp;
         try {
-            cp = CertificateFactory
-                    .getInstance("X509").generateCertPath(cplist); //$NON-NLS-1$
-        } 
+            cp = CertificateFactory.getInstance("X509").generateCertPath(cplist); //$NON-NLS-1$
+        }
         catch (final Exception e) {
             errorMessage = Messages.getString("AOCertVerifier.3"); //$NON-NLS-1$
             throw new AOException(errorMessage, e);
@@ -547,7 +523,7 @@ public final class AOCertVerifier {
         final PKIXParameters pp;
         try {
             pp = new PKIXParameters(tas);
-        } 
+        }
         catch (final Exception e) {
             errorMessage = Messages.getString("AOCertVerifier.4"); //$NON-NLS-1$
             throw new AOException("Error creando los parametros PKIX", e); //$NON-NLS-1$
@@ -557,7 +533,7 @@ public final class AOCertVerifier {
         final CertPathValidator cpv;
         try {
             cpv = CertPathValidator.getInstance("PKIX"); //$NON-NLS-1$
-        } 
+        }
         catch (final Exception e) {
             errorMessage = Messages.getString("AOCertVerifier.5"); //$NON-NLS-1$
             throw new AOException("Error obteniendo un validador PKIX", e); //$NON-NLS-1$
@@ -568,7 +544,7 @@ public final class AOCertVerifier {
         }
         catch (final CertPathValidatorException e) {
             errorMessage = Messages.getString("AOCertVerifier.7"); //$NON-NLS-1$
-         
+
             // Este metodo permite detectar, tanto en Javad 6 como 7, si la causa de que
             // el certificado no sea valido es que este revocado. En Java 7, la clase
             // CertificateRevokedException es publica y permite recuperar la fecha y el motivo
@@ -576,15 +552,15 @@ public final class AOCertVerifier {
             Throwable cause = e.getCause();
             Class<? extends Throwable> exceptionClass = cause != null ? cause.getClass() : e.getClass();
             if (exceptionClass.getSimpleName().equals("CertificateRevokedException")) {
-                AOCertificateRevokedException cre
-                    = new AOCertificateRevokedException(Messages.getString("AOCertVerifier.8"), e);
+                AOCertificateRevokedException cre = new AOCertificateRevokedException(Messages.getString("AOCertVerifier.8"), e);
                 try {
                     Method getRevocationDateMethod = exceptionClass.getMethod("getRevocationDate", (Class[]) null);
                     cre.setRevocationDate((Date) getRevocationDateMethod.invoke(cause, (Object[]) null));
-                    
+
                     Method getRevocationReasonMethod = exceptionClass.getMethod("getRevocationReason", (Class[]) null);
                     cre.setRevocationReason((String) getRevocationReasonMethod.invoke(cause, (Object[]) null));
-                } catch (Exception e2) {
+                }
+                catch (Exception e2) {
                     // En java 6 estos metodos no existiran
                 }
                 throw cre;
@@ -597,13 +573,10 @@ public final class AOCertVerifier {
         }
     }
 
-    /**
-     * Recupera el mensaje de error devuelta por la &uacute;ltima operacion de
+    /** Recupera el mensaje de error devuelta por la &uacute;ltima operacion de
      * verificaci&oacute;n. Si la &uacute;ltima operaci&oacute;n no produjo un
      * error, devolver&aacute; {@code null}.
-     * 
-     * @return Mensaje de error.
-     */
+     * @return Mensaje de error. */
     public String getErrorMessage() {
         return errorMessage;
     }

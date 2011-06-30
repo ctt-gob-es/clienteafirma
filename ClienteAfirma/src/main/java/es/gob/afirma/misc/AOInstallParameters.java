@@ -14,56 +14,47 @@ import java.io.File;
 import java.security.AccessController;
 import java.util.logging.Logger;
 
-/**
- * Constantes de utilidad en toda la aplicaci&oacute;n.
- * 
- * @version 0.4.
- */
+/** Constantes de utilidad en toda la aplicaci&oacute;n.
+ * @version 0.4. */
 public final class AOInstallParameters {
 
-	/** Preguntar al usuario sobre la acci&oacute;n a realizar. */
-	public final static int ACTION_ASK = 1;
+    /** Preguntar al usuario sobre la acci&oacute;n a realizar. */
+    public final static int ACTION_ASK = 1;
 
-	/** Respetar instalaciones antiguas del cliente. */
-	public final static int ACTION_RESPECT = 2;
+    /** Respetar instalaciones antiguas del cliente. */
+    public final static int ACTION_RESPECT = 2;
 
-	/** Eliminar instalaciones antiguas del cliente. */
-	public final static int ACTION_DELETE = 3;
+    /** Eliminar instalaciones antiguas del cliente. */
+    public final static int ACTION_DELETE = 3;
 
-	/**
-	 * Acci&oacute;n a realizar con respecto a las versiones antiguas
-	 * encontradas del cliente.
-	 */
-	public int oldVersionsAction = ACTION_ASK;
+    /** Acci&oacute;n a realizar con respecto a las versiones antiguas
+     * encontradas del cliente. */
+    public int oldVersionsAction = ACTION_ASK;
 
-	/** Directorio de usuario. */
-	public static final String USER_HOME;
-	static {
-		USER_HOME = AccessController
-				.doPrivileged(new java.security.PrivilegedAction<String>() {
-					public String run() {
-						try {
-							return Platform.getUserHome() + File.separator;
-						} catch (Exception e) {
-							Logger.getLogger("es.gob.afirma")
-									.severe("No ha podido determinarse el directorio de usuario para la configuracion del cliente");
-							return "";
-						}
-					}
-				});
-	}
+    /** Directorio de usuario. */
+    public static final String USER_HOME;
+    static {
+        USER_HOME = AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
+            public String run() {
+                try {
+                    return Platform.getUserHome() + File.separator;
+                }
+                catch (Exception e) {
+                    Logger.getLogger("es.gob.afirma").severe("No ha podido determinarse el directorio de usuario para la configuracion del cliente");
+                    return "";
+                }
+            }
+        });
+    }
 
-	// ************************************************************
-	// ************* DIRECTORIOS DE INSTALACION *******************
-	// ************************************************************
+    // ************************************************************
+    // ************* DIRECTORIOS DE INSTALACION *******************
+    // ************************************************************
 
-	/**
-	 * Recupera el directorio del usuario activo (terminado en el car&acute;cter
-	 * separador).
-	 * 
-	 * @return Directorio del usuario activo del sistema.
-	 */
-	public static final String getUserHome() {
-		return USER_HOME;
-	}
+    /** Recupera el directorio del usuario activo (terminado en el car&acute;cter
+     * separador).
+     * @return Directorio del usuario activo del sistema. */
+    public static final String getUserHome() {
+        return USER_HOME;
+    }
 }

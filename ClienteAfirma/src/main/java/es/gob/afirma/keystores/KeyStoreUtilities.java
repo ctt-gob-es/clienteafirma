@@ -202,7 +202,7 @@ public final class KeyStoreUtilities {
                         else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
                             aliassesByFriendlyName.remove(al);
                             Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                                "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
+                            "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
                             );
                             continue;
                         }
@@ -249,7 +249,7 @@ public final class KeyStoreUtilities {
                     else {
                         // Eliminamos aquellos certificados que no hayan encajado
                         Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                            "El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
+                        "El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
                         );
                         aliassesByFriendlyName.remove(al);
                     }

@@ -10,29 +10,22 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n que indica una operaci&oacute;n cancelada voluntariamente
- * por el usuario.
- */
+/** Excepci&oacute;n que indica una operaci&oacute;n cancelada voluntariamente
+ * por el usuario. */
 public final class AOCancelledOperationException extends RuntimeException {
 
-	private static final long serialVersionUID = 4447842480432712246L;
+    private static final long serialVersionUID = 4447842480432712246L;
 
-	/**
-	 * Crea una excepci&oacute;n sin informaci&oacute;n adicional.
-	 */
-	public AOCancelledOperationException() {
-		super();
-	}
+    /** Crea una excepci&oacute;n sin informaci&oacute;n adicional. */
+    public AOCancelledOperationException() {
+        super();
+    }
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOCancelledOperationException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOCancelledOperationException(String msg) {
+        super(msg);
+    }
 
 }

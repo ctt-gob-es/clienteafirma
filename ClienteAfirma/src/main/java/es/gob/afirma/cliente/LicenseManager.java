@@ -16,45 +16,39 @@ import java.util.Locale;
 
 import es.gob.afirma.misc.AOUtil;
 
-/**
- * Clase para la carga del acuerdo de licencia.
- */
+/** Clase para la carga del acuerdo de licencia. */
 final class LicenseManager {
 
-	private static String LICENSE_FILE = "/resources/licenses";
+    private static String LICENSE_FILE = "/resources/licenses";
 
-	/**
-	 * recupera el texto de la licencia del Cliente @firma. Si ocurre un error
-	 * lanza una excepci&oacute;n.
-	 * 
-	 * @return Texto de la licencia.
-	 * @throws IOException
-	 *             Cuando no se ha podido recuperar el texto de la licencia.
-	 */
-	static String getLicenceText() throws IOException {
+    /** recupera el texto de la licencia del Cliente @firma. Si ocurre un error
+     * lanza una excepci&oacute;n.
+     * @return Texto de la licencia.
+     * @throws IOException
+     *         Cuando no se ha podido recuperar el texto de la licencia. */
+    static String getLicenceText() throws IOException {
 
-		InputStream is = Class.class.getResourceAsStream(LICENSE_FILE
-				+ "_" + Locale.getDefault()); //$NON-NLS-1$
+        InputStream is = Class.class.getResourceAsStream(LICENSE_FILE + "_" + Locale.getDefault()); //$NON-NLS-1$
 
-		if (is == null) {
-			is = Class.class.getResourceAsStream(LICENSE_FILE
-					+ "_" + Locale.getDefault().getLanguage()); //$NON-NLS-1$
-		}
+        if (is == null) {
+            is = Class.class.getResourceAsStream(LICENSE_FILE + "_" + Locale.getDefault().getLanguage()); //$NON-NLS-1$
+        }
 
-		if (is == null) {
-			is = Class.class.getClass().getResourceAsStream(LICENSE_FILE);
-		}
+        if (is == null) {
+            is = Class.class.getClass().getResourceAsStream(LICENSE_FILE);
+        }
 
-		try {
-			return new String(AOUtil.getDataFromInputStream(is), "UTF-8"); //$NON-NLS-1$
-		} catch (final Exception e) {
-			throw new IOException(
-					"No se ha podido recuperar el texto de la licencia:" + e);
-		} finally {
-			try {
-				is.close();
-			} catch (final Exception e) {
-			}
-		}
-	}
+        try {
+            return new String(AOUtil.getDataFromInputStream(is), "UTF-8"); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            throw new IOException("No se ha podido recuperar el texto de la licencia:" + e);
+        }
+        finally {
+            try {
+                is.close();
+            }
+            catch (final Exception e) {}
+        }
+    }
 }

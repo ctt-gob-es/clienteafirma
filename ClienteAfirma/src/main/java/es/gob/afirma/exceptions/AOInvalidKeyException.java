@@ -10,34 +10,26 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar que se ha obtenido o proporcionado una clave
- * no v&aacute;lida.
- */
+/** Excepci&oacute;n para notificar que se ha obtenido o proporcionado una clave
+ * no v&aacute;lida. */
 public final class AOInvalidKeyException extends AOException {
 
-	private static final long serialVersionUID = 4592634848579299321L;
+    private static final long serialVersionUID = 4592634848579299321L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOInvalidKeyException(final String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOInvalidKeyException(final String msg) {
+        super(msg);
+    }
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 * @param e
-	 *            Excepci&oacute;n que ha causado el lanzamiento de esta.
-	 */
-	public AOInvalidKeyException(final String msg, final Exception e) {
-		super(msg, e);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n.
+     * @param e
+     *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
+    public AOInvalidKeyException(final String msg, final Exception e) {
+        super(msg, e);
+    }
 
 }

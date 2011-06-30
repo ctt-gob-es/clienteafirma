@@ -42,34 +42,24 @@ import java.util.List;
 
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
-/**
- * Relationship Transform parameter specification class.
- * 
- * @author fcorneli
- * 
- */
-public class RelationshipTransformParameterSpec implements
-		TransformParameterSpec {
+/** Relationship Transform parameter specification class.
+ * @author fcorneli */
+public class RelationshipTransformParameterSpec implements TransformParameterSpec {
 
-	private final List<String> sourceIds;
+    private final List<String> sourceIds;
 
-	/**
-	 * Main constructor.
-	 */
-	public RelationshipTransformParameterSpec() {
-		this.sourceIds = new LinkedList<String>();
-	}
+    /** Main constructor. */
+    public RelationshipTransformParameterSpec() {
+        this.sourceIds = new LinkedList<String>();
+    }
 
-	/**
-	 * Adds a relationship reference for the given source identifier.
-	 * 
-	 * @param sourceId
-	 */
-	public void addRelationshipReference(String sourceId) {
-		this.sourceIds.add(sourceId);
-	}
+    /** Adds a relationship reference for the given source identifier.
+     * @param sourceId */
+    public void addRelationshipReference(String sourceId) {
+        this.sourceIds.add(sourceId);
+    }
 
-	List<String> getSourceIds() {
-		return this.sourceIds;
-	}
+    List<String> getSourceIds() {
+        return this.sourceIds;
+    }
 }

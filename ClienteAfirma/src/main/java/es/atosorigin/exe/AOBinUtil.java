@@ -204,39 +204,44 @@
 
 package es.atosorigin.exe;
 
-/**
- * M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
- * 
+/** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- * @version 0.3
- */
+ * @version 0.3 */
 final class AOBinUtil {
 
-	private AOBinUtil() {
-	}
+    private AOBinUtil() {}
 
-	public static int getDWord(byte[] data, int offset) {
-		data = new byte[] { data[offset + 7], data[offset + 6],
-				data[offset + 5], data[offset + 4], data[offset + 3],
-				data[offset + 2], data[offset + 1], data[offset + 0] };
-		offset = 0;
-		int l = 0;
-		for (int k = 0; k < 8; k++)
-			l = (l << 8) | (data[offset++] & 0xFF);
-		return l;
-	}
+    public static int getDWord(byte[] data, int offset) {
+        data =
+                new byte[] {
+                        data[offset + 7],
+                        data[offset + 6],
+                        data[offset + 5],
+                        data[offset + 4],
+                        data[offset + 3],
+                        data[offset + 2],
+                        data[offset + 1],
+                        data[offset + 0]
+                };
+        offset = 0;
+        int l = 0;
+        for (int k = 0; k < 8; k++)
+            l = (l << 8) | (data[offset++] & 0xFF);
+        return l;
+    }
 
-	public static int getU2(byte[] data, int offset) {
-		return ((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff);
-	}
+    public static int getU2(byte[] data, int offset) {
+        return ((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff);
+    }
 
-	public static int getInt(byte[] data, int offset) {
-		data = new byte[] { data[offset + 3], data[offset + 2],
-				data[offset + 1], data[offset] };
-		offset = 0;
-		int l = 0;
-		for (int k = 0; k < 4; k++)
-			l = (l << 8) | (data[offset++] & 0xFF);
-		return l;
-	}
+    public static int getInt(byte[] data, int offset) {
+        data = new byte[] {
+                data[offset + 3], data[offset + 2], data[offset + 1], data[offset]
+        };
+        offset = 0;
+        int l = 0;
+        for (int k = 0; k < 4; k++)
+            l = (l << 8) | (data[offset++] & 0xFF);
+        return l;
+    }
 }

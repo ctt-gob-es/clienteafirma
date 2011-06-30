@@ -52,73 +52,64 @@ import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 
-/**
- * JSR105 URI dereferencer for Office Open XML documents.
- * 
- * @author Frank Cornelis
- * 
- */
+/** JSR105 URI dereferencer for Office Open XML documents.
+ * @author Frank Cornelis */
 public class OOXMLURIDereferencer implements URIDereferencer {
 
-	private final byte[] ooxml;
+    private final byte[] ooxml;
 
-	private final URIDereferencer baseUriDereferencer;
+    private final URIDereferencer baseUriDereferencer;
 
-	public OOXMLURIDereferencer(byte[] ooxml) {
-		if (null == ooxml)
-			throw new IllegalArgumentException("ooxml is null");
-		this.baseUriDereferencer = XMLSignatureFactory.getInstance()
-				.getURIDereferencer();
-		this.ooxml = ooxml;
-	}
+    public OOXMLURIDereferencer(byte[] ooxml) {
+        if (null == ooxml) throw new IllegalArgumentException("ooxml is null");
+        this.baseUriDereferencer = XMLSignatureFactory.getInstance().getURIDereferencer();
+        this.ooxml = ooxml;
+    }
 
-	public Data dereference(URIReference uriReference, XMLCryptoContext context)
-			throws URIReferenceException {
+    public Data dereference(URIReference uriReference, XMLCryptoContext context) throws URIReferenceException {
 
-		if (null == uriReference)
-			throw new NullPointerException("URIReference cannot be null");
-		if (null == context)
-			throw new NullPointerException("XMLCrytoContext cannot be null");
+        if (null == uriReference) throw new NullPointerException("URIReference cannot be null");
+        if (null == context) throw new NullPointerException("XMLCrytoContext cannot be null");
 
-		String uri = uriReference.getURI();
-		try {
-			uri = URLDecoder.decode(uri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			Logger.getLogger("es.gob.afirma").warning(
-					"could not URL decode the uri: " + uri);
-		}
+        String uri = uriReference.getURI();
+        try {
+            uri = URLDecoder.decode(uri, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            Logger.getLogger("es.gob.afirma").warning("could not URL decode the uri: " + uri);
+        }
 
-		try {
-			InputStream dataInputStream = findDataInputStream(uri);
-			if (null == dataInputStream) {
-				return this.baseUriDereferencer.dereference(uriReference,
-						context);
-			}
-			return new OctetStreamData(dataInputStream, uri, null);
-		} catch (IOException e) {
-			throw new URIReferenceException("I/O error: " + e.getMessage(), e);
-		}
-	}
+        try {
+            InputStream dataInputStream = findDataInputStream(uri);
+            if (null == dataInputStream) {
+                return this.baseUriDereferencer.dereference(uriReference, context);
+            }
+            return new OctetStreamData(dataInputStream, uri, null);
+        }
+        catch (IOException e) {
+            throw new URIReferenceException("I/O error: " + e.getMessage(), e);
+        }
+    }
 
-	private InputStream findDataInputStream(String uri) throws IOException {
-		String entryName;
-		if (uri.startsWith("/")) {
-			entryName = uri.substring(1); // remove '/'
-		} else {
-			entryName = uri.toString();
-		}
-		if (-1 != entryName.indexOf("?")) {
-			entryName = entryName.substring(0, entryName.indexOf("?"));
-		}
+    private InputStream findDataInputStream(String uri) throws IOException {
+        String entryName;
+        if (uri.startsWith("/")) {
+            entryName = uri.substring(1); // remove '/'
+        }
+        else {
+            entryName = uri.toString();
+        }
+        if (-1 != entryName.indexOf("?")) {
+            entryName = entryName.substring(0, entryName.indexOf("?"));
+        }
 
-		ZipInputStream ooxmlZipInputStream = new ZipInputStream(
-				new ByteArrayInputStream(ooxml));
-		ZipEntry zipEntry;
-		while (null != (zipEntry = ooxmlZipInputStream.getNextEntry())) {
-			if (zipEntry.getName().equals(entryName)) {
-				return ooxmlZipInputStream;
-			}
-		}
-		return null;
-	}
+        ZipInputStream ooxmlZipInputStream = new ZipInputStream(new ByteArrayInputStream(ooxml));
+        ZipEntry zipEntry;
+        while (null != (zipEntry = ooxmlZipInputStream.getNextEntry())) {
+            if (zipEntry.getName().equals(entryName)) {
+                return ooxmlZipInputStream;
+            }
+        }
+        return null;
+    }
 }

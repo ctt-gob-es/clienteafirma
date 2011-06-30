@@ -10,34 +10,26 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar un error en la selecci&oacute;n o el uso de
- * un certificado.
- */
+/** Excepci&oacute;n para notificar un error en la selecci&oacute;n o el uso de
+ * un certificado. */
 public final class AOCertificateException extends AOException {
 
-	/** SerialID. */
-	private static final long serialVersionUID = 3035513480174034743L;
+    /** SerialID. */
+    private static final long serialVersionUID = 3035513480174034743L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOCertificateException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOCertificateException(String msg) {
+        super(msg);
+    }
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 * @param e
-	 *            Excepci&oacute;n que ha causado el lanzamiento de esta.
-	 */
-	public AOCertificateException(String msg, Exception e) {
-		super(msg, e);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n.
+     * @param e
+     *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
+    public AOCertificateException(String msg, Exception e) {
+        super(msg, e);
+    }
 }

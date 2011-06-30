@@ -20,52 +20,44 @@ import javax.swing.UIManager;
 /** Clase espec&iacute;fica para firma Web. */
 public final class Browser {
 
-	static {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (final Exception evt) {
-			Logger.getLogger("es.gob.afirma").warning(
-					"No se pudo cargar el Look & Feel de Windows" + evt);
-		}
-	}
+    static {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (final Exception evt) {
+            Logger.getLogger("es.gob.afirma").warning("No se pudo cargar el Look & Feel de Windows" + evt);
+        }
+    }
 
-	/**
-	 * Obtiene una firma Web.
-	 * 
-	 * @param html
-	 *            HTML a firmar
-	 * @param hashAlg
-	 *            Algoritmo de huella digital a usar
-	 * @return Firma Web
-	 * @throws IOException
-	 *             Si ocurren errores de entrada / salida
-	 * @throws NoSuchAlgorithmException
-	 *             Si el algoritmo de huella digital proporcionado no es
-	 *             v&aacute;lido
-	 */
-	public FirmadorWeb.FirmaWeb browse(final String html, final String hashAlg)
-			throws IOException, NoSuchAlgorithmException {
-		final BrowserDialog bd;
-		if (Frame.getFrames() != null && Frame.getFrames().length > 0) {
-			Logger.getLogger("es.gob.afirma").info(
-					"Se ha encontrado al menos un frame");
-			bd = new BrowserDialog(html, Frame.getFrames()[0]);
-		} else {
-			Logger.getLogger("es.gob.afirma").info(
-					"No se han encontrado frames. Creamos uno invisible");
-			bd = new BrowserDialog(html, new Frame());
-		}
+    /** Obtiene una firma Web.
+     * @param html
+     *        HTML a firmar
+     * @param hashAlg
+     *        Algoritmo de huella digital a usar
+     * @return Firma Web
+     * @throws IOException
+     *         Si ocurren errores de entrada / salida
+     * @throws NoSuchAlgorithmException
+     *         Si el algoritmo de huella digital proporcionado no es
+     *         v&aacute;lido */
+    public FirmadorWeb.FirmaWeb browse(final String html, final String hashAlg) throws IOException, NoSuchAlgorithmException {
+        final BrowserDialog bd;
+        if (Frame.getFrames() != null && Frame.getFrames().length > 0) {
+            Logger.getLogger("es.gob.afirma").info("Se ha encontrado al menos un frame");
+            bd = new BrowserDialog(html, Frame.getFrames()[0]);
+        }
+        else {
+            Logger.getLogger("es.gob.afirma").info("No se han encontrado frames. Creamos uno invisible");
+            bd = new BrowserDialog(html, new Frame());
+        }
 
-		bd.setVisible(true);
-		boolean firmar = bd.isFirmar();
+        bd.setVisible(true);
+        boolean firmar = bd.isFirmar();
 
-		if (firmar)
-			return new FirmadorWeb()
-					.firmar(html,
-							AFirmaWebSignHTMLDocument.files
-									.toArray(new Attachment[AFirmaWebSignHTMLDocument.files
-											.size()]), hashAlg);
-		return null;
+        if (firmar) return new FirmadorWeb().firmar(html,
+                                                    AFirmaWebSignHTMLDocument.files.toArray(new Attachment[AFirmaWebSignHTMLDocument.files.size()]),
+                                                    hashAlg);
+        return null;
 
-	}
+    }
 }

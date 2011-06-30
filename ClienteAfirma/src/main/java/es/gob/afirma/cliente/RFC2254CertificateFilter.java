@@ -21,64 +21,57 @@ import javax.naming.ldap.Rdn;
 
 import com.sun.jndi.toolkit.dir.SearchFilter;
 
-/**
- * Clase que representa un filtro de certificados para
- * el di&aacute;logo de selecci&oacute;n.
- */
+/** Clase que representa un filtro de certificados para
+ * el di&aacute;logo de selecci&oacute;n. */
 public final class RFC2254CertificateFilter implements CertificateFilter {
-    
+
     public boolean matches(final X509Certificate cert) {
-        return 
-            matchesKeyUsageFilter(keyUsageFilter, cert) &&
-            filterSubjectByRFC2254(rfc2254SubjectFilter, cert) &&
-            filterIssuerByRFC2254(rfc2254IssuerFilter, cert)
-        ;
+        return matchesKeyUsageFilter(keyUsageFilter, cert) && filterSubjectByRFC2254(rfc2254SubjectFilter, cert)
+               && filterIssuerByRFC2254(rfc2254IssuerFilter, cert);
     }
 
-	/** El KeyUsage m&iacute;nimos que debe cumplir el certificado. */
-	private final Boolean[] keyUsageFilter;
+    /** El KeyUsage m&iacute;nimos que debe cumplir el certificado. */
+    private final Boolean[] keyUsageFilter;
 
-	/** Filtro RFC2254 para el emisor del certificado. */
-	private final String rfc2254IssuerFilter;
+    /** Filtro RFC2254 para el emisor del certificado. */
+    private final String rfc2254IssuerFilter;
 
-	/** Filtro RFC2254 para el emisor del certificado. */
-	private final String rfc2254SubjectFilter;
+    /** Filtro RFC2254 para el emisor del certificado. */
+    private final String rfc2254SubjectFilter;
 
-	/**
-	 * Construye un filtro para certificados.
-	 * @param subjectFilter Cadena seg&uacute;n la RFC2254 para filtro por el campo del titular (subject)
-	 * @param issuerFilter Cadena seg&uacute;n la RFC2254 para filtro por el campo del emisor (issuer)
-	 * @param keyUsage M&aacute;scara de bits para filtro por <i>KeyUsage</i><br/>
-     * Cada certificado puede permitir simult&aacute;neamente cualquiera de
-     * estos 8 usos:<br/>
-     * <ol>
-     * <li><b>digitalSignature</b></li>
-     * <li><b>nonRepudiation</b></li>
-     * <li><b>keyEncipherment</b></li>
-     * <li><b>dataEncipherment</b></li>
-     * <li><b>keyAgreement</b></li>
-     * <li><b>keyCertSign</b></li>
-     * <li><b>cRLSign</b></li>
-     * <li><b>encipherOnly</b></li>
-     * <li><b>decipherOnly</b></li>
-     * </ol>
-     * Cada uno de los elementos del array designan en orden a uno de estos 8
-     * usos. El valor de cada elemento puede ser:
-     * <ul>
-     * <li>{@code null}: No establece un filtro para ese uso del certificado.</li>
-     * <li>{@code false}: El certificado no debe tener permitido ese uso.</li>
-     * <li>{@code true}: El certificado debe tener permitido ese uso.</li>
-     * </ul>
-	 */
-	public RFC2254CertificateFilter(final String subjectFilter, final String issuerFilter, final Boolean[] keyUsage) {
-	    if (subjectFilter == null && issuerFilter == null && keyUsage == null) {
-	        throw new NullPointerException("Al menos uno de los criterios de filtrado debe no ser nulo");
-	    }
-	    keyUsageFilter = keyUsage;
-	    rfc2254IssuerFilter = issuerFilter;
-	    rfc2254SubjectFilter = subjectFilter;
-	}
-	
+    /** Construye un filtro para certificados.
+     * @param subjectFilter Cadena seg&uacute;n la RFC2254 para filtro por el campo del titular (subject)
+     * @param issuerFilter Cadena seg&uacute;n la RFC2254 para filtro por el campo del emisor (issuer)
+     * @param keyUsage M&aacute;scara de bits para filtro por <i>KeyUsage</i><br/>
+     *        Cada certificado puede permitir simult&aacute;neamente cualquiera de
+     *        estos 8 usos:<br/>
+     *        <ol>
+     *        <li><b>digitalSignature</b></li>
+     *        <li><b>nonRepudiation</b></li>
+     *        <li><b>keyEncipherment</b></li>
+     *        <li><b>dataEncipherment</b></li>
+     *        <li><b>keyAgreement</b></li>
+     *        <li><b>keyCertSign</b></li>
+     *        <li><b>cRLSign</b></li>
+     *        <li><b>encipherOnly</b></li>
+     *        <li><b>decipherOnly</b></li>
+     *        </ol>
+     *        Cada uno de los elementos del array designan en orden a uno de estos 8
+     *        usos. El valor de cada elemento puede ser:
+     *        <ul>
+     *        <li>{@code null}: No establece un filtro para ese uso del certificado.</li>
+     *        <li>{@code false}: El certificado no debe tener permitido ese uso.</li>
+     *        <li>{@code true}: El certificado debe tener permitido ese uso.</li>
+     *        </ul> */
+    public RFC2254CertificateFilter(final String subjectFilter, final String issuerFilter, final Boolean[] keyUsage) {
+        if (subjectFilter == null && issuerFilter == null && keyUsage == null) {
+            throw new NullPointerException("Al menos uno de los criterios de filtrado debe no ser nulo");
+        }
+        keyUsageFilter = keyUsage;
+        rfc2254IssuerFilter = issuerFilter;
+        rfc2254SubjectFilter = subjectFilter;
+    }
+
     private boolean filterSubjectByRFC2254(final String filter, final X509Certificate cert) {
         if (cert == null || filter == null) return true;
         return filterRFC2254(filter, cert.getSubjectDN().toString());

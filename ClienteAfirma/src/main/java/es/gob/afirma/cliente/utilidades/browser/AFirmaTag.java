@@ -13,9 +13,9 @@ package es.gob.afirma.cliente.utilidades.browser;
 import javax.swing.text.html.HTML;
 
 class AFirmaTag extends HTML.Tag {
-	static final AFirmaTag INSTANCE = new AFirmaTag();
+    static final AFirmaTag INSTANCE = new AFirmaTag();
 
-	AFirmaTag() {
-		super("afirma", false, false);
-	}
+    AFirmaTag() {
+        super("afirma", false, false);
+    }
 }

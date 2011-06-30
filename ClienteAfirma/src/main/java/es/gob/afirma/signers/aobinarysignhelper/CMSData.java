@@ -14,8 +14,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-/**
- * Clase que implementa firma digital PKCS#7/CMS Data. La Estructura del mensaje
+/** Clase que implementa firma digital PKCS#7/CMS Data. La Estructura del mensaje
  * es la siguiente:<br>
  * 
  * <pre>
@@ -31,21 +30,16 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * 
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje Data de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
- */
+ * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 public final class CMSData {
 
-	/**
-	 * M&eacute;odo que genera una estructura CMS de tipo Data.
-	 * 
-	 * @param content
-	 *            Datos que se desean envolver.
-	 * @return El envoltorio de tipo data.
-	 */
-	public byte[] genData(byte[] content) {
-		return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(
-				content)).getDEREncoded();
-	}
+    /** M&eacute;odo que genera una estructura CMS de tipo Data.
+     * @param content
+     *        Datos que se desean envolver.
+     * @return El envoltorio de tipo data. */
+    public byte[] genData(byte[] content) {
+        return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(content)).getDEREncoded();
+    }
 
 }

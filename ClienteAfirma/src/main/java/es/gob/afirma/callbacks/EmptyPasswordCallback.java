@@ -12,23 +12,19 @@ package es.gob.afirma.callbacks;
 
 import javax.security.auth.callback.PasswordCallback;
 
-/**
- * PasswordCallback que siempre devuelve un array de caracteres vac&iacute;o
- * como contrase&ntilde;a.
- */
+/** PasswordCallback que siempre devuelve un array de caracteres vac&iacute;o
+ * como contrase&ntilde;a. */
 public final class EmptyPasswordCallback extends PasswordCallback {
 
-	private static final long serialVersionUID = -8633754935170264262L;
+    private static final long serialVersionUID = -8633754935170264262L;
 
-	/**
-	 * Contruye el la forma b&aacute;sica de la clase.
-	 */
-	public EmptyPasswordCallback() {
-		super(">", false);
-	}
+    /** Contruye el la forma b&aacute;sica de la clase. */
+    public EmptyPasswordCallback() {
+        super(">", false);
+    }
 
-	@Override
-	public char[] getPassword() {
-		return new char[0];
-	}
+    @Override
+    public char[] getPassword() {
+        return new char[0];
+    }
 }

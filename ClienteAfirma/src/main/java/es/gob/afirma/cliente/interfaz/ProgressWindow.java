@@ -16,61 +16,52 @@ import java.awt.HeadlessException;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-/**
- * Di&aacute;logo de progreso.
- */
+/** Di&aacute;logo de progreso. */
 public final class ProgressWindow extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private final ProgressStatus status;
+    private final ProgressStatus status;
 
-	private final long max;
+    private final long max;
 
-	private int progreso = 0;
+    private int progreso = 0;
 
-	/**
-	 * Crea un di&aacute;logo de progreso
-	 * 
-	 * @param windowTitle
-	 *            T&iacute;tulo de la ventana
-	 * @param statusTitle
-	 *            T&iacute;tulo de la l&iacute;nea de estado
-	 * @param max
-	 *            Valor m&aacute;ximo de la barra de progreso
-	 * @throws HeadlessException
-	 *             Si no hay interfaz gr&aacute;fico
-	 */
-	public ProgressWindow(String windowTitle, String statusTitle, long max)
-			throws HeadlessException {
-		super(windowTitle);
+    /** Crea un di&aacute;logo de progreso
+     * @param windowTitle
+     *        T&iacute;tulo de la ventana
+     * @param statusTitle
+     *        T&iacute;tulo de la l&iacute;nea de estado
+     * @param max
+     *        Valor m&aacute;ximo de la barra de progreso
+     * @throws HeadlessException
+     *         Si no hay interfaz gr&aacute;fico */
+    public ProgressWindow(String windowTitle, String statusTitle, long max) throws HeadlessException {
+        super(windowTitle);
 
-		this.max = max;
-		this.status = new ProgressStatus(statusTitle, "   ");
+        this.max = max;
+        this.status = new ProgressStatus(statusTitle, "   ");
 
-		status.setMaxValue(Integer.MAX_VALUE);
+        status.setMaxValue(Integer.MAX_VALUE);
 
-		getContentPane().add(status, BorderLayout.CENTER);
-		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-		setSize(400, 150);
-		setLocationRelativeTo(null);
-		setVisible(true);
-	}
+        getContentPane().add(status, BorderLayout.CENTER);
+        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+        setSize(400, 150);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
 
-	/**
-	 * Incrementa la barra de progreso.
-	 * 
-	 * @param amount
-	 *            Cantidad de incremento de la barra de progreso
-	 */
-	public void inc(final int amount) {
-		progreso += amount;
+    /** Incrementa la barra de progreso.
+     * @param amount
+     *        Cantidad de incremento de la barra de progreso */
+    public void inc(final int amount) {
+        progreso += amount;
 
-		double ratio = (double) progreso / max;
-		int newVal = (int) (ratio * Integer.MAX_VALUE);
+        double ratio = (double) progreso / max;
+        int newVal = (int) (ratio * Integer.MAX_VALUE);
 
-		status.updateValue(newVal);
+        status.updateValue(newVal);
 
-		status.paint(status.getGraphics());
-	}
+        status.paint(status.getGraphics());
+    }
 }

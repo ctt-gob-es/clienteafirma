@@ -17,32 +17,26 @@ import java.util.Map;
 
 import sun.security.action.PutAllAction;
 
-/**
- * Proveedor para huellas digitales SHA2 con variantes de nombre no contempladas
- * en el proveedor Sun.
- */
+/** Proveedor para huellas digitales SHA2 con variantes de nombre no contempladas
+ * en el proveedor Sun. */
 public final class SHA2AltNamesProvider extends Provider {
 
-	/**
-	 * Construye un nuevo proveedor de huellas digitales SHA-2 con nombres
-	 * alternativos.
-	 */
-	public SHA2AltNamesProvider() {
-		super("AOSHA2AltNamesProvider", 1.0,
-				"Proveedor para huellas digitales SHA-2 con nombres alternativos");
+    /** Construye un nuevo proveedor de huellas digitales SHA-2 con nombres
+     * alternativos. */
+    public SHA2AltNamesProvider() {
+        super("AOSHA2AltNamesProvider", 1.0, "Proveedor para huellas digitales SHA-2 con nombres alternativos");
 
-		final Map map = (System.getSecurityManager() == null) ? (Map) this
-				: new LinkedHashMap();
+        final Map map = (System.getSecurityManager() == null) ? (Map) this : new LinkedHashMap();
 
-		map.put("MessageDigest.SHA256", "sun.security.provider.SHA2");
-		map.put("MessageDigest.SHA384", "sun.security.provider.SHA5$SHA384");
-		map.put("MessageDigest.SHA512", "sun.security.provider.SHA5$SHA512");
+        map.put("MessageDigest.SHA256", "sun.security.provider.SHA2");
+        map.put("MessageDigest.SHA384", "sun.security.provider.SHA5$SHA384");
+        map.put("MessageDigest.SHA512", "sun.security.provider.SHA5$SHA512");
 
-		if (map != this) {
-			AccessController.doPrivileged(new PutAllAction(this, map));
-		}
-	}
+        if (map != this) {
+            AccessController.doPrivileged(new PutAllAction(this, map));
+        }
+    }
 
-	private static final long serialVersionUID = -8651981256670188852L;
+    private static final long serialVersionUID = -8651981256670188852L;
 
 }

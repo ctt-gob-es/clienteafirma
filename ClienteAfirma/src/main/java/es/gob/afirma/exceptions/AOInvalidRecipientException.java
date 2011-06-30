@@ -10,34 +10,26 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para indicar que se ha intentado abrir un sobre digital con
- * un certificado que no estaba entre sus destinatarios.
- */
+/** Excepci&oacute;n para indicar que se ha intentado abrir un sobre digital con
+ * un certificado que no estaba entre sus destinatarios. */
 public final class AOInvalidRecipientException extends AOException {
 
-	private static final long serialVersionUID = 2582498859303039013L;
+    private static final long serialVersionUID = 2582498859303039013L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOInvalidRecipientException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOInvalidRecipientException(String msg) {
+        super(msg);
+    }
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 * @param e
-	 *            Excepci&oacute;n que ha causado el lanzamiento de esta.
-	 */
-	public AOInvalidRecipientException(String msg, Exception e) {
-		super(msg, e);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n.
+     * @param e
+     *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
+    public AOInvalidRecipientException(String msg, Exception e) {
+        super(msg, e);
+    }
 
 }

@@ -10,22 +10,17 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar que se ha proporcionado un fichero o dato con
- * un formato no v&aacute;lido para la acci&oacute;n en curso.
- */
+/** Excepci&oacute;n para notificar que se ha proporcionado un fichero o dato con
+ * un formato no v&aacute;lido para la acci&oacute;n en curso. */
 public final class AOFormatFileException extends AOException {
 
-	private static final long serialVersionUID = 6785819338728771962L;
+    private static final long serialVersionUID = 6785819338728771962L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOFormatFileException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOFormatFileException(String msg) {
+        super(msg);
+    }
 
 }

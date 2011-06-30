@@ -10,21 +10,16 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n utilizada para indicar que se ha sobrepasado el
- * n&uacute;mero m&aacute;ximo de intentos de acceso a un recurso protegido.
- */
+/** Excepci&oacute;n utilizada para indicar que se ha sobrepasado el
+ * n&uacute;mero m&aacute;ximo de intentos de acceso a un recurso protegido. */
 public final class AOMaxAttemptsExceededException extends AOException {
 
-	private static final long serialVersionUID = -1340950945486548407L;
+    private static final long serialVersionUID = -1340950945486548407L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOMaxAttemptsExceededException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOMaxAttemptsExceededException(String msg) {
+        super(msg);
+    }
 }

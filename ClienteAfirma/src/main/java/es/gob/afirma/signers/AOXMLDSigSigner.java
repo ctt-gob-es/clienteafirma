@@ -1652,17 +1652,10 @@ public final class AOXMLDSigSigner implements AOSigner {
             content.add(kif.newKeyValue(cert.getPublicKey()));
             content.add(kif.newX509Data(x509Content));
 
-            final XMLSignature sign = fac.newXMLSignature(
-        		fac.newSignedInfo(
-            		fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null), 
-            		fac.newSignatureMethod(SIGN_ALGOS_URI.get(algo), null), 
-            		referenceList
-        		), 
-        		kif.newKeyInfo(content, keyInfoId), 
-        		null, 
-        		signatureId, 
-        		signatureValueId
-    		);
+            final XMLSignature sign =
+                    fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(canonicalizationAlgorithm, (C14NMethodParameterSpec) null),
+                                                          fac.newSignatureMethod(SIGN_ALGOS_URI.get(algo), null),
+                                                          referenceList), kif.newKeyInfo(content, keyInfoId), null, signatureId, signatureValueId);
 
             final DOMSignContext signContext = new DOMSignContext(keyEntry.getPrivateKey(), signature.getOwnerDocument().getDocumentElement());
             signContext.putNamespacePrefix(DSIGNNS, XML_SIGNATURE_PREFIX);

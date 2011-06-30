@@ -22,10 +22,8 @@ import org.bouncycastle.asn1.cms.CompressedData;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
-/**
- * Clase que crea un tipo Compressed Data seg&uacute;n el RFC 3274 - CMS
+/** Clase que crea un tipo Compressed Data seg&uacute;n el RFC 3274 - CMS
  * Compressed Data.
- * 
  * La Estructura del mensaje es la siguiente:<br>
  * 
  * <pre>
@@ -43,57 +41,45 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * 
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje Compressed Data de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
- */
+ * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 public final class CMSCompressedData {
 
-	/** OID de ZLIB * */
-	public static final String ZLIB = "1.2.840.113549.1.9.16.3.8";
+    /** OID de ZLIB * */
+    public static final String ZLIB = "1.2.840.113549.1.9.16.3.8";
 
-	/**
-	 * Obtiene un tipo CompressedData.
-	 * 
-	 * @param data
-	 *            Datos a comprimir
-	 * @return Tipo CompressedData.
-	 */
-	public byte[] genCompressedData(byte[] data) {
+    /** Obtiene un tipo CompressedData.
+     * @param data
+     *        Datos a comprimir
+     * @return Tipo CompressedData. */
+    public byte[] genCompressedData(byte[] data) {
 
-		// Algoritmo de compresion
-		AlgorithmIdentifier comAlgId = new AlgorithmIdentifier(
-				new DERObjectIdentifier(ZLIB));
+        // Algoritmo de compresion
+        AlgorithmIdentifier comAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(ZLIB));
 
-		// Se comprimen los datos
-		byte[] compressed = BinaryUtils.compress(data);
+        // Se comprimen los datos
+        byte[] compressed = BinaryUtils.compress(data);
 
-		ASN1OctetString comOcts = new BERConstructedOctetString(compressed);
+        ASN1OctetString comOcts = new BERConstructedOctetString(compressed);
 
-		// Contenido comprimido
-		ContentInfo comContent = new ContentInfo(CMSObjectIdentifiers.data,
-				comOcts);
+        // Contenido comprimido
+        ContentInfo comContent = new ContentInfo(CMSObjectIdentifiers.data, comOcts);
 
-		return new ContentInfo(CMSObjectIdentifiers.compressedData,
-				new CompressedData(comAlgId, comContent)).getDEREncoded();
+        return new ContentInfo(CMSObjectIdentifiers.compressedData, new CompressedData(comAlgId, comContent)).getDEREncoded();
 
-	}
+    }
 
-	/**
-	 * M&eacute;todo que extrae el contenido de un tipo CompressedData.
-	 * 
-	 * @param data
-	 *            El tipo CompressedData.
-	 * @return El contenido del envoltorio.
-	 * @throws IOException
-	 *             Se produce cuando hay un error de lectura de datos.
-	 */
-	public byte[] getContentCompressedData(byte[] data) throws IOException {
-		ASN1Sequence contentEnvelopedData = Utils.fetchWrappedData(data);
-		CompressedData compressed = CompressedData
-				.getInstance(contentEnvelopedData);
-		DEROctetString dos = (DEROctetString) compressed.getEncapContentInfo()
-				.getContent();
+    /** M&eacute;todo que extrae el contenido de un tipo CompressedData.
+     * @param data
+     *        El tipo CompressedData.
+     * @return El contenido del envoltorio.
+     * @throws IOException
+     *         Se produce cuando hay un error de lectura de datos. */
+    public byte[] getContentCompressedData(byte[] data) throws IOException {
+        ASN1Sequence contentEnvelopedData = Utils.fetchWrappedData(data);
+        CompressedData compressed = CompressedData.getInstance(contentEnvelopedData);
+        DEROctetString dos = (DEROctetString) compressed.getEncapContentInfo().getContent();
 
-		return BinaryUtils.uncompress(dos.getOctets());
+        return BinaryUtils.uncompress(dos.getOctets());
 
-	}
+    }
 }

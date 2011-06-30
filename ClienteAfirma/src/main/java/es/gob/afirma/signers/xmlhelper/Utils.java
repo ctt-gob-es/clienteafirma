@@ -100,8 +100,8 @@ public final class Utils {
         /** Construye una excepci&oacute;n que indica la imposibilidad de
          * dereferenciar una hoja de estilo.
          * @param s
-         *        Mesaje de excepci&oacute;n 
-         * @param e 
+         *        Mesaje de excepci&oacute;n
+         * @param e
          *        Excepci&oacute;n anterior en la cadena */
         public CannotDereferenceException(final String s, final Exception e) {
             super(s, e);
@@ -225,10 +225,10 @@ public final class Utils {
         }
         if (xml == null || "".equals(xml)) { //$NON-NLS-1$
             return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><?xml-stylesheet type=\"" + //$NON-NLS-1$
-                type
-                + "\" href=\"" + //$NON-NLS-1$
-                href
-                + "\"?>"; //$NON-NLS-1$
+                   type
+                   + "\" href=\"" + //$NON-NLS-1$
+                   href
+                   + "\"?>"; //$NON-NLS-1$
         }
         return xml.replaceFirst(">", //$NON-NLS-1$
                                 ">\r\n<?xml-stylesheet type=\"" + //$NON-NLS-1$
@@ -264,7 +264,7 @@ public final class Utils {
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-              "No se ha podido analizar correctamente la cabecera de definicion de la hora de estilo del XML: " + e //$NON-NLS-1$
+            "No se ha podido analizar correctamente la cabecera de definicion de la hora de estilo del XML: " + e //$NON-NLS-1$
             );
         }
         return ret;
@@ -323,7 +323,7 @@ public final class Utils {
                 }
                 else {
                     Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                      "Se ha solicitado aplicar una transformacion XPATH2 de un tipo no soportado: " + transformSubtype //$NON-NLS-1$
+                    "Se ha solicitado aplicar una transformacion XPATH2 de un tipo no soportado: " + transformSubtype //$NON-NLS-1$
                     );
                     continue;
                 }
@@ -347,7 +347,7 @@ public final class Utils {
                 }
                 catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                      "No se han podido crear los parametros para una transformacion XSLT, se omitira: " + e //$NON-NLS-1$
+                    "No se han podido crear los parametros para una transformacion XSLT, se omitira: " + e //$NON-NLS-1$
                     );
                     continue;
                 }
@@ -392,7 +392,7 @@ public final class Utils {
      *         Cuando se encuentre un algoritmo de transformaci&oacurte;n no
      *         soportado. */
     public static Vector<Transform> getObjectReferenceTransforms(final Node referenceNode, final String namespacePrefix) throws NoSuchAlgorithmException,
-                                                                                                            InvalidAlgorithmParameterException {
+                                                                                                                        InvalidAlgorithmParameterException {
 
         final Vector<Transform> transformList = new Vector<Transform>();
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");

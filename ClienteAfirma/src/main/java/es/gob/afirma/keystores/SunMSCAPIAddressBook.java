@@ -14,38 +14,29 @@ import java.util.Map;
 
 import sun.security.action.PutAllAction;
 
-/**
- * Proveedor JCA para el acceso a los almacenes de claves de CAPI <i>CA</i> y
+/** Proveedor JCA para el acceso a los almacenes de claves de CAPI <i>CA</i> y
  * <i>ADDRESSBOOK</i>. Basado en SunMSCAPI.java
- * 
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class SunMSCAPIAddressBook extends Provider {
 
-	private static final long serialVersionUID = 2561943190524802403L;
+    private static final long serialVersionUID = 2561943190524802403L;
 
-	private static final String INFO = "Provider for CAPI ADDRESSBOOK and CA KeyStores, based on SunMSCAPI";
+    private static final String INFO = "Provider for CAPI ADDRESSBOOK and CA KeyStores, based on SunMSCAPI";
 
-	/**
-	 * Construye el proveedor JCA para el acceso a los almacenes de claves
-	 * <i>CA</i> y <i>ADDRESSBOOK</i>.
-	 */
-	SunMSCAPIAddressBook() {
-		super("SunMSCAPIAddressBook", 0.1d, INFO);
+    /** Construye el proveedor JCA para el acceso a los almacenes de claves
+     * <i>CA</i> y <i>ADDRESSBOOK</i>. */
+    SunMSCAPIAddressBook() {
+        super("SunMSCAPIAddressBook", 0.1d, INFO);
 
-		// if there is no security manager installed, put directly into
-		// the provider. Otherwise, create a temporary map and use a
-		// doPrivileged() call at the end to transfer the contents
-		final Map map = (System.getSecurityManager() == null) ? (Map) this
-				: new HashMap<String, String>();
+        // if there is no security manager installed, put directly into
+        // the provider. Otherwise, create a temporary map and use a
+        // doPrivileged() call at the end to transfer the contents
+        final Map map = (System.getSecurityManager() == null) ? (Map) this : new HashMap<String, String>();
 
-		map.put("KeyStore.Windows-ADDRESSBOOK",
-				"sun.security.mscapi.KeyStoreAddressBook$ADDRESSBOOK");
-		map.put("KeyStore.Windows-CA",
-				"sun.security.mscapi.KeyStoreAddressBook$CA");
+        map.put("KeyStore.Windows-ADDRESSBOOK", "sun.security.mscapi.KeyStoreAddressBook$ADDRESSBOOK");
+        map.put("KeyStore.Windows-CA", "sun.security.mscapi.KeyStoreAddressBook$CA");
 
-		if (map != this)
-			AccessController.doPrivileged(new PutAllAction(this, map));
-	}
+        if (map != this) AccessController.doPrivileged(new PutAllAction(this, map));
+    }
 
 }

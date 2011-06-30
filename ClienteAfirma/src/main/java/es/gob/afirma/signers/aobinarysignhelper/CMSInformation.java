@@ -24,12 +24,9 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import es.gob.afirma.exceptions.AOInvalidFormatException;
 
-/**
- * Clase que obtiene la informaci&oacute;n de los distintos tipos de firma para
+/** Clase que obtiene la informaci&oacute;n de los distintos tipos de firma para
  * CMS a partir de un fichero pasado por par&aacute;metro.
- * 
  * La informaci&oacute;n es para los tipo:
- * 
  * <ul>
  * <li>Data</li>
  * <li>Signed Data</li>
@@ -39,113 +36,106 @@ import es.gob.afirma.exceptions.AOInvalidFormatException;
  * <li>Signed and Enveloped Data</li>
  * <li>Authenticated Data</li>
  * <li>Authenticated and Enveloped Data</li>
- * </ul>
- */
+ * </ul> */
 public final class CMSInformation {
 
-	/**
-	 * M&eacute;todo principal que obtiene la informaci&oacute;n a partir de un
-	 * fichero firmado de tipo CMS.
-	 * 
-	 * @param data
-	 *            Objeto CMS.
-	 * @return Texto descriptivo del objeto CMS.
-	 * @throws IOException
-	 *             Si ocurre alg&uacute;n problema leyendo o escribiendo los
-	 *             datos
-	 * @throws AOInvalidFormatException
-	 *             Error de formato no v&aacute;lido.
-	 */
-	public String getInformation(byte[] data) throws IOException,
-			AOInvalidFormatException {
-		String datos = "";
+    /** M&eacute;todo principal que obtiene la informaci&oacute;n a partir de un
+     * fichero firmado de tipo CMS.
+     * @param data
+     *        Objeto CMS.
+     * @return Texto descriptivo del objeto CMS.
+     * @throws IOException
+     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *         datos
+     * @throws AOInvalidFormatException
+     *         Error de formato no v&aacute;lido. */
+    public String getInformation(byte[] data) throws IOException, AOInvalidFormatException {
+        String datos = "";
 
-		ASN1InputStream is = new ASN1InputStream(data);
-		// LEEMOS EL FICHERO QUE NOS INTRODUCEN
-		ASN1Sequence dsq = null;
-		dsq = (ASN1Sequence) is.readObject();
-		Enumeration<?> e = dsq.getObjects();
-		// Elementos que contienen los elementos OID Data
-		DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-		// Contenido a obtener informacion
-		ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-		if (doi.equals(PKCSObjectIdentifiers.data)) {
-			datos = Utils.getFromData();
-		} else if (doi.equals(PKCSObjectIdentifiers.digestedData)) {
-			datos = getFromDigestedData(doj);
-		} else if (doi.equals(PKCSObjectIdentifiers.encryptedData)) {
-			datos = Utils.extractData(doj, "5", "Tipo: Encrypted\n", "CMS");
-		} else if (doi.equals(PKCSObjectIdentifiers.signedData)) {
-			datos = Utils.extractData(doj, "4", "Tipo: SignedData\n", "CMS");
-		} else if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
-			datos = Utils.extractData(doj, "0", "Tipo: EnvelopedData\n", "CMS");
-		} else if (doi.equals(PKCSObjectIdentifiers.signedAndEnvelopedData)) {
-			datos = Utils.extractData(doj, "3",
-					"Tipo: SignedAndEnvelopedData\n", "CMS");
-		} else if (doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
-			datos = Utils.extractData(doj, "1", "Tipo: AuthenticatedData\n",
-					"CMS");
-		} else if (doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
-			datos = Utils.extractData(doj, "2",
-					"Tipo: AuthenticatedEnvelopedData\n", "CMS");
-		} else if (doi.equals(CMSObjectIdentifiers.compressedData)) {
-			datos = getFromCompressedData(doj);
-		} else {
-			throw new AOInvalidFormatException(
-					"Los datos introducidos no se corresponden con un tipo de objeto CMS soportado");
-		}
+        ASN1InputStream is = new ASN1InputStream(data);
+        // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+        ASN1Sequence dsq = null;
+        dsq = (ASN1Sequence) is.readObject();
+        Enumeration<?> e = dsq.getObjects();
+        // Elementos que contienen los elementos OID Data
+        DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        // Contenido a obtener informacion
+        ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        if (doi.equals(PKCSObjectIdentifiers.data)) {
+            datos = Utils.getFromData();
+        }
+        else if (doi.equals(PKCSObjectIdentifiers.digestedData)) {
+            datos = getFromDigestedData(doj);
+        }
+        else if (doi.equals(PKCSObjectIdentifiers.encryptedData)) {
+            datos = Utils.extractData(doj, "5", "Tipo: Encrypted\n", "CMS");
+        }
+        else if (doi.equals(PKCSObjectIdentifiers.signedData)) {
+            datos = Utils.extractData(doj, "4", "Tipo: SignedData\n", "CMS");
+        }
+        else if (doi.equals(PKCSObjectIdentifiers.envelopedData)) {
+            datos = Utils.extractData(doj, "0", "Tipo: EnvelopedData\n", "CMS");
+        }
+        else if (doi.equals(PKCSObjectIdentifiers.signedAndEnvelopedData)) {
+            datos = Utils.extractData(doj, "3", "Tipo: SignedAndEnvelopedData\n", "CMS");
+        }
+        else if (doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
+            datos = Utils.extractData(doj, "1", "Tipo: AuthenticatedData\n", "CMS");
+        }
+        else if (doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
+            datos = Utils.extractData(doj, "2", "Tipo: AuthenticatedEnvelopedData\n", "CMS");
+        }
+        else if (doi.equals(CMSObjectIdentifiers.compressedData)) {
+            datos = getFromCompressedData(doj);
+        }
+        else {
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado");
+        }
 
-		return datos;
-	}
+        return datos;
+    }
 
-	/**
-	 * Obtiene la informaci&oacute;n de un tipo Digested Data.
-	 * 
-	 * @return Representaci&oacute;n de los datos.
-	 */
-	private String getFromDigestedData(ASN1TaggedObject doj) {
-		String detalle = "";
-		detalle = detalle + "Tipo: DigestedData\n";
+    /** Obtiene la informaci&oacute;n de un tipo Digested Data.
+     * @return Representaci&oacute;n de los datos. */
+    private String getFromDigestedData(ASN1TaggedObject doj) {
+        String detalle = "";
+        detalle = detalle + "Tipo: DigestedData\n";
 
-		// obtenemos el digestedData
-		DigestedData dd = new DigestedData((ASN1Sequence) doj.getObject());
+        // obtenemos el digestedData
+        DigestedData dd = new DigestedData((ASN1Sequence) doj.getObject());
 
-		// obtenemos la version
-		detalle = detalle + "Version: " + dd.getVersion() + "\n";
+        // obtenemos la version
+        detalle = detalle + "Version: " + dd.getVersion() + "\n";
 
-		// obtenemos el algoritmo
-		AlgorithmIdentifier ai = dd.getDigestAlgorithm();
-		detalle = detalle + "Algoritmo de firma: " + ai.getAlgorithm() + "\n";
+        // obtenemos el algoritmo
+        AlgorithmIdentifier ai = dd.getDigestAlgorithm();
+        detalle = detalle + "Algoritmo de firma: " + ai.getAlgorithm() + "\n";
 
-		// obtenemos el tipo de contenido
-		detalle = detalle + "Tipo de Contenido: "
-				+ dd.getContentInfo().getContentType() + "\n";
+        // obtenemos el tipo de contenido
+        detalle = detalle + "Tipo de Contenido: " + dd.getContentInfo().getContentType() + "\n";
 
-		return detalle;
-	}
+        return detalle;
+    }
 
-	/**
-	 * Obtiene la informaci&oacute;n de un tipo Compressed Data.
-	 * 
-	 * @return Representaci&oacute;n de los datos.
-	 */
-	private String getFromCompressedData(ASN1TaggedObject doj) {
-		String detalle = "";
-		detalle = detalle + "Tipo: CompressedData\n";
-		CompressedData ed = new CompressedData((ASN1Sequence) doj.getObject());
+    /** Obtiene la informaci&oacute;n de un tipo Compressed Data.
+     * @return Representaci&oacute;n de los datos. */
+    private String getFromCompressedData(ASN1TaggedObject doj) {
+        String detalle = "";
+        detalle = detalle + "Tipo: CompressedData\n";
+        CompressedData ed = new CompressedData((ASN1Sequence) doj.getObject());
 
-		// obtenemos la version
-		detalle = detalle + "Version: " + ed.getVersion() + "\n";
+        // obtenemos la version
+        detalle = detalle + "Version: " + ed.getVersion() + "\n";
 
-		final AlgorithmIdentifier aid = ed.getCompressionAlgorithmIdentifier();
-		if (aid.getAlgorithm().toString().equals("1.2.840.113549.1.9.16.3.8")) {
-			detalle = detalle + "OID del Algoritmo de firma: ZLIB\n";
-		} else {
-			detalle = detalle + "OID del Algoritmo de firma: "
-					+ aid.getAlgorithm() + "\n";
-		}
+        final AlgorithmIdentifier aid = ed.getCompressionAlgorithmIdentifier();
+        if (aid.getAlgorithm().toString().equals("1.2.840.113549.1.9.16.3.8")) {
+            detalle = detalle + "OID del Algoritmo de firma: ZLIB\n";
+        }
+        else {
+            detalle = detalle + "OID del Algoritmo de firma: " + aid.getAlgorithm() + "\n";
+        }
 
-		return detalle;
-	}
+        return detalle;
+    }
 
 }

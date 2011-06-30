@@ -13,24 +13,20 @@ package es.gob.afirma.keystores;
 import java.security.AccessController;
 import java.security.Provider;
 
-/**
- * Proveedor de seguridad espec&iacute;fico para servicios de <i>KeyStore</i>
- * restringidos a almacenes PKCS#7 y certificados X.509 en Base64.
- */
+/** Proveedor de seguridad espec&iacute;fico para servicios de <i>KeyStore</i>
+ * restringidos a almacenes PKCS#7 y certificados X.509 en Base64. */
 final class SingleCertKeyStoreProvider extends Provider {
 
-	private static final long serialVersionUID = 3525417804439532445L;
+    private static final long serialVersionUID = 3525417804439532445L;
 
-	protected SingleCertKeyStoreProvider() {
-		super("PKCS7", 0.1d, "KeyStore for a PKCS7 or X509 certificate");
+    protected SingleCertKeyStoreProvider() {
+        super("PKCS7", 0.1d, "KeyStore for a PKCS7 or X509 certificate");
 
-		AccessController
-				.doPrivileged(new java.security.PrivilegedAction<Object>() {
-					public Object run() {
-						put("KeyStore.PKCS7",
-								"es.gob.afirma.keystores.SingleCertKeyStore");
-						return null;
-					}
-				});
-	}
+        AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+            public Object run() {
+                put("KeyStore.PKCS7", "es.gob.afirma.keystores.SingleCertKeyStore");
+                return null;
+            }
+        });
+    }
 }

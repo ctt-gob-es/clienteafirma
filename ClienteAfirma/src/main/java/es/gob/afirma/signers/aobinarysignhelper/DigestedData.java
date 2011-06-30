@@ -22,8 +22,7 @@ import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
-/**
- * Clase base para la implementaci&oacute;n del tipo DigestedData La Estructura
+/** Clase base para la implementaci&oacute;n del tipo DigestedData La Estructura
  * del mensaje es la siguiente:<br>
  * 
  * <pre>
@@ -40,83 +39,78 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * 
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje DigestedData de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
- */
+ * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class DigestedData extends ASN1Encodable {
-	private DERInteger version;
-	private AlgorithmIdentifier digestAlgorithm;
-	private ContentInfo contentInfo;
-	private ASN1OctetString digest;
+    private DERInteger version;
+    private AlgorithmIdentifier digestAlgorithm;
+    private ContentInfo contentInfo;
+    private ASN1OctetString digest;
 
-	static DigestedData getInstance(Object o) {
-		if (o instanceof DigestedData) {
-			return (DigestedData) o;
-		} else if (o instanceof ASN1Sequence) {
-			return new DigestedData((ASN1Sequence) o);
-		}
+    static DigestedData getInstance(Object o) {
+        if (o instanceof DigestedData) {
+            return (DigestedData) o;
+        }
+        else if (o instanceof ASN1Sequence) {
+            return new DigestedData((ASN1Sequence) o);
+        }
 
-		throw new IllegalArgumentException("unknown object in factory: "
-				+ o.getClass().getName());
-	}
+        throw new IllegalArgumentException("unknown object in factory: " + o.getClass().getName());
+    }
 
-	DigestedData(AlgorithmIdentifier digestAlgorithms, ContentInfo contentInfo,
-			ASN1OctetString digest) {
-		this.version = new DERInteger(0);
-		this.digestAlgorithm = digestAlgorithms;
-		this.contentInfo = contentInfo;
-		this.digest = digest;
-	}
+    DigestedData(AlgorithmIdentifier digestAlgorithms, ContentInfo contentInfo, ASN1OctetString digest) {
+        this.version = new DERInteger(0);
+        this.digestAlgorithm = digestAlgorithms;
+        this.contentInfo = contentInfo;
+        this.digest = digest;
+    }
 
-	DigestedData(ASN1Sequence seq) {
-		Enumeration<?> e = seq.getObjects();
+    DigestedData(ASN1Sequence seq) {
+        Enumeration<?> e = seq.getObjects();
 
-		version = (DERInteger) e.nextElement();
-		digestAlgorithm = new AlgorithmIdentifier(
-				(ASN1Sequence) e.nextElement());
-		contentInfo = new ContentInfo((ASN1Sequence) e.nextElement());
-		digest = ((ASN1OctetString) (e.nextElement()));
+        version = (DERInteger) e.nextElement();
+        digestAlgorithm = new AlgorithmIdentifier((ASN1Sequence) e.nextElement());
+        contentInfo = new ContentInfo((ASN1Sequence) e.nextElement());
+        digest = ((ASN1OctetString) (e.nextElement()));
 
-	}
+    }
 
-	DERInteger getVersion() {
-		return version;
-	}
+    DERInteger getVersion() {
+        return version;
+    }
 
-	AlgorithmIdentifier getDigestAlgorithm() {
-		return digestAlgorithm;
-	}
+    AlgorithmIdentifier getDigestAlgorithm() {
+        return digestAlgorithm;
+    }
 
-	ASN1OctetString getDigest() {
-		return digest;
-	}
+    ASN1OctetString getDigest() {
+        return digest;
+    }
 
-	ContentInfo getContentInfo() {
-		return contentInfo;
-	}
+    ContentInfo getContentInfo() {
+        return contentInfo;
+    }
 
-	/**
-	 * Produce an object suitable for an ASN1OutputStream.
-	 * 
-	 * <pre>
-	 * DigestedData ::= SEQUENCE {
-	 *     version CMSVersion,
-	 *     digestAlgorithms DigestAlgorithmIdentifiers,
-	 *     encapContentInfo EncapsulatedContentInfo,
-	 *     digest  Digest
-	 *   }
-	 * 
-	 * Digest ::= OCTET STRING
-	 * </pre>
-	 */
-	@Override
-	public DERObject toASN1Object() {
-		ASN1EncodableVector v = new ASN1EncodableVector();
+    /** Produce an object suitable for an ASN1OutputStream.
+     * 
+     * <pre>
+     * DigestedData ::= SEQUENCE {
+     *     version CMSVersion,
+     *     digestAlgorithms DigestAlgorithmIdentifiers,
+     *     encapContentInfo EncapsulatedContentInfo,
+     *     digest  Digest
+     *   }
+     * 
+     * Digest ::= OCTET STRING
+     * </pre> */
+    @Override
+    public DERObject toASN1Object() {
+        ASN1EncodableVector v = new ASN1EncodableVector();
 
-		v.add(version);
-		v.add(digestAlgorithm);
-		v.add(contentInfo);
-		v.add(digest);
+        v.add(version);
+        v.add(digestAlgorithm);
+        v.add(contentInfo);
+        v.add(digest);
 
-		return new BERSequence(v);
-	}
+        return new BERSequence(v);
+    }
 }

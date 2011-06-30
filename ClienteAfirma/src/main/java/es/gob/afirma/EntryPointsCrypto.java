@@ -299,8 +299,7 @@ public interface EntryPointsCrypto {
      * <li>{@link #setElectronicSignature(String)}</li>
      * <li>{@link #setElectronicSignatureFile(String)}</li>
      * </ul>
-     * <li><b>Certificado de firma (excluyentes): </b></li>
-     * <li><b>Configuraci&oacute;n de firma: </b></li>
+     * <li><b>Certificado de firma (excluyentes): </b></li> <li><b>Configuraci&oacute;n de firma: </b></li>
      * <ul>
      * <li>{@link #setSignatureAlgorithm(String)}</li>
      * <li>{@link #setSignatureFormat(String)}</li>
@@ -330,8 +329,7 @@ public interface EntryPointsCrypto {
      * <li>{@link #setElectronicSignature(String)}</li>
      * <li>{@link #setElectronicSignatureFile(String)}</li>
      * </ul>
-     * <li><b>Signature certificate (exclusive): </b></li>
-     * <li><b>Signature configuration: </b></li>
+     * <li><b>Signature certificate (exclusive): </b></li> <li><b>Signature configuration: </b></li>
      * <ul>
      * <li>{@link #setSignatureAlgorithm(String)}</li>
      * <li>{@link #setSignatureFormat(String)}</li>

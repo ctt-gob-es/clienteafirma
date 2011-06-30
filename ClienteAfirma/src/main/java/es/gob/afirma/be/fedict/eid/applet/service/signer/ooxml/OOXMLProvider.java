@@ -40,33 +40,25 @@ package es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml;
 import java.security.Provider;
 import java.security.Security;
 
-/**
- * Security Provider for Office OpenXML.
- * 
- * @author Frank Cornelis
- * 
- */
+/** Security Provider for Office OpenXML.
+ * @author Frank Cornelis */
 public class OOXMLProvider extends Provider {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final String NAME = "OOXMLProvider";
+    public static final String NAME = "OOXMLProvider";
 
-	private OOXMLProvider() {
-		super(NAME, 1.0, "OOXML Security Provider");
-		put("TransformService." + RelationshipTransformService.TRANSFORM_URI,
-				RelationshipTransformService.class.getName());
-		put("TransformService." + RelationshipTransformService.TRANSFORM_URI
-				+ " MechanismType", "DOM");
-	}
+    private OOXMLProvider() {
+        super(NAME, 1.0, "OOXML Security Provider");
+        put("TransformService." + RelationshipTransformService.TRANSFORM_URI, RelationshipTransformService.class.getName());
+        put("TransformService." + RelationshipTransformService.TRANSFORM_URI + " MechanismType", "DOM");
+    }
 
-	/**
-	 * Installs this security provider.
-	 */
-	public static void install() {
-		Provider provider = Security.getProvider(NAME);
-		if (null == provider) {
-			Security.addProvider(new OOXMLProvider());
-		}
-	}
+    /** Installs this security provider. */
+    public static void install() {
+        Provider provider = Security.getProvider(NAME);
+        if (null == provider) {
+            Security.addProvider(new OOXMLProvider());
+        }
+    }
 }

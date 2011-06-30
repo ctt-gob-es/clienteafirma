@@ -12,22 +12,17 @@ package es.gob.afirma.callbacks;
 
 import javax.security.auth.callback.PasswordCallback;
 
-/**
- * PasswordCallbak que cachea y devuelve la contrase&ntilde;a con la que se
- * construy&oacute; o la que se le establece posteriormente.
- */
+/** PasswordCallbak que cachea y devuelve la contrase&ntilde;a con la que se
+ * construy&oacute; o la que se le establece posteriormente. */
 public final class CachePasswordCallback extends PasswordCallback {
 
-	private static final long serialVersionUID = 816457144215238935L;
+    private static final long serialVersionUID = 816457144215238935L;
 
-	/**
-	 * Contruye una Callback con una contrase&ntilda; preestablecida.
-	 * 
-	 * @param password
-	 *            Contrase&ntilde;a por defecto.
-	 */
-	public CachePasswordCallback(char[] password) {
-		super(">", false);
-		this.setPassword(password);
-	}
+    /** Contruye una Callback con una contrase&ntilda; preestablecida.
+     * @param password
+     *        Contrase&ntilde;a por defecto. */
+    public CachePasswordCallback(char[] password) {
+        super(">", false);
+        this.setPassword(password);
+    }
 }

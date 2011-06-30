@@ -10,22 +10,17 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar cuando se ha proporcionado una URI no
- * v&acute;lida.
- */
+/** Excepci&oacute;n para notificar cuando se ha proporcionado una URI no
+ * v&acute;lida. */
 public final class AOInvalidURIException extends AOException {
 
-	private static final long serialVersionUID = -8626075085228436061L;
+    private static final long serialVersionUID = -8626075085228436061L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOInvalidURIException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOInvalidURIException(String msg) {
+        super(msg);
+    }
 
 }

@@ -10,12 +10,10 @@
 
 package es.gob.afirma.signers.xmlhelper;
 
-/**
- * Clase con las constantes comunes compartidas por los distintos formatos de
- * firma XML.
- */
+/** Clase con las constantes comunes compartidas por los distintos formatos de
+ * firma XML. */
 public final class XMLConstants {
 
-	/** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
-	public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#";
+    /** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
+    public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#";
 }

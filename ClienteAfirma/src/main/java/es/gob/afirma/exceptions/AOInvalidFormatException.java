@@ -10,33 +10,25 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar que se ha encontrado un objeto con un formato
- * inesperado.
- */
+/** Excepci&oacute;n para notificar que se ha encontrado un objeto con un formato
+ * inesperado. */
 public final class AOInvalidFormatException extends AOException {
 
-	private static final long serialVersionUID = 825249824660706387L;
+    private static final long serialVersionUID = 825249824660706387L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOInvalidFormatException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOInvalidFormatException(String msg) {
+        super(msg);
+    }
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 * @param e
-	 *            Excepci&oacute;n que ha causado el lanzamiento de esta.
-	 */
-	public AOInvalidFormatException(String msg, Exception e) {
-		super(msg, e);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n.
+     * @param e
+     *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
+    public AOInvalidFormatException(String msg, Exception e) {
+        super(msg, e);
+    }
 }

@@ -12,23 +12,19 @@ package es.gob.afirma.callbacks;
 
 import javax.security.auth.callback.PasswordCallback;
 
-/**
- * PasswordCallback que siempre devuelve <code>null</code> como
- * contrase&ntilde;a.
- */
+/** PasswordCallback que siempre devuelve <code>null</code> como
+ * contrase&ntilde;a. */
 public final class NullPasswordCallback extends PasswordCallback {
 
-	private static final long serialVersionUID = -5926953046433722802L;
+    private static final long serialVersionUID = -5926953046433722802L;
 
-	/**
-	 * Contruye el la forma b&aacute;sica de la clase.
-	 */
-	public NullPasswordCallback() {
-		super(">", false);
-	}
+    /** Contruye el la forma b&aacute;sica de la clase. */
+    public NullPasswordCallback() {
+        super(">", false);
+    }
 
-	@Override
-	public char[] getPassword() {
-		return null;
-	}
+    @Override
+    public char[] getPassword() {
+        return null;
+    }
 }

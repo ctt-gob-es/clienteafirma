@@ -31,12 +31,9 @@ import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-/**
- * Clase que verifica los distintos tipos de firma para CMS a partir de un
+/** Clase que verifica los distintos tipos de firma para CMS a partir de un
  * fichero pasado por par&aacute;metro.
- * 
  * La verificaci&oacute; es para los tipo:
- * 
  * <ul>
  * <li>Data</li>
  * <li>Signed Data</li>
@@ -47,363 +44,345 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * <li>Compressed Data</li>
  * <li>Authenticated Data</li>
  * <li>Authenticated and Enveloped Data</li>
- * </ul>
- */
+ * </ul> */
 public final class ValidateCMS {
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo "data"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSData(byte[] data) {
-		boolean isValid = true;
-		try {
-			ASN1InputStream is = new ASN1InputStream(data);
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID Data
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(PKCSObjectIdentifiers.data)) {
-				isValid = false;
-			} else {
-				// Contenido de Data
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+    /** M&eacute;todo que verifica que es una firma de tipo "data"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSData(byte[] data) {
+        boolean isValid = true;
+        try {
+            ASN1InputStream is = new ASN1InputStream(data);
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID Data
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.data)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de Data
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-				/*
-				 * Si no es un objeto de tipo Dara se pasa al manejo de la
-				 * excepcion
-				 */
-				new DEROctetString(doj.getObject());
-			}
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-			// + ex);
-			isValid = false;
-		}
+                /*
+                 * Si no es un objeto de tipo Dara se pasa al manejo de la
+                 * excepcion
+                 */
+                new DEROctetString(doj.getObject());
+            }
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
+            // + ex);
+            isValid = false;
+        }
 
-		return isValid;
-	}
+        return isValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo "Signed data"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSSignedData(byte[] data) {
-		boolean isValid = true;
-		try {
-			ASN1InputStream is = new ASN1InputStream(data);
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID Data
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
-				isValid = false;
-			} else {
-				// Contenido de SignedData
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-				ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-				SignedData sd = new SignedData(datos);
-				ASN1Set signerInfosSd = sd.getSignerInfos();
+    /** M&eacute;todo que verifica que es una firma de tipo "Signed data"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSSignedData(byte[] data) {
+        boolean isValid = true;
+        try {
+            ASN1InputStream is = new ASN1InputStream(data);
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID Data
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de SignedData
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+                SignedData sd = new SignedData(datos);
+                ASN1Set signerInfosSd = sd.getSignerInfos();
 
-				for (int i = 0; isValid && i < signerInfosSd.size(); i++) {
-					SignerInfo si = new SignerInfo(
-							(ASN1Sequence) signerInfosSd.getObjectAt(i));
-					isValid = verifySignerInfo(si);
-				}
-			}
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-			// + ex);
-			isValid = false;
-		}
-		return isValid;
-	}
+                for (int i = 0; isValid && i < signerInfosSd.size(); i++) {
+                    SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    isValid = verifySignerInfo(si);
+                }
+            }
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
+            // + ex);
+            isValid = false;
+        }
+        return isValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que los SignerInfos tenga el par&aacute;metro
-	 * que identifica que es de tipo cades.
-	 * 
-	 * @param si
-	 *            SignerInfo para la verificaci&oacute;n del p&aacute;rametro
-	 *            adecuado.
-	 * @return si contiene el par&aacute;metro.
-	 */
-	private boolean verifySignerInfo(SignerInfo si) {
-		boolean isSignerValid = true;
-		ASN1Set attrib = si.getAuthenticatedAttributes();
-		Enumeration<?> e = attrib.getObjects();
-		Attribute atribute;
-		while (isSignerValid && e.hasMoreElements()) {
-			atribute = new Attribute((ASN1Sequence) e.nextElement());
-			// si tiene la pol&iacute;tica es CADES.
-			if (atribute.getAttrType().equals(
-					PKCSObjectIdentifiers.id_aa_ets_sigPolicyId)) {
-				isSignerValid = false;
-				Logger.getLogger("es.gob.afirma").warning(
-						"El signerInfo no es del tipo CMS, es del tipo CADES.");
-			}
-		}
-		return isSignerValid;
-	}
+    /** M&eacute;todo que verifica que los SignerInfos tenga el par&aacute;metro
+     * que identifica que es de tipo cades.
+     * @param si
+     *        SignerInfo para la verificaci&oacute;n del p&aacute;rametro
+     *        adecuado.
+     * @return si contiene el par&aacute;metro. */
+    private boolean verifySignerInfo(SignerInfo si) {
+        boolean isSignerValid = true;
+        ASN1Set attrib = si.getAuthenticatedAttributes();
+        Enumeration<?> e = attrib.getObjects();
+        Attribute atribute;
+        while (isSignerValid && e.hasMoreElements()) {
+            atribute = new Attribute((ASN1Sequence) e.nextElement());
+            // si tiene la pol&iacute;tica es CADES.
+            if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId)) {
+                isSignerValid = false;
+                Logger.getLogger("es.gob.afirma").warning("El signerInfo no es del tipo CMS, es del tipo CADES.");
+            }
+        }
+        return isSignerValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo "Digested data"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSDigestedData(byte[] data) {
-		boolean isValid = true;
-		try {
-			ASN1InputStream is = new ASN1InputStream(data);
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID Data
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(PKCSObjectIdentifiers.digestedData)) {
-				isValid = false;
-			} else {
-				// Contenido de Data
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+    /** M&eacute;todo que verifica que es una firma de tipo "Digested data"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSDigestedData(byte[] data) {
+        boolean isValid = true;
+        try {
+            ASN1InputStream is = new ASN1InputStream(data);
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID Data
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.digestedData)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de Data
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-				/*
-				 * Estas variables no se usan, solo es para verificar que la
-				 * conversion ha sido correcta. De no ser asi, se pasaria al
-				 * manejo de la excepcion.
-				 */
-				new DigestedData((ASN1Sequence) doj.getObject());
-			}
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-			// + ex);
-			isValid = false;
-		}
+                /*
+                 * Estas variables no se usan, solo es para verificar que la
+                 * conversion ha sido correcta. De no ser asi, se pasaria al
+                 * manejo de la excepcion.
+                 */
+                new DigestedData((ASN1Sequence) doj.getObject());
+            }
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
+            // + ex);
+            isValid = false;
+        }
 
-		return isValid;
-	}
+        return isValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo "Encrypted data"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSEncryptedData(byte[] data) {
-		boolean isValid = true;
-		try {
-			ASN1InputStream is = new ASN1InputStream(data);
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID Data
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(PKCSObjectIdentifiers.encryptedData)) {
-				isValid = false;
-			} else {
-				// Contenido de Data
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-				ASN1Sequence asq = (ASN1Sequence) doj.getObject();
+    /** M&eacute;todo que verifica que es una firma de tipo "Encrypted data"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSEncryptedData(byte[] data) {
+        boolean isValid = true;
+        try {
+            ASN1InputStream is = new ASN1InputStream(data);
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID Data
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.encryptedData)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de Data
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                ASN1Sequence asq = (ASN1Sequence) doj.getObject();
 
-				/*
-				 * Si no es de tipo EncryptedData se pasa al manejo de la
-				 * excepcion
-				 */
-				DERInteger.getInstance(asq.getObjectAt(0));
-				EncryptedContentInfo.getInstance(asq.getObjectAt(1));
-			}
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-			// + ex);
-			isValid = false;
-		}
+                /*
+                 * Si no es de tipo EncryptedData se pasa al manejo de la
+                 * excepcion
+                 */
+                DERInteger.getInstance(asq.getObjectAt(0));
+                EncryptedContentInfo.getInstance(asq.getObjectAt(1));
+            }
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
+            // + ex);
+            isValid = false;
+        }
 
-		return isValid;
-	}
+        return isValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo "Enveloped data"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSEnvelopedData(byte[] data) {
-		boolean isValid = true;
-		try {
-			ASN1InputStream is = new ASN1InputStream(data);
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID Data
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(PKCSObjectIdentifiers.envelopedData)) {
-				isValid = false;
-			} else {
-				// Contenido de Data
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-				/*
-				 * Si no se construye el objeto correctamente, se pasa al manejo
-				 * de la excepcion
-				 */
-				new EnvelopedData((ASN1Sequence) doj.getObject());
-			}
+    /** M&eacute;todo que verifica que es una firma de tipo "Enveloped data"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSEnvelopedData(byte[] data) {
+        boolean isValid = true;
+        try {
+            ASN1InputStream is = new ASN1InputStream(data);
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID Data
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.envelopedData)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de Data
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                /*
+                 * Si no se construye el objeto correctamente, se pasa al manejo
+                 * de la excepcion
+                 */
+                new EnvelopedData((ASN1Sequence) doj.getObject());
+            }
 
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-			// + ex);
-			isValid = false;
-		}
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
+            // + ex);
+            isValid = false;
+        }
 
-		return isValid;
-	}
+        return isValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo
-	 * "Signed and Enveloped data"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSSignedAndEnvelopedData(byte[] data) {
-		boolean isValid = true;
-		try {
-			ASN1InputStream is = new ASN1InputStream(data);
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID Data
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(PKCSObjectIdentifiers.signedAndEnvelopedData)) {
-				isValid = false;
-			} else {
-				// Contenido de SignedData
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-				ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-				SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
-				ASN1Set signerInfosSd = sd.getSignerInfos();
+    /** M&eacute;todo que verifica que es una firma de tipo
+     * "Signed and Enveloped data"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSSignedAndEnvelopedData(byte[] data) {
+        boolean isValid = true;
+        try {
+            ASN1InputStream is = new ASN1InputStream(data);
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID Data
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.signedAndEnvelopedData)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de SignedData
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+                SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
+                ASN1Set signerInfosSd = sd.getSignerInfos();
 
-				for (int i = 0; i < signerInfosSd.size() && isValid; i++) {
-					SignerInfo si = new SignerInfo(
-							(ASN1Sequence) signerInfosSd.getObjectAt(i));
-					isValid = verifySignerInfo(si);
-				}
-			}
+                for (int i = 0; i < signerInfosSd.size() && isValid; i++) {
+                    SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    isValid = verifySignerInfo(si);
+                }
+            }
 
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-			// + ex);
-			isValid = false;
-		}
-		return isValid;
-	}
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
+            // + ex);
+            isValid = false;
+        }
+        return isValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo "AuthenticatedData"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSAuthenticatedData(byte[] data) {
-		boolean isValid = true;
-		// Leemos el fichero que contiene la firma.
-		ASN1InputStream is = new ASN1InputStream(data);
+    /** M&eacute;todo que verifica que es una firma de tipo "AuthenticatedData"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSAuthenticatedData(byte[] data) {
+        boolean isValid = true;
+        // Leemos el fichero que contiene la firma.
+        ASN1InputStream is = new ASN1InputStream(data);
 
-		try {
-			// Comenzamos a obtener los datos.
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID AuthenticatedData.
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
-				isValid = false;
-			} else {
-				// Contenido de AuthenticatedData
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-				ASN1Sequence authenticatedData = (ASN1Sequence) doj.getObject();
-				AuthenticatedData.getInstance(authenticatedData);
-			}
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo AuthenticatedData:  "
-			// + ex);
-			isValid = false;
-		}
-		return isValid;
-	}
+        try {
+            // Comenzamos a obtener los datos.
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID AuthenticatedData.
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de AuthenticatedData
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                ASN1Sequence authenticatedData = (ASN1Sequence) doj.getObject();
+                AuthenticatedData.getInstance(authenticatedData);
+            }
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo AuthenticatedData:  "
+            // + ex);
+            isValid = false;
+        }
+        return isValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo
-	 * "AuthenticatedEnvelopedData"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSAuthenticatedEnvelopedData(byte[] data) {
-		boolean isValid = true;
-		// Leemos el fichero que contiene la firma.
-		ASN1InputStream is = new ASN1InputStream(data);
+    /** M&eacute;todo que verifica que es una firma de tipo
+     * "AuthenticatedEnvelopedData"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSAuthenticatedEnvelopedData(byte[] data) {
+        boolean isValid = true;
+        // Leemos el fichero que contiene la firma.
+        ASN1InputStream is = new ASN1InputStream(data);
 
-		try {
-			// Comenzamos a obtener los datos.
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID
-			// AuthenticatedEnvelopedData.
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
-				isValid = false;
-			} else {
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-				ASN1Sequence authenticatedEnvelopedData = (ASN1Sequence) doj
-						.getObject();
-				AuthEnvelopedData.getInstance(authenticatedEnvelopedData);
-			}
+        try {
+            // Comenzamos a obtener los datos.
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID
+            // AuthenticatedEnvelopedData.
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
+                isValid = false;
+            }
+            else {
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                ASN1Sequence authenticatedEnvelopedData = (ASN1Sequence) doj.getObject();
+                AuthEnvelopedData.getInstance(authenticatedEnvelopedData);
+            }
 
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo AuthenticatedEnvelopedData:  "
-			// + ex);
-			isValid = false;
-		}
-		return isValid;
-	}
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo AuthenticatedEnvelopedData:  "
+            // + ex);
+            isValid = false;
+        }
+        return isValid;
+    }
 
-	/**
-	 * M&eacute;todo que verifica que es una firma de tipo "CompressedData"
-	 * 
-	 * @param data
-	 *            Datos CMS.
-	 * @return si es de este tipo.
-	 */
-	public boolean isCMSCompressedData(byte[] data) {
-		boolean isValid = true;
-		// Leemos el fichero que contiene la firma.
-		ASN1InputStream is = new ASN1InputStream(data);
-		try {
-			// Comenzamos a obtener los datos.
-			ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-			Enumeration<?> e = dsq.getObjects();
-			// Elementos que contienen los elementos OID CompressedData.
-			DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
-			if (!doi.equals(CMSObjectIdentifiers.compressedData)) {
-				isValid = false;
-			} else {
-				// Contenido de CompressedData
-				ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-				ASN1Sequence compressedData = (ASN1Sequence) doj.getObject();
-				CompressedData.getInstance(compressedData);
-			}
-		} catch (Exception ex) {
-			// Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo CompressedData:  "
-			// + ex);
-			isValid = false;
-		}
-		return isValid;
-	}
+    /** M&eacute;todo que verifica que es una firma de tipo "CompressedData"
+     * @param data
+     *        Datos CMS.
+     * @return si es de este tipo. */
+    public boolean isCMSCompressedData(byte[] data) {
+        boolean isValid = true;
+        // Leemos el fichero que contiene la firma.
+        ASN1InputStream is = new ASN1InputStream(data);
+        try {
+            // Comenzamos a obtener los datos.
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            Enumeration<?> e = dsq.getObjects();
+            // Elementos que contienen los elementos OID CompressedData.
+            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            if (!doi.equals(CMSObjectIdentifiers.compressedData)) {
+                isValid = false;
+            }
+            else {
+                // Contenido de CompressedData
+                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                ASN1Sequence compressedData = (ASN1Sequence) doj.getObject();
+                CompressedData.getInstance(compressedData);
+            }
+        }
+        catch (Exception ex) {
+            // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo CompressedData:  "
+            // + ex);
+            isValid = false;
+        }
+        return isValid;
+    }
 }

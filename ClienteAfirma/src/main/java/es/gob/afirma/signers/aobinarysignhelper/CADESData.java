@@ -14,8 +14,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-/**
- * Clase que implementa firma digital Data de CADES, que se basa en PKCS#7/CMS
+/** Clase que implementa firma digital Data de CADES, que se basa en PKCS#7/CMS
  * Data. La Estructura del mensaje es la siguiente:<br>
  * 
  * <pre>
@@ -31,26 +30,21 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * 
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje Data de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a>
- */
+ * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
 public final class CADESData {
 
-	/**
-	 * M&eacute;odo que genera una firma digital usando el sitema conocido como
-	 * Data y que consiste en el contenido del fichero codificado como un
-	 * conjunto de bytes.
-	 * 
-	 * @param parameters
-	 *            Par&aacute;metros necesarios para obtener los datos de
-	 *            SignedData.
-	 * @return El contenido del fichero en formato Data.
-	 */
-	public byte[] genData(P7ContentSignerParameters parameters) {
+    /** M&eacute;odo que genera una firma digital usando el sitema conocido como
+     * Data y que consiste en el contenido del fichero codificado como un
+     * conjunto de bytes.
+     * @param parameters
+     *        Par&aacute;metros necesarios para obtener los datos de
+     *        SignedData.
+     * @return El contenido del fichero en formato Data. */
+    public byte[] genData(P7ContentSignerParameters parameters) {
 
-		// construimos el Data y lo devolvemos
-		return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(
-				parameters.getContent())).getDEREncoded();
-	}
+        // construimos el Data y lo devolvemos
+        return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(parameters.getContent())).getDEREncoded();
+    }
 
 }

@@ -27,149 +27,129 @@ import es.gob.afirma.ciphers.AOCipherConfig;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOConstants.AOCipherAlgorithm;
 
-/**
- * Clase que descifra el contenido de un fichero en formato EncryptedData de
+/** Clase que descifra el contenido de un fichero en formato EncryptedData de
  * CMS.
- * 
- * Se usa para ello una clave del usuario.
- */
+ * Se usa para ello una clave del usuario. */
 public final class CMSDecipherEncryptedData {
 
-	/**
-	 * Clave de cifrado. La almacenamos internamente porque no hay forma de
-	 * mostrarla directamente al usuario.
-	 */
-	private SecretKey cipherKey;
+    /** Clave de cifrado. La almacenamos internamente porque no hay forma de
+     * mostrarla directamente al usuario. */
+    private SecretKey cipherKey;
 
-	private AOCipherConfig config;
+    private AOCipherConfig config;
 
-	/**
-	 * M&eacute;todo principal que descifra datos del tipo de EncryptedData.
-	 * 
-	 * @param encryptedData
-	 *            Datos del tipo CMS EncryptedData.
-	 * @param pass
-	 *            Contrase&ntilde;a o clave que se uso para cifrar los datos.
-	 * 
-	 * @return Datos sin encriptar.
-	 * @throws AOException
-	 *             Cuando ocurre un error durante el proceso de descifrado
-	 *             (formato o clave incorrecto,...)
-	 * @throws InvalidKeyException
-	 *             Cuando se proporciona una clave incorrecta para el
-	 *             descifrado.
-	 */
-	public byte[] dechiperEncryptedData(byte[] encryptedData, String pass)
-			throws AOException, InvalidKeyException {
+    /** M&eacute;todo principal que descifra datos del tipo de EncryptedData.
+     * @param encryptedData
+     *        Datos del tipo CMS EncryptedData.
+     * @param pass
+     *        Contrase&ntilde;a o clave que se uso para cifrar los datos.
+     * @return Datos sin encriptar.
+     * @throws AOException
+     *         Cuando ocurre un error durante el proceso de descifrado
+     *         (formato o clave incorrecto,...)
+     * @throws InvalidKeyException
+     *         Cuando se proporciona una clave incorrecta para el
+     *         descifrado. */
+    public byte[] dechiperEncryptedData(byte[] encryptedData, String pass) throws AOException, InvalidKeyException {
 
-		AlgorithmIdentifier alg = null;
-		EncryptedContentInfo eci = null;
+        AlgorithmIdentifier alg = null;
+        EncryptedContentInfo eci = null;
 
-		// donde se guardara el resultad.
-		final byte[] deciphered;
+        // donde se guardara el resultad.
+        final byte[] deciphered;
 
-		try {
-			ASN1Sequence contentEncryptedData = Utils
-					.fetchWrappedData(encryptedData);
+        try {
+            ASN1Sequence contentEncryptedData = Utils.fetchWrappedData(encryptedData);
 
-			// Obtenemos los datos del encryptedData.
-			Enumeration<?> e2 = contentEncryptedData.getObjects();
-			// version
-			e2.nextElement();
-			// EncryptedContentInfo. donde está lo que necesitamos.
-			eci = EncryptedContentInfo.getInstance(e2.nextElement());
+            // Obtenemos los datos del encryptedData.
+            Enumeration<?> e2 = contentEncryptedData.getObjects();
+            // version
+            e2.nextElement();
+            // EncryptedContentInfo. donde está lo que necesitamos.
+            eci = EncryptedContentInfo.getInstance(e2.nextElement());
 
-			// Obtenemos el agoritmo de cifrado
-			alg = eci.getContentEncryptionAlgorithm();
+            // Obtenemos el agoritmo de cifrado
+            alg = eci.getContentEncryptionAlgorithm();
 
-			// Se intenta obtener el encrypted data.
-			// Si no puede convertirse, dara error.
-			// "EncryptedData EncryptedData" no se usara. solo es para verificar
-			// que es de este tipo.
-			new EncryptedData(eci);
-		} catch (final Exception ex) {
-			throw new AOException(
-					"El fichero no contiene un tipo EncryptedData", ex);
-		}
+            // Se intenta obtener el encrypted data.
+            // Si no puede convertirse, dara error.
+            // "EncryptedData EncryptedData" no se usara. solo es para verificar
+            // que es de este tipo.
+            new EncryptedData(eci);
+        }
+        catch (final Exception ex) {
+            throw new AOException("El fichero no contiene un tipo EncryptedData", ex);
+        }
 
-		// asignamos la clave de descifrado a partir del algoritmo.
-		assignKey(alg, pass);
+        // asignamos la clave de descifrado a partir del algoritmo.
+        assignKey(alg, pass);
 
-		// Obtenemos el contenido cifrado.
-		byte[] contCifrado = eci.getEncryptedContent().getOctets();
+        // Obtenemos el contenido cifrado.
+        byte[] contCifrado = eci.getEncryptedContent().getOctets();
 
-		// Desciframos.
-		try {
-			deciphered = Utils.deCipherContent(contCifrado, config, cipherKey);
-		} catch (InvalidKeyException ex) {
-			throw ex;
-		} catch (Exception ex) {
-			Logger.getLogger("es.gob.afirma").severe(
-					"El fichero no contiene un tipo EncryptedData:  " + ex);
-			throw new AOException(
-					"Error al descifrar los contenidos encriptados", ex);
-		}
+        // Desciframos.
+        try {
+            deciphered = Utils.deCipherContent(contCifrado, config, cipherKey);
+        }
+        catch (InvalidKeyException ex) {
+            throw ex;
+        }
+        catch (Exception ex) {
+            Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo EncryptedData:  " + ex);
+            throw new AOException("Error al descifrar los contenidos encriptados", ex);
+        }
 
-		return deciphered;
-	}
+        return deciphered;
+    }
 
-	/**
-	 * Asigna la clave para firmar el contenido del fichero que queremos
-	 * envolver y qeu m&aacute;s tarde ser&aacute; cifrada con la clave
-	 * p&uacute;blica del usuario que hace la firma.
-	 * 
-	 * @param alg
-	 *            Algoritmo necesario para crear la clave.
-	 * @param key
-	 *            Contrase&ntilde;a que se va a usar para cifrar.
-	 * @throws AOException
-	 *             Cuando la clave o password no son v&aacute;lidas.
-	 */
-	private void assignKey(AlgorithmIdentifier alg, String key)
-			throws AOException {
+    /** Asigna la clave para firmar el contenido del fichero que queremos
+     * envolver y qeu m&aacute;s tarde ser&aacute; cifrada con la clave
+     * p&uacute;blica del usuario que hace la firma.
+     * @param alg
+     *        Algoritmo necesario para crear la clave.
+     * @param key
+     *        Contrase&ntilde;a que se va a usar para cifrar.
+     * @throws AOException
+     *         Cuando la clave o password no son v&aacute;lidas. */
+    private void assignKey(AlgorithmIdentifier alg, String key) throws AOException {
 
-		// obtenemos el oid del algoritmo.
-		String algoritmoOid = alg.getAlgorithm().toString();
+        // obtenemos el oid del algoritmo.
+        String algoritmoOid = alg.getAlgorithm().toString();
 
-		AOCipherAlgorithm algorithm = null;
-		AOCipherAlgorithm aux = null;
+        AOCipherAlgorithm algorithm = null;
+        AOCipherAlgorithm aux = null;
 
-		// A partir de los tipos de algoritmos, buscamos el que coincida
-		// con el oid de cifrado obtenido del fichero de firma.
-		AOCipherAlgorithm[] algoritmos = AOCipherAlgorithm.values();
-		for (int i = 0; i < algoritmos.length; i++) {
-			aux = algoritmos[i];
-			if (aux.getOid().equals(algoritmoOid)) {
-				algorithm = aux;
-			}
-		}
-		// Creamos una configuraci&oacute;n partir del algoritmo.
-		config = new AOCipherConfig(algorithm, null, null);
+        // A partir de los tipos de algoritmos, buscamos el que coincida
+        // con el oid de cifrado obtenido del fichero de firma.
+        AOCipherAlgorithm[] algoritmos = AOCipherAlgorithm.values();
+        for (int i = 0; i < algoritmos.length; i++) {
+            aux = algoritmos[i];
+            if (aux.getOid().equals(algoritmoOid)) {
+                algorithm = aux;
+            }
+        }
+        // Creamos una configuraci&oacute;n partir del algoritmo.
+        config = new AOCipherConfig(algorithm, null, null);
 
-		// Generamos la clave necesaria para el cifrado
-		if ((config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES))
-				|| (config.getAlgorithm()
-						.equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE))
-				|| (config.getAlgorithm()
-						.equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40))) {
-			try {
-				this.cipherKey = Utils.loadCipherKey(config, key);
-			} catch (Exception ex) {
-				throw new AOException(
-						"Error durante el proceso de asignacion de la clave (a partir de password)",
-						ex);
-			}
-		} else {
-			try {
-				this.cipherKey = new SecretKeySpec(Base64.decodeBase64(key),
-						config.getAlgorithm().getName());
-			} catch (Exception ex) {
-				throw new AOException(
-						"Error durante el proceso de asignacion de la clave (a partir de key)",
-						ex);
-			}
-		}
+        // Generamos la clave necesaria para el cifrado
+        if ((config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES)) || (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE))
+            || (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40))) {
+            try {
+                this.cipherKey = Utils.loadCipherKey(config, key);
+            }
+            catch (Exception ex) {
+                throw new AOException("Error durante el proceso de asignacion de la clave (a partir de password)", ex);
+            }
+        }
+        else {
+            try {
+                this.cipherKey = new SecretKeySpec(Base64.decodeBase64(key), config.getAlgorithm().getName());
+            }
+            catch (Exception ex) {
+                throw new AOException("Error durante el proceso de asignacion de la clave (a partir de key)", ex);
+            }
+        }
 
-	}
+    }
 
 }

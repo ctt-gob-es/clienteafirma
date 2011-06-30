@@ -41,26 +41,19 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.output.ProxyOutputStream;
 
-/**
- * Output Stream proxy that doesn't close the underlying stream.
- * 
- * @author fcorneli
- * 
- */
+/** Output Stream proxy that doesn't close the underlying stream.
+ * @author fcorneli */
 public class NoCloseOutputStream extends ProxyOutputStream {
 
-	/**
-	 * Main constructor.
-	 * 
-	 * @param proxy
-	 */
-	public NoCloseOutputStream(OutputStream proxy) {
-		super(proxy);
-	}
+    /** Main constructor.
+     * @param proxy */
+    public NoCloseOutputStream(OutputStream proxy) {
+        super(proxy);
+    }
 
-	@Override
-	public void close() throws IOException {
-		Logger.getLogger("es.gob.afirma").info("close");
-		// empty
-	}
+    @Override
+    public void close() throws IOException {
+        Logger.getLogger("es.gob.afirma").info("close");
+        // empty
+    }
 }

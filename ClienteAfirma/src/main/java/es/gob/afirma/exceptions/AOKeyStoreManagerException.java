@@ -10,33 +10,25 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar un error en la inicializacion o en el acceso
- * a un almac&eacute;n de certificados.
- */
+/** Excepci&oacute;n para notificar un error en la inicializacion o en el acceso
+ * a un almac&eacute;n de certificados. */
 public final class AOKeyStoreManagerException extends AOException {
 
-	private static final long serialVersionUID = 2896862509190263027L;
+    private static final long serialVersionUID = 2896862509190263027L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public AOKeyStoreManagerException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n. */
+    public AOKeyStoreManagerException(String msg) {
+        super(msg);
+    }
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 * @param e
-	 *            Excepci&oacute;n que ha causado el lanzamiento de esta.
-	 */
-	public AOKeyStoreManagerException(String msg, Exception e) {
-		super(msg, e);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n.
+     * @param e
+     *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
+    public AOKeyStoreManagerException(String msg, Exception e) {
+        super(msg, e);
+    }
 }

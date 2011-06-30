@@ -40,24 +40,16 @@ import java.io.InputStream;
 
 import org.apache.commons.io.input.ProxyInputStream;
 
-/**
- * Input Stream proxy that doesn't close the underlying input stream.
- * 
- * @author fcorneli
- * 
- */
+/** Input Stream proxy that doesn't close the underlying input stream.
+ * @author fcorneli */
 public class NoCloseInputStream extends ProxyInputStream {
 
-	/**
-	 * Main constructor.
-	 * 
-	 * @param proxy
-	 */
-	public NoCloseInputStream(InputStream proxy) {
-		super(proxy);
-	}
+    /** Main constructor.
+     * @param proxy */
+    public NoCloseInputStream(InputStream proxy) {
+        super(proxy);
+    }
 
-	@Override
-	public void close() throws IOException {
-	}
+    @Override
+    public void close() throws IOException {}
 }

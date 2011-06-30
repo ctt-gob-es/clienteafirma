@@ -20,32 +20,25 @@ package es.gob.afirma.be.fedict.eid.applet.service.spi;
 
 import java.io.Serializable;
 
-/**
- * Digest Information data transfer class.
- * 
- * @author Frank Cornelis
- * 
- */
+/** Digest Information data transfer class.
+ * @author Frank Cornelis */
 public class DigestInfo implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Main constructor.
-	 * 
-	 * @param digestValue
-	 * @param digestAlgo
-	 * @param description
-	 */
-	public DigestInfo(byte[] digestValue, String digestAlgo, String description) {
-		this.digestValue = digestValue;
-		this.digestAlgo = digestAlgo;
-		this.description = description;
-	}
+    /** Main constructor.
+     * @param digestValue
+     * @param digestAlgo
+     * @param description */
+    public DigestInfo(byte[] digestValue, String digestAlgo, String description) {
+        this.digestValue = digestValue;
+        this.digestAlgo = digestAlgo;
+        this.description = description;
+    }
 
-	public final byte[] digestValue;
+    public final byte[] digestValue;
 
-	public final String description;
+    public final String description;
 
-	public final String digestAlgo;
+    public final String digestAlgo;
 }

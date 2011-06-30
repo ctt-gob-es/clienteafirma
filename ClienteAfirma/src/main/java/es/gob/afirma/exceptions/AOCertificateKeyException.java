@@ -10,34 +10,26 @@
 
 package es.gob.afirma.exceptions;
 
-/**
- * Excepci&oacute;n para notificar que no se ha podido recuperar la clave de un
- * certificado.
- */
+/** Excepci&oacute;n para notificar que no se ha podido recuperar la clave de un
+ * certificado. */
 public final class AOCertificateKeyException extends AOException {
 
-	private static final long serialVersionUID = -6996346324337434742L;
+    private static final long serialVersionUID = -6996346324337434742L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n
-	 */
-	public AOCertificateKeyException(String msg) {
-		super(msg);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n */
+    public AOCertificateKeyException(String msg) {
+        super(msg);
+    }
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado a&ntilde;adiendo a la
-	 * pila otra excepci&oacute;n.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n
-	 * @param e
-	 *            Excepci&oacute;n a a&ntilde;afir a la pila
-	 */
-	public AOCertificateKeyException(String msg, Exception e) {
-		super(msg, e);
-	}
+    /** Crea la excepci&oacute;n con un mensaje determinado a&ntilde;adiendo a la
+     * pila otra excepci&oacute;n.
+     * @param msg
+     *        Mensaje descriptivo de la excepci&oacute;n
+     * @param e
+     *        Excepci&oacute;n a a&ntilde;afir a la pila */
+    public AOCertificateKeyException(String msg, Exception e) {
+        super(msg, e);
+    }
 }

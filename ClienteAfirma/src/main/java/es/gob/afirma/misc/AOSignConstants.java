@@ -10,35 +10,30 @@
 
 package es.gob.afirma.misc;
 
-/**
- * Constantes relativas a las firmas digitales.
- */
+/** Constantes relativas a las firmas digitales. */
 public final class AOSignConstants {
 
-	// ************************************************************
-	// ************* OPCIONES DE MULTIFIRMA ***********************
-	// ************************************************************
+    // ************************************************************
+    // ************* OPCIONES DE MULTIFIRMA ***********************
+    // ************************************************************
 
-	/**
-	 * Permite definir los objetivos para la contrafirma:
-	 * <ul>
-	 * <li>Signers: Contrafirma de firmantes concretos.</li>
-	 * <li>Nodes: Contrafirma de nodos de firma concretos.</li>
-	 * <li>Tree: Contrafirma de todo el &aacute;rbol de firma.</li>
-	 * <li>Leafs: Contrafirma de todos los nodos de firma.</li>
-	 * </ul>
-	 */
-	public static enum CounterSignTarget {
-		/** Contrafirma de firmantes concretos. */
-		Signers,
-		/** Contrafirma de nodos de firma concretos. */
-		Nodes,
-		/** Contrafirma de todo el &aacute;rbol de firma. */
-		Tree,
-		/** Contrafirma de todas las hojas del &aacute;rbol de firma. */
-		Leafs
-	}
+    /** Permite definir los objetivos para la contrafirma:
+     * <ul>
+     * <li>Signers: Contrafirma de firmantes concretos.</li>
+     * <li>Nodes: Contrafirma de nodos de firma concretos.</li>
+     * <li>Tree: Contrafirma de todo el &aacute;rbol de firma.</li>
+     * <li>Leafs: Contrafirma de todos los nodos de firma.</li>
+     * </ul> */
+    public static enum CounterSignTarget {
+        /** Contrafirma de firmantes concretos. */
+        Signers,
+        /** Contrafirma de nodos de firma concretos. */
+        Nodes,
+        /** Contrafirma de todo el &aacute;rbol de firma. */
+        Tree,
+        /** Contrafirma de todas las hojas del &aacute;rbol de firma. */
+        Leafs
+    }
 
-	private AOSignConstants() {
-	}
+    private AOSignConstants() {}
 }

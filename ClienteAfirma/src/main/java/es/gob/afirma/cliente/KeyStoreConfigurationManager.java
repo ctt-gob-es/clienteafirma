@@ -73,7 +73,7 @@ final class KeyStoreConfigurationManager {
 
     private boolean showExpiratedCertificates = false;
     private boolean mandatoryCert = false;
-    private Vector<CertificateFilter> certFilters = new Vector<CertificateFilter>(); 
+    private Vector<CertificateFilter> certFilters = new Vector<CertificateFilter>();
 
     /** Construye la configuraci&oacute;n por defecto para el Cliente, pudiendo
      * variar el almac&eacute;n seg&uacute;n el sistema operativo:
@@ -122,11 +122,11 @@ final class KeyStoreConfigurationManager {
     void resetFilters() {
         certFilters.removeAllElements();
     }
-    
+
     void addCertFilter(final CertificateFilter certFilter) {
         if (certFilter != null) certFilters.add(certFilter);
     }
-    
+
     /** Reestablece el almac&eacute;n de certificados por defecto y reinicia su
      * configuraci&oacute;n. */
     void initialize() {
