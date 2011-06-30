@@ -127,8 +127,12 @@ public final class MozillaKeyStoreUtilities {
         int pos = regKeyLowCase.indexOf("firefox.exe");
         if (pos != -1) {
             dir = dir.substring(0, pos);
-            if (dir.startsWith("\"")) dir = dir.substring(1);
-            if (dir.endsWith(File.separator)) dir = dir.substring(0, dir.length() - 1);
+            if (dir.startsWith("\"")) {
+                dir = dir.substring(1);
+            }
+            if (dir.endsWith(File.separator)) {
+                dir = dir.substring(0, dir.length() - 1);
+            }
 
             File tmpFile = new File(dir);
             if (tmpFile.exists() && tmpFile.isDirectory()) {
@@ -159,7 +163,9 @@ public final class MozillaKeyStoreUtilities {
                     // cargando una de las bibliotecas
                     try {
                         final String[] libs = getSoftkn3Dependencies(dir);
-                        if (libs != null && libs.length > 0) System.load(libs[0]);
+                        if (libs != null && libs.length > 0) {
+                            System.load(libs[0]);
+                        }
                     }
                     catch (final Exception e) {
                         final File localNSS = new File(Platform.getUserHome() + "\\" + NSS_INSTALL_DIR + "\\nss" + Platform.getJavaArch());
@@ -195,7 +201,9 @@ public final class MozillaKeyStoreUtilities {
                             // devolvemos el temporal
                             File tmp = File.createTempFile("nss", null);
                             tmp.delete();
-                            if (!tmp.mkdir()) throw new AOException("No se ha creado el directorio temporal");
+                            if (!tmp.mkdir()) {
+                                throw new AOException("No se ha creado el directorio temporal");
+                            }
                             String dest = tmp.getCanonicalPath() + File.separator;
 
                             // Las cuatro primeras bibliotecas son comunes para
@@ -212,23 +220,35 @@ public final class MozillaKeyStoreUtilities {
                             // Cuidado, en Firefox 4 sqlite3.dll pasa a llamarse
                             // mozsqlite3.dll
                             File tmpFile2 = new File(dir + File.separator + "mozsqlite3.dll");
-                            if (tmpFile2.exists()) AOUtil.copyFile(tmpFile2, new File(dest + "mozsqlite3.dll"));
+                            if (tmpFile2.exists()) {
+                                AOUtil.copyFile(tmpFile2, new File(dest + "mozsqlite3.dll"));
+                            }
                             else {
                                 tmpFile2 = new File(dir + File.separator + "sqlite3.dll");
-                                if (tmpFile2.exists()) AOUtil.copyFile(tmpFile2, new File(dest + "sqlite3.dll"));
+                                if (tmpFile2.exists()) {
+                                    AOUtil.copyFile(tmpFile2, new File(dest + "sqlite3.dll"));
+                                }
                             }
 
                             tmpFile2 = new File(dir + File.separator + "mozcrt19.dll");
-                            if (tmpFile2.exists()) AOUtil.copyFile(tmpFile2, new File(dest + "mozcrt19.dll"));
+                            if (tmpFile2.exists()) {
+                                AOUtil.copyFile(tmpFile2, new File(dest + "mozcrt19.dll"));
+                            }
 
                             tmpFile2 = new File(dir + File.separator + "nssutil3.dll");
-                            if (tmpFile2.exists()) AOUtil.copyFile(tmpFile2, new File(dest + "nssutil3.dll"));
+                            if (tmpFile2.exists()) {
+                                AOUtil.copyFile(tmpFile2, new File(dest + "nssutil3.dll"));
+                            }
 
                             tmpFile2 = new File(dir + File.separator + "freebl3.dll");
-                            if (tmpFile2.exists()) AOUtil.copyFile(tmpFile2, new File(dest + "freebl3.dll"));
+                            if (tmpFile2.exists()) {
+                                AOUtil.copyFile(tmpFile2, new File(dest + "freebl3.dll"));
+                            }
 
                             tmpFile2 = new File(dir + File.separator + "nssdbm3.dll");
-                            if (tmpFile2.exists()) AOUtil.copyFile(tmpFile2, new File(dest + "nssdbm3.dll"));
+                            if (tmpFile2.exists()) {
+                                AOUtil.copyFile(tmpFile2, new File(dest + "nssdbm3.dll"));
+                            }
 
                             return tmp.getCanonicalPath();
 
@@ -286,14 +306,18 @@ public final class MozillaKeyStoreUtilities {
             }
         }
 
-        if (nssLibDir == null) throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X");
+        if (nssLibDir == null) {
+            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X");
+        }
 
         return nssLibDir;
     }
 
     private static String getSystemNSSLibDirUNIX() throws FileNotFoundException {
 
-        if (nssLibDir != null && (!"".equals(nssLibDir))) return nssLibDir;
+        if (nssLibDir != null && (!"".equals(nssLibDir))) {
+            return nssLibDir;
+        }
 
         // *********************************************************************
         // *********************************************************************
@@ -309,7 +333,9 @@ public final class MozillaKeyStoreUtilities {
                 Logger.getLogger("es.gob.afirma")
                       .warning("Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e);
             }
-            if (nssLibDir != null) return nssLibDir;
+            if (nssLibDir != null) {
+                return nssLibDir;
+            }
         }
         // *********************************************************************
         // *********************************************************************
@@ -339,11 +365,15 @@ public final class MozillaKeyStoreUtilities {
                                                               + "' porque no puede cargarse adecuadamente: "
                                                               + e);
                 }
-                if (nssLibDir != null) return nssLibDir;
+                if (nssLibDir != null) {
+                    return nssLibDir;
+                }
             }
         }
 
-        if (nssLibDir == null) throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX");
+        if (nssLibDir == null) {
+            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX");
+        }
 
         return nssLibDir;
     }
@@ -361,7 +391,9 @@ public final class MozillaKeyStoreUtilities {
      *         v&aacute;lidad de NSS. */
     public static String getSystemNSSLibDir() throws FileNotFoundException, AOInvalidFormatException {
 
-        if (nssLibDir != null) return nssLibDir;
+        if (nssLibDir != null) {
+            return nssLibDir;
+        }
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return getSystemNSSLibDirWindows();
@@ -385,9 +417,13 @@ public final class MozillaKeyStoreUtilities {
             final String filenames[] = directoryLib.list();
             final List<String> firefoxDirectories = new ArrayList<String>();
             for (String filename : filenames) {
-                if (filename.startsWith("firefox-")) firefoxDirectories.add(filename.replace("firefox-", ""));
+                if (filename.startsWith("firefox-")) {
+                    firefoxDirectories.add(filename.replace("firefox-", ""));
+                }
             }
-            if (firefoxDirectories.isEmpty()) return "";
+            if (firefoxDirectories.isEmpty()) {
+                return "";
+            }
             for (int i = 0; i < firefoxDirectories.size(); i++) {
                 try {
                     Integer.getInteger(firefoxDirectories.get(i));
@@ -396,7 +432,9 @@ public final class MozillaKeyStoreUtilities {
                     firefoxDirectories.remove(i);
                 }
             }
-            if (firefoxDirectories.size() == 1) return firefoxDirectories.get(0);
+            if (firefoxDirectories.size() == 1) {
+                return firefoxDirectories.get(0);
+            }
             Collections.sort(firefoxDirectories, new Comparator<String>() {
                 public int compare(String o1, String o2) {
                     return o1.compareTo(o2);
@@ -445,7 +483,9 @@ public final class MozillaKeyStoreUtilities {
      * @return Nombre correspondiente al m&oacute;dulo de seguridad */
     static String getMozModuleName(final String description) {
         final int ini = description.indexOf('(');
-        if (ini > 0) return description.substring(0, ini).trim();
+        if (ini > 0) {
+            return description.substring(0, ini).trim();
+        }
         return description;
     }
 
@@ -466,9 +506,11 @@ public final class MozillaKeyStoreUtilities {
         final Set<String> revisedLibs = new HashSet<String>();
 
         String tmpLib;
-        for (String key : table.keySet()) {
+        for (final String key : table.keySet()) {
             tmpLib = table.get(key);
-            if (tmpLib.toLowerCase().endsWith(".dll")) tmpLib = tmpLib.toLowerCase();
+            if (tmpLib.toLowerCase().endsWith(".dll")) {
+                tmpLib = tmpLib.toLowerCase();
+            }
 
             if (!revisedLibs.contains(tmpLib) && (!tmpLib.toLowerCase().contains("nssckbi"))) {
                 purgedTable.put(key, table.get(key));
@@ -498,16 +540,36 @@ public final class MozillaKeyStoreUtilities {
         if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File("/lib/libnspr4.so").exists()) {
             try {
                 System.load("/lib/libnspr4.so");
-                if (new File("/lib/libplds4.so").exists()) System.load("/lib/libplds4.so");
-                if (new File("/usr/lib/libplds4.so").exists()) System.load("/usr/lib/libplds4.so");
-                if (new File("/lib/libplc4.so").exists()) System.load("/lib/libplc4.so");
-                if (new File("/usr/lib/libplc4.so").exists()) System.load("/usr/lib/libplc4.so");
-                if (new File("/lib/libnssutil3.so").exists()) System.load("/lib/libnssutil3.so");
-                if (new File("/usr/lib/libnssutil3.so").exists()) System.load("/usr/lib/libnssutil3.so");
-                if (new File("/lib/libsqlite3.so").exists()) System.load("/lib/libsqlite3.so");
-                if (new File("/usr/lib/libsqlite3.so").exists()) System.load("/usr/lib/libsqlite3.so");
-                if (new File("/lib/libmozsqlite3.so").exists()) System.load("/lib/libmozsqlite3.so");
-                if (new File("/usr/lib/libmozsqlite3.so").exists()) System.load("/usr/lib/libmozsqlite3.so");
+                if (new File("/lib/libplds4.so").exists()) {
+                    System.load("/lib/libplds4.so");
+                }
+                if (new File("/usr/lib/libplds4.so").exists()) {
+                    System.load("/usr/lib/libplds4.so");
+                }
+                if (new File("/lib/libplc4.so").exists()) {
+                    System.load("/lib/libplc4.so");
+                }
+                if (new File("/usr/lib/libplc4.so").exists()) {
+                    System.load("/usr/lib/libplc4.so");
+                }
+                if (new File("/lib/libnssutil3.so").exists()) {
+                    System.load("/lib/libnssutil3.so");
+                }
+                if (new File("/usr/lib/libnssutil3.so").exists()) {
+                    System.load("/usr/lib/libnssutil3.so");
+                }
+                if (new File("/lib/libsqlite3.so").exists()) {
+                    System.load("/lib/libsqlite3.so");
+                }
+                if (new File("/usr/lib/libsqlite3.so").exists()) {
+                    System.load("/usr/lib/libsqlite3.so");
+                }
+                if (new File("/lib/libmozsqlite3.so").exists()) {
+                    System.load("/lib/libmozsqlite3.so");
+                }
+                if (new File("/usr/lib/libmozsqlite3.so").exists()) {
+                    System.load("/usr/lib/libmozsqlite3.so");
+                }
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("Error cargando NSS en una instalacion partida entre /lib y /usr/lib: " + e);
@@ -520,7 +582,9 @@ public final class MozillaKeyStoreUtilities {
         final String path = nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator);
         for (final String libPath : getSoftkn3Dependencies(path)) {
             try {
-                if (new File(libPath).exists()) System.load(libPath);
+                if (new File(libPath).exists()) {
+                    System.load(libPath);
+                }
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("Error al cargar la biblioteca " + libPath
@@ -540,7 +604,9 @@ public final class MozillaKeyStoreUtilities {
      * @return Listado con los nombres de las bibliotecas. */
     private static String[] getSoftkn3Dependencies(String nssPath) {
 
-        if (nssPath == null) return new String[0];
+        if (nssPath == null) {
+            return new String[0];
+        }
 
         if (Platform.getOS().equals(Platform.OS.MACOSX)) {
             // En Mac OS X no funciona la precarga de bibliotecas
@@ -629,7 +695,9 @@ public final class MozillaKeyStoreUtilities {
                 // En Firefox usamos preferentemente el profiles.ini
                 regFile = new File(appDataDir + "\\Mozilla\\Firefox\\profiles.ini");
                 try {
-                    if (regFile.exists()) finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
+                    if (regFile.exists()) {
+                        finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
+                    }
                 }
                 catch (Exception e) {
                     Logger.getLogger("es.gob.afirma")
@@ -642,7 +710,9 @@ public final class MozillaKeyStoreUtilities {
                 // Hemos probado el de Firefox, vamos ahora con el de Mozilla
                 regFile = new File(appDataDir + "\\Mozilla\\registry.dat");
                 try {
-                    if (regFile.exists()) finalDir = NSPreferences.getNS6UserProfileDirectory(regFile);
+                    if (regFile.exists()) {
+                        finalDir = NSPreferences.getNS6UserProfileDirectory(regFile);
+                    }
                 }
                 catch (Exception e) {
                     Logger.getLogger("es.gob.afirma")
@@ -662,7 +732,9 @@ public final class MozillaKeyStoreUtilities {
             // Si es un Mac OS X, profiles.ini esta en una ruta distinta...
             regFile = new File(Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini");
             try {
-                if (regFile.exists()) return NSPreferences.getFireFoxUserProfileDirectory(regFile);
+                if (regFile.exists()) {
+                    return NSPreferences.getFireFoxUserProfileDirectory(regFile);
+                }
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma")
@@ -679,7 +751,9 @@ public final class MozillaKeyStoreUtilities {
             // Probamos primero con "profiles.ini" de Firefox
             regFile = new File(Platform.getUserHome() + "/.mozilla/firefox/profiles.ini");
             try {
-                if (regFile.exists()) return NSPreferences.getFireFoxUserProfileDirectory(regFile);
+                if (regFile.exists()) {
+                    return NSPreferences.getFireFoxUserProfileDirectory(regFile);
+                }
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe("Error obteniendo el directorio de perfil de usuario de Firefox, " + "se devolvera null: "
@@ -690,7 +764,9 @@ public final class MozillaKeyStoreUtilities {
             // Y luego con el registro clasico de Mozilla
             regFile = new File(Platform.getUserHome() + "/.mozilla/appreg");
             try {
-                if (regFile.exists()) return NSPreferences.getNS6UserProfileDirectory(regFile);
+                if (regFile.exists()) {
+                    return NSPreferences.getNS6UserProfileDirectory(regFile);
+                }
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe("Error obteniendo el directorio de perfil de usuario de Firefox, " + "se devolvera null: "

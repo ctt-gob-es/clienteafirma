@@ -36,7 +36,9 @@ final class SunMSCAPIAddressBook extends Provider {
         map.put("KeyStore.Windows-ADDRESSBOOK", "sun.security.mscapi.KeyStoreAddressBook$ADDRESSBOOK");
         map.put("KeyStore.Windows-CA", "sun.security.mscapi.KeyStoreAddressBook$CA");
 
-        if (map != this) AccessController.doPrivileged(new PutAllAction(this, map));
+        if (map != this) {
+            AccessController.doPrivileged(new PutAllAction(this, map));
+        }
     }
 
 }

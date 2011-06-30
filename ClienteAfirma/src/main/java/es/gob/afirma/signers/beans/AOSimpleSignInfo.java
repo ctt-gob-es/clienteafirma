@@ -55,7 +55,7 @@ public final class AOSimpleSignInfo {
             throw new NullPointerException("No se ha introducido la cadena de certificaci&oacute;n.");
         }
 
-        this.certs = chainCert;
+        this.certs = chainCert.clone();
         this.signingTime = signingTime;
     }
 
@@ -63,7 +63,7 @@ public final class AOSimpleSignInfo {
         return signAlgorithm;
     }
 
-    public void setSignAlgorithm(String algorithm) {
+    public void setSignAlgorithm(final String algorithm) {
         this.signAlgorithm = algorithm;
     }
 
@@ -76,15 +76,15 @@ public final class AOSimpleSignInfo {
     }
 
     public Date[] getTimestampingTime() {
-        return timestampingTime;
+        return timestampingTime.clone();
     }
 
     public void setTimestampingTime(final Date[] timestampingTime) {
-        this.timestampingTime = timestampingTime;
+        this.timestampingTime = timestampingTime.clone();
     }
 
     public X509Certificate[] getCerts() {
-        return certs;
+        return certs.clone();
     }
 
     public Date getSigningTime() {
@@ -100,22 +100,25 @@ public final class AOSimpleSignInfo {
     /** Recupera el PKCS#1 de la firma en cuesti&oacute;n. Devuelve {@code null} si no se preestablecio.
      * @return PKCS#1 de la firma. */
     public byte[] getPkcs1() {
-        return pkcs1;
+        return pkcs1.clone();
     }
 
     /** Establece el PKCS#1 de la firma.
      * @param pkcs1
      *        PKCS#1 que gener&oacute; la firma. */
-    public void setPkcs1(byte[] pkcs1) {
-        this.pkcs1 = pkcs1;
+    public void setPkcs1(final byte[] pkcs1) {
+        this.pkcs1 = pkcs1.clone();
     }
 
     @Override
     public String toString() {
         String desc = AOUtil.getCN(certs[0]);
-        if (timestampingTime != null && timestampingTime.length > 0 && timestampingTime[0] != null) desc +=
-                " (TimeStamp: " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(signingTime) + ")";
-        else if (signingTime != null) desc += " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(signingTime) + ")";
+        if (timestampingTime != null && timestampingTime.length > 0 && timestampingTime[0] != null) {
+            desc += " (TimeStamp: " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(signingTime) + ")";
+        }
+        else if (signingTime != null) {
+            desc += " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(signingTime) + ")";
+        }
 
         return desc;
     }

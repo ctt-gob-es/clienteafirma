@@ -571,15 +571,15 @@ public final class MassiveSignatureHelper {
      * de firma. */
     public static class MassiveSignConfiguration {
 
-        private X509Certificate certificate = null;
-        private PrivateKeyEntry keyEntry = null;
-        protected MassiveType massiveOperation = null;
-        protected String algorithm = AOConstants.DEFAULT_SIGN_ALGO;
-        protected String mode = AOConstants.DEFAULT_SIGN_MODE;
-        protected String defaultFormat = AOConstants.DEFAULT_SIGN_FORMAT;
-        protected boolean originalFormat = true;
-        protected String selectedAlias = null;
-        protected Properties extraParams = null;
+        private final X509Certificate certificate;
+        private final PrivateKeyEntry keyEntry;
+        private MassiveType massiveOperation = null;
+        private String algorithm = AOConstants.DEFAULT_SIGN_ALGO;
+        private String mode = AOConstants.DEFAULT_SIGN_MODE;
+        private String defaultFormat = AOConstants.DEFAULT_SIGN_FORMAT;
+        private boolean originalFormat = true;
+        private String selectedAlias = null;
+        private Properties extraParams;
 
         /** Crea un <i>JavaBean</i> con los par&aacute;metros necesarios para las
          * operaciones de firma masiva.

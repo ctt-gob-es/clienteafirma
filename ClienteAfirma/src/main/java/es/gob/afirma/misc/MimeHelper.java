@@ -47,9 +47,11 @@ public final class MimeHelper {
      *         Cuando se introducen datos nulos. */
     public MimeHelper(final byte[] data) {
 
-        if (data == null) throw new NullPointerException("No se han indicado los datos que se desean analizar");
+        if (data == null) {
+            throw new NullPointerException("No se han indicado los datos que se desean analizar");
+        }
 
-        this.data = data;
+        this.data = data.clone();
         this.match = null;
 
         try {
@@ -69,7 +71,9 @@ public final class MimeHelper {
      *        del que deseamos obtener el Oid.
      * @return OID asociado al Mime Type. */
     public static String transformMimeTypeToOid(final String mimetype) {
-        if (mimetypeOidProp == null) loadMimetypeOidProperties();
+        if (mimetypeOidProp == null) {
+            loadMimetypeOidProperties();
+        }
         return mimetypeOidProp.getProperty(mimetype);
     }
 
@@ -79,7 +83,9 @@ public final class MimeHelper {
      *        del que deseamos obtener el Mime Type.
      * @return MimeType asociado al OID. */
     public static String transformOidToMimeType(final String oid) {
-        if (oidMimetypeProp == null) loadOidMimetypeProperties();
+        if (oidMimetypeProp == null) {
+            loadOidMimetypeProperties();
+        }
         return oidMimetypeProp.getProperty(oid);
     }
 
@@ -103,7 +109,9 @@ public final class MimeHelper {
 
     /** Carga la tabla de relacion de MimeTypes y Oids. */
     private static void loadMimetypeOidProperties() {
-        if (oidMimetypeProp == null) loadOidMimetypeProperties();
+        if (oidMimetypeProp == null) {
+            loadOidMimetypeProperties();
+        }
         mimetypeOidProp = new Properties();
         for (String key : oidMimetypeProp.keySet().toArray(new String[0])) {
             mimetypeOidProp.put(oidMimetypeProp.get(key), key);
@@ -150,27 +158,24 @@ public final class MimeHelper {
     public String getExtension() {
 
         String extension = null;
-        // Comprobamos si ya se calculo previamente el tipo de datos
-        if (extension == null) {
 
-            // Probamos a pasear los datos como si fuesen un XML, si no lanzan
-            // una excepcion, entonces son datos XML.
-            try {
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
-                extension = "xml";
-            }
-            catch (final Exception e) {}
+        // Probamos a pasear los datos como si fuesen un XML, si no lanzan
+        // una excepcion, entonces son datos XML.
+        try {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
+            extension = "xml";
+        }
+        catch (final Exception e) {}
 
-            if (extension == null && match != null) {
-                extension = match.getExtension();
-            }
+        if (extension == null && match != null) {
+            extension = match.getExtension();
+        }
 
-            // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
-            // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
-            // estructura concreta)
-            if (extension != null && extension.equals("zip")) {
-                extension = OfficeXMLAnalizer.getExtension(data);
-            }
+        // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
+        // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
+        // estructura concreta)
+        if (extension != null && extension.equals("zip")) {
+            extension = OfficeXMLAnalizer.getExtension(data);
         }
 
         return extension;
@@ -180,11 +185,10 @@ public final class MimeHelper {
      * se pudo detectar.
      * @return Descripci&oacute;n del tipo de dato. */
     public String getDescription() {
-        String description = null;
         if (match != null) {
-            description = match.getDescription();
+            return match.getDescription();
         }
-        return description;
+        return null;
     }
 
     // ************************************************************
@@ -219,7 +223,9 @@ public final class MimeHelper {
             sb.append('\n');
         }
 
-        if (contentType == null) contentType = new MimeHelper(data).getMimeType();
+        if (contentType == null) {
+            contentType = new MimeHelper(data).getMimeType();
+        }
         if (contentType != null) {
             sb.append("Content-Type: ");
             sb.append(contentType);
@@ -246,9 +252,13 @@ public final class MimeHelper {
             }
             else {
                 sb.append("; filename=");
-                if (containsTSpecial(fileName)) sb.append('"');
+                if (containsTSpecial(fileName)) {
+                    sb.append('"');
+                }
                 sb.append(fileName);
-                if (containsTSpecial(fileName)) sb.append('"');
+                if (containsTSpecial(fileName)) {
+                    sb.append('"');
+                }
                 sb.append(";");
             }
         }
@@ -273,9 +283,13 @@ public final class MimeHelper {
     };
 
     private static boolean containsTSpecial(final String in) {
-        if (in == null) return false;
+        if (in == null) {
+            return false;
+        }
         for (String s : MIME_T_SPECIALS) {
-            if (in.indexOf(s) != -1) return true;
+            if (in.indexOf(s) != -1) {
+                return true;
+            }
         }
         return false;
     }
@@ -286,11 +300,10 @@ public final class MimeHelper {
      * @return Devuelve {@code true} si todos los caracteres de la cadena son
      *         ASCII, {@code false} en caso contrario. */
     private static boolean isPureAscii(String v) {
-        byte bytearray[] = v.getBytes();
+        final byte bytearray[] = v.getBytes();
         final java.nio.charset.CharsetDecoder d = java.nio.charset.Charset.forName("US-ASCII").newDecoder();
         try {
-            java.nio.CharBuffer r = d.decode(java.nio.ByteBuffer.wrap(bytearray));
-            r.toString();
+            d.decode(java.nio.ByteBuffer.wrap(bytearray)).toString();
         }
         catch (final java.nio.charset.CharacterCodingException e) {
             return false;

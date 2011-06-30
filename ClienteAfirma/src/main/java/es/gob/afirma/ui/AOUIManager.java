@@ -188,10 +188,18 @@ public final class AOUIManager {
         final String[] finalOrderedAliases = aliassesByFriendlyName.values().toArray(new String[0]);
         Arrays.sort(finalOrderedAliases, new Comparator<String>() {
             public int compare(String o1, String o2) {
-                if (o1 == null && o2 == null) return 0;
-                else if (o1 == null) return 1;
-                else if (o2 == null) return -1;
-                else return o1.compareToIgnoreCase(o2);
+                if (o1 == null && o2 == null) {
+                    return 0;
+                }
+                else if (o1 == null) {
+                    return 1;
+                }
+                else if (o2 == null) {
+                    return -1;
+                }
+                else{
+                    return o1.compareToIgnoreCase(o2);
+                }
             }
         });
 
@@ -203,7 +211,9 @@ public final class AOUIManager {
                                                null);
 
         final String certName;
-        if (o != null) certName = o.toString();
+        if (o != null) {
+            certName = o.toString();
+        }
         else {
             Logger.getLogger("es.gob.afirma").warning("Operacion de seleccion de certificado cancelada"); //$NON-NLS-1$ //$NON-NLS-2$
             throw new AOCancelledOperationException("Operacion de seleccion de certificado cancelada"); //$NON-NLS-1$
@@ -216,7 +226,9 @@ public final class AOUIManager {
                     final AOCertVerifier cv = new AOCertVerifier();
                     for (KeyStore ks : kss) {
                         try {
-                            if (!ks.containsAlias(al)) continue;
+                            if (!ks.containsAlias(al)) {
+                                continue;
+                            }
                         }
                         catch (Exception e) {
                             continue;
@@ -258,7 +270,9 @@ public final class AOUIManager {
                             rejected = true;
                         }
 
-                        if (rejected) throw new AOCancelledOperationException("Se ha reusado un certificado probablemente no valido"); //$NON-NLS-1$
+                        if (rejected) {
+                            throw new AOCancelledOperationException("Se ha reusado un certificado probablemente no valido"); //$NON-NLS-1$
+                        }
                     }
                 }
                 return al;
@@ -296,10 +310,16 @@ public final class AOUIManager {
                                                final String description,
                                                final Component parentComponent) {
         final JFileChooser jfc = new JFileChooser();
-        if (dialogTitle != null && dialogTitle.length() > 0) jfc.setDialogTitle(dialogTitle);
-        if (extensions != null && extensions.length > 0) jfc.setFileFilter(new ExtFilter(extensions, description));
+        if (dialogTitle != null && dialogTitle.length() > 0) {
+            jfc.setDialogTitle(dialogTitle);
+        }
+        if (extensions != null && extensions.length > 0) {
+            jfc.setFileFilter(new ExtFilter(extensions, description));
+        }
         int ret = jfc.showOpenDialog(parentComponent);
-        if (ret == JFileChooser.APPROVE_OPTION) return jfc.getSelectedFile().getAbsolutePath();
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            return jfc.getSelectedFile().getAbsolutePath();
+        }
         return null;
     }
 
@@ -315,7 +335,9 @@ public final class AOUIManager {
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         jfc.setDialogTitle(title);
         int ret = jfc.showOpenDialog(parentComponent);
-        if (ret == JFileChooser.APPROVE_OPTION) return jfc.getSelectedFile().getAbsolutePath();
+        if (ret == JFileChooser.APPROVE_OPTION) {
+            return jfc.getSelectedFile().getAbsolutePath();
+        }
         return null;
     }
 
@@ -403,21 +425,27 @@ public final class AOUIManager {
          *        Descripci&oacute;n del tipo de fichero correspondiente a
          *        las extensiones */
         public ExtFilter(final String[] exts, String desc) {
-            if (exts == null || exts.length < 1) throw new NullPointerException("No se puede crear un filtro vacio" //$NON-NLS-1$
-            );
-            if (desc == null || desc.length() < 1) desc = Messages.getString("AOUIManager.0"); //$NON-NLS-1$
+            if (exts == null || exts.length < 1) {
+                throw new NullPointerException("No se puede crear un filtro vacio"); //$NON-NLS-1$
+            }
+            if (desc == null || desc.length() < 1) {
+                desc = Messages.getString("AOUIManager.0"); //$NON-NLS-1$
+            }
             extensions = exts.clone();
             description = desc;
         }
 
         @Override
         public boolean accept(File f) {
-            if (f.isDirectory()) return true;
+            if (f.isDirectory()) {
+                return true;
+            }
             // getExtension() pasa la extension a minusculas, no hace falta
             // el "ignoreCase"
-            String extension = getExtension(f);
-            for (int i = 0; i < extensions.length; i++)
+            final String extension = getExtension(f);
+            for (int i = 0; i < extensions.length; i++) {
                 if (extensions[i].equalsIgnoreCase(extension)) return true;
+            }
             return false;
         }
 
@@ -437,8 +465,10 @@ public final class AOUIManager {
          *         tiene extensi&oacute;n */
         private final static String getExtension(final File f) {
             final String s = f.getName();
-            int i = s.lastIndexOf('.');
-            if (i > 0 && i < s.length() - 1) return s.substring(i + 1).toLowerCase();
+            final int i = s.lastIndexOf('.');
+            if (i > 0 && i < s.length() - 1) {
+                return s.substring(i + 1).toLowerCase();
+            }
             return ""; //$NON-NLS-1$
         }
 
@@ -474,9 +504,13 @@ public final class AOUIManager {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
     public final static char[] getPassword(String text, final String charSet, final boolean beep, final Component c) throws AOCancelledOperationException {
-        if (text == null) text = Messages.getString("AOUIManager.24"); //$NON-NLS-1$
+        if (text == null) {
+            text = Messages.getString("AOUIManager.24"); //$NON-NLS-1$
+        }
         final JPasswordField pwd = new JPasswordField(10);
-        if (charSet != null) pwd.setDocument(new JTextFieldFilter(charSet, beep));
+        if (charSet != null) {
+            pwd.setDocument(new JTextFieldFilter(charSet, beep));
+        }
         final JLabel lbText = new JLabel(text);
         lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
         lbText.setLabelFor(pwd);
@@ -496,7 +530,9 @@ public final class AOUIManager {
         pane.createDialog(c, Messages.getString("AOUIManager.24")).setVisible(true);
 
         final Object selectedValue = pane.getValue();
-        if (selectedValue == null) return new char[0];
+        if (selectedValue == null) {
+            return new char[0];
+        }
         if (((Integer) selectedValue).intValue() == JOptionPane.OK_OPTION) {
             return pwd.getPassword();
         }
@@ -599,13 +635,18 @@ public final class AOUIManager {
      * @return Nombre de salida del fichero */
     public static final String getOutFileName(final String inName, final String signFormat) {
 
-        if (inName == null || inName.equals("")) throw new NullPointerException( //$NON-NLS-1$
-        "El nombre de fichero no puede estar vacio" //$NON-NLS-1$
-        );
+        if (inName == null || inName.equals("")) {
+            throw new NullPointerException("El nombre de fichero no puede estar vacio"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        
 
-        if (signFormat == null) throw new NullPointerException("El formato de firma no puede ser nulo"); //$NON-NLS-1$
+        if (signFormat == null) {
+            throw new NullPointerException("El formato de firma no puede ser nulo"); //$NON-NLS-1$
+        }
 
-        if (signFormat.equals(AOConstants.SIGN_FORMAT_CMS) || signFormat.equals(AOConstants.SIGN_FORMAT_CADES)) return inName + ".csig"; //$NON-NLS-1$
+        if (signFormat.equals(AOConstants.SIGN_FORMAT_CMS) || signFormat.equals(AOConstants.SIGN_FORMAT_CADES)) {
+            return inName + ".csig"; //$NON-NLS-1$
+        }
         if (signFormat.equals(AOConstants.SIGN_FORMAT_XMLDSIG_DETACHED) || signFormat.equals(AOConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)
             || signFormat.equals(AOConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING)
             || signFormat.equals(AOConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED)
@@ -618,7 +659,9 @@ public final class AOUIManager {
         if (signFormat.equals(AOConstants.SIGN_FORMAT_PDF) || signFormat.equals(AOConstants.SIGN_FORMAT_ODF)
             || signFormat.equals(AOConstants.SIGN_FORMAT_OOXML)) {
             int i = inName.lastIndexOf('.');
-            if (i > 0 && i < inName.length() - 1) return inName.substring(0, i) + ".signed" + inName.substring(i).toLowerCase(); //$NON-NLS-1$
+            if (i > 0 && i < inName.length() - 1) {
+                return inName.substring(0, i) + ".signed" + inName.substring(i).toLowerCase(); //$NON-NLS-1$
+            }
         }
 
         return inName + ".sig"; //$NON-NLS-1$
@@ -804,10 +847,14 @@ public final class AOUIManager {
 
         @Override
         public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
-            if (str == null) return;
+            if (str == null) {
+                return;
+            }
             for (int i = 0; i < str.length(); i++)
                 if (acceptedChars.indexOf(String.valueOf(str.charAt(i))) == -1) {
-                    if (beep) Toolkit.getDefaultToolkit().beep();
+                    if (beep) {
+                        Toolkit.getDefaultToolkit().beep();
+                    }
                     return;
                 }
             super.insertString(offset, str, attr);
@@ -833,11 +880,15 @@ public final class AOUIManager {
 
         @Override
         public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
-            if (str == null) return;
+            if (str == null) {
+                return;
+            }
 
             for (int i = 0; i < str.length(); i++)
                 if (str.charAt(i) < 32 || str.charAt(i) > 126) {
-                    if (beep) Toolkit.getDefaultToolkit().beep();
+                    if (beep) {
+                        Toolkit.getDefaultToolkit().beep();
+                    }
                     return;
                 }
             super.insertString(offset, str, attr);
@@ -884,12 +935,16 @@ public final class AOUIManager {
 
             // Si se nos ha indicado un nombre de fichero por defecto, lo
             // establecemos
-            if (selectedFile != null) fileChooser.setSelectedFile(selectedFile);
+            if (selectedFile != null) {
+                fileChooser.setSelectedFile(selectedFile);
+            }
 
             // Solo aplicamos el filtro cuando este definido para evitar que el
             // desplegable de
             // la ventana de guardado nos aparecezca vacio
-            if (fileFilter != null) fileChooser.setFileFilter(fileFilter);
+            if (fileFilter != null) {
+                fileChooser.setFileFilter(fileFilter);
+            }
 
             int selectedOption = JOptionPane.YES_OPTION;
             if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(parentComponent)) {

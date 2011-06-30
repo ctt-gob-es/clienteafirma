@@ -69,9 +69,9 @@ final class NSRegistry {
      * The REGTYPE_ENTRY constant (0x0010) comes from NSReg.h, see <a href= "http://lxr.mozilla.org/mozilla/source/modules/libreg/include/NSReg.h">
      * source/modules/libreg/include/NSReg.h </a> */
     private static final class Record {
-        int name, namelen;
-        int left, down, value;
-        long valuelen;
+        private int name, namelen;
+        private int left, down, value;
+        private long valuelen;
     }
 
     /** Read a Record at the specified offset. Throws an IOException if the

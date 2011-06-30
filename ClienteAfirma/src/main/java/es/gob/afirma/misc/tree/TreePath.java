@@ -20,15 +20,21 @@ final class TreePath {
      * @param path
      *        an array of Objects representing the path to a node */
     TreePath(final Object[] path) {
-        if (path == null || path.length == 0) throw new IllegalArgumentException("path in TreePath must be non null and not empty.");
+        if (path == null || path.length == 0) {
+            throw new IllegalArgumentException("path in TreePath must be non null and not empty.");
+        }
         lastPathComponent = path[path.length - 1];
-        if (path.length > 1) parentPath = new TreePath(path, path.length - 1);
+        if (path.length > 1) {
+            parentPath = new TreePath(path, path.length - 1);
+        }
     }
 
     /** Constructs a new TreePath with the identified path components of length <code>length</code>. */
-    private TreePath(Object[] path, int length) {
+    private TreePath(final Object[] path, final int length) {
         lastPathComponent = path[length - 1];
-        if (length > 1) parentPath = new TreePath(path, length - 1);
+        if (length > 1) {
+            parentPath = new TreePath(path, length - 1);
+        }
     }
 
     /** Returns the number of elements in the path.
@@ -49,10 +55,12 @@ final class TreePath {
      * @throws IllegalArgumentException
      *         if the index is beyond the length of the path
      * @see #TreePath(Object[]) */
-    private Object getPathComponent(int element) {
+    private Object getPathComponent(final int element) {
         int pathLength = getPathCount();
 
-        if (element < 0 || element >= pathLength) throw new IllegalArgumentException("Index " + element + " is out of the specified range");
+        if (element < 0 || element >= pathLength) {
+            throw new IllegalArgumentException("Index " + element + " is out of the specified range");
+        }
 
         TreePath path = this;
 
@@ -69,11 +77,15 @@ final class TreePath {
      *        the Object to compare */
     @Override
     public boolean equals(final Object o) {
-        if (o == this) return true;
+        if (o == this) {
+            return true;
+        }
         if (o instanceof TreePath) {
             TreePath oTreePath = (TreePath) o;
 
-            if (getPathCount() != oTreePath.getPathCount()) return false;
+            if (getPathCount() != oTreePath.getPathCount()) {
+                return false;
+            }
             for (TreePath path = this; path != null; path = path.parentPath) {
                 if (!(path.lastPathComponent.equals(oTreePath.lastPathComponent))) {
                     return false;
@@ -92,7 +104,9 @@ final class TreePath {
         final StringBuffer tempSpot = new StringBuffer("[");
 
         for (int counter = 0, maxCounter = getPathCount(); counter < maxCounter; counter++) {
-            if (counter > 0) tempSpot.append(", ");
+            if (counter > 0) {
+                tempSpot.append(", ");
+            }
             tempSpot.append(getPathComponent(counter));
         }
         tempSpot.append("]");

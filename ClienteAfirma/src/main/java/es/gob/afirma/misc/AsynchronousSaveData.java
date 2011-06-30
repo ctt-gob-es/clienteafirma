@@ -12,6 +12,7 @@ package es.gob.afirma.misc;
 
 import java.awt.Frame;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.security.AccessController;
 import java.util.logging.Logger;
 
@@ -52,9 +53,11 @@ public final class AsynchronousSaveData implements Runnable {
                                 final Frame p,
                                 final boolean errorDialog) {
         if (data == null || data.length == 0) throw new NullPointerException("Los datos a guardar no pueden ser nulos");
-        dataToSave = data;
+        dataToSave = data.clone();
         savingTarget = fileName;
-        if (desc != null && !"".equals(desc)) description = desc;
+        if (desc != null && !"".equals(desc)) {
+            description = desc;
+        }
         extensions = exts;
         parent = p;
         showDialogIfError = errorDialog;
@@ -78,7 +81,7 @@ public final class AsynchronousSaveData implements Runnable {
                 }
 
                 // Aqui ya tenemos un nombre de salida
-                FileOutputStream fos = null;
+                OutputStream fos = null;
                 try {
                     fos = new FileOutputStream(savingTarget);
                     fos.write(dataToSave);

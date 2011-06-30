@@ -25,7 +25,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
-class AFirmaWebSignHTMLDocument extends HTMLDocument {
+final class AFirmaWebSignHTMLDocument extends HTMLDocument {
     private static final long serialVersionUID = 1L;
 
     static List<Attachment> files = new ArrayList<Attachment>();
@@ -45,11 +45,6 @@ class AFirmaWebSignHTMLDocument extends HTMLDocument {
             super(pos);
             registerTag(AFirmaTag.INSTANCE, new AFirmaTagAction());
             Logger.getLogger("es.gob.afirma").info("Posicion del lector: " + pos);
-        }
-
-        @Override
-        public void flush() throws BadLocationException {
-            super.flush();
         }
 
         @Override

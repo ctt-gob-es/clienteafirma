@@ -35,7 +35,7 @@ public final class P7ContentSignerParameters {
      *        Certificados del firmante */
     public P7ContentSignerParameters(final byte[] data2, String signatureAlgorithm, X509Certificate[] cChain) {
 
-        data = data2;
+        data = data2.clone();
 
         if (signatureAlgorithm == null || signatureAlgorithm.length() < 1) {
             Logger.getLogger("es.gob.afirma")
@@ -57,13 +57,13 @@ public final class P7ContentSignerParameters {
     /** M&eacute;todo que devuelve el contenido
      * @return el contenido */
     public byte[] getContent() {
-        return data;
+        return data.clone();
     }
 
     /** M&eacute;todo que devuelve la firma.
      * @return la firma. */
     public byte[] getSignature() {
-        return signature;
+        return signature.clone();
     }
 
     /** M&eacute;todo que devuelve el tipo
@@ -75,7 +75,7 @@ public final class P7ContentSignerParameters {
     /** M&eacute;todo que devuelve los certificados del firmante
      * @return Array de certificados. */
     public X509Certificate[] getSignerCertificateChain() {
-        return certChain;
+        return certChain.clone();
     }
 
     /** Obtiene la URL de la autoridad de sellado de tiempo.

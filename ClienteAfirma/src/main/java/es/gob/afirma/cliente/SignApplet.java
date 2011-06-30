@@ -455,7 +455,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
             public String run() {
                 final X509Certificate cert = SignApplet.this.getCertificateBinary(alias);
-                if (cert == null) return null;
+                if (cert == null) {
+                    return null;
+                }
 
                 final String b64CertEncode;
                 try {
@@ -483,7 +485,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
             public String run() {
                 X509Certificate cert = SignApplet.this.getCertificateBinary(alias);
-                if (cert == null) return null;
+                if (cert == null) {
+                    return null;
+                }
 
                 final String b64PKEncoded;
                 try {
@@ -738,8 +742,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         // de script ocupado. En el resto de navegadores dejamos que aparezcan
         // estos
         // dialogos, porque los procesos asincronos pueden causar errores
-        if (Platform.getBrowser().equals(Platform.BROWSER.FIREFOX)) new Thread(saveDataDialog).start();
-        else saveDataDialog.run();
+        if (Platform.getBrowser().equals(Platform.BROWSER.FIREFOX)) {
+            new Thread(saveDataDialog).start();
+        }
+        else {
+            saveDataDialog.run();
+        }
     }
 
     public final void setData(final String data) {
@@ -1013,7 +1021,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 // Establecemos el mimetype de los datos
                 try {
                     final String mimeType = SignApplet.this.extMimeType != null ? SignApplet.this.extMimeType : SignApplet.this.dataMimeType;
-                    if (mimeType == null) signer.setDataObjectFormat(SignApplet.this.dataDescription, null, null, null);
+                    if (mimeType == null) {
+                        signer.setDataObjectFormat(SignApplet.this.dataDescription, null, null, null);
+                    }
                     else {
                         final String oid = MimeHelper.transformMimeTypeToOid(mimeType);
                         signer.setDataObjectFormat(SignApplet.this.dataDescription,
@@ -1417,7 +1427,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                     // Establecemos el formato de los datos
                     final String mimeType = SignApplet.this.extMimeType != null ? SignApplet.this.extMimeType : SignApplet.this.dataMimeType;
-                    if (mimeType == null) signer.setDataObjectFormat(SignApplet.this.dataDescription, null, null, null);
+                    if (mimeType == null) {
+                        signer.setDataObjectFormat(SignApplet.this.dataDescription, null, null, null);
+                    }
                     else {
                         try {
                             final String oid = MimeHelper.transformMimeTypeToOid(mimeType);
@@ -1523,7 +1535,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     // Agregamos las ultimas configuraciones y firmamos
                     genericConfig.setProperty("mode", mode); //$NON-NLS-1$
                     genericConfig.setProperty("format", format); //$NON-NLS-1$
-                    if (SignApplet.this.fileUri != null) genericConfig.setProperty("uri", SignApplet.this.fileUri.toASCIIString()); //$NON-NLS-1$
+                    if (SignApplet.this.fileUri != null) {
+                        genericConfig.setProperty("uri", SignApplet.this.fileUri.toASCIIString()); //$NON-NLS-1$
+                    }
 
                     final byte[] outputBuffer;
                     try {
@@ -1578,8 +1592,12 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
             for (int i = 0; i < xmlTransforms.size(); i++) {
                 genericConfig.setProperty("xmlTransform" + (i) + "Type", xmlTransforms.get(i).getType()); //$NON-NLS-1$ //$NON-NLS-2$
                 // El subtipo y el cuerpo son opcionales
-                if (xmlTransforms.get(i).getSubtype() != null) genericConfig.setProperty("xmlTransform" + (i) + "Subtype", xmlTransforms.get(i).getSubtype()); //$NON-NLS-1$ //$NON-NLS-2$
-                if (xmlTransforms.get(i).getBody() != null) genericConfig.setProperty("xmlTransform" + (i) + "Body", xmlTransforms.get(i).getBody()); //$NON-NLS-1$ //$NON-NLS-2$
+                if (xmlTransforms.get(i).getSubtype() != null) {
+                    genericConfig.setProperty("xmlTransform" + (i) + "Subtype", xmlTransforms.get(i).getSubtype()); //$NON-NLS-1$ //$NON-NLS-2$
+                }
+                if (xmlTransforms.get(i).getBody() != null) {
+                    genericConfig.setProperty("xmlTransform" + (i) + "Body", xmlTransforms.get(i).getBody()); //$NON-NLS-1$ //$NON-NLS-2$
+                }
             }
         }
     }
@@ -1620,9 +1638,15 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
      * operaci&oacute;n de firma.
      * @see #setPolicy(String, String, String) */
     private void configurePolicy() {
-        if (this.policyId != null) genericConfig.setProperty("policyIdentifier", this.policyId.toString()); //$NON-NLS-1$
-        if (this.policyDesc != null) genericConfig.setProperty("policyDescription", this.policyDesc); //$NON-NLS-1$
-        if (this.policyQualifier != null) genericConfig.setProperty("policyQualifier", this.policyQualifier.toString()); //$NON-NLS-1$
+        if (this.policyId != null) {
+            genericConfig.setProperty("policyIdentifier", this.policyId.toString()); //$NON-NLS-1$
+        }
+        if (this.policyDesc != null) {
+            genericConfig.setProperty("policyDescription", this.policyDesc); //$NON-NLS-1$
+        }
+        if (this.policyQualifier != null) {
+            genericConfig.setProperty("policyQualifier", this.policyQualifier.toString()); //$NON-NLS-1$
+        }
     }
 
     public boolean coSign() {
@@ -1736,7 +1760,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                 // Establecemos el formato de los datos
                 final String mimeType = SignApplet.this.extMimeType != null ? SignApplet.this.extMimeType : SignApplet.this.dataMimeType;
-                if (mimeType == null) signer.setDataObjectFormat(SignApplet.this.dataDescription, null, null, null);
+                if (mimeType == null) {
+                    signer.setDataObjectFormat(SignApplet.this.dataDescription, null, null, null);
+                }
                 else {
                     try {
                         final String oid = MimeHelper.transformMimeTypeToOid(mimeType);
@@ -1773,7 +1799,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                 // Finalmente, configuramos y operamos
                 genericConfig.setProperty("mode", mode); //$NON-NLS-1$
-                if (SignApplet.this.fileUri != null) genericConfig.setProperty("uri", SignApplet.this.fileUri.toASCIIString()); //$NON-NLS-1$
+                if (SignApplet.this.fileUri != null) {
+                    genericConfig.setProperty("uri", SignApplet.this.fileUri.toASCIIString()); //$NON-NLS-1$
+                }
 
                 byte[] outputBuffer;
                 try {
@@ -1934,7 +1962,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     StringBuilder description = new StringBuilder(AppletMessages.getString("SignApplet.201")); //$NON-NLS-1$
                     for (int i = 0; i < massiveExtFiltered.length; i++) {
                         description.append("*.").append(massiveExtFiltered[i]); //$NON-NLS-1$
-                        if (i + 1 != massiveExtFiltered.length) description.append(","); //$NON-NLS-1$
+                        if (i + 1 != massiveExtFiltered.length) {
+                            description.append(","); //$NON-NLS-1$
+                        }
                     }
                     massiveSigner.setFileFilter(new AOUIManager.ExtFilter(massiveExtFiltered, description.toString()));
                 }
@@ -1964,7 +1994,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     return false;
                 }
 
-                if (allOk) SignApplet.this.setError(null);
+                if (allOk) {
+                    SignApplet.this.setError(null);
+                }
 
                 return allOk;
             }
@@ -2166,7 +2198,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
             public String run() {
                 final String result = SignApplet.this.massiveSignatureHelper.signData(b64Data);
-                if (result == null) SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+                if (result == null) {
+                    SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+                }
                 return result;
             }
         });
@@ -2182,7 +2216,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
             public String run() {
                 final String result = SignApplet.this.massiveSignatureHelper.signHash(b64Hash);
-                if (result == null) SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+                if (result == null) {
+                    SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+                }
                 return result;
             }
         });
@@ -2215,7 +2251,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return AccessController.doPrivileged(new java.security.PrivilegedAction<String>() {
             public String run() {
                 final String result = SignApplet.this.massiveSignatureHelper.signFile(filename);
-                if (result == null) SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+                if (result == null){
+                    SignApplet.this.setError(SignApplet.this.massiveSignatureHelper.getCurrentLogEntry());
+                }
                 return result;
             }
         });
@@ -2294,7 +2332,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                     firmaWeb = null;
                 }
 
-                if (firmaWeb != null) return firmaWeb.tmpWebDataFile.getAbsolutePath();
+                if (firmaWeb != null) {
+                    return firmaWeb.tmpWebDataFile.getAbsolutePath();
+                }
                 return "ERROR"; //$NON-NLS-1$
             }
         });
@@ -2439,7 +2479,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         // Si es un fichero local eliminamos el esquema de la ruta
-        if (path.startsWith("file://")) path = path.substring(7); //$NON-NLS-1$
+        if (path.startsWith("file://")) {
+            path = path.substring(7); //$NON-NLS-1$
+        }
 
         return path;
     }
@@ -3043,7 +3085,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public void removeRecipientToCMS(final String certB64) {
 
-        if (certB64 == null || certB64.length() == 0) throw new NullPointerException("No se ha introducido el certificado que se desea eliminar"); //$NON-NLS-1$
+        if (certB64 == null || certB64.length() == 0) {
+            throw new NullPointerException("No se ha introducido el certificado que se desea eliminar"); //$NON-NLS-1$
+        }
 
         try {
             enveloperManager.removeRecipient(AOCryptoUtil.decodeBase64(certB64));
@@ -3072,7 +3116,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
         try {
             ldapServerPort = Integer.parseInt(port);
-            if (ldapServerPort < 1 || ldapServerPort > 65535) throw new IllegalArgumentException("Numero de puerto no valido, el numero de puerto debe estar entre 1 y 65535"); //$NON-NLS-1$
+            if (ldapServerPort < 1 || ldapServerPort > 65535) {
+                throw new IllegalArgumentException("Numero de puerto no valido, el numero de puerto debe estar entre 1 y 65535"); //$NON-NLS-1$
+            }
         }
         catch (final Exception e) {
             logger.warning("No se ha insertado un numero de puerto valido para el LDAP, se usara el puerto " + DEFAULT_LDAP_PORT + ": " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -3345,8 +3391,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public String getB64Data() {
         logger.info("Invocando getB64Data"); //$NON-NLS-1$
-        if (this.data == null) logger.warning("No se dispone de datos de salida, se devolvera cadena vacia"); //$NON-NLS-1$
-        return (this.data == null ? "" : AOCryptoUtil.encodeBase64(this.data, false)); //$NON-NLS-1$
+        if (this.data == null) {
+            logger.warning("No se dispone de datos de salida, se devolvera cadena vacia"); //$NON-NLS-1$
+            return "";  //$NON-NLS-1$
+        }
+        return AOCryptoUtil.encodeBase64(this.data, false);
     }
 
     @Deprecated
@@ -3357,7 +3406,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public String getData() {
         logger.info("Invocando getData"); //$NON-NLS-1$
-        if (this.data == null) logger.warning("No se dispone de datos de salida, se devolvera cadena vacia"); //$NON-NLS-1$
+        if (this.data == null) {
+            logger.warning("No se dispone de datos de salida, se devolvera cadena vacia"); //$NON-NLS-1$
+        }
         return (this.data == null ? "" : new String(this.data)); //$NON-NLS-1$
     }
 
@@ -3614,7 +3665,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         // Creamos primeramente el listado de atributos si no lo esta ya
-        if (this.signedAttributes == null) this.signedAttributes = new HashMap<org.ietf.jgss.Oid, String>();
+        if (this.signedAttributes == null) {
+            this.signedAttributes = new HashMap<org.ietf.jgss.Oid, String>();
+        }
 
         // Comprobamos que OID se valido
         final org.ietf.jgss.Oid newOid;
@@ -3687,7 +3740,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         // Creamos primeramente el listado de atributos si no lo esta ya
-        if (this.unsignedAttributes == null) this.unsignedAttributes = new HashMap<org.ietf.jgss.Oid, Vector<String>>();
+        if (this.unsignedAttributes == null) {
+            this.unsignedAttributes = new HashMap<org.ietf.jgss.Oid, Vector<String>>();
+        }
 
         // Comprobamos que OID se valido
         org.ietf.jgss.Oid newOid = null;
@@ -3758,7 +3813,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         // Si esta vacio el listado de atributos, liberamos memoria
-        if (this.unsignedAttributes != null && this.unsignedAttributes.isEmpty()) this.unsignedAttributes = null;
+        if (this.unsignedAttributes != null && this.unsignedAttributes.isEmpty()) {
+            this.unsignedAttributes = null;
+        }
 
         return true;
     }
@@ -3767,7 +3824,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         logger.warning("Invocando addExtraParam: " + key); //$NON-NLS-1$
 
         // Si no se ha indicado una clave o valor, abortamos la operacion
-        if (key == null || value == null) return;
+        if (key == null || value == null) {
+            return;
+        }
 
         // Establecemos la propiedad
         genericConfig.setProperty(key, value);
@@ -3777,14 +3836,18 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         logger.warning("Invocando removeExtraParam: " + key); //$NON-NLS-1$
 
         // Si no se ha indicado una clave, abortamos la operacion
-        if (key == null) return;
+        if (key == null) {
+            return;
+        }
 
         // Eliminamos la propiedad
         genericConfig.remove(key);
     }
 
     public void addXMLTransform(final String type, final String subtype, final String body) {
-        if (this.xmlTransforms == null) this.xmlTransforms = new Vector<AOXMLTransform>();
+        if (this.xmlTransforms == null) {
+            this.xmlTransforms = new Vector<AOXMLTransform>();
+        }
 
         this.xmlTransforms.add(new AOXMLTransform(type, subtype, body));
     }
@@ -3880,9 +3943,13 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** Recupera el frame del que cuelga un componente.
      * @return Frame padre del componente. */
     private Frame getParentFrame(final Component c) {
-        if (c == null) return null;
+        if (c == null) {
+            return null;
+        }
         final Container cont = c.getParent();
-        if (cont instanceof Frame) return (Frame) cont;
+        if (cont instanceof Frame) {
+            return (Frame) cont;
+        }
         return getParentFrame(cont);
     }
 
@@ -3892,7 +3959,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     private String concatStrings(final String[] strings, final String delimitator) {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < strings.length; i++) {
-            if (i > 0) sb.append(delimitator);
+            if (i > 0) {
+                sb.append(delimitator);
+            }
             sb.append(strings[i]);
         }
         return sb.toString();
