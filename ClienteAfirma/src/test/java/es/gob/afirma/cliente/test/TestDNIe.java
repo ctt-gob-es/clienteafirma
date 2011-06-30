@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 import es.gob.afirma.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -27,6 +28,7 @@ public class TestDNIe {
 
     /** Prueba de firma XAdES con DNIe. */
     @Test
+    @Ignore
     public void testXADESSignatureDNIe() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         AOSigner signer = new AOXAdESSigner();
@@ -57,6 +59,7 @@ public class TestDNIe {
 
     /** Pruebas de m&oacute;dulo PKCS#11 de DNIe. */
     @Test
+    @Ignore
     public void testPKCS11KeyStore() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         System.out.println("Probando almacen PKCS#11 con DNIe...");

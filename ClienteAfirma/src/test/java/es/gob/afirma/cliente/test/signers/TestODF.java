@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOConstants.AOKeyStore;
@@ -23,6 +24,7 @@ public class TestODF {
 
     /** Prueba de firma ODF. */
     @Test
+    @Ignore
     public void testSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOODFSigner();
@@ -71,6 +73,7 @@ public class TestODF {
 
     /** Prueba de cofirma ODF. */
     @Test
+    @Ignore
     public void testCoSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOODFSigner();

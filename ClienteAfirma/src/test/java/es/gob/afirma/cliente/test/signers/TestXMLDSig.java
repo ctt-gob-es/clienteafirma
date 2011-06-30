@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 import es.gob.afirma.cliente.test.TestUtils;
 import es.gob.afirma.misc.AOConstants;
@@ -31,6 +32,7 @@ public final class TestXMLDSig {
 
     /** Prueba de firma XMLDSig. */
     @Test
+    @Ignore
     public void testSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOXMLDSigSigner();
@@ -90,6 +92,7 @@ public final class TestXMLDSig {
 
     /** Prueba de contrafirma XMLDSig. */
     @Test
+    @Ignore
     public void testCounterSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOXMLDSigSigner();
@@ -159,6 +162,7 @@ public final class TestXMLDSig {
 
     /** Prueba de cofirma XMLDSig. */
     @Test
+    @Ignore
     public void testCoSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOXMLDSigSigner();

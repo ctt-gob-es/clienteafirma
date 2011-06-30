@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 import es.gob.afirma.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -43,6 +44,7 @@ public final class TestKeyStores {
 
     /** Prueba el almac&eacute;n de usuario de NSS. */
     @Test
+    @Ignore
     public void testNssKeyStore() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         System.out.println("Probando almacen NSS...");

@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 import es.gob.afirma.cliente.test.TestUtils;
 import es.gob.afirma.misc.AOConstants;
@@ -81,6 +82,7 @@ public final class TestCAdES {
 
     /** Prueba de contrafirmas CAdES. */
     @Test
+    @Ignore
     public void testCounterSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOCAdESSigner();
@@ -156,6 +158,7 @@ public final class TestCAdES {
 
     /** Pruebas de cofirmas CAdES. */
     @Test
+    @Ignore
     public void testCoSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);

@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 import es.gob.afirma.cliente.test.TestUtils;
 import es.gob.afirma.misc.AOConstants;
@@ -33,6 +34,7 @@ public final class TestXAdES {
 
     /** Prueba de firma XAdES. */
     @Test
+    @Ignore
     public void testSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOXAdESSigner();
@@ -92,6 +94,7 @@ public final class TestXAdES {
 
     /** Prueba de contrafirma XAdES. */
     @Test
+    @Ignore
     public void testCounterSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOXAdESSigner();
@@ -161,6 +164,7 @@ public final class TestXAdES {
 
     /** Prueba de cofirma XAdES. */
     @Test
+    @Ignore
     public void testCoSignature() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
         final AOSigner signer = new AOXAdESSigner();
