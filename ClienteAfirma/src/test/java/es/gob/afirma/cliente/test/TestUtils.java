@@ -8,6 +8,8 @@ import java.util.Properties;
 
 import javax.security.auth.callback.PasswordCallback;
 
+import org.junit.Ignore;
+
 import es.gob.afirma.callbacks.CachePasswordCallback;
 import es.gob.afirma.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.AOKeyStoreManager;
@@ -20,6 +22,7 @@ import es.gob.afirma.misc.Platform;
 
 /** M&eacute;todos de utilidad para las pruebas del Cliente Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+@Ignore
 public class TestUtils {
 
     /** Algoritmos de cifrado a probar. */
