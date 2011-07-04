@@ -29,7 +29,7 @@ public interface EntryPointsUtil {
      * @return El contenido del fichero codificado en base 64. <br>
      *         File contents, codified in base 64.
      * @see #getFileBase64Encoded(String, boolean) */
-    public String getFileBase64Encoded(boolean showProgress);
+    String getFileBase64Encoded(boolean showProgress);
 
     /** Devuelve el contenido de un fichero en base 64. Si se produce
      * alg&uacute;n error durante la operaci&oacute;n se devolver&aacute; <code>null</code>. <br>
@@ -46,7 +46,7 @@ public interface EntryPointsUtil {
      * @return El contenido del fichero codificado en base 64 <br>
      *         File contents, codified in base 64.
      * @see #getFileBase64Encoded(boolean) */
-    public String getFileBase64Encoded(String fileUri, boolean showProgress);
+    String getFileBase64Encoded(String fileUri, boolean showProgress);
 
     /** Devuelve el hash de un fichero (especificado previamente con setFileURI)
      * codificado en base 64. El hash se calcula mediante el algoritmo de hash
@@ -61,7 +61,7 @@ public interface EntryPointsUtil {
      *        Show / Hide File Read Progress window
      * @return El hash del fichero, en base 64. <br>
      *         File's Hash, in base 64. */
-    public String getFileHashBase64Encoded(boolean showProgress);
+    String getFileHashBase64Encoded(boolean showProgress);
 
     /** Devuelve el contenido de un fichero como String.<br>
      * Returns a file's contents as a string.
@@ -70,7 +70,7 @@ public interface EntryPointsUtil {
      *        File's URL to be read.
      * @return El contenido del fichero como java.lang.String <br>
      *         File contents as java.lang.String */
-    public String getTextFileContent(String url);
+    String getTextFileContent(String url);
 
     /** Devuelve verdadero si el applet ha quedado en estado de error tras la
      * última operaci&oacute;n. <br>
@@ -80,7 +80,7 @@ public interface EntryPointsUtil {
      *         correctamente, false en caso contrario <br>
      *         true if last execution could not be correctly completed.
      *         Otherwise, false. */
-    public boolean isError();
+    boolean isError();
 
     /** Devuelve el mensaje de error, si el Applet est&aacute; en estado de
      * error. Si no esta en estado de error, se devuelve cadena vac&iacute;a. <br>
@@ -89,7 +89,7 @@ public interface EntryPointsUtil {
      * state, returns empty string.
      * @return Mensaje de error <br>
      *         Error Message */
-    public String getErrorMessage();
+    String getErrorMessage();
 
     /** Establece si se debe informar de los errores al usuario
      * gr&aacute;ficamente cu&aacute;ndo se producen. Debe evitarse el uso de
@@ -104,7 +104,7 @@ public interface EntryPointsUtil {
      *        errores mediante un di&aacute;logo gr&aacute;fico, <code>false</code> en caso contrario <br>
      *        <code>true</code> if errors must be displayed using a
      *        graphical dialog. Else, <code>false</code>. */
-    public void setShowErrors(boolean showErrors);
+    void setShowErrors(boolean showErrors);
 
     /** Si showHashMessage=true, se muestra el mensaje informativo sobre el hash
      * de los datos a firmar. Si showHashMessage=false, no se muestra el
@@ -120,7 +120,7 @@ public interface EntryPointsUtil {
      *             datos a firmar. <br>
      *             Applet must never display the hash of data to be signed. */
     @Deprecated
-    public void setShowHashMessage(boolean showHashMessage);
+    void setShowHashMessage(boolean showHashMessage);
 
     /** Indica si se deben mostrar los certificados caducados o aun no activos en
      * el listado de certificados disponibles para firma. <br>
@@ -132,13 +132,13 @@ public interface EntryPointsUtil {
      *        v&aacute;lidos. <br>
      *        Indicates whether void or not yet valid certificates should be
      *        displayed. */
-    public void setShowExpiratedCertificates(boolean showExpiratedCerts);
+    void setShowExpiratedCertificates(boolean showExpiratedCerts);
 
     /** Devuelve <code>true</code> si el applet ha sido inicializado. <br>
      * Returns <code>true</code> if applet has been initialized.
      * @return <code>true</code> si el Applet ha sido inicializado <br>
      *         <code>true</code> if applet has been initialized. */
-    public boolean isInitialized();
+    boolean isInitialized();
 
     /** Reinicia todos los par&aacute;metros del cliente de firma
      * (par&aacute;metros de entrada a su valor por defecto y los de salida a
@@ -152,7 +152,7 @@ public interface EntryPointsUtil {
      * state is removed. This method is desirable for complex operations (e.g.,
      * signature, multi-signature, cyphering, digital enveloping) and later data
      * storage. */
-    public void initialize();
+    void initialize();
 
     /** Decodifica un texto en base 64. Si se produce alg&uacute;n error se
      * devuelve <code>null</code>. <br>
@@ -164,7 +164,7 @@ public interface EntryPointsUtil {
      *        Text in base 64.
      * @return Texto decodificado. <br>
      *         Decoded text. */
-    public String getTextFromBase64(String b64);
+    String getTextFromBase64(String b64);
 
     /** Codifica un texto plano a base 64. Si se produce alg&uacute;n error se
      * devuelve <code>null</code>. <br>
@@ -176,7 +176,7 @@ public interface EntryPointsUtil {
      *        Plain Text.
      * @return Texto codificado. <br>
      *         Encoded Text. */
-    public String getBase64FromText(String plainText);
+    String getBase64FromText(String plainText);
 
     /** Recupera la versi&oacute;n del cliente de firma.<br/>
      * El formato de la versi&oacute;n ser&aacute; siempre:<br/>
@@ -194,7 +194,7 @@ public interface EntryPointsUtil {
      * supplement client's version identification.
      * @return Versi&oacute;n del cliente. <br>
      *         Client Version. */
-    public String getVersion();
+    String getVersion();
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
      * del que se recuperar&aacute; su ruta completa. Si no se selecciona
@@ -216,7 +216,7 @@ public interface EntryPointsUtil {
      *        Description of the search files' type.
      * @return Ruta completa del fichero seleccionado. <br>
      *         Complete route to the selected file. */
-    public String loadFilePath(String title, String exts, String description);
+    String loadFilePath(String title, String exts, String description);
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un
      * directorio. Si no se selecciona ning&uacute;n directorio, se devuelve <code>null</code>. <br>
@@ -225,7 +225,7 @@ public interface EntryPointsUtil {
      * is selected, <code>null</code> is returned.
      * @return Ruta completa del directorio seleccionado. <br>
      *         Complete route for the selected directory. */
-    public String selectDirectory();
+    String selectDirectory();
 
     /** Cambia el idioma del actual del Cliente. <br>
      * <br>
@@ -233,19 +233,19 @@ public interface EntryPointsUtil {
      * @param locale
      *        C&oacute;digo de idioma (por ejemplo: en, es, it...). <br>
      *        Language code (p.e. en, es, it...) */
-    public void changeLanguage(String locale);
+    void changeLanguage(String locale);
 
     // /**
     // * Recupera un fragmento de datos en base 64.
     // * @return Fragmento base 64 de los datos.
     // */
-    // public String getTrunkBase64Encoded ();
+    // String getTrunkBase64Encoded ();
     //
     // /**
     // * Informa si restan fragmentos de datos por recuperar.
     // * @return Devuelve {@code true} si quedan datos por recuperar, {@code
     // false} en caso contrario.
     // */
-    // public boolean hasMoreData();
+    // boolean hasMoreData();
 
 }

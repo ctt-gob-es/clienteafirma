@@ -37,8 +37,10 @@ public final class TestKeyStores {
             e.printStackTrace();
         }
         assertNotNull(ksm);
-        assertTrue(ksm.getKeyStores().size() > 0);
-        assertNotNull(ksm.getKeyStores().get(0));
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
         System.out.println();
     }
 
@@ -56,8 +58,10 @@ public final class TestKeyStores {
             e.printStackTrace();
         }
         assertNotNull(ksm);
-        assertTrue(ksm.getKeyStores().size() > 0);
-        assertNotNull(ksm.getKeyStores().get(0));
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
         System.out.println();
     }
 
@@ -95,8 +99,10 @@ public final class TestKeyStores {
             e.printStackTrace();
         }
         assertNotNull(ksm);
-        assertTrue(ksm.getKeyStores().size() > 0);
-        assertNotNull(ksm.getKeyStores().get(0));
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
         System.out.println();
     }
 
@@ -114,8 +120,10 @@ public final class TestKeyStores {
             e.printStackTrace();
         }
         assertNotNull(ksm);
-        assertTrue(ksm.getKeyStores().size() > 0);
-        assertNotNull(ksm.getKeyStores().get(0));
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
         System.out.println();
     }
 
@@ -133,8 +141,10 @@ public final class TestKeyStores {
             e.printStackTrace();
         }
         assertNotNull(ksm);
-        assertTrue(ksm.getKeyStores().size() > 0);
-        assertNotNull(ksm.getKeyStores().get(0));
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
         System.out.println();
     }
 
@@ -152,8 +162,10 @@ public final class TestKeyStores {
             e.printStackTrace();
         }
         assertNotNull(ksm);
-        assertTrue(ksm.getKeyStores().size() > 0);
-        assertNotNull(ksm.getKeyStores().get(0));
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
         System.out.println();
     }
 
@@ -191,8 +203,10 @@ public final class TestKeyStores {
             e.printStackTrace();
         }
         assertNotNull(ksm);
-        assertTrue(ksm.getKeyStores().size() > 0);
-        assertNotNull(ksm.getKeyStores().get(0));
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
         System.out.println();
     }
 
@@ -210,8 +224,10 @@ public final class TestKeyStores {
             e.printStackTrace();
         }
         assertNotNull(ksm);
-        assertTrue(ksm.getKeyStores().size() > 0);
-        assertNotNull(ksm.getKeyStores().get(0));
+        if (ksm != null) {
+            assertTrue(ksm.getKeyStores().size() > 0);
+            assertNotNull(ksm.getKeyStores().get(0));
+        }
         System.out.println();
     }
 }

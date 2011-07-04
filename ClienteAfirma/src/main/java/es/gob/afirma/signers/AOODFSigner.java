@@ -130,11 +130,15 @@ public final class AOODFSigner implements AOSigner {
             Logger.getLogger("es.gob.afirma").warning("Las firmas ODF s\u00F3lo soportan el algoritmo de firma SHA1withRSA");
         }
 
-        if (extraParams == null) extraParams = new Properties();
+        if (extraParams == null) {
+            extraParams = new Properties();
+        }
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD);
         final boolean useOpenOffice31Mode = "true".equalsIgnoreCase(extraParams.getProperty("useOpenOffice31Mode"));
 
-        if (!isValidDataFile(data)) throw new AOFormatFileException("El fichero introducido no es un documento ODF");
+        if (!isValidDataFile(data)) {
+            throw new AOFormatFileException("El fichero introducido no es un documento ODF");
+        }
 
         String fullPath = "META-INF/manifest.xml";
         boolean isCofirm = false;
@@ -272,7 +276,9 @@ public final class AOODFSigner implements AOSigner {
 
                     // si no se trata del documento de firmas se anade la
                     // referencia
-                    if (!fullPath.equals("META-INF/documentsignatures.xml")) referenceList.add(reference);
+                    if (!fullPath.equals("META-INF/documentsignatures.xml")) {
+                        referenceList.add(reference);
+                    }
 
                     // si existe el documento de firmas, entonces sera una
                     // cofirma.
@@ -280,8 +286,8 @@ public final class AOODFSigner implements AOSigner {
                 }
             }
 
-            Document docSignatures;
-            Element rootSignatures;
+            final Document docSignatures;
+            final Element rootSignatures;
             // si es cofirma
             if (isCofirm) {
                 // recupera el documento de firmas y su raiz
@@ -440,7 +446,7 @@ public final class AOODFSigner implements AOSigner {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros ODF");
     }
 
-    public TreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo) {
+    public TreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
         try {
             // genera el archivo zip temporal a partir del InputStream de
@@ -478,43 +484,52 @@ public final class AOODFSigner implements AOSigner {
             final TreeNode[] arrayNodes = new TreeNode[numSignatures];
 
             for (int i = 0; i < numSignatures; i++) {
-                Element signature = (Element) signatures.item(i);
-                String sigId = signature.getAttribute("Id");
+                final Element signature = (Element) signatures.item(i);
+                final String sigId = signature.getAttribute("Id");
 
-                String strCert = signature.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "X509Certificate").item(0).getTextContent();
+                final String strCert = signature.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "X509Certificate").item(0).getTextContent();
                 TreeNode node;
 
-                if (asSimpleSignInfo) node = new TreeNode(Utils.getSimpleSignInfoNode(null, signature));
-                else node = new TreeNode(AOUtil.getCN(AOCryptoUtil.createCert(strCert)));
+                if (asSimpleSignInfo) {
+                    node = new TreeNode(Utils.getSimpleSignInfoNode(null, signature));
+                }
+                else {
+                    node = new TreeNode(AOUtil.getCN(AOCryptoUtil.createCert(strCert)));
+                }
                 arrayIds[i] = sigId;
                 arrayNodes[i] = node;
 
-                String typeReference =
+                final String typeReference =
                         ((Element) signature.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Reference").item(0)).getAttribute("Type");
                 if (typeReference.equals("http://uri.etsi.org/01903#CountersignedSignature")) {
-                    String uri =
+                    final String uri =
                             ((Element) signature.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Reference").item(0)).getAttribute("URI");
                     arrayRef[i] = uri.substring(1, uri.length() - 5);
                 }
-                else arrayRef[i] = "";
+                else {
+                    arrayRef[i] = "";
+                }
             }
 
-            TreeNode tree = new TreeNode("Datos");
+            final TreeNode tree = new TreeNode("Datos");
 
             for (int i = numSignatures - 1; i > 0; i--)
                 for (int j = 0; j < numSignatures; j++) {
-                    if (arrayRef[i].equals(arrayIds[j])) arrayNodes[j].add(arrayNodes[i]);
+                    if (arrayRef[i].equals(arrayIds[j])) {
+                        arrayNodes[j].add(arrayNodes[i]);
+                    }
                 }
 
-            for (int i = 0; i < numSignatures; i++)
+            for (int i = 0; i < numSignatures; i++) {
                 if (arrayRef[i] == "") {
                     tree.add(arrayNodes[i]);
                 }
+            }
 
             try {
                 zipFile.delete();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
 
             return new TreeModel(tree, tree.getChildCount());
         }
@@ -533,11 +548,11 @@ public final class AOODFSigner implements AOSigner {
      *        Firma que deseamos comprobar.
      * @return Devuelve <code>true</code> si el fichero es una firma reconocida
      *         por este signer, <code>false</code> en caso contrario. */
-    public boolean isSign(byte[] signData) {
+    public boolean isSign(final byte[] signData) {
         return isValidDataFile(signData);
     }
 
-    public boolean isValidDataFile(byte[] data) {
+    public boolean isValidDataFile(final byte[] data) {
 
         // Si el mimetype del fichero no se ajusta a alguno de los MimeTypes
         // soportados
@@ -557,27 +572,37 @@ public final class AOODFSigner implements AOSigner {
         return mimetype != null && supportedFormats.contains(mimetype);
     }
 
-    public String getSignedName(String originalName, String inText) {
+    public String getSignedName(final String originalName, final String inText) {
 
-        String inTextInt = (inText != null ? inText : "");
+        final String inTextInt = (inText != null ? inText : "");
 
-        if (originalName == null) return inTextInt + ".odf";
-        String originalNameLC = originalName.toLowerCase();
-        if (originalNameLC.length() <= 4) return originalName + inTextInt + ".odf";
-        if (originalNameLC.endsWith(".odt")) return originalName.substring(0, originalName.length() - 4) + inTextInt + ".odt";
-        if (originalNameLC.endsWith(".odp")) return originalName.substring(0, originalName.length() - 4) + inTextInt + ".odp";
-        if (originalNameLC.endsWith(".ods")) return originalName.substring(0, originalName.length() - 4) + inTextInt + ".ods";
+        if (originalName == null) {
+            return inTextInt + ".odf";
+        }
+        final String originalNameLC = originalName.toLowerCase();
+        if (originalNameLC.length() <= 4) {
+            return originalName + inTextInt + ".odf";
+        }
+        if (originalNameLC.endsWith(".odt")) {
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".odt";
+        }
+        if (originalNameLC.endsWith(".odp")) {
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".odp";
+        }
+        if (originalNameLC.endsWith(".ods")) {
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".ods";
+        }
         return originalName + inTextInt + ".odf";
     }
 
     /** M&eacute;todo no implementado. */
-    public void setDataObjectFormat(String description, Oid objectIdentifier, javax.activation.MimeType mimeType, String encoding) {}
+    public void setDataObjectFormat(final String description, final Oid objectIdentifier, final javax.activation.MimeType mimeType, final String encoding) {}
 
-    private static void writeXML(OutputStream outStream, Node node, boolean indent) {
+    private static void writeXML(final OutputStream outStream, final Node node, final boolean indent) {
         writeXML(new BufferedWriter(new OutputStreamWriter(outStream, Charset.forName("UTF-8"))), node, indent);
     }
 
-    private static void writeXML(Writer writer, Node node, boolean indent) {
+    private static void writeXML(final Writer writer, final Node node, final boolean indent) {
         try {
             Transformer serializer = TransformerFactory.newInstance().newTransformer();
             serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -592,7 +617,7 @@ public final class AOODFSigner implements AOSigner {
         }
     }
 
-    public byte[] getData(byte[] signData) throws AOInvalidFormatException {
+    public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
 
         // Si no es una firma ODF valida, lanzamos una excepcion
         if (!isSign(signData)) {
@@ -603,26 +628,21 @@ public final class AOODFSigner implements AOSigner {
         return signData;
     }
 
-    public AOSignInfo getSignInfo(byte[] signData) throws AOInvalidFormatException, AOException {
-        if (signData == null) throw new NullPointerException("No se han introducido datos para analizar");
-
+    public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
+        if (signData == null) {
+            throw new NullPointerException("No se han introducido datos para analizar");
+        }
         if (!isSign(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
         }
-
-        AOSignInfo signInfo = new AOSignInfo(AOConstants.SIGN_FORMAT_ODF);
-        // TODO: Aqui podria venir el analisis de la firma buscando alguno de
-        // los otros datos de relevancia
-        // que se almacenan en el objeto AOSignInfo
-
-        return signInfo;
+        return new AOSignInfo(AOConstants.SIGN_FORMAT_ODF);
     }
 
-    public String getDataMimeType(byte[] signData) throws AOUnsupportedSignFormatException {
-
-        String mimetype = getODFMimeType(signData);
-        if (mimetype == null || !supportedFormats.contains(mimetype)) throw new AOUnsupportedSignFormatException("La firma introducida no es un documento ODF");
-
+    public String getDataMimeType(final byte[] signData) throws AOUnsupportedSignFormatException {
+        final String mimetype = getODFMimeType(signData);
+        if (mimetype == null || !supportedFormats.contains(mimetype)) {
+            throw new AOUnsupportedSignFormatException("La firma introducida no es un documento ODF");
+        }
         return mimetype;
     }
 
@@ -631,8 +651,8 @@ public final class AOODFSigner implements AOSigner {
         try {
             // Genera el archivo zip temporal a partir del InputStream de
             // entrada
-            File zipFile = File.createTempFile("sign", ".zip");
-            FileOutputStream fos = new FileOutputStream(zipFile);
+            final File zipFile = File.createTempFile("sign", ".zip");
+            final FileOutputStream fos = new FileOutputStream(zipFile);
 
             fos.write(signData);
 
@@ -646,7 +666,7 @@ public final class AOODFSigner implements AOSigner {
             catch (final Exception e) {}
 
             // carga el fichero zip
-            ZipFile zf = null;
+            final ZipFile zf;
             try {
                 zf = new ZipFile(zipFile);
             }
@@ -656,8 +676,10 @@ public final class AOODFSigner implements AOSigner {
             }
 
             // obtiene el archivo mimetype
-            ZipEntry entry = zf.getEntry("mimetype");
-            if (entry != null) mimetype = new String(AOUtil.getDataFromInputStream(zf.getInputStream(entry)));
+            final ZipEntry entry = zf.getEntry("mimetype");
+            if (entry != null) {
+                mimetype = new String(AOUtil.getDataFromInputStream(zf.getInputStream(entry)));
+            }
 
             try {
                 zipFile.delete();
@@ -665,7 +687,7 @@ public final class AOODFSigner implements AOSigner {
             catch (Exception e) {}
 
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Error al analizar el fichero de firma: " + e);
             return null;
         }

@@ -18,7 +18,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.text.BadLocationException;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;

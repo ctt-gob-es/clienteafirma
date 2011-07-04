@@ -127,7 +127,9 @@ public final class OfficeXMLAnalizer {
             else if (isOOXMLFile(zipFile)) {
                 tempMimetype = getOOXMLMimeType(zipFile.getInputStream(zipFile.getEntry("[Content_Types].xml")));
             }
-            if (tempMimetype != null) mimetype = tempMimetype;
+            if (tempMimetype != null) {
+                mimetype = tempMimetype;
+            }
         }
         catch (Exception e) {}
 
@@ -143,7 +145,9 @@ public final class OfficeXMLAnalizer {
      * @return Extensi&oacute;n. */
     public static String getExtension(byte[] zipData) {
         String mimetype = getMimeType(zipData);
-        if (mimetype == null) return null;
+        if (mimetype == null) {
+            return null;
+        }
 
         return FILE_EXTENSIONS.get(mimetype);
     }
@@ -214,8 +218,12 @@ public final class OfficeXMLAnalizer {
 
                 if (nodeAttribute != null) {
                     String value = nodeAttribute.getNodeValue();
-                    if (value.indexOf('.') != -1) value = value.substring(0, value.lastIndexOf('.'));
-                    if (OOXML_MIMETYPES.contains(value)) return value;
+                    if (value.indexOf('.') != -1) {
+                        value = value.substring(0, value.lastIndexOf('.'));
+                    }
+                    if (OOXML_MIMETYPES.contains(value)) {
+                        return value;
+                    }
                 }
             }
         }
@@ -258,15 +266,17 @@ public final class OfficeXMLAnalizer {
      * @param file
      *        Fichero del que deseamos obtener la extensi&oacute;n.
      * @return Extensi&oacute;n del documento. */
-    private static String getODFMimeType(InputStream contentTypeIs) {
-        String contentTypeData;
+    private static String getODFMimeType(final InputStream contentTypeIs) {
+        final String contentTypeData;
         try {
             contentTypeData = new String(AOUtil.getDataFromInputStream(contentTypeIs));
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             return null;
         }
-        if (ODF_MIMETYPES.contains(contentTypeData)) return contentTypeData;
+        if (ODF_MIMETYPES.contains(contentTypeData)) {
+            return contentTypeData;
+        }
         return null;
     }
 }

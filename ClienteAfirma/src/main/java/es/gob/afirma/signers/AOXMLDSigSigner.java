@@ -563,7 +563,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             dataElement.setAttributeNS(null, "MimeType", mimeType);
             dataElement.setAttributeNS(null, "Encoding", encoding);
             if (hashAlgoUri != null) {
-                dataElement.setAttribute("hashAlgorithm", hashAlgoUri); // TODO: Aqui se agrega el atributo a la Detached Explicita
+                dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri); // TODO: Aqui se agrega el atributo a la Detached Explicita
             }
 
             dataElement.setTextContent(AOCryptoUtil.encodeBase64(digestValue, true));

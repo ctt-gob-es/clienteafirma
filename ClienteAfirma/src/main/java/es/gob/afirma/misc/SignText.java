@@ -150,12 +150,16 @@ public final class SignText {
                     filter.append("(");
                     for (int i = 0; i < dn.getRdns().size(); i++) {
                         filter.append(dn.getRdns().get(i).toString());
-                        if (i != dn.getRdns().size() - 1) filter.append(" & ");
+                        if (i != dn.getRdns().size() - 1) {
+                            filter.append(" & ");
+                        }
                     }
                     filter.append(")");
                 }
 
-                if (j != caNameN.length - 1) filter.append(" | ");
+                if (j != caNameN.length - 1) {
+                    filter.append(" | ");
+                }
             }
             issuerFilter = filter.toString();
         }
@@ -217,10 +221,12 @@ public final class SignText {
             return NO_MATCHING_CERT;
         }
         try {
-            if (!useCAdES) return AOCryptoUtil.encodeBase64(new AOCMSSigner().sign(stringToSign.getBytes(),
+            if (!useCAdES) { 
+                return AOCryptoUtil.encodeBase64(new AOCMSSigner().sign(stringToSign.getBytes(),
                                                                                    AOConstants.SIGN_ALGORITHM_SHA1WITHRSA,
                                                                                    keyEntry,
                                                                                    null), false);
+            }
             return AOCryptoUtil.encodeBase64(new AOCAdESSigner().sign(stringToSign.getBytes(), AOConstants.SIGN_ALGORITHM_SHA1WITHRSA, keyEntry, null),
                                              false);
         }
@@ -245,11 +251,15 @@ public final class SignText {
      *        PassWord callback si el KeyStore necesita contrase&ntilde;a.
      *        Si de especifica <code>null</code> se utilizara un <code>NullPasswordCallback</code> */
     public SignText(final String[] aliases, final AOKeyStoreManager ksm, final Component parentComponent, final PasswordCallback pc) {
-        alias = aliases;
+        alias = aliases.clone();
         kss = ksm;
         parent = parentComponent;
-        if (pc == null) passCbk = new NullPasswordCallback();
-        else passCbk = pc;
+        if (pc == null) {
+            passCbk = new NullPasswordCallback();
+        }
+        else {
+            passCbk = pc;
+        }
     }
 
     private void createUI(final String stringToSign, final Hashtable<String, String> aliasesByFriendlyName) {
@@ -275,10 +285,16 @@ public final class SignText {
         // mayusculas y minusculas
         Object[] finalOrderedAliases = aliasesByFriendlyName.values().toArray();
         Arrays.sort(finalOrderedAliases, new Comparator<Object>() {
-            public int compare(Object o1, Object o2) {
-                if (o1 == null && o2 == null) return 0;
-                else if (o1 == null && o2 != null) return 1;
-                else if (o1 != null && o2 == null) return -1;
+            public int compare(final Object o1, final Object o2) {
+                if (o1 == null && o2 == null) {
+                    return 0;
+                }
+                else if (o1 == null && o2 != null) {
+                    return 1;
+                }
+                else if (o1 != null && o2 == null) {
+                    return -1;
+                }
                 return o1.toString().compareToIgnoreCase(o2.toString());
             }
         });

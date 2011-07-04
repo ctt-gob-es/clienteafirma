@@ -45,7 +45,7 @@ public final class WinRegistry {
 
         KeyValue(int type, byte[] data) {
             this.type = type;
-            this.data = data;
+            this.data = data.clone();
         }
 
         /** Retorna el tipo del valor del par-valor
@@ -57,7 +57,7 @@ public final class WinRegistry {
         /** Retorna el valor del par-valor
          * @return Valor de la clave */
         public byte[] getData() {
-            return data;
+            return data.clone();
         }
 
         /** Retorna el valor tras realizar el casting al objeto java adecuado, ya
@@ -66,7 +66,9 @@ public final class WinRegistry {
         public Object getValue() {
             switch (type) {
                 case REG_SZ:
-                    if (data.length <= 0) return null;
+                    if (data.length <= 0) {
+                        return null;
+                    }
                     return new String(data, 0, data.length - 1);
 
                 case REG_DWORD: {

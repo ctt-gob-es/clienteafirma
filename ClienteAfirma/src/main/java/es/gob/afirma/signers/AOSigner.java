@@ -40,7 +40,7 @@ public interface AOSigner {
      * @return Contenido firmado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
+    byte[] sign(byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
 
     /** Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
      * cofirma se necesitan los datos originales (que este m&eacute;todo
@@ -61,7 +61,7 @@ public interface AOSigner {
      * @return Contenido firmado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(byte[] data, byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
+    byte[] cosign(byte[] data, byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
 
     /** Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
      * cofirma se necesita el documento en el que se encuentra la firma sobre la
@@ -79,7 +79,7 @@ public interface AOSigner {
      * @return Contenido firmado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
+    byte[] cosign(byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
 
     /** Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br/>
      * Los nodos que se deben firmar se indican en <code>targetType</code> y
@@ -108,7 +108,7 @@ public interface AOSigner {
      * @return Contenido firmado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] countersign(byte[] sign,
+    byte[] countersign(byte[] sign,
                               String algorithm,
                               AOSignConstants.CounterSignTarget targetType,
                               Object[] targets,
@@ -136,14 +136,14 @@ public interface AOSigner {
      *        certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de
      *         error. */
-    public TreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo);
+    TreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo);
 
     /** Indica si un dato es una firma compatible con el signer concreto.
      * @param is
      *        Dato que deseamos comprobar.
      * @return Devuelve <code>true</code> si el dato es una firma reconocida por
      *         este signer, <code>false</code> en caso contrario. */
-    public boolean isSign(byte[] is);
+    boolean isSign(byte[] is);
 
     /** Comprueba que el dato introducido sea v&aacute;lido para ser firmado por
      * este manejador de firma.<br/>
@@ -159,7 +159,7 @@ public interface AOSigner {
      *        Dato que deseamos comprobar.
      * @return Devuelve <code>true</code> si el dato es V6aacute;lido para
      *         firmar, <code>false</code> en caso contrario. */
-    public boolean isValidDataFile(byte[] is);
+    boolean isValidDataFile(byte[] is);
 
     /** Devuelve el nombre de fichero de firma predeterminado que
      * asignar&iacute;a este signer a un fichero con el nombre asignado. Si se
@@ -171,7 +171,7 @@ public interface AOSigner {
      *        Particula intermedia que agregar al nombre del fichero de
      *        firma.
      * @return Nombre apropiado para el fichero de firma. */
-    public String getSignedName(String originalName, String inText);
+    String getSignedName(String originalName, String inText);
 
     /** Establece el formato que tienen los datos que se firman.
      * @param description
@@ -182,7 +182,7 @@ public interface AOSigner {
      *        MimeType de los datos. Por defecto <code>application/octet-stream</code>
      * @param encoding
      *        Codificaci&oacute;n de los datos. Por defecto <code>base64</code> */
-    public void setDataObjectFormat(String description, Oid objectIdentifier, javax.activation.MimeType mimeType, String encoding);
+    void setDataObjectFormat(String description, Oid objectIdentifier, javax.activation.MimeType mimeType, String encoding);
 
     /** Recupera los datos originalmente firmados de la firma pasada por
      * par&aacute;metro. En caso de no contener la firma los datos firmados, se
@@ -198,7 +198,7 @@ public interface AOSigner {
      *         datos.
      * @throws NullPointerException
      *         La firma introducida es nula. */
-    public byte[] getData(byte[] signData) throws AOInvalidFormatException, AOException;
+    byte[] getData(byte[] signData) throws AOInvalidFormatException, AOException;
 
     /** Obtiene la informacion general de un objeto de firma. Ya que un objeto de
      * firma puede contener muchas firmas, se considera informaci&oacute;n
@@ -223,7 +223,7 @@ public interface AOSigner {
      *         datos.
      * @throws NullPointerException
      *         La firma introducida es nula. */
-    public AOSignInfo getSignInfo(byte[] signData) throws AOInvalidFormatException, AOException;
+    AOSignInfo getSignInfo(byte[] signData) throws AOInvalidFormatException, AOException;
 
     /** Obtiene el tipo de datos declarado en una firma mediante su Mime Type. Si
      * no se conoce el tipo de dato se devolver&aacute; <code>null</code>.
@@ -235,5 +235,5 @@ public interface AOSigner {
      * @throws AOUnsupportedSignFormatException
      *         Cuando la firma no est&eacute; soportada por el manejador
      *         proporcionado. */
-    public String getDataMimeType(byte[] signData) throws AOUnsupportedSignFormatException;
+    String getDataMimeType(byte[] signData) throws AOUnsupportedSignFormatException;
 }

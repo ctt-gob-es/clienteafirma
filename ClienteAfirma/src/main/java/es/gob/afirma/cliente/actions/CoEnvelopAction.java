@@ -12,23 +12,23 @@ import es.gob.afirma.exceptions.AOKeyStoreManagerException;
 public final class CoEnvelopAction extends BasicPrivilegedAction<Boolean, byte[]> {
 
     /** Manejador de ensobrado. */
-    private EnveloperManager enveloperManager;
+    private final EnveloperManager enveloperManager;
 
     /** Envoltorio que se desea desensobrar. */
-    private byte[] envelop;
+    private final byte[] envelop;
 
     /** Envoltorio de m&uacute;ltiples remitentes.
      * @param enveloperManager
      *        Gestor de envoltorios
      * @param envelop
      *        Envoltorio */
-    public CoEnvelopAction(EnveloperManager enveloperManager, byte[] envelop) {
+    public CoEnvelopAction(final EnveloperManager enveloperManager, final byte[] envelop) {
         if (enveloperManager == null) {
             throw new NullPointerException();
         }
 
         this.enveloperManager = enveloperManager;
-        this.envelop = envelop;
+        this.envelop = envelop.clone();
     }
 
     public Boolean run() {

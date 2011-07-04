@@ -302,7 +302,7 @@ public class TestUtils {
 
         if (sign == null) throw new NullPointerException("Los datos de firma a validar son nulos");
 
-        final String endpointURL = "https://des-afirma.redinteradministrativa.es:443/afirmaws/services/DSSAfirmaVerify";
+        //final String endpointURL = "https://des-afirma.redinteradministrativa.es:443/afirmaws/services/DSSAfirmaVerify";
         // final String endpointURL = "http://217.15.39.2:8080/afirmaws/services/DSSAfirmaVerify";
 
         // TODO: Hacer esto por reflexion para evitar problemas de carga en Java 5??

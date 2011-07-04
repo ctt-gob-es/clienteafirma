@@ -25,7 +25,7 @@ public interface AOCipher {
     /** Recupera las distintas configuraciones de algoritmos de cifrado
      * (algoritmo-modo_de_bloque-padding) que soporta el proveedor.
      * @return Configuraciones de cifrado. */
-    public AOCipherConfig[] getSupportedConfigs();
+    AOCipherConfig[] getSupportedConfigs();
 
     /** Cifra un mensaje. El algoritmo que deseamos utilizar para el descifrado
      * puede ir acompa&ntilde;ado de una configuraci&oacute;n, seg&uacute;n lo
@@ -47,7 +47,7 @@ public interface AOCipher {
      * @throws AOInvalidKeyException
      *         Cuando la clave de cifrado introducida no es compatible con
      *         este algoritmo. */
-    public byte[] cipher(byte[] data, AOCipherConfig algorithmConfig, Key cipherKey) throws AOException, AOInvalidKeyException;
+    byte[] cipher(byte[] data, AOCipherConfig algorithmConfig, Key cipherKey) throws AOException, AOInvalidKeyException;
 
     /** Descifra un mensaje. El algoritmo que deseamos utilizar para el
      * descifrado puede ir acompa&ntilde;ado de una configuraci&oacute;n,
@@ -69,7 +69,7 @@ public interface AOCipher {
      * @throws AOInvalidKeyException
      *         Cuando la clave de cifrado introducida no es compatible con
      *         este algoritmo. */
-    public byte[] decipher(byte[] data, AOCipherConfig algorithmConfig, Key decipherKey) throws AOException, AOInvalidKeyException;
+    byte[] decipher(byte[] data, AOCipherConfig algorithmConfig, Key decipherKey) throws AOException, AOInvalidKeyException;
 
     /** Obtiene una clave para el algoritmo seleccionado a partir de su
      * codificaci&oacute;n. Seg&uacute;n el algoritmo puede ser necesario o no
@@ -83,7 +83,7 @@ public interface AOCipher {
      * @return Clave.
      * @throws AOException
      *         Cuando se produce un error al generar la clave. */
-    public Key decodeKey(String base64Key, AOCipherConfig algorithmConfig, Object[] params) throws AOException;
+    Key decodeKey(String base64Key, AOCipherConfig algorithmConfig, Object[] params) throws AOException;
 
     /** Obtiene una clave para el algoritmo seleccionado a partir de la
      * contrase&ntilde;a. Seg&uacute;n el algoritmo puede ser necesario o no el
@@ -97,7 +97,7 @@ public interface AOCipher {
      * @return Clave.
      * @throws AOException
      *         Cuando se produce un error al generar la clave. */
-    public Key decodePassphrase(char[] passphrase, AOCipherConfig algorithmConfig, Object[] params) throws AOException;
+    Key decodePassphrase(char[] passphrase, AOCipherConfig algorithmConfig, Object[] params) throws AOException;
 
     /** Genera una nueva clave para el algoritmo seleccionado.
      * @param algorithmConfig
@@ -107,6 +107,6 @@ public interface AOCipher {
      *         Cuando el algoritmo de cifrado no est&aacute; soportado.
      * @throws AOException
      *         Cuando se produce un error al generar la clave. */
-    public Key generateKey(AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException;
+    Key generateKey(AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException;
 
 }

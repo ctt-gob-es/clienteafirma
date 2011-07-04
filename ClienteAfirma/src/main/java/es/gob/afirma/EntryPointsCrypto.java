@@ -120,7 +120,7 @@ public interface EntryPointsCrypto {
      * @see #setSignatureFormat(String)
      * @return <code>true</code> si se ha ejecutado correctamente, <code>false</code> en caso contrario <br>
      *         <code>true</code> if execution is correct, else <code>false</code>. */
-    public boolean sign();
+    boolean sign();
 
     /** Firma los datos proporcionados en base 64. <br>
      * <br>
@@ -134,7 +134,7 @@ public interface EntryPointsCrypto {
      *         failure.
      * @see #getSignatureBase64Encoded()
      * @see #getSignatureText() */
-    public boolean signData(String b64data);
+    boolean signData(String b64data);
 
     /** Metodo que se mantiene por compatibilidad con las versi&oacute;n 4 y
      * anteriores de la plataforma @firma. <br>
@@ -147,7 +147,7 @@ public interface EntryPointsCrypto {
      *         codificado en base 64. <br>
      *         String containing the certificate and signed data, both encoded
      *         in base 64. */
-    public String Firma(String datos);
+    String Firma(String datos);
 
     /** A&ntilde;ade un atributo firmado al formato de firma seleccionado. Este
      * formato debe reconocer el OID especificado, siendo el atributo {@code value} su valor como cadena de texto. <br>
@@ -163,7 +163,7 @@ public interface EntryPointsCrypto {
      *        Assigned value
      * @return true si se ha realizado correctamente. <br>
      *         true if successful. */
-    public boolean addSignedAttribute(String oid, String value);
+    boolean addSignedAttribute(String oid, String value);
 
     /** Elimina el atributo con el OID indicado antes de realizar la firma. <br>
      * <br>
@@ -174,7 +174,7 @@ public interface EntryPointsCrypto {
      *         o ha ocurrido alg&uacute;n error. <br>
      *         true if it has been successfully eliminated. False if
      *         nonexistent, or an error occurred. */
-    public boolean removeSignedAttribute(String oid);
+    boolean removeSignedAttribute(String oid);
 
     /** A&ntilde;ade un atributo no firmado al formato de firma seleccionado. <br>
      * <br>
@@ -186,7 +186,7 @@ public interface EntryPointsCrypto {
      *        Assigned value
      * @return true si se ha realizado correctamente. <br>
      *         true if successful. */
-    public boolean addUnsignedAttribute(String oid, String value);
+    boolean addUnsignedAttribute(String oid, String value);
 
     /** Elimina el atributo con el OID indicado antes de realizar la firma. <br>
      * Eliminates the attribute with the indicated OID before signing.
@@ -199,7 +199,7 @@ public interface EntryPointsCrypto {
      *         o ha ocurrido alg&uacute;n error. <br>
      *         true if successfully eliminated. False if nonexistent, or error
      *         occurred. */
-    public boolean removeUnsignedAttribute(String oid, String value);
+    boolean removeUnsignedAttribute(String oid, String value);
 
     /** Agrega una propiedad adicional a la configuraci&oacute;n de firma. <br>
      * <br>
@@ -210,7 +210,7 @@ public interface EntryPointsCrypto {
      * @param value
      *        Valor que se desea establecer a la propiedad. <br>
      *        Value for the property to be included. */
-    public void addExtraParam(String key, String value);
+    void addExtraParam(String key, String value);
 
     /** Elimina una propiedad adicional de la configuraci&oacute;n de firma. <br>
      * <br>
@@ -218,7 +218,7 @@ public interface EntryPointsCrypto {
      * @param key
      *        propiedad que se desea eliminar. <br>
      *        property to be eliminated. */
-    public void removeExtraParam(String key);
+    void removeExtraParam(String key);
 
     /** Agrega una nueva transformaci&oacute;n XML a la configuraci&oacute;n del
      * cliente. Esta transformaci&oacute;n ser&aacute; tenida en cuenta por
@@ -278,12 +278,12 @@ public interface EntryPointsCrypto {
      * @param body
      *        Cuerpo de la transformaci&oacute;n. <br>
      *        Transformation body. */
-    public void addXMLTransform(String type, String subtype, String body);
+    void addXMLTransform(String type, String subtype, String body);
 
     /** Elimina todas las transformaciones XML configuradas en el cliente. <br>
      * <br>
      * Eliminates all XML transformations configured in the client. */
-    public void resetXMLTransforms();
+    void resetXMLTransforms();
 
     /** Realiza el proceso de co-firmado (firma en paralelo). Los
      * par&aacute;metros de operaci&oacute;n que pueden establecerse y los
@@ -348,7 +348,7 @@ public interface EntryPointsCrypto {
      * @return <code>true</code> si la operaci&oacute;n ha finalizado
      *         correctamente, <code>false</code> en caso contrario. <br>
      *         <code>true</code> if the operation ended successfully. Else, <code>false</code>. */
-    public boolean coSign();
+    boolean coSign();
 
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
      * firmantes se separan por '\n' y comienzan por tantos '\t' como el nivel
@@ -385,7 +385,7 @@ public interface EntryPointsCrypto {
      * @return Una cadena en la que se representa la estructura firmas (en
      *         paralelo y cascada). <br>
      *         A string representing signature structure (parallel and cascade) */
-    public String getSignersStructure();
+    String getSignersStructure();
 
     /** Realiza el proceso de contra-firmado (firma en cascada). Contra-firma
      * todos los nodos de un o varios firmantes.<br>
@@ -532,7 +532,7 @@ public interface EntryPointsCrypto {
      * @see #getSignersStructure()
      * @return true si se ha ejecutado correctamente <br>
      *         true if successful. */
-    public boolean counterSignSigners();
+    boolean counterSignSigners();
 
     /** Realiza el proceso de contra-firmado (firma en cascada). Contra-firma los
      * nodos con determinados &iacute;ndices.<br>
@@ -682,7 +682,7 @@ public interface EntryPointsCrypto {
      * @see #getSignatureBase64Encoded()
      * @see #getFileUsedPath()
      * @see #getSignCertificateBase64Encoded() */
-    public boolean counterSignIndexes();
+    boolean counterSignIndexes();
 
     /** Realiza el proceso de contra-firmado (firma en cascada). Contra-firma
      * todos los nodos del &aacute;rbol. <br>
@@ -814,7 +814,7 @@ public interface EntryPointsCrypto {
      * @see #getSignatureBase64Encoded()
      * @see #getFileUsedPath()
      * @see #getSignCertificateBase64Encoded() */
-    public boolean counterSignTree();
+    boolean counterSignTree();
 
     /** Realiza el proceso de contra-firmado (firma en cascada). Contra-firma las
      * hojas del &aacute;rbol.<br>
@@ -948,7 +948,7 @@ public interface EntryPointsCrypto {
      * @see #getSignatureBase64Encoded()
      * @see #getFileUsedPath()
      * @see #getSignCertificateBase64Encoded() */
-    public boolean counterSignLeafs();
+    boolean counterSignLeafs();
 
     /** Guarda una firma electr&oacute;nica generada anteriormente en un fichero.
      * La firma electr&oacute;nica se habr&aacute; generado mediante una de las
@@ -963,7 +963,7 @@ public interface EntryPointsCrypto {
      * no storage route has been set, a Save dialog box is displayed.
      * @return true si el proceso termina correctamente, false en otro caso. <br>
      *         true if process ends successfully. Else, false. */
-    public boolean saveSignToFile();
+    boolean saveSignToFile();
 
     /** Devuelve el certificado en base 64 con el que se ha firmado. Esta
      * operaci&oacute;n devuelve el &uacute;ltimo certificado cargado durante la
@@ -980,7 +980,7 @@ public interface EntryPointsCrypto {
      * certificate has been selected an empty string is returned.
      * @return El certificado de firma en base 64. <br>
      *         The signature certificate in base 64. */
-    public String getSignCertificateBase64Encoded();
+    String getSignCertificateBase64Encoded();
 
     /** Devuelve el certificado con el que se ha firmado o ensobrado datos. Esta
      * operaci&oacute;n devuelve el &uacute;ltimo certificado cargado durante
@@ -998,7 +998,7 @@ public interface EntryPointsCrypto {
      * returned.
      * @return El certificado de firma. <br>
      *         The signature certificate. */
-    public X509Certificate getSignCertificate();
+    X509Certificate getSignCertificate();
 
     /** Establece el algoritmo de firma. Puede ser:
      * <ul>
@@ -1027,14 +1027,14 @@ public interface EntryPointsCrypto {
      * @param signatureAlgorithm
      *        Nombre del algoritmo a usar en las operaciones de firma. <br>
      *        Algorithm name to be used in signature operations. */
-    public void setSignatureAlgorithm(String signatureAlgorithm);
+    void setSignatureAlgorithm(String signatureAlgorithm);
 
     /** Establece el formato de la firma electr&oacute;nica generada.
      * Sets the electronic signature format to be generated.
      * @param signatureFormat
      *        Formato de la firma electr&oacute;nica a generar <br>
      *        Electronic signature's format to be generated. */
-    public void setSignatureFormat(String signatureFormat);
+    void setSignatureFormat(String signatureFormat);
 
     /** Establece los los datos cifrados en base 64 que se van a descifrar
      * mediante una pr&oacute;xima llamada a {@link #decipherData()}. <br>
@@ -1043,7 +1043,7 @@ public interface EntryPointsCrypto {
      * @param data
      *        Datos cifrados en base 64. <br>
      *        Encrypted data in base 64. */
-    public void setCipherData(String data);
+    void setCipherData(String data);
 
     /** Define los datos planos que se van a cifrar mediante una pr&oacute;xima
      * llamada a {@link #cipherData()}. <br>
@@ -1052,7 +1052,7 @@ public interface EntryPointsCrypto {
      * @param data
      *        Datos planos a cifrar. <br>
      *        Plain data to be encrypted. */
-    public void setPlainData(String data);
+    void setPlainData(String data);
 
     /** Devuelve los datos cifrados. Si no se han establecido datos cifrados, se
      * devolver&aacute; <code>null</code> <br>
@@ -1060,7 +1060,7 @@ public interface EntryPointsCrypto {
      * Returns the encrypted data. If no encrypted data have been set, <code>null</code> will be returned.
      * @return String en Base64 con el texto cifrado. <br>
      *         Base64 string, with the encrypted text. */
-    public String getCipherData();
+    String getCipherData();
 
     /** Devuelve los datos planos que se han introducido para cifrar o el texto
      * resultado de un descifrado (lo &uacute;ltimo que haya ocurrido). En caso
@@ -1074,7 +1074,7 @@ public interface EntryPointsCrypto {
      *         Plain text string of the encryption/decryption operation.
      * @see #decipherData()
      * @see #setPlainData(String) */
-    public String getPlainData();
+    String getPlainData();
 
     /** Establece la ruta del fichero en donde se almacenar&aacute;n los datos
      * resultados de la operaci&oacute;n realizada. <br>
@@ -1084,7 +1084,7 @@ public interface EntryPointsCrypto {
      * @param outFilePath
      *        Ruta por defecto del fichero de salida. <br>
      *        Output file's default route. */
-    public void setOutFilePath(String outFilePath);
+    void setOutFilePath(String outFilePath);
 
     /** Devuelve la estructura de firma generada o establecida codificada en base
      * 64. Si no se dispone de una firma, se devuelve cadena vac&iacute;a. <br>
@@ -1094,7 +1094,7 @@ public interface EntryPointsCrypto {
      * @return La firma en base 64. <br>
      *         Signature in base 64.
      * @see #getSignatureText() */
-    public String getSignatureBase64Encoded();
+    String getSignatureBase64Encoded();
 
     /** Devuelve la firma generadaen el &uacute;ltimo proceso de firma o
      * establecida por en el cliente como un String (&uacute;til para firmas
@@ -1116,7 +1116,7 @@ public interface EntryPointsCrypto {
      * @return La &uacute;ltima firma electr&oacute;nica generada o establecida
      *         por el cliente. <br>
      *         Last generated (or user set) electronic signature. */
-    public String getSignatureText();
+    String getSignatureText();
 
     /** Establece los datos de entrada en base 64 para los procesos de firma,
      * co-firma (firma en paralelo) y generaci&oacute;n de sobres digitales. <br/>
@@ -1134,7 +1134,7 @@ public interface EntryPointsCrypto {
      *        Data to operate with, encrypted in base 64.
      * @see #setHash(String)
      * @see #setFileuri(String) */
-    public void setData(String data);
+    void setData(String data);
 
     /** Establece la URI (o URL) que apunta al fichero que contiene los datos de
      * entrada para operar (cifrar, firmar, leer...) Se soporta el protocolo <code>file://</code> para ficheros en almacenamiento local. <br/>
@@ -1152,7 +1152,7 @@ public interface EntryPointsCrypto {
      * @see #setData(String)
      * @see #setHash(String)
      * @see #setFileuriBase64(String) */
-    public void setFileuri(String fileuri);
+    void setFileuri(String fileuri);
 
     /** Establece los datos contenidos en el fichero indicado (en donde se
      * encontrar&aacute;n codificados en base 64), como los datos de entrada
@@ -1170,7 +1170,7 @@ public interface EntryPointsCrypto {
      *        URI hacia el fichero de datos. <br>
      *        URI to the data file.
      * @see #setFileuri(String) */
-    public void setFileuriBase64(String fileuri);
+    void setFileuriBase64(String fileuri);
 
     /** Establece el hash de los datos a firmar para los procesos de firma. <br/>
      * Estos entrada tendr&aacute; m&aacute;xima prioridad cuando se realice una
@@ -1183,7 +1183,7 @@ public interface EntryPointsCrypto {
      *        Hash en base 64 que se desea firmar.
      * @see #setData(String)
      * @see #setFileuri(String) */
-    public void setHash(final String hash);
+    void setHash(final String hash);
 
     /** Ruta al fichero en el que se ha guardado la firma. Esta direcci&oacute;n
      * puede hacerse establecido program&aacute;ticamente mediante {@link #setOutFilePath(String) setOutFilePath} o mediante la interfaz que
@@ -1200,7 +1200,7 @@ public interface EntryPointsCrypto {
      * set output file, an empty string is returned.
      * @return Ruta al fichero en que se ha guardado la firma. <br>
      *         Route to the file containing the signature. */
-    public String getFilePath();
+    String getFilePath();
 
     /** Devuelve la ruta del fichero de entrada. Esta direcci&oacute;n puede
      * haberse establecido program&aacute;ticamente mediante {@link #setFileuri(String) setFileuri} o mediante la interfaz que aparece
@@ -1225,7 +1225,7 @@ public interface EntryPointsCrypto {
      * does not allow directly acquiring a file by the class {@link java.io.File}. An URI must be previously acquired.
      * @return Fichero que seleccion&oacute; el usuario para firmar <br>
      *         File selected by the user for signature. */
-    public String getFileUsedPath();
+    String getFileUsedPath();
 
     /** Establece una firma electr&oacute;nica en base 64 como entrada para el
      * cliente de firma. Este metodo se utiliza principalmente para indicar la
@@ -1238,7 +1238,7 @@ public interface EntryPointsCrypto {
      * @param inElectronicSignature
      *        Firma electr&oacute;nica en base 64. <br>
      *        Electronic signature in base 64. */
-    public void setElectronicSignature(String inElectronicSignature);
+    void setElectronicSignature(String inElectronicSignature);
 
     /** Establece la ruta de un fichero de firma electr&oacute;nica como entrada
      * para el cliente de firma. Este m&eacute;todo se utiliza principalmente
@@ -1251,7 +1251,7 @@ public interface EntryPointsCrypto {
      * @param inElectronicSignatureFile
      *        Ruta del fichero de firma. <br>
      *        Route to the signature file. */
-    public void setElectronicSignatureFile(String inElectronicSignatureFile);
+    void setElectronicSignatureFile(String inElectronicSignatureFile);
 
     /** Establece los nodos que deben contrafirmarse durante las operaciones de
      * contrafirma de firmantes y de nodos. Cuando se va a realizar la
@@ -1274,7 +1274,7 @@ public interface EntryPointsCrypto {
      * @param signers
      *        Cadena de nombres de firmantes o &iacute;ndices de los nodos. <br>
      *        Signer names string or node indexes. */
-    public void setSignersToCounterSign(String signers);
+    void setSignersToCounterSign(String signers);
 
     /** Guarda los datos provenientes de la funci&oacute;n realizada
      * anteriormente en un fichero especificado. <br>
@@ -1286,7 +1286,7 @@ public interface EntryPointsCrypto {
      *        Route to the destination file.
      * @return <code>true</code> si los datos se han guardado correctamente, <code>false</code> en caso contrario. <br>
      *         <code>true</code> if data has been stored successfully. Else, <code>false</code>. */
-    public boolean saveDataToFile(String fileUri);
+    boolean saveDataToFile(String fileUri);
 
     /** Guarda los datos provenientes de la funci&oacute;n realizada
      * anteriormente en un fichero. <br>
@@ -1294,7 +1294,7 @@ public interface EntryPointsCrypto {
      * Stores data originating in the function previously performed on a file
      * @return <code>true</code> si los datos se han guardado correctamente, <code>false</code> en caso contrario. <br>
      *         <code>true</code> if data has been stored successfully. Else, <code>false</code> */
-    public boolean saveDataToFile();
+    boolean saveDataToFile();
 
     /** Define el tipo de datos mime de los datos tras introducirlos. Si se
      * especifica un archivo, el mimetype se intentar&aacute; obtener
@@ -1310,7 +1310,7 @@ public interface EntryPointsCrypto {
      * @param mimetype
      *        Tipo de datos para los datos actuales. <br>
      *        Type of data, for current data. */
-    public void setDataMimeType(String mimetype);
+    void setDataMimeType(String mimetype);
 
     /** Muestra y firma un HTML (firma web). <br>
      * <br>
@@ -1320,7 +1320,7 @@ public interface EntryPointsCrypto {
      *        HTML to be shown and signed.
      * @return Ruta al fichero que contiene la firma. <br>
      *         Route to the file containing the signature. */
-    public String webSign(final String html);
+    String webSign(final String html);
 
     // *******************************************************************/
     // ***************** FUNCIONALIDADES DE CIFRADO **********************/
@@ -1342,7 +1342,7 @@ public interface EntryPointsCrypto {
      * @return true si la operaci&oacute;n se realiz&oacute; con &eacute;xito,
      *         false en caso contrario. <br>
      *         true if operation successful. Else, false. */
-    public boolean cipherData();
+    boolean cipherData();
 
     /** Cifra el fichero especificado. El resultado de esta operaci&oacute;n es
      * el mismo que el de ejecutar el m&eacute;todo {@link #cipherData()} tras
@@ -1357,7 +1357,7 @@ public interface EntryPointsCrypto {
      *        Data file to encrypt.
      * @return true si la operaci&oacute;n se efectu&oacute; con &eacute;xito <br>
      *         true if operation successful. */
-    public boolean cipherFile(String fileUri);
+    boolean cipherFile(String fileUri);
 
     /** Realiza una operaci&oacute;n de descifrado de datos. Los datos a
      * descifrar pueden establecerse en base 64 mediante el m&eacute;todo {@link #setCipherData(String)} o, de tratarse de un fichero, a
@@ -1397,7 +1397,7 @@ public interface EntryPointsCrypto {
      * @return true si la operaci&oacute;n finaliz&oacute; con &eacute;xito,
      *         false en caso contrario. <br>
      *         true if operation successful. Else, false. */
-    public boolean decipherData();
+    boolean decipherData();
 
     /** Desencripta el fichero indicado. La configuraci&oacute;n de cifrado que
      * se utiliz&oacute; para los datos debe indicarse por medio del
@@ -1437,7 +1437,7 @@ public interface EntryPointsCrypto {
      * @return true si la operaci&oacute;n finaliz&oacute; con &eacute;xito,
      *         false en caso contrario. <br>
      *         true if operation successful. Else, false. */
-    public boolean decipherFile(String fileUri);
+    boolean decipherFile(String fileUri);
 
     /** Devuelve la clave de cifrado actualmente en uso en Base64. Si se acaba de
      * realizar alguna acci&oacute;n se devolver&aacute; la clave utilizada para
@@ -1449,7 +1449,7 @@ public interface EntryPointsCrypto {
      * (in case of manual key) or null will be returned.
      * @return Clave en Base64. <br>
      *         Key in Base64 */
-    public String getKey();
+    String getKey();
 
     /** Define una nueva clave sim&eacute;trica para para el cifrado cuando el
      * modo de cifrado es mediante clave introducida por el usuario. Debe ser
@@ -1457,7 +1457,7 @@ public interface EntryPointsCrypto {
      * @param newKey
      *        Clave en base64.
      * @see #setKeyMode(String) */
-    public void setKey(String newKey);
+    void setKey(String newKey);
 
     /** Establece la cadena de texto usada como contrase&ntilde;a para el cifrado
      * de datos. Este m&eacute;todo debe usarse estableciendo el modo de clave
@@ -1476,7 +1476,7 @@ public interface EntryPointsCrypto {
      *         v&aacute;lida, <code>false</code> en caso contrario. <br>
      *         Returns <code>true</code> if password is valid. Else, <code>false</code>.
      * @see #setKeyMode(String) */
-    public boolean setPassword(String password);
+    boolean setPassword(String password);
 
     /** Devuelve la cadena de texto usada como password en la &uacute;ltima
      * operaci&oacute;n de cifrado. <br>
@@ -1485,7 +1485,7 @@ public interface EntryPointsCrypto {
      * operation.
      * @return String Password o, si no se ha establecido una, nulo. <br>
      *         String password or, if none, null. */
-    public String getPassword();
+    String getPassword();
 
     /** Especifica el algoritmo a utilizar para la
      * encriptaci&oacute;n/desencriptaci&oacute;n sim&eacute;trica.<br/>
@@ -1563,7 +1563,7 @@ public interface EntryPointsCrypto {
      * @see #cipherData()
      * @see #cipherFile(String)
      * @see #buildCMSStructure() */
-    public void setCipherAlgorithm(String algorithm);
+    void setCipherAlgorithm(String algorithm);
 
     /** Devuelve el algoritmo sim&eacute;trico actualmente en uso.<br>
      * Los algoritmos de cifrados aceptados son:<br/>
@@ -1606,7 +1606,7 @@ public interface EntryPointsCrypto {
      * @return Algoritmo de cifrado. <br>
      *         Encryption algorithm.
      * @see #setKeyMode(String) */
-    public String getCipherAlgorithm();
+    String getCipherAlgorithm();
 
     /** Devuelve el modo de firma electr&oacute;nica empleado en la &uacute;ltima
      * firma. <br>
@@ -1614,7 +1614,7 @@ public interface EntryPointsCrypto {
      * Returns the electronic signature mode used in the last signature.
      * @return Modo de firma. <br>
      *         Signature mode. */
-    public String getSignatureMode();
+    String getSignatureMode();
 
     /** Establece el modo de firma, que define si los datos se incrustar&aacute;n
      * o no en una firma generada. Puede ser "Explicit" o "Implicit" (o
@@ -1629,7 +1629,7 @@ public interface EntryPointsCrypto {
      * @param mode
      *        Modo de firma. <br>
      *        Signature mode. */
-    public void setSignatureMode(String mode);
+    void setSignatureMode(String mode);
 
     /** Devuelve el modo actual de generaci&oacute;n de clave. <br>
      * <br>
@@ -1637,7 +1637,7 @@ public interface EntryPointsCrypto {
      * @return Modo de generaci&oacute;n. <br>
      *         Generation Mode.
      * @see #setKeyMode(String) */
-    public String getKeyMode();
+    String getKeyMode();
 
     /** Define el modo de obtenci&oacute;n de clave para cifrado / descifrado
      * sim&eacute;trico. Los modos de obtenci&oacute;n de clave son:
@@ -1658,7 +1658,7 @@ public interface EntryPointsCrypto {
      * @param keyMode
      *        Modo de obtenci&oacute;n de clave. <br>
      *        Key acquiring mode. */
-    public void setKeyMode(String keyMode);
+    void setKeyMode(String keyMode);
 
     /** Graba los datos cifrados en un fichero. <br>
      * <br>
@@ -1669,7 +1669,7 @@ public interface EntryPointsCrypto {
      *        Route to the storage file.
      * @return Devuelve <code>true</code> si se ha realizado con &eacute;xito. <br>
      *         Returns <code>true</code> if successful. */
-    public boolean saveCipherDataToFile(String fileUri);
+    boolean saveCipherDataToFile(String fileUri);
 
     /** Guarda los datos descrifrados en una anterior operaci&oacute;n de
      * desencriptado o el texto plano introducido anteriormente, seg&uacute;n
@@ -1683,7 +1683,7 @@ public interface EntryPointsCrypto {
      *        text.
      * @return true si los datos se guardaron correctamente. <br>
      *         true if data was saved successfully. */
-    public boolean savePlainDataToFile(String fileUri);
+    boolean savePlainDataToFile(String fileUri);
 
     // ***************** USO DEL ALMACEN DE CLAVES DE CIFRADO *****************
     // ************************ USE OF KEYSTORE *******************************
@@ -1694,7 +1694,7 @@ public interface EntryPointsCrypto {
      * @param useKeyStore
      *        Indica si se debe usar el almacen de claves. <br>
      *        Indicates whether or not the keystore mut be used. */
-    public void setUseCipherKeyStore(boolean useKeyStore);
+    void setUseCipherKeyStore(boolean useKeyStore);
 
     // *******************************************************************/
     // ************** FUNCIONALIDADES DE SOBRE DIGITAL ******************/
@@ -1710,7 +1710,7 @@ public interface EntryPointsCrypto {
      *        Cadena de rutas a los ficheros, separados por 'retornos de
      *        l&iacute;nea' ('\n'). <br>
      *        String of routes to the files, separated by 'returns' ('\n'). */
-    public void setRecipientsToCMS(String recipientsCertPath);
+    void setRecipientsToCMS(String recipientsCertPath);
 
     /** Agrega un nuevo destinatario, por medio de su certificado, a la lista de
      * destinatarios a los que se enviar&aacute; un sobre digital. Este
@@ -1729,7 +1729,7 @@ public interface EntryPointsCrypto {
      * @param certB64
      *        Certificado en base 64. <br>
      *        Certificate in base 64. */
-    public void addRecipientToCMS(String certB64);
+    void addRecipientToCMS(String certB64);
 
     /** Eliminar un destinatario de la lista de destinatarios a los que se
      * enviar&aacute; un sobre digital siempre y cuando este se haya
@@ -1741,7 +1741,7 @@ public interface EntryPointsCrypto {
      *        Certificado en base 64 del destinatario que deseamos eliminar. <br>
      *        Certificate in base 64, for the recipient desired for
      *        ellimination. */
-    public void removeRecipientToCMS(String certB64);
+    void removeRecipientToCMS(String certB64);
 
     /** Crea un objeto CMS encriptado (sin informaci&oacute;n de clave, emisor o
      * receptor) con los datos establecidos mediante {@link #setData(String)} o {@link #setFileuri(String)}. La configuraci&oacute;n del cifrado se
@@ -1780,7 +1780,7 @@ public interface EntryPointsCrypto {
      *             Replace with the content type's configuration with {@link #setCMSContentType(String)} and the structure
      *             generation with {@link #buildCMSStructure()}. */
     @Deprecated
-    public boolean buildCMSEncrypted();
+    boolean buildCMSEncrypted();
 
     /** Crea un objeto CMS AuthenticatedData con los datos establecidos mediante {@link #setData(String)} o {@link #setFileuri(String)}. <br>
      * <br>
@@ -1796,7 +1796,7 @@ public interface EntryPointsCrypto {
      *             Replace with the content type's configuration with {@link #setCMSContentType(String)} and the structure
      *             generation with {@link #buildCMSStructure()}. */
     @Deprecated
-    public boolean buildCMSAuthenticated();
+    boolean buildCMSAuthenticated();
 
     /** Crea un objeto CMS envuelto utilizando los datos introducidos con {@link #setData(String)} o {@link #setFileuri(String)} y los certificados
      * indicados mediante {@link #setRecipientsToCMS(String)} como receptores.
@@ -1824,7 +1824,7 @@ public interface EntryPointsCrypto {
      *             Replace with the content type's configuration with {@link #setCMSContentType(String)} and the structure
      *             generation with {@link #buildCMSStructure()} */
     @Deprecated
-    public boolean buildCMSEnveloped();
+    boolean buildCMSEnveloped();
 
     /** Crea la estructura CMS del tipo indicado con {@link #setCMSContentType(String)}, por defecto "EnvelopedData".<br/>
      * La estructura de datos se generar&aacute; a partir de los datons
@@ -1868,7 +1868,7 @@ public interface EntryPointsCrypto {
      * @return Devuelve <code>true</code> si la operaci&oacute;n finaliz&oacute;
      *         con &eacute;xito. <br>
      *         Returns <code>true</code> if operation ended successfully. */
-    public boolean buildCMSStructure();
+    boolean buildCMSStructure();
 
     /** Establece un tipo de contenido para la generaci&oacute;n de una
      * estructura CMS. Los tipos de contenido soportados son:
@@ -1892,7 +1892,7 @@ public interface EntryPointsCrypto {
      *        Tipo de contenido. <br>
      *        Type of contents.
      * @see #buildCMSStructure() */
-    public void setCMSContentType(String contentType);
+    void setCMSContentType(String contentType);
 
     /** Devuelve los datos generados en la &uacute;ltima operaci&oacute;n de
      * envoltorio CMS codificados en Base 64. En caso de no haberse realizado
@@ -1907,7 +1907,7 @@ public interface EntryPointsCrypto {
      * @see #buildCMSEnveloped()
      * @see #signAndPackData()
      * @see #signAndPackFile(String) */
-    public String getB64Data();
+    String getB64Data();
 
     /** Recupera el contenido de un sobre digital. El sobre se indicar&aacute;
      * mediante una cadena en Base 64 con <code>setData</code> o mediante un
@@ -1931,7 +1931,7 @@ public interface EntryPointsCrypto {
      * saved to a file with {@link #saveDataToFile()}.
      * @return true si la operaci&oacute;n fue correcta. <br>
      *         true if successful. */
-    public boolean recoverCMS();
+    boolean recoverCMS();
 
     /** Formatea el objeto DER en Base64 especificado en la llamada y devuelve
      * una cadena con los objetos CMS contenidos. Si el datos no est&aacute;
@@ -1946,7 +1946,7 @@ public interface EntryPointsCrypto {
      *        DER object in base 64.
      * @return Cadena correspondiente al objeto CMS. <br>
      *         String for the CMS object. */
-    public String formatEnvelopedCMS(String b64);
+    String formatEnvelopedCMS(String b64);
 
     /** Formatea el objeto DER en Base64 especificado en la llamada y devuelve
      * una cadena con los objetos CMS contenidos. Si el datos no est&aacute;
@@ -1961,7 +1961,7 @@ public interface EntryPointsCrypto {
      *        DER object, in base 64.
      * @return Cadena correspondiente al objeto CMS. <br>
      *         String for the CMS object. */
-    public String formatEncryptedCMS(String b64);
+    String formatEncryptedCMS(String b64);
 
     /** Firma y empaqueta en un sobre digital los datos especificados por {@link #setData(String)} o {@link #setFileuri(String)} El resultado puede
      * ser recuperado mediante {@link #getB64Data()} <br>
@@ -1970,7 +1970,7 @@ public interface EntryPointsCrypto {
      * {@link #getB64Data()} or {@link #setFileuri(String)}.
      * @return true si la operaci&oacute;n se ha efectuado correctamente <br>
      *         true if successful. */
-    public boolean signAndPackData();
+    boolean signAndPackData();
 
     /** Firma y empaqueta en un sobre digital el fichero especificado por uri. El
      * resultado puede ser recuperado mediante {@link #getB64Data()}. <br>
@@ -1983,7 +1983,7 @@ public interface EntryPointsCrypto {
      *        Location in URI format of data to sign and pack.
      * @return true si la operaci&oacute;n se ha efectuado correctamente <br>
      *         true if successful. */
-    public boolean signAndPackFile(String uri);
+    boolean signAndPackFile(String uri);
 
     /** Agrega un nuevo remitente a un sobre electr&oacute;nico especificado
      * mediante {@link #setData(String)} o {@link #setFileuri(String)}. El
@@ -1993,7 +1993,7 @@ public interface EntryPointsCrypto {
      * retrieved with {@link #getB64Data()}.
      * @return true si la operaci&oacute;n se ha efectuado correctamente. <br>
      *         true if successful. */
-    public boolean coEnvelop();
+    boolean coEnvelop();
 
     // ************* SELECCION DE DESTINATARIO DESDE LDAP *******************/
     // ************* RECIPIENT'S SELECTION FROM LDAP *******************/
@@ -2015,7 +2015,7 @@ public interface EntryPointsCrypto {
      * @param root
      *        Direcci&oacute;n ra&iacute;z del LDAP. <br>
      *        LDAP root address. */
-    public void setLdapConfiguration(String address, String port, String root);
+    void setLdapConfiguration(String address, String port, String root);
 
     /** Establece el nombre "principal" del certificado que se desea recuperar. <br>
      * <br>
@@ -2023,7 +2023,7 @@ public interface EntryPointsCrypto {
      * @param ldapCertificatePrincipal
      *        Nombre "principal". <br>
      *        "Main" name. */
-    public void setLdapCertificatePrincipal(String ldapCertificatePrincipal);
+    void setLdapCertificatePrincipal(String ldapCertificatePrincipal);
 
     /** Obtiene un certificado en base 64 de un servidor LDAP.<br/>
      * Es necesario haber establecido previamente la configuraci&oacute;n del
@@ -2036,7 +2036,7 @@ public interface EntryPointsCrypto {
      *         Downloaded certificate in base 64.
      * @see #setLdapConfiguration(String, String, String)
      * @see #setLdapCertificatePrincipal(String) */
-    public String getLdapCertificate();
+    String getLdapCertificate();
 
     // *******************************************************************/
     // ************ FUNCIONALIDADES DE FIRMA MASIVA ORIGINAL *************/
@@ -2049,7 +2049,7 @@ public interface EntryPointsCrypto {
      * @param aHash
      *        Hash que se desea firmar. <br>
      *        Hash desired for signature. */
-    public void addMassiveHash(String aHash);
+    void addMassiveHash(String aHash);
 
     // *******************************************************************/
     // ************** FUNCIONALIDADES DE MULTIFIRMA MASIVA ***************/
@@ -2096,7 +2096,7 @@ public interface EntryPointsCrypto {
      *         todos los ficheros afectados. <br>
      *         Returns <code>true</code> if the signature was correct for all
      *         appropriate files. */
-    public boolean signDirectory();
+    boolean signDirectory();
 
     /** Establece la operaci&oacute;n masiva a realizar en el proceso generado
      * por los m&eacute;todos {@link #signDirectory()}, {@link #massiveSignatureData(String)} y {@link EntryPointsCrypto#massiveSignatureFile(String)}
@@ -2122,7 +2122,7 @@ public interface EntryPointsCrypto {
      * @param massiveOperation
      *        Tipo de operaci&oacute;n masiva a realizar. <br>
      *        Type of massive operation to perform. */
-    public void setMassiveOperation(String massiveOperation);
+    void setMassiveOperation(String massiveOperation);
 
     /** Indica si se debe respetar el formato de firma original para las
      * operaciones de multifirma masiva o, si en cambio, se usar&aacute; la
@@ -2135,7 +2135,7 @@ public interface EntryPointsCrypto {
      * @param originalFormat
      *        Indica si respetar el formato original. <br>
      *        Sets whether or not to use the original format. */
-    public void setOriginalFormat(boolean originalFormat);
+    void setOriginalFormat(boolean originalFormat);
 
     /** Devuelve la ruta absoluta del directorio donde se ubican los ficheros a
      * ser firmados de forma masiva. <br>
@@ -2144,7 +2144,7 @@ public interface EntryPointsCrypto {
      * signed are found.
      * @return Ruta absoluta del directorio. <br>
      *         Absolute route of the directory. */
-    public String getInputDirectoryToSign();
+    String getInputDirectoryToSign();
 
     /** Selecciona el directorio de donde se tomar&aacute;an los ficheros de
      * firma y datos para la operaci&oacute;n de firma masiva. <br>
@@ -2154,7 +2154,7 @@ public interface EntryPointsCrypto {
      * @param directory
      *        Ruta absoluta del directorio. <br>
      *        Absolute route of the directory. */
-    public void setInputDirectoryToSign(String directory);
+    void setInputDirectoryToSign(String directory);
 
     /** Devuelve la ruta absoluta del directorio donde se almacenar&aacute;n las
      * firmas resultado de la operaci&oacute;n de firma masiva. <br>
@@ -2163,7 +2163,7 @@ public interface EntryPointsCrypto {
      * from the massive signature operation will be stored.
      * @return Ruta absoluta del directorio de salida de la firma masiva. <br>
      *         Absolute route of the massive signature output directory. */
-    public String getOutputDirectoryToSign();
+    String getOutputDirectoryToSign();
 
     /** Selecciona el directorio donde se depositar&aacute;n las firmas masivas
      * de los archivos situados en <code>InputDirectoryToSign</code>. <br>
@@ -2172,7 +2172,7 @@ public interface EntryPointsCrypto {
      * @param directory
      *        Ruta absoluta del directorio. <br>
      *        Absolute route of the directory. */
-    public void setOutputDirectoryToSign(String directory);
+    void setOutputDirectoryToSign(String directory);
 
     /** Define las extensiones que se incluir&aacute;n en la firma de
      * directorios. La cadena que se debe introducir se corresponde con las
@@ -2185,7 +2185,7 @@ public interface EntryPointsCrypto {
      * @param extensions
      *        Extensiones de los ficheros que se desean firmar. <br>
      *        File extensions for the files to be signed. */
-    public void setInIncludeExtensions(String extensions);
+    void setInIncludeExtensions(String extensions);
 
     /** Establece si la firma de directorios se efectuar&aacute; de forma
      * recursiva o no. <br>
@@ -2195,7 +2195,7 @@ public interface EntryPointsCrypto {
      *        <code>true</code> para firmar un directorio y sus
      *        subdirectorios. <code>false</code> en caso contrario. <br>
      *        <code>true</code> to sign a directory and its subdirectories. <code>false</code> otherwise. */
-    public void setInRecursiveDirectorySign(boolean recursiveSignDir);
+    void setInRecursiveDirectorySign(boolean recursiveSignDir);
 
     /** Toma la configuraci&oacute;n de firma del cliente y prepara el proceso de
      * firma masiva. Los datos que toma de la configuracion del cliente son:
@@ -2255,14 +2255,14 @@ public interface EntryPointsCrypto {
      * @see #setSelectedCertificateAlias(String)
      * @see #setOriginalFormat(boolean)
      * @see #setMassiveOperation(String) */
-    public boolean initMassiveSignature();
+    boolean initMassiveSignature();
 
     /** Libera la configuraci&oacute;n del procedimiento de firma masiva
      * previamente inicializado. <br>
      * <br>
      * Frees the massive signature procedure configuration which was previously
      * initialized. */
-    public void endMassiveSignature();
+    void endMassiveSignature();
 
     /** Firma datos con la configuraci&oacute;n de firma masiva establecida. En
      * el caso de la operaci&oacute;n de firma masiva tendremos que indicar los
@@ -2279,7 +2279,7 @@ public interface EntryPointsCrypto {
      * @return Firma resultado en base 64 o <code>null</code> en caso de error. <br>
      *         Resulting signature in base 64 or <code>null</code> if error
      *         occurs. */
-    public String massiveSignatureData(String b64Data);
+    String massiveSignatureData(String b64Data);
 
     /** Firma un hash con la configuraci&oacute;n de firma masiva establecida.
      * Esta m&eacute;todo s&oacute;lo es v&aacute;lido para la operaci&oacute;n
@@ -2294,7 +2294,7 @@ public interface EntryPointsCrypto {
      * @return Firma resultado en base 64 o <code>null</code> en caso de error. <br>
      *         Resulting signature in base 64, or <code>null</code> if error
      *         occurs. */
-    public String massiveSignatureHash(String b64Hash);
+    String massiveSignatureHash(String b64Hash);
 
     /** Firma un fichero con la configuraci&oacute;n de firma masiva establecida.
      * En el caso de la operacion de firma masiva tendremos que indicar el
@@ -2312,7 +2312,7 @@ public interface EntryPointsCrypto {
      * @return Firma resultado en base 64 o <code>null</code> en caso de error. <br>
      *         Resulting signature in base 64. <code>null</code>, if error
      *         occurs. */
-    public String massiveSignatureFile(String fileuri);
+    String massiveSignatureFile(String fileuri);
 
     /** Devuelve la traza de log de la &uacte;ltima operaci&oacute;n del
      * procedimiento de firma masiva. <br>
@@ -2320,13 +2320,13 @@ public interface EntryPointsCrypto {
      * Returns the log trace for the last massive signature procedure operation.
      * @return Log de la &uacute;ltima operaci&oacute;n. <br>
      *         Last operation's log. */
-    public String getMassiveSignatureCurrentLog();
+    String getMassiveSignatureCurrentLog();
 
     /** Devuelve el log completo del procedimiento de firma masiva. El log de
      * cada operaci&oacute;n se muestra en &uacute;nica l&iacute;nea y se
      * mantiene el orden.
      * @return Log completo del procedimiento de firma masiva. */
-    public String getMassiveSignatureLog();
+    String getMassiveSignatureLog();
 
     /** Almacena en un fichero todas las trazas de log generadas hasta el momento
      * por el procedimiento de firma masiva. La ruta del fichero se puede
@@ -2339,7 +2339,7 @@ public interface EntryPointsCrypto {
      * Else, a window will be displayed, prompting the user where to store the
      * log file. */
 
-    public void saveMassiveSignatureLog();
+    void saveMassiveSignatureLog();
 
     // *******************************************************************/
     // ************* FUNCIONALIDADES DE GESTION DE KEYSTORES *************/
@@ -2392,7 +2392,7 @@ public interface EntryPointsCrypto {
      * @param type
      *        Tipo de repositorio. <br>
      *        Repository type. */
-    public void setKeyStore(String path, String password, String type);
+    void setKeyStore(String path, String password, String type);
 
     // *******************************************************************/
     // ******************* FUNCIONALIDADES NUEVAS AO *********************/
@@ -2417,7 +2417,7 @@ public interface EntryPointsCrypto {
      *        indicar el calificador como OID debe usarse una URN (por
      *        ejemplo "urn:oid:2.16.724.1.3.2.2.3.1" <br>
      *        Signature policy's qualifying oid. */
-    public void setPolicy(String identifier, String description, String qualifier);
+    void setPolicy(String identifier, String description, String qualifier);
 
     /** Obtiene todos los alias de los certificados disponibles para firmar o
      * cifrar y los devuelve como una &uacute;nica cadena en donde los alias
@@ -2427,7 +2427,7 @@ public interface EntryPointsCrypto {
      * returns them as a single string with aliases separated by {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR}
      * @return Todos los alias de los certificados disponibles. <br>
      *         All available certificate's aliases. */
-    public String getCertificatesAlias();
+    String getCertificatesAlias();
 
     /** Obtiene todos los alias de los certificados disponibles para firmar o
      * cifrar y los devuelve en un array. <br>
@@ -2436,7 +2436,7 @@ public interface EntryPointsCrypto {
      * returns them in an array.
      * @return Alias de los certificados disponibles. <br>
      *         Available certificates' aliases. */
-    public String[] getArrayCertificatesAlias();
+    String[] getArrayCertificatesAlias();
 
     /** Obtiene una cadena con todos los certificados del almac&eacute;n actual
      * en ASCII Base64 separados por {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR}. <br>
@@ -2445,12 +2445,12 @@ public interface EntryPointsCrypto {
      * separated by {@link es.gob.afirma.cliente.SignApplet#STRING_SEPARATOR}.
      * @return Cadena con todos los certificados. <br>
      *         String with all certificates. */
-    public String getCertificates();
+    String getCertificates();
 
     /** Obtiene un array con todos los certificados del almac&eacute;n actual en
      * ASCII Base64.
      * @return Array con todos los certificados. */
-    public String[] getArrayCertificates();
+    String[] getArrayCertificates();
 
     /** Recupera un certificado del repositorio activo en la forma:
      * <p>
@@ -2479,36 +2479,36 @@ public interface EntryPointsCrypto {
      *        Certificate alias meant for retrieval.
      * @return Certificado recuperado o <code>null</code> en caso de error. <br>
      *         Retrieved certificate or <code>null</code> if error occurs. */
-    public String getCertificate(String alias);
+    String getCertificate(String alias);
 
     /** Recupera la clave p&uacute;blica de un certificado del repositorio activo
      * en la forma:
      * <p>
      * <code>
-     * -----BEGIN RSA PUBLIC KEY-----<br/>
+     * -----BEGIN RSA KEY-----<br/>
      * Clave p&uacute;blica del certificado en base 64<br/>
-     * -----END RSA PUBLIC KEY-----<br/>
+     * -----END RSA KEY-----<br/>
      * </code>
      * </p>
      * <br>
      * <br>
-     * Retrieves a certificate's public key from the current repository, under
+     * Retrieves a certificate's key from the current repository, under
      * the form:
      * <p>
      * <code>
-     * -----BEGIN RSA PUBLIC KEY-----<br/>
-     * Certificate's Public Key in base 64<br/>
-     * -----END RSA PUBLIC KEY-----<br/>
+     * -----BEGIN RSA KEY-----<br/>
+     * Certificate's Key in base 64<br/>
+     * -----END RSA KEY-----<br/>
      * </code>
      * </p>
      * @param alias
      *        Alias del certificado del que queremos recuperar la clave
      *        p&uacute;blica. <br>
-     *        Alias of certificate to recover public key from.
+     *        Alias of certificate to recover key from.
      * @return Clave p&uacute;blica del certificado o <code>null</code> en caso
      *         de error. <br>
-     *         Certificate's public key or <code>null</code> if error occurs. */
-    public String getCertificatePublicKey(String alias);
+     *         Certificate's key or <code>null</code> if error occurs. */
+    String getCertificatePublicKey(String alias);
 
     /** Establece el alias del certificado activo. <br>
      * <br>
@@ -2518,7 +2518,7 @@ public interface EntryPointsCrypto {
      *        certificado presente en el <code>KeyStore</code> activo <br>
      *        Certificate's alias. Must match an alias of a certificate
      *        found in the active <code>KeyStore</code>. */
-    public void setSelectedCertificateAlias(String certAlias);
+    void setSelectedCertificateAlias(String certAlias);
 
     /** Establece un filtro para la selecci&oacute;n de certificados, solo se
      * mostrar&aacute;n en el di&aacute;logo de selecci&oacute;n los que cumplan
@@ -2549,7 +2549,7 @@ public interface EntryPointsCrypto {
      *        activated <i>nonRepudiation</i> bit in field <i>KeyUsage</i>
      *        bit are displayed for selection. If set to <code>false</code> all certificates are displayed.
      * @see #setMandatoryCertificateConditionRFC2254(String, String, boolean) */
-    public void setCertFilterRFC2254(String subjectFilter, String issuerFilter, boolean onlySignatureCertificates);
+    void setCertFilterRFC2254(String subjectFilter, String issuerFilter, boolean onlySignatureCertificates);
 
     /** Establece una condici&oacute;n para seleccionar el certificado con el que
      * se ha de firmar. No se permite elegir certificado al usuario pues se
@@ -2585,7 +2585,7 @@ public interface EntryPointsCrypto {
      *        displayed for selection, if set to <code>false</code> all
      *        certificates are displayed.
      * @see #setCertFilterRFC2254(String, String, boolean) */
-    public void setMandatoryCertificateConditionRFC2254(String subjectFilter, String issuerFilter, boolean onlySignatureCertificates);
+    void setMandatoryCertificateConditionRFC2254(String subjectFilter, String issuerFilter, boolean onlySignatureCertificates);
 
     /** Muestra el di&aacute;logo de selecci&oacute;n de certificados del
      * almac&eacute;n seleccionado, aplicando los filtros de certificado de ser
@@ -2604,7 +2604,7 @@ public interface EntryPointsCrypto {
      *         claves) del certificado seleccionado. <br>
      *         Selected certificate's real alias (alias used for registering in
      *         the keystore) */
-    public String showCertSelectionDialog();
+    String showCertSelectionDialog();
 
     // *******************************************************************//
     // ******************** METODOS DEPRECADOS ***************************//
@@ -2624,7 +2624,7 @@ public interface EntryPointsCrypto {
      *             This operation is discouraged, since results may vary
      *             depending on system's coding. */
     @Deprecated
-    public String getData();
+    String getData();
 
     /** Devuelve los datos generados el la &uacute;ltima operaci&oacute;n CMS <br>
      * <br>
@@ -2635,7 +2635,7 @@ public interface EntryPointsCrypto {
      *         String in base 64.
      * @see #getB64Data */
     @Deprecated
-    public String getCMSData();
+    String getCMSData();
 
     /** Tras una firma masiva (firma a partir de m&uacute;ltiples hashes),
      * devuelve las firmas en base64 separadas unas de otras por '!' (cierre de
@@ -2654,6 +2654,6 @@ public interface EntryPointsCrypto {
      * @deprecated Por el consumo excesivo de memoria. <br>
      *             By excessive memory consumption. */
     @Deprecated
-    public String getSignaturesBase64Encoded();
+    String getSignaturesBase64Encoded();
 
 }

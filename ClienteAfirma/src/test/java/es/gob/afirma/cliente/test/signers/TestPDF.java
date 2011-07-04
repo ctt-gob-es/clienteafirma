@@ -23,8 +23,6 @@ import es.gob.afirma.signers.AOSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class TestPDF {
 
-    private final static boolean ONLINE = false;
-
     /** Prueba de firma PDF. */
     @Test
     public void testSignature() {
@@ -75,14 +73,14 @@ public class TestPDF {
                     result = null;
                 }
                 assertNotNull("El resultado de la firma es nulo", result);
-                if (ONLINE && !Platform.JREVER.J5.equals(Platform.getJavaVersion())) {
-                    try {
-                        System.out.println("Resultado de la validacion: " + TestUtils.verifyBinSignature(result));
-                    }
-                    catch (final Exception e) {
-                        org.junit.Assert.fail("Error validando la firma generada: " + e);
-                    }
+
+                try {
+                    System.out.println("Resultado de la validacion: " + TestUtils.verifyBinSignature(result));
                 }
+                catch (final Exception e) {
+                    org.junit.Assert.fail("Error validando la firma generada: " + e);
+                }
+                
             }
         }
     }
@@ -138,14 +136,14 @@ public class TestPDF {
                     result = null;
                 }
                 assertNotNull("El resultado de la cofirma es nulo", result);
-                if (ONLINE && !Platform.JREVER.J5.equals(Platform.getJavaVersion())) {
-                    try {
-                        System.out.println("Resultado de la validacion: " + TestUtils.verifyBinSignature(result));
-                    }
-                    catch (final Exception e) {
-                        org.junit.Assert.fail("Error validando la cofirma generada: " + e);
-                    }
+
+                try {
+                    System.out.println("Resultado de la validacion: " + TestUtils.verifyBinSignature(result));
                 }
+                catch (final Exception e) {
+                    org.junit.Assert.fail("Error validando la cofirma generada: " + e);
+                }
+                
             }
         }
     }

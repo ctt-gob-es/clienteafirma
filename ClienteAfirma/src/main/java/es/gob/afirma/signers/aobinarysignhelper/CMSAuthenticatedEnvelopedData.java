@@ -86,10 +86,6 @@ import es.gob.afirma.ciphers.AOCipherConfig;
 
 public final class CMSAuthenticatedEnvelopedData {
 
-    /** Clave de cifrado. La almacenamos internamente porque no hay forma de
-     * mostrarla directamente al usuario. */
-    private SecretKey cipherKey;
-
     /** @param parameters
      *        Par&aacute;metros necesarios que contienen tanto la firma del
      *        archivo a firmar como los datos del firmante.
@@ -124,12 +120,12 @@ public final class CMSAuthenticatedEnvelopedData {
                                                 boolean applySigningTime,
                                                 Map<Oid, byte[]> atrib,
                                                 Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
-        this.cipherKey = Utils.initEnvelopedData(config, certDest);
+        final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // 1. ORIGINATORINFO
         // obtenemos la lista de certificados
-        X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
-        ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
+        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
+        final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
         ASN1Set certrevlist = null;
 
         OriginatorInfo origInfo = null;
@@ -142,18 +138,16 @@ public final class CMSAuthenticatedEnvelopedData {
         }
 
         // 2. RECIPIENTINFOS
-        Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
 
         // 4. ATRIBUTOS FIRMADOS
-        ASN1Set authAttr = null;
-        authAttr = generateSignedAtt(dataType, applySigningTime, atrib);
+        final ASN1Set authAttr = generateSignedAtt(dataType, applySigningTime, atrib);
 
         // 5. MAC
-        byte[] mac = Utils.genMac(autenticationAlgorithm, genPack(authAttr.getDEREncoded(), parameters.getContent()), cipherKey);
+        final byte[] mac = Utils.genMac(autenticationAlgorithm, genPack(authAttr.getDEREncoded(), parameters.getContent()), cipherKey);
 
         // 6. ATRIBUTOS NO FIRMADOS.
-        ASN1Set unAuthAttr = null;
-        unAuthAttr = Utils.generateUnsignedAtt(uatrib);
+        final ASN1Set unAuthAttr = Utils.generateUnsignedAtt(uatrib);
 
         // construimos el Authenticated data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.id_ct_authEnvelopedData, new AuthEnvelopedData(origInfo, // originatorInfo,
@@ -166,8 +160,8 @@ public final class CMSAuthenticatedEnvelopedData {
 
     }
 
-    private byte[] genPack(byte[] parte1, byte[] parte2) {
-        byte[] pack = new byte[parte1.length + parte2.length];
+    private byte[] genPack(final byte[] parte1, final byte[] parte2) {
+        final byte[] pack = new byte[parte1.length + parte2.length];
 
         for (int i = 0; i < parte1.length; i++) {
             pack[i] = parte1[i];
@@ -201,7 +195,7 @@ public final class CMSAuthenticatedEnvelopedData {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
         ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype.toString()))));
@@ -214,9 +208,9 @@ public final class CMSAuthenticatedEnvelopedData {
         // agregamos la lista de atributos a mayores.
         if (atrib.size() != 0) {
 
-            Iterator<Map.Entry<Oid, byte[]>> it = atrib.entrySet().iterator();
+            final Iterator<Map.Entry<Oid, byte[]>> it = atrib.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<Oid, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
@@ -242,24 +236,22 @@ public final class CMSAuthenticatedEnvelopedData {
      * @return La nueva firma AuthenticatedEnvelopedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
      *         nueva. */
-    public byte[] addOriginatorInfo(byte[] data, X509Certificate[] signerCertificateChain) {
-        // boolean isValid = false;
-        byte[] retorno = null;
-        try {
-            ASN1InputStream is = new ASN1InputStream(data);
-            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = null;
-            dsq = (ASN1Sequence) is.readObject();
+    public byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
 
-            Enumeration<?> e = dsq.getObjects();
+        try {
+            final ASN1InputStream is = new ASN1InputStream(data);
+            // LEEMOS EL FICHERO QUE NOS INTRODUCEN
+            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
 
             if (doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
                 // Contenido de Data
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-                AuthEnvelopedData authEnv = new AuthEnvelopedData((ASN1Sequence) doj.getObject());
+                final AuthEnvelopedData authEnv = new AuthEnvelopedData((ASN1Sequence) doj.getObject());
 
                 // Obtenemos los originatorInfo
                 OriginatorInfo origInfo = authEnv.getOriginatorInfo();
@@ -272,8 +264,7 @@ public final class CMSAuthenticatedEnvelopedData {
 
                 // Se crea un nuevo AuthenticatedEnvelopedData a partir de los
                 // datos anteriores con los nuevos originantes.
-                retorno =
-                        new ContentInfo(PKCSObjectIdentifiers.id_ct_authEnvelopedData, new AuthEnvelopedData(origInfo, // OriginatorInfo
+                return new ContentInfo(PKCSObjectIdentifiers.id_ct_authEnvelopedData, new AuthEnvelopedData(origInfo, // OriginatorInfo
                                                                                                              authEnv.getRecipientInfos(), // ASN1Set
                                                                                                              authEnv.getAuthEncryptedContentInfo(),
                                                                                                              authEnv.getAuthAttrs(),
@@ -282,9 +273,9 @@ public final class CMSAuthenticatedEnvelopedData {
             }
 
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de insercion: " + ex);
         }
-        return retorno;
+        return null;
     }
 }

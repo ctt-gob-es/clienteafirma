@@ -69,7 +69,9 @@ public final class OOXMLUtil {
         ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
 
         // Si no existe el fichero, el documento no contiene firmas
-        if (relsEntry == null) return new RelationShip[0];
+        if (relsEntry == null) {
+            return new RelationShip[0];
+        }
 
         // Analizamos el fichero de relaciones
         final RelationshipsParser parser;
@@ -125,7 +127,9 @@ public final class OOXMLUtil {
         ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
 
         // Si no existe el fichero, el documento no contiene firmas
-        if (relsEntry == null) return new byte[0][];
+        if (relsEntry == null) {
+            return new byte[0][];
+        }
 
         // Analizamos el fichero de relaciones
         final RelationshipsParser parser;
@@ -145,7 +149,9 @@ public final class OOXMLUtil {
                 // Comprobamos que exista el firma referenciada
                 final String target = rel.getTarget();
                 ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target);
-                if (signEntry == null) signEntry = zipFile.getEntry("_xmlsignatures\\" + target);
+                if (signEntry == null) {
+                    signEntry = zipFile.getEntry("_xmlsignatures\\" + target);
+                }
                 if (signEntry == null) {
                     Logger.getLogger("es.gob.afirma").severe("El documento OOXML no contiene las firmas declaradas");
                     return new byte[0][];
@@ -178,7 +184,9 @@ public final class OOXMLUtil {
      * @return Entrada con la relaci&oacute;n de firmas. */
     private static ZipEntry getSignaturesRelsEntry(ZipFile ooxmlZipFile) {
         ZipEntry relsEntry = ooxmlZipFile.getEntry("_rels/.rels");
-        if (relsEntry == null) relsEntry = ooxmlZipFile.getEntry("_rels\\.rels");
+        if (relsEntry == null) {
+            relsEntry = ooxmlZipFile.getEntry("_rels\\.rels");
+        }
 
         // Analizamos el fichero de relaciones
         final RelationshipsParser parser;
@@ -191,15 +199,17 @@ public final class OOXMLUtil {
         }
 
         ZipEntry signsEntry = null;
-        for (RelationShip rel : parser.getRelationships()) {
-            String c = OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE;
-            String r = rel.getType();
+        for (final RelationShip rel : parser.getRelationships()) {
+            //String c = OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE;
+            //String r = rel.getType();
 
             if (OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE.equals(rel.getType())) {
-                String middleTarget = rel.getTarget().substring(0, "_xmlsignatures".length() + 1);
-                String target = rel.getTarget().substring("_xmlsignatures".length() + 1);
+                final String middleTarget = rel.getTarget().substring(0, "_xmlsignatures".length() + 1);
+                final String target = rel.getTarget().substring("_xmlsignatures".length() + 1);
                 signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels/" + target + ".rels");
-                if (signsEntry == null) signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels\\" + target + ".rels");
+                if (signsEntry == null) {
+                    signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels\\" + target + ".rels");
+                }
                 break;
             }
         }

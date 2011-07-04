@@ -30,8 +30,6 @@ import es.gob.afirma.signers.AOXAdESSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestXAdES {
 
-    private final static boolean ONLINE = false;
-
     /** Prueba de firma XAdES. */
     @Test
     @Ignore

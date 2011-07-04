@@ -67,18 +67,22 @@ public final class RFC2254CertificateFilter implements CertificateFilter {
         if (subjectFilter == null && issuerFilter == null && keyUsage == null) {
             throw new NullPointerException("Al menos uno de los criterios de filtrado debe no ser nulo");
         }
-        keyUsageFilter = keyUsage;
+        keyUsageFilter = keyUsage.clone();
         rfc2254IssuerFilter = issuerFilter;
         rfc2254SubjectFilter = subjectFilter;
     }
 
     private boolean filterSubjectByRFC2254(final String filter, final X509Certificate cert) {
-        if (cert == null || filter == null) return true;
+        if (cert == null || filter == null) {
+            return true;
+        }
         return filterRFC2254(filter, cert.getSubjectDN().toString());
     }
 
     private boolean filterIssuerByRFC2254(final String filter, final X509Certificate cert) {
-        if (cert == null || filter == null) return true;
+        if (cert == null || filter == null) {
+            return true;
+        }
         return filterRFC2254(filter, cert.getIssuerDN().toString());
     }
 
@@ -113,7 +117,9 @@ public final class RFC2254CertificateFilter implements CertificateFilter {
      *         filtro o este &uacute;ltimo es nulo, <code>false</code> en caso
      *         contrario */
     private boolean filterRFC2254(final String f, final LdapName name) {
-        if (f == null || name == null) return true;
+        if (f == null || name == null) {
+            return true;
+        }
         try {
             final List<Rdn> rdns = name.getRdns();
             if (rdns == null || (rdns.isEmpty())) {
@@ -122,8 +128,9 @@ public final class RFC2254CertificateFilter implements CertificateFilter {
                 return false;
             }
             final Attributes attrs = new BasicAttributes(true);
-            for (final Rdn rdn : rdns)
+            for (final Rdn rdn : rdns) {
                 attrs.put(rdn.getType(), rdn.getValue());
+            }
             return new SearchFilter(f).check(attrs);
         }
         catch (final Exception e) {
@@ -143,13 +150,19 @@ public final class RFC2254CertificateFilter implements CertificateFilter {
      *        Filtro con los bits de uso (<i>KeyUsage</i>) a verificar
      * @return <code>true</code> si el certificado concuerda con el filtro, <code>false</code> en caso contrario */
     private boolean matchesKeyUsageFilter(final Boolean[] filter, final X509Certificate cert) {
-        if (filter == null) return true;
-        if (cert == null) return false;
+        if (filter == null) {
+            return true;
+        }
+        if (cert == null) {
+            return false;
+        }
         if (filter.length == 9) {
             boolean[] certUsage = cert.getKeyUsage();
             if (certUsage != null) {
                 for (int j = 0; j < certUsage.length; j++) {
-                    if (filter[j] != null && filter[j].booleanValue() != certUsage[j]) return false;
+                    if (filter[j] != null && filter[j].booleanValue() != certUsage[j]) {
+                        return false;
+                    }
                 }
                 return true;
             }

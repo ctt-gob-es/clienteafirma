@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * Microsystems. */
 final class NSRegistry {
 
-    private static final int magic = 0x76644441;
+    private static final int MAGIC = 0x76644441;
     private RandomAccessFile in = null;
     private int rootOffset;
 
@@ -108,7 +108,9 @@ final class NSRegistry {
     private int readUnsignedShort() throws IOException {
         int ch1 = in.read();
         int ch2 = in.read();
-        if ((ch1 | ch2) < 0) throw new EOFException();
+        if ((ch1 | ch2) < 0) {
+            throw new EOFException();
+        }
         return (ch2 << 8) + (ch1 << 0);
     }
 
@@ -119,7 +121,9 @@ final class NSRegistry {
         int ch2 = in.read();
         int ch3 = in.read();
         int ch4 = in.read();
-        if ((ch1 | ch2 | ch3 | ch4) < 0) throw new EOFException();
+        if ((ch1 | ch2 | ch3 | ch4) < 0) {
+            throw new EOFException();
+        }
         return ((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
     }
 
@@ -130,7 +134,9 @@ final class NSRegistry {
         int ch2 = in.read();
         int ch3 = in.read();
         int ch4 = in.read();
-        if ((ch1 | ch2 | ch3 | ch4) < 0) throw new EOFException();
+        if ((ch1 | ch2 | ch3 | ch4) < 0) {
+            throw new EOFException();
+        }
         return ((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
     }
 
@@ -143,13 +149,17 @@ final class NSRegistry {
      * <p>
      * <a href="http://lxr.mozilla.org/mozilla/source/modules/libreg/src/reg.h"> source/modules/libreg/src/reg.h </a>
      * <p>
-     * Here's the header struct itself: typedef struct _hdr { uint32 magic; // must equal MAGIC_NUMBER uint16 verMajor; // major version number uint16
+     * Here's the header struct itself: typedef struct _hdr { uint32 MAGIC; // must equal MAGIC_NUMBER uint16 verMajor; // major version number uint16
      * verMinor; // minor version number REGOFF avail; // next available offset REGOFF root; // root object } REGHDR; */
-    NSRegistry open(File regFile) {
-        if (in != null) return this;
+    NSRegistry open(final File regFile) {
+        if (in != null) {
+            return this;
+        }
         try {
             in = new RandomAccessFile(regFile, "r");
-            if (readInt() != magic) throw new IOException("not a valid Netscape Registry File");
+            if (readInt() != MAGIC) {
+                throw new IOException("not a valid Netscape Registry File");
+            }
             /* majorVersion = */readUnsignedShort();
             /* minorVersion = */readUnsignedShort();
             if (in.skipBytes(4) != 4) {
@@ -192,7 +202,9 @@ final class NSRegistry {
             int childOffset = parent.down;
             while (childOffset != 0) {
                 Record key = readRecord(childOffset);
-                if (name.equals(readString(key.name, key.namelen - 1))) return get(key, pathElts);
+                if (name.equals(readString(key.name, key.namelen - 1))) {
+                    return get(key, pathElts);
+                }
                 childOffset = key.left;
             }
             return null;
@@ -205,8 +217,10 @@ final class NSRegistry {
 
         int entryOffset = parent.value;
         while (entryOffset != 0) {
-            Record entry = readRecord(entryOffset);
-            if (name.equals(readString(entry.name, entry.namelen - 1))) return readString(entry.value, entry.valuelen - 1);
+            final Record entry = readRecord(entryOffset);
+            if (name.equals(readString(entry.name, entry.namelen - 1))) {
+                return readString(entry.value, entry.valuelen - 1);
+            }
             entryOffset = entry.left;
         }
         return null;

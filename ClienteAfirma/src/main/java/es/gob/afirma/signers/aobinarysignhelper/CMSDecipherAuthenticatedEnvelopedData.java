@@ -53,16 +53,16 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public byte[] dechiperAuthenticatedEnvelopedData(byte[] cmsData, PrivateKeyEntry keyEntry) throws IOException,
+    public byte[] dechiperAuthenticatedEnvelopedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                               CertificateEncodingException,
                                                                                               AOException,
                                                                                               AOInvalidRecipientException,
                                                                                               InvalidKeyException {
 
         // Contendra el contenido a tratar.
-        AuthEnvelopedData authEnvelopedData = null;
+        final AuthEnvelopedData authEnvelopedData;
 
-        Enumeration<?> elementRecipient;
+        final Enumeration<?> elementRecipient;
         try {
             ASN1Sequence contentAuthEnvelopedData = Utils.fetchWrappedData(cmsData);
 
@@ -73,8 +73,7 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
             throw new AOException("El fichero no contiene un tipo AuthenticatedEnvelopedData", ex);
         }
 
-        X509Certificate userCert = (X509Certificate) keyEntry.getCertificate();
-        final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas(userCert, elementRecipient);
+        final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas((X509Certificate) keyEntry.getCertificate(), elementRecipient);
 
         // Obtenemos el contenido cifrado
         final EncryptedContentInfo contenidoCifrado = authEnvelopedData.getAuthEncryptedContentInfo();

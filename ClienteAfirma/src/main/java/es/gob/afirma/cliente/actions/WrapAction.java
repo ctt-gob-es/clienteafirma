@@ -15,10 +15,10 @@ import es.gob.afirma.misc.AOConstants;
 public final class WrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
 
     /** Manejador de ensobrado. */
-    private EnveloperManager enveloperManager;
+    private final EnveloperManager enveloperManager;
 
     /** Datos que se desean ensobrar. */
-    private byte[] data;
+    private final byte[] data;
 
     /** Construye la operaci&oacute;n de ensobrado de datos. Si se indican datos,
      * se ensobraran estos; si no se indican se tomar&aacute;n los configurados
@@ -28,14 +28,14 @@ public final class WrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
      * @param data
      *        Datos que se desean ensobrar, {@code null} si se desean tomar
      *        los del manejador. */
-    public WrapAction(EnveloperManager enveloperManager, byte[] data) {
+    public WrapAction(final EnveloperManager enveloperManager, final byte[] data) {
 
         if (enveloperManager == null) {
             throw new NullPointerException();
         }
 
         this.enveloperManager = enveloperManager;
-        this.data = data;
+        this.data = data.clone();
     }
 
     public Boolean run() {

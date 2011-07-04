@@ -44,7 +44,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
     }
 
-    static class KeyEntry {
+    final static class KeyEntry {
         // private Key privateKey;
         private X509Certificate certChain[];
         private String alias;
@@ -106,18 +106,20 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     private java.lang.reflect.Method loadKeysOrCertificateChains;
     private KeyStore.MY nativeWrapper;
 
-    KeyStoreAddressBook(String storeName) {
+    KeyStoreAddressBook(final String storeName) {
 
         nativeWrapper = new KeyStore.MY();
 
         try {
             nativeWrapper.getClass();
-            for (java.lang.reflect.Method m : nativeWrapper.getClass().getDeclaredMethods()) {
+            for (final java.lang.reflect.Method m : nativeWrapper.getClass().getDeclaredMethods()) {
                 m.setAccessible(true);
             }
-            for (java.lang.reflect.Method m : nativeWrapper.getClass().getSuperclass().getDeclaredMethods()) {
+            for (final java.lang.reflect.Method m : nativeWrapper.getClass().getSuperclass().getDeclaredMethods()) {
                 m.setAccessible(true);
-                if (m.getName().equals("loadKeysOrCertificateChains")) loadKeysOrCertificateChains = m;
+                if (m.getName().equals("loadKeysOrCertificateChains")) {
+                    loadKeysOrCertificateChains = m;
+                }
             }
         }
         catch (final Exception e) {
@@ -125,10 +127,14 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
 
         // Get the compatibility mode
-        String prop = (String) AccessController.doPrivileged(new GetPropertyAction(KEYSTORE_COMPATIBILITY_MODE_PROP));
+        final String prop = AccessController.doPrivileged(new GetPropertyAction(KEYSTORE_COMPATIBILITY_MODE_PROP));
 
-        if ("false".equalsIgnoreCase(prop)) keyStoreCompatibilityMode = false;
-        else keyStoreCompatibilityMode = true;
+        if ("false".equalsIgnoreCase(prop)) {
+            keyStoreCompatibilityMode = false;
+        }
+        else {
+            keyStoreCompatibilityMode = true;
+        }
 
         this.storeName = storeName;
     }
@@ -150,7 +156,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @exception UnrecoverableKeyException
      *            if the key cannot be recovered. */
     @Override
-    public java.security.Key engineGetKey(String alias, char[] password) throws NoSuchAlgorithmException, UnrecoverableKeyException {
+    public final java.security.Key engineGetKey(String alias, char[] password) throws NoSuchAlgorithmException, UnrecoverableKeyException {
         throw new UnsupportedOperationException();
     }
 
@@ -163,8 +169,10 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *         (i.e., the given alias identifies either a <i>trusted certificate
      *         entry</i> or a <i>key entry</i> without a certificate chain). */
     @Override
-    public Certificate[] engineGetCertificateChain(String alias) {
-        if (alias == null) return null;
+    public final Certificate[] engineGetCertificateChain(String alias) {
+        if (alias == null) {
+            return null;
+        }
 
         for (KeyEntry entry : entries) {
             if (alias.equals(entry.getAlias())) {
@@ -186,8 +194,10 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return the certificate, or null if the given alias does not exist or
      *         does not contain a certificate. */
     @Override
-    public Certificate engineGetCertificate(String alias) {
-        if (alias == null) return null;
+    public final Certificate engineGetCertificate(String alias) {
+        if (alias == null) {
+            return null;
+        }
         java.lang.reflect.Method getAlias = null;
         java.lang.reflect.Method getCertificateChain = null;
         for (Object o : entries) {
@@ -223,8 +233,10 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return the creation date of this entry, or null if the given alias does
      *         not exist */
     @Override
-    public Date engineGetCreationDate(String alias) {
-        if (alias == null) return null;
+    public final Date engineGetCreationDate(String alias) {
+        if (alias == null) {
+            return null;
+        }
         return new Date();
     }
 
@@ -253,7 +265,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            protected, or if compatibility mode is disabled and <code>password</code> is non-null, or if this operation
      *            fails for some other reason. */
     @Override
-    public void engineSetKeyEntry(String alias, java.security.Key key, char[] password, Certificate[] chain) throws KeyStoreException {
+    public final void engineSetKeyEntry(String alias, java.security.Key key, char[] password, Certificate[] chain) throws KeyStoreException {
         throw new UnsupportedOperationException();
     }
 
@@ -275,7 +287,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @exception KeyStoreException
      *            if this operation fails. */
     @Override
-    public void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain) throws KeyStoreException {
+    public final void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain) throws KeyStoreException {
         throw new UnsupportedOperationException("Cannot assign the encoded key to the given alias.");
     }
 
@@ -292,7 +304,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            <i>trusted certificate entry</i>, or this operation fails
      *            for some other reason. */
     @Override
-    public void engineSetCertificateEntry(String alias, Certificate cert) throws KeyStoreException {
+    public final void engineSetCertificateEntry(String alias, Certificate cert) throws KeyStoreException {
         throw new UnsupportedOperationException();
     }
 
@@ -302,32 +314,31 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @exception KeyStoreException
      *            if the entry cannot be removed. */
     @Override
-    public void engineDeleteEntry(String alias) throws KeyStoreException {
+    public final void engineDeleteEntry(String alias) throws KeyStoreException {
         throw new UnsupportedOperationException();
     }
 
     /** Lists all the alias names of this keystore.
      * @return enumeration of the alias names */
     @Override
-    @SuppressWarnings("unchecked")
-    public Enumeration engineAliases() {
+    public final Enumeration<String> engineAliases() {
 
-        final Iterator iter = entries.iterator();
+        final Iterator<KeyEntry> iter = entries.iterator();
 
-        return new Enumeration() {
+        return new Enumeration<String>() {
             public boolean hasMoreElements() {
                 return iter.hasNext();
             }
 
-            public Object nextElement() {
-                Object o = iter.next();
-                for (java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
+            public String nextElement() {
+                final Object o = iter.next();
+                for (final java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
                     if (m.getName().equals("getAlias")) {
                         m.setAccessible(true);
                         try {
-                            return m.invoke(o, new Object[0]);
+                            return m.invoke(o, new Object[0]).toString();
                         }
-                        catch (Exception e) {
+                        catch (final Exception e) {
                             Logger.getLogger("es.atosorigin").severe("No se ha podido invocar a sunmscapi.dll para obtener los alias: " + e);
                             return null;
                         }
@@ -343,10 +354,12 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *        the alias name
      * @return true if the alias exists, false otherwise */
     @Override
-    public boolean engineContainsAlias(String alias) {
-        for (Enumeration<?> enumerator = engineAliases(); enumerator.hasMoreElements();) {
-            String a = (String) enumerator.nextElement();
-            if (a.equals(alias)) return true;
+    public final boolean engineContainsAlias(String alias) {
+        for (final Enumeration<?> enumerator = engineAliases(); enumerator.hasMoreElements();) {
+            final String a = (String) enumerator.nextElement();
+            if (a.equals(alias)) {
+                return true;
+            }
         }
         return false;
     }
@@ -354,7 +367,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     /** Retrieves the number of entries in this keystore.
      * @return the number of entries in this keystore */
     @Override
-    public int engineSize() {
+    public final int engineSize() {
         return entries.size();
     }
 
@@ -363,7 +376,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return true if the entry identified by the given alias is a <i>key
      *         entry</i>, false otherwise. */
     @Override
-    public boolean engineIsKeyEntry(String alias) {
+    public final boolean engineIsKeyEntry(final String alias) {
         throw new UnsupportedOperationException();
     }
 
@@ -372,7 +385,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return true if the entry identified by the given alias is a <i>trusted
      *         certificate entry</i>, false otherwise. */
     @Override
-    public boolean engineIsCertificateEntry(String alias) {
+    public final boolean engineIsCertificateEntry(final String alias) {
         throw new UnsupportedOperationException();
     }
 
@@ -387,8 +400,8 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return the (alias) name of the first entry with matching certificate, or
      *         null if no such entry exists in this keystore. */
     @Override
-    public String engineGetCertificateAlias(Certificate cert) {
-        for (KeyEntry entry : entries) {
+    public final String engineGetCertificateAlias(final Certificate cert) {
+        for (final KeyEntry entry : entries) {
             if (entry.certChain != null && entry.certChain[0].equals(cert)) {
                 return entry.getAlias();
             }
@@ -411,9 +424,13 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            if compatibility mode is disabled and either parameter is
      *            non-null. */
     @Override
-    public void engineStore(OutputStream stream, char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
-        if (stream != null && !keyStoreCompatibilityMode) throw new IOException("Keystore output stream must be null");
-        if (password != null && !keyStoreCompatibilityMode) throw new IOException("Keystore password must be null");
+    public final void engineStore(OutputStream stream, char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
+        if (stream != null && !keyStoreCompatibilityMode) {
+            throw new IOException("Keystore output stream must be null");
+        }
+        if (password != null && !keyStoreCompatibilityMode) {
+            throw new IOException("Keystore password must be null");
+        }
     }
 
     /** Loads the keystore.
@@ -441,7 +458,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            returned by
      *            this provider's <code>getName</code> method. */
     @Override
-    public void engineLoad(InputStream stream, char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
+    public final void engineLoad(final InputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
         if (stream != null && !keyStoreCompatibilityMode) {
             throw new IOException("Keystore input stream must be null");
         }
@@ -453,7 +470,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         /*
          * Use the same security check as AuthProvider.login
          */
-        SecurityManager sm = System.getSecurityManager();
+        final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new SecurityPermission("authProvider.SunMSCAPI"));
         }
@@ -465,7 +482,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
             // Load keys and/or certificate chains
             loadKeysOrCertificateChains(getName(), entries);
         }
-        catch (KeyStoreException kse) {
+        catch (final KeyStoreException kse) {
             // Wrap the JNI exception in an IOException
             throw new IOException(kse.toString());
         }

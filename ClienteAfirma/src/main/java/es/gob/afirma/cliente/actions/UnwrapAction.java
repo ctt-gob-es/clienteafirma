@@ -15,10 +15,10 @@ import es.gob.afirma.exceptions.AOInvalidRecipientException;
 public final class UnwrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
 
     /** Manejador de ensobrado. */
-    private EnveloperManager enveloperManager;
+    private final EnveloperManager enveloperManager;
 
     /** Envoltorio que se desea desensobrar. */
-    private byte[] envelop;
+    private final byte[] envelop;
 
     /** Construye la operaci&oacute;n de desensobrado de datos. Si se indica un
      * sobre, se ensobrara este; si no se indica se tomar&aacute; el configurado
@@ -28,14 +28,14 @@ public final class UnwrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
      * @param envelop
      *        Sobre que se desea desensobrar, {@code null} si se desean
      *        tomar los del manejador. */
-    public UnwrapAction(EnveloperManager enveloperManager, byte[] envelop) {
+    public UnwrapAction(final EnveloperManager enveloperManager, final byte[] envelop) {
 
         if (enveloperManager == null) {
             throw new NullPointerException();
         }
 
         this.enveloperManager = enveloperManager;
-        this.envelop = envelop;
+        this.envelop = envelop.clone();
     }
 
     public Boolean run() {

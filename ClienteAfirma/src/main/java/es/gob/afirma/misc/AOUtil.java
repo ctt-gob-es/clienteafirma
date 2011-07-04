@@ -57,11 +57,15 @@ public final class AOUtil {
      *         cuando ocurre cualquier problema creando la URI */
     public final static URI createURI(String filename) throws AOException {
 
-        if (filename == null) throw new AOException("No se puede crear una URI a partir de un nulo");
+        if (filename == null) {
+            throw new AOException("No se puede crear una URI a partir de un nulo");
+        }
 
         filename = filename.trim();
 
-        if ("".equals(filename)) throw new AOException("La URI no puede ser una cadena vacia");
+        if ("".equals(filename)) {
+            throw new AOException("La URI no puede ser una cadena vacia");
+        }
 
         // Cambiamos los caracteres Windows
         filename = filename.replace('\\', '/');
@@ -92,8 +96,11 @@ public final class AOUtil {
 
         // Comprobamos si es un esquema soportado
         final String scheme = uri.getScheme();
-        for (int i = 0; i < SUPPORTED_URI_SCHEMES.length; i++)
-            if (SUPPORTED_URI_SCHEMES[i].equals(scheme)) return uri;
+        for (int i = 0; i < SUPPORTED_URI_SCHEMES.length; i++) {
+            if (SUPPORTED_URI_SCHEMES[i].equals(scheme)) {
+                return uri;
+            }
+        }
 
         // Si el esquema es nulo, aun puede ser un nombre de fichero valido
         // El caracter '#' debe protegerse en rutas locales
@@ -135,7 +142,9 @@ public final class AOUtil {
         // nuevos
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
 
-        if (uri == null) throw new NullPointerException("Se ha pedido el contenido de una URI nula");
+        if (uri == null) {
+            throw new NullPointerException("Se ha pedido el contenido de una URI nula");
+        }
 
         javax.swing.ProgressMonitor pm = null;
 
@@ -145,11 +154,15 @@ public final class AOUtil {
             try {
                 // Retiramos el "file://" de la uri
                 String path = uri.getSchemeSpecificPart();
-                if (path.startsWith("//")) path = path.substring(2);
+                if (path.startsWith("//")) {
+                    path = path.substring(2);
+                }
                 // Cuidado, el ProgressMonitor no se entera del tamano de los
                 // ficheros grandes:
                 // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6445283
-                if (waitDialog) return new ProgressMonitorInputStream(c, "Leyendo " + path, new FileInputStream(new File(path)));
+                if (waitDialog) {
+                    return new ProgressMonitorInputStream(c, "Leyendo " + path, new FileInputStream(new File(path)));
+                }
 
                 return new FileInputStream(new File(path));
             }
@@ -184,7 +197,9 @@ public final class AOUtil {
             else tmpStream = new BufferedInputStream(uri.toURL().openStream());
         }
         catch (final Exception e) {
-            if (pm != null) pm.close();
+            if (pm != null) {
+                pm.close();
+            }
             throw new AOException("Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL", e);
         }
         // Las firmas via URL fallan en la descarga por temas de Sun, asi que
@@ -195,13 +210,17 @@ public final class AOUtil {
             tmpBuffer = getDataFromInputStream(tmpStream);
         }
         catch (final Exception e) {
-            if (pm != null) pm.close();
+            if (pm != null) {
+                pm.close();
+            }
             throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "'", e);
         }
 
         // Hay que cerrar el ProgressMonitor a mano:
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4174850
-        if (pm != null) pm.close();
+        if (pm != null) {
+            pm.close();
+        }
 
         // Logger.getLogger("es.gob.afirma").info(
         // "Leido fichero de " + tmpBuffer.length + " bytes:\n" + new
@@ -256,7 +275,9 @@ public final class AOUtil {
      * @throws IOException
      *         Cuando ocurre un problema durante la lectura */
     public final static byte[] getDataFromInputStream(final InputStream input) throws IOException {
-        if (input == null) return new byte[0];
+        if (input == null) {
+            return new byte[0];
+        }
         int nBytes = 0;
         byte[] buffer = new byte[4096];
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -269,7 +290,9 @@ public final class AOUtil {
     /** Obtiene el directorio principal del sistema operativo del sistema.
      * @return Directorio principal del sistema operativo */
     private final static String getSystemRoot() {
-        if (!Platform.getOS().equals(Platform.OS.WINDOWS)) return File.separator;
+        if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
+            return File.separator;
+        }
         String systemRoot = null;
         final String defaultSystemRoot = "C:\\WINDOWS";
         try {
@@ -285,7 +308,9 @@ public final class AOUtil {
         }
         if (systemRoot == null) {
             final File winSys32 = new File(defaultSystemRoot + "\\SYSTEM32");
-            if (winSys32.exists() && winSys32.isDirectory()) return defaultSystemRoot;
+            if (winSys32.exists() && winSys32.isDirectory()) {
+                return defaultSystemRoot;
+            }
         }
         if (systemRoot == null) {
             Logger.getLogger("es.gob.afirma")
@@ -306,7 +331,9 @@ public final class AOUtil {
                       .warning("No se ha podido determinar el directorio de Windows accediendo al registro, " + "se establecera 'C:\\WINDOWS\\' por defecto");
                 systemRoot = "c:\\windows\\";
             }
-            if (!systemRoot.endsWith("\\")) systemRoot += "\\";
+            if (!systemRoot.endsWith("\\")) {
+                systemRoot += "\\";
+            }
             return systemRoot + "System32";
         }
         return "/usr/lib";
@@ -320,7 +347,9 @@ public final class AOUtil {
      * @return Nombre com&uacute;n (Common Name, CN) del titular de un
      *         certificado X.509 */
     public final static String getCN(final X509Certificate c) {
-        if (c == null) return null;
+        if (c == null) {
+            return null;
+        }
         return getCN(c.getSubjectDN().toString());
     }
 
@@ -332,8 +361,10 @@ public final class AOUtil {
      * @return Nombre com&uacute;n (Common Name, CN) de un <i>Principal</i>
      *         X.400 */
     public final static String getCN(final String principal) {
-        if (principal == null) return null;
-        List<Rdn> rdns;
+        if (principal == null) {
+            return null;
+        }
+        final List<Rdn> rdns;
         try {
             rdns = new LdapName(principal).getRdns();
         }
@@ -372,7 +403,7 @@ public final class AOUtil {
      * A&ntilde;adimos el car&aacute;cter &tilde; porque en ciertas
      * codificaciones de Base64 est&aacute; aceptado, aunque no es nada
      * recomendable */
-    private static final String base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\n+/0123456789\r~";
+    private static final String BASE_64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\n+/0123456789\r~";
 
     /** @param data
      *        Datos a comprobar si podr6iacute;an o no ser Base64
@@ -385,17 +416,20 @@ public final class AOUtil {
         // if (!new String(data).endsWith("=")) return false;
 
         // Comprobamos que la cadena tenga una longitud multiplo de 4 caracteres
-        String b64String = new String(data).trim();
+        final String b64String = new String(data).trim();
         if (b64String.replace("\r\n", "").replace("\n", "").length() % 4 != 0) {
             return false;
         }
 
         // Comprobamos que todos los caracteres de la cadena pertenezcan al
         // alfabeto base 64
-        for (byte b : data)
-            if (!base64Alphabet.contains(new String(new byte[] {
+        for (final byte b : data) {
+            if (!BASE_64_ALPHABET.contains(new String(new byte[] {
                 b
-            }))) return false;
+            }))) { 
+                return false;
+            }
+        }
         return true;
     }
 
@@ -415,17 +449,23 @@ public final class AOUtil {
      *        gui&oacute;n y en l&iacute;neas de 16
      * @return Representaci&oacute;n textual del vector de octetos de entrada */
     public final static String hexify(byte abyte0[], boolean separator) {
-        if (abyte0 == null) return "null";
+        if (abyte0 == null) {
+            return "null";
+        }
 
         final StringBuffer stringbuffer = new StringBuffer(256);
         int i = 0;
         for (int j = 0; j < abyte0.length; j++) {
-            if (separator && i > 0) stringbuffer.append('-');
+            if (separator && i > 0) {
+                stringbuffer.append('-');
+            }
             stringbuffer.append(HEX_CHARS[abyte0[j] >> 4 & 0xf]);
             stringbuffer.append(HEX_CHARS[abyte0[j] & 0xf]);
             ++i;
             if (i == 16) {
-                if (separator && j < abyte0.length - 1) stringbuffer.append('\n');
+                if (separator && j < abyte0.length - 1) {
+                    stringbuffer.append('\n');
+                }
                 i = 0;
             }
         }
@@ -442,11 +482,15 @@ public final class AOUtil {
      *        gui&oacute;n y en l&iacute;neas de 16
      * @return Representaci&oacute;n textual del vector de octetos de entrada */
     public static final String hexify(final byte abyte0[], final String separator) {
-        if (abyte0 == null) return "null";
+        if (abyte0 == null) {
+            return "null";
+        }
 
         final StringBuffer stringbuffer = new StringBuffer(256);
         for (int j = 0; j < abyte0.length; j++) {
-            if (separator != null && j > 0) stringbuffer.append(separator);
+            if (separator != null && j > 0) {
+                stringbuffer.append(separator);
+            }
             stringbuffer.append(HEX_CHARS[abyte0[j] >> 4 & 0xf]);
             stringbuffer.append(HEX_CHARS[abyte0[j] & 0xf]);
         }
@@ -470,7 +514,9 @@ public final class AOUtil {
     public final static String getDigestAlgorithm(final String signatureAlgorithm) {
 
         final int withPos = signatureAlgorithm.indexOf("with");
-        if (withPos == -1) return null;
+        if (withPos == -1) {
+            return null;
+        }
 
         String digestAlg = signatureAlgorithm.substring(0, withPos);
         if (digestAlg.startsWith("SHA")) {
@@ -543,14 +589,18 @@ public final class AOUtil {
             return null;
         }
 
-        if (linePrefx == null) linePrefx = "";
-        if (identationString == null) identationString = "\t";
+        if (linePrefx == null) {
+            linePrefx = "";
+        }
+        if (identationString == null) {
+            identationString = "\t";
+        }
 
-        StringBuilder buffer = new StringBuilder();
+        final StringBuilder buffer = new StringBuilder();
 
         // Transformamos en cadenas de texto cada rama que surja del nodo raiz
         // del arbol
-        TreeNode root = (TreeNode) tree.getRoot();
+        final TreeNode root = (TreeNode) tree.getRoot();
         for (int i = 0; i < root.getChildCount(); i++) {
             archiveTreeNode(root.getChildAt(i), 0, linePrefx, identationString, buffer);
         }
@@ -633,7 +683,9 @@ public final class AOUtil {
      * @return Devuelve <code>true</code> si la operac&oacute;n finaliza
      *         correctamente, <code>false</code> en caso contrario. */
     public static boolean copyFile(final File source, final File dest) {
-        if (source == null || dest == null) return false;
+        if (source == null || dest == null) {
+            return false;
+        }
         try {
             final FileInputStream is = new FileInputStream(source);
             final FileOutputStream os = new FileOutputStream(dest);
@@ -694,12 +746,20 @@ public final class AOUtil {
         int i = 0;
         int j = 0;
         while (i != text.length() && (j = text.indexOf(sp, i)) != -1) {
-            if (i == j) parts.add("");
-            else parts.add(text.substring(i, j));
+            if (i == j) {
+                parts.add("");
+            }
+            else {
+                parts.add(text.substring(i, j));
+            }
             i = j + sp.length();
         }
-        if (i == text.length()) parts.add("");
-        else parts.add(text.substring(i));
+        if (i == text.length()) {
+            parts.add("");
+        }
+        else {
+            parts.add(text.substring(i));
+        }
 
         return parts.toArray(new String[0]);
     }

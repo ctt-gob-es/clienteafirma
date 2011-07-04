@@ -60,16 +60,22 @@ public class OOXMLURIDereferencer implements URIDereferencer {
 
     private final URIDereferencer baseUriDereferencer;
 
-    public OOXMLURIDereferencer(byte[] ooxml) {
-        if (null == ooxml) throw new IllegalArgumentException("ooxml is null");
+    public OOXMLURIDereferencer(final byte[] ooxml) {
+        if (null == ooxml) {
+            throw new IllegalArgumentException("ooxml is null");
+        }
         this.baseUriDereferencer = XMLSignatureFactory.getInstance().getURIDereferencer();
-        this.ooxml = ooxml;
+        this.ooxml = ooxml.clone();
     }
 
-    public Data dereference(URIReference uriReference, XMLCryptoContext context) throws URIReferenceException {
+    public Data dereference(final URIReference uriReference, final XMLCryptoContext context) throws URIReferenceException {
 
-        if (null == uriReference) throw new NullPointerException("URIReference cannot be null");
-        if (null == context) throw new NullPointerException("XMLCrytoContext cannot be null");
+        if (null == uriReference) {
+            throw new NullPointerException("URIReference cannot be null");
+        }
+        if (null == context) {
+            throw new NullPointerException("XMLCrytoContext cannot be null");
+        }
 
         String uri = uriReference.getURI();
         try {
@@ -80,7 +86,7 @@ public class OOXMLURIDereferencer implements URIDereferencer {
         }
 
         try {
-            InputStream dataInputStream = findDataInputStream(uri);
+            final InputStream dataInputStream = findDataInputStream(uri);
             if (null == dataInputStream) {
                 return this.baseUriDereferencer.dereference(uriReference, context);
             }
@@ -91,7 +97,7 @@ public class OOXMLURIDereferencer implements URIDereferencer {
         }
     }
 
-    private InputStream findDataInputStream(String uri) throws IOException {
+    private InputStream findDataInputStream(final String uri) throws IOException {
         String entryName;
         if (uri.startsWith("/")) {
             entryName = uri.substring(1); // remove '/'
@@ -103,7 +109,7 @@ public class OOXMLURIDereferencer implements URIDereferencer {
             entryName = entryName.substring(0, entryName.indexOf("?"));
         }
 
-        ZipInputStream ooxmlZipInputStream = new ZipInputStream(new ByteArrayInputStream(ooxml));
+        final ZipInputStream ooxmlZipInputStream = new ZipInputStream(new ByteArrayInputStream(ooxml));
         ZipEntry zipEntry;
         while (null != (zipEntry = ooxmlZipInputStream.getNextEntry())) {
             if (zipEntry.getName().equals(entryName)) {

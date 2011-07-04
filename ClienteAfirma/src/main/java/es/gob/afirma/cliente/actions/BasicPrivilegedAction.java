@@ -33,7 +33,7 @@ public abstract class BasicPrivilegedAction<T, U> implements PrivilegedAction<T>
     /** Establece el resultado de la operaci&oacute;n.
      * @param result
      *        Resultado de la operaci&oacute;n. */
-    protected void setResult(U result) {
+    protected void setResult(final U result) {
         this.result = result;
     }
 
@@ -54,7 +54,7 @@ public abstract class BasicPrivilegedAction<T, U> implements PrivilegedAction<T>
      * entender&aacute;a que no ocurri&oacute; ning&uacute;n error.
      * @param errorMsg
      *        Mensaje de error. */
-    protected void setError(String errorMsg) {
+    protected void setError(final String errorMsg) {
         this.errorMsg = errorMsg;
     }
 
@@ -65,7 +65,7 @@ public abstract class BasicPrivilegedAction<T, U> implements PrivilegedAction<T>
      *        Mensaje de error.
      * @param e
      *        Excepci&oacute;n que caus&oacute; el error. */
-    protected void setError(String errorMsg, Exception e) {
+    protected void setError(final String errorMsg, final Exception e) {
         this.errorMsg = errorMsg;
         this.exception = e;
     }

@@ -26,7 +26,7 @@ public final class SHA2AltNamesProvider extends Provider {
     public SHA2AltNamesProvider() {
         super("AOSHA2AltNamesProvider", 1.0, "Proveedor para huellas digitales SHA-2 con nombres alternativos");
 
-        final Map map = (System.getSecurityManager() == null) ? (Map) this : new LinkedHashMap();
+        final Map map = (System.getSecurityManager() == null) ? (Map) this : new LinkedHashMap<String, String>();
 
         map.put("MessageDigest.SHA256", "sun.security.provider.SHA2");
         map.put("MessageDigest.SHA384", "sun.security.provider.SHA5$SHA384");
