@@ -113,7 +113,7 @@ public final class ValidateBinarySignature {
         final String BC = BouncyCastleProvider.PROVIDER_NAME;
         
         CMSSignedData s = new CMSSignedData(sign);
-        CertStore certStore = s.getCertificatesAndCRLs("Collection", BC);
+        CertStore certStore = s.getCertificatesAndCRLs("Collection", BC);  //$NON-NLS-1$
         SignerInformationStore signers = s.getSignerInfos();
         Iterator<?> it = signers.getSigners().iterator();
 
@@ -123,44 +123,49 @@ public final class ValidateBinarySignature {
             X509Certificate cert = (X509Certificate) certIt.next();
 
             if (!signer.verify(cert, BC)) {
-                throw new Exception("Firma no valida");
+                throw new Exception("Firma no valida"); //$NON-NLS-1$
             }
             
             if (data != null) {
                 if (signer.getDigestAlgorithmID() == null) {
-                    throw new CMSException("No se ha podido localizar el algoritmo de huella digital");
+                    throw new CMSException("No se ha podido localizar el algoritmo de huella digital"); //$NON-NLS-1$
                 }
                 
                 String mdAlgorithm;
                 String mdAlgorithmOID = signer.getDigestAlgorithmID().getAlgorithm().toString();
                 if (AlgorithmId.MD2_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "MD2";
-                } else if (AlgorithmId.MD5_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "MD5";
-                } else if (AlgorithmId.SHA_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "SHA1";
-                } else if (AlgorithmId.SHA256_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "SHA256";
-                } else if (AlgorithmId.SHA384_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "SHA384";
-                } else if (AlgorithmId.SHA512_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "SHA512";
+                    mdAlgorithm = "MD2"; //$NON-NLS-1$
+                } 
+                else if (AlgorithmId.MD5_oid.toString().equals(mdAlgorithmOID)) {
+                    mdAlgorithm = "MD5"; //$NON-NLS-1$
+                } 
+                else if (AlgorithmId.SHA_oid.toString().equals(mdAlgorithmOID)) {
+                    mdAlgorithm = "SHA1"; //$NON-NLS-1$
+                } 
+                else if (AlgorithmId.SHA256_oid.toString().equals(mdAlgorithmOID)) {
+                    mdAlgorithm = "SHA256"; //$NON-NLS-1$
+                } 
+                else if (AlgorithmId.SHA384_oid.toString().equals(mdAlgorithmOID)) {
+                    mdAlgorithm = "SHA384"; //$NON-NLS-1$
+                } 
+                else if (AlgorithmId.SHA512_oid.toString().equals(mdAlgorithmOID)) {
+                    mdAlgorithm = "SHA512"; //$NON-NLS-1$
                 } else {
-                    throw new NoSuchAlgorithmException("Algoritmo de huella digital no reconocido");
+                    throw new NoSuchAlgorithmException("Algoritmo de huella digital no reconocido"); //$NON-NLS-1$
                 }
                 
                 if (!MessageDigest.isEqual(MessageDigest.getInstance(mdAlgorithm).digest(data),
                         signer.getContentDigest())) {
-                    throw new NoMatchDataException("Los datos introducidos no coinciden con los firmados");
+                    throw new NoMatchDataException("Los datos introducidos no coinciden con los firmados"); //$NON-NLS-1$
                 }
             }
         }
 
-        if (certStore.getCertificates(null).size() != s.getCertificates("Collection", BC).getMatches(null).size()) {
-            throw new CertStoreException("Error en la estructura de certificados de la firma"); 
+        if (certStore.getCertificates(null).size() != s.getCertificates("Collection", BC).getMatches(null).size()) { //$NON-NLS-1$
+            throw new CertStoreException("Error en la estructura de certificados de la firma");  //$NON-NLS-1$
         }
-        if (certStore.getCRLs(null).size() != s.getCRLs("Collection", BC).getMatches(null).size()) {
-            throw new CRLException("Error en la estructura de CRLs de la firma");
+        if (certStore.getCRLs(null).size() != s.getCRLs("Collection", BC).getMatches(null).size()) { //$NON-NLS-1$
+            throw new CRLException("Error en la estructura de CRLs de la firma"); //$NON-NLS-1$
         }
     }
 

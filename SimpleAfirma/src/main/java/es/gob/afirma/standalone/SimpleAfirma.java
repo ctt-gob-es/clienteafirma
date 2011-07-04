@@ -84,10 +84,20 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * <i>Look&Field</i>. */
     public SimpleAfirma() {
         setLookAndFeel();
+        this.mainMenu = new MainMenu(this.window, this);
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            try {
+                com.apple.eawt.Application.getApplication().setDefaultMenuBar(this.mainMenu);
+            }
+            catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                this.window.setJMenuBar(this.mainMenu);
+            }
+        }
     }
 
     private AOKeyStoreManager ksManager;
-    private MainMenu mainMenu;
+    private final MainMenu mainMenu;
 
     /** Indica si el <code>AOKeyStoreManager</code> ha terminado de inicializarse
      * y est&aacute; listo para su uso.
@@ -225,18 +235,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * @param firstTime <code>true</code> si se la primera vez que se carga, <code>en caso contrario</code>
      */
     public void loadMainApp(final boolean firstTime) { 
-        if (this.mainMenu == null) this.mainMenu = new MainMenu(this.window, this);
         if (this.window != null) {
         	this.window.setTitle(Messages.getString("SimpleAfirma.10")); //$NON-NLS-1$
             if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             	this.window.getRootPane().putClientProperty("Window.documentFile", null); //$NON-NLS-1$
-                try {
-                    com.apple.eawt.Application.getApplication().setDefaultMenuBar(this.mainMenu);
-                }
-                catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                    this.window.setJMenuBar(this.mainMenu);
-                }
             }
             else {
                 this.window.setJMenuBar(this.mainMenu);
@@ -534,17 +536,15 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      * @param args
      *        Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
-        
-        boolean executeVisor = false;
         if (args != null && args.length > 0) {
             File signFile = new File(args[0]);
-            if (signFile.exists() && signFile.isFile()) {
-                executeVisor = true;
+            if (signFile.exists() && signFile.isFile() && signFile.canRead()) {
+                VisorFirma visor = new VisorFirma(new File(args[0]));
+                visor.initialize(false, null);
             }
-        }
-        if (executeVisor) {
-            VisorFirma visor = new VisorFirma(new File(args[0]));
-            visor.initialize(false, null);
+            else {
+                System.out.println(Messages.getString("SimpleAfirma.2")); //$NON-NLS-1$
+            }
         }
         else {
             new SimpleAfirma().initialize(false);

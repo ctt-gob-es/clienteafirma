@@ -69,7 +69,7 @@ public final class VisorPanel extends JPanel {
     private void openSign(final File signFile, byte[] sign) {
 
         if (signFile == null && sign == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se ha intentado abrir una firma nula");
+            Logger.getLogger("es.gob.afirma").warning("Se ha intentado abrir una firma nula");  //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
                 
@@ -79,8 +79,9 @@ public final class VisorPanel extends JPanel {
                     FileInputStream fis = new FileInputStream(signFile);
                     sign = AOUtil.getDataFromInputStream(fis);
                     try { fis.close(); } catch (Exception e) { }
-                } catch (Exception e) {
-                    Logger.getLogger("No se ha podido cargar el fichero de firma: " + e);
+                } 
+                catch (final Exception e) {
+                    Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
         }

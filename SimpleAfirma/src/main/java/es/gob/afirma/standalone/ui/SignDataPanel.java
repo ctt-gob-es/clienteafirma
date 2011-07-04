@@ -96,7 +96,7 @@ final class SignDataPanel extends JPanel {
         filePath.setBackground(SimpleAfirma.WINDOW_COLOR);
         filePath.setEditable(false);
         filePath.setCursor(new Cursor(Cursor.TEXT_CURSOR));
-        filePath.setText(signFile == null ? "Datos en memoria" : signFile.getAbsolutePath());
+        filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
         filePath.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(final MouseEvent me) {
@@ -331,19 +331,18 @@ final class SignDataPanel extends JPanel {
             Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido"); //$NON-NLS-1$ //$NON-NLS-2$
             throw new IllegalArgumentException("Formato de firma no reconocido"); //$NON-NLS-1$ 
         } 
-        else {
-            try {
-                signInfo.setSignInfo(signer.getSignInfo(signData));
-            } 
-            catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-            signInfo.setSignsTree(signer.getSignersStructure(signData, true));
-            try {
-                signInfo.setData(signer.getData(signData));
-            } catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$//$NON-NLS-2$
-            }
+        try {
+            signInfo.setSignInfo(signer.getSignInfo(signData));
+        } 
+        catch (final Exception e) {
+            Logger.getLogger("es.gob.afirma").warning("Error al leer la informacion de la firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        signInfo.setSignsTree(signer.getSignersStructure(signData, true));
+        try {
+            signInfo.setData(signer.getData(signData));
+        } 
+        catch (final Exception e) {
+            Logger.getLogger("es.gob.afirma").warning("Error al extraer los datos firmados: " + e);  //$NON-NLS-1$//$NON-NLS-2$
         }
         return signInfo;
     }

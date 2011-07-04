@@ -35,9 +35,9 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
     private JPanel currentPanel;
     
     /** Fichero de firma. */
-    private File signFile = null;
+    private File signFile;
     
-    public VisorFirma(File signFile) {
+    public VisorFirma(final File signFile) {
         this.signFile = signFile;
         this.setLookAndFeel();
     }
@@ -100,10 +100,10 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
         }
     }
     
-    public void initialize(final boolean asApplet, final File signFile) {
+    public void initialize(final boolean asApplet, final File sigFile) {
 
-        if (signFile != null) {
-            this.signFile = signFile;
+        if (sigFile != null) {
+            this.signFile = sigFile;
         }
         
         // Cargamos las preferencias establecidas
@@ -122,7 +122,7 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
             }
             
             this.window = (JFrame) this.container;
-            this.window.setTitle("Visor de firmas");
+            this.window.setTitle(Messages.getString("VisorFirma.0"));  //$NON-NLS-1$
         }
     }
     
@@ -197,16 +197,18 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
      *        C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
      *        indica error y cero indica salida normal */
     public void closeApplication(final int exitCode) {
-        if (this.window != null) this.window.dispose();
+        if (this.window != null) {
+            this.window.dispose();
+        }
         System.exit(exitCode);
     }
     
     @Override
-    public void actionPerformed(ActionEvent e) {
-        File signFile = FileUIManager.openFile(VisorFirma.this.window, null, null, "Abrir");
-        if (signFile == null)
+    public void actionPerformed(final ActionEvent e) {
+        final File sgFile = FileUIManager.openFile(VisorFirma.this.window, null, null, Messages.getString("VisorFirma.1")); //$NON-NLS-1$
+        if (sgFile == null) {
             return;
-        
-        initialize(VisorFirma.this.container == VisorFirma.this, signFile);
+        }
+        initialize(VisorFirma.this.container == VisorFirma.this, sgFile);
     }
 }

@@ -4,7 +4,7 @@ package es.gob.afirma.signature;
  * Indica si la firma es v&aacute;lida o no.
  * @author Carlos Gamuci
  */
-public class SignValidity {
+public final class SignValidity {
 
     /** Tipo del resultado de la firma. */
     public enum SIGN_DETAIL_TYPE {
@@ -41,17 +41,17 @@ public class SignValidity {
     }
     
     /** Validez de la firma. */
-    private SIGN_DETAIL_TYPE validity = SIGN_DETAIL_TYPE.UNKNOWN;
+    private final SIGN_DETAIL_TYPE validity;
     
     /** Error que invalida la firma o hace que la validez sea desconocida. */
-    private VALIDITY_ERROR error = null;
+    private final VALIDITY_ERROR error;
     
     /**
      * Identifica la validez de una firma.
      * @param type Validez de la firma.
      * @param error Error que invalida o impide comprobar la firma.
      */
-    public SignValidity(SIGN_DETAIL_TYPE type, VALIDITY_ERROR error) {
+    public SignValidity(final SIGN_DETAIL_TYPE type, final VALIDITY_ERROR error) {
         this.validity = type;
         this.error = error;
     }
@@ -61,7 +61,7 @@ public class SignValidity {
      * @return Validez de la firma.
      */
     public SIGN_DETAIL_TYPE getValidity() {
-        return validity;
+        return this.validity;
     }
 
     /**
@@ -69,7 +69,7 @@ public class SignValidity {
      * se devolver&aacute; {@code null}.
      * @return Error que invalida la firma o impide comprobar su validez.
      */
-    public VALIDITY_ERROR getError() {
-        return error;
+    public VALIDITY_ERROR getError() { 
+        return this.error;
     }
 }
