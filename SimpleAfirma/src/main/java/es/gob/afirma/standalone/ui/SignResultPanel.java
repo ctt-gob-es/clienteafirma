@@ -103,9 +103,19 @@ final class SignResultPanel extends JPanel {
                 break;
             case KO:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.5")); //$NON-NLS-1$
-                switch (validity.getError()) {
-                case CORRUPTED_SIGN: errorMessage = Messages.getString("SignResultPanel.14"); break; //$NON-NLS-1$
-                default:
+                if (validity.getError() != null) {
+                    switch (validity.getError()) {
+                    case CORRUPTED_SIGN: errorMessage = Messages.getString("SignResultPanel.14"); break; //$NON-NLS-1$
+                    case CERTIFICATE_EXPIRED: errorMessage = Messages.getString("SignResultPanel.16"); break; //$NON-NLS-1$
+                    case CERTIFICATE_NOT_VALID_YET: errorMessage = Messages.getString("SignResultPanel.17"); break; //$NON-NLS-1$
+                    case CERTIFICATE_PROBLEM: errorMessage = Messages.getString("SignResultPanel.18"); break; //$NON-NLS-1$
+                    case NO_MATCH_DATA: errorMessage = Messages.getString("SignResultPanel.19"); break; //$NON-NLS-1$
+                    case CRL_PROBLEM: errorMessage = Messages.getString("SignResultPanel.20"); break; //$NON-NLS-1$
+                    case ALGORITHM_NOT_SUPPORTED: errorMessage = Messages.getString("SignResultPanel.17"); break; //$NON-NLS-1$
+                    default:
+                        errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
+                    }
+                } else {
                     errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 }
                 this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -113,9 +123,13 @@ final class SignResultPanel extends JPanel {
                 break;
             default:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.11")); //$NON-NLS-1$
-                switch (validity.getError()) {
-                case NO_DATA: errorMessage = Messages.getString("SignResultPanel.15"); break; //$NON-NLS-1$
-                default:
+                if (validity.getError() != null) {
+                    switch (validity.getError()) {
+                    case NO_DATA: errorMessage = Messages.getString("SignResultPanel.15"); break; //$NON-NLS-1$
+                    default:
+                        errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
+                    }
+                } else {
                     errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                 }
                 this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$

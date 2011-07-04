@@ -24,8 +24,20 @@ public class SignValidity {
         NO_DATA,
         /** Cuando la informacion contenida en la firma no sea consistente (certificados corruptos,...). */
         CORRUPTED_SIGN,
+        /** Cuando la firma no se corresponda con los datos firmados. */
+        NO_MATCH_DATA,
         /** Cuando no se encuentra la firma dentro del documento. */
-        NO_SIGN
+        NO_SIGN,
+        /** Cuando no se puede extraer un certificado o este no es v&aacute;lido. */
+        CERTIFICATE_PROBLEM,
+        /** Cuando existe un certificado de firma caducado. */
+        CERTIFICATE_EXPIRED,
+        /** Cuando existe un certificado de firma que aun no es v&aacute;lido. */
+        CERTIFICATE_NOT_VALID_YET,
+        /** Cuando la firma contiene un algoritmo no reconocido o no soportado. */
+        ALGORITHM_NOT_SUPPORTED,
+        /** Cuando existe alg&uacute;n problema con las CRLs incrustadas en la firma. */
+        CRL_PROBLEM
     }
     
     /** Validez de la firma. */

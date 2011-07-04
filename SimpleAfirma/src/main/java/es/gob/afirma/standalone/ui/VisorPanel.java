@@ -138,7 +138,7 @@ public final class VisorPanel extends JPanel {
         } else if (DataAnalizerUtil.isXML(sign)) {
             return ValidateXMLSignature.validate(sign);
         } else if(new AOCMSSigner().isSign(sign) || new AOCAdESSigner().isSign(sign)) {
-            return ValidateBinarySignature.validate(sign);
+            return ValidateBinarySignature.validate(sign, null);
         }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
     }

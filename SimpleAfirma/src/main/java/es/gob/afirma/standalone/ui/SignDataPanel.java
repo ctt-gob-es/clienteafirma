@@ -251,8 +251,13 @@ final class SignDataPanel extends JPanel {
         }
 
         // Panel el detalle de la firma
-        final CompleteSignInfo signInfo = this.getSignInfo(sign);
-        final JScrollPane detailPanel = new JScrollPane(this.getSignDataTree(signInfo));
+        CompleteSignInfo signInfo;
+        try {
+            signInfo = this.getSignInfo(sign);
+        } catch (Exception e) {
+            signInfo = null;
+        }
+        final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo));
         // En Apple siempre hay barras, y es el SO el que las pinta o no si hacen o no falta
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             detailPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -318,12 +323,13 @@ final class SignDataPanel extends JPanel {
      * @param signData Firma.
      * @return Informaci&oacute;n de la firma.
      */
-    private CompleteSignInfo getSignInfo(final byte[] signData) {
+    private CompleteSignInfo getSignInfo(final byte[] signData) throws IllegalArgumentException {
         final CompleteSignInfo signInfo = new CompleteSignInfo();
         signInfo.setSignData(signData);
         final AOSigner signer = AOSignerFactory.getSigner(signData);
         if (signer == null) {
             Logger.getLogger("es.gob.afirma").warning("Formato de firma no reconocido"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new IllegalArgumentException("Formato de firma no reconocido"); //$NON-NLS-1$ 
         } 
         else {
             try {
