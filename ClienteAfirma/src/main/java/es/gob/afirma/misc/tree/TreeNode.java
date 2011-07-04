@@ -89,7 +89,7 @@ public final class TreeNode {
             throw new IllegalArgumentException("new child is an ancestor");
         }
 
-        TreeNode oldParent = newChild.getParent();
+        final TreeNode oldParent = newChild.getParent();
 
         if (oldParent != null) {
             oldParent.remove(newChild);
@@ -107,8 +107,8 @@ public final class TreeNode {
      *        the index in this node's child array of the child to remove
      * @exception ArrayIndexOutOfBoundsException
      *            if <code>childIndex</code> is out of bounds */
-    public void remove(int childIndex) {
-        TreeNode child = getChildAt(childIndex);
+    public void remove(final int childIndex) {
+        final TreeNode child = getChildAt(childIndex);
         children.removeElementAt(childIndex);
         child.setParent(null);
     }
@@ -118,7 +118,7 @@ public final class TreeNode {
      * messaged from anywhere else.
      * @param newParent
      *        this node's new parent */
-    public void setParent(TreeNode newParent) {
+    public void setParent(final TreeNode newParent) {
         parent = newParent;
     }
 
@@ -134,7 +134,7 @@ public final class TreeNode {
      * @exception ArrayIndexOutOfBoundsException
      *            if <code>index</code> is out of bounds
      * @return the TreeNode in this node's child array at the specified index */
-    public TreeNode getChildAt(int index) {
+    public TreeNode getChildAt(final int index) {
         if (children == null) {
             throw new ArrayIndexOutOfBoundsException("node has no children");
         }
@@ -144,7 +144,9 @@ public final class TreeNode {
     /** Returns the number of children of this node.
      * @return an int giving the number of children of this node */
     public int getChildCount() {
-        if (children == null) return 0;
+        if (children == null) {
+            return 0;
+        }
         return children.size();
     }
 
@@ -159,7 +161,7 @@ public final class TreeNode {
      * @return an int giving the index of the node in this node's child array,
      *         or <code>-1</code> if the specified node is a not a child of this
      *         node */
-    public int getIndex(TreeNode aChild) {
+    public int getIndex(final TreeNode aChild) {
         if (aChild == null) {
             throw new IllegalArgumentException("argument is null");
         }
@@ -175,7 +177,9 @@ public final class TreeNode {
      * created before the modification.
      * @return an Enumeration of this node's children */
     public Enumeration<TreeNode> children() {
-        if (children == null) return EMPTY_ENUMERATION;
+        if (children == null) {
+            return EMPTY_ENUMERATION;
+        }
         return children.elements();
     }
 
@@ -209,7 +213,7 @@ public final class TreeNode {
     /** Removes the subtree rooted at this node from the tree, giving this node a
      * null parent. Does nothing if this node is the root of its tree. */
     public void removeFromParent() {
-        TreeNode part = getParent();
+        final TreeNode part = getParent();
         if (part != null) {
             part.remove(this);
         }
@@ -222,7 +226,7 @@ public final class TreeNode {
      * @exception IllegalArgumentException
      *            if <code>aChild</code> is null or is not a child of this
      *            node */
-    public void remove(TreeNode aChild) {
+    public void remove(final TreeNode aChild) {
         if (aChild == null) {
             throw new IllegalArgumentException("argument is null");
         }
@@ -243,8 +247,12 @@ public final class TreeNode {
      * @exception IllegalStateException
      *            if this node does not allow children */
     public void add(TreeNode newChild) {
-        if (newChild != null && newChild.getParent() == this) insert(newChild, getChildCount() - 1);
-        else insert(newChild, getChildCount());
+        if (newChild != null && newChild.getParent() == this) {
+            insert(newChild, getChildCount() - 1);
+        }
+        else {
+            insert(newChild, getChildCount());
+        }
     }
 
     //
@@ -261,7 +269,7 @@ public final class TreeNode {
      * @param anotherNode
      *        node to test as an ancestor of this node
      * @return true if this node is a descendant of <code>anotherNode</code> */
-    private boolean isNodeAncestor(TreeNode anotherNode) {
+    private boolean isNodeAncestor(final TreeNode anotherNode) {
         if (anotherNode == null) {
             return false;
         }
@@ -333,7 +341,9 @@ public final class TreeNode {
      * @see #getUserObject */
     @Override
     public String toString() {
-        if (userObject == null) return "null";
+        if (userObject == null) {
+            return "null";
+        }
         return userObject.toString();
     }
 

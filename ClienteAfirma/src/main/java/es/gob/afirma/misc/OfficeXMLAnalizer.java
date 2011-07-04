@@ -105,15 +105,15 @@ public final class OfficeXMLAnalizer {
      * @return MimeType. */
     public static String getMimeType(byte[] zipData) {
 
-        ZipFile zipFile;
+        final ZipFile zipFile;
         try {
             zipFile = AOFileUtils.createTempZipFile(zipData);
         }
-        catch (ZipException e1) {
+        catch (final ZipException e1) {
             Logger.getLogger("es.gob.afirma").warning("El fichero indicado no es un ZIP");
             return null;
         }
-        catch (Exception e1) {
+        catch (final Exception e1) {
             Logger.getLogger("es.gob.afirma").warning("No se pudo leer el fichero, se considerara que es un zip");
             return ZIP_MIMETYPE;
         }
@@ -131,7 +131,7 @@ public final class OfficeXMLAnalizer {
                 mimetype = tempMimetype;
             }
         }
-        catch (Exception e) {}
+        catch (final Exception e) {}
 
         return mimetype;
     }
@@ -143,7 +143,7 @@ public final class OfficeXMLAnalizer {
      * @param zipData
      *        Fichero ODF u OOXML
      * @return Extensi&oacute;n. */
-    public static String getExtension(byte[] zipData) {
+    public static String getExtension(final byte[] zipData) {
         String mimetype = getMimeType(zipData);
         if (mimetype == null) {
             return null;
@@ -157,7 +157,7 @@ public final class OfficeXMLAnalizer {
      *        Fichero a analizar
      * @return Devuelve <code>true</code> si el fichero era un OOXML, <code>false</code> en caso contrario. */
     public static boolean isOOXMLDocument(byte[] document) {
-        ZipFile zipFile;
+        final ZipFile zipFile;
         try {
             zipFile = AOFileUtils.createTempZipFile(document);
         }
@@ -173,7 +173,7 @@ public final class OfficeXMLAnalizer {
      * @param zipFile
      *        Fichero zip que deseamos comprobar.
      * @return Devuelve <code>true</code> si el fichero era un OOXML soportado, <code>false</code> en caso contrario. */
-    private static boolean isOOXMLFile(ZipFile zipFile) {
+    private static boolean isOOXMLFile(final ZipFile zipFile) {
         // Comprobamos si estan todos los ficheros principales del documento
         return zipFile.getEntry("[Content_Types].xml") != null && zipFile.getEntry("_rels/.rels") != null
                && zipFile.getEntry("docProps/app.xml") != null
@@ -188,7 +188,7 @@ public final class OfficeXMLAnalizer {
      *         devuelve {@code null}. */
     public static String getOOXMLMimeType(InputStream contentTypeIs) {
 
-        Document doc = null;
+        final Document doc;
         try {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(contentTypeIs);
         }
@@ -197,7 +197,7 @@ public final class OfficeXMLAnalizer {
         }
 
         // Obtenemos la raiz
-        Element root = doc.getDocumentElement();
+        final Element root = doc.getDocumentElement();
         if (!root.getNodeName().equalsIgnoreCase("Types")) {
             return null;
         }
@@ -235,7 +235,7 @@ public final class OfficeXMLAnalizer {
      *        Fichero a analizar
      * @return Devuelve <code>true</code> si el fichero era un ODF, <code>false</code> en caso contrario. */
     public static boolean isODFDocument(byte[] document) {
-        ZipFile zipFile;
+        final ZipFile zipFile;
         try {
             zipFile = AOFileUtils.createTempZipFile(document);
         }

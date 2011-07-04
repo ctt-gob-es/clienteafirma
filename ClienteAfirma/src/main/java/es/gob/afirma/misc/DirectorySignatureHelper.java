@@ -122,7 +122,9 @@ public class DirectorySignatureHelper {
      * @throws AOUnsupportedSignFormatException
      *         Cuando se indica un formato no soportado. */
     public DirectorySignatureHelper(String algorithm, String format, String mode) throws AOUnsupportedSignFormatException {
-        if (algorithm == null || format == null || mode == null) throw new NullPointerException("No se ha indicado una configuracion de algoritmo de firma valida");
+        if (algorithm == null || format == null || mode == null) {
+            throw new NullPointerException("No se ha indicado una configuracion de algoritmo de firma valida");
+        }
         this.algorithm = algorithm;
         this.format = format;
         this.mode = mode;
@@ -223,7 +225,9 @@ public class DirectorySignatureHelper {
                                X509Certificate cert,
                                Properties config) throws AOException {
 
-        if (config == null || !config.containsKey("format") || !config.containsKey("mode")) throw new NullPointerException("No se ha establecido el formato y modo de firma");
+        if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
+            throw new NullPointerException("No se ha establecido el formato y modo de firma");
+        }
 
         if (startDir == null) {
             Logger.getLogger("es.gob.afirma").warning("No se ha indicado un directorio de inicio, se usara el actual");
@@ -232,19 +236,28 @@ public class DirectorySignatureHelper {
 
         File id = new File(startDir);
         this.inDir = id.getAbsolutePath();
-        if (!id.exists() || !id.isDirectory()) throw new AOException("El directorio de entrada no existe");
-        if (!id.canRead()) throw new AOException("No se tienen permisos de lectura para el directorio de entrada");
-        Vector<String> filenames = new Vector<String>();
-        Vector<File> files = new Vector<File>();
-        for (File file : id.listFiles())
+        if (!id.exists() || !id.isDirectory()) {
+            throw new AOException("El directorio de entrada no existe");
+        }
+        if (!id.canRead()) {
+            throw new AOException("No se tienen permisos de lectura para el directorio de entrada");
+        }
+        final Vector<String> filenames = new Vector<String>();
+        final Vector<File> files = new Vector<File>();
+        for (final File file : id.listFiles()) {
             files.add(file);
+        }
         for (int i = 0; i < files.size(); i++) {
             if (files.get(i).isFile()) {
-                if (this.fileFilter == null) filenames.add(files.get(i).getPath());
-                else if (this.fileFilter.accept(files.get(i))) filenames.add(files.get(i).getAbsolutePath());
+                if (this.fileFilter == null) {
+                    filenames.add(files.get(i).getPath());
+                }
+                else if (this.fileFilter.accept(files.get(i))) {
+                    filenames.add(files.get(i).getAbsolutePath());
+                }
             }
             else if (recurse) {
-                for (File file : files.get(i).listFiles()) {
+                for (final File file : files.get(i).listFiles()) {
                     files.add(file);
                 }
             }
@@ -342,14 +355,20 @@ public class DirectorySignatureHelper {
                                X509Certificate cert,
                                Properties config) throws AOException {
 
-        if (config == null || !config.containsKey("format") || !config.containsKey("mode")) throw new NullPointerException("No se ha establecido el formato y modo de firma");
+        if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
+            throw new NullPointerException("No se ha establecido el formato y modo de firma");
+        }
 
-        Properties signConfig = (Properties) config.clone();
+        final Properties signConfig = (Properties) config.clone();
         signConfig.setProperty("headLess", "true");
 
         // Establecemos la configuracion de firma por defecto si no se indica
-        if (!signConfig.containsKey("mode")) signConfig.setProperty("mode", this.mode);
-        if (!signConfig.containsKey("format")) signConfig.setProperty("format", this.format);
+        if (!signConfig.containsKey("mode")) {
+            signConfig.setProperty("mode", this.mode);
+        }
+        if (!signConfig.containsKey("format")) {
+            signConfig.setProperty("format", this.format);
+        }
 
         // Indica si todas las operaciones se finalizaron correctamente
         boolean allOK = true;
@@ -357,7 +376,9 @@ public class DirectorySignatureHelper {
         // Inicializamos el vector de ficheros firmados
         this.signedFilenames.removeAllElements();
 
-        if (type == null) type = MassiveType.SIGN;
+        if (type == null) {
+            type = MassiveType.SIGN;
+        }
 
         if (filenames == null || filenames.length == 0) {
             Logger.getLogger("es.gob.afirma").warning("No se han proporcionado ficheros para firmar");
@@ -372,10 +393,16 @@ public class DirectorySignatureHelper {
             this.outputDir = ".";
         }
 
-        File od = new File(this.outputDir);
-        if (!od.exists() && createOutDir) od.mkdirs();
-        if (!od.exists() || !od.isDirectory()) throw new AOException("El directorio de salida no existe o existe un fichero con el mismo nombre");
-        if (!od.canWrite()) throw new AOException("No se tienen permisos de escritura en el directorio de salida");
+        final File od = new File(this.outputDir);
+        if (!od.exists() && createOutDir) {
+            od.mkdirs();
+        }
+        if (!od.exists() || !od.isDirectory()) {
+            throw new AOException("El directorio de salida no existe o existe un fichero con el mismo nombre");
+        }
+        if (!od.canWrite()) {
+            throw new AOException("No se tienen permisos de escritura en el directorio de salida");
+        }
 
         // Inicializamos el log de operacion
         if (this.activeLog) {
@@ -383,7 +410,7 @@ public class DirectorySignatureHelper {
         }
 
         // Realizamos la operacion masiva correspondiente
-        File[] files = this.getFiles(filenames);
+        final File[] files = this.getFiles(filenames);
         this.prepareOperation(files.clone());
         if (type == MassiveType.SIGN) {
             allOK = this.massiveSignOperation(files, od, keyEntry, cert, signConfig);
@@ -433,7 +460,9 @@ public class DirectorySignatureHelper {
             throw new NullPointerException("Los hashes a firmar y la clave y el certificado de firma no pueden ser nulos");
         }
 
-        if (config == null || !config.containsKey("format") || !config.containsKey("mode")) throw new NullPointerException("No se ha establecido el formato y modo de firma");
+        if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
+            throw new NullPointerException("No se ha establecido el formato y modo de firma");
+        }
 
         // Comprobamos que no se nos haya introducido un signer de distinto tipo
         if (configuredSigner != null && !configuredSigner.getClass().equals(this.defaultSigner.getClass())) {
@@ -447,11 +476,17 @@ public class DirectorySignatureHelper {
 
         // Establecemos el algoritmo de Hash
         int pos = this.algorithm.indexOf("with");
-        if (pos == -1) throw new AOException("El algoritmo '" + this.algorithm + "' no esta soportado para la firma de hashes");
+        if (pos == -1) {
+            throw new AOException("El algoritmo '" + this.algorithm + "' no esta soportado para la firma de hashes");
+        }
 
         // Configuramos y ejecutamos la operacion
-        if (!signConfig.containsKey("mode")) signConfig.setProperty("mode", this.mode);
-        if (!signConfig.containsKey("format")) signConfig.setProperty("format", this.format);
+        if (!signConfig.containsKey("mode")) {
+            signConfig.setProperty("mode", this.mode);
+        }
+        if (!signConfig.containsKey("format")) {
+            signConfig.setProperty("format", this.format);
+        }
         signConfig.setProperty("precalculatedHashAlgorithm", this.algorithm.substring(0, pos));
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
@@ -671,7 +706,7 @@ public class DirectorySignatureHelper {
         byte[] signedData;
         byte[] originalData;
         AOSigner signer;
-        for (File file : files) {
+        for (final File file : files) {
             try {
                 originalData = AOUtil.getDataFromInputStream(getFileInputStream(file));
             }
@@ -834,7 +869,7 @@ public class DirectorySignatureHelper {
         InputStream fis = null;
         final CounterSignTarget target = (type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.Tree : CounterSignTarget.Leafs);
         AOSigner signer = this.defaultSigner;
-        for (File file : files) {
+        for (final File file : files) {
             if (originalFormat) {
                 try {
                     signer = this.getAppropiatedSigner(file);
@@ -972,7 +1007,7 @@ public class DirectorySignatureHelper {
         }
 
         // Almacenamos el fichero
-        FileOutputStream fos = null;
+        OutputStream fos = null;
         try {
             fos = new FileOutputStream(finalFile);
             fos.write(signData);
@@ -1189,8 +1224,12 @@ public class DirectorySignatureHelper {
                     Logger.getLogger("es.gob.afirma").warning("Se ha pudo insertar una entrada en el log de error: " + e1);
                 }
             }
-            if (typeLog == Level.WARNING) this.warnCount++;
-            if (typeLog == Level.SEVERE) this.errorCount++;
+            if (typeLog == Level.WARNING) {
+                this.warnCount++;
+            }
+            if (typeLog == Level.SEVERE) {
+                this.errorCount++;
+            }
         }
     }
 

@@ -47,38 +47,53 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 
     @Override
     public boolean engineContainsAlias(String alias) {
-        if (alias == null) return false;
-        for (Enumeration<String> e = engineAliases(); e.hasMoreElements();)
-            if (e.nextElement().equals(alias)) return true;
+        if (alias == null) {
+            return false; 
+        }
+        for (final Enumeration<String> e = engineAliases(); e.hasMoreElements();) {
+            if (e.nextElement().equals(alias)) {
+                return true;
+            }
+        }
         return false;
     }
 
     @Override
     public void engineDeleteEntry(String alias) throws KeyStoreException {
-        if (alias == null) return;
+        if (alias == null) {
+            return;
+        }
         certificates.remove(alias);
     }
 
     @Override
     public Certificate engineGetCertificate(String alias) {
-        if (alias == null) return null;
+        if (alias == null) {
+            return null;
+        }
         return certificates.get(alias);
     }
 
     @Override
     public String engineGetCertificateAlias(Certificate cert) {
-        if (!(cert instanceof X509Certificate)) return null;
+        if (!(cert instanceof X509Certificate)) {
+            return null;
+        }
         String tmpAlias;
-        for (Enumeration<String> e = engineAliases(); e.hasMoreElements();) {
+        for (final Enumeration<String> e = engineAliases(); e.hasMoreElements();) {
             tmpAlias = e.nextElement();
-            if (certificates.get(tmpAlias).equals(cert)) return tmpAlias;
+            if (certificates.get(tmpAlias).equals(cert)) {
+                return tmpAlias;
+            }
         }
         return null;
     }
 
     @Override
     public Certificate[] engineGetCertificateChain(String alias) {
-        if (!engineContainsAlias(alias)) return new Certificate[0];
+        if (!engineContainsAlias(alias)) {
+            return new Certificate[0];
+        }
         return new Certificate[] {
             certificates.get(alias)
         };
@@ -91,7 +106,9 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 
     @Override
     public Key engineGetKey(String alias, char[] arg1) throws NoSuchAlgorithmException, UnrecoverableKeyException {
-        if (!engineContainsAlias(alias)) throw new UnrecoverableKeyException("No hay ningun certificado con el alias '" + alias + "'");
+        if (!engineContainsAlias(alias)) {
+            throw new UnrecoverableKeyException("No hay ningun certificado con el alias '" + alias + "'");
+        }
         return engineGetCertificate(alias).getPublicKey();
     }
 
@@ -107,7 +124,9 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
 
     @Override
     public void engineLoad(InputStream is, char[] pwd) throws IOException, NoSuchAlgorithmException, CertificateException {
-        if (is == null) throw new IOException("Se necesitan certificados");
+        if (is == null) {
+            throw new IOException("Se necesitan certificados");
+        }
 
         // Primero leemos todo el Stream en un ByteArray
         byte[] certs = AOUtil.getDataFromInputStream(is);
@@ -115,7 +134,9 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
         // Probamos con la factoría de Sun
         Collection<? extends Certificate> tmpColCerts = null;
         try {
-            if (cf == null) cf = CertificateFactory.getInstance("X.509");
+            if (cf == null) {
+                cf = CertificateFactory.getInstance("X.509");
+            }
             tmpColCerts = cf.generateCertificates(new ByteArrayInputStream(certs));
         }
         catch (Exception e) {
@@ -125,7 +146,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
             return;
         }
         if (tmpColCerts != null) {
-            for (Certificate c : tmpColCerts) {
+            for (final Certificate c : tmpColCerts) {
                 if (!(c instanceof X509Certificate)) {
                     Logger.getLogger("es.gob.afirma").warning("Se ha encontrado un certificado en un formato que no es X.509, se ignorara");
                     continue;
@@ -141,17 +162,19 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
         // Si la coleccion es nula queda la opcion de que haya que pretratar,
         // aun cuando no salto la
         // excepcion...
-        else getCertificatesFromStream(new ByteArrayInputStream(certs));
+        else {
+            getCertificatesFromStream(new ByteArrayInputStream(certs));
+        }
     }
 
     @Override
-    public void engineSetCertificateEntry(String arg0, Certificate arg1) throws KeyStoreException {}
+    public void engineSetCertificateEntry(final String arg0, final Certificate arg1) throws KeyStoreException {}
 
     @Override
-    public void engineSetKeyEntry(String arg0, byte[] arg1, Certificate[] arg2) throws KeyStoreException {}
+    public void engineSetKeyEntry(final String arg0, final byte[] arg1, final Certificate[] arg2) throws KeyStoreException {}
 
     @Override
-    public void engineSetKeyEntry(String arg0, Key arg1, char[] arg2, Certificate[] arg3) throws KeyStoreException {}
+    public void engineSetKeyEntry(final String arg0, final Key arg1, final char[] arg2, final Certificate[] arg3) throws KeyStoreException {}
 
     @Override
     public int engineSize() {
@@ -159,10 +182,10 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     }
 
     @Override
-    public void engineStore(OutputStream arg0, char[] arg1) throws IOException, NoSuchAlgorithmException, CertificateException {}
+    public void engineStore(final OutputStream arg0, final char[] arg1) throws IOException, NoSuchAlgorithmException, CertificateException {}
 
     private void getCertificatesFromStream(InputStream stream) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(stream)));
+        final BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(stream)));
         String strLine;
         String currentAlias = null;
         StringBuilder currentCertificate = null;
@@ -202,7 +225,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
             Logger.getLogger("es.gob.afirma").warning("El certificado es nulo, no se anadira al almacen");
             return;
         }
-        X509Certificate tmpCert;
+        final X509Certificate tmpCert;
         try {
             if (cf == null) cf = CertificateFactory.getInstance("X.509");
             tmpCert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(base64Cert.getBytes()));
@@ -215,7 +238,9 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
             Logger.getLogger("es.gob.afirma").warning("Error generando el certificado, no se anadira al almacen");
             return;
         }
-        if (alias == null || "".equals(alias)) alias = AOUtil.getCN(tmpCert);
+        if (alias == null || "".equals(alias)) {
+            alias = AOUtil.getCN(tmpCert);
+        }
         certificates.put(alias, tmpCert);
     }
 

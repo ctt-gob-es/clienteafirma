@@ -93,11 +93,15 @@ public class AOKeyStoreManager {
         }
         ksType = type;
 
-        if (pssCallBack == null) pssCallBack = new NullPasswordCallback();
+        if (pssCallBack == null) {
+            pssCallBack = new NullPasswordCallback(); 
+        }
 
         if (type == AOConstants.AOKeyStore.SINGLE) {
 
-            if (store == null) throw new AOException("Es necesario proporcionar el fichero X.509 o PKCS#7");
+            if (store == null) {
+                throw new AOException("Es necesario proporcionar el fichero X.509 o PKCS#7");
+            }
 
             final Provider pkcs7Provider = new SingleCertKeyStoreProvider();
             Security.addProvider(pkcs7Provider);
@@ -131,7 +135,9 @@ public class AOKeyStoreManager {
             // Suponemos que el proveedor SunJSSE esta instalado. Hay que tener
             // cuidado con esto
             // si alguna vez se usa JSS, que a veces lo retira
-            if (store == null) throw new AOException("Es necesario proporcionar el fichero KeyStore");
+            if (store == null) {
+                throw new AOException("Es necesario proporcionar el fichero KeyStore");
+            }
 
             try {
                 ks = KeyStore.getInstance(type.getName());
@@ -164,7 +170,9 @@ public class AOKeyStoreManager {
             // cuidado con esto
             // si alguna vez se usa JSS, que a veces lo retira
 
-            if (store == null) throw new AOException("Es necesario proporcionar el fichero PKCS12 / PFX");
+            if (store == null) {
+                throw new AOException("Es necesario proporcionar el fichero PKCS12 / PFX");
+            }
 
             try {
                 ks = KeyStore.getInstance(type.getName());
@@ -343,15 +351,21 @@ public class AOKeyStoreManager {
             // [OPCIONAL]
 
             // Anadimos el proveedor PKCS11 de Sun
-            if (params == null || params.length < 2) throw new AOException("No se puede acceder al KeyStore PKCS#11 si no se especifica la biblioteca");
+            if (params == null || params.length < 2) {
+                throw new AOException("No se puede acceder al KeyStore PKCS#11 si no se especifica la biblioteca");
+            }
             final String p11lib;
-            if (params[0] != null) p11lib = params[0].toString();
+            if (params[0] != null) {
+                p11lib = params[0].toString();
+            }
             else throw new NullPointerException("No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula");
 
             // Numero de lector
             Integer slot = null;
             if (params.length >= 3) {
-                if (params[2] instanceof Integer) slot = (Integer) params[2];
+                if (params[2] instanceof Integer) {
+                    slot = (Integer) params[2];
+                }
             }
 
             // Agregamos un nombre a cada PKCS#11 para asegurarnos de no se
@@ -438,7 +452,9 @@ public class AOKeyStoreManager {
             // de Mozilla / Firefox.
 
             // Anadimos el proveedor PKCS11 de Sun
-            if (params == null || params.length < 2) throw new AOException("No se puede acceder al KeyStore PKCS#11 de NSS si no se especifica el directorio del perfil de " + "usuario y la ubicacion de las bibliotecas");
+            if (params == null || params.length < 2) {
+                throw new AOException("No se puede acceder al KeyStore PKCS#11 de NSS si no se especifica el directorio del perfil de " + "usuario y la ubicacion de las bibliotecas");
+            }
             final String mozillaProfileDir = params[0].toString();
             final String nssLibDir = params[1].toString();
 
@@ -537,9 +553,13 @@ public class AOKeyStoreManager {
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) throws AOCancelledOperationException,
                                                                                                  AOCertificateKeyException {
 
-        if (pssCallback == null) pssCallback = new NullPasswordCallback();
+        if (pssCallback == null) {
+            pssCallback = new NullPasswordCallback();
+        }
 
-        if (ks == null) throw new NullPointerException("Se han pedido claves a un almacen no inicializado");
+        if (ks == null) {
+            throw new NullPointerException("Se han pedido claves a un almacen no inicializado");
+        }
 
         final KeyStore.PrivateKeyEntry keyEntry;
 
@@ -590,7 +610,9 @@ public class AOKeyStoreManager {
      * @return Certificado cuya clave privada es la indicada */
     public X509Certificate getCertificate(final KeyStore.PrivateKeyEntry privateKeyEntry) {
         final Certificate cert = privateKeyEntry.getCertificate();
-        if (cert instanceof X509Certificate) return (X509Certificate) cert;
+        if (cert instanceof X509Certificate) {
+            return (X509Certificate) cert;
+        }
         Logger.getLogger("es.gob.afirma").severe("El certificado solicitado no era de tipo X509Certificate, se devolvera null");
         return null;
     }
@@ -623,7 +645,9 @@ public class AOKeyStoreManager {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null");
             return null;
         }
-        if (cert instanceof X509Certificate) return (X509Certificate) cert;
+        if (cert instanceof X509Certificate) {
+            return (X509Certificate) cert;
+        }
 
         Logger.getLogger("es.gob.afirma").warning("El certificado con alias '" + alias + "' no es de tipo X509Certificate, se devolvera null");
         return null;
@@ -637,11 +661,15 @@ public class AOKeyStoreManager {
      * @return Certificados de la cadena de certificaci&oacute;n. */
     public X509Certificate[] getCertificateChain(final KeyStore.PrivateKeyEntry privateKeyEntry) {
         final Certificate[] certs = privateKeyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) return (X509Certificate[]) certs;
+        if (certs != null && (certs instanceof X509Certificate[])) {
+            return (X509Certificate[]) certs;
+        }
         final Certificate cert = privateKeyEntry.getCertificate();
-        if (cert instanceof X509Certificate) return new X509Certificate[] {
-            (X509Certificate) cert
-        };
+        if (cert instanceof X509Certificate) { 
+            return new X509Certificate[] {
+                                          (X509Certificate) cert
+            };
+        }
         Logger.getLogger("es.gob.afirma").severe("No se ha podido obtener la cadena de certificados, se devolvera una cadena vacia");
         return new X509Certificate[0];
     }
@@ -659,11 +687,15 @@ public class AOKeyStoreManager {
         }
         try {
             final Certificate[] certs = ks.getCertificateChain(alias);
-            if (certs != null && (certs instanceof X509Certificate[])) return (X509Certificate[]) certs;
+            if (certs != null && (certs instanceof X509Certificate[])) {
+                return (X509Certificate[]) certs;
+            }
             final Certificate cert = ks.getCertificate(alias);
-            if (cert instanceof X509Certificate) return new X509Certificate[] {
-                (X509Certificate) cert
-            };
+            if (cert instanceof X509Certificate) { 
+                return new X509Certificate[] {
+                                              (X509Certificate) cert
+                };
+            }
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Error al obtener la cadena de certificados para el alias '" + alias
@@ -680,7 +712,9 @@ public class AOKeyStoreManager {
      * @return Todos los alias encontrados en el almac&eacute;n actual */
     public String[] getAliases() {
 
-        if (ks == null) throw new NullPointerException("Se han pedido los alias de un almacen no inicializado");
+        if (ks == null) {
+            throw new NullPointerException("Se han pedido los alias de un almacen no inicializado");
+        }
 
         Logger.getLogger("es.gob.afirma").info("Solicitando los alias al KeyStore (" + ks.getProvider() + ")");
 
@@ -723,7 +757,7 @@ public class AOKeyStoreManager {
      * @return KeyStore Repositorio de certificados. */
     public static AOKeyStore getKeyStore(final String description) {
         AOKeyStore keystore = null;
-        for (AOKeyStore tempKs : AOKeyStore.values()) {
+        for (final AOKeyStore tempKs : AOKeyStore.values()) {
             if (tempKs.getDescription().equals(description)) {
                 return tempKs;
             }

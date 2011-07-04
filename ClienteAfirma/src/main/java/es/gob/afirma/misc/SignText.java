@@ -49,9 +49,9 @@ import es.gob.afirma.signers.AOCMSSigner;
  * JavaScript en navegadores Mozilla / Firefox. */
 public final class SignText {
 
-    private static final String USER_CANCEL = "error:userCancel";
-    private static final String INTERNAL_ERROR = "error:internalError";
-    private static final String NO_MATCHING_CERT = "error:noMatchingCert";
+    private static final String USER_CANCEL = "error:userCancel"; //$NON-NLS-1$
+    private static final String INTERNAL_ERROR = "error:internalError"; //$NON-NLS-1$
+    private static final String NO_MATCHING_CERT = "error:noMatchingCert"; //$NON-NLS-1$
 
     private final String[] alias;
     private final AOKeyStoreManager kss;
@@ -112,14 +112,14 @@ public final class SignText {
      *        Representation of Distinguished Names</a>. */
     public void signText(final String stringToSign, final String caOption, final String... caNameN) {
 
-        if (stringToSign == null || "".equals(stringToSign)) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha proporcionado un texto para firmar");
+        if (stringToSign == null || "".equals(stringToSign)) { //$NON-NLS-1$
+            Logger.getLogger("es.gob.afirma").warning("No se ha proporcionado un texto para firmar"); //$NON-NLS-1$ //$NON-NLS-2$
             result = INTERNAL_ERROR;
             return;
         }
 
-        if (!("ask".equals(caOption)) && !("auto".equals(caOption))) {
-            Logger.getLogger("es.gob.afirma").severe("Valor incorrecto para caOption, debe ser 'ask' u 'auto': " + caOption);
+        if (!("ask".equals(caOption)) && !("auto".equals(caOption))) { //$NON-NLS-1$ //$NON-NLS-2$
+            Logger.getLogger("es.gob.afirma").severe("Valor incorrecto para caOption, debe ser 'ask' u 'auto': " + caOption); //$NON-NLS-1$ //$NON-NLS-2$
             result = INTERNAL_ERROR;
             return;
         }
@@ -143,27 +143,27 @@ public final class SignText {
                     dn = new LdapName(ca);
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").warning("DN de CA para filtro mal formado ('" + ca + "'), se ignorara: " + e);
+                    Logger.getLogger("es.gob.afirma").warning("DN de CA para filtro mal formado ('" + ca + "'), se ignorara: " + e);  //$NON-NLS-1$ //$NON-NLS-2$  //$NON-NLS-3$
                     continue;
                 }
                 if (dn.getRdns().size() > 0) {
-                    filter.append("(");
+                    filter.append("(");  //$NON-NLS-1$
                     for (int i = 0; i < dn.getRdns().size(); i++) {
                         filter.append(dn.getRdns().get(i).toString());
                         if (i != dn.getRdns().size() - 1) {
-                            filter.append(" & ");
+                            filter.append(" & ");  //$NON-NLS-1$
                         }
                     }
-                    filter.append(")");
+                    filter.append(")");  //$NON-NLS-1$
                 }
 
                 if (j != caNameN.length - 1) {
-                    filter.append(" | ");
+                    filter.append(" | ");  //$NON-NLS-1$
                 }
             }
             issuerFilter = filter.toString();
         }
-        Logger.getLogger("es.gob.afirma").info("Se utilizara el siguiente filtro de emisor: " + issuerFilter);
+        Logger.getLogger("es.gob.afirma").info("Se utilizara el siguiente filtro de emisor: " + issuerFilter);  //$NON-NLS-1$ //$NON-NLS-2$
 
         // Obtenemos la lista de nombres descriptivos de los alias de los
         // certificados
@@ -181,7 +181,7 @@ public final class SignText {
                     );
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error obteniendo los nombres descriptivos de los alias: " + e);
+            Logger.getLogger("es.gob.afirma").severe("Error obteniendo los nombres descriptivos de los alias: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             result = INTERNAL_ERROR;
             return;
         }
@@ -194,7 +194,7 @@ public final class SignText {
         }
 
         // En "auto" seleccionamos automaticamente el primero de la lista
-        if ("auto".equals(caOption)) {
+        if ("auto".equals(caOption)) { //$NON-NLS-1$
             final Hashtable<String, String> tmpHash = new Hashtable<String, String>(1);
             final String key = aliasesByFriendlyName.keys().nextElement();
             tmpHash.put(key, aliasesByFriendlyName.get(key));
@@ -209,15 +209,15 @@ public final class SignText {
 
     private String firmar(final String stringToSign, final PrivateKeyEntry keyEntry, final X509Certificate cert) {
         if (stringToSign == null) {
-            Logger.getLogger("es.gob.afirma").severe("El texto a firmar no puede ser nulo");
+            Logger.getLogger("es.gob.afirma").severe("El texto a firmar no puede ser nulo"); //$NON-NLS-1$ //$NON-NLS-2$
             return INTERNAL_ERROR;
         }
         if (keyEntry == null) {
-            Logger.getLogger("es.gob.afirma").severe("La clave privada de firma no puede ser nula");
+            Logger.getLogger("es.gob.afirma").severe("La clave privada de firma no puede ser nula"); //$NON-NLS-1$ //$NON-NLS-2$
             return NO_MATCHING_CERT;
         }
         if (cert == null) {
-            Logger.getLogger("es.gob.afirma").severe("El certificado de firma no puede ser nulo");
+            Logger.getLogger("es.gob.afirma").severe("El certificado de firma no puede ser nulo"); //$NON-NLS-1$ //$NON-NLS-2$
             return NO_MATCHING_CERT;
         }
         try {
@@ -231,7 +231,7 @@ public final class SignText {
                                              false);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error creando la firma: " + e);
+            Logger.getLogger("es.gob.afirma").severe("Error creando la firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             return INTERNAL_ERROR;
         }
     }
@@ -283,7 +283,7 @@ public final class SignText {
 
         // Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
         // mayusculas y minusculas
-        Object[] finalOrderedAliases = aliasesByFriendlyName.values().toArray();
+        final Object[] finalOrderedAliases = aliasesByFriendlyName.values().toArray();
         Arrays.sort(finalOrderedAliases, new Comparator<Object>() {
             public int compare(final Object o1, final Object o2) {
                 if (o1 == null && o2 == null) {
@@ -341,11 +341,11 @@ public final class SignText {
                 // ********************************************************************
                 final String certName = comboBox.getSelectedItem().toString();
 
-                for (String al : aliasesByFriendlyName.keySet().toArray(new String[aliasesByFriendlyName.size()])) {
+                for (final String al : aliasesByFriendlyName.keySet().toArray(new String[aliasesByFriendlyName.size()])) {
                     if (aliasesByFriendlyName.get(al).equals(certName)) {
                         if (kss != null) {
-                            AOCertVerifier cv = new AOCertVerifier();
-                            for (KeyStore ks : kss.getKeyStores()) {
+                            final AOCertVerifier cv = new AOCertVerifier();
+                            for (final KeyStore ks : kss.getKeyStores()) {
                                 String errorMessage = null;
                                 try {
                                     if (ks.containsAlias(al)) {
@@ -355,30 +355,29 @@ public final class SignText {
                                             }, false);
                                         }
                                         catch (final CertificateExpiredException e) {
-                                            errorMessage = "Puede que el certificado haya caducado. " + Messages.getString("AOUIManager.8") //$NON-NLS-1$
-                                                           + "\r\n" + Messages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                                            errorMessage = "Puede que el certificado haya caducado." + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa."
+                                                           + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?";
                                         }
                                         catch (final CertificateNotYetValidException e) {
-                                            errorMessage = "Puede que el certificado aun no sea v\u00E1lido. " + Messages.getString("AOUIManager.8") //$NON-NLS-1$
-                                                           + "\r\n" + Messages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                                            errorMessage = "Puede que el certificado aun no sea v\u00E1lido." + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa."
+                                                           + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?";
                                         }
                                         catch (final CertPathValidatorException e) {
                                             errorMessage =
-                                                    "No se ha podido validar la cadena de certificaci\u00F3n del certificado.\r\nEs posible que su certificado no tenga correctamente declarada la cadena de\r\ncertificaci\u00F3n o que los certificados de esta no est\u00E1n importados en su almac\u00E9n\r\nde autoridades de confianza." + "\r\n" + Messages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                                                    "No se ha podido validar la cadena de certificaci\u00F3n del certificado." + "\r\n" + "Es posible que su certificado no tenga correctamente declarada la cadena de\r\ncertificaci\u00F3n o que los certificados de esta no est\u00E1n importados en su almac\u00E9n\r\nde autoridades de confianza." + "\r\n" + "Quiz\u00E1s la firma generada no tenga validez legal.\r\n\u00BFDesea continuar con la operaci\u00F3n?";
                                         }
                                         catch (final AOCertificateRevokedException e) {
                                             errorMessage =
-                                                    "Su certificado est\u00E1 revocado.\r\nLas firmas electr\u00F3nicas generadas con \u00E9l no ser\u00E1n v\u00E1lidas.\r\n\u00BFDesea continuar con la operaci\u00F3n?";
+                                                    "Su certificado est\u00E1 revocado.\r\nLas firmas electr\u00F3nicas generadas con \u00E9l no ser\u00E1n v\u00E1lidas." + "\r\n" + "\u00BFDesea continuar con la operaci\u00F3n?";
                                         }
                                         catch (final Exception e) {
-                                            e.printStackTrace();
-                                            errorMessage = Messages.getString("Ocurrio un error durante la validacion del certificado.");
+                                            errorMessage = "Ocurrio un error durante la validacion del certificado";
                                         }
 
                                         if (errorMessage != null) {
-                                            Logger.getLogger("es.gob.afirma").warning(errorMessage);
-                                            if (JOptionPane.showConfirmDialog(parent, cv.getErrorMessage() + Messages.getString("AOUIManager.8"), //$NON-NLS-1$
-                                                                              Messages.getString("AOUIManager.5"), //$NON-NLS-1$
+                                            Logger.getLogger("es.gob.afirma").warning(errorMessage); //$NON-NLS-1$
+                                            if (JOptionPane.showConfirmDialog(parent, cv.getErrorMessage() + "\r\n" + "Se ha usado la hora local de su ordenador, por lo que la comprobaci\u00F3n puede no ser precisa.",
+                                                                              "Advertencia", //$NON-NLS-1$
                                                                               JOptionPane.YES_NO_OPTION,
                                                                               JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
                                                 return;
@@ -388,15 +387,15 @@ public final class SignText {
                                         result = firmar(stringToSign, kss.getKeyEntry(al, passCbk), kss.getCertificate(al));
                                     }
                                 }
-                                catch (Exception e) {}
+                                catch (final Exception e) {}
                             }
                         }
                     }
                 }
 
             }
-            catch (Exception t) {
-                Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma de texto: " + t);
+            catch (final Exception t) {
+                Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma de texto: " + t); //$NON-NLS-1$ //$NON-NLS-2$
                 JOptionPane.showMessageDialog(parent, "Error durante el proceso de firma", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }

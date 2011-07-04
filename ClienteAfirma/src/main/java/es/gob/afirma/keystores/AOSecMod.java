@@ -87,7 +87,9 @@ final class AOSecMod {
         if (modules == null) {
 
             profileDir = profileDir.replace("\\ ", " ");
-            if (!profileDir.endsWith("/")) profileDir = profileDir + "/";
+            if (!profileDir.endsWith("/")) {
+                profileDir = profileDir + "/"; 
+            }
             final File secmod = new File(profileDir + "secmod.db");
             if (!secmod.exists()) {
                 throw new AOException("El directorio del perfil de Mozilla proporcionado no contiene una base de datos de modulos (secmod.db)");
@@ -177,20 +179,28 @@ final class AOSecMod {
      *        b&uacute;squeda
      * @return Ruta completa del fichero encontrado en el PATH o <code>null</code> si no se encontr&oacute; nada */
     private final static String searchPathForFile(final String[] files, final boolean excludeAFirma) {
-        if (files == null || files.length < 1) return null;
+        if (files == null || files.length < 1) {
+            return null;
+        }
 
         // Si existe el primero con el PATH completo lo devolvemos sin mas
-        if (new File(files[0]).exists()) return files[0];
+        if (new File(files[0]).exists()) {
+            return files[0];
+        }
 
         final StringTokenizer st = new StringTokenizer(Platform.getJavaLibraryPath(), File.pathSeparator);
         String libPath;
         while (st.hasMoreTokens()) {
             libPath = st.nextToken();
-            if (!libPath.endsWith(File.separator)) libPath = libPath + File.separator;
+            if (!libPath.endsWith(File.separator)) {
+                libPath = libPath + File.separator;
+            }
             File tmpFile;
-            for (String f : files) {
+            for (final String f : files) {
                 tmpFile = new File(libPath + f);
-                if (tmpFile.exists() && (!tmpFile.isDirectory())) return libPath + f;
+                if (tmpFile.exists() && (!tmpFile.isDirectory())) {
+                    return libPath + f;
+                }
             }
         }
         return null;

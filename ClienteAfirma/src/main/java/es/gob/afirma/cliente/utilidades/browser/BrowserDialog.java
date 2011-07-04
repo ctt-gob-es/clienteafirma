@@ -38,7 +38,7 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
-class BrowserDialog extends JDialog {
+final class BrowserDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
     private boolean firmar = false;
@@ -165,11 +165,13 @@ class BrowserDialog extends JDialog {
         }
     }
 
-    void disableContent(Container cnt) {
+    void disableContent(final Container cnt) {
         int numChildrens = cnt.getComponentCount();
         for (int i = 0; i < numChildrens; i++) {
             Component children = cnt.getComponent(i);
-            if (children instanceof Container) disableContent((Container) children);
+            if (children instanceof Container) {
+                disableContent((Container) children);
+            }
             children.setEnabled(false);
         }
         cnt.setEnabled(false);

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -112,14 +111,14 @@ public final class CMSAuthenticatedEnvelopedData {
      *         firma.
      * @throws NoSuchAlgorithmException
      *         Si no se encuentra un algoritmo v&aacute;lido. */
-    public byte[] genAuthenticatedEnvelopedData(P7ContentSignerParameters parameters,
-                                                String autenticationAlgorithm,
-                                                AOCipherConfig config,
-                                                X509Certificate[] certDest,
-                                                Oid dataType,
-                                                boolean applySigningTime,
-                                                Map<Oid, byte[]> atrib,
-                                                Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+    public byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
+                                                final String autenticationAlgorithm,
+                                                final AOCipherConfig config,
+                                                final X509Certificate[] certDest,
+                                                final Oid dataType,
+                                                final boolean applySigningTime,
+                                                final Map<Oid, byte[]> atrib,
+                                                final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
         final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // 1. ORIGINATORINFO
@@ -132,8 +131,7 @@ public final class CMSAuthenticatedEnvelopedData {
         if (signerCertificateChain.length != 0) {
             // introducimos una lista vacía en los CRL ya que no podemos
             // modificar el codigo de bc.
-            List<DEREncodable> crl = new ArrayList<DEREncodable>();
-            certrevlist = createBerSetFromList(crl);
+            certrevlist = createBerSetFromList(new ArrayList<DEREncodable>());
             origInfo = new OriginatorInfo(certificates, certrevlist);
         }
 
@@ -162,15 +160,8 @@ public final class CMSAuthenticatedEnvelopedData {
 
     private byte[] genPack(final byte[] parte1, final byte[] parte2) {
         final byte[] pack = new byte[parte1.length + parte2.length];
-
-        for (int i = 0; i < parte1.length; i++) {
-            pack[i] = parte1[i];
-        }
-
-        for (int i = 0; i < parte2.length; i++) {
-            pack[i + parte1.length] = parte2[i];
-        }
-
+        System.arraycopy(parte1, 0, pack, 0, parte1.length);
+        System.arraycopy(parte2, 0, pack, parte1.length, parte2.length);
         return pack;
     }
 
