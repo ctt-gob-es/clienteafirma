@@ -19,11 +19,11 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.TransformException;
-import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -75,7 +75,9 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
      *        no se a&ntilde;ade la hoja de estilo) */
     public void addStyleSheetEnvelopingOntoSignature(final Element s, final String sType, final String sEncoding, final String sId) {
         this.styleElement = s;
-        if (sType != null) this.styleType = sType;
+        if (sType != null) {
+            this.styleType = sType;
+        }
         this.styleId = sId;
         this.styleEncoding = sEncoding;
     }
@@ -85,16 +87,19 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
      *        URL del algoritmo de canonicalizaci&oacute;n. Debe estar
      *        soportado en XMLDSig 1.0 &oacute; 1.1 */
     public void setCanonicalizationMethod(final String canMethod) {
-        if (canMethod != null) canonicalizationMethod = canMethod;
+        if (canMethod != null) {
+            canonicalizationMethod = canMethod;
+        }
     }
 
     @Override
     protected KeyInfo newKeyInfo(final X509Certificate certificate, final String keyInfoId) throws KeyException {
-
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
-        final List<Object> x509DataList = new ArrayList<Object>();
-        if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) x509DataList.add(certificate);
-        final List<Object> newList = new ArrayList<Object>();
+        final List<X509Certificate> x509DataList = new ArrayList<X509Certificate>();
+        if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
+            x509DataList.add(certificate);
+        }
+        final List<XMLStructure> newList = new ArrayList<XMLStructure>();
         newList.add(keyInfoFactory.newKeyValue(certificate.getPublicKey()));
         newList.add(keyInfoFactory.newX509Data(x509DataList));
         return keyInfoFactory.newKeyInfo(newList, keyInfoId);
@@ -110,10 +115,11 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
         final List<?> referencesIdList = new ArrayList(refsIdList);
 
-        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace())) xades.setSigningCertificate(certificate);
+        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace())) {
+            xades.setSigningCertificate(certificate);
+        }
 
-        XMLObject xadesObject = marshalXMLSignature(xadesNamespace, signatureIdPrefix, referencesIdList, tsaURL);
-        addXMLObject(xadesObject);
+        addXMLObject(marshalXMLSignature(xadesNamespace, signatureIdPrefix, referencesIdList, tsaURL));
 
         final XMLSignatureFactory fac = getXMLSignatureFactory();
 
@@ -135,36 +141,6 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                                     getSignatureValueId(signatureIdPrefix));
 
         this.signContext = new DOMSignContext(privateKey, baseElement);
-
-        // //*********************************************************************
-        // //************ PARCHE PARA PROBLEMAS JAVA 7
-        // ***************************
-        // //*********************************************************************
-        // String referenceId;
-        // for (Reference reference : documentReferences) {
-        // if (reference.getURI() != null && reference.getURI().length() > 0) {
-        // referenceId = reference.getURI();
-        // if (referenceId.startsWith("#")) {
-        // referenceId = referenceId.substring(referenceId.lastIndexOf('-')+1);
-        // NodeList elementsByTagNameNS =
-        // ((Element)((QualifyingProperties)
-        // xadesObject.getContent().get(0)).getNode()).getElementsByTagNameNS(xadesNamespace,
-        // referenceId);
-        // if (elementsByTagNameNS.getLength() > 0) {
-        // this.signContext.setIdAttributeNS(
-        // (Element)elementsByTagNameNS.item(0),
-        // xadesNamespace,
-        // "Id"
-        // );
-        // }
-        // }
-        // }
-        // }
-        // //*********************************************************************
-        // //************ FIN PARCHE PARA PROBLEMAS JAVA 7
-        // ***********************
-        // //*********************************************************************
-
         this.signContext.putNamespacePrefix(XMLSignature.XMLNS, xades.getXmlSignaturePrefix());
         this.signContext.putNamespacePrefix(xadesNamespace, xades.getXadesPrefix());
 

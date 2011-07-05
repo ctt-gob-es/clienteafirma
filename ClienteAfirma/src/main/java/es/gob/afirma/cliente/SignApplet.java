@@ -57,7 +57,6 @@ import es.gob.afirma.cliente.utilidades.NormalizedNames;
 import es.gob.afirma.cliente.utilidades.browser.Browser;
 import es.gob.afirma.cliente.utilidades.browser.FirmadorWeb.FirmaWeb;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCantSaveDataException;
 import es.gob.afirma.exceptions.AOCertificateException;
 import es.gob.afirma.exceptions.AOCertificateKeyException;
 import es.gob.afirma.exceptions.AOCertificatesNotFoundException;

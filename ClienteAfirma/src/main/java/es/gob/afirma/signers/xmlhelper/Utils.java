@@ -131,7 +131,9 @@ public final class Utils {
     public static Document dereferenceStyleSheet(final String id, final boolean headLess) throws CannotDereferenceException,
                                                                                          IsInnerlException,
                                                                                          ReferenceIsNotXMLException {
-        if (id == null || "".equals(id)) throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (id == null || "".equals(id)) {
+            throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
         byte[] xml = null;
 
@@ -139,7 +141,9 @@ public final class Utils {
         // http://, https:// y file://
         try {
             final URI styleURI = AOUtil.createURI(id);
-            if (styleURI.getScheme().equals("file")) throw new UnsupportedOperationException("No se aceptan dereferenciaciones directas con file://");
+            if (styleURI.getScheme().equals("file")) {
+                throw new UnsupportedOperationException("No se aceptan dereferenciaciones directas con file://");
+            }
             xml = AOUtil.getDataFromInputStream(AOUtil.loadFile(styleURI, null, false));
         }
         catch (final Exception e) {
@@ -153,7 +157,9 @@ public final class Utils {
             final String[] idParts = id.replace(File.separator, "/").split("/"); //$NON-NLS-1$ //$NON-NLS-2$
             final String fileName = idParts[idParts.length - 1];
 
-            if (fileName.startsWith("#")) throw new IsInnerlException(); //$NON-NLS-1$
+            if (fileName.startsWith("#")) {
+                throw new IsInnerlException(); //$NON-NLS-1$
+            }
             else if (id.startsWith("file://")) { //$NON-NLS-1$
                 // Preguntamos al usuario para la dereferenciacion
                 if (JOptionPane.showConfirmDialog(null, Messages.getString("Utils.5"), //$NON-NLS-1$
@@ -165,8 +171,12 @@ public final class Utils {
                     fc.setFileFilter(new FileFilter() {
                         @Override
                         public boolean accept(final File f) {
-                            if (f == null) return false;
-                            if (f.getName().equalsIgnoreCase(fileName)) return true;
+                            if (f == null) {
+                                return false;
+                            }
+                            if (f.getName().equalsIgnoreCase(fileName)) {
+                                return true;
+                            }
                             return false;
                         }
 
@@ -279,9 +289,9 @@ public final class Utils {
      *        Informaci&oacute;n sobre las transformaciones a a&ntilde;adir
      * @param xmlSignaturePrefix
      *        Prefijo XMLDSig */
-    public static void addCustomTransforms(List<Transform> transformList, Properties extraParams, String xmlSignaturePrefix) {
+    public static void addCustomTransforms(List<Transform> transformList, Properties extraParams, final String xmlSignaturePrefix) {
 
-        XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
+        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
         if (transformList == null) {
             transformList = new ArrayList<Transform>();
         }
@@ -314,7 +324,9 @@ public final class Utils {
             }
             else if (Transform.XPATH2.equals(transformType) && transformBody != null) {
                 transformSubtype = extraParams.getProperty("xmlTransform" + Integer.toString(i) + "Subtype"); //$NON-NLS-1$ //$NON-NLS-2$
-                if ("subtract".equals(transformSubtype)) xPath2TransformFilter = Filter.SUBTRACT; //$NON-NLS-1$
+                if ("subtract".equals(transformSubtype)) {
+                    xPath2TransformFilter = Filter.SUBTRACT; //$NON-NLS-1$
+                }
                 else if ("intersect".equals(transformSubtype)) { //$NON-NLS-1$
                     xPath2TransformFilter = Filter.INTERSECT;
                 }
@@ -502,11 +514,18 @@ public final class Utils {
                         final Node filterNode = xpathTransformNode.getAttributes().getNamedItem("Filter");
                         if (filterNode != null) {
                             final String filterName = filterNode.getNodeValue();
-                            if (filterName.equals("subtract")) filter = Filter.SUBTRACT;
-                            else if (filterName.equals("intersect")) filter = Filter.INTERSECT;
-                            else if (filterName.equals("union")) filter = Filter.UNION;
-                            else throw new InvalidAlgorithmParameterException("El subtipo '" + filterName
-                                                                              + "' de la transformacion XPATH2 no es valido");
+                            if (filterName.equals("subtract")) {
+                                filter = Filter.SUBTRACT;
+                            }
+                            else if (filterName.equals("intersect")) {
+                                filter = Filter.INTERSECT;
+                            }
+                            else if (filterName.equals("union")) {
+                                filter = Filter.UNION;
+                            }
+                            else {
+                                throw new InvalidAlgorithmParameterException("El subtipo '" + filterName + "' de la transformacion XPATH2 no es valido");
+                            }
                         }
                         else {
                             throw new InvalidAlgorithmParameterException("No se ha declarado un subtipo para la transformacion XPATH2");
@@ -612,9 +631,15 @@ public final class Utils {
         final int numXades141 = countSubstring(signatureText, xades141);
 
         // Prioridad: xades132 > latest > xades141
-        if (numXades132 >= numLatest && numXades132 >= numXades141) return xades132.replace("\"", "");
-        if (numLatest >= numXades132 && numLatest >= numXades141) return latest.replace("\"", "");
-        if (numXades141 >= numLatest && numXades141 >= numXades132) return xades141.replace("\"", "");
+        if (numXades132 >= numLatest && numXades132 >= numXades141) {
+            return xades132.replace("\"", "");
+        }
+        if (numLatest >= numXades132 && numLatest >= numXades141) {
+            return latest.replace("\"", "");
+        }
+        if (numXades141 >= numLatest && numXades141 >= numXades132) {
+            return xades141.replace("\"", "");
+        }
 
         return xades132.replace("\"", "");
     }
@@ -693,7 +718,9 @@ public final class Utils {
     public static List<Reference> cleanReferencesList(final List<Reference> referenceList) {
 
         final List<Reference> newList = new ArrayList<Reference>();
-        if (referenceList == null) return newList;
+        if (referenceList == null) {
+            return newList;
+        }
         List<Transform> trans;
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
         boolean needsReconReference;
@@ -711,7 +738,9 @@ public final class Utils {
                             // Si el ID es nulo y hay una transformacion Base64
                             // reconstruimos la referencia
                             // pero quitando esa transformacion Base64
-                            if (trans == null) trans = new ArrayList<Transform>();
+                            if (trans == null) {
+                                trans = new ArrayList<Transform>();
+                            }
                             trans.add((Transform) t);
                         }
                         else {
@@ -780,7 +809,7 @@ public final class Utils {
         // guardarlo mediante DOM para que no aparezcan.
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        Document docum;
+        final Document docum;
         try {
             docum = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         }
@@ -832,15 +861,20 @@ public final class Utils {
             final TransformerFactory tf = TransformerFactory.newInstance();
             final Transformer serializer = tf.newTransformer();
 
-            if (properties == null) properties = new Hashtable<String, String>();
+            if (properties == null) {
+                properties = new Hashtable<String, String>();
+            }
             // Por defecto, si no hay eclarada una codificacion, se utiliza
             // UTF-8
-            if (!properties.containsKey(OutputKeys.ENCODING) || "".equals(properties.get(OutputKeys.ENCODING))) properties.put(OutputKeys.ENCODING,
-                                                                                                                               "UTF-8");
+            if (!properties.containsKey(OutputKeys.ENCODING) || "".equals(properties.get(OutputKeys.ENCODING))) {
+                properties.put(OutputKeys.ENCODING, "UTF-8");
+            }
             for (final String key : properties.keySet()) {
                 serializer.setOutputProperty(key, properties.get(key));
             }
-            if (indent) serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+            if (indent) {
+                serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+            }
             serializer.transform(domSource, streamResult);
         }
         catch (final Exception e) {

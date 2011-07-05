@@ -30,7 +30,6 @@ import es.gob.afirma.ciphers.AOSunJCECipher;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOInvalidKeyException;
-import es.gob.afirma.exceptions.AOMaxAttemptsExceededException;
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOConstants.AOCipherAlgorithm;
 import es.gob.afirma.misc.AOConstants.AOCipherBlockMode;

@@ -55,15 +55,21 @@ import es.gob.afirma.signers.beans.AOSignInfo;
 public final class AOCMSSigner implements AOSigner {
 
     private Oid dataType = null;
-    private Map<Oid, byte[]> atrib = new HashMap<Oid, byte[]>();
-    private Map<Oid, byte[]> uatrib = new HashMap<Oid, byte[]>();
+    private final Map<Oid, byte[]> atrib = new HashMap<Oid, byte[]>();
+    private final Map<Oid, byte[]> uatrib = new HashMap<Oid, byte[]>();
 
     public byte[] sign(final byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
-        if (extraParams == null) extraParams = new Properties();
+        if (extraParams == null) {
+            extraParams = new Properties();
+        }
 
-        if (algorithm.equalsIgnoreCase("RSA")) algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        else if (algorithm.equalsIgnoreCase("DSA")) algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
+        if (algorithm.equalsIgnoreCase("RSA")) {
+            algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
+        }
+        else if (algorithm.equalsIgnoreCase("DSA")) {
+            algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
+        }
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
 
@@ -74,12 +80,16 @@ public final class AOCMSSigner implements AOSigner {
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) xCerts = (X509Certificate[]) certs;
+        if (certs != null && (certs instanceof X509Certificate[])) {
+            xCerts = (X509Certificate[]) certs;
+        }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) xCerts = new X509Certificate[] {
-                (X509Certificate) cert
-            };
+            if (cert instanceof X509Certificate) { 
+                xCerts = new X509Certificate[] {
+                                                (X509Certificate) cert
+                };
+            }
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
@@ -114,10 +124,16 @@ public final class AOCMSSigner implements AOSigner {
 
     public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
-        if (extraParams == null) extraParams = new Properties();
+        if (extraParams == null) {
+            extraParams = new Properties();
+        }
 
-        if (algorithm.equalsIgnoreCase("RSA")) algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        else if (algorithm.equalsIgnoreCase("DSA")) algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
+        if (algorithm.equalsIgnoreCase("RSA")) {
+            algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
+        }
+        else if (algorithm.equalsIgnoreCase("DSA")) {
+            algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
+        }
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
 
@@ -128,12 +144,16 @@ public final class AOCMSSigner implements AOSigner {
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) xCerts = (X509Certificate[]) certs;
+        if (certs != null && (certs instanceof X509Certificate[])) {
+            xCerts = (X509Certificate[]) certs;
+        }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) xCerts = new X509Certificate[] {
-                (X509Certificate) cert
-            };
+            if (cert instanceof X509Certificate) { 
+                xCerts = new X509Certificate[] {
+                                                (X509Certificate) cert
+                };
+            }
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
@@ -175,8 +195,12 @@ public final class AOCMSSigner implements AOSigner {
 
     public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
-        if (algorithm.equalsIgnoreCase("RSA")) algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        else if (algorithm.equalsIgnoreCase("DSA")) algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
+        if (algorithm.equalsIgnoreCase("RSA")) {
+            algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
+        }
+        else if (algorithm.equalsIgnoreCase("DSA")) {
+            algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
+        }
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -194,12 +218,16 @@ public final class AOCMSSigner implements AOSigner {
         // Array de certificados
         X509Certificate[] aCertificados = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) aCertificados = (X509Certificate[]) certs;
+        if (certs != null && (certs instanceof X509Certificate[])) {
+            aCertificados = (X509Certificate[]) certs;
+        }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) aCertificados = new X509Certificate[] {
-                (X509Certificate) cert
-            };
+            if (cert instanceof X509Certificate) { 
+                aCertificados = new X509Certificate[] {
+                                                       (X509Certificate) cert
+                };
+            }
         }
 
         // Si la firma que nos introducen es SignedData
@@ -254,17 +282,25 @@ public final class AOCMSSigner implements AOSigner {
                               final PrivateKeyEntry keyEntry,
                               final Properties extraParams) throws AOException {
 
-        if (algorithm.equalsIgnoreCase("RSA")) algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        else if (algorithm.equalsIgnoreCase("DSA")) algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
+        if (algorithm.equalsIgnoreCase("RSA")) {
+            algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
+        }
+        else if (algorithm.equalsIgnoreCase("DSA")) {
+            algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHDSA;
+        }
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) xCerts = (X509Certificate[]) certs;
+        if (certs != null && (certs instanceof X509Certificate[])) {
+            xCerts = (X509Certificate[]) certs;
+        }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) xCerts = new X509Certificate[] {
-                (X509Certificate) cert
-            };
+            if (cert instanceof X509Certificate) { 
+                xCerts = new X509Certificate[] {
+                                                (X509Certificate) cert
+                };
+            }
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, xCerts);
@@ -303,8 +339,9 @@ public final class AOCMSSigner implements AOSigner {
                 // CASO DE FIRMA DE NODOS
                 else if (targetType == CounterSignTarget.Nodes) {
                     int[] nodesID = new int[targets.length];
-                    for (int i = 0; i < targets.length; i++)
+                    for (int i = 0; i < targets.length; i++) {
                         nodesID[i] = ((Integer) targets[i]).intValue();
+                    }
                     nodesID = new ReadNodesTree().simplyArray(nodesID);
                     dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Nodes, nodesID, keyEntry, dataType, atrib, uatrib);
                 }
@@ -312,10 +349,11 @@ public final class AOCMSSigner implements AOSigner {
                 else if (targetType == CounterSignTarget.Signers) {
 
                     // clase que lee los nodos de un fichero firmado (p7s)
-                    String[] signers = new String[targets.length];
-                    for (int i = 0; i < targets.length; i++)
+                    final String[] signers = new String[targets.length];
+                    for (int i = 0; i < targets.length; i++) {
                         signers[i] = (String) targets[i];
-                    ReadNodesTree rn2 = new ReadNodesTree();
+                    }
+                    final ReadNodesTree rn2 = new ReadNodesTree();
                     int[] nodes2 = rn2.readNodesFromSigners(signers, sign);
                     dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Signers, nodes2, keyEntry, dataType, atrib, uatrib);
 
@@ -362,8 +400,9 @@ public final class AOCMSSigner implements AOSigner {
                 // CASO DE FIRMA DE NODOS
                 else if (targetType == CounterSignTarget.Nodes) {
                     int[] nodesID = new int[targets.length];
-                    for (int i = 0; i < targets.length; i++)
+                    for (int i = 0; i < targets.length; i++) {
                         nodesID[i] = ((Integer) targets[i]).intValue();
+                    }
                     nodesID = new ReadNodesTree().simplyArray(nodesID);
                     dataSigned =
                             new CounterSignerEnveloped().counterSignerEnveloped(csp,
@@ -379,16 +418,15 @@ public final class AOCMSSigner implements AOSigner {
                 else if (targetType == CounterSignTarget.Signers) {
 
                     // clase que lee los nodos de un fichero firmado (p7s)
-                    String[] signers = new String[targets.length];
-                    for (int i = 0; i < targets.length; i++)
+                    final String[] signers = new String[targets.length];
+                    for (int i = 0; i < targets.length; i++){
                         signers[i] = (String) targets[i];
-                    ReadNodesTree rn2 = new ReadNodesTree();
-                    int[] nodes2 = rn2.readNodesFromSigners(signers, sign);
+                    }
                     dataSigned =
                             new CounterSignerEnveloped().counterSignerEnveloped(csp,
                                                                                 sign,
                                                                                 CounterSignTarget.Signers,
-                                                                                nodes2,
+                                                                                new ReadNodesTree().readNodesFromSigners(signers, sign),
                                                                                 keyEntry,
                                                                                 dataType,
                                                                                 atrib,
@@ -396,7 +434,7 @@ public final class AOCMSSigner implements AOSigner {
 
                 }
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 throw new AOException("Error generando la Contrafirma PKCS#7", e);
             }
 
@@ -406,16 +444,14 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     public TreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo) {
-
-        TreeModel treeModel = null;
-        ReadNodesTree Rn = new ReadNodesTree();
+        final ReadNodesTree Rn = new ReadNodesTree();
         try {
-            treeModel = Rn.readNodesTree(sign, asSimpleSignInfo);
+            return Rn.readNodesTree(sign, asSimpleSignInfo);
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             Logger.getLogger("es.gob.afirma").severe(ex.toString());
         }
-        return treeModel;
+        return null;
     }
 
     public boolean isSign(byte[] signData) {
@@ -455,7 +491,7 @@ public final class AOCMSSigner implements AOSigner {
         }
 
         // Extraemos el mimetype
-        ExtractMimeType extract = new ExtractMimeType();
+        final ExtractMimeType extract = new ExtractMimeType();
         numOid = extract.extractMimeType(signData);
 
         // Transformamos el OID a mimeType
@@ -471,7 +507,7 @@ public final class AOCMSSigner implements AOSigner {
      *        Object Identifier. Identificador del objeto a introducir.
      * @param value
      *        Valor asignado */
-    public void addSignedAttribute(org.ietf.jgss.Oid oid, byte[] value) {
+    public void addSignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
         atrib.put(oid, value);
     }
 
@@ -480,7 +516,7 @@ public final class AOCMSSigner implements AOSigner {
      *        Object Identifier. Identificador del atributo a introducir.
      * @param value
      *        Valor asignado */
-    public void addUnsignedAttribute(org.ietf.jgss.Oid oid, byte[] value) {
+    public void addUnsignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
         uatrib.put(oid, value);
     }
 
@@ -493,7 +529,7 @@ public final class AOCMSSigner implements AOSigner {
 
     }
 
-    public byte[] getData(byte[] signData) throws AOInvalidFormatException, AOException {
+    public byte[] getData(final byte[] signData) throws AOInvalidFormatException, AOException {
 
         if (signData == null) {
             throw new NullPointerException("Se han introducido datos nulos para su comprobacion");
@@ -506,11 +542,11 @@ public final class AOCMSSigner implements AOSigner {
         return new ObtainContentSignedData().obtainData(signData);
     }
 
-    public String getSignedName(String originalName, String inText) {
+    public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".csig";
     }
 
-    public AOSignInfo getSignInfo(byte[] signData) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
 
         if (signData == null) throw new NullPointerException("No se han introducido datos para analizar");
 

@@ -8,19 +8,20 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
-package es.gob.afirma.exceptions;
+package es.gob.afirma.cliente;
 
-/** Excepci&oacute;n para notificar que se ha indicado un algoritmo de cifrado no
- * soportado. */
-public final class AOCipherAlgorithmException extends AOException {
+import es.gob.afirma.exceptions.AOException;
 
-    private static final long serialVersionUID = 7108060731888267988L;
+/** Excepci&oacute;n utilizada para indicar que se ha sobrepasado el
+ * n&uacute;mero m&aacute;ximo de intentos de acceso a un recurso protegido. */
+public final class AOMaxAttemptsExceededException extends AOException {
+
+    private static final long serialVersionUID = -1340950945486548407L;
 
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n. */
-    public AOCipherAlgorithmException(String msg) {
+    public AOMaxAttemptsExceededException(String msg) {
         super(msg);
     }
-
 }

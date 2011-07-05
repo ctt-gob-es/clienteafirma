@@ -8,7 +8,9 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
-package es.gob.afirma.exceptions;
+package es.gob.afirma.cliente;
+
+import es.gob.afirma.exceptions.AOException;
 
 /** Excepci&oacute;n para notificar que no se han podido guardar datos. */
 public final class AOCantSaveDataException extends AOException {

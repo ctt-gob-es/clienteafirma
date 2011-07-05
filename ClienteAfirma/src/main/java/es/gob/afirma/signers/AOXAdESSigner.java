@@ -632,7 +632,7 @@ public final class AOXAdESSigner implements AOSigner {
 
         final List<Reference> referenceList = new ArrayList<Reference>();
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-        DigestMethod digestMethod;
+        final DigestMethod digestMethod;
         try {
             digestMethod = fac.newDigestMethod(digestMethodAlgorithm, null);
         }
@@ -929,7 +929,9 @@ public final class AOXAdESSigner implements AOSigner {
                 getPolicy(extraParams.getProperty("policyIdentifier"),
                           extraParams.getProperty("policyDescription"),
                           extraParams.getProperty("policyQualifier"));
-        if (spi != null) xades.setSignaturePolicyIdentifier(spi);
+        if (spi != null) {
+            xades.setSignaturePolicyIdentifier(spi);
+        }
 
         // SignatureProductionPlace
         final SignatureProductionPlace spp =
@@ -945,14 +947,22 @@ public final class AOXAdESSigner implements AOSigner {
             final String claimedRole = extraParams.getProperty("signerClaimedRole");
             final String certifiedRole = extraParams.getProperty("signerCertifiedRole");
             signerRole = new SignerRoleImpl();
-            if (claimedRole != null) signerRole.addClaimedRole(claimedRole);
-            if (certifiedRole != null) signerRole.addCertifiedRole(certifiedRole);
+            if (claimedRole != null) {
+                signerRole.addClaimedRole(claimedRole);
+            }
+            if (certifiedRole != null) {
+                signerRole.addCertifiedRole(certifiedRole);
+            }
         }
         catch (final Exception e) {}
-        if (signerRole != null) xades.setSignerRole(signerRole);
+        if (signerRole != null) {
+            xades.setSignerRole(signerRole);
+        }
 
         // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true"))) xades.setSigningTime(new Date());
+        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true"))) {
+            xades.setSigningTime(new Date());
+        }
 
         // DataObjectFormat
         ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
@@ -1063,8 +1073,12 @@ public final class AOXAdESSigner implements AOSigner {
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es detached */
     public boolean isDetached(final Element element) {
-        if (element == null) return false;
-        if (element.getFirstChild().getLocalName() != null && element.getFirstChild().getLocalName().equals(DETACHED_CONTENT_ELEMENT_NAME)) return true;
+        if (element == null) {
+            return false;
+        }
+        if (element.getFirstChild().getLocalName() != null && element.getFirstChild().getLocalName().equals(DETACHED_CONTENT_ELEMENT_NAME)) {
+            return true;
+        }
         return false;
     }
 
@@ -1075,9 +1089,9 @@ public final class AOXAdESSigner implements AOSigner {
      * @return Valor booleano, siendo verdadero cuando la firma es enveloped */
     public boolean isEnveloped(final Element element) {
         final NodeList transformList = element.getElementsByTagNameNS(DSIGNNS, "Transform");
-        for (int i = 0; i < transformList.getLength(); i++)
+        for (int i = 0; i < transformList.getLength(); i++) {
             if (((Element) transformList.item(i)).getAttribute("Algorithm").equals(Transform.ENVELOPED)) return true;
-
+        }
         return false;
     }
 
@@ -1086,11 +1100,12 @@ public final class AOXAdESSigner implements AOSigner {
      *        Elemento que contiene el nodo ra$iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
-    public boolean isEnveloping(Element element) {
+    public boolean isEnveloping(final Element element) {
         if (element.getLocalName().equals("Signature") || (element.getLocalName().equals(AFIRMA) && element.getFirstChild()
                                                                                                            .getLocalName()
-                                                                                                           .equals("Signature"))) return true;
-
+                                                                                                           .equals("Signature"))) {
+            return true;
+        }
         return false;
     }
 
@@ -1164,9 +1179,10 @@ public final class AOXAdESSigner implements AOSigner {
                 // ByteArrayInputStream(baos.toByteArray());
 
                 // obtiene las firmas y las elimina
-                NodeList signatures = rootSig.getElementsByTagNameNS(DSIGNNS, "Signature");
-                for (int i = 0; i < signatures.getLength(); i++)
+                final NodeList signatures = rootSig.getElementsByTagNameNS(DSIGNNS, "Signature");
+                for (int i = 0; i < signatures.getLength(); i++) {
                     rootSig.removeChild(signatures.item(0));
+                }
 
                 elementRes = rootSig;
             }
@@ -1175,7 +1191,7 @@ public final class AOXAdESSigner implements AOSigner {
             else if (this.isEnveloping(rootSig)) {
 
                 // obtiene el nodo Object de la primera firma
-                Element object = (Element) rootSig.getElementsByTagNameNS(DSIGNNS, "Object").item(0);
+                final Element object = (Element) rootSig.getElementsByTagNameNS(DSIGNNS, "Object").item(0);
                 // si el documento es un xml se extrae como tal
                 if (object.getAttribute("MimeType").equals("text/xml")) {
                     elementRes = (Element) object.getFirstChild();
@@ -1197,8 +1213,10 @@ public final class AOXAdESSigner implements AOSigner {
             throw new AOInvalidFormatException("Error al leer el fichero de firmas", ex);
         }
 
-        // si no se ha recuperado ningún dato se devuelve null
-        if (elementRes == null) return null;
+        // si no se ha recuperado ningun dato se devuelve null
+        if (elementRes == null) {
+            return null;
+        }
 
         // convierte el documento obtenido en un array de bytes
         ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
@@ -1211,12 +1229,16 @@ public final class AOXAdESSigner implements AOSigner {
                                                                  final String province,
                                                                  final String postalCode,
                                                                  final String country) {
-        if (city == null && province == null && postalCode == null && country == null) return null;
+        if (city == null && province == null && postalCode == null && country == null) {
+            return null;
+        }
         return new SignatureProductionPlaceImpl(city, province, postalCode, country);
     }
 
     private SignaturePolicyIdentifier getPolicy(final String identifier, final String description, final String qualifier) {
-        if (identifier == null) return null;
+        if (identifier == null) {
+            return null;
+        }
         final SignaturePolicyIdentifier spi = new SignaturePolicyIdentifierImpl(false);
         try {
             spi.setIdentifier(identifier);
@@ -1232,32 +1254,49 @@ public final class AOXAdESSigner implements AOSigner {
         final String desc = (description != null ? description : "");
         spi.setDescription(desc);
 
-        if (qualifier != null) spi.setQualifier(qualifier);
+        if (qualifier != null) {
+            spi.setQualifier(qualifier);
+        }
         return spi;
     }
 
     public void setDataObjectFormat(final String description, final Oid objectIdentifier, final MimeType mimeType, final String encoding) {
         // La descripcion ya no es valida en XAdES 1.3 y 1.4
         // TODO: Habilitar solo para XAdES 1.3
-        if (description != null) this.dataObjectFormatDescription = description;
-        if (mimeType != null) this.mimeType = mimeType.getBaseType();
-        if (encoding != null && (!"".equals(encoding))) this.encoding = encoding;
-        if (this.encoding.equalsIgnoreCase("base64")) this.encoding = AOConstants.BASE64_ENCODING;
-        if (objectIdentifier != null) this.objectIdentifier =
-                new ObjectIdentifierImpl("OIDAsURN", "urn:oid:" + objectIdentifier, null, new ArrayList<String>(0));
+        if (description != null) {
+            this.dataObjectFormatDescription = description;
+        }
+        if (mimeType != null) {
+            this.mimeType = mimeType.getBaseType();
+        }
+        if (encoding != null && (!"".equals(encoding))) {
+            this.encoding = encoding;
+        }
+        if (this.encoding.equalsIgnoreCase("base64")) {
+            this.encoding = AOConstants.BASE64_ENCODING;
+        }
+        if (objectIdentifier != null) {
+            this.objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:" + objectIdentifier, null, new ArrayList<String>(0));
+        }
     }
 
     public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
-        if (algorithm.equalsIgnoreCase("RSA")) algorithm = SIGN_ALGORITHM_SHA1WITHRSA;
-        else if (algorithm.equalsIgnoreCase("DSA")) algorithm = SIGN_ALGORITHM_SHA1WITHDSA;
+        if (algorithm.equalsIgnoreCase("RSA")) {
+            algorithm = SIGN_ALGORITHM_SHA1WITHRSA;
+        }
+        else if (algorithm.equalsIgnoreCase("DSA")) {
+            algorithm = SIGN_ALGORITHM_SHA1WITHDSA;
+        }
 
         final String algoUri = SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'");
         }
 
-        if (extraParams == null) extraParams = new Properties();
+        if (extraParams == null) {
+            extraParams = new Properties();
+        }
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD);
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE);
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS);
@@ -1560,19 +1599,29 @@ public final class AOXAdESSigner implements AOSigner {
 
             // Si no hay asignado un MimeType o es el por defecto establecemos
             // el de XML
-            if (mimeType == null || DEFAULT_MIMETYPE.equals(mimeType)) mimeType = "text/xml";
-            if (encoding == null) encoding = doc.getXmlEncoding();
+            if (mimeType == null || DEFAULT_MIMETYPE.equals(mimeType)) {
+                mimeType = "text/xml";
+            }
+            if (encoding == null) {
+                encoding = doc.getXmlEncoding();
+            }
 
             // Ademas del encoding, sacamos otros datos del doc XML original.
             // Hacemos la comprobacion del base64 por si se establecido desde
             // fuera
-            if (encoding != null && !AOConstants.BASE64_ENCODING.equals(encoding)) originalXMLProperties.put(OutputKeys.ENCODING, encoding);
+            if (encoding != null && !AOConstants.BASE64_ENCODING.equals(encoding)) {
+                originalXMLProperties.put(OutputKeys.ENCODING, encoding);
+            }
             String tmpXmlProp = doc.getXmlVersion();
-            if (tmpXmlProp != null) originalXMLProperties.put(OutputKeys.VERSION, tmpXmlProp);
+            if (tmpXmlProp != null) {
+                originalXMLProperties.put(OutputKeys.VERSION, tmpXmlProp);
+            }
             final DocumentType dt = doc.getDoctype();
             if (dt != null) {
                 tmpXmlProp = dt.getSystemId();
-                if (tmpXmlProp != null) originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM, tmpXmlProp);
+                if (tmpXmlProp != null) {
+                    originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM, tmpXmlProp);
+                }
             }
 
             // Nos aseguramos que la configuracion no afectara a operaciones
@@ -1597,9 +1646,15 @@ public final class AOXAdESSigner implements AOSigner {
 
         try {
             if (targetType == CounterSignTarget.Tree) this.countersignTree(root, keyEntry, extraParams, algorithm);
-            else if (targetType == CounterSignTarget.Leafs) this.countersignLeafs(root, keyEntry, extraParams, algorithm);
-            else if (targetType == CounterSignTarget.Nodes) this.countersignNodes(root, targets, keyEntry, extraParams, algorithm);
-            else if (targetType == CounterSignTarget.Signers) this.countersignSigners(root, targets, keyEntry, extraParams, algorithm);
+            else if (targetType == CounterSignTarget.Leafs) {
+                this.countersignLeafs(root, keyEntry, extraParams, algorithm);
+            }
+            else if (targetType == CounterSignTarget.Nodes) {
+                this.countersignNodes(root, targets, keyEntry, extraParams, algorithm);
+            }
+            else if (targetType == CounterSignTarget.Signers) {
+                this.countersignSigners(root, targets, keyEntry, extraParams, algorithm);
+            }
         }
         catch (final UnsupportedOperationException e) {
             throw e;
@@ -1645,8 +1700,9 @@ public final class AOXAdESSigner implements AOSigner {
 
         // y crea sus contrafirmas
         try {
-            for (int i = 0; i < numSignatures; i++)
+            for (int i = 0; i < numSignatures; i++) {
                 this.cs(nodes[i], keyEntry, extraParams, algorithm);
+            }
         }
         catch (final UnsupportedOperationException e) {
             throw e;
@@ -1708,7 +1764,9 @@ public final class AOXAdESSigner implements AOSigner {
         // descarta las posiciones que esten repetidas
         final List<Integer> targetsList = new ArrayList<Integer>();
         for (int i = 0; i < targets.length; i++) {
-            if (!targetsList.contains(targets[i])) targetsList.add((Integer) targets[i]);
+            if (!targetsList.contains(targets[i])) {
+                targetsList.add((Integer) targets[i]);
+            }
         }
         targets = targetsList.toArray();
 
@@ -1720,7 +1778,9 @@ public final class AOXAdESSigner implements AOSigner {
         try {
             for (int i = 0; i < targets.length; i++) {
                 nodes[i] = (Element) signatures.item((Integer) targets[i]);
-                if (nodes[i] == null) throw new AOException("Posicion de nodo no valida.");
+                if (nodes[i] == null) {
+                    throw new AOException("Posicion de nodo no valida.");
+                }
             }
         }
         catch (final ClassCastException e) {
@@ -1729,8 +1789,9 @@ public final class AOXAdESSigner implements AOSigner {
 
         // y crea sus contrafirmas
         try {
-            for (int i = 0; i < nodes.length; i++)
+            for (int i = 0; i < nodes.length; i++) {
                 this.cs(nodes[i], keyEntry, extraParams, algorithm);
+            }
         }
         catch (final UnsupportedOperationException e) {
             throw e;
@@ -1763,7 +1824,7 @@ public final class AOXAdESSigner implements AOSigner {
 
         // obtiene los nodos de los firmantes indicados en targets
         for (int i = 0; i < signatures.getLength(); i++) {
-            Element node = (Element) signatures.item(i);
+            final Element node = (Element) signatures.item(i);
             if (signers.contains(AOUtil.getCN(Utils.getCertificate(node.getElementsByTagNameNS(DSIGNNS, "X509Certificate").item(0))))) {
                 nodes.add(node);
             }
@@ -1810,7 +1871,9 @@ public final class AOXAdESSigner implements AOSigner {
         // recupera o crea un nodo UnsignedProperties
         final NodeList up = signature.getElementsByTagNameNS(xadesNamespace, "UnsignedProperties");
         final Element unsignedProperties;
-        if (up.getLength() == 0) unsignedProperties = doc.createElement(XADES_SIGNATURE_PREFIX + ":UnsignedProperties");
+        if (up.getLength() == 0) {
+            unsignedProperties = doc.createElement(XADES_SIGNATURE_PREFIX + ":UnsignedProperties");
+        }
         else unsignedProperties = (Element) up.item(0);
 
         unsignedProperties.appendChild(unsignedSignatureProperties);
@@ -1887,8 +1950,12 @@ public final class AOXAdESSigner implements AOSigner {
             final String claimedRole = extraParams.getProperty("signerClaimedRole");
             final String certifiedRole = extraParams.getProperty("signerCertifiedRole");
             signerRole = new SignerRoleImpl();
-            if (claimedRole != null) signerRole.addClaimedRole(claimedRole);
-            if (certifiedRole != null) signerRole.addCertifiedRole(certifiedRole);
+            if (claimedRole != null) {
+                signerRole.addClaimedRole(claimedRole);
+            }
+            if (certifiedRole != null) {
+                signerRole.addCertifiedRole(certifiedRole);
+            }
         }
         catch (final Exception e) {}
         if (signerRole != null) {
@@ -1896,7 +1963,9 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true"))) xades.setSigningTime(new Date());
+        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true"))) {
+            xades.setSigningTime(new Date());
+        }
 
         // crea la firma
         final AOXMLAdvancedSignature xmlSignature;
@@ -2162,7 +2231,7 @@ public final class AOXAdESSigner implements AOSigner {
     private boolean checkSignNodes(Node rootNode, List<Node> signNodes) {
 
         final String xadesNamespace = Utils.guessXAdESNamespaceURL(rootNode);
-        for (Node signNode : signNodes) {
+        for (final Node signNode : signNodes) {
             if (((Element) signNode).getElementsByTagNameNS(xadesNamespace, "QualifyingProperties").getLength() == 0) {
                 return false;
             }
@@ -2208,7 +2277,9 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     public AOSignInfo getSignInfo(byte[] sign) throws AOInvalidFormatException, AOException {
-        if (sign == null) throw new NullPointerException("No se han introducido datos para analizar");
+        if (sign == null) {
+            throw new NullPointerException("No se han introducido datos para analizar");
+        }
 
         if (!isSign(sign)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
