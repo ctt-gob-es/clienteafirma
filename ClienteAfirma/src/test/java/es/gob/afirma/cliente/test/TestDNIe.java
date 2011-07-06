@@ -31,13 +31,13 @@ public class TestDNIe {
     @Ignore
     public void testXADESSignatureDNIe() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
-        AOSigner signer = new AOXAdESSigner();
+        final AOSigner signer = new AOXAdESSigner();
         assertNotNull(signer);
         byte[] result = null;
         PrivateKeyEntry pke = null;
         // for (byte[] content : TEST_CONTENT) {
         // for(Properties extraParams : XADES_MODES) {
-        for (String algo : ALGOS) {
+        for (final String algo : ALGOS) {
             System.out.println();
             System.out.println();
             System.out.println();
@@ -65,8 +65,12 @@ public class TestDNIe {
         System.out.println("Probando almacen PKCS#11 con DNIe...");
         String p11lib = null;
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            if (new File("C:\\Windows\\SysWOW64\\UsrPkcs11.dll").exists()) p11lib = "C:\\Windows\\SysWOW64\\UsrPkcs11.dll";
-            else p11lib = "C:\\Windows\\System32\\UsrPkcs11.dll";
+            if (new File("C:\\Windows\\SysWOW64\\UsrPkcs11.dll").exists()) {
+                p11lib = "C:\\Windows\\SysWOW64\\UsrPkcs11.dll";
+            }
+            else {
+                p11lib = "C:\\Windows\\System32\\UsrPkcs11.dll";
+            }
         }
         // else if (Platform.OS.LINUX.equals(Platform.getOS())) {
         // p11lib = null;

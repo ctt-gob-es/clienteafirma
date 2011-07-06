@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo las licencias EUPL version 1.1 y GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -24,7 +24,7 @@ final class CipherConfig {
     private AOCipher cipher;
     private AOCipherAlgorithm cipherAlgoritm;
 
-    CipherConfig(String algoritmo) {
+    CipherConfig(final String algoritmo) {
         configurarCipher(algoritmo);
     }
 
@@ -82,7 +82,9 @@ final class CipherConfig {
      * @return Proveedor que soporta la configuraci&oacute;n indicada. */
     AOCipher getCipher(final AOCipherConfig algorithmConfig) {
         for (final CipherConfigures configure : configures) {
-            if (configure.config.equals(algorithmConfig)) return configure.provider;
+            if (configure.config.equals(algorithmConfig)) {
+                return configure.provider;
+            }
         }
         return null;
     }

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -65,19 +65,19 @@ import es.gob.afirma.misc.AOCryptoUtil;
  * (SerialNumber), va la firma del certificado.<br>
  * La Estructura del mensaje es la siguiente (Se omite la parte correspondiente
  * a CMS):<br>
- * 
+ *
  * <pre>
  * <code>
  *  id-aa-ets-sigPolicyId OBJECT IDENTIFIER ::= { iso(1)
  *      member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9)
  *      smime(16) id-aa(2) 15 }
- * 
+ *
  *      SignaturePolicyIdentifier ::= CHOICE {
  *           signaturePolicyId          SignaturePolicyId,
  *           signaturePolicyImplied     SignaturePolicyImplied
  *                                      -- not used in this version
  *   }
- * 
+ *
  *      SignaturePolicyId ::= SEQUENCE {
  *           sigPolicyId           SigPolicyId,
  *           sigPolicyHash         SigPolicyHash,
@@ -85,7 +85,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
  *                                   SigPolicyQualifierInfo OPTIONAL}
  * </code>
  * </pre>
- * 
+ *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje SignedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
@@ -139,7 +139,9 @@ public final class GenCadesEPESSignedData {
                                      final PrivateKeyEntry keyEntry,
                                      final byte[] messageDigest) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
 
-        if (parameters == null) throw new NullPointerException("Los parametros no pueden ser nulos");
+        if (parameters == null) {
+            throw new NullPointerException("Los parametros no pueden ser nulos");
+        }
 
         // 1. VERSION
         // la version se mete en el constructor del signedData y es 1
@@ -156,9 +158,13 @@ public final class GenCadesEPESSignedData {
         final int with = signatureAlgorithm.indexOf("with");
         if (with > 0) {
             digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(signatureAlgorithm);
-            int and = signatureAlgorithm.indexOf("and", with + 4);
-            if (and > 0) keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-            else keyAlgorithm = signatureAlgorithm.substring(with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4);
+            if (and > 0) {
+                keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
+            }
+            else {
+                keyAlgorithm = signatureAlgorithm.substring(with + 4);
+            }
         }
 
         final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
@@ -176,12 +182,12 @@ public final class GenCadesEPESSignedData {
         // si se introduce el contenido o no
 
         ContentInfo encInfo = null;
-        ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
 
         if (omitContent == false) {
-            ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            byte[] content2 = parameters.getContent();
-            CMSProcessable msg = new CMSProcessableByteArray(content2);
+            final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+            final byte[] content2 = parameters.getContent();
+            final CMSProcessable msg = new CMSProcessableByteArray(content2);
             try {
                 msg.write(bOut);
             }
@@ -190,38 +196,41 @@ public final class GenCadesEPESSignedData {
             }
             encInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
         }
-        else encInfo = new ContentInfo(contentTypeOID, null);
+        else {
+            encInfo = new ContentInfo(contentTypeOID, null);
+        }
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
 
         ASN1Set certificates = null;
-        X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
+        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
         if (signerCertificateChain.length != 0) {
-            List<DEREncodable> ce = new ArrayList<DEREncodable>();
-            for (int i = 0; i < signerCertificateChain.length; i++)
-                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
+            final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+            for (final X509Certificate element : signerCertificateChain) {
+                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+            }
             certificates = createBerSetFromList(ce);
         }
 
-        ASN1Set certrevlist = null;
+        final ASN1Set certrevlist = null;
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
-        ASN1EncodableVector signerInfos = new ASN1EncodableVector();
+        final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
-        TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-        IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
 
-        SignerIdentifier identifier = new SignerIdentifier(encSid);
+        final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
         digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
 
         // // ATRIBUTOS
 
-        ASN1EncodableVector contextExcepcific =
+        final ASN1EncodableVector contextExcepcific =
                 Utils.generateSignerInfo(signerCertificateChain[0],
                                          digestAlgorithmId,
                                          digestAlgorithm,
@@ -233,12 +242,12 @@ public final class GenCadesEPESSignedData {
                                          dataType,
                                          messageDigest);
         signedAttr2 = getAttributeSet(new AttributeTable(contextExcepcific));
-        ASN1Set signedAttr = getAttributeSet(new AttributeTable(contextExcepcific));
+        final ASN1Set signedAttr = getAttributeSet(new AttributeTable(contextExcepcific));
 
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
+        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
         final AlgorithmIdentifier encAlgId;
         try {
             encAlgId = makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
@@ -251,7 +260,7 @@ public final class GenCadesEPESSignedData {
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
-        catch (AOException ex) {
+        catch (final AOException ex) {
             throw ex;
         }
 
@@ -274,13 +283,13 @@ public final class GenCadesEPESSignedData {
      *        Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1OctetString firma(String signatureAlgorithm, PrivateKeyEntry keyEntry) throws AOException {
+    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
         Signature sig = null;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
         }
 
@@ -289,7 +298,7 @@ public final class GenCadesEPESSignedData {
         try {
             tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
         }
-        catch (IOException ex) {
+        catch (final IOException ex) {
             Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, ex.toString(), ex);
             throw new AOException("Error al detectar la codificacion de los datos ASN.1", ex);
         }
@@ -319,7 +328,7 @@ public final class GenCadesEPESSignedData {
             throw new AOException("Error durante el proceso de firma", e);
         }
 
-        ASN1OctetString encDigest = new DEROctetString(realSig);
+        final ASN1OctetString encDigest = new DEROctetString(realSig);
 
         return encDigest;
 

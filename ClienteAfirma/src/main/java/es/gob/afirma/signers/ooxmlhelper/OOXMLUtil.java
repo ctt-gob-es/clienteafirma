@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -38,7 +38,7 @@ public final class OOXMLUtil {
      *        Documento OOXML.
      * @return N&uacute;mero de firma del documento OOXML. */
     public static int countOOXMLSignatures(final byte[] ooxmlFile) {
-        RelationShip[] rels = getOOXMLSignaturesRelationships(ooxmlFile);
+        final RelationShip[] rels = getOOXMLSignaturesRelationships(ooxmlFile);
         return (rels == null ? 0 : rels.length);
     }
 
@@ -66,7 +66,7 @@ public final class OOXMLUtil {
         // Comprobamos si existe la relacion de firmas del documento
         // ZipEntry relsEntry = zipFile.getEntry("_xmlsignatures/_rels/origin.sigs.rels");
         // if (relsEntry == null) relsEntry = zipFile.getEntry("_xmlsignatures\\_rels\\origin.sigs.rels");
-        ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
+        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
 
         // Si no existe el fichero, el documento no contiene firmas
         if (relsEntry == null) {
@@ -124,7 +124,7 @@ public final class OOXMLUtil {
         // Comprobamos si existe la relacion de firmas del documento
         // ZipEntry relsEntry = zipFile.getEntry("_xmlsignatures/_rels/origin.sigs.rels");
         // if (relsEntry == null) relsEntry = zipFile.getEntry("_xmlsignatures\\_rels\\origin.sigs.rels");
-        ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
+        final ZipEntry relsEntry = getSignaturesRelsEntry(zipFile);
 
         // Si no existe el fichero, el documento no contiene firmas
         if (relsEntry == null) {
@@ -182,7 +182,7 @@ public final class OOXMLUtil {
     /** Recupera la entrada con la relaci&oacute;n de firmas del documento.
      * @param ooxmlZipFile Fichero OOXML.
      * @return Entrada con la relaci&oacute;n de firmas. */
-    private static ZipEntry getSignaturesRelsEntry(ZipFile ooxmlZipFile) {
+    private static ZipEntry getSignaturesRelsEntry(final ZipFile ooxmlZipFile) {
         ZipEntry relsEntry = ooxmlZipFile.getEntry("_rels/.rels");
         if (relsEntry == null) {
             relsEntry = ooxmlZipFile.getEntry("_rels\\.rels");

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -38,15 +38,25 @@ public final class AOCipherConfig {
     public AOCipherConfig(AOCipherAlgorithm ciphAlgo, AOCipherBlockMode ciphMode, AOCipherPadding ciphPadding) {
         // En caso de nulos tomamos defectos y algunas combinaciones
         // predefinidas
-        if (ciphAlgo == null) ciphAlgo = AOCipherAlgorithm.getDefault();
+        if (ciphAlgo == null) {
+            ciphAlgo = AOCipherAlgorithm.getDefault();
+        }
         if (ciphMode == null) {
             if (ciphAlgo.equals(AOCipherAlgorithm.PBEWITHMD5ANDDES) || ciphAlgo.equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE)
-                || ciphAlgo.equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40)) ciphMode = AOCipherBlockMode.CBC;
-            else ciphMode = AOCipherBlockMode.ECB;
+                || ciphAlgo.equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40)) {
+                ciphMode = AOCipherBlockMode.CBC;
+            }
+            else {
+                ciphMode = AOCipherBlockMode.ECB;
+            }
         }
         if (ciphPadding == null) {
-            if (ciphAlgo.equals(AOCipherAlgorithm.ARCFOUR)) ciphPadding = AOCipherPadding.NOPADDING;
-            else ciphPadding = AOCipherPadding.PKCS5PADDING;
+            if (ciphAlgo.equals(AOCipherAlgorithm.ARCFOUR)) {
+                ciphPadding = AOCipherPadding.NOPADDING;
+            }
+            else {
+                ciphPadding = AOCipherPadding.PKCS5PADDING;
+            }
         }
         this.algo = ciphAlgo;
         this.mode = ciphMode;
@@ -69,14 +79,14 @@ public final class AOCipherConfig {
      *        Configuraci&oacute;n de cifrado.
      * @throws NoSuchAlgorithmException
      *         Cuando el algoritmo no est&aacute; soportado. */
-    public static AOCipherConfig parse(String cipherConfig) throws NoSuchAlgorithmException {
+    public static AOCipherConfig parse(final String cipherConfig) throws NoSuchAlgorithmException {
         // Desmenbramos el algoritmo por si se ha indicado el modo de bloque y
         // el padding
 
         AOCipherAlgorithm cipAlgo = null;
         AOCipherBlockMode cipBlockMode = null;
         AOCipherPadding cipPadding = null;
-        String[] algoConfig = cipherConfig.split("/"); //$NON-NLS-1$
+        final String[] algoConfig = cipherConfig.split("/"); //$NON-NLS-1$
         cipAlgo = AOCipherAlgorithm.getValueOf(algoConfig[0]);
         if (cipAlgo == null) {
             throw new NoSuchAlgorithmException();
@@ -92,8 +102,7 @@ public final class AOCipherConfig {
 
     @Override
     public String toString() {
-
-        StringBuilder config = new StringBuilder(algo.getName());
+        final StringBuilder config = new StringBuilder(algo.getName());
         if (mode != null && padding != null) {
             config.append("/").append(mode.getName()).append("/").append(padding.getName());
         }
@@ -101,8 +110,10 @@ public final class AOCipherConfig {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof AOCipherConfig)) return false;
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof AOCipherConfig)) {
+            return false;
+        }
         return ((AOCipherConfig) obj).algo.equals(algo) && ((AOCipherConfig) obj).mode.equals(mode) && ((AOCipherConfig) obj).padding.equals(padding);
     }
 
@@ -132,21 +143,21 @@ public final class AOCipherConfig {
     /** Establece el algoritmo de cifrado.
      * @param algo
      *        Algoritmo. */
-    public void setAlgorithm(AOCipherAlgorithm algo) {
+    public void setAlgorithm(final AOCipherAlgorithm algo) {
         this.algo = algo;
     }
 
     /** Establece el modo de bloque para el cifrado.
      * @param mode
      *        Modo de bloque. */
-    public void setBlockMode(AOCipherBlockMode mode) {
+    public void setBlockMode(final AOCipherBlockMode mode) {
         this.mode = mode;
     }
 
     /** Establece el padding para el cifrado.
      * @param padding
      *        Padding. */
-    public void setPadding(AOCipherPadding padding) {
+    public void setPadding(final AOCipherPadding padding) {
         this.padding = padding;
     }
 }

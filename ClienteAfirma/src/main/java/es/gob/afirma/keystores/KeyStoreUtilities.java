@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -38,7 +38,9 @@ public final class KeyStoreUtilities {
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
     static final String createPKCS11ConfigFile(final String lib, String name, final Integer slot) {
-        if (name == null) name = "AFIRMA-PKCS11";
+        if (name == null) {
+            name = "AFIRMA-PKCS11";
+        }
         final StringBuilder buffer = new StringBuilder("library=");
 
         // TODO: Ir uno a uno en el ApplicationPath de Java hasta que
@@ -49,7 +51,9 @@ public final class KeyStoreUtilities {
         // Mozilla devuelve las bibliotecas sin Path
         if (!new java.io.File(lib).exists()) {
             String sysLibDir = AOUtil.getSystemLibDir();
-            if (!sysLibDir.endsWith(java.io.File.separator)) sysLibDir += java.io.File.separator;
+            if (!sysLibDir.endsWith(java.io.File.separator)) {
+                sysLibDir += java.io.File.separator;
+            }
             buffer.append(sysLibDir);
         }
 
@@ -139,7 +143,7 @@ public final class KeyStoreUtilities {
         // Creamos un HashTable con la relacion Alias-Nombre_a_mostrar de los
         // certificados
         final Hashtable<String, String> aliassesByFriendlyName = new Hashtable<String, String>(trimmedAliases.length);
-        for (String trimmedAlias : trimmedAliases) {
+        for (final String trimmedAlias : trimmedAliases) {
             aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
         }
 
@@ -154,7 +158,7 @@ public final class KeyStoreUtilities {
                 tmpCert = null;
 
                 // Seleccionamos el KeyStore en donde se encuentra el alias
-                for (KeyStore tmpKs : kss) {
+                for (final KeyStore tmpKs : kss) {
                     try {
                         tmpCert = (X509Certificate) tmpKs.getCertificate(al);
                     }
@@ -170,9 +174,14 @@ public final class KeyStoreUtilities {
 
                 // Si no tenemos Store para el alias en curso, pasamos al
                 // siguiente alias
-                if (ks == null) continue;
+                if (ks == null) {
+                    continue;
+                }
 
-                if (tmpCert == null) Logger.getLogger("es.gob.afirma").warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$ //$NON-NLS-2$
+                if (tmpCert == null)
+                 {
+                    Logger.getLogger("es.gob.afirma").warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$ //$NON-NLS-2$
+                }
 
                 if (!showExpiredCertificates && tmpCert != null) {
                     try {
@@ -197,7 +206,9 @@ public final class KeyStoreUtilities {
                             catch (final Exception e) {
                                 throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X", e);
                             }
-                            if (key == null) throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X");
+                            if (key == null) {
+                                throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X");
+                            }
                         }
                         else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
                             aliassesByFriendlyName.remove(al);
@@ -271,15 +282,16 @@ public final class KeyStoreUtilities {
                 final String value = aliassesByFriendlyName.get(al);
                 if (value.length() > ALIAS_MAX_LENGTH) {
                     tmpCN = AOUtil.getCN(value);
-                    if (tmpCN != null) aliassesByFriendlyName.put(al, tmpCN);
-                    else aliassesByFriendlyName.put(al, value.substring(0, ALIAS_MAX_LENGTH - 3) + "..."); //$NON-NLS-1$
+                    if (tmpCN != null) {
+                        aliassesByFriendlyName.put(al, tmpCN);
+                    }
+                    else {
+                        aliassesByFriendlyName.put(al, value.substring(0, ALIAS_MAX_LENGTH - 3) + "..."); //$NON-NLS-1$
+                    }
                 }
-                // Hacemos un trim() antes de insertar, porque los alias de los
-                // certificados de las tarjetas
-                // ceres terminan con un '\r', que se ve como un caracter
-                // extrano.
-                // Esto ya lo habremos hecho anteriormente si teniamos KeyStore
-                else aliassesByFriendlyName.put(al, value.trim());
+                else {
+                    aliassesByFriendlyName.put(al, value.trim());
+                }
             }
         }
 

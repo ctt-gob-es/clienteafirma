@@ -163,7 +163,7 @@ final class Utils {
         try {
             return assignKey(config);
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de asignado de clave: " + ex);
         }
 
@@ -176,12 +176,12 @@ final class Utils {
      * @param config
      *        configuraci&oacute;n necesaria para crear la clave.
      * @return */
-    private static SecretKey assignKey(AOCipherConfig config) throws NoSuchAlgorithmException {
-        SecureRandom rand = new SecureRandom();
+    private static SecretKey assignKey(final AOCipherConfig config) throws NoSuchAlgorithmException {
+        final SecureRandom rand = new SecureRandom();
 
-        KeyGenerator kg = KeyGenerator.getInstance(config.getAlgorithm().getName());
+        final KeyGenerator kg = KeyGenerator.getInstance(config.getAlgorithm().getName());
         kg.init(rand);
-        SecretKey encKey = kg.generateKey();
+        final SecretKey encKey = kg.generateKey();
         return encKey;
     }
 
@@ -203,7 +203,7 @@ final class Utils {
                                                                                                                    SALT,
                                                                                                                    ITERATION_COUNT));
             }
-            catch (Exception ex) {
+            catch (final Exception ex) {
                 Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de asignacion de la clave (a partir de password): " + ex);
             }
         }
@@ -223,22 +223,23 @@ final class Utils {
         ASN1Set certificates = null;
 
         if (signerCertificateChain.length != 0) {
-            List<DEREncodable> ce = new ArrayList<DEREncodable>();
-            for (int i = 0; i < signerCertificateChain.length; i++)
-                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
+            final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+            for (final X509Certificate element : signerCertificateChain) {
+                ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+            }
             certificates = createBerSetFromList(ce);
         }
 
         return certificates;
     }
 
-    public static Info initVariables(byte[] data, AOCipherConfig config, X509Certificate[] certDest, SecretKey cipherKey) throws IOException,
+    public static Info initVariables(final byte[] data, final AOCipherConfig config, final X509Certificate[] certDest, final SecretKey cipherKey) throws IOException,
                                                                                                                          CertificateEncodingException {
 
         // Reiniciamos las dos variables
-        Info infos = new Info();
+        final Info infos = new Info();
 
-        ASN1EncodableVector recipientInfos = new ASN1EncodableVector();
+        final ASN1EncodableVector recipientInfos = new ASN1EncodableVector();
         X509Certificate cert;
         TBSCertificateStructure tbs;
         IssuerAndSerialNumber isse;
@@ -252,8 +253,8 @@ final class Utils {
 
         RecipientInfo recipient = null;
 
-        for (int contCert = 0; contCert < certDest.length; contCert++) {
-            cert = certDest[contCert];
+        for (final X509Certificate element : certDest) {
+            cert = element;
             tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
             // Obtenemos el Isuer & serial number
             isse = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
@@ -296,7 +297,7 @@ final class Utils {
 
     /** M&eacute;todo que obtiene el EncriptedContentInfo a partir del archivo a
      * cifrar. El contenido es el siguiente:
-     * 
+     *
      * <pre>
      * <code>
      * EncryptedContentInfo ::= SEQUENCE {
@@ -319,21 +320,21 @@ final class Utils {
      * @throws java.security.InvalidKeyException
      * @throws java.io.IOException
      * @throws org.bouncycastle.cms.CMSException */
-    public static EncryptedContentInfo getEncryptedContentInfo(byte[] file, AOCipherConfig config, SecretKey cipherKey) throws NoSuchAlgorithmException,
+    public static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final SecretKey cipherKey) throws NoSuchAlgorithmException,
                                                                                                                        NoSuchPaddingException,
                                                                                                                        InvalidAlgorithmParameterException,
                                                                                                                        InvalidKeyException,
                                                                                                                        IOException {
 
-        AlgorithmParameterSpec params = getParams(config);
-        Cipher cipher = createCipher(config.toString());
+        final AlgorithmParameterSpec params = getParams(config);
+        final Cipher cipher = createCipher(config.toString());
         cipher.init(Cipher.ENCRYPT_MODE, cipherKey, params);
         return getEncryptedContentInfo(file, config, params, cipher);
     }
 
     /** M&eacute;todo que obtiene el EncriptedContentInfo a partir del archivo a
      * cifrar. El contenido es el siguiente:
-     * 
+     *
      * <pre>
      * <code>
      * EncryptedContentInfo ::= SEQUENCE {
@@ -363,8 +364,8 @@ final class Utils {
                                                                                                                                    InvalidAlgorithmParameterException,
                                                                                                                                    InvalidKeyException,
                                                                                                                                    IOException {
-        AlgorithmParameterSpec params = Utils.getParams(config);
-        Cipher cipher = createCipher(config.toString());
+        final AlgorithmParameterSpec params = Utils.getParams(config);
+        final Cipher cipher = createCipher(config.toString());
         cipher.init(Cipher.ENCRYPT_MODE, cipherKey, params);
         return getEncryptedContentInfo(file, config, params, cipher);
     }
@@ -380,21 +381,21 @@ final class Utils {
      *        Encriptador
      * @return
      * @throws IOException */
-    private static EncryptedContentInfo getEncryptedContentInfo(byte[] file, AOCipherConfig config, AlgorithmParameterSpec params, Cipher cipher) throws IOException {
+    private static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final AlgorithmParameterSpec params, final Cipher cipher) throws IOException {
         byte[] ciphered = null;
         try {
             ciphered = cipher.doFinal(file);
         }
-        catch (IllegalBlockSizeException ex) {
+        catch (final IllegalBlockSizeException ex) {
             Logger.getLogger(CMSEnvelopedData.class.getName()).log(Level.SEVERE, null, ex);
         }
-        catch (BadPaddingException ex) {
+        catch (final BadPaddingException ex) {
             Logger.getLogger(CMSEnvelopedData.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         DEREncodable asn1Params;
         if (params != null) {
-            ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1"));
+            final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1"));
             asn1Params = aIn.readObject();
         }
         else {
@@ -402,10 +403,10 @@ final class Utils {
         }
 
         // obtenemos el OID del algoritmo de cifrado
-        AlgorithmIdentifier encAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(config.getAlgorithm().getOid()), asn1Params);
+        final AlgorithmIdentifier encAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(config.getAlgorithm().getOid()), asn1Params);
 
         // Obtenemos el identificador
-        DERObjectIdentifier contentType = PKCSObjectIdentifiers.encryptedData;
+        final DERObjectIdentifier contentType = PKCSObjectIdentifiers.encryptedData;
         return new EncryptedContentInfo(contentType, encAlgId, new DEROctetString(ciphered));
     }
 
@@ -417,7 +418,7 @@ final class Utils {
      *        Proveedor que se utiliza para cifrar.
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException */
-    private static Cipher createCipher(String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
         return Cipher.getInstance(algName);
     }
 
@@ -427,10 +428,12 @@ final class Utils {
      * @param algorithmConfig
      *        Configuracion de cifrado que debemos parametrizar.
      * @return Par&aacute;metros para operar. */
-    public static AlgorithmParameterSpec getParams(AOCipherConfig algorithmConfig) {
+    public static AlgorithmParameterSpec getParams(final AOCipherConfig algorithmConfig) {
 
         AlgorithmParameterSpec params = null;
-        if (algorithmConfig.getAlgorithm().supportsPassword()) params = new PBEParameterSpec(SALT, ITERATION_COUNT);
+        if (algorithmConfig.getAlgorithm().supportsPassword()) {
+            params = new PBEParameterSpec(SALT, ITERATION_COUNT);
+        }
         else {
             if (!algorithmConfig.getBlockMode().equals(AOCipherBlockMode.ECB)) {
                 params = new IvParameterSpec(algorithmConfig.getAlgorithm().equals(AOCipherAlgorithm.AES) ? IV_16 : IV_8);
@@ -453,16 +456,16 @@ final class Utils {
      * @throws java.security.InvalidAlgorithmParameterException
      * @throws javax.crypto.IllegalBlockSizeException
      * @throws javax.crypto.BadPaddingException */
-    private static byte[] cipherKey(PublicKey pKey, SecretKey cipherKey) throws NoSuchAlgorithmException,
+    private static byte[] cipherKey(final PublicKey pKey, final SecretKey cipherKey) throws NoSuchAlgorithmException,
                                                                         NoSuchPaddingException,
                                                                         InvalidKeyException,
                                                                         InvalidAlgorithmParameterException,
                                                                         IllegalBlockSizeException {
 
-        Cipher cipher = createCipher(pKey.getAlgorithm());
-        AlgorithmParameters params = cipher.getParameters();
+        final Cipher cipher = createCipher(pKey.getAlgorithm());
+        final AlgorithmParameters params = cipher.getParameters();
         cipher.init(Cipher.WRAP_MODE, pKey, params);
-        byte[] ciphered = cipher.wrap(cipherKey);
+        final byte[] ciphered = cipher.wrap(cipherKey);
 
         return ciphered;
     }
@@ -474,12 +477,14 @@ final class Utils {
      * @param messageDigest
      * @return ASN1EncodableVector
      * @throws NoSuchAlgorithmException */
-    public static ASN1EncodableVector initContexExpecific(String digestAlgorithm, byte[] datos, Oid dataType, byte[] messageDigest) throws NoSuchAlgorithmException {
+    public static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final Oid dataType, byte[] messageDigest) throws NoSuchAlgorithmException {
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        if (dataType != null) ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
+        if (dataType != null) {
+            ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
+        }
 
         // fecha de firma
         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
@@ -501,18 +506,18 @@ final class Utils {
      *        Lista de atributos no firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos no firmados de la firma. */
-    public static ASN1Set generateUnsignedAtt(Map<Oid, byte[]> uatrib) {
+    public static ASN1Set generateUnsignedAtt(final Map<Oid, byte[]> uatrib) {
 
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
-            Iterator<Map.Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
+            final Iterator<Map.Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<Oid, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
@@ -527,11 +532,15 @@ final class Utils {
         return getAttributeSet(new AttributeTable(ContexExpecific));
     }
 
-    public static byte[] genMac(String encryptionAlg, byte[] content, SecretKey ciphKey) throws NoSuchAlgorithmException, IOException {
+    public static byte[] genMac(final String encryptionAlg, final byte[] content, final SecretKey ciphKey) throws NoSuchAlgorithmException, IOException {
         Mac mac;
 
-        if (encryptionAlg == null || encryptionAlg.equals("")) mac = Mac.getInstance(ENCRYPTION_ALG_DEFAULT);
-        else mac = Mac.getInstance(encryptionAlg);
+        if (encryptionAlg == null || encryptionAlg.equals("")) {
+            mac = Mac.getInstance(ENCRYPTION_ALG_DEFAULT);
+        }
+        else {
+            mac = Mac.getInstance(encryptionAlg);
+        }
         try {
             mac.init(ciphKey);
             return mac.doFinal(content);
@@ -541,17 +550,20 @@ final class Utils {
         }
     }
 
-    public static OriginatorInfo checkCertificates(X509Certificate[] signerCertificateChain, OriginatorInfo origInfo, ASN1Set certs) throws IOException,
+    public static OriginatorInfo checkCertificates(final X509Certificate[] signerCertificateChain, OriginatorInfo origInfo, final ASN1Set certs) throws IOException,
                                                                                                                                     CertificateEncodingException {
         // Si no hay certificados, se deja como esta.
         if (signerCertificateChain.length != 0) {
             // no tiene remitentes
             if (certs == null) {
                 ASN1Set certificates = null;
-                ASN1Set certrevlist = null;
-                List<DEREncodable> ce = new ArrayList<DEREncodable>();
-                for (int i = 0; i < signerCertificateChain.length; i++)
-                    if (signerCertificateChain[i] != null) ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
+                final ASN1Set certrevlist = null;
+                final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+                for (final X509Certificate element : signerCertificateChain) {
+                    if (element != null) {
+                        ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                    }
+                }
                 // se introducen la nueva cadena de certificados.
                 if (ce.size() != 0) {
                     certificates = createBerSetFromList(ce);
@@ -561,9 +573,9 @@ final class Utils {
             // tiene remitentes
             else {
                 // Se obtienen los certificados que tenia la firma.
-                ASN1EncodableVector v = new ASN1EncodableVector();
+                final ASN1EncodableVector v = new ASN1EncodableVector();
                 if (certs.getObjectAt(0) instanceof DERSequence) {
-                    ASN1EncodableVector subv = new ASN1EncodableVector();
+                    final ASN1EncodableVector subv = new ASN1EncodableVector();
                     for (int i = 0; i < certs.size(); i++) {
                         subv.add(certs.getObjectAt(i));
                     }
@@ -576,10 +588,13 @@ final class Utils {
                 }
 
                 ASN1Set certificates = null;
-                ASN1Set certrevlist = new BERSet(new ASN1EncodableVector());
-                List<DEREncodable> ce = new ArrayList<DEREncodable>();
-                for (int i = 0; i < signerCertificateChain.length; i++)
-                    if (signerCertificateChain[i] != null) ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
+                final ASN1Set certrevlist = new BERSet(new ASN1EncodableVector());
+                final List<DEREncodable> ce = new ArrayList<DEREncodable>();
+                for (final X509Certificate element : signerCertificateChain) {
+                    if (element != null) {
+                        ce.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+                    }
+                }
                 // se introducen la nueva cadena de certificados.
                 if (ce.size() != 0) {
                     certificates = createBerSetFromList(ce);
@@ -600,11 +615,11 @@ final class Utils {
      * @throws AOInvalidRecipientException
      * @throws IOException
      * @throws CertificateEncodingException */
-    public static EncryptedKeyDatas fetchEncryptedKeyDatas(X509Certificate userCert, Enumeration<?> elementRecipient) throws AOInvalidRecipientException,
+    public static EncryptedKeyDatas fetchEncryptedKeyDatas(final X509Certificate userCert, final Enumeration<?> elementRecipient) throws AOInvalidRecipientException,
                                                                                                                      IOException,
                                                                                                                      CertificateEncodingException {
 
-        EncryptedKeyDatas encryptedKeyDatas = new EncryptedKeyDatas();
+        final EncryptedKeyDatas encryptedKeyDatas = new EncryptedKeyDatas();
         AlgorithmIdentifier algEncryptedKey = null;
         byte[] encryptedKey = null;
 
@@ -620,10 +635,10 @@ final class Utils {
         RecipientInfo reci = null;
         while (elementRecipient.hasMoreElements()) {
             // obtengo los recipientInfo
-            ASN1Sequence intermedio = (ASN1Sequence) elementRecipient.nextElement();
+            final ASN1Sequence intermedio = (ASN1Sequence) elementRecipient.nextElement();
             reci = RecipientInfo.getInstance(intermedio);
-            KeyTransRecipientInfo kri = KeyTransRecipientInfo.getInstance(reci.getDERObject());
-            IssuerAndSerialNumber actual = IssuerAndSerialNumber.getInstance(kri.getRecipientIdentifier().getDERObject());
+            final KeyTransRecipientInfo kri = KeyTransRecipientInfo.getInstance(reci.getDERObject());
+            final IssuerAndSerialNumber actual = IssuerAndSerialNumber.getInstance(kri.getRecipientIdentifier().getDERObject());
             // Comparo el issuer y el serial number con el certificado que me
             // pasan para descifrar.
             if (actual.equals(isse)) {
@@ -649,20 +664,20 @@ final class Utils {
      *        Bytes con los datos
      * @return ASN1Sequence
      * @throws IOException */
-    public static ASN1Sequence fetchWrappedData(byte[] cmsData) throws IOException {
+    public static ASN1Sequence fetchWrappedData(final byte[] cmsData) throws IOException {
         // Leemos el fichero que contiene el envoltorio
-        ASN1InputStream is = new ASN1InputStream(cmsData);
+        final ASN1InputStream is = new ASN1InputStream(cmsData);
 
         // Comenzamos a obtener los datos.
-        ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        Enumeration<?> e = dsq.getObjects();
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+        final Enumeration<?> e = dsq.getObjects();
 
         // Elementos que contienen los elementos OID EnvelopedData.
         e.nextElement();
 
         // Contenido de EnvelopedData
-        ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        ASN1Sequence authenticatedData = (ASN1Sequence) doj.getObject();
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1Sequence authenticatedData = (ASN1Sequence) doj.getObject();
         return authenticatedData;
     }
 
@@ -682,16 +697,16 @@ final class Utils {
      * @throws org.bouncycastle.cms.CMSException
      * @throws javax.crypto.IllegalBlockSizeException
      * @throws javax.crypto.BadPaddingException */
-    public static byte[] deCipherContent(byte[] file, AOCipherConfig config, SecretKey cipherKey) throws NoSuchAlgorithmException,
+    public static byte[] deCipherContent(final byte[] file, final AOCipherConfig config, final SecretKey cipherKey) throws NoSuchAlgorithmException,
                                                                                                  NoSuchPaddingException,
                                                                                                  InvalidAlgorithmParameterException,
                                                                                                  InvalidKeyException,
                                                                                                  IllegalBlockSizeException,
                                                                                                  BadPaddingException {
         // asignamos los par&aacute;metros
-        AlgorithmParameterSpec params = getParams(config);
+        final AlgorithmParameterSpec params = getParams(config);
         // Creamos el cipher
-        Cipher cipher = createCipher(config.toString());
+        final Cipher cipher = createCipher(config.toString());
         // inicializamos el cipher
         cipher.init(Cipher.DECRYPT_MODE, cipherKey, params);
 
@@ -707,8 +722,8 @@ final class Utils {
      * @return Clave secreta
      * @throws InvalidKeySpecException
      * @throws NoSuchAlgorithmException */
-    public static SecretKey loadCipherKey(AOCipherConfig config, String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        SecretKey cipherKey =
+    public static SecretKey loadCipherKey(final AOCipherConfig config, final String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        final SecretKey cipherKey =
                 SecretKeyFactory.getInstance(config.getAlgorithm().getName())
                                 .generateSecret(new PBEKeySpec(key.toCharArray(), SALT, ITERATION_COUNT));
 
@@ -735,14 +750,16 @@ final class Utils {
         AOCipherAlgorithm algorithm = null;
 
         // obtenemos el algoritmo usado para cifrar la pass
-        for (AOCipherAlgorithm algo : AOCipherAlgorithm.values()) {
+        for (final AOCipherAlgorithm algo : AOCipherAlgorithm.values()) {
             if (algo.getOid().equals(algClave.getAlgorithm().toString())) {
                 algorithm = algo;
                 break;
             }
         }
 
-        if (algorithm == null) throw new AOException("No se ha podido determinal el algoritmo de cifrado de la clave");
+        if (algorithm == null) {
+            throw new AOException("No se ha podido determinal el algoritmo de cifrado de la clave");
+        }
 
         // establecemos como configuraci&oacute;n para descifrar el contenido
         // del paquete despu&eacute;s,
@@ -751,13 +768,13 @@ final class Utils {
         // Desembolvemos la clave usada para cifrar el contenido
         // a partir de la clave privada del certificado del usuario.
         try {
-            byte[] encrypted = passCiphered;
-            Cipher cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            final byte[] encrypted = passCiphered;
+            final Cipher cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             cipher2.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
             keyAsigned.setCipherKey((SecretKey) cipher2.unwrap(encrypted, algorithm.getName(), Cipher.SECRET_KEY));
             return keyAsigned;
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Ocurri\u00F3 un error al recuperar la clave de cifrado del sobre digital: " + e);
             throw new AOException("Ocurri\u00F3 un error al recuperar la clave de cifrado del sobre digital", e);
         }
@@ -778,18 +795,18 @@ final class Utils {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.security.cert.CertificateException
      * @throws java.io.IOException */
-    public static ASN1Set generateSignerInfo(String digestAlgorithm, byte[] datos, Oid dataType, Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
+    public static ASN1Set generateSignerInfo(final String digestAlgorithm, final byte[] datos, final Oid dataType, final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = Utils.initContexExpecific(digestAlgorithm, datos, dataType, null);
+        final ASN1EncodableVector ContexExpecific = Utils.initContexExpecific(digestAlgorithm, datos, dataType, null);
 
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
-            Iterator<Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
+            final Iterator<Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<Oid, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
@@ -797,7 +814,9 @@ final class Utils {
                                                   new DERSet(new DERPrintableString(e.getValue()))));
             }
         }
-        else return null;
+        else {
+            return null;
+        }
 
         return getAttributeSet(new AttributeTable(ContexExpecific));
     }
@@ -806,7 +825,7 @@ final class Utils {
      * @param datos
      *        informacion de los datos cifrados sin formatear.
      * @return informacion de los datos cifrados. */
-    public static String getEncryptedContentInfo(EncryptedContentInfo datos) {
+    public static String getEncryptedContentInfo(final EncryptedContentInfo datos) {
         String info = "";
 
         // especificamos el tipo de contenido
@@ -818,14 +837,14 @@ final class Utils {
         }
 
         // el algoritmo de cifrado de los datos
-        AlgorithmIdentifier ai = datos.getContentEncryptionAlgorithm();
+        final AlgorithmIdentifier ai = datos.getContentEncryptionAlgorithm();
         AOCipherAlgorithm algorithm = null;
-        AOCipherAlgorithm[] algos = AOCipherAlgorithm.values();
+        final AOCipherAlgorithm[] algos = AOCipherAlgorithm.values();
 
         // obtenemos el algoritmo usado para cifrar la pass
-        for (int i = 0; i < algos.length; i++) {
-            if (algos[i].getOid().equals(ai.getAlgorithm().toString())) {
-                algorithm = algos[i];
+        for (final AOCipherAlgorithm algo : algos) {
+            if (algo.getOid().equals(ai.getAlgorithm().toString())) {
+                algorithm = algo;
             }
         }
 
@@ -845,18 +864,19 @@ final class Utils {
      * @return ASN1EncodableVector
      * @throws IOException
      * @throws CertificateEncodingException */
-    public static ASN1EncodableVector loadCertificatesList(SignedAndEnvelopedData signEnv, X509Certificate[] signerCertificateChain) throws IOException,
+    public static ASN1EncodableVector loadCertificatesList(final SignedAndEnvelopedData signEnv, final X509Certificate[] signerCertificateChain) throws IOException,
                                                                                                                                     CertificateEncodingException {
-        ASN1EncodableVector signCerts = new ASN1EncodableVector();
+        final ASN1EncodableVector signCerts = new ASN1EncodableVector();
 
-        Enumeration<?> cers = signEnv.getCertificates().getObjects();
+        final Enumeration<?> cers = signEnv.getCertificates().getObjects();
         while (cers.hasMoreElements()) {
             signCerts.add((ASN1Sequence) cers.nextElement());
         }
 
         if (signerCertificateChain.length != 0) {
-            for (int i = 0; i < signerCertificateChain.length; i++)
-                signCerts.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[i].getEncoded())));
+            for (final X509Certificate element : signerCertificateChain) {
+                signCerts.add(X509CertificateStructure.getInstance(ASN1Object.fromByteArray(element.getEncoded())));
+            }
         }
 
         return signCerts;
@@ -873,14 +893,14 @@ final class Utils {
      * @param signedAttr2
      * @return SignerInfo
      * @throws IOException */
-    public static SignerInfo signAndEnvelope(PrivateKeyEntry keyEntry,
-                                             String signatureAlgorithm,
-                                             AlgorithmIdentifier digAlgId,
-                                             SignerIdentifier identifier,
-                                             ASN1Set signedAttr,
-                                             ASN1Set unSignedAttr,
-                                             AlgorithmId digestAlgorithmIdEnc,
-                                             ASN1Set signedAttr2) throws IOException {
+    public static SignerInfo signAndEnvelope(final PrivateKeyEntry keyEntry,
+                                             final String signatureAlgorithm,
+                                             final AlgorithmIdentifier digAlgId,
+                                             final SignerIdentifier identifier,
+                                             final ASN1Set signedAttr,
+                                             final ASN1Set unSignedAttr,
+                                             final AlgorithmId digestAlgorithmIdEnc,
+                                             final ASN1Set signedAttr2) throws IOException {
         AlgorithmIdentifier encAlgId;
         try {
             encAlgId = makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
@@ -893,12 +913,12 @@ final class Utils {
         try {
             sign2 = firma(signatureAlgorithm, keyEntry, signedAttr2);
         }
-        catch (AOException ex) {
+        catch (final AOException ex) {
             Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         // EN ESTE PUNTO YA TENEMOS EL NUEVO SIGNER
-        SignerInfo nuevoSigner = new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
+        final SignerInfo nuevoSigner = new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
                 );
 
         return nuevoSigner;
@@ -943,7 +963,9 @@ final class Utils {
 
         // Actualizamos la configuracion de firma
         try {
-            if (tmp != null) sig.update(tmp);
+            if (tmp != null) {
+                sig.update(tmp);
+            }
         }
         catch (final SignatureException e) {
             throw new AOException("Error al configurar la informacion de firma", e);
@@ -958,7 +980,7 @@ final class Utils {
             throw new AOException("Error durante el proceso de firma", e);
         }
 
-        ASN1OctetString encDigest = new DEROctetString(realSig);
+        final ASN1OctetString encDigest = new DEROctetString(realSig);
 
         return encDigest;
     }
@@ -973,7 +995,7 @@ final class Utils {
      * @param signBinaryType
      *        Tipo de firmado binario (CADES o CMS)
      * @return Representaci&oacute;n de los datos. */
-    public static String extractData(ASN1TaggedObject doj, String envelopeType, String tipoDetalle, String signBinaryType) {
+    public static String extractData(final ASN1TaggedObject doj, final String envelopeType, final String tipoDetalle, final String signBinaryType) {
         String detalle = "";
         detalle = detalle + tipoDetalle;
 
@@ -988,14 +1010,14 @@ final class Utils {
         ASN1Set signerInfosSd = null;
 
         if (envelopeType.equals("0")) {
-            EnvelopedData ed = new EnvelopedData((ASN1Sequence) doj.getObject());
+            final EnvelopedData ed = new EnvelopedData((ASN1Sequence) doj.getObject());
             version = ed.getVersion();
             rins = ed.getRecipientInfos();
             encryptedContentInfo = ed.getEncryptedContentInfo();
             unprotectedAttrs = ed.getUnprotectedAttrs();
         }
         else if (envelopeType.equals("1")) {
-            AuthenticatedData ed = new AuthenticatedData((ASN1Sequence) doj.getObject());
+            final AuthenticatedData ed = new AuthenticatedData((ASN1Sequence) doj.getObject());
             version = ed.getVersion();
             rins = ed.getRecipientInfos();
             aid = ed.getMacAlgorithm();
@@ -1004,7 +1026,7 @@ final class Utils {
             unprotectedAttrs = ed.getUnauthAttrs();
         }
         else if (envelopeType.equals("2")) {
-            AuthEnvelopedData ed = new AuthEnvelopedData((ASN1Sequence) doj.getObject());
+            final AuthEnvelopedData ed = new AuthEnvelopedData((ASN1Sequence) doj.getObject());
             version = ed.getVersion();
             rins = ed.getRecipientInfos();
             encryptedContentInfo = ed.getAuthEncryptedContentInfo();
@@ -1012,24 +1034,26 @@ final class Utils {
             unprotectedAttrs = ed.getUnauthAttrs();
         }
         else if (envelopeType.equals("3")) {
-            SignedAndEnvelopedData ed = new SignedAndEnvelopedData((ASN1Sequence) doj.getObject());
+            final SignedAndEnvelopedData ed = new SignedAndEnvelopedData((ASN1Sequence) doj.getObject());
             version = ed.getVersion();
             rins = ed.getRecipientInfos();
             encryptedContentInfo = ed.getEncryptedContentInfo();
             signerInfosSd = ed.getSignerInfos();
         }
         else if (envelopeType.equals("4")) {
-            SignedData ed = new SignedData((ASN1Sequence) doj.getObject());
+            final SignedData ed = new SignedData((ASN1Sequence) doj.getObject());
             version = ed.getVersion();
             ds = ed.getDigestAlgorithms();
             ci = ed.getEncapContentInfo();
             signerInfosSd = ed.getSignerInfos();
         }
         else if (envelopeType.equals("5")) {
-            ASN1Sequence ed = (ASN1Sequence) doj.getObject();
+            final ASN1Sequence ed = (ASN1Sequence) doj.getObject();
             version = DERInteger.getInstance(ed.getObjectAt(0));
             encryptedContentInfo = EncryptedContentInfo.getInstance(ed.getObjectAt(1));
-            if (ed.size() == 3) unprotectedAttrs = (ASN1Set) ed.getObjectAt(2);
+            if (ed.size() == 3) {
+                unprotectedAttrs = (ASN1Set) ed.getObjectAt(2);
+            }
         }
 
         // obtenemos la version
@@ -1041,7 +1065,7 @@ final class Utils {
                 detalle = detalle + "Destinatarios: \n";
             }
             for (int i = 0; i < rins.size(); i++) {
-                KeyTransRecipientInfo kti = KeyTransRecipientInfo.getInstance(RecipientInfo.getInstance(rins.getObjectAt(i)).getInfo());
+                final KeyTransRecipientInfo kti = KeyTransRecipientInfo.getInstance(RecipientInfo.getInstance(rins.getObjectAt(i)).getInfo());
                 detalle = detalle + " - Informacion de destino de firma " + (i + 1) + ":\n";
                 final AlgorithmIdentifier diAlg = kti.getKeyEncryptionAlgorithm();
 
@@ -1052,12 +1076,12 @@ final class Utils {
 
                 // el algoritmo de cifrado de los datos
                 AOCipherAlgorithm algorithm = null;
-                AOCipherAlgorithm[] algos = AOCipherAlgorithm.values();
+                final AOCipherAlgorithm[] algos = AOCipherAlgorithm.values();
 
                 // obtenemos el algoritmo usado para cifrar la pass
-                for (int j = 0; j < algos.length; j++) {
-                    if (algos[j].getOid().equals(diAlg.getAlgorithm().toString())) {
-                        algorithm = algos[j];
+                for (final AOCipherAlgorithm algo : algos) {
+                    if (algo.getOid().equals(diAlg.getAlgorithm().toString())) {
+                        algorithm = algo;
                     }
                 }
                 if (algorithm != null) {
@@ -1080,9 +1104,9 @@ final class Utils {
             detalle = detalle + "OID del Algoritmo de MAC: " + aid.getAlgorithm() + "\n";
 
             // digestAlgorithm
-            ASN1Sequence seq = (ASN1Sequence) doj.getObject();
-            ASN1TaggedObject da = (ASN1TaggedObject) seq.getObjectAt(4);
-            AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getObject());
+            final ASN1Sequence seq = (ASN1Sequence) doj.getObject();
+            final ASN1TaggedObject da = (ASN1TaggedObject) seq.getObjectAt(4);
+            final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getObject());
             detalle = detalle + "OID del Algoritmo de firma: " + dai.getAlgorithm() + "\n";
 
             // obtenemos datos de los datos cifrados.
@@ -1098,9 +1122,9 @@ final class Utils {
         }
         else if (envelopeType.equals("3")) {
             // algoritmo de firma
-            ASN1Sequence seq = (ASN1Sequence) doj.getObject();
-            ASN1Set da = (ASN1Set) seq.getObjectAt(2);
-            AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getObjectAt(0));
+            final ASN1Sequence seq = (ASN1Sequence) doj.getObject();
+            final ASN1Set da = (ASN1Set) seq.getObjectAt(2);
+            final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(da.getObjectAt(0));
             detalle = detalle + "OID del Algoritmo de firma: " + dai.getAlgorithm() + "\n";
 
             // obtenemos datos de los datos cifrados.
@@ -1109,19 +1133,21 @@ final class Utils {
         }
         else if (envelopeType.equals("4") && ci != null && ds != null) {
             // algoritmo de firma
-            AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(ds.getObjectAt(0));
+            final AlgorithmIdentifier dai = AlgorithmIdentifier.getInstance(ds.getObjectAt(0));
             detalle = detalle + "OID del Algoritmo de firma: " + dai.getAlgorithm() + "\n";
             detalle = detalle + "OID del tipo de contenido: " + ci.getContentType() + "\n";
         }
 
         // obtenemos lo atributos opcionales
-        if (!envelopeType.equals("3")) if (unprotectedAttrs == null) {
-            detalle = detalle + "Atributos : No tiene atributos opcionales\n";
-        }
-        else {
-            String atributos = getUnSignedAttributes(unprotectedAttrs.getObjects());
-            detalle = detalle + "Atributos : \n";
-            detalle = detalle + atributos;
+        if (!envelopeType.equals("3")) {
+            if (unprotectedAttrs == null) {
+                detalle = detalle + "Atributos : No tiene atributos opcionales\n";
+            }
+            else {
+                final String atributos = getUnSignedAttributes(unprotectedAttrs.getObjects());
+                detalle = detalle + "Atributos : \n";
+                detalle = detalle + atributos;
+            }
         }
         else if (envelopeType.equals("3") || envelopeType.equals("4")) {
             // obtenemos el(los) firmate(s)
@@ -1130,23 +1156,23 @@ final class Utils {
                     detalle = detalle + "Firmantes:\n";
                 }
                 for (int i = 0; i < signerInfosSd.size(); i++) {
-                    SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
 
                     detalle = detalle + "- firmante " + (i + 1) + " :\n";
                     // version
                     detalle = detalle + "\tversion: " + si.getVersion() + "\n";
                     // signerIdentifier
-                    SignerIdentifier sident = si.getSID();
-                    IssuerAndSerialNumber iss = IssuerAndSerialNumber.getInstance(sident.getId());
+                    final SignerIdentifier sident = si.getSID();
+                    final IssuerAndSerialNumber iss = IssuerAndSerialNumber.getInstance(sident.getId());
                     detalle = detalle + "\tIssuer: " + iss.getName().toString() + "\n";
                     detalle = detalle + "\tNumero de serie: " + iss.getSerialNumber() + "\n";
 
                     // digestAlgorithm
-                    AlgorithmIdentifier algId = si.getDigestAlgorithm();
+                    final AlgorithmIdentifier algId = si.getDigestAlgorithm();
                     detalle = detalle + "\tOID del algoritmo de firma de este firmante: " + algId.getAlgorithm() + "\n";
 
                     // obtenemos lo atributos obligatorios
-                    ASN1Set sa = si.getAuthenticatedAttributes();
+                    final ASN1Set sa = si.getAuthenticatedAttributes();
                     String satributes = "";
                     if (sa != null) {
                         satributes = getsignedAttributes(sa, signBinaryType);
@@ -1166,13 +1192,13 @@ final class Utils {
      * @param detalle
      * @param authAttrs
      * @return */
-    private static String getObligatorieAtrib(String signBinaryType, String detalle, ASN1Set authAttrs) {
+    private static String getObligatorieAtrib(final String signBinaryType, String detalle, final ASN1Set authAttrs) {
         // obtenemos lo atributos obligatorios
         if (authAttrs == null) {
             detalle = detalle + "Atributos Autenticados: No tiene atributos autenticados\n";
         }
         else {
-            String atributos = getsignedAttributes(authAttrs, signBinaryType);
+            final String atributos = getsignedAttributes(authAttrs, signBinaryType);
             detalle = detalle + "Atributos Autenticados: \n";
             detalle = detalle + atributos;
         }
@@ -1185,14 +1211,14 @@ final class Utils {
      * @param binarySignType
      *        Identifica el tipo de firma binaria (CMS o CADES)
      * @return lista de atributos concatenados. */
-    public static String getsignedAttributes(ASN1Set attributes, String binarySignType) {
+    public static String getsignedAttributes(final ASN1Set attributes, final String binarySignType) {
         String attributos = "";
 
-        Enumeration<?> e = attributes.getObjects();
+        final Enumeration<?> e = attributes.getObjects();
 
         while (e.hasMoreElements()) {
-            ASN1Sequence a = (ASN1Sequence) e.nextElement();
-            DERObjectIdentifier derIden = (DERObjectIdentifier) a.getObjectAt(0);
+            final ASN1Sequence a = (ASN1Sequence) e.nextElement();
+            final DERObjectIdentifier derIden = (DERObjectIdentifier) a.getObjectAt(0);
             // tipo de contenido de la firma.
             if (derIden.equals(CMSAttributes.contentType)) {
                 attributos = attributos + "\t\tOID del tipo de contenido: " + a.getObjectAt(1) + "\n";
@@ -1203,17 +1229,17 @@ final class Utils {
             }
             // la fecha de firma. obtenemos y casteamos a algo legible.
             if (derIden.equals(CMSAttributes.signingTime)) {
-                ASN1Set time = (ASN1Set) a.getObjectAt(1);
-                DERUTCTime d = (DERUTCTime) time.getObjectAt(0);
+                final ASN1Set time = (ASN1Set) a.getObjectAt(1);
+                final DERUTCTime d = (DERUTCTime) time.getObjectAt(0);
                 Date date = null;
                 try {
                     date = d.getDate();
                 }
-                catch (ParseException ex) {
+                catch (final ParseException ex) {
                     Logger.getLogger("es.gob.afirma").warning("No es posible convertir la fecha");
                 }
-                SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss");
-                String ds = formatter.format(date);
+                final SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss");
+                final String ds = formatter.format(date);
 
                 attributos = attributos + "\t\tContiene fecha de firma: " + ds + "\n";
             }
@@ -1237,12 +1263,12 @@ final class Utils {
      * @param attributes
      *        Grupo de atributos opcionales
      * @return lista de atributos concatenados. */
-    private static String getUnSignedAttributes(Enumeration<?> e) {
+    private static String getUnSignedAttributes(final Enumeration<?> e) {
         String attributos = "";
 
         while (e.hasMoreElements()) {
-            ASN1Sequence a = (ASN1Sequence) e.nextElement();
-            DERObjectIdentifier derIden = (DERObjectIdentifier) a.getObjectAt(0);
+            final ASN1Sequence a = (ASN1Sequence) e.nextElement();
+            final DERObjectIdentifier derIden = (DERObjectIdentifier) a.getObjectAt(0);
             // tipo de contenido de la firma.
             if (derIden.equals(CMSAttributes.contentType)) {
                 attributos = attributos + "\tOID del tipo de contenido: " + a.getObjectAt(1) + "\n";
@@ -1253,17 +1279,17 @@ final class Utils {
             }
             // la fecha de firma. obtenemos y casteamos a algo legible.
             if (derIden.equals(CMSAttributes.signingTime)) {
-                ASN1Set time = (ASN1Set) a.getObjectAt(1);
-                DERUTCTime d = (DERUTCTime) time.getObjectAt(0);
+                final ASN1Set time = (ASN1Set) a.getObjectAt(1);
+                final DERUTCTime d = (DERUTCTime) time.getObjectAt(0);
                 Date date = null;
                 try {
                     date = d.getDate();
                 }
-                catch (ParseException ex) {
+                catch (final ParseException ex) {
                     Logger.getLogger("es.gob.afirma").warning("No es posible convertir la fecha");
                 }
-                SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss");
-                String ds = formatter.format(date);
+                final SimpleDateFormat formatter = new SimpleDateFormat("E, dd MMM yyyy HH:mm:ss");
+                final String ds = formatter.format(date);
 
                 attributos = attributos + "\tContiene fecha de firma: " + ds + "\n";
             }
@@ -1289,14 +1315,18 @@ final class Utils {
      * @param digestAlgorithmId
      * @return keyAlgorithm
      * @throws IOException */
-    public static String getKeyAlgorithm(String signatureAlgorithm, AlgorithmId digestAlgorithmId) throws IOException {
+    public static String getKeyAlgorithm(final String signatureAlgorithm, final AlgorithmId digestAlgorithmId) throws IOException {
         try {
             String keyAlgorithm = null;
-            int with = signatureAlgorithm.indexOf("with");
+            final int with = signatureAlgorithm.indexOf("with");
             if (with > 0) {
-                int and = signatureAlgorithm.indexOf("and", with + 4);
-                if (and > 0) keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-                else keyAlgorithm = signatureAlgorithm.substring(with + 4);
+                final int and = signatureAlgorithm.indexOf("and", with + 4);
+                if (and > 0) {
+                    keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
+                }
+                else {
+                    keyAlgorithm = signatureAlgorithm.substring(with + 4);
+                }
             }
 
             return keyAlgorithm;
@@ -1328,22 +1358,22 @@ final class Utils {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws CertificateEncodingException */
-    public static ASN1EncodableVector generateSignerInfo(X509Certificate cert,
-                                                         AlgorithmId digestAlgorithmId,
-                                                         String digestAlgorithm,
-                                                         AlgorithmIdentifier digAlgId,
-                                                         byte[] datos,
-                                                         String politica,
-                                                         Oid qualifier,
-                                                         boolean signingCertificateV2,
-                                                         Oid dataType,
-                                                         byte[] messageDigest) throws NoSuchAlgorithmException,
+    public static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
+                                                         final AlgorithmId digestAlgorithmId,
+                                                         final String digestAlgorithm,
+                                                         final AlgorithmIdentifier digAlgId,
+                                                         final byte[] datos,
+                                                         final String politica,
+                                                         final Oid qualifier,
+                                                         final boolean signingCertificateV2,
+                                                         final Oid dataType,
+                                                         final byte[] messageDigest) throws NoSuchAlgorithmException,
                                                                               IOException,
                                                                               CertificateEncodingException {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = initContexExpecific(digestAlgorithm, datos, dataType, messageDigest);
+        final ASN1EncodableVector ContexExpecific = initContexExpecific(digestAlgorithm, datos, dataType, messageDigest);
 
         // Serial Number
         // comentar lo de abajo para version del rfc 3852
@@ -1359,20 +1389,20 @@ final class Utils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber */
 
-            TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-            GeneralName gn = new GeneralName(tbs.getIssuer());
-            GeneralNames gns = new GeneralNames(gn);
+            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+            final GeneralName gn = new GeneralName(tbs.getIssuer());
+            final GeneralNames gns = new GeneralNames(gn);
 
-            IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
+            final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
 
             /** ESSCertIDv2 ::= SEQUENCE { hashAlgorithm AlgorithmIdentifier
              * DEFAULT {algorithm id-sha256}, certHash Hash, issuerSerial
              * IssuerSerial OPTIONAL }
              * Hash ::= OCTET STRING */
 
-            MessageDigest md = MessageDigest.getInstance(AOCryptoUtil.getDigestAlgorithmName(digestAlgorithmId.getName()));
-            byte[] certHash = md.digest(cert.getEncoded());
-            ESSCertIDv2[] essCertIDv2 = {
+            final MessageDigest md = MessageDigest.getInstance(AOCryptoUtil.getDigestAlgorithmName(digestAlgorithmId.getName()));
+            final byte[] certHash = md.digest(cert.getEncoded());
+            final ESSCertIDv2[] essCertIDv2 = {
                 new ESSCertIDv2(digAlgId, certHash, isuerSerial)
             };
 
@@ -1387,12 +1417,14 @@ final class Utils {
             SigningCertificateV2 scv2 = null;
             if (qualifier != null) {
 
-                DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
-                if (politica.equals("")) pI = new PolicyInformation[] {
-                    new PolicyInformation(oidQualifier)
-                };
+                final DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
+                if (politica.equals("")) {
+                    pI = new PolicyInformation[] {
+                        new PolicyInformation(oidQualifier)
+                    };
+                }
                 else {
-                    PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
+                    final PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier, new DERSequence(pqInfo))
                     };
@@ -1421,21 +1453,21 @@ final class Utils {
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber } */
 
-            TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-            GeneralName gn = new GeneralName(tbs.getIssuer());
-            GeneralNames gns = new GeneralNames(gn);
+            final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+            final GeneralName gn = new GeneralName(tbs.getIssuer());
+            final GeneralNames gns = new GeneralNames(gn);
 
-            IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
+            final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
 
             /** ESSCertID ::= SEQUENCE { certHash Hash, issuerSerial IssuerSerial
              * OPTIONAL }
              * Hash ::= OCTET STRING -- SHA1 hash of entire certificate */
             // MessageDigest
             // Los DigestAlgorithms con SHA-2 tienen un guion:
-            String digestAlgorithmName = AOCryptoUtil.getDigestAlgorithmName(digestAlgorithmId.getName());
-            MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
-            byte[] certHash = md.digest(cert.getEncoded());
-            ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
+            final String digestAlgorithmName = AOCryptoUtil.getDigestAlgorithmName(digestAlgorithmId.getName());
+            final MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
+            final byte[] certHash = md.digest(cert.getEncoded());
+            final ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
 
             /** PolicyInformation ::= SEQUENCE { policyIdentifier CertPolicyId,
              * policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo
@@ -1448,14 +1480,14 @@ final class Utils {
             SigningCertificate scv = null;
             if (qualifier != null) {
 
-                DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
+                final DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
                 if (politica.equals("")) {
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier)
                     };
                 }
                 else {
-                    PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
+                    final PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier, new DERSequence(pqInfo))
                     };
@@ -1468,7 +1500,7 @@ final class Utils {
                  * HAY QUE HACER UN SEQUENCE, YA QUE EL CONSTRUCTOR DE BOUNCY
                  * CASTLE NO TIENE DICHO CONSTRUCTOR.
                  */
-                ASN1EncodableVector v = new ASN1EncodableVector();
+                final ASN1EncodableVector v = new ASN1EncodableVector();
                 v.add(new DERSequence(essCertID));
                 v.add(new DERSequence(pI));
                 scv = new SigningCertificate(new DERSequence(v)); // con
@@ -1491,15 +1523,15 @@ final class Utils {
             /*
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
-            DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(qualifier.toString());
+            final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(qualifier.toString());
 
             /*
              * OtherHashAlgAndValue ::= SEQUENCE { hashAlgorithm
              * AlgorithmIdentifier, hashValue OCTET STRING }
              */
-            MessageDigest mdgest = MessageDigest.getInstance(digestAlgorithm);
-            byte[] hashed = mdgest.digest(politica.getBytes());
-            DigestInfo OtherHashAlgAndValue = new DigestInfo(digAlgId, hashed);
+            final MessageDigest mdgest = MessageDigest.getInstance(digestAlgorithm);
+            final byte[] hashed = mdgest.digest(politica.getBytes());
+            final DigestInfo OtherHashAlgAndValue = new DigestInfo(digAlgId, hashed);
 
             /*
              * SigPolicyQualifierInfo ::= SEQUENCE { SigPolicyQualifierId
@@ -1507,14 +1539,14 @@ final class Utils {
              * policyQualifierId }
              */
 
-            SigPolicyQualifierInfo spqInfo = new SigPolicyQualifierInfo(politica);
+            final SigPolicyQualifierInfo spqInfo = new SigPolicyQualifierInfo(politica);
 
             /*
              * SignaturePolicyId ::= SEQUENCE { sigPolicyId SigPolicyId,
              * sigPolicyHash SigPolicyHash, sigPolicyQualifiers SEQUENCE SIZE
              * (1..MAX) OF SigPolicyQualifierInfo OPTIONAL}
              */
-            ASN1EncodableVector v = new ASN1EncodableVector();
+            final ASN1EncodableVector v = new ASN1EncodableVector();
             // sigPolicyId
             v.add(DOISigPolicyId);
             // sigPolicyHash
@@ -1522,7 +1554,7 @@ final class Utils {
             // sigPolicyQualifiers
             v.add(spqInfo.toASN1Object());
 
-            DERSequence ds = new DERSequence(v);
+            final DERSequence ds = new DERSequence(v);
 
             // Secuencia con singningCertificate
             ContexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Object())));

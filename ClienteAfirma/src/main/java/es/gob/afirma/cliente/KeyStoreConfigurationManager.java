@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -73,7 +73,7 @@ final class KeyStoreConfigurationManager {
 
     private boolean showExpiratedCertificates = false;
     private boolean mandatoryCert = false;
-    private Vector<CertificateFilter> certFilters = new Vector<CertificateFilter>();
+    private final Vector<CertificateFilter> certFilters = new Vector<CertificateFilter>();
 
     /** Construye la configuraci&oacute;n por defecto para el Cliente, pudiendo
      * variar el almac&eacute;n seg&uacute;n el sistema operativo:
@@ -111,9 +111,16 @@ final class KeyStoreConfigurationManager {
      * operativo actual.
      * @return Almac&eacute;n de claves por defecto. */
     private AOKeyStore getDefaultKeyStore() {
-        if (Platform.getOS().equals(Platform.OS.WINDOWS)) return AOKeyStore.WINDOWS; // Sistemas Windows
-        if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) return AOKeyStore.MOZ_UNI;
-        if (Platform.getOS().equals(Platform.OS.MACOSX)) return AOKeyStore.APPLE;
+        if (Platform.getOS().equals(Platform.OS.WINDOWS))
+         {
+            return AOKeyStore.WINDOWS; // Sistemas Windows
+        }
+        if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
+            return AOKeyStore.MOZ_UNI;
+        }
+        if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+            return AOKeyStore.APPLE;
+        }
 
         // Otros sistemas
         return AOKeyStore.PKCS12;
@@ -124,7 +131,9 @@ final class KeyStoreConfigurationManager {
     }
 
     void addCertFilter(final CertificateFilter certFilter) {
-        if (certFilter != null) certFilters.add(certFilter);
+        if (certFilter != null) {
+            certFilters.add(certFilter);
+        }
     }
 
     /** Reestablece el almac&eacute;n de certificados por defecto y reinicia su
@@ -246,7 +255,7 @@ final class KeyStoreConfigurationManager {
             try {
                 this.initKeyStore(this.ksPath, this.ksPassword);
             }
-            catch (AOKeystoreAlternativeException e) {
+            catch (final AOKeystoreAlternativeException e) {
                 throw e;
             }
             catch (final Exception e) {
@@ -424,9 +433,13 @@ final class KeyStoreConfigurationManager {
     X509Certificate getSelectedCertificate() {
         if (this.ke != null) {
             final Certificate cert = ke.getCertificate();
-            if (cert instanceof X509Certificate) return (X509Certificate) cert;
+            if (cert instanceof X509Certificate) {
+                return (X509Certificate) cert;
+            }
         }
-        if (this.selectedAlias != null) return this.ksManager.getCertificate(this.selectedAlias);
+        if (this.selectedAlias != null) {
+            return this.ksManager.getCertificate(this.selectedAlias);
+        }
         throw new UnsupportedOperationException("No se puede recuperar el Certificado X509");
     }
 

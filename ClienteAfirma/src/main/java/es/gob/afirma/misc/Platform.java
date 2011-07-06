@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -114,7 +114,7 @@ public final class Platform {
             osVersion = System.getProperty("os.version");
             userHome = System.getProperty("user.home");
             javaLibraryPath = System.getProperty("java.library.path");
-            String osName = System.getProperty("os.name");
+            final String osName = System.getProperty("os.name");
 
             if (osName.contains("indows")) {
                 os = OS.WINDOWS;
@@ -134,17 +134,27 @@ public final class Platform {
             }
 
             javaArch = System.getProperty("sun.arch.data.model");
-            if (javaArch == null) javaArch = System.getProperty("com.ibm.vm.bitmode");
+            if (javaArch == null) {
+                javaArch = System.getProperty("com.ibm.vm.bitmode");
+            }
             javaHome = recoverJavaHome();
             initialized = true;
             final String jreVersion = System.getProperty("java.version");
             if (jreVersion.startsWith("1.0") || jreVersion.startsWith("1.1")
                 || jreVersion.startsWith("1.2")
                 || jreVersion.startsWith("1.3")
-                || jreVersion.startsWith("1.4")) javaVersion = JREVER.J4;
-            else if (jreVersion.startsWith("1.5")) javaVersion = JREVER.J5;
-            else if (jreVersion.startsWith("1.6")) javaVersion = JREVER.J6;
-            else javaVersion = JREVER.J7;
+                || jreVersion.startsWith("1.4")) {
+                javaVersion = JREVER.J4;
+            }
+            else if (jreVersion.startsWith("1.5")) {
+                javaVersion = JREVER.J5;
+            }
+            else if (jreVersion.startsWith("1.6")) {
+                javaVersion = JREVER.J6;
+            }
+            else {
+                javaVersion = JREVER.J7;
+            }
             osArch = System.getProperty("os.arch");
         }
         catch (final Exception e) {
@@ -168,7 +178,7 @@ public final class Platform {
     /** Establece el UserAgent del navegador desde el que se carga el applet.
      * @param userAgent
      *        UserAgent del aplicativo de acceso. */
-    public static void setUserAgent(String userAgent) {
+    public static void setUserAgent(final String userAgent) {
 
         if (userAgent == null) {
             browser = BROWSER.OTHER;
@@ -278,9 +288,11 @@ public final class Platform {
      * @return Directorio "endorsed". */
     public static String getEndorsedDir() {
 
-        if (endorsedDir != null) return endorsedDir;
+        if (endorsedDir != null) {
+            return endorsedDir;
+        }
 
-        String endorsedDirsString = System.getProperty("java.endorsed.dirs"); //$NON-NLS-1$
+        final String endorsedDirsString = System.getProperty("java.endorsed.dirs"); //$NON-NLS-1$
         String[] endorsedDirs;
         if (endorsedDirsString != null && (endorsedDirs = endorsedDirsString.split(System.getProperty("path.separator"))).length > 0) { //$NON-NLS-1$
             endorsedDir = endorsedDirs[0];

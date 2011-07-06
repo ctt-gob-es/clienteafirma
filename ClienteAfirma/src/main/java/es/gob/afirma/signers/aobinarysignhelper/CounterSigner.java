@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -132,19 +132,19 @@ public final class CounterSigner {
         this.atrib2 = atri;
         this.uatrib2 = uatri;
 
-        ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1InputStream is = new ASN1InputStream(data);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq = (ASN1Sequence) is.readObject();
-        Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
         // Contenido de SignedData
-        ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();
 
-        SignedData sd = new SignedData(contentSignedData);
+        final SignedData sd = new SignedData(contentSignedData);
 
         // Obtenemos los signerInfos del SignedData
         ASN1Set signerInfosSd = null;
@@ -153,11 +153,11 @@ public final class CounterSigner {
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
         ASN1Set certificates = null;
-        X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
+        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
-        ASN1Set certificatesSigned = sd.getCertificates();
-        ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
-        Enumeration<?> certs = certificatesSigned.getObjects();
+        final ASN1Set certificatesSigned = sd.getCertificates();
+        final ASN1EncodableVector vCertsSig = new ASN1EncodableVector();
+        final Enumeration<?> certs = certificatesSigned.getObjects();
 
         // COGEMOS LOS CERTIFICADOS EXISTENTES EN EL FICHERO
         while (certs.hasMoreElements()) {
@@ -179,7 +179,7 @@ public final class CounterSigner {
         }
 
         // CRLS no usado
-        ASN1Set certrevlist = null;
+        final ASN1Set certrevlist = null;
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -205,8 +205,8 @@ public final class CounterSigner {
                 sigDat = new SignedData(sd.getDigestAlgorithms(), sd.getEncapContentInfo(), certificates, certrevlist, new DERSet(signerInfos));
 
                 // Esto se realiza as&iacute; por problemas con los casting.
-                ASN1InputStream sd2 = new ASN1InputStream(sigDat.getDEREncoded());
-                ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
+                final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getDEREncoded());
+                final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
 
                 aux = new SignedData(contentSignedData2);
             }
@@ -226,8 +226,8 @@ public final class CounterSigner {
                 sigDat = new SignedData(sd.getDigestAlgorithms(), sd.getEncapContentInfo(), certificates, certrevlist, new DERSet(signerInfos));
 
                 // Esto se realiza as&iacute; por problemas con los casting.
-                ASN1InputStream sd2 = new ASN1InputStream(sigDat.getDEREncoded());
-                ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
+                final ASN1InputStream sd2 = new ASN1InputStream(sigDat.getDEREncoded());
+                final ASN1Sequence contentSignedData2 = (ASN1Sequence) sd2.readObject();// contenido del SignedData
 
                 aux = new SignedData(contentSignedData2);
             }
@@ -270,18 +270,18 @@ public final class CounterSigner {
      * @throws es.gob.afirma.exceptions.AOException
      *         Cuando ocurre un error durante el proceso de contrafirma
      *         (formato o clave incorrecto,...) */
-    private ASN1EncodableVector CounterTree(ASN1Set signerInfosRaiz,
-                                            P7ContentSignerParameters parameters,
-                                            X509Certificate cert,
-                                            PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+    private ASN1EncodableVector CounterTree(final ASN1Set signerInfosRaiz,
+                                            final P7ContentSignerParameters parameters,
+                                            final X509Certificate cert,
+                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
-        ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
+        final ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
 
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            ASN1Sequence atribute = (ASN1Sequence) signerInfosRaiz.getObjectAt(i);
-            SignerInfo si = new SignerInfo(atribute);
+            final ASN1Sequence atribute = (ASN1Sequence) signerInfosRaiz.getObjectAt(i);
+            final SignerInfo si = new SignerInfo(atribute);
 
-            SignerInfo CounterSigner = getCounterUnsignedAtributes(si, parameters, cert, keyEntry);
+            final SignerInfo CounterSigner = getCounterUnsignedAtributes(si, parameters, cert, keyEntry);
             CounterSigners.add(CounterSigner);
         }
 
@@ -305,18 +305,18 @@ public final class CounterSigner {
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1EncodableVector CounterLeaf(ASN1Set signerInfosRaiz,
-                                            P7ContentSignerParameters parameters,
-                                            X509Certificate cert,
-                                            PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+    private ASN1EncodableVector CounterLeaf(final ASN1Set signerInfosRaiz,
+                                            final P7ContentSignerParameters parameters,
+                                            final X509Certificate cert,
+                                            final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
-        ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
+        final ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
 
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            ASN1Sequence atribute = (ASN1Sequence) signerInfosRaiz.getObjectAt(i);
-            SignerInfo si = new SignerInfo(atribute);
+            final ASN1Sequence atribute = (ASN1Sequence) signerInfosRaiz.getObjectAt(i);
+            final SignerInfo si = new SignerInfo(atribute);
 
-            SignerInfo CounterSigner = getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry);
+            final SignerInfo CounterSigner = getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry);
             CounterSigners.add(CounterSigner);
         }
 
@@ -341,23 +341,23 @@ public final class CounterSigner {
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1EncodableVector CounterNode(SignedData sd,
-                                            P7ContentSignerParameters parameters,
-                                            X509Certificate cert,
-                                            PrivateKeyEntry keyEntry,
-                                            int nodo) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+    private ASN1EncodableVector CounterNode(final SignedData sd,
+                                            final P7ContentSignerParameters parameters,
+                                            final X509Certificate cert,
+                                            final PrivateKeyEntry keyEntry,
+                                            final int nodo) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
-        ASN1Set signerInfosRaiz = sd.getSignerInfos();
+        final ASN1Set signerInfosRaiz = sd.getSignerInfos();
 
-        ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
+        final ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
         ASN1Set auxSignerRaiz;
 
         auxSignerRaiz = signerInfosRaiz;
         actualIndex = 0;
 
         for (int i = 0; i < auxSignerRaiz.size(); i++) {
-            ASN1Sequence atribute = (ASN1Sequence) auxSignerRaiz.getObjectAt(i);
-            SignerInfo si = new SignerInfo(atribute);
+            final ASN1Sequence atribute = (ASN1Sequence) auxSignerRaiz.getObjectAt(i);
+            final SignerInfo si = new SignerInfo(atribute);
             SignerInfo CounterSigner = null;
             if (actualIndex == nodo) {
                 CounterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
@@ -393,33 +393,33 @@ public final class CounterSigner {
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private SignerInfo getCounterUnsignedAtributes(SignerInfo signerInfo,
-                                                   P7ContentSignerParameters parameters,
-                                                   X509Certificate cert,
-                                                   PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+    private SignerInfo getCounterUnsignedAtributes(final SignerInfo signerInfo,
+                                                   final P7ContentSignerParameters parameters,
+                                                   final X509Certificate cert,
+                                                   final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
                                                                             IOException,
                                                                             CertificateException,
                                                                             AOException {
 
-        List<Object> Atributes = new ArrayList<Object>();
-        ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
-        ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
+        final List<Object> Atributes = new ArrayList<Object>();
+        final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
+        final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
         SignerInfo CounterSigner = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {
-            Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
+            final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
 
             while (eAtributes.hasMoreElements()) {
-                Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
-                    ASN1Set setInto = data.getAttrValues();
-                    Enumeration<?> eAtributesData = setInto.getObjects();
+                    final ASN1Set setInto = data.getAttrValues();
+                    final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        Object obj = eAtributesData.nextElement();
+                        final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
-                            ASN1Sequence atrib = (ASN1Sequence) obj;
-                            SignerInfo si = new SignerInfo(atrib);
+                            final ASN1Sequence atrib = (ASN1Sequence) obj;
+                            final SignerInfo si = new SignerInfo(atrib);
 
-                            SignerInfo obtained = getCounterUnsignedAtributes(si, parameters, cert, keyEntry);
+                            final SignerInfo obtained = getCounterUnsignedAtributes(si, parameters, cert, keyEntry);
                             signerInfosU.add(obtained);
                         }
                         else {
@@ -437,7 +437,7 @@ public final class CounterSigner {
 
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
-            ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+            final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
             if (signerInfosU.size() > 1) {
                 for (int i = 0; i < signerInfosU.size(); i++) {
                     if (signerInfosU.get(i) instanceof Attribute) {
@@ -467,7 +467,7 @@ public final class CounterSigner {
                         ContexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
                         signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-                        Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
+                        final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         ContexExpecific.add(uAtrib);
 
                     }
@@ -489,7 +489,7 @@ public final class CounterSigner {
                     // actual cuando no sea hoja
                     // signerInfosU.add(UnsignedAtributte(parameters, cert,
                     // signerInfo, keyEntry));
-                    Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
+                    final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
                     CounterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
@@ -503,7 +503,7 @@ public final class CounterSigner {
         }
         else {
             signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-            Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
+            final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             CounterSigner =
                     new SignerInfo(signerInfo.getSID(),
                                    signerInfo.getDigestAlgorithm(),
@@ -536,34 +536,34 @@ public final class CounterSigner {
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private SignerInfo getCounterLeafUnsignedAtributes(SignerInfo signerInfo,
-                                                       P7ContentSignerParameters parameters,
-                                                       X509Certificate cert,
-                                                       PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+    private SignerInfo getCounterLeafUnsignedAtributes(final SignerInfo signerInfo,
+                                                       final P7ContentSignerParameters parameters,
+                                                       final X509Certificate cert,
+                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
                                                                                 IOException,
                                                                                 CertificateException,
                                                                                 AOException {
 
-        List<Object> Atributes = new ArrayList<Object>();
-        ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
-        ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
+        final List<Object> Atributes = new ArrayList<Object>();
+        final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
+        final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
         SignerInfo CounterSigner = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {
-            Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
+            final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
 
             while (eAtributes.hasMoreElements()) {
-                Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
-                    ASN1Set setInto = data.getAttrValues();
-                    Enumeration<?> eAtributesData = setInto.getObjects();
+                    final ASN1Set setInto = data.getAttrValues();
+                    final Enumeration<?> eAtributesData = setInto.getObjects();
 
                     while (eAtributesData.hasMoreElements()) {
-                        Object obj = eAtributesData.nextElement();
+                        final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
-                            ASN1Sequence atrib = (ASN1Sequence) obj;
-                            SignerInfo si = new SignerInfo(atrib);
+                            final ASN1Sequence atrib = (ASN1Sequence) obj;
+                            final SignerInfo si = new SignerInfo(atrib);
 
-                            SignerInfo obtained = getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry);
+                            final SignerInfo obtained = getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry);
                             signerInfosU.add(obtained);
                         }
                         else {
@@ -578,7 +578,7 @@ public final class CounterSigner {
             }
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
-            ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+            final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
             if (signerInfosU.size() > 1) {
                 for (int i = 0; i < signerInfosU.size(); i++) {
                     if (signerInfosU.get(i) instanceof Attribute) {
@@ -606,7 +606,7 @@ public final class CounterSigner {
                         ContexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
                         signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-                        Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
+                        final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         ContexExpecific.add(uAtrib);
 
                     }
@@ -628,7 +628,7 @@ public final class CounterSigner {
                     // actual cuando no sea hoja
                     // signerInfosU.add(UnsignedAtributte(parameters, cert,
                     // signerInfo, keyEntry));
-                    Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
+                    final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
                     CounterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
@@ -643,7 +643,7 @@ public final class CounterSigner {
         }
         else {
             signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-            Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
+            final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             CounterSigner =
                     new SignerInfo(signerInfo.getSID(),
                                    signerInfo.getDigestAlgorithm(),
@@ -675,28 +675,28 @@ public final class CounterSigner {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException */
-    private SignerInfo getCounterNodeUnsignedAtributes(SignerInfo signerInfo,
-                                                       P7ContentSignerParameters parameters,
-                                                       X509Certificate cert,
-                                                       PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException {
+    private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
+                                                       final P7ContentSignerParameters parameters,
+                                                       final X509Certificate cert,
+                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException {
 
-        List<Object> Atributes = new ArrayList<Object>();
-        ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
-        ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
+        final List<Object> Atributes = new ArrayList<Object>();
+        final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
+        final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
         SignerInfo CounterSigner = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {
-            Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
+            final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
             while (eAtributes.hasMoreElements()) {
-                Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
-                    ASN1Set setInto = data.getAttrValues();
-                    Enumeration<?> eAtributesData = setInto.getObjects();
+                    final ASN1Set setInto = data.getAttrValues();
+                    final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        Object obj = eAtributesData.nextElement();
+                        final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
 
-                            ASN1Sequence atrib = (ASN1Sequence) obj;
-                            SignerInfo si = new SignerInfo(atrib);
+                            final ASN1Sequence atrib = (ASN1Sequence) obj;
+                            final SignerInfo si = new SignerInfo(atrib);
                             signerInfosU.add(si);
                         }
                         else {
@@ -713,7 +713,7 @@ public final class CounterSigner {
 
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
-            ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+            final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
             if (signerInfosU.size() > 1) {
                 for (int i = 0; i < signerInfosU.size(); i++) {
                     if (signerInfosU.get(i) instanceof Attribute) {
@@ -741,7 +741,7 @@ public final class CounterSigner {
                         ContexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
                         signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-                        Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
+                        final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
                         ContexExpecific.add(uAtrib);
 
                     }
@@ -763,7 +763,7 @@ public final class CounterSigner {
                     // actual cuando no sea hoja
                     // signerInfosU.add(UnsignedAtributte(parameters, cert,
                     // signerInfo, keyEntry));
-                    Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
+                    final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
                     CounterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
@@ -778,7 +778,7 @@ public final class CounterSigner {
         }
         else {
             signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-            Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
+            final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
             CounterSigner =
                     new SignerInfo(signerInfo.getSID(),
                                    signerInfo.getDigestAlgorithm(),
@@ -812,28 +812,28 @@ public final class CounterSigner {
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private SignerInfo getCounterNodeUnsignedAtributes(SignerInfo signerInfo,
-                                                       P7ContentSignerParameters parameters,
-                                                       X509Certificate cert,
-                                                       PrivateKeyEntry keyEntry,
-                                                       int node) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
+    private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
+                                                       final P7ContentSignerParameters parameters,
+                                                       final X509Certificate cert,
+                                                       final PrivateKeyEntry keyEntry,
+                                                       final int node) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
-        List<Object> Atributes = new ArrayList<Object>();
-        ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
+        final List<Object> Atributes = new ArrayList<Object>();
+        final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         SignerInfo CounterSigner = null;
         SignerInfo CounterSigner2 = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {
-            Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
+            final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
             while (eAtributes.hasMoreElements()) {
-                Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
-                    ASN1Set setInto = data.getAttrValues();
-                    Enumeration<?> eAtributesData = setInto.getObjects();
+                    final ASN1Set setInto = data.getAttrValues();
+                    final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        Object obj = eAtributesData.nextElement();
+                        final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
-                            ASN1Sequence atrib = (ASN1Sequence) obj;
-                            SignerInfo si = new SignerInfo(atrib);
+                            final ASN1Sequence atrib = (ASN1Sequence) obj;
+                            final SignerInfo si = new SignerInfo(atrib);
                             actualIndex++;
                             if (actualIndex != node) {
                                 if (actualIndex < node) {
@@ -845,7 +845,7 @@ public final class CounterSigner {
                                 }
                             }
                             else {
-                                SignerInfo obtained = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
+                                final SignerInfo obtained = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
                                 signerInfosU.add(obtained);
                             }
                         }
@@ -861,7 +861,7 @@ public final class CounterSigner {
             }
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
-            ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+            final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
             if (signerInfosU.size() > 1) {
                 for (int i = 0; i < signerInfosU.size(); i++) {
                     if (signerInfosU.get(i) instanceof Attribute) {
@@ -933,12 +933,12 @@ public final class CounterSigner {
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
      * @throws java.security.NoSuchAlgorithmException */
-    private ASN1Set generateSignerInfo(X509Certificate cert, String digestAlgorithm, byte[] datos) throws NoSuchAlgorithmException {
+    private ASN1Set generateSignerInfo(final X509Certificate cert, String digestAlgorithm, final byte[] datos) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // Las Contrafirmas CMS no tienen ContentType
         // //tipo de contenido
@@ -949,9 +949,15 @@ public final class CounterSigner {
         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
         // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equals("SHA512")) digestAlgorithm = "SHA-512";
-        else if (digestAlgorithm.equals("SHA384")) digestAlgorithm = "SHA-384";
-        else if (digestAlgorithm.equals("SHA256")) digestAlgorithm = "SHA-256";
+        if (digestAlgorithm.equals("SHA512")) {
+            digestAlgorithm = "SHA-512";
+        }
+        else if (digestAlgorithm.equals("SHA384")) {
+            digestAlgorithm = "SHA-384";
+        }
+        else if (digestAlgorithm.equals("SHA256")) {
+            digestAlgorithm = "SHA-256";
+        }
 
         // MessageDigest
         ContexExpecific.add(new Attribute(CMSAttributes.messageDigest,
@@ -962,9 +968,9 @@ public final class CounterSigner {
 
         // agregamos la lista de atributos a mayores.
         if (atrib2.size() != 0) {
-            Iterator<Map.Entry<Oid, byte[]>> it = atrib2.entrySet().iterator();
+            final Iterator<Map.Entry<Oid, byte[]>> it = atrib2.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<Oid, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
@@ -987,13 +993,13 @@ public final class CounterSigner {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // agregamos la lista de atributos a mayores.
         if (uatrib2.size() != 0) {
-            Iterator<Map.Entry<Oid, byte[]>> it = uatrib2.entrySet().iterator();
+            final Iterator<Map.Entry<Oid, byte[]>> it = uatrib2.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<Oid, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
@@ -1015,18 +1021,18 @@ public final class CounterSigner {
      *        Lista de atributos no firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos no firmados de la firma. */
-    private ASN1Set generateUnsignerInfoFromCounter(Attribute uAtrib) {
+    private ASN1Set generateUnsignerInfoFromCounter(final Attribute uAtrib) {
 
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // agregamos la lista de atributos a mayores.
         if (uatrib2.size() != 0) {
-            Iterator<Map.Entry<Oid, byte[]>> it = uatrib2.entrySet().iterator();
+            final Iterator<Map.Entry<Oid, byte[]>> it = uatrib2.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<Oid, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
@@ -1057,7 +1063,7 @@ public final class CounterSigner {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException */
-    private SignerInfo UnsignedAtributte(P7ContentSignerParameters parameters, X509Certificate cert, SignerInfo si, PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+    private SignerInfo UnsignedAtributte(final P7ContentSignerParameters parameters, final X509Certificate cert, final SignerInfo si, final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
                                                                                                                                              IOException,
                                                                                                                                              CertificateException {
         // // UNAUTHENTICATEDATTRIBUTES
@@ -1067,13 +1073,13 @@ public final class CounterSigner {
         // buscamos que timo de algoritmo es y lo codificamos con su OID
 
         AlgorithmIdentifier digAlgId;
-        String signatureAlgorithm = parameters.getSignatureAlgorithm();
+        final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         String digestAlgorithm = null;
         String keyAlgorithm = null;
-        int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with");
         if (with > 0) {
             digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(signatureAlgorithm);
-            int and = signatureAlgorithm.indexOf("and", with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4);
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
             }
@@ -1082,7 +1088,7 @@ public final class CounterSigner {
             }
         }
 
-        AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
+        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
         digAlgId = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
 
         // ATRIBUTOS FINALES
@@ -1093,9 +1099,9 @@ public final class CounterSigner {
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
-        TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-        IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
-        SignerIdentifier identifier = new SignerIdentifier(encSid);
+        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
+        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
+        final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
         digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
@@ -1103,7 +1109,7 @@ public final class CounterSigner {
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
+        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
         AlgorithmIdentifier encAlgId;
 
         encAlgId = makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
@@ -1120,11 +1126,11 @@ public final class CounterSigner {
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
-        catch (AOException ex) {
+        catch (final AOException ex) {
             Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        SignerInfo uAtrib = new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unsignedAttr// null
+        final SignerInfo uAtrib = new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unsignedAttr// null
                 );
 
         return uAtrib;
@@ -1138,7 +1144,7 @@ public final class CounterSigner {
      *        Clave para firmar.
      * @return Firma de los atributos.
      * @throws es.map.es.map.afirma.exceptions.AOException */
-    private ASN1OctetString firma(String signatureAlgorithm, PrivateKeyEntry keyEntry) throws AOException {
+    private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
         Signature sig = null;
         try {
@@ -1153,7 +1159,7 @@ public final class CounterSigner {
         try {
             tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
         }
-        catch (IOException ex) {
+        catch (final IOException ex) {
             Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -1182,7 +1188,7 @@ public final class CounterSigner {
             throw new AOException("Error durante el proceso de firma", e);
         }
 
-        ASN1OctetString encDigest = new DEROctetString(realSig);
+        final ASN1OctetString encDigest = new DEROctetString(realSig);
 
         return encDigest;
 

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -46,8 +46,10 @@ final class SigUtils {
      * @return El identificador del algoritmo formateado y listo para introducir
      *         en el cms.
      * @throws java.io.IOException */
-    static AlgorithmIdentifier makeAlgId(String oid, byte[] params) throws IOException {
-        if (params != null) return new AlgorithmIdentifier(new DERObjectIdentifier(oid), makeObj(params));
+    static AlgorithmIdentifier makeAlgId(final String oid, final byte[] params) throws IOException {
+        if (params != null) {
+            return new AlgorithmIdentifier(new DERObjectIdentifier(oid), makeObj(params));
+        }
         return new AlgorithmIdentifier(new DERObjectIdentifier(oid), new DERNull());
     }
 
@@ -57,7 +59,7 @@ final class SigUtils {
      *        Lo codificado
      * @return Un objeto formateado de tipo DER
      * @throws java.io.IOException */
-    static DERObject makeObj(byte[] encoding) throws IOException {
+    static DERObject makeObj(final byte[] encoding) throws IOException {
         if (encoding == null) {
             Logger.getLogger("es.gob.afirma").warning("La codificacion era nula, se devolvera null");
             return null;
@@ -69,10 +71,11 @@ final class SigUtils {
      * @param derObjects
      *        Una lista con los objetos a obtener el tipo SET
      * @return Un SET de ASN1 con los elementos de la lista introducida. */
-    static ASN1Set createBerSetFromList(List<DEREncodable> derObjects) {
-        ASN1EncodableVector v = new ASN1EncodableVector();
-        for (DEREncodable d : derObjects)
+    static ASN1Set createBerSetFromList(final List<DEREncodable> derObjects) {
+        final ASN1EncodableVector v = new ASN1EncodableVector();
+        for (final DEREncodable d : derObjects) {
             v.add(d);
+        }
         // Version del blucle para Java 1.4
         // for (Iterator it = derObjects.iterator(); it.hasNext();) {
         // v.add((DEREncodable) it.next());
@@ -84,8 +87,10 @@ final class SigUtils {
      * @param attr
      *        Atributo a formatear.
      * @return SET en formato DER del atributo. */
-    static ASN1Set getAttributeSet(AttributeTable attr) {
-        if (attr != null) return new DERSet(attr.toASN1EncodableVector());
+    static ASN1Set getAttributeSet(final AttributeTable attr) {
+        if (attr != null) {
+            return new DERSet(attr.toASN1EncodableVector());
+        }
         Logger.getLogger("es.gob.afirma").warning("Los atributos eran nulos, se devolvera null");
         return null;
     }
@@ -95,8 +100,9 @@ final class SigUtils {
      *        Una lista con los objetos a obtener el tipo SET
      * @return Un SET de ASN1 con los elementos de la lista introducida. */
     static ASN1Set fillRestCerts(final List<DEREncodable> derObjects, final ASN1EncodableVector v) {
-        for (DEREncodable d : derObjects)
+        for (final DEREncodable d : derObjects) {
             v.add(d);
+        }
         return new BERSet(v);
     }
 
@@ -125,10 +131,10 @@ final class SigUtils {
         catch (final Exception e) {
             throw new AOException("Error al inicializar la firma con la clave privada", e);
         }
-        BufferedInputStream bufin = new BufferedInputStream(file);
-        byte[] buffer = new byte[1024];
+        final BufferedInputStream bufin = new BufferedInputStream(file);
+        final byte[] buffer = new byte[1024];
         int len;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
             while (bufin.available() != 0) {

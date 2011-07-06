@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -24,12 +24,14 @@ public final class NormalizedNames {
      * @param name
      *        Nombre de modo.
      * @return Nombre normalizado del modo. */
-    public static String normalizeModeName(String name) {
+    public static String normalizeModeName(final String name) {
 
         // Dejamos que el objeto que llame al metodo se encargue del error
-        if (name == null) return null;
+        if (name == null) {
+            return null;
+        }
 
-        String modeLw = name.toLowerCase();
+        final String modeLw = name.toLowerCase();
         if (modeLw.equals("explicit")) { //$NON-NLS-1$
             return AOConstants.SIGN_MODE_EXPLICIT;
         }
@@ -44,10 +46,12 @@ public final class NormalizedNames {
      * @param name
      *        Nombre de algoritmo.
      * @return Nombre normalizado del algoritmo. */
-    public static String normalizeAlgorithmName(String name) {
+    public static String normalizeAlgorithmName(final String name) {
 
         // Dejamos que el objeto que llame al metodo se encargue del error
-        if (name == null) return null;
+        if (name == null) {
+            return null;
+        }
 
         if (name.equalsIgnoreCase("sha1WithRsaEncryption") || name.equalsIgnoreCase("SHA1withRSA") || name.equalsIgnoreCase("SHA-1withRSA") || name.equalsIgnoreCase("SHA1RSA")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             return AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
@@ -66,7 +70,9 @@ public final class NormalizedNames {
     public static final String normalizeFormatName(final String name) {
 
         // Dejamos que el objeto que llame al metodo se encargue del error
-        if (name == null) return null;
+        if (name == null) {
+            return null;
+        }
 
         if (name.equalsIgnoreCase("CMS") || name.equalsIgnoreCase("CMS-BES") || //$NON-NLS-1$ //$NON-NLS-2$
             name.equalsIgnoreCase("PKCS7") || name.equalsIgnoreCase("PKCS#7")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -101,7 +107,7 @@ public final class NormalizedNames {
             // return AOConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED;
         }
         else if (name.equalsIgnoreCase("XMLDSign Enveloped") || name.equalsIgnoreCase("XMLDSig Enveloped") || //$NON-NLS-1$ //$NON-NLS-2$
-                 name.equalsIgnoreCase("XMLDSIGN_Enveloped") || name.equalsIgnoreCase("XMLDSIG_Enveloped")) { //$NON-NLS-1$ //$NON-NLS-2$ 
+                 name.equalsIgnoreCase("XMLDSIGN_Enveloped") || name.equalsIgnoreCase("XMLDSIG_Enveloped")) { //$NON-NLS-1$ //$NON-NLS-2$
             return AOConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED;
         }
         else if (name.equalsIgnoreCase("XMLDSign Enveloping") || name.equalsIgnoreCase("XMLDSig Enveloping") || //$NON-NLS-1$ //$NON-NLS-2$
@@ -132,9 +138,9 @@ public final class NormalizedNames {
      * @param type
      *        Tipo de keystore.
      * @return Nombre normalizado del keystore. */
-    public static String normalizeKeyStoreName(String type) {
+    public static String normalizeKeyStoreName(final String type) {
 
-        String typeLw = type.toLowerCase();
+        final String typeLw = type.toLowerCase();
         if (typeLw.equals("windows") || typeLw.equals("internet explorer") //$NON-NLS-1$ //$NON-NLS-2$
             || typeLw.equals("ie") || typeLw.equals("microsoft") //$NON-NLS-1$ //$NON-NLS-2$
             || typeLw.equals("windows-my") || typeLw.equals("windowsmy")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -147,11 +153,11 @@ public final class NormalizedNames {
         }
         else if (typeLw.equals("mac os x") || typeLw.equals("macos x") //$NON-NLS-1$ //$NON-NLS-2$
                  || typeLw.equals("macosx") || typeLw.equals("safari") //$NON-NLS-1$ //$NON-NLS-2$
-                 || typeLw.equals("apple") || typeLw.equals("apple safari") //$NON-NLS-1$ //$NON-NLS-2$ 
+                 || typeLw.equals("apple") || typeLw.equals("apple safari") //$NON-NLS-1$ //$NON-NLS-2$
                  || typeLw.equals("keychainstore")) { //$NON-NLS-1$
             return AOKeyStore.APPLE.getDescription();
         }
-        else if (typeLw.equals("mozilla") || typeLw.equals("firefox") || typeLw.equals("ff")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+        else if (typeLw.equals("mozilla") || typeLw.equals("firefox") || typeLw.equals("ff")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return AOKeyStore.MOZ_UNI.getDescription();
         }
         else if (typeLw.equals("pkcs#12") || typeLw.equals("pkcs12") || typeLw.equals("p12") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

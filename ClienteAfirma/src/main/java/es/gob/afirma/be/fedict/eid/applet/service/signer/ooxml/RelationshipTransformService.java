@@ -13,14 +13,14 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
 /*
  * Copyright (C) 2008-2009 FedICT.
  * Copyright (C) 2009 Frank Cornelis.
- * 
+ *
  * This file is part of the eID Applet Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,35 +99,35 @@ public class RelationshipTransformService extends TransformService {
     }
 
     @Override
-    public void init(TransformParameterSpec params) throws InvalidAlgorithmParameterException {
+    public void init(final TransformParameterSpec params) throws InvalidAlgorithmParameterException {
         if (false == params instanceof RelationshipTransformParameterSpec) {
             throw new InvalidAlgorithmParameterException();
         }
-        RelationshipTransformParameterSpec relParams = (RelationshipTransformParameterSpec) params;
-        for (String sourceId : relParams.getSourceIds()) {
+        final RelationshipTransformParameterSpec relParams = (RelationshipTransformParameterSpec) params;
+        for (final String sourceId : relParams.getSourceIds()) {
             this.sourceIds.add(sourceId);
         }
     }
 
     @Override
-    public void init(XMLStructure parent, XMLCryptoContext context) throws InvalidAlgorithmParameterException {
+    public void init(final XMLStructure parent, final XMLCryptoContext context) throws InvalidAlgorithmParameterException {
 
-        DOMStructure domParent = (DOMStructure) parent;
-        Node parentNode = domParent.getNode();
+        final DOMStructure domParent = (DOMStructure) parent;
+        final Node parentNode = domParent.getNode();
         try {
             /* System.out.println("parent: " + */toString(parentNode)/* ) */;
         }
-        catch (TransformerException e) {
+        catch (final TransformerException e) {
             throw new InvalidAlgorithmParameterException();
         }
-        Element nsElement = parentNode.getOwnerDocument().createElement("ns");
+        final Element nsElement = parentNode.getOwnerDocument().createElement("ns");
         nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
         nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature");
         NodeList nodeList;
         try {
             nodeList = XPathAPI.selectNodeList(parentNode, "mdssi:RelationshipReference/@SourceId", nsElement);
         }
-        catch (TransformerException e) {
+        catch (final TransformerException e) {
             Logger.getLogger("es.gob.afirma").severe("transformer exception: " + e.getMessage());
             throw new InvalidAlgorithmParameterException();
         }
@@ -135,21 +135,21 @@ public class RelationshipTransformService extends TransformService {
             Logger.getLogger("es.gob.afirma").warning("no RelationshipReference/@SourceId parameters present");
         }
         for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
-            Node node = nodeList.item(nodeIdx);
-            String sourceId = node.getTextContent();
+            final Node node = nodeList.item(nodeIdx);
+            final String sourceId = node.getTextContent();
             this.sourceIds.add(sourceId);
         }
     }
 
     @Override
-    public void marshalParams(XMLStructure parent, XMLCryptoContext context) throws MarshalException {
-        DOMStructure domParent = (DOMStructure) parent;
-        Node parentNode = domParent.getNode();
-        Element parentElement = (Element) parentNode;
+    public void marshalParams(final XMLStructure parent, final XMLCryptoContext context) throws MarshalException {
+        final DOMStructure domParent = (DOMStructure) parent;
+        final Node parentNode = domParent.getNode();
+        final Element parentElement = (Element) parentNode;
         parentElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature");
-        Document document = parentNode.getOwnerDocument();
-        for (String sourceId : this.sourceIds) {
-            Element relationshipReferenceElement =
+        final Document document = parentNode.getOwnerDocument();
+        for (final String sourceId : this.sourceIds) {
+            final Element relationshipReferenceElement =
                     document.createElementNS("http://schemas.openxmlformats.org/package/2006/digital-signature", "mdssi:RelationshipReference");
             relationshipReferenceElement.setAttribute("SourceId", sourceId);
             parentElement.appendChild(relationshipReferenceElement);
@@ -160,16 +160,16 @@ public class RelationshipTransformService extends TransformService {
         return null;
     }
 
-    public Data transform(Data data, XMLCryptoContext context) throws TransformException {
+    public Data transform(final Data data, final XMLCryptoContext context) throws TransformException {
 
-        OctetStreamData octetStreamData = (OctetStreamData) data;
+        final OctetStreamData octetStreamData = (OctetStreamData) data;
 
-        InputStream octetStream = octetStreamData.getOctetStream();
+        final InputStream octetStream = octetStreamData.getOctetStream();
         Document relationshipsDocument;
         try {
             relationshipsDocument = loadDocument(octetStream);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new TransformException(e.getMessage(), e);
         }
         try {
@@ -177,23 +177,23 @@ public class RelationshipTransformService extends TransformService {
              * System.out.println("relationships document: " +
              */toString(relationshipsDocument)/* ) */;
         }
-        catch (TransformerException e) {
+        catch (final TransformerException e) {
             throw new TransformException(e.getMessage(), e);
         }
-        Element nsElement = relationshipsDocument.createElement("ns");
+        final Element nsElement = relationshipsDocument.createElement("ns");
         nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/relationships");
-        Element relationshipsElement = relationshipsDocument.getDocumentElement();
-        NodeList childNodes = relationshipsElement.getChildNodes();
+        final Element relationshipsElement = relationshipsDocument.getDocumentElement();
+        final NodeList childNodes = relationshipsElement.getChildNodes();
         for (int nodeIdx = 0; nodeIdx < childNodes.getLength(); nodeIdx++) {
-            Node childNode = childNodes.item(nodeIdx);
+            final Node childNode = childNodes.item(nodeIdx);
             if (Node.ELEMENT_NODE != childNode.getNodeType()) {
                 // System.out.println("removing node");
                 relationshipsElement.removeChild(childNode);
                 nodeIdx--;
                 continue;
             }
-            Element childElement = (Element) childNode;
-            String idAttribute = childElement.getAttribute("Id");
+            final Element childElement = (Element) childNode;
+            final String idAttribute = childElement.getAttribute("Id");
             if (false == this.sourceIds.contains(idAttribute)) {
                 relationshipsElement.removeChild(childNode);
                 nodeIdx--;
@@ -211,37 +211,37 @@ public class RelationshipTransformService extends TransformService {
         try {
             return toOctetStreamData(relationshipsDocument);
         }
-        catch (TransformerException e) {
+        catch (final TransformerException e) {
             throw new TransformException(e.getMessage(), e);
         }
     }
 
-    private void sortRelationshipElements(Element relationshipsElement) {
-        List<Element> relationshipElements = new LinkedList<Element>();
-        NodeList relationshipNodes = relationshipsElement.getElementsByTagName("*");
-        int nodeCount = relationshipNodes.getLength();
+    private void sortRelationshipElements(final Element relationshipsElement) {
+        final List<Element> relationshipElements = new LinkedList<Element>();
+        final NodeList relationshipNodes = relationshipsElement.getElementsByTagName("*");
+        final int nodeCount = relationshipNodes.getLength();
         for (int nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
-            Node relationshipNode = relationshipNodes.item(0);
-            Element relationshipElement = (Element) relationshipNode;
+            final Node relationshipNode = relationshipNodes.item(0);
+            final Element relationshipElement = (Element) relationshipNode;
             // System.out.println("unsorted Id: " +
             // relationshipElement.getAttribute("Id"));
             relationshipElements.add(relationshipElement);
             relationshipsElement.removeChild(relationshipNode);
         }
         Collections.sort(relationshipElements, new RelationshipComparator());
-        for (Element relationshipElement : relationshipElements) {
+        for (final Element relationshipElement : relationshipElements) {
             // System.out.println("sorted Id: " +
             // relationshipElement.getAttribute("Id"));
             relationshipsElement.appendChild(relationshipElement);
         }
     }
 
-    private String toString(Node dom) throws TransformerException {
-        Source source = new DOMSource(dom);
-        StringWriter stringWriter = new StringWriter();
-        Result result = new StreamResult(stringWriter);
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
+    private String toString(final Node dom) throws TransformerException {
+        final Source source = new DOMSource(dom);
+        final StringWriter stringWriter = new StringWriter();
+        final Result result = new StreamResult(stringWriter);
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        final Transformer transformer = transformerFactory.newTransformer();
         /*
          * We have to omit the ?xml declaration if we want to embed the
          * document.
@@ -251,12 +251,12 @@ public class RelationshipTransformService extends TransformService {
         return stringWriter.getBuffer().toString();
     }
 
-    private OctetStreamData toOctetStreamData(Node node) throws TransformerException {
-        Source source = new DOMSource(node);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Result result = new StreamResult(outputStream);
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
+    private OctetStreamData toOctetStreamData(final Node node) throws TransformerException {
+        final Source source = new DOMSource(node);
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final Result result = new StreamResult(outputStream);
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        final Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.transform(source, result);
         // System.out.println("result: " + new
@@ -264,21 +264,21 @@ public class RelationshipTransformService extends TransformService {
         return new OctetStreamData(new ByteArrayInputStream(outputStream.toByteArray()));
     }
 
-    private Document loadDocument(InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
-        InputSource inputSource = new InputSource(documentInputStream);
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    private Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+        final InputSource inputSource = new InputSource(documentInputStream);
+        final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        Document document = documentBuilder.parse(inputSource);
+        final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        final Document document = documentBuilder.parse(inputSource);
         return document;
     }
 
-    public Data transform(Data data, XMLCryptoContext context, OutputStream os) throws TransformException {
+    public Data transform(final Data data, final XMLCryptoContext context, final OutputStream os) throws TransformException {
         // System.out.println("transform(data,context,os)");
         return null;
     }
 
-    public boolean isFeatureSupported(String feature) {
+    public boolean isFeatureSupported(final String feature) {
         // System.out.println("isFeatureSupported(feature)");
         return false;
     }

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -113,7 +113,7 @@ public final class MimeHelper {
             loadOidMimetypeProperties();
         }
         mimetypeOidProp = new Properties();
-        for (String key : oidMimetypeProp.keySet().toArray(new String[0])) {
+        for (final String key : oidMimetypeProp.keySet().toArray(new String[0])) {
             mimetypeOidProp.put(oidMimetypeProp.get(key), key);
         }
     }
@@ -286,7 +286,7 @@ public final class MimeHelper {
         if (in == null) {
             return false;
         }
-        for (String s : MIME_T_SPECIALS) {
+        for (final String s : MIME_T_SPECIALS) {
             if (in.indexOf(s) != -1) {
                 return true;
             }
@@ -299,7 +299,7 @@ public final class MimeHelper {
      *        Cadena que se desea comprobar.
      * @return Devuelve {@code true} si todos los caracteres de la cadena son
      *         ASCII, {@code false} en caso contrario. */
-    private static boolean isPureAscii(String v) {
+    private static boolean isPureAscii(final String v) {
         final byte bytearray[] = v.getBytes();
         final java.nio.charset.CharsetDecoder d = java.nio.charset.Charset.forName("US-ASCII").newDecoder();
         try {

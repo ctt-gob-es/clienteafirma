@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -70,7 +70,9 @@ public final class AOKeyStoreManagerFactory {
             || store == AOConstants.AOKeyStore.JAVACE
             || store == AOConstants.AOKeyStore.JCEKS) {
             String storeFilename = null;
-            if (lib != null && !"".equals(lib) && new File(lib).exists()) storeFilename = lib;
+            if (lib != null && !"".equals(lib) && new File(lib).exists()) {
+                storeFilename = lib;
+            }
             if (storeFilename == null) {
 
                 String desc = null;
@@ -101,7 +103,9 @@ public final class AOKeyStoreManagerFactory {
                 }
 
                 storeFilename = AOUIManager.getLoadFileName("Abrir repositorio " + store.getDescription(), exts, desc, parentComponent);
-                if (storeFilename == null) throw new AOCancelledOperationException("No se ha seleccionado el almac\u00E9n de certificados");
+                if (storeFilename == null) {
+                    throw new AOCancelledOperationException("No se ha seleccionado el almac\u00E9n de certificados");
+                }
             }
             final InputStream is;
             try {
@@ -118,11 +122,17 @@ public final class AOKeyStoreManagerFactory {
         // Token PKCS#11, en cualquier sistema operativo
         else if (store == AOConstants.AOKeyStore.PKCS11) {
             String p11Lib = null;
-            if (lib != null && !"".equals(lib) && new File(lib).exists()) p11Lib = lib;
-            if (p11Lib == null) p11Lib = AOUIManager.getLoadFileName("Seleccionar biblioteca PKCS#11", new String[] {
-                    "dll", "so"
-            }, "Bibliotecas PKCS#11 (*.dll, *.so)", parentComponent);
-            if (p11Lib == null) throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11");
+            if (lib != null && !"".equals(lib) && new File(lib).exists()) {
+                p11Lib = lib;
+            }
+            if (p11Lib == null) {
+                p11Lib = AOUIManager.getLoadFileName("Seleccionar biblioteca PKCS#11", new String[] {
+                        "dll", "so"
+                }, "Bibliotecas PKCS#11 (*.dll, *.so)", parentComponent);
+            }
+            if (p11Lib == null) {
+                throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11");
+            }
             if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
                 try {
                     final InputStream is = new FileInputStream(new File(p11Lib));
@@ -231,9 +241,15 @@ public final class AOKeyStoreManagerFactory {
 
     /** @return <code>AOConstants.AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo */
     private static AOConstants.AOKeyStore getAlternateKeyStoreType(final AOConstants.AOKeyStore currentStore) {
-        if (AOConstants.AOKeyStore.PKCS12.equals(currentStore)) return null;
-        if (Platform.OS.WINDOWS.equals(Platform.getOS()) && (!AOConstants.AOKeyStore.WINDOWS.equals(currentStore))) return AOConstants.AOKeyStore.WINDOWS;
-        if (Platform.OS.MACOSX.equals(Platform.getOS()) && (!AOConstants.AOKeyStore.APPLE.equals(currentStore))) return AOConstants.AOKeyStore.APPLE;
+        if (AOConstants.AOKeyStore.PKCS12.equals(currentStore)) {
+            return null;
+        }
+        if (Platform.OS.WINDOWS.equals(Platform.getOS()) && (!AOConstants.AOKeyStore.WINDOWS.equals(currentStore))) {
+            return AOConstants.AOKeyStore.WINDOWS;
+        }
+        if (Platform.OS.MACOSX.equals(Platform.getOS()) && (!AOConstants.AOKeyStore.APPLE.equals(currentStore))) {
+            return AOConstants.AOKeyStore.APPLE;
+        }
         return AOConstants.AOKeyStore.PKCS12;
     }
 }

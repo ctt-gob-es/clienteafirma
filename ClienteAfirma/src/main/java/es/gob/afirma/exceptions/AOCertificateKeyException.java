@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -19,7 +19,7 @@ public final class AOCertificateKeyException extends AOException {
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n */
-    public AOCertificateKeyException(String msg) {
+    public AOCertificateKeyException(final String msg) {
         super(msg);
     }
 
@@ -29,7 +29,7 @@ public final class AOCertificateKeyException extends AOException {
      *        Mensaje descriptivo de la excepci&oacute;n
      * @param e
      *        Excepci&oacute;n a a&ntilde;afir a la pila */
-    public AOCertificateKeyException(String msg, Exception e) {
+    public AOCertificateKeyException(final String msg, final Exception e) {
         super(msg, e);
     }
 }

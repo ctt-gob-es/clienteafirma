@@ -20,7 +20,9 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
     public AOKeystoreAlternativeException(final AOConstants.AOKeyStore ks, final String desc, final Exception e) {
         super(desc, e);
-        if (ks == null) throw new NullPointerException("Es necesario proporcionar un AOConstants.AOKeyStore alternativo");
+        if (ks == null) {
+            throw new NullPointerException("Es necesario proporcionar un AOConstants.AOKeyStore alternativo");
+        }
         alternativeKs = ks;
     }
 
@@ -32,7 +34,9 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Mensaje descriptivo de la excepci&oacute;n. */
     public AOKeystoreAlternativeException(final AOConstants.AOKeyStore ks, final String desc) {
         super(desc);
-        if (ks == null) throw new NullPointerException("Es necesario proporcionar un AOConstants.AOKeyStore alternativo");
+        if (ks == null) {
+            throw new NullPointerException("Es necesario proporcionar un AOConstants.AOKeyStore alternativo");
+        }
         alternativeKs = ks;
     }
 

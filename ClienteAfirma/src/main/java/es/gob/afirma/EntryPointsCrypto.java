@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -394,64 +394,64 @@ public interface EntryPointsCrypto {
      * - Para la selecci&oacute;n de certificado (opcional, excluyentes): Si no
      * se especifica ninguno, se muestra una ventana al usuario para que escoja
      * entre todos los certificados que tenga instalados<br>
-     * 
+     *
      * <pre>
      * -mandatoryCertCondition
      * </pre>
-     * 
+     *
      * <pre>
      * -certFilter
      * </pre>
-     * 
+     *
      * - Para la firma digital(opcionales): Si no se especifican, se toman los
      * valores por defecto <br>
-     * 
+     *
      * <pre>
      * -signatureAlgorithm
      * </pre>
-     * 
+     *
      * <pre>
      * -signatureFormat
      * </pre>
-     * 
+     *
      * - Firma electr&oacute;nica de entrada(opcional, excluyentes):
-     * 
+     *
      * <pre>
      * -electronicSignature
      * </pre>
-     * 
+     *
      * <pre>
      * -electronicSignatureFile
      * </pre>
-     * 
+     *
      * - Firmantes a contra-firmar:
-     * 
+     *
      * <pre>
      * - signersToCounterSign (nombres de firmantes devueltos por getSignersStructure() separados por '\n' )
      * </pre>
-     * 
+     *
      * <br>
      * <b>Par&aacute;metros de salida:</b><br>
      * - Si se produjo un error (isError()==true):<br>
-     * 
+     *
      * <pre>
      * -errorMessage
      * </pre>
-     * 
+     *
      * - Si no se produjo (isError()==false)<br>
-     * 
+     *
      * <pre>
      * -signatureBase64Encoded
      * </pre>
-     * 
+     *
      * <pre>
      * - fileUsedPath (si se han le&iacute;do los datos a firmar de un fichero)
      * </pre>
-     * 
+     *
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * 
+     *
      * <br>
      * Performs the counter-signature process (cascade signature). Counter-signs
      * all nodes from one or more signers.<br>
@@ -459,64 +459,64 @@ public interface EntryPointsCrypto {
      * <b>Input parameters:</b><br>
      * - Certificate selection (optional, exclusive): if unspecified, a window
      * is displayed, prompting the user to choose among installed certificates<br>
-     * 
+     *
      * <pre>
      * -mandatoryCertCondition
      * </pre>
-     * 
+     *
      * <pre>
      * -certFilter
      * </pre>
-     * 
+     *
      * - For electronic signature (optional): If unspecified, default values are
      * used<br>
-     * 
+     *
      * <pre>
      * -signatureAlgorithm
      * </pre>
-     * 
+     *
      * <pre>
      * -signatureFormat
      * </pre>
-     * 
+     *
      * - Input Electronic Signature (optional, exclusive):
-     * 
+     *
      * <pre>
      * -electronicSignature
      * </pre>
-     * 
+     *
      * <pre>
      * -electronicSignatureFile
      * </pre>
-     * 
+     *
      * - Signers to counter-sign:
-     * 
+     *
      * <pre>
      * - signersToCounterSign (signers names returned by getSignersStructure() separated by '\n' )
      * </pre>
-     * 
+     *
      * <br>
      * <b>Output parameters:</b><br>
      * - If error occurs (isError()==true):<br>
-     * 
+     *
      * <pre>
      * -errorMessage
      * </pre>
-     * 
+     *
      * - No error occurs (isError()==false)<br>
-     * 
+     *
      * <pre>
      * -signatureBase64Encoded
      * </pre>
-     * 
+     *
      * <pre>
      * - fileUsedPath (if data to be signed has been read from a file)
      * </pre>
-     * 
+     *
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * 
+     *
      * <br>
      * <br>
      * @see #setCertFilterRFC2254(String, String, boolean)
@@ -541,64 +541,64 @@ public interface EntryPointsCrypto {
      * - Para la selecci&oacute;n de certificado (opcional, excluyentes): Si no
      * se especifica ninguno, se muestra una ventana al usuario para que escoja
      * entre todos los certificados que tenga instalados<br>
-     * 
+     *
      * <pre>
      * -mandatoryCertCondition
      * </pre>
-     * 
+     *
      * <pre>
      * -certFilter
      * </pre>
-     * 
+     *
      * - Para la firma digital(opcionales): Si no se especifican, se toman los
      * valores por defecto <br>
-     * 
+     *
      * <pre>
      * -signatureAlgorithm
      * </pre>
-     * 
+     *
      * <pre>
      * -signatureFormat
      * </pre>
-     * 
+     *
      * - Firma electr&oacute;nica de entrada(opcional, excluyentes):
-     * 
+     *
      * <pre>
      * -electronicSignature
      * </pre>
-     * 
+     *
      * <pre>
      * -electronicSignatureFile
      * </pre>
-     * 
+     *
      * - Firmantes a contra-firmar:
-     * 
+     *
      * <pre>
      * - signersToCounterSign (indices de nodos de getSignersStructure() separados por '\n')
      * </pre>
-     * 
+     *
      * <br>
      * <b>Par&aacute;metros de salida:</b><br>
      * - Si se produjo un error (isError()==true):<br>
-     * 
+     *
      * <pre>
      * -errorMessage
      * </pre>
-     * 
+     *
      * - Si no se produjo (isError()==false)<br>
-     * 
+     *
      * <pre>
      * -signatureBase64Encoded
      * </pre>
-     * 
+     *
      * <pre>
      * - fileUsedPath (si se han le&iacute;do los datos a firmar de un fichero)
      * </pre>
-     * 
+     *
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * 
+     *
      * <br>
      * <br>
      * Performs the counter-signature process (cascade signature). Counter-signs
@@ -608,64 +608,64 @@ public interface EntryPointsCrypto {
      * - For certificate selection (optional, exclusive): If unspecified, a
      * window is displayed prompting user to choose among all installed
      * certificates<br>
-     * 
+     *
      * <pre>
      * -mandatoryCertCondition
      * </pre>
-     * 
+     *
      * <pre>
      * -certFilter
      * </pre>
-     * 
+     *
      * - For electronic signature (optional): If unspecified, default values are
      * used. <br>
-     * 
+     *
      * <pre>
      * -signatureAlgorithm
      * </pre>
-     * 
+     *
      * <pre>
      * -signatureFormat
      * </pre>
-     * 
+     *
      * - Input Electronic Signature (optional, exclusive):
-     * 
+     *
      * <pre>
      * -electronicSignature
      * </pre>
-     * 
+     *
      * <pre>
      * -electronicSignatureFile
      * </pre>
-     * 
+     *
      * - Signers to counter-sign:
-     * 
+     *
      * <pre>
      * - signersToCounterSign (Node index from  getSignersStructure() separated by '\n')
      * </pre>
-     * 
+     *
      * <br>
      * <b>Output parameters:</b><br>
      * - If error occurs (isError()==true):<br>
-     * 
+     *
      * <pre>
      * -errorMessage
      * </pre>
-     * 
+     *
      * - No error occurs (isError()==false)<br>
-     * 
+     *
      * <pre>
      * -signatureBase64Encoded
      * </pre>
-     * 
+     *
      * <pre>
      * - fileUsedPath (if data to be signed has been read from a file)
      * </pre>
-     * 
+     *
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * 
+     *
      * <br>
      * <br>
      * @return Devuelve <codetrue</code>> si la operaci&oacute;n finaliz&oacute;
@@ -690,58 +690,58 @@ public interface EntryPointsCrypto {
      * - Para la selecci&oacute;n de certificado (opcional, excluyentes): Si no
      * se especifica ninguno, se muestra una ventana al usuario para que escoja
      * entre todos los certificados que tenga instalados<br>
-     * 
+     *
      * <pre>
      * -mandatoryCertCondition
      * </pre>
-     * 
+     *
      * <pre>
      * -certFilter
      * </pre>
-     * 
+     *
      * - Para la firma digital(opcionales): Si no se especifican, se toman los
      * valores por defecto <br>
-     * 
+     *
      * <pre>
      * -signatureAlgorithm
      * </pre>
-     * 
+     *
      * <pre>
      * -signatureFormat
      * </pre>
-     * 
+     *
      * - Firma electr&oacute;nica de entrada(opcional, excluyentes):
-     * 
+     *
      * <pre>
      * -electronicSignature
      * </pre>
-     * 
+     *
      * <pre>
      * -electronicSignatureFile
      * </pre>
-     * 
+     *
      * <br>
      * <b>Par&aacute;metros de salida:</b><br>
      * - Si se produjo un error (isError()==true):<br>
-     * 
+     *
      * <pre>
      * -errorMessage
      * </pre>
-     * 
+     *
      * - Si no se produjo (isError()==false)<br>
-     * 
+     *
      * <pre>
      * -signatureBase64Encoded
      * </pre>
-     * 
+     *
      * <pre>
      * - fileUsedPath (si se han le&iacute;do los datos a firmar de un fichero)
      * </pre>
-     * 
+     *
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * 
+     *
      * <br>
      * Performs the counter-signature process (cascade signature). Counter-signs
      * all nodes in tree. <br>
@@ -749,58 +749,58 @@ public interface EntryPointsCrypto {
      * - For certificate selection (optional, exclusive): If unspecified, a
      * window is displayed prompting user to choose among all installed
      * certificates<br>
-     * 
+     *
      * <pre>
      * -mandatoryCertCondition
      * </pre>
-     * 
+     *
      * <pre>
      * -certFilter
      * </pre>
-     * 
+     *
      * - For electronic signature (optional): If unspecified, default values are
      * used. <br>
-     * 
+     *
      * <pre>
      * -signatureAlgorithm
      * </pre>
-     * 
+     *
      * <pre>
      * -signatureFormat
      * </pre>
-     * 
+     *
      * - Input Electronic Signature (optional, exclusive):
-     * 
+     *
      * <pre>
      * -electronicSignature
      * </pre>
-     * 
+     *
      * <pre>
      * -electronicSignatureFile
      * </pre>
-     * 
+     *
      * <br>
      * <b>Output parameters:</b><br>
      * - If error occurs (isError()==true):<br>
-     * 
+     *
      * <pre>
      * -errorMessage
      * </pre>
-     * 
+     *
      * - No error occurs (isError()==false)<br>
-     * 
+     *
      * <pre>
      * -signatureBase64Encoded
      * </pre>
-     * 
+     *
      * <pre>
      * - fileUsedPath (if data to be signed has been read from a file)
      * </pre>
-     * 
+     *
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * 
+     *
      * <br>
      * @return true si se ha ejecutado correctamente <br>
      *         true if succesful.
@@ -823,58 +823,58 @@ public interface EntryPointsCrypto {
      * - Para la selecci&oacute;n de certificado (opcional, excluyentes): Si no
      * se especifica ninguno, se muestra una ventana al usuario para que escoja
      * entre todos los certificados que tenga instalados<br>
-     * 
+     *
      * <pre>
      * -mandatoryCertCondition
      * </pre>
-     * 
+     *
      * <pre>
      * -certFilter
      * </pre>
-     * 
+     *
      * - Para la firma digital(opcionales): Si no se especifican, se toman los
      * valores por defecto <br>
-     * 
+     *
      * <pre>
      * -signatureAlgorithm
      * </pre>
-     * 
+     *
      * <pre>
      * -signatureFormat
      * </pre>
-     * 
+     *
      * - Firma electr&oacute;nica de entrada(opcional, excluyentes):
-     * 
+     *
      * <pre>
      * -electronicSignature
      * </pre>
-     * 
+     *
      * <pre>
      * -electronicSignatureFile
      * </pre>
-     * 
+     *
      * <br>
      * <b>Par&aacute;metros de salida:</b><br>
      * - Si se produjo un error (isError()==true):<br>
-     * 
+     *
      * <pre>
      * -errorMessage
      * </pre>
-     * 
+     *
      * - Si no se produjo (isError()==false)<br>
-     * 
+     *
      * <pre>
      * -signatureBase64Encoded
      * </pre>
-     * 
+     *
      * <pre>
      * - fileUsedPath (si se han le&iacute;do los datos a firmar de un fichero)
      * </pre>
-     * 
+     *
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * 
+     *
      * <br>
      * Performs counter-signature process (cascade signature). Counter-signs
      * tree leaves.<br>
@@ -883,58 +883,58 @@ public interface EntryPointsCrypto {
      * - For certificate selection (optional, exclusive): If unspecified, a
      * window is displayed prompting user to choose among all installed
      * certificates<br>
-     * 
+     *
      * <pre>
      * -mandatoryCertCondition
      * </pre>
-     * 
+     *
      * <pre>
      * -certFilter
      * </pre>
-     * 
+     *
      * - For electronic signature (optional): If unspecified, default values are
      * used <br>
-     * 
+     *
      * <pre>
      * -signatureAlgorithm
      * </pre>
-     * 
+     *
      * <pre>
      * -signatureFormat
      * </pre>
-     * 
+     *
      * - Input Electronic signature (optional, exclusive):
-     * 
+     *
      * <pre>
      * -electronicSignature
      * </pre>
-     * 
+     *
      * <pre>
      * -electronicSignatureFile
      * </pre>
-     * 
+     *
      * <br>
      * <b>Output parameters:</b><br>
      * - If error occurs (isError()==true):<br>
-     * 
+     *
      * <pre>
      * -errorMessage
      * </pre>
-     * 
+     *
      * - No error occurs (isError()==false)<br>
-     * 
+     *
      * <pre>
      * -signatureBase64Encoded
      * </pre>
-     * 
+     *
      * <pre>
      * - fileUsedPath (if data to be signed has been read from a file)
      * </pre>
-     * 
+     *
      * <pre>
      * -signCertificateBase64Encoded
      * </pre>
-     * 
+     *
      * <br>
      * @return true si se ha ejecutado correctamente <br>
      *         true if succesful.
@@ -1494,17 +1494,17 @@ public interface EntryPointsCrypto {
      * En caso de requerir el algoritmo algun tipo de configuraci&oacute;n de
      * modo de clave y padding se podr&aacute; pasar junto a su nombre separados
      * por '/' con el formato:
-     * 
+     *
      * <pre>
      * <code>Algoritmo/Modo/Padding</code>
      * </pre>
-     * 
+     *
      * Por ejemplo:
-     * 
+     *
      * <pre>
      * <code>AES/ECB/PKCS5PADDING</code>
      * </pre>
-     * 
+     *
      * <br/>
      * Los algoritmos de cifrados aceptados son:<br/>
      * Para los modos de cifrado con clave:
@@ -1529,17 +1529,17 @@ public interface EntryPointsCrypto {
      * envelopes.<br/>
      * If key mode and padding configuration are required by the algorithm, they
      * may be provided next to its name, separated by '/' with the format:
-     * 
+     *
      * <pre>
      * <code>Algorithm/Mode/Padding</code>
      * </pre>
-     * 
+     *
      * Example:
-     * 
+     *
      * <pre>
      * <code>AES/ECB/PKCS5PADDING</code>
      * </pre>
-     * 
+     *
      * <br/>
      * Accepted encryption algorithms are:<br/>
      * To the cipher modes using keys:

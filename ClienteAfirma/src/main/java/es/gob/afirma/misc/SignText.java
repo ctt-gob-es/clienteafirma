@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -35,7 +35,6 @@ import javax.swing.JTextArea;
 
 import es.atosorigin.AOCertVerifier;
 import es.atosorigin.AOCertificateRevokedException;
-import es.gob.afirma.Messages;
 import es.gob.afirma.callbacks.NullPasswordCallback;
 import es.gob.afirma.cliente.CertificateFilter;
 import es.gob.afirma.cliente.RFC2254CertificateFilter;
@@ -80,7 +79,7 @@ public final class SignText {
      * @param useit
      *        <code>true</code> para usar CAdES, <code>false</code> (por
      *        defecto) para usar CMS */
-    public void setUseCAdES(boolean useit) {
+    public void setUseCAdES(final boolean useit) {
         useCAdES = useit;
     }
 
@@ -221,7 +220,7 @@ public final class SignText {
             return NO_MATCHING_CERT;
         }
         try {
-            if (!useCAdES) { 
+            if (!useCAdES) {
                 return AOCryptoUtil.encodeBase64(new AOCMSSigner().sign(stringToSign.getBytes(),
                                                                                    AOConstants.SIGN_ALGORITHM_SHA1WITHRSA,
                                                                                    keyEntry,

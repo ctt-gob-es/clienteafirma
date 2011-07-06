@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -50,17 +50,17 @@ import es.gob.afirma.ciphers.AOCipherConfig;
 
 /** Clase que implementa firma digital PKCS#7/CMS AuthenticatedEnvelopedData (RFC
  * 5083) La Estructura del mensaje es la siguiente:<br>
- * 
+ *
  * <pre>
  * <code>
- * 
+ *
  *  id-ct-authEnvelopedData OBJECT IDENTIFIER ::= { iso(1)
  *         member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-9(9)
  *         smime(16) ct(1) 23 }
- * 
+ *
  *  The authenticated-data content type shall have ASN.1 type
  *  AuthenticatedEnvelopedData:
- * 
+ *
  *      AuthEnvelopedData ::= SEQUENCE {
  *       version CMSVersion,
  *       originatorInfo [0] IMPLICIT OriginatorInfo OPTIONAL,
@@ -69,16 +69,16 @@ import es.gob.afirma.ciphers.AOCipherConfig;
  *       authAttrs [1] IMPLICIT AuthAttributes OPTIONAL,
  *       mac MessageAuthenticationCode,
  *       unauthAttrs [2] IMPLICIT UnauthAttributes OPTIONAL }
- * 
+ *
  *     AuthAttributes ::= SET SIZE (1..MAX) OF Attribute
- * 
+ *
  *     UnauthAttributes ::= SET SIZE (1..MAX) OF Attribute
- * 
+ *
  *     MessageAuthenticationCode ::= OCTET STRING
- * 
+ *
  * </code>
  * </pre>
- * 
+ *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje AuthenticatedEnvelopedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
@@ -232,7 +232,7 @@ public final class CMSAuthenticatedEnvelopedData {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
 
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data

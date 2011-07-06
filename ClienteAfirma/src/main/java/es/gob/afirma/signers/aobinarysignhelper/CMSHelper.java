@@ -31,22 +31,46 @@ public final class CMSHelper {
             return false;
         }
 
-        ValidateCMS validator = new ValidateCMS();
+        final ValidateCMS validator = new ValidateCMS();
         boolean valid = validator.isCMSData(data); // Comprobamos DATA
-        if (!valid) valid = validator.isCMSSignedData(data); // Comprobamos SIGNEDDATA
-        if (!valid) valid = validator.isCMSDigestedData(data); // Comprobamos DIGESTDATA
-        if (!valid) valid = validator.isCMSEncryptedData(data); // Comprobamos
+        if (!valid)
+         {
+            valid = validator.isCMSSignedData(data); // Comprobamos SIGNEDDATA
+        }
+        if (!valid)
+         {
+            valid = validator.isCMSDigestedData(data); // Comprobamos DIGESTDATA
+        }
+        if (!valid)
+         {
+            valid = validator.isCMSEncryptedData(data); // Comprobamos
+        }
                                                                 // ENCRYPTEDDATA
-        if (!valid) valid = validator.isCMSEnvelopedData(data); // Comprobamos
+        if (!valid)
+         {
+            valid = validator.isCMSEnvelopedData(data); // Comprobamos
+        }
                                                                 // ENVELOPEDDATA
-        if (!valid) valid = validator.isCMSSignedAndEnvelopedData(data); // Comprobamos
+        if (!valid)
+         {
+            valid = validator.isCMSSignedAndEnvelopedData(data); // Comprobamos
+        }
                                                                          // SIGNEDANDENVELOPED
-        if (!valid) valid = validator.isCMSAuthenticatedData(data); // Comprobamos
+        if (!valid)
+         {
+            valid = validator.isCMSAuthenticatedData(data); // Comprobamos
+        }
                                                                     // AUTHENTICATED
-        if (!valid) valid = validator.isCMSAuthenticatedEnvelopedData(data); // Comprobamos
+        if (!valid)
+         {
+            valid = validator.isCMSAuthenticatedEnvelopedData(data); // Comprobamos
+        }
                                                                              // AUTHENTICATEDENVELOPEDDATA
-        if (!valid) valid = validator.isCMSCompressedData(data); // Comprobamos
-                                                                 // COMPRESSEDDATA
+        if (!valid)
+         {
+            valid = validator.isCMSCompressedData(data); // Comprobamos
+                                                                     // COMPRESSEDDATA
+        }
 
         return valid;
     }
@@ -58,7 +82,7 @@ public final class CMSHelper {
      *        Tipo de dato que queremos.
      * @return Indica si el fichero es una envoltura CMS con el tipo de
      *         contenido indicado. */
-    public static boolean isCMSValid(byte[] data, String type) {
+    public static boolean isCMSValid(final byte[] data, final String type) {
         if (type.equals(AOConstants.CMS_CONTENTTYPE_DATA)) {
             return new ValidateCMS().isCMSData(data);
         }

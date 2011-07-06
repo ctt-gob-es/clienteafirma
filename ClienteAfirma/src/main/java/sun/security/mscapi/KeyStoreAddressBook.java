@@ -46,14 +46,14 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     final static class KeyEntry {
         // private Key privateKey;
-        private X509Certificate certChain[];
+        private final X509Certificate certChain[];
         private String alias;
 
-        KeyEntry(Key key, X509Certificate[] chain) {
+        KeyEntry(final Key key, final X509Certificate[] chain) {
             this(null, key, chain);
         }
 
-        KeyEntry(String alias, Key key, X509Certificate[] chain) {
+        KeyEntry(final String alias, final Key key, final X509Certificate[] chain) {
 
             // this.privateKey = key;
             this.certChain = chain;
@@ -75,7 +75,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
 
         /** Sets the alias for the keystore entry. */
-        void setAlias(String alias) {
+        void setAlias(final String alias) {
             this.alias = alias;
         }
 
@@ -96,7 +96,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     private final boolean keyStoreCompatibilityMode;
 
     /* The keystore entries. */
-    private Collection<KeyEntry> entries = new ArrayList<KeyEntry>();
+    private final Collection<KeyEntry> entries = new ArrayList<KeyEntry>();
 
     /*
      * The keystore name. Case is not significant.
@@ -104,7 +104,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     private final String storeName;
 
     private java.lang.reflect.Method loadKeysOrCertificateChains;
-    private KeyStore.MY nativeWrapper;
+    private final KeyStore.MY nativeWrapper;
 
     KeyStoreAddressBook(final String storeName) {
 
@@ -156,7 +156,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @exception UnrecoverableKeyException
      *            if the key cannot be recovered. */
     @Override
-    public final java.security.Key engineGetKey(String alias, char[] password) throws NoSuchAlgorithmException, UnrecoverableKeyException {
+    public final java.security.Key engineGetKey(final String alias, final char[] password) throws NoSuchAlgorithmException, UnrecoverableKeyException {
         throw new UnsupportedOperationException();
     }
 
@@ -169,14 +169,14 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *         (i.e., the given alias identifies either a <i>trusted certificate
      *         entry</i> or a <i>key entry</i> without a certificate chain). */
     @Override
-    public final Certificate[] engineGetCertificateChain(String alias) {
+    public final Certificate[] engineGetCertificateChain(final String alias) {
         if (alias == null) {
             return null;
         }
 
-        for (KeyEntry entry : entries) {
+        for (final KeyEntry entry : entries) {
             if (alias.equals(entry.getAlias())) {
-                X509Certificate[] certChain = entry.getCertificateChain();
+                final X509Certificate[] certChain = entry.getCertificateChain();
                 return certChain.clone();
             }
         }
@@ -194,14 +194,14 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return the certificate, or null if the given alias does not exist or
      *         does not contain a certificate. */
     @Override
-    public final Certificate engineGetCertificate(String alias) {
+    public final Certificate engineGetCertificate(final String alias) {
         if (alias == null) {
             return null;
         }
         java.lang.reflect.Method getAlias = null;
         java.lang.reflect.Method getCertificateChain = null;
-        for (Object o : entries) {
-            for (java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
+        for (final Object o : entries) {
+            for (final java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
                 if (m.getName().equals("getAlias")) {
                     m.setAccessible(true);
                     getAlias = m;
@@ -214,7 +214,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
                     try {
                         if (alias.equals(getAlias.invoke(o, new Object[0]))) {
                             if (getCertificateChain != null) {
-                                X509Certificate[] certChain = (X509Certificate[]) getCertificateChain.invoke(o, new Object[0]);
+                                final X509Certificate[] certChain = (X509Certificate[]) getCertificateChain.invoke(o, new Object[0]);
                                 return certChain[0];
                             }
                         }
@@ -233,7 +233,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return the creation date of this entry, or null if the given alias does
      *         not exist */
     @Override
-    public final Date engineGetCreationDate(String alias) {
+    public final Date engineGetCreationDate(final String alias) {
         if (alias == null) {
             return null;
         }
@@ -265,7 +265,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            protected, or if compatibility mode is disabled and <code>password</code> is non-null, or if this operation
      *            fails for some other reason. */
     @Override
-    public final void engineSetKeyEntry(String alias, java.security.Key key, char[] password, Certificate[] chain) throws KeyStoreException {
+    public final void engineSetKeyEntry(final String alias, final java.security.Key key, final char[] password, final Certificate[] chain) throws KeyStoreException {
         throw new UnsupportedOperationException();
     }
 
@@ -287,7 +287,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @exception KeyStoreException
      *            if this operation fails. */
     @Override
-    public final void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain) throws KeyStoreException {
+    public final void engineSetKeyEntry(final String alias, final byte[] key, final Certificate[] chain) throws KeyStoreException {
         throw new UnsupportedOperationException("Cannot assign the encoded key to the given alias.");
     }
 
@@ -304,7 +304,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            <i>trusted certificate entry</i>, or this operation fails
      *            for some other reason. */
     @Override
-    public final void engineSetCertificateEntry(String alias, Certificate cert) throws KeyStoreException {
+    public final void engineSetCertificateEntry(final String alias, final Certificate cert) throws KeyStoreException {
         throw new UnsupportedOperationException();
     }
 
@@ -314,7 +314,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @exception KeyStoreException
      *            if the entry cannot be removed. */
     @Override
-    public final void engineDeleteEntry(String alias) throws KeyStoreException {
+    public final void engineDeleteEntry(final String alias) throws KeyStoreException {
         throw new UnsupportedOperationException();
     }
 
@@ -354,7 +354,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *        the alias name
      * @return true if the alias exists, false otherwise */
     @Override
-    public final boolean engineContainsAlias(String alias) {
+    public final boolean engineContainsAlias(final String alias) {
         for (final Enumeration<?> enumerator = engineAliases(); enumerator.hasMoreElements();) {
             final String a = (String) enumerator.nextElement();
             if (a.equals(alias)) {
@@ -424,7 +424,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            if compatibility mode is disabled and either parameter is
      *            non-null. */
     @Override
-    public final void engineStore(OutputStream stream, char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
+    public final void engineStore(final OutputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
         if (stream != null && !keyStoreCompatibilityMode) {
             throw new IOException("Keystore output stream must be null");
         }

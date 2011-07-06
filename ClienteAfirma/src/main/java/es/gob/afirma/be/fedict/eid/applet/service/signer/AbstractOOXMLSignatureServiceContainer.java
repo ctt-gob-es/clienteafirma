@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -68,8 +68,12 @@ public final class AbstractOOXMLSignatureServiceContainer {
             catch (final Exception e) {
                 throw new IllegalArgumentException("No se ha podido leer el OOXML desde el InputStream de entrada");
             }
-            if (digestAlgo == null) digestAlgorithm = "SHA1";
-            else digestAlgorithm = digestAlgo;
+            if (digestAlgo == null) {
+                digestAlgorithm = "SHA1";
+            }
+            else {
+                digestAlgorithm = digestAlgo;
+            }
         }
 
         @Override
@@ -95,7 +99,7 @@ public final class AbstractOOXMLSignatureServiceContainer {
 
         OOXMLProvider.install();
 
-        OOXMLSignatureService signatureService = new OOXMLSignatureService(ooxml, digestAlgorithm);
+        final OOXMLSignatureService signatureService = new OOXMLSignatureService(ooxml, digestAlgorithm);
 
         return signatureService.outputSignedOfficeOpenXMLDocument(signatureService.preSign(null, certChain, pk));
 

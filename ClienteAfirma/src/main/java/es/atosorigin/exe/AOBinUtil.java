@@ -225,12 +225,13 @@ final class AOBinUtil {
                 };
         offset = 0;
         int l = 0;
-        for (int k = 0; k < 8; k++)
+        for (int k = 0; k < 8; k++) {
             l = (l << 8) | (data[offset++] & 0xFF);
+        }
         return l;
     }
 
-    public static int getU2(byte[] data, int offset) {
+    public static int getU2(final byte[] data, final int offset) {
         return ((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff);
     }
 
@@ -240,8 +241,9 @@ final class AOBinUtil {
         };
         offset = 0;
         int l = 0;
-        for (int k = 0; k < 4; k++)
+        for (int k = 0; k < 4; k++) {
             l = (l << 8) | (data[offset++] & 0xFF);
+        }
         return l;
     }
 }

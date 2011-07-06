@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -103,7 +103,7 @@ public final class AOCAdESSigner implements AOSigner {
     public byte[] sign(byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
         if (extraParams == null) {
-            extraParams = new Properties(); 
+            extraParams = new Properties();
         }
 
         if (algorithm.equalsIgnoreCase("RSA")) {
@@ -154,9 +154,11 @@ public final class AOCAdESSigner implements AOSigner {
         }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) xCerts = new X509Certificate[] {
-                (X509Certificate) cert
-            };
+            if (cert instanceof X509Certificate) {
+                xCerts = new X509Certificate[] {
+                    (X509Certificate) cert
+                };
+            }
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
@@ -229,7 +231,7 @@ public final class AOCAdESSigner implements AOSigner {
         else {
             final Certificate cert = keyEntry.getCertificate();
             if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {   
+                xCerts = new X509Certificate[] {
                                                 (X509Certificate) cert
                 };
             }
@@ -255,7 +257,7 @@ public final class AOCAdESSigner implements AOSigner {
             catch (final Exception e) {}
 
             // Si la firma que nos introducen es SignedData
-            boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+            final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
             if (signedData) {
 
                 final String mode = extraParams.getProperty("mode", AOConstants.DEFAULT_SIGN_MODE);
@@ -311,7 +313,7 @@ public final class AOCAdESSigner implements AOSigner {
             }
         }
         // algoritmo de firma.
-        String typeAlgorithm = algorithm;
+        final String typeAlgorithm = algorithm;
         // Array de certificados
         X509Certificate[] aCertificados = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();
@@ -334,7 +336,7 @@ public final class AOCAdESSigner implements AOSigner {
         catch (final Exception e) {}
 
         // Si la firma que nos introducen es SignedData
-        boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+        final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
         if (signedData) {
             try {
                 return new CadesCoSigner().coSigner(typeAlgorithm,
@@ -401,7 +403,7 @@ public final class AOCAdESSigner implements AOSigner {
         }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) { 
+            if (cert instanceof X509Certificate) {
                 xCerts = new X509Certificate[] {
                                                 (X509Certificate) cert
                 };
@@ -435,12 +437,12 @@ public final class AOCAdESSigner implements AOSigner {
         byte[] dataSigned = null;
 
         // Si la firma que nos introducen es SignedData
-        boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+        final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
         if (signedData) {
             try {
                 // CASO DE FIRMA DE ARBOL
                 if (targetType == CounterSignTarget.Tree) {
-                    int[] nodes = {
+                    final int[] nodes = {
                         0
                     };
 
@@ -457,7 +459,7 @@ public final class AOCAdESSigner implements AOSigner {
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.Leafs) {
-                    int[] nodes = {
+                    final int[] nodes = {
                         0
                     };
                     dataSigned =
@@ -524,7 +526,7 @@ public final class AOCAdESSigner implements AOSigner {
         try {
             // CASO DE FIRMA DE ARBOL
             if (targetType == CounterSignTarget.Tree) {
-                int[] nodes = {
+                final int[] nodes = {
                     0
                 };
 
@@ -541,7 +543,7 @@ public final class AOCAdESSigner implements AOSigner {
             }
             // CASO DE FIRMA DE HOJAS
             else if (targetType == CounterSignTarget.Leafs) {
-                int[] nodes = {
+                final int[] nodes = {
                     0
                 };
                 dataSigned =
@@ -674,7 +676,7 @@ public final class AOCAdESSigner implements AOSigner {
             }
             else {
                 final Certificate cert = keyEntry.getCertificate();
-                if (cert instanceof X509Certificate) { 
+                if (cert instanceof X509Certificate) {
                     xCerts = new X509Certificate[] {
                                                     (X509Certificate) cert
                     };
@@ -979,11 +981,11 @@ public final class AOCAdESSigner implements AOSigner {
      * @return Firma original con el nuevo firmante a&ntilde;adido
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] addOriginatorInfo(InputStream signFile,
-                                    InputStream file,
-                                    String signatureAlgorithm,
-                                    PrivateKeyEntry keyEntry,
-                                    Properties extraParams) throws AOException {
+    public byte[] addOriginatorInfo(final InputStream signFile,
+                                    final InputStream file,
+                                    final String signatureAlgorithm,
+                                    final PrivateKeyEntry keyEntry,
+                                    final Properties extraParams) throws AOException {
 
         // Comprobamos que el archivo a tratar no sea nulo.
         if (file == null) {
@@ -1008,7 +1010,7 @@ public final class AOCAdESSigner implements AOSigner {
             }
             else {
                 final Certificate cert = keyEntry.getCertificate();
-                if (cert instanceof X509Certificate) { 
+                if (cert instanceof X509Certificate) {
                     xCerts = new X509Certificate[] {
                                                     (X509Certificate) cert
                     };
@@ -1066,7 +1068,7 @@ public final class AOCAdESSigner implements AOSigner {
         this.cipherAlgorithm = alg;
     }
 
-    public void setDataObjectFormat(final String description, final Oid objectIdentifier, final javax.activation.MimeType mimeType, String encoding) {
+    public void setDataObjectFormat(final String description, final Oid objectIdentifier, final javax.activation.MimeType mimeType, final String encoding) {
         // No permitimos el cambio del tipo de dato. CMS/CAdES establece que
         // siempre
         // sera de tipo DATA

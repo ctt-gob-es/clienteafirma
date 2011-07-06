@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -41,13 +41,13 @@ public final class ExtractMimeType {
             final ASN1InputStream is = new ASN1InputStream(data);
 
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            Enumeration<?> e = ((ASN1Sequence) is.readObject()).getObjects();
+            final Enumeration<?> e = ((ASN1Sequence) is.readObject()).getObjects();
 
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (doi.equals(PKCSObjectIdentifiers.signedData)) {
                 // Contenido de SignedData
-                SignedData sd = new SignedData((ASN1Sequence) ((ASN1TaggedObject) e.nextElement()).getObject());
+                final SignedData sd = new SignedData((ASN1Sequence) ((ASN1TaggedObject) e.nextElement()).getObject());
 
                 // El contentype es el que nos dice el tipo de contenido que es.
                 // Consultar la cabecera de la clase

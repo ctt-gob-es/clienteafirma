@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -31,27 +31,27 @@ public final class ObtainContentSignedData {
      * @param data
      *        datos que contienen la firma.
      * @return el contenido firmado. */
-    public byte[] obtainData(byte[] data) {
+    public byte[] obtainData(final byte[] data) {
         byte[] contenido = null;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             ASN1Sequence dsq = null;
             dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             // Contenido a obtener informacion
-            ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+            final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
             // buscamos si es signedData
             if (doi.equals(PKCSObjectIdentifiers.signedData)) {
                 // obtenemos el signed Data
-                SignedData sd = new SignedData((ASN1Sequence) doj.getObject());
-                ContentInfo ci = sd.getEncapContentInfo();
+                final SignedData sd = new SignedData((ASN1Sequence) doj.getObject());
+                final ContentInfo ci = sd.getEncapContentInfo();
                 // obtenemos el contenido si lo tiene.
                 if (ci.getContent() != null) {
-                    DEROctetString os = (DEROctetString) ci.getContent();
+                    final DEROctetString os = (DEROctetString) ci.getContent();
                     contenido = os.getOctets();
                 }
                 else {
@@ -63,7 +63,7 @@ public final class ObtainContentSignedData {
             }
 
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("No se pudieron recuperar los datos contenidos en la firma: " + e);
             contenido = null;
         }

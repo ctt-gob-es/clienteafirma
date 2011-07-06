@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -46,7 +46,7 @@ public final class Messages {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             return '!' + key + '!';
         }
     }
@@ -62,7 +62,7 @@ public final class Messages {
         try {
             return RESOURCE_BUNDLE.getString(key).replace("%0", text);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             return '!' + key + '!';
         }
     }
@@ -81,7 +81,7 @@ public final class Messages {
         try {
             text = RESOURCE_BUNDLE.getString(key);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             return '!' + key + '!';
         }
 

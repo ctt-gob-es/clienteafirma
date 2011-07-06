@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -61,7 +61,7 @@ public final class AOPDFVericode {
      * @throws AOException
      *         Cuando ocurri&oacute; un error al comprobar la anchura que
      *         debe tener la imagen final. */
-    public static BufferedImage getVericode(Image logo, String upperText, String bottomText, String code, VericodeOrientation direction) throws AOException {
+    public static BufferedImage getVericode(final Image logo, final String upperText, final String bottomText, final String code, final VericodeOrientation direction) throws AOException {
 
         if (code == null) {
             throw new NullPointerException("No se ha indicado el codigo que se desea generar");
@@ -74,10 +74,10 @@ public final class AOPDFVericode {
         if (logo != null) {
             imageWidth += LOGO_WIDTH + 20;
         }
-        BufferedImage bImg = new BufferedImage(imageWidth, LOGO_WIDTH, BufferedImage.TYPE_INT_RGB);
+        final BufferedImage bImg = new BufferedImage(imageWidth, LOGO_WIDTH, BufferedImage.TYPE_INT_RGB);
 
         // Tomamos el grafics y lo configuramos
-        Graphics gbImage = bImg.getGraphics();
+        final Graphics gbImage = bImg.getGraphics();
         gbImage.setColor(Color.white);
         gbImage.fillRect(0, 0, bImg.getWidth(), bImg.getHeight());
         gbImage.setColor(Color.black);
@@ -86,9 +86,9 @@ public final class AOPDFVericode {
 
         // Pintamos el logo
         if (logo != null) {
-            ImageIcon imageTmp = new ImageIcon(logo);
-            int width = Math.min(imageTmp.getIconWidth(), LOGO_WIDTH);
-            int height = Math.min(imageTmp.getIconHeight(), LOGO_WIDTH);
+            final ImageIcon imageTmp = new ImageIcon(logo);
+            final int width = Math.min(imageTmp.getIconWidth(), LOGO_WIDTH);
+            final int height = Math.min(imageTmp.getIconHeight(), LOGO_WIDTH);
 
             gbImage.drawImage(new ImageIcon(logo.getScaledInstance(width, height, Image.SCALE_SMOOTH)).getImage(), 0, 0, null);
             xPosition += LOGO_WIDTH;
@@ -121,7 +121,7 @@ public final class AOPDFVericode {
      * @param direction
      *        Direcc&oacute;n en la que rotar la imagen.
      * @return Imagen rotada. */
-    private static BufferedImage rotateImage(BufferedImage image, VericodeOrientation direction) {
+    private static BufferedImage rotateImage(final BufferedImage image, final VericodeOrientation direction) {
 
         if (image == null) {
             throw new NullPointerException("No se ha indicado la imagen que se desea rotar");
@@ -132,22 +132,26 @@ public final class AOPDFVericode {
         // Si hay que rotar, operamos como corresponde
         if (direction == VericodeOrientation.DIRECTION_UP_TO_DOWN || direction == VericodeOrientation.DIRECTION_DOWN_TO_UP) {
 
-            int initWidth = image.getWidth();
-            int initHeight = image.getHeight();
+            final int initWidth = image.getWidth();
+            final int initHeight = image.getHeight();
 
-            int[] pixels = image.getRGB(0, 0, initWidth, initHeight, null, 0, image.getWidth());
+            final int[] pixels = image.getRGB(0, 0, initWidth, initHeight, null, 0, image.getWidth());
             rotatedImage = new BufferedImage(initHeight, initWidth, BufferedImage.TYPE_INT_RGB);
 
             int p = 0;
             if (direction == VericodeOrientation.DIRECTION_UP_TO_DOWN) { // UP-TO-DOWN
-                for (int x = 0; x < initHeight; x++)
-                    for (int y = 0; y < initWidth; y++)
+                for (int x = 0; x < initHeight; x++) {
+                    for (int y = 0; y < initWidth; y++) {
                         rotatedImage.setRGB((initHeight - 1) - x, y, pixels[p++]);
+                    }
+                }
             }
             else { // DOWN-TO-UP
-                for (int x = 0; x < initHeight; x++)
-                    for (int y = 0; y < initWidth; y++)
+                for (int x = 0; x < initHeight; x++) {
+                    for (int y = 0; y < initWidth; y++) {
                         rotatedImage.setRGB(x, (initWidth - 1) - y, pixels[p++]);
+                    }
+                }
             }
         }
 
@@ -165,12 +169,12 @@ public final class AOPDFVericode {
      * @param code
      *        C&oacute;digo de barras.
      * @return Longitud */
-    private static int calculateWidth(String upperText, String bottomText, String code) {
+    private static int calculateWidth(final String upperText, final String bottomText, final String code) {
 
         final int DEFAULT_MAX_WIDTH = 100;
         int maxWidth = DEFAULT_MAX_WIDTH;
         FontMetrics fm = null;
-        BufferedImage canvas = new BufferedImage(100, 60, BufferedImage.TYPE_INT_RGB);
+        final BufferedImage canvas = new BufferedImage(100, 60, BufferedImage.TYPE_INT_RGB);
 
         try {
             // Texto superior
@@ -190,7 +194,7 @@ public final class AOPDFVericode {
             }
 
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma")
                   .warning("Error al calcular el tama\u00F1o m\u00E1ximo de los texto, se devolvera la longitud por defecto: " + e.getMessage());
             maxWidth = DEFAULT_MAX_WIDTH;
@@ -205,7 +209,7 @@ public final class AOPDFVericode {
      * @param code
      *        C&oacute;digo textual.
      * @return Texto con el formato v&aacute;lido. */
-    private static String formatBarcode(String code) {
+    private static String formatBarcode(final String code) {
         String barcode = code;
         if (!code.startsWith("*") || !code.endsWith("*")) { //$NON-NLS-1$  //$NON-NLS-2$
             barcode = "*" + code + "*"; //$NON-NLS-1$  //$NON-NLS-2$
@@ -233,10 +237,10 @@ public final class AOPDFVericode {
     private static Font getBarcodeFont() throws AOException {
         if (barcodeFont == null) {
             try {
-                InputStream is = AOPDFVericode.class.getResourceAsStream("/FREE3OF9.TTF");
+                final InputStream is = AOPDFVericode.class.getResourceAsStream("/FREE3OF9.TTF");
                 barcodeFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(Font.PLAIN, 36);
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe("No se ha podido cargar la fuente del codigo de barras");
                 throw new AOException("No se ha podido cargar la fuente del codigo de barras", e);
             }

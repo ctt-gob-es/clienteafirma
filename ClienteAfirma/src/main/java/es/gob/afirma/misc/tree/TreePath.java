@@ -56,7 +56,7 @@ final class TreePath {
      *         if the index is beyond the length of the path
      * @see #TreePath(Object[]) */
     private Object getPathComponent(final int element) {
-        int pathLength = getPathCount();
+        final int pathLength = getPathCount();
 
         if (element < 0 || element >= pathLength) {
             throw new IllegalArgumentException("Index " + element + " is out of the specified range");

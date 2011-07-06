@@ -32,7 +32,7 @@ public final class TreeNode {
     transient protected Object userObject;
 
     /** true if the node is able to have children */
-    private boolean allowsChildren;
+    private final boolean allowsChildren;
 
     /** Creates a tree node with no parent, no children, but which allows
      * children, and initializes it with the specified user object.
@@ -194,7 +194,7 @@ public final class TreeNode {
      *        the Object that constitutes this node's user-specified data
      * @see #getUserObject
      * @see #toString */
-    public void setUserObject(Object userObject) {
+    public void setUserObject(final Object userObject) {
         this.userObject = userObject;
     }
 
@@ -246,7 +246,7 @@ public final class TreeNode {
      *            if <code>newChild</code> is null
      * @exception IllegalStateException
      *            if this node does not allow children */
-    public void add(TreeNode newChild) {
+    public void add(final TreeNode newChild) {
         if (newChild != null && newChild.getParent() == this) {
             insert(newChild, getChildCount() - 1);
         }
@@ -300,7 +300,7 @@ public final class TreeNode {
 
     /** Returns true if <code>aNode</code> is a child of this node. If <code>aNode</code> is null, this method returns false.
      * @return true if <code>aNode</code> is a child of this node; false if <code>aNode</code> is null */
-    private boolean isNodeChild(TreeNode aNode) {
+    private boolean isNodeChild(final TreeNode aNode) {
         boolean retval;
 
         if (aNode == null) {
@@ -348,11 +348,11 @@ public final class TreeNode {
     }
 
     private static final class PreorderEnumeration implements Enumeration<TreeNode> {
-        private Stack<Enumeration<TreeNode>> stack;
+        private final Stack<Enumeration<TreeNode>> stack;
 
-        PreorderEnumeration(TreeNode rootNode) {
+        PreorderEnumeration(final TreeNode rootNode) {
             super();
-            Vector<TreeNode> v = new Vector<TreeNode>(1);
+            final Vector<TreeNode> v = new Vector<TreeNode>(1);
             v.addElement(rootNode); // PENDING: don't really need a vector
             stack = new Stack<Enumeration<TreeNode>>();
             stack.push(v.elements());

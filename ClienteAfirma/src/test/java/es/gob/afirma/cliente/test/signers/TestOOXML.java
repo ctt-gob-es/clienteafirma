@@ -39,10 +39,12 @@ public final class TestOOXML {
             e.printStackTrace();
             ooxml = null;
         }
-        if (ooxml != null && ooxml.length == 0) ooxml = null;
+        if (ooxml != null && ooxml.length == 0) {
+            ooxml = null;
+        }
         assertNotNull("No se ha podido cargar el OOXML a firmar", ooxml);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
             System.out.println();
             System.out.println();
             System.out.println();
@@ -87,10 +89,12 @@ public final class TestOOXML {
             e.printStackTrace();
             ooxml = null;
         }
-        if (ooxml != null && ooxml.length == 0) ooxml = null;
+        if (ooxml != null && ooxml.length == 0) {
+            ooxml = null;
+        }
         assertNotNull("No se ha podido cargar el OOXML a cofirmar", ooxml);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
             System.out.println();
             System.out.println();
             System.out.println();

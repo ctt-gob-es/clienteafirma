@@ -58,31 +58,31 @@ public final class WrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
                 }
             }
         }
-        catch (AOCancelledOperationException e) {
+        catch (final AOCancelledOperationException e) {
             setError("Operacion cancelada por el usuario", e); //$NON-NLS-1$
             return false;
         }
-        catch (IllegalArgumentException e) {
+        catch (final IllegalArgumentException e) {
             setError("Modo de clave no soportado", e); //$NON-NLS-1$
             return false;
         }
-        catch (NullPointerException e) {
+        catch (final NullPointerException e) {
             setError("No se ha indicado el tipo de envoltorio o los destinatarios del mismo", e); //$NON-NLS-1$
             return false;
         }
-        catch (NoSuchAlgorithmException e) {
+        catch (final NoSuchAlgorithmException e) {
             setError("Algoritmo de ensobrado no soportado", e); //$NON-NLS-1$
             return false;
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             setError("No se han podido leer los datos a ensobrar", e); //$NON-NLS-1$
             return false;
         }
-        catch (AOException e) {
+        catch (final AOException e) {
             setError("Error durante el proceso de ensobrado", e); //$NON-NLS-1$
             return false;
         }
-        catch (CertificateEncodingException e) {
+        catch (final CertificateEncodingException e) {
             setError("El certificado del remitente no es valido", e); //$NON-NLS-1$
             return false;
         }

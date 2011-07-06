@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -81,7 +81,7 @@ public class OOXMLURIDereferencer implements URIDereferencer {
         try {
             uri = URLDecoder.decode(uri, "UTF-8");
         }
-        catch (UnsupportedEncodingException e) {
+        catch (final UnsupportedEncodingException e) {
             Logger.getLogger("es.gob.afirma").warning("could not URL decode the uri: " + uri);
         }
 
@@ -92,7 +92,7 @@ public class OOXMLURIDereferencer implements URIDereferencer {
             }
             return new OctetStreamData(dataInputStream, uri, null);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             throw new URIReferenceException("I/O error: " + e.getMessage(), e);
         }
     }

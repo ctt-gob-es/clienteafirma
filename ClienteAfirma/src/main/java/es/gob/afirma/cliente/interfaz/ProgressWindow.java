@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -36,7 +36,7 @@ public final class ProgressWindow extends JFrame {
      *        Valor m&aacute;ximo de la barra de progreso
      * @throws HeadlessException
      *         Si no hay interfaz gr&aacute;fico */
-    public ProgressWindow(String windowTitle, String statusTitle, long max) throws HeadlessException {
+    public ProgressWindow(final String windowTitle, final String statusTitle, final long max) throws HeadlessException {
         super(windowTitle);
 
         this.max = max;
@@ -57,8 +57,8 @@ public final class ProgressWindow extends JFrame {
     public void inc(final int amount) {
         progreso += amount;
 
-        double ratio = (double) progreso / max;
-        int newVal = (int) (ratio * Integer.MAX_VALUE);
+        final double ratio = (double) progreso / max;
+        final int newVal = (int) (ratio * Integer.MAX_VALUE);
 
         status.updateValue(newVal);
 

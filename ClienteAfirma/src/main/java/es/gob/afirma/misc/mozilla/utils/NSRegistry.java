@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -29,13 +29,13 @@ import java.util.logging.Logger;
  * <p>
  * To use this class you must create an NSRegistry object and open a valid registry file. To look up a value (the value of an "entry") you provide
  * it's path; here's an example that prints the current version of Communicator.
- * 
+ *
  * <pre>
  * NSRegistry reg = new NSRegistry().open(new File("c:\WINNT\nsreg.dat"));
  * System.out.println(reg.get("Version Registry/Netscape/Communicator/Version"));
  * reg.close();
  * </pre>
- * 
+ *
  * The NSRegistry.dump() method prints the contents of the entire registry. Inspirada en la clase com.sun.deploy.net.proxy.NSRegistry de Sun
  * Microsystems. */
 final class NSRegistry {
@@ -50,7 +50,7 @@ final class NSRegistry {
      * struct definition was lifted directly from the mozilla sources, see
      * <p>
      * <a href="http://lxr.mozilla.org/mozilla/source/modules/libreg/src/reg.h"> source/modules/libreg/src/reg.h </a>
-     * 
+     *
      * <pre>
      *  typedef struct _desc {
      *      REGOFF  location;   // this object's offset (for verification)
@@ -65,7 +65,7 @@ final class NSRegistry {
      *     REGOFF  parent;     // the node on the immediate level above
      * } REGDESC;
      * </pre>
-     * 
+     *
      * The REGTYPE_ENTRY constant (0x0010) comes from NSReg.h, see <a href= "http://lxr.mozilla.org/mozilla/source/modules/libreg/include/NSReg.h">
      * source/modules/libreg/include/NSReg.h </a> */
     private static final class Record {
@@ -81,7 +81,7 @@ final class NSRegistry {
         if (readInt() != offset) {
             throw new IOException("invalid offset for record [" + offset + "]");
         }
-        Record r = new Record();
+        final Record r = new Record();
         r.name = readInt();
         r.namelen = readUnsignedShort();
         /* r.type = */readUnsignedShort();
@@ -95,19 +95,20 @@ final class NSRegistry {
 
     /** Read a UTF8 string at the specified offset. Note that nchars does not
      * include a terminating null character. */
-    private String readString(long offset, long nchars) throws IOException {
+    private String readString(final long offset, final long nchars) throws IOException {
         in.seek(offset);
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < nchars; i++)
+        final StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < nchars; i++) {
             sb.append((char) (in.read()));
+        }
         return sb.toString();
     }
 
     /** Read an unsigned short at the current offset. The byte ordering matches
      * what's used by the Netscape registry on all platforms. */
     private int readUnsignedShort() throws IOException {
-        int ch1 = in.read();
-        int ch2 = in.read();
+        final int ch1 = in.read();
+        final int ch2 = in.read();
         if ((ch1 | ch2) < 0) {
             throw new EOFException();
         }
@@ -117,10 +118,10 @@ final class NSRegistry {
     /** Read an integer at the current offset. The byte ordering matches what's
      * used by the Netscape registry on all platforms. */
     private int readInt() throws IOException {
-        int ch1 = in.read();
-        int ch2 = in.read();
-        int ch3 = in.read();
-        int ch4 = in.read();
+        final int ch1 = in.read();
+        final int ch2 = in.read();
+        final int ch3 = in.read();
+        final int ch4 = in.read();
         if ((ch1 | ch2 | ch3 | ch4) < 0) {
             throw new EOFException();
         }
@@ -130,10 +131,10 @@ final class NSRegistry {
     /** Read an unsigned integer at the current offset. The byte ordering matches
      * what's used by the Netscape registry on all platforms. */
     private long readUnsignedInt() throws IOException {
-        int ch1 = in.read();
-        int ch2 = in.read();
-        int ch3 = in.read();
-        int ch4 = in.read();
+        final int ch1 = in.read();
+        final int ch2 = in.read();
+        final int ch3 = in.read();
+        final int ch4 = in.read();
         if ((ch1 | ch2 | ch3 | ch4) < 0) {
             throw new EOFException();
         }
@@ -169,7 +170,7 @@ final class NSRegistry {
             rootOffset = readInt();
             return this;
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             Logger.getLogger("es.gob.afirma").severe("Error abriendo el registro de Mozilla, se devolvera null: " + e);
             return null;
         }
@@ -181,7 +182,7 @@ final class NSRegistry {
             try {
                 in.close();
             }
-            catch (IOException exc) {
+            catch (final IOException exc) {
                 Logger.getLogger("es.gob.afirma").warning("Error cerrando el flujo de lectura del registro de Mozilla ");
             }
             in = null;
@@ -191,8 +192,8 @@ final class NSRegistry {
     /** Recursively find a matching subkey (relative to the parent Record) until
      * the last token in pathElts is reached. The last token must match an entry
      * in parent. */
-    private String get(Record parent, StringTokenizer pathElts) throws IOException {
-        String name = pathElts.nextToken();
+    private String get(final Record parent, final StringTokenizer pathElts) throws IOException {
+        final String name = pathElts.nextToken();
 
         /*
          * If this isn't the last path element then find a subkey with a
@@ -201,7 +202,7 @@ final class NSRegistry {
         if (pathElts.hasMoreTokens()) {
             int childOffset = parent.down;
             while (childOffset != 0) {
-                Record key = readRecord(childOffset);
+                final Record key = readRecord(childOffset);
                 if (name.equals(readString(key.name, key.namelen - 1))) {
                     return get(key, pathElts);
                 }
@@ -232,18 +233,18 @@ final class NSRegistry {
      * path element must match the name of a registry entry. Paths always
      * implicitly begin with a slash. Here's an example that returns the version
      * of Navigator:
-     * 
+     *
      * <pre>
      * NSRegistry reg = new NSRegistry().open();
      * reg.get(&quot;Version Registry/Netscape/Communicator/Version&quot;);
      * reg.close();
      * </pre> */
-    String get(String path) {
-        StringTokenizer pathElts = new StringTokenizer(path, "/");
+    String get(final String path) {
+        final StringTokenizer pathElts = new StringTokenizer(path, "/");
         try {
             return get(readRecord(rootOffset), pathElts);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             return null;
         }
     }

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -19,13 +19,13 @@ class Attachment {
 
     // public final byte[] bytes;
 
-    Attachment(String url) {
+    Attachment(final String url) {
         this.url = url;
         // this.bytes= bytes;
     }
 
     String getName() {
-        int p1 = url.lastIndexOf(File.pathSeparatorChar);
+        final int p1 = url.lastIndexOf(File.pathSeparatorChar);
         return p1 < url.length() ? url.substring(p1 + 1) : "";
     }
 

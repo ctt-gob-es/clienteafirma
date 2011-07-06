@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -124,7 +124,7 @@ public final class MozillaKeyStoreUtilities {
         }
 
         final String regKeyLowCase = dir.toLowerCase();
-        int pos = regKeyLowCase.indexOf("firefox.exe");
+        final int pos = regKeyLowCase.indexOf("firefox.exe");
         if (pos != -1) {
             dir = dir.substring(0, pos);
             if (dir.startsWith("\"")) {
@@ -140,7 +140,7 @@ public final class MozillaKeyStoreUtilities {
                 if (tmpFile.exists()) {
                     try {
                         Logger.getLogger("es.gob.afirma").info("Informacion sobre el modulo PKCS#11 de NSS");
-                        InputStream is = new FileInputStream(tmpFile);
+                        final InputStream is = new FileInputStream(tmpFile);
                         new PEParser().parse(AOUtil.getDataFromInputStream(is), Logger.getLogger("es.gob.afirma"));
                         try {
                             is.close();
@@ -199,12 +199,12 @@ public final class MozillaKeyStoreUtilities {
 
                             // Copiamos las DLL necesarias a un temporal y
                             // devolvemos el temporal
-                            File tmp = File.createTempFile("nss", null);
+                            final File tmp = File.createTempFile("nss", null);
                             tmp.delete();
                             if (!tmp.mkdir()) {
                                 throw new AOException("No se ha creado el directorio temporal");
                             }
-                            String dest = tmp.getCanonicalPath() + File.separator;
+                            final String dest = tmp.getCanonicalPath() + File.separator;
 
                             // Las cuatro primeras bibliotecas son comunes para
                             // Firefox 2, 3 y 4
@@ -264,7 +264,7 @@ public final class MozillaKeyStoreUtilities {
         }
         else {
             // No hay NSS en el sistema, buscamos uno local
-            File localNSS = new File(Platform.getUserHome() + "\\" + NSS_INSTALL_DIR + "\\nss" + Platform.getJavaArch());
+            final File localNSS = new File(Platform.getUserHome() + "\\" + NSS_INSTALL_DIR + "\\nss" + Platform.getJavaArch());
             if (localNSS.exists() && localNSS.isDirectory() && localNSS.canRead()) {
                 try {
                     return localNSS.getCanonicalPath();
@@ -291,7 +291,7 @@ public final class MozillaKeyStoreUtilities {
                         Platform.getUserHome() + "/" + NSS_INSTALL_DIR + "/nss" + Platform.getJavaArch()
                 };
 
-        for (String path : paths) {
+        for (final String path : paths) {
             if (new File(path + "/libsoftokn3.dylib").exists() && new File(path + "/libnspr4.dylib").exists()) {
                 try {
                     System.load(path + "/libnspr4.dylib");
@@ -353,7 +353,7 @@ public final class MozillaKeyStoreUtilities {
                         Platform.getUserHome() + "/" + NSS_INSTALL_DIR + "/nss" + Platform.getJavaArch()
                 };
 
-        for (String path : paths) {
+        for (final String path : paths) {
             if (new File(path + "/libsoftokn3.so").exists() && new File(path + "/libnspr4.so").exists()) {
                 try {
                     System.load(path + "/libnspr4.so");
@@ -416,7 +416,7 @@ public final class MozillaKeyStoreUtilities {
         if (directoryLib.isDirectory()) {
             final String filenames[] = directoryLib.list();
             final List<String> firefoxDirectories = new ArrayList<String>();
-            for (String filename : filenames) {
+            for (final String filename : filenames) {
                 if (filename.startsWith("firefox-")) {
                     firefoxDirectories.add(filename.replace("firefox-", ""));
                 }
@@ -436,7 +436,7 @@ public final class MozillaKeyStoreUtilities {
                 return firefoxDirectories.get(0);
             }
             Collections.sort(firefoxDirectories, new Comparator<String>() {
-                public int compare(String o1, String o2) {
+                public int compare(final String o1, final String o2) {
                     return o1.compareTo(o2);
                 }
             });
@@ -453,7 +453,7 @@ public final class MozillaKeyStoreUtilities {
     static Hashtable<String, String> getMozillaPKCS11Modules() {
         try {
             final Hashtable<String, String> modsByDesc = new Hashtable<String, String>();
-            for (ModuleName module : AOSecMod.getModules(getMozillaUserProfileDirectory())) {
+            for (final ModuleName module : AOSecMod.getModules(getMozillaUserProfileDirectory())) {
                 modsByDesc.put(module.getDescription(), module.getLib());
             }
 
@@ -472,9 +472,9 @@ public final class MozillaKeyStoreUtilities {
      * es dependiente de la implementaci&oacute;n de <code>toString()</code> de
      * la clase <code>sun.security.pkcs11.Secmod.Module</code>, ya que no
      * podemos acceder directamente al atributo <code>slot</code> por ser de
-     * tipo <i>friend</i>: <code><pre> 
+     * tipo <i>friend</i>: <code><pre>
      * public String toString() {
-     *   return 
+     *   return
      *   commonName + " (" + type + ", " + libraryName + ", slot " + slot + ")";
      *  }
      *  </pre></code>
@@ -699,7 +699,7 @@ public final class MozillaKeyStoreUtilities {
                         finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
                     }
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma")
                           .severe("Error obteniendo el directorio de perfil de usuario de Firefox, " + "se devolvera null: " + e);
                     return null;
@@ -714,7 +714,7 @@ public final class MozillaKeyStoreUtilities {
                         finalDir = NSPreferences.getNS6UserProfileDirectory(regFile);
                     }
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma")
                           .severe("Error obteniendo el directorio de perfil de usuario de Mozilla, " + "se devolvera null: " + e);
                     return null;

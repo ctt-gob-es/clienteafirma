@@ -13,7 +13,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -56,7 +56,7 @@ public final class OOXMLProvider extends Provider {
 
     /** Installs this security provider. */
     public static void install() {
-        Provider provider = Security.getProvider(NAME);
+        final Provider provider = Security.getProvider(NAME);
         if (null == provider) {
             Security.addProvider(new OOXMLProvider());
         }

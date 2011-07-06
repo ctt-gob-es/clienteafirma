@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -30,7 +30,7 @@ public class DigestInfo implements Serializable {
      * @param digestValue
      * @param digestAlgo
      * @param description */
-    public DigestInfo(byte[] digestValue, String digestAlgo, String description) {
+    public DigestInfo(final byte[] digestValue, final String digestAlgo, final String description) {
         this.digestValue = digestValue;
         this.digestAlgo = digestAlgo;
         this.description = description;

@@ -12,7 +12,7 @@ final class EncryptedKeyDatas {
         return encryptedKey;
     }
 
-    public void setEncryptedKey(byte[] encryptedKey) {
+    public void setEncryptedKey(final byte[] encryptedKey) {
         this.encryptedKey = encryptedKey;
     }
 
@@ -20,7 +20,7 @@ final class EncryptedKeyDatas {
         return algEncryptedKey;
     }
 
-    public void setAlgEncryptedKey(AlgorithmIdentifier algEncryptedKey) {
+    public void setAlgEncryptedKey(final AlgorithmIdentifier algEncryptedKey) {
         this.algEncryptedKey = algEncryptedKey;
     }
 }

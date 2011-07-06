@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -166,10 +166,12 @@ public final class AOODFSigner implements AOSigner {
             final InputStream manifest = zf.getInputStream(zf.getEntry(fullPath));
             final byte[] manifestData = AOUtil.getDataFromInputStream(manifest);
 
-            if (manifest != null) try {
-                manifest.close();
+            if (manifest != null) {
+                try {
+                    manifest.close();
+                }
+                catch (final Exception t) {}
             }
-            catch (final Exception t) {}
 
             // obtiene el documento manifest.xml y su raiz
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -195,7 +197,7 @@ public final class AOODFSigner implements AOSigner {
             try {
                 dm = fac.newDigestMethod(digestMethodAlgorithm, null);
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 if (DIGEST_METHOD.equals(digestMethodAlgorithm)) {
                     throw new AOException("No se ha podido obtener un generador de huellas digitales", e);
                 }
@@ -279,10 +281,9 @@ public final class AOODFSigner implements AOSigner {
                     if (!fullPath.equals("META-INF/documentsignatures.xml")) {
                         referenceList.add(reference);
                     }
-
-                    // si existe el documento de firmas, entonces sera una
-                    // cofirma.
-                    else isCofirm = true;
+                    else {
+                        isCofirm = true;
+                    }
                 }
             }
 
@@ -477,7 +478,7 @@ public final class AOODFSigner implements AOSigner {
             // obtiene todas las firmas
             final NodeList signatures = root.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
-            int numSignatures = signatures.getLength();
+            final int numSignatures = signatures.getLength();
 
             final String[] arrayIds = new String[numSignatures];
             final String[] arrayRef = new String[numSignatures];
@@ -513,12 +514,13 @@ public final class AOODFSigner implements AOSigner {
 
             final TreeNode tree = new TreeNode("Datos");
 
-            for (int i = numSignatures - 1; i > 0; i--)
+            for (int i = numSignatures - 1; i > 0; i--) {
                 for (int j = 0; j < numSignatures; j++) {
                     if (arrayRef[i].equals(arrayIds[j])) {
                         arrayNodes[j].add(arrayNodes[i]);
                     }
                 }
+            }
 
             for (int i = 0; i < numSignatures; i++) {
                 if (arrayRef[i] == "") {
@@ -563,7 +565,7 @@ public final class AOODFSigner implements AOSigner {
         try {
             mimetype = this.getODFMimeType(data);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             return false;
         }
 
@@ -604,7 +606,7 @@ public final class AOODFSigner implements AOSigner {
 
     private static void writeXML(final Writer writer, final Node node, final boolean indent) {
         try {
-            Transformer serializer = TransformerFactory.newInstance().newTransformer();
+            final Transformer serializer = TransformerFactory.newInstance().newTransformer();
             serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
             if (indent) {
@@ -612,7 +614,7 @@ public final class AOODFSigner implements AOSigner {
             }
             serializer.transform(new DOMSource(node), new StreamResult(writer));
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             Logger.getLogger("es.gob.afirma").severe("Error al escribir el cuerpo del XML: " + ex);
         }
     }
@@ -646,7 +648,7 @@ public final class AOODFSigner implements AOSigner {
         return mimetype;
     }
 
-    private String getODFMimeType(byte[] signData) {
+    private String getODFMimeType(final byte[] signData) {
         String mimetype = null;
         try {
             // Genera el archivo zip temporal a partir del InputStream de
@@ -670,7 +672,7 @@ public final class AOODFSigner implements AOSigner {
             try {
                 zf = new ZipFile(zipFile);
             }
-            catch (ZipException e) {
+            catch (final ZipException e) {
                 // Si detectamos que no es un fichero Zip, devolvemos null
                 return null;
             }
@@ -684,7 +686,7 @@ public final class AOODFSigner implements AOSigner {
             try {
                 zipFile.delete();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
 
         }
         catch (final Exception e) {

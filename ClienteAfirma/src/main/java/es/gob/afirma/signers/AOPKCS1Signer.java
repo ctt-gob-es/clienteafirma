@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -48,33 +48,33 @@ public final class AOPKCS1Signer implements AOSigner {
         throw new UnsupportedOperationException("No se pueden hacer contrafirmas sin formato (PKCS#1)");
     }
 
-    public String getSignedName(String originalName, String inText) {
+    public String getSignedName(final String originalName, final String inText) {
         return "";
     }
 
-    public TreeModel getSignersStructure(byte[] sign, boolean asCertificates) {
+    public TreeModel getSignersStructure(final byte[] sign, final boolean asCertificates) {
         return new TreeModel(new TreeNode("Ra\u00EDz"));
     }
 
-    public boolean isSign(byte[] sign) {
+    public boolean isSign(final byte[] sign) {
         return false;
     }
 
-    public void setDataObjectFormat(String description, Oid objectIdentifier, MimeType mimeType, String encoding) {}
+    public void setDataObjectFormat(final String description, final Oid objectIdentifier, final MimeType mimeType, final String encoding) {}
 
-    public String getDataMimeType(byte[] sign) throws AOUnsupportedSignFormatException {
+    public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
         return null;
     }
 
-    public byte[] getData(byte[] sign) throws AOInvalidFormatException {
+    public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
         return null;
     }
 
-    public AOSignInfo getSignInfo(byte[] sign) throws AOInvalidFormatException {
+    public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException {
         throw new AOInvalidFormatException("No es posible identificar y recuperar la informacion de una firma PKCS#1");
     }
 
-    public boolean isValidDataFile(byte[] data) {
+    public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
             return false;
@@ -85,7 +85,7 @@ public final class AOPKCS1Signer implements AOSigner {
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
         try {
-            Signature s = Signature.getInstance(algorithm);
+            final Signature s = Signature.getInstance(algorithm);
             s.initSign(keyEntry.getPrivateKey());
             s.update(data);
             return s.sign();

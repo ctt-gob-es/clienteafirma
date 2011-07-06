@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -144,7 +144,7 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
         while (null != (zipEntry = zipInputStream.getNextEntry())) {
             zipOutputStream.putNextEntry(new ZipEntry(zipEntry.getName()));
             if ("[Content_Types].xml".equals(zipEntry.getName())) {
-                Document contentTypesDocument = loadDocumentNoClose(zipInputStream);
+                final Document contentTypesDocument = loadDocumentNoClose(zipInputStream);
                 final Element typesElement = contentTypesDocument.getDocumentElement();
 
                 // We need to add an Override element.

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -88,7 +88,7 @@ public final class EnveloperManager {
      * los di&aacute;logos modales.
      * @param parent
      *        Componente sobre el que mostrar los di&aacute;logos. */
-    public EnveloperManager(Component parent) {
+    public EnveloperManager(final Component parent) {
         this();
         this.parent = parent;
     }
@@ -141,7 +141,7 @@ public final class EnveloperManager {
     /** Establece el manejador de cifrado.
      * @param manager
      *        Manejador de cifrado. */
-    public void setCipherManager(CipherManager manager) {
+    public void setCipherManager(final CipherManager manager) {
         this.cipherManager = manager;
     }
 
@@ -177,7 +177,7 @@ public final class EnveloperManager {
     /** Establece el manejador de almacenes a utilizar.
      * @param manager
      *        Manejador de almacenes. */
-    public void setKsConfigManager(KeyStoreConfigurationManager manager) {
+    public void setKsConfigManager(final KeyStoreConfigurationManager manager) {
         this.ksConfigManager = manager;
     }
 
@@ -402,7 +402,7 @@ public final class EnveloperManager {
         try {
             this.contentData = enveloper.recoverData(envelop);
         }
-        catch (InvalidKeyException e) {
+        catch (final InvalidKeyException e) {
             throw new AOException("La clave interna del sobre no es valida", e);
         }
     }
@@ -461,9 +461,11 @@ public final class EnveloperManager {
         }
         finally {
             try {
-                if (is != null) is.close();
+                if (is != null) {
+                    is.close();
+                }
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
         }
     }
 

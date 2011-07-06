@@ -41,10 +41,12 @@ public class TestODF {
             e.printStackTrace();
             odf = null;
         }
-        if (odf != null && odf.length == 0) odf = null;
+        if (odf != null && odf.length == 0) {
+            odf = null;
+        }
         assertNotNull("No se ha podido cargar el ODF a firmar", odf);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
             System.out.println();
             System.out.println();
             System.out.println();
@@ -90,7 +92,9 @@ public class TestODF {
             e.printStackTrace();
             odf = null;
         }
-        if (odf != null && odf.length == 0) odf = null;
+        if (odf != null && odf.length == 0) {
+            odf = null;
+        }
         assertNotNull("No se ha podido cargar el ODF a cofirmar", odf);
 
         for (final AOConstants.AOKeyStore kstore : KEYSTORES) {

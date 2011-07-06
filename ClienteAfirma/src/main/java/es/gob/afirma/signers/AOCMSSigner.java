@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -85,7 +85,7 @@ public final class AOCMSSigner implements AOSigner {
         }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) { 
+            if (cert instanceof X509Certificate) {
                 xCerts = new X509Certificate[] {
                                                 (X509Certificate) cert
                 };
@@ -99,7 +99,7 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 this.dataType = new Oid(PKCSObjectIdentifiers.data.getId());
             }
-            catch (GSSException ex) {
+            catch (final GSSException ex) {
                 Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto: " + ex);
             }
         }
@@ -107,7 +107,7 @@ public final class AOCMSSigner implements AOSigner {
         final String mode = extraParams.getProperty("mode", AOConstants.DEFAULT_SIGN_MODE);
 
         try {
-            boolean omitContent = mode.equals(AOConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
+            final boolean omitContent = mode.equals(AOConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
             return new GenSignedData().generateSignedData(csp,
                                                           omitContent,
                                                           Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")),
@@ -149,7 +149,7 @@ public final class AOCMSSigner implements AOSigner {
         }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) { 
+            if (cert instanceof X509Certificate) {
                 xCerts = new X509Certificate[] {
                                                 (X509Certificate) cert
                 };
@@ -193,7 +193,7 @@ public final class AOCMSSigner implements AOSigner {
         }
     }
 
-    public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
         if (algorithm.equalsIgnoreCase("RSA")) {
             algorithm = AOConstants.SIGN_ALGORITHM_SHA1WITHRSA;
@@ -207,13 +207,13 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 this.dataType = new Oid(PKCSObjectIdentifiers.data.getId());
             }
-            catch (Exception ex) {
+            catch (final Exception ex) {
                 Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto: " + ex);
             }
         }
 
         // Algoritmo de firma.
-        String typeAlgorithm = algorithm;
+        final String typeAlgorithm = algorithm;
 
         // Array de certificados
         X509Certificate[] aCertificados = new X509Certificate[0];
@@ -223,7 +223,7 @@ public final class AOCMSSigner implements AOSigner {
         }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) { 
+            if (cert instanceof X509Certificate) {
                 aCertificados = new X509Certificate[] {
                                                        (X509Certificate) cert
                 };
@@ -296,7 +296,7 @@ public final class AOCMSSigner implements AOSigner {
         }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) { 
+            if (cert instanceof X509Certificate) {
                 xCerts = new X509Certificate[] {
                                                 (X509Certificate) cert
                 };
@@ -310,7 +310,7 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 this.dataType = new Oid(PKCSObjectIdentifiers.data.getId());
             }
-            catch (GSSException ex) {
+            catch (final GSSException ex) {
                 Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto: " + ex);
             }
         }
@@ -324,14 +324,14 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 // CASO DE FIRMA DE ARBOL
                 if (targetType == CounterSignTarget.Tree) {
-                    int[] nodes = {
+                    final int[] nodes = {
                         0
                     };
                     dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Tree, nodes, keyEntry, dataType, atrib, uatrib);
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.Leafs) {
-                    int[] nodes = {
+                    final int[] nodes = {
                         0
                     };
                     dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Leafs, nodes, keyEntry, dataType, atrib, uatrib);
@@ -354,7 +354,7 @@ public final class AOCMSSigner implements AOSigner {
                         signers[i] = (String) targets[i];
                     }
                     final ReadNodesTree rn2 = new ReadNodesTree();
-                    int[] nodes2 = rn2.readNodesFromSigners(signers, sign);
+                    final int[] nodes2 = rn2.readNodesFromSigners(signers, sign);
                     dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Signers, nodes2, keyEntry, dataType, atrib, uatrib);
 
                 }
@@ -369,7 +369,7 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 // CASO DE FIRMA DE ARBOL
                 if (targetType == CounterSignTarget.Tree) {
-                    int[] nodes = {
+                    final int[] nodes = {
                         0
                     };
                     dataSigned =
@@ -384,7 +384,7 @@ public final class AOCMSSigner implements AOSigner {
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.Leafs) {
-                    int[] nodes = {
+                    final int[] nodes = {
                         0
                     };
                     dataSigned =
@@ -443,7 +443,7 @@ public final class AOCMSSigner implements AOSigner {
         return dataSigned;
     }
 
-    public TreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo) {
+    public TreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
         final ReadNodesTree Rn = new ReadNodesTree();
         try {
             return Rn.readNodesTree(sign, asSimpleSignInfo);
@@ -454,7 +454,7 @@ public final class AOCMSSigner implements AOSigner {
         return null;
     }
 
-    public boolean isSign(byte[] signData) {
+    public boolean isSign(final byte[] signData) {
         if (signData == null) {
             Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
             return false;
@@ -469,7 +469,7 @@ public final class AOCMSSigner implements AOSigner {
         return signed;
     }
 
-    public boolean isValidDataFile(byte[] data) {
+    public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
             return false;
@@ -477,7 +477,7 @@ public final class AOCMSSigner implements AOSigner {
         return true;
     }
 
-    public String getDataMimeType(byte[] signData) throws AOUnsupportedSignFormatException {
+    public String getDataMimeType(final byte[] signData) throws AOUnsupportedSignFormatException {
 
         String numOid = "";
         String oid = "";
@@ -486,7 +486,7 @@ public final class AOCMSSigner implements AOSigner {
         try {
             this.isSign(signData);
         }
-        catch (Exception e1) {
+        catch (final Exception e1) {
             throw new AOUnsupportedSignFormatException("No es un tipo de firma valido.");
         }
 
@@ -520,7 +520,7 @@ public final class AOCMSSigner implements AOSigner {
         uatrib.put(oid, value);
     }
 
-    public void setDataObjectFormat(String description, Oid objectIdentifier, javax.activation.MimeType mimeType, String encoding) {
+    public void setDataObjectFormat(final String description, final Oid objectIdentifier, final javax.activation.MimeType mimeType, final String encoding) {
 
         // No permitimos el cambio del tipo de dato. CMS/CAdES establece que
         // siempre
@@ -548,13 +548,15 @@ public final class AOCMSSigner implements AOSigner {
 
     public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
 
-        if (signData == null) throw new NullPointerException("No se han introducido datos para analizar");
+        if (signData == null) {
+            throw new NullPointerException("No se han introducido datos para analizar");
+        }
 
         if (!isSign(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
         }
 
-        AOSignInfo signInfo = new AOSignInfo(AOConstants.SIGN_FORMAT_CMS);
+        final AOSignInfo signInfo = new AOSignInfo(AOConstants.SIGN_FORMAT_CMS);
         // Aqui podria venir el analisis de la firma buscando alguno de los
         // otros datos de relevancia
         // que se almacenan en el objeto AOSignInfo

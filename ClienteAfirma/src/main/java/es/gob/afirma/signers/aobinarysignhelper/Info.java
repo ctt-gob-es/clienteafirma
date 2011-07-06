@@ -14,7 +14,7 @@ final class Info {
         return recipientInfos;
     }
 
-    public void setRecipientInfos(ASN1EncodableVector recipientInfos) {
+    public void setRecipientInfos(final ASN1EncodableVector recipientInfos) {
         this.recipientInfos = recipientInfos;
     }
 
@@ -22,7 +22,7 @@ final class Info {
         return encInfo;
     }
 
-    public void setEncInfo(EncryptedContentInfo encInfo) {
+    public void setEncInfo(final EncryptedContentInfo encInfo) {
         this.encInfo = encInfo;
     }
 }

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -50,7 +50,7 @@ public final class CMSDecipherEncryptedData {
      * @throws InvalidKeyException
      *         Cuando se proporciona una clave incorrecta para el
      *         descifrado. */
-    public byte[] dechiperEncryptedData(byte[] encryptedData, String pass) throws AOException, InvalidKeyException {
+    public byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException, InvalidKeyException {
 
         AlgorithmIdentifier alg = null;
         EncryptedContentInfo eci = null;
@@ -59,10 +59,10 @@ public final class CMSDecipherEncryptedData {
         final byte[] deciphered;
 
         try {
-            ASN1Sequence contentEncryptedData = Utils.fetchWrappedData(encryptedData);
+            final ASN1Sequence contentEncryptedData = Utils.fetchWrappedData(encryptedData);
 
             // Obtenemos los datos del encryptedData.
-            Enumeration<?> e2 = contentEncryptedData.getObjects();
+            final Enumeration<?> e2 = contentEncryptedData.getObjects();
             // version
             e2.nextElement();
             // EncryptedContentInfo. donde está lo que necesitamos.
@@ -85,16 +85,16 @@ public final class CMSDecipherEncryptedData {
         assignKey(alg, pass);
 
         // Obtenemos el contenido cifrado.
-        byte[] contCifrado = eci.getEncryptedContent().getOctets();
+        final byte[] contCifrado = eci.getEncryptedContent().getOctets();
 
         // Desciframos.
         try {
             deciphered = Utils.deCipherContent(contCifrado, config, cipherKey);
         }
-        catch (InvalidKeyException ex) {
+        catch (final InvalidKeyException ex) {
             throw ex;
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo EncryptedData:  " + ex);
             throw new AOException("Error al descifrar los contenidos encriptados", ex);
         }
@@ -111,19 +111,19 @@ public final class CMSDecipherEncryptedData {
      *        Contrase&ntilde;a que se va a usar para cifrar.
      * @throws AOException
      *         Cuando la clave o password no son v&aacute;lidas. */
-    private void assignKey(AlgorithmIdentifier alg, String key) throws AOException {
+    private void assignKey(final AlgorithmIdentifier alg, final String key) throws AOException {
 
         // obtenemos el oid del algoritmo.
-        String algoritmoOid = alg.getAlgorithm().toString();
+        final String algoritmoOid = alg.getAlgorithm().toString();
 
         AOCipherAlgorithm algorithm = null;
         AOCipherAlgorithm aux = null;
 
         // A partir de los tipos de algoritmos, buscamos el que coincida
         // con el oid de cifrado obtenido del fichero de firma.
-        AOCipherAlgorithm[] algoritmos = AOCipherAlgorithm.values();
-        for (int i = 0; i < algoritmos.length; i++) {
-            aux = algoritmos[i];
+        final AOCipherAlgorithm[] algoritmos = AOCipherAlgorithm.values();
+        for (final AOCipherAlgorithm algoritmo : algoritmos) {
+            aux = algoritmo;
             if (aux.getOid().equals(algoritmoOid)) {
                 algorithm = aux;
             }
@@ -137,7 +137,7 @@ public final class CMSDecipherEncryptedData {
             try {
                 this.cipherKey = Utils.loadCipherKey(config, key);
             }
-            catch (Exception ex) {
+            catch (final Exception ex) {
                 throw new AOException("Error durante el proceso de asignacion de la clave (a partir de password)", ex);
             }
         }
@@ -145,7 +145,7 @@ public final class CMSDecipherEncryptedData {
             try {
                 this.cipherKey = new SecretKeySpec(Base64.decodeBase64(key), config.getAlgorithm().getName());
             }
-            catch (Exception ex) {
+            catch (final Exception ex) {
                 throw new AOException("Error durante el proceso de asignacion de la clave (a partir de key)", ex);
             }
         }

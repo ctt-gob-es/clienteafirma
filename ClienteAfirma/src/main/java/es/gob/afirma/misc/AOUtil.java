@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -96,8 +96,8 @@ public final class AOUtil {
 
         // Comprobamos si es un esquema soportado
         final String scheme = uri.getScheme();
-        for (int i = 0; i < SUPPORTED_URI_SCHEMES.length; i++) {
-            if (SUPPORTED_URI_SCHEMES[i].equals(scheme)) {
+        for (final String element : SUPPORTED_URI_SCHEMES) {
+            if (element.equals(scheme)) {
                 return uri;
             }
         }
@@ -194,7 +194,9 @@ public final class AOUtil {
 
                 tmpStream = new BufferedInputStream(pmis);
             }
-            else tmpStream = new BufferedInputStream(uri.toURL().openStream());
+            else {
+                tmpStream = new BufferedInputStream(uri.toURL().openStream());
+            }
         }
         catch (final Exception e) {
             if (pm != null) {
@@ -279,7 +281,7 @@ public final class AOUtil {
             return new byte[0];
         }
         int nBytes = 0;
-        byte[] buffer = new byte[4096];
+        final byte[] buffer = new byte[4096];
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while ((nBytes = input.read(buffer)) != -1) {
             baos.write(buffer, 0, nBytes);
@@ -426,7 +428,7 @@ public final class AOUtil {
         for (final byte b : data) {
             if (!BASE_64_ALPHABET.contains(new String(new byte[] {
                 b
-            }))) { 
+            }))) {
                 return false;
             }
         }
@@ -448,7 +450,7 @@ public final class AOUtil {
      *        Indica si han o no de separarse los octetos con un
      *        gui&oacute;n y en l&iacute;neas de 16
      * @return Representaci&oacute;n textual del vector de octetos de entrada */
-    public final static String hexify(byte abyte0[], boolean separator) {
+    public final static String hexify(final byte abyte0[], final boolean separator) {
         if (abyte0 == null) {
             return "null";
         }
@@ -630,8 +632,9 @@ public final class AOUtil {
                                               final String identationString,
                                               final StringBuilder buffer) {
         buffer.append('\n').append(linePrefx);
-        for (int i = 0; i < depth; i++)
+        for (int i = 0; i < depth; i++) {
             buffer.append(identationString);
+        }
         buffer.append((node).getUserObject());
         for (int i = 0; i < node.getChildCount(); i++) {
             archiveTreeNode(node.getChildAt(i), depth + 1, linePrefx, identationString, buffer);
@@ -740,9 +743,9 @@ public final class AOUtil {
      * @return Listado de fragmentos de texto entre separadores.
      * @throws NullPointerException
      *         Cuando alguno de los par&aacute;metros de entrada es {@code null}. */
-    public static String[] split(String text, String sp) {
+    public static String[] split(final String text, final String sp) {
 
-        Vector<String> parts = new Vector<String>();
+        final Vector<String> parts = new Vector<String>();
         int i = 0;
         int j = 0;
         while (i != text.length() && (j = text.indexOf(sp, i)) != -1) {

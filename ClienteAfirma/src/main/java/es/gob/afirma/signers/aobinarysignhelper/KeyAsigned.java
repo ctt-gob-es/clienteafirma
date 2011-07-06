@@ -18,7 +18,7 @@ final class KeyAsigned {
         return cipherKey;
     }
 
-    public void setCipherKey(SecretKey cipherKey) {
+    public void setCipherKey(final SecretKey cipherKey) {
         this.cipherKey = cipherKey;
     }
 
@@ -26,7 +26,7 @@ final class KeyAsigned {
         return config;
     }
 
-    public void setConfig(AOCipherConfig config) {
+    public void setConfig(final AOCipherConfig config) {
         this.config = config;
     }
 }

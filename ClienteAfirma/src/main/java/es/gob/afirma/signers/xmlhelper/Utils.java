@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -132,7 +132,7 @@ public final class Utils {
                                                                                          IsInnerlException,
                                                                                          ReferenceIsNotXMLException {
         if (id == null || "".equals(id)) {
-            throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$ 
         }
 
         byte[] xml = null;
@@ -158,7 +158,7 @@ public final class Utils {
             final String fileName = idParts[idParts.length - 1];
 
             if (fileName.startsWith("#")) {
-                throw new IsInnerlException(); //$NON-NLS-1$
+                throw new IsInnerlException(); 
             }
             else if (id.startsWith("file://")) { //$NON-NLS-1$
                 // Preguntamos al usuario para la dereferenciacion
@@ -300,7 +300,7 @@ public final class Utils {
         }
 
         // primero compruebo si hay transformaciones a medida
-        int numTransforms = Integer.parseInt(extraParams.getProperty("xmlTransforms", "0")); //$NON-NLS-1$ //$NON-NLS-2$
+        final int numTransforms = Integer.parseInt(extraParams.getProperty("xmlTransforms", "0")); //$NON-NLS-1$ //$NON-NLS-2$
         String transformType;
         String transformBody;
         String transformSubtype;
@@ -325,7 +325,7 @@ public final class Utils {
             else if (Transform.XPATH2.equals(transformType) && transformBody != null) {
                 transformSubtype = extraParams.getProperty("xmlTransform" + Integer.toString(i) + "Subtype"); //$NON-NLS-1$ //$NON-NLS-2$
                 if ("subtract".equals(transformSubtype)) {
-                    xPath2TransformFilter = Filter.SUBTRACT; //$NON-NLS-1$
+                    xPath2TransformFilter = Filter.SUBTRACT; 
                 }
                 else if ("intersect".equals(transformSubtype)) { //$NON-NLS-1$
                     xPath2TransformFilter = Filter.INTERSECT;
@@ -780,7 +780,9 @@ public final class Utils {
      * @return Cadena de texto con el XML en forma de array de octetos */
     public final static byte[] writeXML(final Node node, Hashtable<String, String> xmlProps, final String styleHref, final String styleType) {
 
-        if (xmlProps == null) xmlProps = new Hashtable<String, String>(0);
+        if (xmlProps == null) {
+            xmlProps = new Hashtable<String, String>(0);
+        }
 
         // La codificacion por defecto sera UTF-8
         final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ? xmlProps.get(OutputKeys.ENCODING) : "UTF-8";
@@ -913,7 +915,7 @@ public final class Utils {
         try {
             pkcs1 = AOCryptoUtil.decodeBase64(((Element) signature.getElementsByTagNameNS(DSIGNNS, "SignatureValue").item(0)).getTextContent());
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se pudo extraer el PKCS#1 de una firma");
             pkcs1 = null;
         }

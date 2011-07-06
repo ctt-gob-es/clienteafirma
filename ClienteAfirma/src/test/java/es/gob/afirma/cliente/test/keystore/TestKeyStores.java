@@ -27,7 +27,9 @@ public final class TestKeyStores {
     @Test
     public void testCapiKeyStore() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
-        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) return;
+        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            return;
+        }
         System.out.println("Probando almacen CAPI...");
         AOKeyStoreManager ksm = null;
         try {
@@ -110,7 +112,9 @@ public final class TestKeyStores {
     @Test
     public void testCapiAddressBookKeyStore() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
-        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) return;
+        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            return;
+        }
         System.out.println("Probando almacen CAPI AddressBook...");
         AOKeyStoreManager ksm = null;
         try {
@@ -131,7 +135,9 @@ public final class TestKeyStores {
     @Test
     public void testCapiCAKeyStore() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
-        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) return;
+        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            return;
+        }
         System.out.println("Probando almacen CAPI CA...");
         AOKeyStoreManager ksm = null;
         try {
@@ -152,7 +158,9 @@ public final class TestKeyStores {
     @Test
     public void testCapiRootKeyStore() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
-        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) return;
+        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            return;
+        }
         System.out.println("Probando almacen CAPI Root...");
         AOKeyStoreManager ksm = null;
         try {
@@ -214,7 +222,9 @@ public final class TestKeyStores {
     @Test
     public void testMacKeyStore() {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
-        if (!Platform.OS.MACOSX.equals(Platform.getOS())) return;
+        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+            return;
+        }
         System.out.println("Probando almacen Llavero de Mac OS X...");
         AOKeyStoreManager ksm = null;
         try {

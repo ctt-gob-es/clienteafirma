@@ -40,7 +40,9 @@ public final class TestCipher {
                 e.printStackTrace();
             }
             assertNotNull("Los datos son nulos", cypheredData);
-            if (cypheredData != null) assertTrue(cypheredData.length > 0);
+            if (cypheredData != null) {
+                assertTrue(cypheredData.length > 0);
+            }
             byte[] plainData = null;
             try {
                 plainData = cypherConfig.getCipher().decipher(cypheredData, cypherConfig.getConfig(), key);
@@ -49,7 +51,9 @@ public final class TestCipher {
                 e.printStackTrace();
             }
             assertNotNull("Los datos son nulos", plainData);
-            if (plainData != null) assertTrue(plainData.length > 0);
+            if (plainData != null) {
+                assertTrue(plainData.length > 0);
+            }
             assertArrayEquals(DATA, plainData);
         }
     }
@@ -77,7 +81,9 @@ public final class TestCipher {
                 e.printStackTrace();
             }
             assertNotNull("Los datos son nulos", cypheredData);
-            if (cypheredData != null) assertTrue(cypheredData.length > 0);
+            if (cypheredData != null) {
+                assertTrue(cypheredData.length > 0);
+            }
             byte[] plainData = null;
             try {
                 plainData = cypherConfig.getCipher().decipher(cypheredData, cypherConfig.getConfig(), key);
@@ -86,7 +92,9 @@ public final class TestCipher {
                 e.printStackTrace();
             }
             assertNotNull("Los datos son nulos", plainData);
-            if (plainData != null) assertTrue(plainData.length > 0);
+            if (plainData != null) {
+                assertTrue(plainData.length > 0);
+            }
             assertArrayEquals(DATA, plainData);
 
         }

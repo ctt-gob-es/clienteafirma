@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -68,13 +68,13 @@ final class AuthenticatedDataHelper {
      * @param content
      *        Contenido que se cifrar&aacute; con dicha MAC.
      * @return Cifrado MAC. */
-    byte[] macGenerator(String encryptionOID, byte[] content, SecretKey cipherKey) throws Exception {
+    byte[] macGenerator(final String encryptionOID, final byte[] content, final SecretKey cipherKey) throws Exception {
         MacOutputStream mOut = null;
 
         Security.addProvider(new BouncyCastleProvider());
-        Provider provider = Security.getProvider("BC");
+        final Provider provider = Security.getProvider("BC");
 
-        Mac mac = getMac(encryptionOID, provider);
+        final Mac mac = getMac(encryptionOID, provider);
 
         AlgorithmParameterSpec params;
 
@@ -82,24 +82,24 @@ final class AuthenticatedDataHelper {
 
         mac.init(cipherKey, params);
 
-        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         mOut = new MacOutputStream(bOut, mac);
         mOut.write(content);
 
         return mOut.getMac();
     }
 
-    Mac getMac(String macOID, Provider provider) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    Mac getMac(final String macOID, final Provider provider) throws NoSuchAlgorithmException, NoSuchPaddingException {
         try {
             return createMac(macOID, provider);
         }
-        catch (NoSuchAlgorithmException e) {
-            String alternate = MAC_ALG_NAMES.get(macOID);
+        catch (final NoSuchAlgorithmException e) {
+            final String alternate = MAC_ALG_NAMES.get(macOID);
 
             try {
                 return createMac(alternate, provider);
             }
-            catch (NoSuchAlgorithmException ex) {
+            catch (final NoSuchAlgorithmException ex) {
                 if (provider != null) {
                     return getMac(macOID, null); // roll back to default
                 }
@@ -108,47 +108,47 @@ final class AuthenticatedDataHelper {
         }
     }
 
-    private Mac createMac(String algName, Provider provider) throws NoSuchAlgorithmException {
+    private Mac createMac(final String algName, final Provider provider) throws NoSuchAlgorithmException {
         if (provider != null) {
             return Mac.getInstance(algName, provider);
         }
         return Mac.getInstance(algName);
     }
 
-    protected AlgorithmParameterSpec generateParameterSpec(String encryptionOID, SecretKey encKey, Provider encProvider) {
-        SecureRandom rand = new SecureRandom();
+    protected AlgorithmParameterSpec generateParameterSpec(final String encryptionOID, final SecretKey encKey, final Provider encProvider) {
+        final SecureRandom rand = new SecureRandom();
         try {
             if (encryptionOID.equals(PKCSObjectIdentifiers.RC2_CBC.getId())) {
-                byte[] iv = new byte[8];
+                final byte[] iv = new byte[8];
 
                 rand.nextBytes(iv);
 
                 return new RC2ParameterSpec(encKey.getEncoded().length * 8, iv);
             }
 
-            AlgorithmParameterGenerator pGen = this.createAlgorithmParameterGenerator(encryptionOID, encProvider);
+            final AlgorithmParameterGenerator pGen = this.createAlgorithmParameterGenerator(encryptionOID, encProvider);
 
-            AlgorithmParameters p = pGen.generateParameters();
+            final AlgorithmParameters p = pGen.generateParameters();
 
             return p.getParameterSpec(IvParameterSpec.class);
         }
-        catch (GeneralSecurityException e) {
+        catch (final GeneralSecurityException e) {
             return null;
         }
     }
 
-    AlgorithmParameterGenerator createAlgorithmParameterGenerator(String encryptionOID, Provider provider) throws NoSuchAlgorithmException {
+    AlgorithmParameterGenerator createAlgorithmParameterGenerator(final String encryptionOID, final Provider provider) throws NoSuchAlgorithmException {
         try {
             return createAlgorithmParamsGenerator(encryptionOID, provider);
         }
-        catch (NoSuchAlgorithmException e) {
+        catch (final NoSuchAlgorithmException e) {
             try {
-                String algName = BASE_CIPHER_NAMES.get(encryptionOID);
+                final String algName = BASE_CIPHER_NAMES.get(encryptionOID);
                 if (algName != null) {
                     return createAlgorithmParamsGenerator(algName, provider);
                 }
             }
-            catch (NoSuchAlgorithmException ex) {
+            catch (final NoSuchAlgorithmException ex) {
                 // ignore
             }
             //
@@ -159,34 +159,34 @@ final class AuthenticatedDataHelper {
         }
     }
 
-    private AlgorithmParameterGenerator createAlgorithmParamsGenerator(String algName, Provider provider) throws NoSuchAlgorithmException {
+    private AlgorithmParameterGenerator createAlgorithmParamsGenerator(final String algName, final Provider provider) throws NoSuchAlgorithmException {
         if (provider != null) {
             return AlgorithmParameterGenerator.getInstance(algName, provider);
         }
         return AlgorithmParameterGenerator.getInstance(algName);
     }
 
-    protected AlgorithmIdentifier getAlgorithmIdentifier(String encryptionOID, AlgorithmParameterSpec paramSpec, Provider provider) throws IOException,
+    protected AlgorithmIdentifier getAlgorithmIdentifier(final String encryptionOID, final AlgorithmParameterSpec paramSpec, final Provider provider) throws IOException,
                                                                                                                                    NoSuchAlgorithmException,
                                                                                                                                    InvalidParameterSpecException {
-        AlgorithmParameters params = this.createAlgorithmParameters(encryptionOID, provider);
+        final AlgorithmParameters params = this.createAlgorithmParameters(encryptionOID, provider);
         params.init(paramSpec);
 
         return getAlgorithmIdentifier(encryptionOID, params);
     }
 
-    AlgorithmParameters createAlgorithmParameters(String encryptionOID, Provider provider) throws NoSuchAlgorithmException {
+    AlgorithmParameters createAlgorithmParameters(final String encryptionOID, final Provider provider) throws NoSuchAlgorithmException {
         try {
             return createAlgorithmParams(encryptionOID, provider);
         }
-        catch (NoSuchAlgorithmException e) {
+        catch (final NoSuchAlgorithmException e) {
             try {
-                String algName = BASE_CIPHER_NAMES.get(encryptionOID);
+                final String algName = BASE_CIPHER_NAMES.get(encryptionOID);
                 if (algName != null) {
                     return createAlgorithmParams(algName, provider);
                 }
             }
-            catch (NoSuchAlgorithmException ex) {
+            catch (final NoSuchAlgorithmException ex) {
                 // ignore
             }
             //
@@ -197,14 +197,14 @@ final class AuthenticatedDataHelper {
         }
     }
 
-    private AlgorithmParameters createAlgorithmParams(String algName, Provider provider) throws NoSuchAlgorithmException {
+    private AlgorithmParameters createAlgorithmParams(final String algName, final Provider provider) throws NoSuchAlgorithmException {
         if (provider != null) {
             return AlgorithmParameters.getInstance(algName, provider);
         }
         return AlgorithmParameters.getInstance(algName);
     }
 
-    protected AlgorithmIdentifier getAlgorithmIdentifier(String encryptionOID, AlgorithmParameters params) throws IOException {
+    protected AlgorithmIdentifier getAlgorithmIdentifier(final String encryptionOID, final AlgorithmParameters params) throws IOException {
         DEREncodable asn1Params;
         if (params != null) {
             asn1Params = ASN1Object.fromByteArray(params.getEncoded("ASN.1"));
@@ -219,27 +219,27 @@ final class AuthenticatedDataHelper {
     /** Clase Auxiliar para el manejo de las MAC. Es Original de Bouncy Castle */
     protected static class MacOutputStream extends OutputStream {
         private final OutputStream out;
-        private Mac mac;
+        private final Mac mac;
 
-        MacOutputStream(OutputStream out, Mac mac) {
+        MacOutputStream(final OutputStream out, final Mac mac) {
             this.out = out;
             this.mac = mac;
         }
 
         @Override
-        public void write(byte[] buf) throws IOException {
+        public void write(final byte[] buf) throws IOException {
             mac.update(buf, 0, buf.length);
             out.write(buf, 0, buf.length);
         }
 
         @Override
-        public void write(byte[] buf, int off, int len) throws IOException {
+        public void write(final byte[] buf, final int off, final int len) throws IOException {
             mac.update(buf, off, len);
             out.write(buf, off, len);
         }
 
         @Override
-        public void write(int i) throws IOException {
+        public void write(final int i) throws IOException {
             mac.update((byte) i);
             out.write(i);
         }

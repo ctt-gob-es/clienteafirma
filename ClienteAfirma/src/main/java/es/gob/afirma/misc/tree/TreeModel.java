@@ -6,7 +6,7 @@ public final class TreeModel {
     private static final long serialVersionUID = 1L;
 
     /** Root of the tree. */
-    private TreeNode root;
+    private final TreeNode root;
 
     /** Children count. Always 1 starting with the root */
     private Integer count = 1;
@@ -27,13 +27,13 @@ public final class TreeModel {
      * @see TreeNode#getAllowsChildren
      * @see TreeModel#isLeaf
      * @see #setAsksAllowsChildren */
-    private boolean asksAllowsChildren;
+    private final boolean asksAllowsChildren;
 
     /** Creates a tree in which any node can have children.
      * @param root
      *        a TreeNode object that is the root of the tree
      * @see #TreeModel(TreeNode, boolean) */
-    public TreeModel(TreeNode root) {
+    public TreeModel(final TreeNode root) {
         this(root, false);
     }
 

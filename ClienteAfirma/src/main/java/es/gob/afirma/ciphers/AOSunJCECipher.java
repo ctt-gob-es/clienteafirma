@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -133,7 +133,7 @@ public final class AOSunJCECipher implements AOCipher {
         return SUPPORTED_CONFIGS.clone();
     }
 
-    public byte[] cipher(byte[] data, AOCipherConfig algorithmConfig, Key cipherKey) throws AOException, AOInvalidKeyException {
+    public byte[] cipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key cipherKey) throws AOException, AOInvalidKeyException {
 
         if (data == null || algorithmConfig == null || cipherKey == null || data.length == 0) {
             throw new AOException("Los parametros de la funcion de cifrado no pueden ser nulos o vacios");
@@ -164,7 +164,7 @@ public final class AOSunJCECipher implements AOCipher {
         try {
             return cipher.doFinal(data);
         }
-        catch (BadPaddingException e) {
+        catch (final BadPaddingException e) {
             throw new AOInvalidKeyException("La clave o contrase\u00F1a introducida no es v\u00E1lida");
         }
         catch (final Exception e) {
@@ -172,7 +172,7 @@ public final class AOSunJCECipher implements AOCipher {
         }
     }
 
-    public byte[] decipher(byte[] data, AOCipherConfig algorithmConfig, Key decipherKey) throws AOException, AOInvalidKeyException {
+    public byte[] decipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key decipherKey) throws AOException, AOInvalidKeyException {
 
         if (data == null || algorithmConfig == null || decipherKey == null) {
             throw new AOException("Los parametros de la funcion de descifrado no pueden ser nulos");
@@ -204,7 +204,7 @@ public final class AOSunJCECipher implements AOCipher {
         try {
             return cipher.doFinal(data);
         }
-        catch (BadPaddingException e) {
+        catch (final BadPaddingException e) {
             throw new AOInvalidKeyException(e.toString());
         }
         catch (final Exception e) {
@@ -212,9 +212,13 @@ public final class AOSunJCECipher implements AOCipher {
         }
     }
 
-    public Key decodeKey(String base64Key, AOCipherConfig algorithmConfig, Object[] params) throws AOException {
-        if (base64Key == null || base64Key.length() < 1) throw new NullPointerException("La clave a descodificar no puede ser nula ni vacia");
-        if (algorithmConfig == null) throw new NullPointerException("La configuracion de cifrado no puede ser nula");
+    public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws AOException {
+        if (base64Key == null || base64Key.length() < 1) {
+            throw new NullPointerException("La clave a descodificar no puede ser nula ni vacia");
+        }
+        if (algorithmConfig == null) {
+            throw new NullPointerException("La configuracion de cifrado no puede ser nula");
+        }
 
         try {
             return new SecretKeySpec(AOCryptoUtil.decodeBase64(base64Key), algorithmConfig.getAlgorithm().getName());
@@ -226,8 +230,12 @@ public final class AOSunJCECipher implements AOCipher {
 
     public Key decodePassphrase(final char[] passphrase, final AOCipherConfig algorithmConfig, final Object[] params) throws AOException {
 
-        if (passphrase == null || passphrase.length < 1) throw new NullPointerException("La contrase\u00F1a para la generacion de la clave no puede ser nula ni vacia");
-        if (algorithmConfig == null) throw new NullPointerException("La configuracion de cifrado no puede ser nula");
+        if (passphrase == null || passphrase.length < 1) {
+            throw new NullPointerException("La contrase\u00F1a para la generacion de la clave no puede ser nula ni vacia");
+        }
+        if (algorithmConfig == null) {
+            throw new NullPointerException("La configuracion de cifrado no puede ser nula");
+        }
 
         try {
             return SecretKeyFactory.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER).generateSecret(new PBEKeySpec(passphrase,
@@ -239,14 +247,14 @@ public final class AOSunJCECipher implements AOCipher {
         }
     }
 
-    public Key generateKey(AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException {
+    public Key generateKey(final AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException {
         try {
             return KeyGenerator.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER).generateKey();
         }
-        catch (NoSuchAlgorithmException e) {
+        catch (final NoSuchAlgorithmException e) {
             throw e;
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new AOException("No se pudo generar una clave compatible para la configuracion '" + algorithmConfig + "'", e);
         }
     }
@@ -257,17 +265,14 @@ public final class AOSunJCECipher implements AOCipher {
      * @param algorithmConfig
      *        Configuracion de cifrado que debemos parametrizar.
      * @return Par&aacute;metros para operar. */
-    private AlgorithmParameterSpec getParams(AOCipherConfig algorithmConfig) {
-
-        AlgorithmParameterSpec params = null;
-        if (algorithmConfig.getAlgorithm().supportsPassword()) params = new PBEParameterSpec(SALT, ITERATION_COUNT);
-        else {
-            if (!algorithmConfig.getBlockMode().equals(AOCipherBlockMode.ECB)) {
-                params = new IvParameterSpec(algorithmConfig.getAlgorithm().equals(AOCipherAlgorithm.AES) ? IV_16 : IV_8);
-            }
+    private AlgorithmParameterSpec getParams(final AOCipherConfig algorithmConfig) {
+        if (algorithmConfig.getAlgorithm().supportsPassword()) {
+            return new PBEParameterSpec(SALT, ITERATION_COUNT);
         }
-
-        return params;
+        if (!algorithmConfig.getBlockMode().equals(AOCipherBlockMode.ECB)) {
+            return new IvParameterSpec(algorithmConfig.getAlgorithm().equals(AOCipherAlgorithm.AES) ? IV_16 : IV_8);
+        }
+        return null;
     }
     //
     // private AlgorithmParameterSpec getParams(String algorithmConfig) {

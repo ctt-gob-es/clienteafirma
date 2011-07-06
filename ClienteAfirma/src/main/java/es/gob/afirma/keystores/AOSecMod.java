@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -46,18 +46,18 @@ final class AOSecMod {
         int namesRunningOffset = namesOffset;
 
         int len = getShort(secmoddb, namesRunningOffset + 0);
-        String commonName = new String(secmoddb, namesRunningOffset + 2, len);
+        final String commonName = new String(secmoddb, namesRunningOffset + 2, len);
 
         namesRunningOffset += len + 2;
 
         len = getShort(secmoddb, namesRunningOffset);
-        String libName = new String(secmoddb, namesRunningOffset + 2, len);
+        final String libName = new String(secmoddb, namesRunningOffset + 2, len);
 
         if (libName.endsWith(".DLL") || libName.endsWith(".dll") || libName.endsWith(".so") || libName.endsWith(".dylib")) {
 
             // namesRunningOffset += len + 2;
 
-            String trueLibName = searchPathForFile(new String[] {
+            final String trueLibName = searchPathForFile(new String[] {
                 libName
             }, false);
 
@@ -88,7 +88,7 @@ final class AOSecMod {
 
             profileDir = profileDir.replace("\\ ", " ");
             if (!profileDir.endsWith("/")) {
-                profileDir = profileDir + "/"; 
+                profileDir = profileDir + "/";
             }
             final File secmod = new File(profileDir + "secmod.db");
             if (!secmod.exists()) {
@@ -98,7 +98,7 @@ final class AOSecMod {
             try {
                 secMod = AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(secmod.getAbsolutePath()), null, false));
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 throw new AOException("Error leyendo la base de datos de modulos (secmod.db)");
             }
 
@@ -108,7 +108,7 @@ final class AOSecMod {
             final Set<String> libs = new HashSet<String>();
             for (int i = 0; i < secMod.length; i++) {
                 try {
-                    ModuleName module = processNames(secMod, i);
+                    final ModuleName module = processNames(secMod, i);
                     if (!libs.contains(module.getLib())) {
                         libs.add(module.getLib());
                         modules.add(module);
@@ -116,7 +116,7 @@ final class AOSecMod {
                         // + module);
                     }
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     continue;
                 }
             }
@@ -128,10 +128,10 @@ final class AOSecMod {
     /** M&oacute;dulo de seguridad (PKCS#11) de Mozilla / Firefox. */
     static class ModuleName {
 
-        private String lib;
-        private String description;
+        private final String lib;
+        private final String description;
 
-        ModuleName(String l, String d) {
+        ModuleName(final String l, final String d) {
             lib = l;
             description = d;
         }

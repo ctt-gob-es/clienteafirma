@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -94,7 +94,7 @@ public class AOKeyStoreManager {
         ksType = type;
 
         if (pssCallBack == null) {
-            pssCallBack = new NullPasswordCallback(); 
+            pssCallBack = new NullPasswordCallback();
         }
 
         if (type == AOConstants.AOKeyStore.SINGLE) {
@@ -358,7 +358,9 @@ public class AOKeyStoreManager {
             if (params[0] != null) {
                 p11lib = params[0].toString();
             }
-            else throw new NullPointerException("No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula");
+            else {
+                throw new NullPointerException("No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula");
+            }
 
             // Numero de lector
             Integer slot = null;
@@ -380,11 +382,11 @@ public class AOKeyStoreManager {
                 try {
                     sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class);
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     throw new AOKeyStoreManagerException("No se ha podido construir un proveedor de tipo 'sun.security.pkcs11.SunPKCS11'", e);
                 }
 
-                byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
+                final byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
                 try {
                     p11Provider = (Provider) sunPKCS11Contructor.newInstance( // TODO:
                                                                               // InvocationTargetException
@@ -468,7 +470,7 @@ public class AOKeyStoreManager {
                     // nssProvider = new sun.security.pkcs11.SunPKCS11(new
                     // ByteArrayInputStream(KeyStoreUtilities.createPKCS11NSSConfigFile(mozillaProfileDir,
                     // NSSLibDir).getBytes()));
-                    Constructor<?> sunPKCS11Constructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class);
+                    final Constructor<?> sunPKCS11Constructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class);
                     nssProvider =
                             (Provider) sunPKCS11Constructor.newInstance(new ByteArrayInputStream(MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(mozillaProfileDir,
                                                                                                                                                     nssLibDir)
@@ -665,7 +667,7 @@ public class AOKeyStoreManager {
             return (X509Certificate[]) certs;
         }
         final Certificate cert = privateKeyEntry.getCertificate();
-        if (cert instanceof X509Certificate) { 
+        if (cert instanceof X509Certificate) {
             return new X509Certificate[] {
                                           (X509Certificate) cert
             };
@@ -691,7 +693,7 @@ public class AOKeyStoreManager {
                 return (X509Certificate[]) certs;
             }
             final Certificate cert = ks.getCertificate(alias);
-            if (cert instanceof X509Certificate) { 
+            if (cert instanceof X509Certificate) {
                 return new X509Certificate[] {
                                               (X509Certificate) cert
                 };
@@ -756,7 +758,7 @@ public class AOKeyStoreManager {
      *        Descripci&oacute;n del repositorio que se desea recuperar.
      * @return KeyStore Repositorio de certificados. */
     public static AOKeyStore getKeyStore(final String description) {
-        AOKeyStore keystore = null;
+        final AOKeyStore keystore = null;
         for (final AOKeyStore tempKs : AOKeyStore.values()) {
             if (tempKs.getDescription().equals(description)) {
                 return tempKs;

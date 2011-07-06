@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -24,10 +24,10 @@ final class BinaryUtils {
      * @param input
      *        Entrada a comrpimir.
      * @return Entrada comprimida. */
-    static public byte[] compress(byte[] input) {
+    static public byte[] compress(final byte[] input) {
 
         // Create the compressor with highest level of compression
-        Deflater compressor = new Deflater();
+        final Deflater compressor = new Deflater();
         compressor.setLevel(Deflater.BEST_COMPRESSION);
 
         // Give the compressor the data to compress
@@ -38,21 +38,21 @@ final class BinaryUtils {
         // You cannot use an array that's the same size as the orginal because
         // there is no guarantee that the compressed data will be smaller than
         // the uncompressed data.
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
 
         // Compress the data
-        byte[] buf = new byte[1024];
+        final byte[] buf = new byte[1024];
         while (!compressor.finished()) {
-            int count = compressor.deflate(buf);
+            final int count = compressor.deflate(buf);
             bos.write(buf, 0, count);
         }
         try {
             bos.close();
         }
-        catch (IOException e) {}
+        catch (final IOException e) {}
 
         // Get the compressed data
-        byte[] compressedData = bos.toByteArray();
+        final byte[] compressedData = bos.toByteArray();
 
         return compressedData;
     }
@@ -61,20 +61,20 @@ final class BinaryUtils {
      * @param compressedData
      *        Entrada a descomprimir.
      * @return Entrada descomprimida. */
-    static public byte[] uncompress(byte[] compressedData) {
+    static public byte[] uncompress(final byte[] compressedData) {
 
         // Create the decompressor and give it the data to compress
-        Inflater decompressor = new Inflater();
+        final Inflater decompressor = new Inflater();
         decompressor.setInput(compressedData);
 
         // Create an expandable byte array to hold the decompressed data
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
 
         // Decompress the data
-        byte[] buf = new byte[1024];
+        final byte[] buf = new byte[1024];
         while (!decompressor.finished()) {
             try {
-                int count = decompressor.inflate(buf);
+                final int count = decompressor.inflate(buf);
                 bos.write(buf, 0, count);
             }
             catch (final Exception e) {
@@ -90,7 +90,7 @@ final class BinaryUtils {
         }
 
         // Get the decompressed data
-        byte[] decompressedData = bos.toByteArray();
+        final byte[] decompressedData = bos.toByteArray();
 
         return decompressedData;
 

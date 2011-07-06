@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -27,7 +27,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
 
 /** Clase base para la implementaci&oacute;n del tipo DigestedData en CADES
  * basado en CMS. La Estructura del mensaje es la siguiente:<br>
- * 
+ *
  * <pre>
  * <code>
  *  DigestedData ::= SEQUENCE {
@@ -35,11 +35,11 @@ import es.gob.afirma.misc.AOCryptoUtil;
  *        digestAlgorithm DigestAlgorithmIdentifier,
  *        encapContentInfo EncapsulatedContentInfo,
  *        digest Digest }
- * 
+ *
  *  Digest ::= OCTET STRING
  * </code>
  * </pre>
- * 
+ *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje DigestedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
@@ -59,13 +59,13 @@ public final class CADESDigestedData {
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
      *         datos */
-    public byte[] genDigestedData(P7ContentSignerParameters parameters, Oid dataType) throws NoSuchAlgorithmException, IOException {
+    public byte[] genDigestedData(final P7ContentSignerParameters parameters, final Oid dataType) throws NoSuchAlgorithmException, IOException {
         if (parameters == null) {
             throw new NullPointerException("Los parametros no pueden ser nulos");
         }
         // Obtenemos el algoritmo para "digestear"
-        String digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
-        AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
+        final String digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
+        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
         org.bouncycastle.asn1.x509.AlgorithmIdentifier digAlgId;
         try {
             digAlgId = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
@@ -76,13 +76,13 @@ public final class CADESDigestedData {
         ContentInfo encInfo = null;
 
         // indicamos el tipo de contenido
-        ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
         encInfo = new ContentInfo(contentTypeOID, null);
 
-        byte data[] = parameters.getContent();
+        final byte data[] = parameters.getContent();
 
         // digest
-        DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm.toString()).digest(data));
+        final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm.toString()).digest(data));
 
         // construimos el digestedData.
         return (new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest))).getDEREncoded();

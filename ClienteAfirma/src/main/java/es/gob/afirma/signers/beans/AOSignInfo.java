@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -43,7 +43,7 @@ public final class AOSignInfo {
      * un formato de firma se establece el formato "Desconocido".
      * @param signFormat
      *        Formato general de firma. */
-    public AOSignInfo(String signFormat) {
+    public AOSignInfo(final String signFormat) {
         this.format = (signFormat != null ? signFormat : "Desconocido");
     }
 
@@ -69,7 +69,7 @@ public final class AOSignInfo {
         return urlSignedData;
     }
 
-    public void setUrlSignedData(String urlSignedData) {
+    public void setUrlSignedData(final String urlSignedData) {
         this.urlSignedData = urlSignedData;
     }
 
@@ -77,7 +77,7 @@ public final class AOSignInfo {
         return b64VerificationCode;
     }
 
-    public void setB64VerificationCode(String b64VerificationCode) {
+    public void setB64VerificationCode(final String b64VerificationCode) {
         this.b64VerificationCode = b64VerificationCode;
     }
 

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -37,11 +37,15 @@ public final class NSPreferences {
         // Get current user profile directory
         if (reg != null) {
             currProfileName = reg.get("Common/Profiles/CurrentProfile");
-            if (currProfileName != null) path = reg.get("Common/Profiles/" + currProfileName + "/directory");
+            if (currProfileName != null) {
+                path = reg.get("Common/Profiles/" + currProfileName + "/directory");
+            }
             reg.close();
         }
 
-        if (path == null) throw new IOException();
+        if (path == null) {
+            throw new IOException();
+        }
         return path;
     }
 
@@ -56,7 +60,9 @@ public final class NSPreferences {
      *         Cuando ocurre un error abriendo o leyendo el fichero. */
     public static String getFireFoxUserProfileDirectory(final File iniFile) throws IOException {
 
-        if (iniFile == null) throw new NullPointerException("El fichero INI es nulo y no se podra determinar el directorio del usuario de firefox");
+        if (iniFile == null) {
+            throw new NullPointerException("El fichero INI es nulo y no se podra determinar el directorio del usuario de firefox");
+        }
 
         if (!iniFile.exists() || !iniFile.isFile()) {
             throw new IOException("No se ha encontrado el fichero con los perfiles de firefox");
@@ -67,7 +73,7 @@ public final class NSPreferences {
         // Leemos el fichero con la informacion de los perfiles y buscamos el
         // activo(el que esta bloqueado)
         final FirefoxProfile[] profiles = readProfiles(iniFile);
-        for (FirefoxProfile profile : profiles) {
+        for (final FirefoxProfile profile : profiles) {
             if (isProfileLocked(profile)) {
                 currentProfilePath = profile.absolutePath;
                 break;
@@ -76,7 +82,7 @@ public final class NSPreferences {
 
         // Si no hay ninguno actualmente activo, tomamos el por defecto
         if (currentProfilePath == null) {
-            for (FirefoxProfile profile : profiles) {
+            for (final FirefoxProfile profile : profiles) {
                 if (profile.isDefault) {
                     currentProfilePath = profile.absolutePath;
                     break;
@@ -116,18 +122,30 @@ public final class NSPreferences {
             while ((line = in.readLine()) != null) {
 
                 // Buscamos un nuevo bloque de perfil
-                if (!line.trim().toLowerCase().startsWith("[profile")) continue;
+                if (!line.trim().toLowerCase().startsWith("[profile")) {
+                    continue;
+                }
 
                 final FirefoxProfile profile = new FirefoxProfile();
                 while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) {
-                    if (line.trim().toLowerCase().startsWith(NAME_ATR)) profile.name = line.trim().substring(NAME_ATR.length());
-                    else if (line.trim().toLowerCase().startsWith(IS_RELATIVE_ATR)) profile.isRelative =
-                            line.trim().substring(IS_RELATIVE_ATR.length()).equals("1");
-                    else if (line.trim().toLowerCase().startsWith(PATH_PROFILES_ATR)) profile.path =
-                            line.trim().substring(PATH_PROFILES_ATR.length());
-                    else if (line.trim().toLowerCase().startsWith(IS_DEFAULT_ATR)) profile.isDefault =
-                            line.trim().substring(IS_DEFAULT_ATR.length()).equals("1");
-                    else break;
+                    if (line.trim().toLowerCase().startsWith(NAME_ATR)) {
+                        profile.name = line.trim().substring(NAME_ATR.length());
+                    }
+                    else if (line.trim().toLowerCase().startsWith(IS_RELATIVE_ATR)) {
+                        profile.isRelative =
+                                line.trim().substring(IS_RELATIVE_ATR.length()).equals("1");
+                    }
+                    else if (line.trim().toLowerCase().startsWith(PATH_PROFILES_ATR)) {
+                        profile.path =
+                                line.trim().substring(PATH_PROFILES_ATR.length());
+                    }
+                    else if (line.trim().toLowerCase().startsWith(IS_DEFAULT_ATR)) {
+                        profile.isDefault =
+                                line.trim().substring(IS_DEFAULT_ATR.length()).equals("1");
+                    }
+                    else {
+                        break;
+                    }
                 }
 
                 // Debemos encontrar al menos el nombre y la ruta del perfil
@@ -145,7 +163,7 @@ public final class NSPreferences {
             try {
                 in.close();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
         }
 
         return profiles.toArray(new FirefoxProfile[profiles.size()]);

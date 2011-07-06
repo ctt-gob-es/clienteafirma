@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -35,7 +35,7 @@ public final class AOCipherKeyStoreHelper {
 
     /** Interfaz para la inserci&oacute;n de la contrase&ntilde;a del
      * almac&eacute;n. */
-    private char[] pss;
+    private final char[] pss;
 
     /** Almacena una clave en el almac&eacute;n privado de AFirma.
      * @param alias
@@ -45,7 +45,7 @@ public final class AOCipherKeyStoreHelper {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso de
      *         almacenado */
-    public void storeKey(String alias, Key key) throws AOException {
+    public void storeKey(final String alias, final Key key) throws AOException {
         if (ks == null) {
             throw new AOException("No se puede almacenar una clave en un almacen no inicializado");
         }
@@ -71,13 +71,14 @@ public final class AOCipherKeyStoreHelper {
         try {
             aliases = ks.aliases();
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Error obteniendo los alias del almacen, se devolvera una lista vacia: " + e);
             return new String[0];
         }
-        Vector<String> tmpRet = new Vector<String>();
-        while (aliases.hasMoreElements())
+        final Vector<String> tmpRet = new Vector<String>();
+        while (aliases.hasMoreElements()) {
             tmpRet.add(aliases.nextElement().toString());
+        }
         return tmpRet.toArray(new String[0]);
     }
 
@@ -165,7 +166,7 @@ public final class AOCipherKeyStoreHelper {
      *         de AFirma cuyo alias coincide con el proporcionado
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    public Key getKey(String alias) throws AOException {
+    public Key getKey(final String alias) throws AOException {
         try {
             return ks.getKey(alias, pss);
         }
@@ -182,8 +183,10 @@ public final class AOCipherKeyStoreHelper {
      *         almac&eacute;n.
      * @throws IOException
      *         Cuando la contrase&ntilde;a es incorrecta. */
-    public AOCipherKeyStoreHelper(char[] p) throws AOException, IOException {
-        if (p == null) throw new NullPointerException("Se necesita una contrasena para instanciar la clase");
+    public AOCipherKeyStoreHelper(final char[] p) throws AOException, IOException {
+        if (p == null) {
+            throw new NullPointerException("Se necesita una contrasena para instanciar la clase");
+        }
         pss = p;
         loadCipherKeyStore();
     }
@@ -192,7 +195,7 @@ public final class AOCipherKeyStoreHelper {
      * sido ya creado.
      * @return <code>true</code> si el almac&eacute;n ya existe, <code>false</code> en caso contrario */
     public static boolean storeExists() {
-        File keystore = new File(AOUtil.getCipherKeystore());
+        final File keystore = new File(AOUtil.getCipherKeystore());
         return keystore.exists() && keystore.isFile();
     }
 
@@ -201,7 +204,7 @@ public final class AOCipherKeyStoreHelper {
      * @return Devuelve <code>true</code> si el keystore exist&iacute;a y se
      *         borr&oacute; correctamente. */
     public static boolean removeStore() {
-        File storeFile = new File(AOUtil.getCipherKeystore());
+        final File storeFile = new File(AOUtil.getCipherKeystore());
         return storeFile.exists() && storeFile.delete();
     }
 }

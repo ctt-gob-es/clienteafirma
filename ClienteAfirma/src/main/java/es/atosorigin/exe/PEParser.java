@@ -244,12 +244,14 @@ public final class PEParser {
      *         Si ocurre cualquier problema durante el an&aacute;lisis */
     public boolean parse(final byte[] peFile, final Logger logger) throws AOException {
 
-        int coffOffset = AOBinUtil.getU2(peFile, PE_SIGNATURE_OFFSET) + 4;
+        final int coffOffset = AOBinUtil.getU2(peFile, PE_SIGNATURE_OFFSET) + 4;
         if (!"PE\0\0".equals(new String(new byte[] {
                 peFile[coffOffset - 4], peFile[coffOffset - 3], peFile[coffOffset - 2], peFile[coffOffset - 1]
-        }))) throw new AOException("Cabecera PE\\0\\0 no encontrada en el offset " + AOUtil.hexify(new byte[] {
-            PE_SIGNATURE_OFFSET
-        }, false));
+        }))) {
+            throw new AOException("Cabecera PE\\0\\0 no encontrada en el offset " + AOUtil.hexify(new byte[] {
+                PE_SIGNATURE_OFFSET
+            }, false));
+        }
 
         final StringBuilder sb = new StringBuilder();
 
@@ -264,7 +266,9 @@ public final class PEParser {
         sb.append(MACHINE_TYPE.get(machineType));
 
         boolean is64 = false;
-        if (machineType.equals("86-64") /* x64 */|| machineType.equals("02-00") /* IA64 */) is64 = true;
+        if (machineType.equals("86-64") /* x64 */|| machineType.equals("02-00") /* IA64 */) {
+            is64 = true;
+        }
 
         // int numberOfSections = AOBinUtil.getU2(peFile, coffOffset+2); // +2,
         // +3
@@ -286,17 +290,20 @@ public final class PEParser {
                   .warning("El numero de entradas de la tabla de simbolos no es cero (se implementa una caracteristica deprecada)");
         }
 
-        int sizeOfOptionalHeader = AOBinUtil.getU2(peFile, coffOffset + 16); // +16,
+        final int sizeOfOptionalHeader = AOBinUtil.getU2(peFile, coffOffset + 16); // +16,
                                                                              // +17
 
-        if (sizeOfOptionalHeader == 0) sb.append("\nEl fichero es un objeto (no tiene cabecera opcional)");
-        // else {
-        // sb.append(
-        // "\nEl fichero es ejecutable (tamano de la cabecera opcional: "
-        // );
-        // sb.append(sizeOfOptionalHeader);
-        // sb.append(")");
-        // }
+        if (sizeOfOptionalHeader == 0)
+         {
+            sb.append("\nEl fichero es un objeto (no tiene cabecera opcional)");
+            // else {
+            // sb.append(
+            // "\nEl fichero es ejecutable (tamano de la cabecera opcional: "
+            // );
+            // sb.append(sizeOfOptionalHeader);
+            // sb.append(")");
+            // }
+        }
 
         // byte[] characteristics = new byte[] {peFile[coffOffset+19],
         // peFile[coffOffset+18]}; // +18, +19
@@ -345,19 +352,27 @@ public final class PEParser {
 
             // Magic +0, +1
             if (peFile[coffOffset + optionalHeaderOffset + 1] == (byte) 0x01) {
-                if (peFile[coffOffset + optionalHeaderOffset + 0] == (byte) 0x0B) sb.append("\nLa imagen es un ejecutable normal (PE32)");
-                else if (peFile[coffOffset + optionalHeaderOffset + 0] == (byte) 0x07) sb.append("\nLa imagen es una ROM");
-                else Logger.getLogger("es.atosorigin").warning("El fichero de imagen es de un tipo desconocido (Magic: " + AOUtil.hexify(new byte[] {
-                        peFile[coffOffset + 21], peFile[coffOffset + 20]
-                }, true) + ")");
+                if (peFile[coffOffset + optionalHeaderOffset + 0] == (byte) 0x0B) {
+                    sb.append("\nLa imagen es un ejecutable normal (PE32)");
+                }
+                else if (peFile[coffOffset + optionalHeaderOffset + 0] == (byte) 0x07) {
+                    sb.append("\nLa imagen es una ROM");
+                }
+                else {
+                    Logger.getLogger("es.atosorigin").warning("El fichero de imagen es de un tipo desconocido (Magic: " + AOUtil.hexify(new byte[] {
+                            peFile[coffOffset + 21], peFile[coffOffset + 20]
+                    }, true) + ")");
+                }
             }
             else if ((peFile[coffOffset + optionalHeaderOffset + 1] == (byte) 0x02) && (peFile[coffOffset + 20] == (byte) 0x0B)) {
                 sb.append("\nLa imagen es un ejecutable PE32+");
                 // pe32Plus = true;
             }
-            else Logger.getLogger("es.atosorigin").warning("El fichero de imagen es de un tipo desconocido (Magic: " + AOUtil.hexify(new byte[] {
-                    peFile[coffOffset + 21], peFile[coffOffset + 20]
-            }, true) + ")");
+            else {
+                Logger.getLogger("es.atosorigin").warning("El fichero de imagen es de un tipo desconocido (Magic: " + AOUtil.hexify(new byte[] {
+                        peFile[coffOffset + 21], peFile[coffOffset + 20]
+                }, true) + ")");
+            }
 
             // Linker, +2, +3
             // sb.append("\nVersion del enlazador usado para crear la imagen: "
@@ -454,7 +469,9 @@ public final class PEParser {
 
         }
 
-        if (logger != null) logger.info(sb.toString());
+        if (logger != null) {
+            logger.info(sb.toString());
+        }
         return is64;
     }
 

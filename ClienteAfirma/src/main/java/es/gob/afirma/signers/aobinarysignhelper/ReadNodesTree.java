@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -57,7 +57,7 @@ public final class ReadNodesTree {
         return seleccionados;
     }
 
-    void setSeleccionados(int[] seleccionados) {
+    void setSeleccionados(final int[] seleccionados) {
         this.seleccionados = seleccionados;
     }
 
@@ -67,7 +67,7 @@ public final class ReadNodesTree {
         return StringRetorn;
     }
 
-    void setStringRetorn(String StringRetorn) {
+    void setStringRetorn(final String StringRetorn) {
         this.StringRetorn = StringRetorn;
     }
 
@@ -81,19 +81,19 @@ public final class ReadNodesTree {
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
      *         datos */
-    public TreeModel readNodesTree(byte[] data, boolean asSimpleSignInfo) throws IOException {
+    public TreeModel readNodesTree(final byte[] data, final boolean asSimpleSignInfo) throws IOException {
 
-        ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1InputStream is = new ASN1InputStream(data);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq = (ASN1Sequence) is.readObject();
-        Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
         // Contenido de SignedData
-        ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
                                                                         // del
                                                                         // SignedData
 
@@ -102,18 +102,18 @@ public final class ReadNodesTree {
         ASN1Set signerInfosSd = null;
         ASN1Set certificates = null;
         try {
-            SignedData sd = new SignedData(contentSignedData);
+            final SignedData sd = new SignedData(contentSignedData);
             signerInfosSd = sd.getSignerInfos();
             certificates = sd.getCertificates();
         }
-        catch (Exception exception) {
+        catch (final Exception exception) {
             try {
                 Logger.getLogger("es.gob.afirma").info("No es signedData, probamos con SignedAndEnvelopedData.");
-                SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
+                final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
                 signerInfosSd = sd.getSignerInfos();
                 certificates = sd.getCertificates();
             }
-            catch (Exception e2) {
+            catch (final Exception e2) {
                 Logger.getLogger("es.gob.afirma").severe(e2.toString());
             }
         }
@@ -125,12 +125,12 @@ public final class ReadNodesTree {
 
         if (asSimpleSignInfo && signerInfosSd != null) {
             for (int i = 0; i < signerInfosSd.size(); i++) {
-                ASN1Sequence atribute = (ASN1Sequence) signerInfosSd.getObjectAt(i);
-                IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atribute.getObjectAt(1));
-                X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
-                SignerInfo si = new SignerInfo(atribute);
-                Date signingTime = getSigningTime(si);
-                AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
+                final ASN1Sequence atribute = (ASN1Sequence) signerInfosSd.getObjectAt(i);
+                final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atribute.getObjectAt(1));
+                final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
+                final SignerInfo si = new SignerInfo(atribute);
+                final Date signingTime = getSigningTime(si);
+                final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
                 aossi.setPkcs1(si.getEncryptedDigest().getOctets());
                 rama = new TreeNode(aossi);
                 listaCert.add(nameSigner);
@@ -141,10 +141,10 @@ public final class ReadNodesTree {
         }
         else if (signerInfosSd != null) {
             for (int i = 0; i < signerInfosSd.size(); i++) {
-                ASN1Sequence atribute = (ASN1Sequence) signerInfosSd.getObjectAt(i);
-                IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atribute.getObjectAt(1));
-                String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
-                SignerInfo si = new SignerInfo(atribute);
+                final ASN1Sequence atribute = (ASN1Sequence) signerInfosSd.getObjectAt(i);
+                final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atribute.getObjectAt(1));
+                final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
+                final SignerInfo si = new SignerInfo(atribute);
                 rama = new TreeNode(nameSigner);
                 lista.add(nameSigner);
                 getUnsignedAtributes(si.getUnauthenticatedAttributes(), rama, certificates);
@@ -163,24 +163,24 @@ public final class ReadNodesTree {
      *        Rama hija donde buscar los siguientes nodos.
      * @param certificates
      *        Certificados. */
-    private void getUnsignedAtributesWithCertificates(ASN1Set signerInfouAtrib, TreeNode ramahija, ASN1Set certificates) {
+    private void getUnsignedAtributesWithCertificates(final ASN1Set signerInfouAtrib, final TreeNode ramahija, final ASN1Set certificates) {
 
         if (signerInfouAtrib != null) {
-            Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
+            final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
             while (eAtributes.hasMoreElements()) {
-                Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
-                    ASN1Set setInto = data.getAttrValues();
-                    Enumeration<?> eAtributesData = setInto.getObjects();
+                    final ASN1Set setInto = data.getAttrValues();
+                    final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        Object obj = eAtributesData.nextElement();
+                        final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
-                            ASN1Sequence atrib = (ASN1Sequence) obj;
-                            IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atrib.getObjectAt(1));
-                            SignerInfo si = new SignerInfo(atrib);
-                            X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
-                            Date signingTime = getSigningTime(si);
-                            AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
+                            final ASN1Sequence atrib = (ASN1Sequence) obj;
+                            final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atrib.getObjectAt(1));
+                            final SignerInfo si = new SignerInfo(atrib);
+                            final X509Certificate[] nameSigner = searchCert(certificates, issuerSerial.getSerialNumber());
+                            final Date signingTime = getSigningTime(si);
+                            final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
                             aossi.setPkcs1(si.getEncryptedDigest().getOctets());
                             rama2 = new TreeNode(aossi);
                             listaCert.add(nameSigner);
@@ -201,22 +201,22 @@ public final class ReadNodesTree {
      *        Rama hija donde buscar los siguientes nodos.
      * @param certificates
      *        Certificados. */
-    private void getUnsignedAtributes(ASN1Set signerInfouAtrib, TreeNode ramahija, ASN1Set certificates) {
+    private void getUnsignedAtributes(final ASN1Set signerInfouAtrib, final TreeNode ramahija, final ASN1Set certificates) {
 
         if (signerInfouAtrib != null) {
-            Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
+            final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
             while (eAtributes.hasMoreElements()) {
-                Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
-                    ASN1Set setInto = data.getAttrValues();
-                    Enumeration<?> eAtributesData = setInto.getObjects();
+                    final ASN1Set setInto = data.getAttrValues();
+                    final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        Object obj = eAtributesData.nextElement();
+                        final Object obj = eAtributesData.nextElement();
                         if (obj instanceof ASN1Sequence) {
-                            ASN1Sequence atrib = (ASN1Sequence) obj;
-                            IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atrib.getObjectAt(1));
-                            SignerInfo si = new SignerInfo(atrib);
-                            String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
+                            final ASN1Sequence atrib = (ASN1Sequence) obj;
+                            final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atrib.getObjectAt(1));
+                            final SignerInfo si = new SignerInfo(atrib);
+                            final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
                             rama2 = new TreeNode(nameSigner);
                             lista.add(nameSigner);
                             ramahija.add(rama2);
@@ -241,13 +241,12 @@ public final class ReadNodesTree {
         int[] solucion;
 
         readNodesTree(data, false);
-        List<String> listaComp = lista;
-        int[] nodesToSign = new int[listaComp.size()];
+        final List<String> listaComp = lista;
+        final int[] nodesToSign = new int[listaComp.size()];
         int cont = 0;
         for (int i = 0; i < listaComp.size(); i++) {
-            for (int j = 0; j < signers.length; j++) {
-                String aux = listaComp.get(i);
-                String aux2 = signers[j];
+            for (final String aux2 : signers) {
+                final String aux = listaComp.get(i);
                 if (aux.equals(aux2)) {
                     nodesToSign[cont] = i;
                     cont++;
@@ -271,15 +270,15 @@ public final class ReadNodesTree {
      * @param nodes
      *        array con posibles repetidos.
      * @return array sin repetidos. */
-    public int[] simplyArray(int[] nodes) {
-        List<Integer> devolver = new ArrayList<Integer>();
+    public int[] simplyArray(final int[] nodes) {
+        final List<Integer> devolver = new ArrayList<Integer>();
 
         for (int i = 0; i < nodes.length; i++) {
             if (!devolver.contains(nodes[i])) {
                 devolver.add(Integer.valueOf(nodes[i]));
             }
         }
-        int[] simplificado = new int[devolver.size()];
+        final int[] simplificado = new int[devolver.size()];
         for (int i = 0; i < devolver.size(); i++) {
             simplificado[i] = devolver.get(i);
         }
@@ -294,14 +293,14 @@ public final class ReadNodesTree {
      * @param serialNumber
      *        N&uacute;mero de serie del certificado a firmar.
      * @return El nombre com&uacute;n. */
-    private String searchName(ASN1Set certificates, DERInteger serialNumber) {
+    private String searchName(final ASN1Set certificates, final DERInteger serialNumber) {
         String nombre = "";
-        Enumeration<?> certSet = certificates.getObjects();
+        final Enumeration<?> certSet = certificates.getObjects();
         while (certSet.hasMoreElements()) {
-            ASN1Sequence atrib2 = (ASN1Sequence) certSet.nextElement();
-            TBSCertificateStructure atrib = TBSCertificateStructure.getInstance(atrib2.getObjectAt(0));
+            final ASN1Sequence atrib2 = (ASN1Sequence) certSet.nextElement();
+            final TBSCertificateStructure atrib = TBSCertificateStructure.getInstance(atrib2.getObjectAt(0));
             if (serialNumber.toString().equals(atrib.getSerialNumber().toString())) {
-                X509Name name = atrib.getSubject();
+                final X509Name name = atrib.getSubject();
                 nombre = name.getValues(X509ObjectIdentifiers.commonName).toString();
                 if (nombre != null && !nombre.equals("") && !nombre.equals("[]")) {
                     nombre = nombre.substring(1, nombre.length() - 1);
@@ -323,8 +322,8 @@ public final class ReadNodesTree {
      *        N&uacute;mero de serie del certificado a firmar.
      * @return El certificado (en la posici&oacute;n 0 y su cadena de confianza
      *         en orden). */
-    private X509Certificate[] searchCert(ASN1Set certificates, DERInteger serialNumber) {
-        Enumeration<?> certSet = certificates.getObjects();
+    private X509Certificate[] searchCert(final ASN1Set certificates, final DERInteger serialNumber) {
+        final Enumeration<?> certSet = certificates.getObjects();
         ASN1Sequence atrib2;
         while (certSet.hasMoreElements()) {
             atrib2 = (ASN1Sequence) certSet.nextElement();
@@ -334,16 +333,18 @@ public final class ReadNodesTree {
             // TBSCertificateStructure.getInstance(seq.getObjectAt(0));
             // sigAlgId = AlgorithmIdentifier.getInstance(seq.getObjectAt(1));
             // sig = DERBitString.getInstance(seq.getObjectAt(2));
-            if (atrib2.size() < 1) continue;
-            TBSCertificateStructure atrib = TBSCertificateStructure.getInstance(atrib2.getObjectAt(0));
+            if (atrib2.size() < 1) {
+                continue;
+            }
+            final TBSCertificateStructure atrib = TBSCertificateStructure.getInstance(atrib2.getObjectAt(0));
             if (serialNumber.toString().equals(atrib.getSerialNumber().toString())) {
                 // Es el certificado bueno, creamos el array con un único
                 // elemento y lo devolvemos
-                X509Certificate[] ret = new X509Certificate[1];
+                final X509Certificate[] ret = new X509Certificate[1];
                 try {
                     ret[0] = new X509CertificateObject(new X509CertificateStructure(atrib2));
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma")
                           .severe("No se pudieron recuperar los certificados de la lista, se devolvera un array vacio: " + e);
                     return new X509Certificate[0];
@@ -355,20 +356,20 @@ public final class ReadNodesTree {
         return new X509Certificate[0];
     }
 
-    private Date getSigningTime(SignerInfo si) {
+    private Date getSigningTime(final SignerInfo si) {
         Date returnDate = null;
 
         if (si.getAuthenticatedAttributes() != null) {
-            Enumeration<?> eAtributes = si.getAuthenticatedAttributes().getObjects();
+            final Enumeration<?> eAtributes = si.getAuthenticatedAttributes().getObjects();
             while (eAtributes.hasMoreElements()) {
-                Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
                 if (data.getAttrType().equals(CMSAttributes.signingTime)) {
-                    ASN1Set time = data.getAttrValues();
-                    DERUTCTime d = (DERUTCTime) time.getObjectAt(0);
+                    final ASN1Set time = data.getAttrValues();
+                    final DERUTCTime d = (DERUTCTime) time.getObjectAt(0);
                     try {
                         returnDate = d.getDate();
                     }
-                    catch (ParseException ex) {
+                    catch (final ParseException ex) {
                         Logger.getLogger("es.gob.afirma").warning("No es posible convertir la fecha");
                     }
                 }

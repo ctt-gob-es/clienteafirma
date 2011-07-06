@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -29,13 +29,13 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
 
     static List<Attachment> files = new ArrayList<Attachment>();
 
-    AFirmaWebSignHTMLDocument(StyleSheet styles) {
+    AFirmaWebSignHTMLDocument(final StyleSheet styles) {
         super(styles);
         files.clear();
     }
 
     @Override
-    public HTMLEditorKit.ParserCallback getReader(int pos) {
+    public HTMLEditorKit.ParserCallback getReader(final int pos) {
         return new CustomReader(pos);
     }
 
@@ -58,14 +58,14 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
         @Override
         public void handleStartTag(final HTML.Tag t, final MutableAttributeSet a, final int pos) {
             if (t.toString().toLowerCase().equals("afirma")) {
-                String type = (String) a.getAttribute(HTML.Attribute.TYPE);
+                final String type = (String) a.getAttribute(HTML.Attribute.TYPE);
                 if (type != null && type.equals("file")) {
-                    String uri = (String) a.getAttribute(HTML.Attribute.HREF);
+                    final String uri = (String) a.getAttribute(HTML.Attribute.HREF);
                     startFile(uri);
                 }
                 else {
                     Logger.getLogger("es.gob.afirma").info("1. tipo erroneo: " + type);
-                    Enumeration<?> e = a.getAttributeNames();
+                    final Enumeration<?> e = a.getAttributeNames();
                     while (e.hasMoreElements()) {
                         Logger.getLogger("es.gob.afirma").info("ATT: " + e.nextElement());
                     }
@@ -79,7 +79,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
         }
 
         @Override
-        public void handleEndTag(HTML.Tag t, int pos) {
+        public void handleEndTag(final HTML.Tag t, final int pos) {
             Logger.getLogger("es.gob.afirma").info("Fin: " + t.toString());
             if (t.toString().toLowerCase().equals("afirma")) {
                 Logger.getLogger("es.gob.afirma").info("Fin de afirma");
@@ -95,7 +95,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
         }
 
         @Override
-        public void handleSimpleTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+        public void handleSimpleTag(final HTML.Tag t, final MutableAttributeSet a, final int pos) {
             if (t.toString().toLowerCase().equals("afirma")) {
                 if (a.isDefined(HTML.Attribute.ENDTAG)) {
                     Logger.getLogger("es.gob.afirma").info("Fin de afirma");
@@ -105,19 +105,19 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
                     // }
                 }
                 else {
-                    String type = (String) a.getAttribute(HTML.Attribute.TYPE);
+                    final String type = (String) a.getAttribute(HTML.Attribute.TYPE);
                     if (type != null && type.equals("file")) {
-                        String uri = (String) a.getAttribute(HTML.Attribute.HREF);
+                        final String uri = (String) a.getAttribute(HTML.Attribute.HREF);
                         try {
                             AFirmaWebSignHTMLDocument.files.add(new Attachment(URLDecoder.decode(uri, "UTF-8")));
                         }
-                        catch (IOException e) {
+                        catch (final IOException e) {
                             AFirmaWebSignHTMLDocument.files.add(new Attachment(uri));
                         }
                     }
                     else {
                         Logger.getLogger("es.gob.afirma").info("2. tipo erroneo: " + type);
-                        Enumeration<?> e = a.getAttributeNames();
+                        final Enumeration<?> e = a.getAttributeNames();
                         while (e.hasMoreElements()) {
                             Logger.getLogger("es.gob.afirma").info("ATT: " + e.nextElement());
                         }
@@ -131,7 +131,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
         }
 
         @Override
-        public void handleError(String errorMsg, int pos) {
+        public void handleError(final String errorMsg, final int pos) {
             Logger.getLogger("es.gob.afirma").severe("Error: " + errorMsg + ", posicion: " + pos);
             super.handleError(errorMsg, pos);
         }
@@ -146,7 +146,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             try {
                 AFirmaWebSignHTMLDocument.files.add(new Attachment(URLDecoder.decode(uri, "UTF-8")));
             }
-            catch (UnsupportedEncodingException e) {
+            catch (final UnsupportedEncodingException e) {
                 AFirmaWebSignHTMLDocument.files.add(new Attachment(uri));
             }
 
@@ -166,10 +166,10 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             }
 
             @Override
-            public void start(HTML.Tag t, MutableAttributeSet a) {
-                String type = (String) a.getAttribute("type");
+            public void start(final HTML.Tag t, final MutableAttributeSet a) {
+                final String type = (String) a.getAttribute("type");
                 if (type.equalsIgnoreCase("file")) {
-                    String uri = (String) a.getAttribute("uri");
+                    final String uri = (String) a.getAttribute("uri");
                     startFile(uri);
                 }
             }
@@ -188,7 +188,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             // }
 
             @Override
-            public void end(HTML.Tag t) {
+            public void end(final HTML.Tag t) {
                 // endFile();
             }
 

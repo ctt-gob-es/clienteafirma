@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -283,12 +283,14 @@ public final class AOXAdESSigner implements AOSigner {
             algorithm = SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
-        String algoUri = SIGN_ALGOS_URI.get(algorithm);
+        final String algoUri = SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'");
         }
 
-        if (extraParams == null) extraParams = new Properties();
+        if (extraParams == null) {
+            extraParams = new Properties();
+        }
         final String format = extraParams.getProperty("format", AOConstants.SIGN_FORMAT_XADES_ENVELOPING);
         final String mode = extraParams.getProperty("mode", AOConstants.SIGN_MODE_IMPLICIT);
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD);
@@ -682,8 +684,12 @@ public final class AOXAdESSigner implements AOSigner {
 
                 // Si los datos se han convertido a base64, bien por ser
                 // binarios o explicitos
-                if (isBase64) structures.add(new DOMStructure(dataElement.getFirstChild()));
-                else structures.add(new DOMStructure(dataElement));
+                if (isBase64) {
+                    structures.add(new DOMStructure(dataElement.getFirstChild()));
+                }
+                else {
+                    structures.add(new DOMStructure(dataElement));
+                }
 
                 final String objectId = "Object-" + UUID.randomUUID().toString();
                 envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
@@ -792,19 +798,29 @@ public final class AOXAdESSigner implements AOSigner {
                 try {
                     // Convertimos el algo del Message Digest externo a la
                     // nomenclatura XML
-                    if (AOCryptoUtil.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA1")) dm =
-                            fac.newDigestMethod(DigestMethod.SHA1, null);
-                    else if (AOCryptoUtil.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA-256")) dm =
-                            fac.newDigestMethod(DigestMethod.SHA256, null);
-                    else if (AOCryptoUtil.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA-512")) dm =
-                            fac.newDigestMethod(DigestMethod.SHA512, null);
-                    else if (AOCryptoUtil.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("RIPEMD160")) dm =
-                            fac.newDigestMethod(DigestMethod.RIPEMD160, null);
+                    if (AOCryptoUtil.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA1")) {
+                        dm =
+                                fac.newDigestMethod(DigestMethod.SHA1, null);
+                    }
+                    else if (AOCryptoUtil.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA-256")) {
+                        dm =
+                                fac.newDigestMethod(DigestMethod.SHA256, null);
+                    }
+                    else if (AOCryptoUtil.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("SHA-512")) {
+                        dm =
+                                fac.newDigestMethod(DigestMethod.SHA512, null);
+                    }
+                    else if (AOCryptoUtil.getDigestAlgorithmName(precalculatedHashAlgorithm).equalsIgnoreCase("RIPEMD160")) {
+                        dm =
+                                fac.newDigestMethod(DigestMethod.RIPEMD160, null);
+                    }
                 }
                 catch (final Exception e) {
                     throw new AOException("No se ha podido crear el metodo de huella digital para la referencia Externally Detached", e);
                 }
-                if (dm == null) throw new AOException("Metodo de Message Digest para la referencia Externally Detached no soportado: " + precalculatedHashAlgorithm);
+                if (dm == null) {
+                    throw new AOException("Metodo de Message Digest para la referencia Externally Detached no soportado: " + precalculatedHashAlgorithm);
+                }
                 ref = fac.newReference("", dm, null, null, referenceId, data);
             }
             // Tenemos URI y no nos han establecido algoritmo de message digest,
@@ -841,7 +857,9 @@ public final class AOXAdESSigner implements AOSigner {
                     }
                 }
             }
-            if (ref == null) throw new AOException("Error al generar la firma Externally Detached, no se ha podido crear la referencia externa");
+            if (ref == null) {
+                throw new AOException("Error al generar la firma Externally Detached, no se ha podido crear la referencia externa");
+            }
             referenceList.add(ref);
 
             // Hojas de estilo remotas en Externally Detached
@@ -861,8 +879,10 @@ public final class AOXAdESSigner implements AOSigner {
                               .severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e);
                     }
                 }
-                else Logger.getLogger("es.gob.afirma")
-                           .warning("Se necesita una referencia externa HTTP o HTTPS a la hoja de estilo para referenciarla en firmas XML Externally Detached");
+                else {
+                    Logger.getLogger("es.gob.afirma")
+                               .warning("Se necesita una referencia externa HTTP o HTTPS a la hoja de estilo para referenciarla en firmas XML Externally Detached");
+                }
             }
 
         }
@@ -939,7 +959,9 @@ public final class AOXAdESSigner implements AOSigner {
                                             extraParams.getProperty("signatureProductionProvince"),
                                             extraParams.getProperty("signatureProductionPostalCode"),
                                             extraParams.getProperty("signatureProductionCountry"));
-        if (spp != null) xades.setSignatureProductionPlace(spp);
+        if (spp != null) {
+            xades.setSignatureProductionPlace(spp);
+        }
 
         // SignerRole
         SignerRole signerRole = null;
@@ -965,8 +987,8 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // DataObjectFormat
-        ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
-        DataObjectFormat objectFormat = new DataObjectFormatImpl(
+        final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
+        final DataObjectFormat objectFormat = new DataObjectFormatImpl(
         // TODO: Establecer la variable en XAdES 1.3.2, esta deprecado
         // en XAdES 1.4.1
                                                                  dataObjectFormatDescription,
@@ -1090,7 +1112,9 @@ public final class AOXAdESSigner implements AOSigner {
     public boolean isEnveloped(final Element element) {
         final NodeList transformList = element.getElementsByTagNameNS(DSIGNNS, "Transform");
         for (int i = 0; i < transformList.getLength(); i++) {
-            if (((Element) transformList.item(i)).getAttribute("Algorithm").equals(Transform.ENVELOPED)) return true;
+            if (((Element) transformList.item(i)).getAttribute("Algorithm").equals(Transform.ENVELOPED)) {
+                return true;
+            }
         }
         return false;
     }
@@ -1120,7 +1144,9 @@ public final class AOXAdESSigner implements AOSigner {
         try {
 
             // comprueba que sea una documento de firma valido
-            if (!isSign(sign)) throw new AOInvalidFormatException("El documento no es un documento de firmas valido.");
+            if (!isSign(sign)) {
+                throw new AOInvalidFormatException("El documento no es un documento de firmas valido.");
+            }
 
             // obtiene la raiz del documento de firmas
             rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
@@ -1128,7 +1154,7 @@ public final class AOXAdESSigner implements AOSigner {
             // si es detached
             if (this.isDetached(rootSig)) {
 
-                Element firstChild = (Element) rootSig.getFirstChild();
+                final Element firstChild = (Element) rootSig.getFirstChild();
                 // si el documento es un xml se extrae como tal
                 if (firstChild.getAttribute("MimeType").equals("text/xml")) {
                     elementRes = (Element) firstChild.getFirstChild();
@@ -1219,7 +1245,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // convierte el documento obtenido en un array de bytes
-        ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
+        final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
         XMLUtils.writeXML(baosSig, elementRes, false);
 
         return baosSig.toByteArray();
@@ -1384,10 +1410,10 @@ public final class AOXAdESSigner implements AOSigner {
                 try {
                     currentTransformList = Utils.getObjectReferenceTransforms(currentElement, XML_SIGNATURE_PREFIX);
                 }
-                catch (NoSuchAlgorithmException e) {
+                catch (final NoSuchAlgorithmException e) {
                     throw new AOException("Se ha declarado una transformacion personalizada de un tipo no soportado", e);
                 }
-                catch (InvalidAlgorithmParameterException e) {
+                catch (final InvalidAlgorithmParameterException e) {
                     throw new AOException("Se han especificado parametros erroneos para una transformacion personalizada", e);
                 }
 
@@ -1433,7 +1459,9 @@ public final class AOXAdESSigner implements AOSigner {
                 getPolicy(extraParams.getProperty("policyIdentifier"),
                           extraParams.getProperty("policyDescription"),
                           extraParams.getProperty("policyQualifier"));
-        if (spi != null) xades.setSignaturePolicyIdentifier(spi);
+        if (spi != null) {
+            xades.setSignaturePolicyIdentifier(spi);
+        }
 
         // SignatureProductionPlace
         final SignatureProductionPlace spp =
@@ -1441,7 +1469,9 @@ public final class AOXAdESSigner implements AOSigner {
                                             extraParams.getProperty("signatureProductionProvince"),
                                             extraParams.getProperty("signatureProductionPostalCode"),
                                             extraParams.getProperty("signatureProductionCountry"));
-        if (spp != null) xades.setSignatureProductionPlace(spp);
+        if (spp != null) {
+            xades.setSignatureProductionPlace(spp);
+        }
 
         // SignerRole
         SignerRole signerRole = null;
@@ -1499,7 +1529,7 @@ public final class AOXAdESSigner implements AOSigner {
         return Utils.writeXML(rootSig, originalXMLProperties, null, null);
     }
 
-    public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -1645,7 +1675,9 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         try {
-            if (targetType == CounterSignTarget.Tree) this.countersignTree(root, keyEntry, extraParams, algorithm);
+            if (targetType == CounterSignTarget.Tree) {
+                this.countersignTree(root, keyEntry, extraParams, algorithm);
+            }
             else if (targetType == CounterSignTarget.Leafs) {
                 this.countersignLeafs(root, keyEntry, extraParams, algorithm);
             }
@@ -1668,7 +1700,7 @@ public final class AOXAdESSigner implements AOSigner {
         // y se vuelve a dejar como raiz el nodo Signature original
         if (esFirmaSimple) {
             try {
-                Document newdoc = dbf.newDocumentBuilder().newDocument();
+                final Document newdoc = dbf.newDocumentBuilder().newDocument();
                 newdoc.appendChild(newdoc.adoptNode(doc.getElementsByTagNameNS(DSIGNNS, "Signature").item(0)));
                 doc = newdoc;
             }
@@ -1691,7 +1723,7 @@ public final class AOXAdESSigner implements AOSigner {
 
         // obtiene todas las firmas
         final NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
-        int numSignatures = signatures.getLength();
+        final int numSignatures = signatures.getLength();
 
         final Element[] nodes = new Element[numSignatures];
         for (int i = 0; i < numSignatures; i++) {
@@ -1719,7 +1751,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Algoritmo de firma XML
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    private void countersignLeafs(final Element root, final PrivateKeyEntry keyEntry, Properties extraParams, String algorithm) throws AOException {
+    private void countersignLeafs(final Element root, final PrivateKeyEntry keyEntry, final Properties extraParams, final String algorithm) throws AOException {
 
         // obtiene todas las firmas
         final NodeList signatures = root.getElementsByTagNameNS(DSIGNNS, "Signature");
@@ -1729,7 +1761,7 @@ public final class AOXAdESSigner implements AOSigner {
         try {
             for (int i = 0; i < numSignatures; i++) {
                 final Element signature = (Element) signatures.item(i);
-                int children = signature.getElementsByTagNameNS(DSIGNNS, "Signature").getLength();
+                final int children = signature.getElementsByTagNameNS(DSIGNNS, "Signature").getLength();
 
                 // y crea sus contrafirmas
                 if (children == 0) {
@@ -1789,8 +1821,8 @@ public final class AOXAdESSigner implements AOSigner {
 
         // y crea sus contrafirmas
         try {
-            for (int i = 0; i < nodes.length; i++) {
-                this.cs(nodes[i], keyEntry, extraParams, algorithm);
+            for (final Element node : nodes) {
+                this.cs(node, keyEntry, extraParams, algorithm);
             }
         }
         catch (final UnsupportedOperationException e) {
@@ -1844,7 +1876,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Algoritmo de firma XML
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    private void cs(final Element signature, final PrivateKeyEntry keyEntry, Properties extraParams, String algorithm) throws AOException {
+    private void cs(final Element signature, final PrivateKeyEntry keyEntry, Properties extraParams, final String algorithm) throws AOException {
 
         if (extraParams == null) {
             extraParams = new Properties();
@@ -1874,7 +1906,9 @@ public final class AOXAdESSigner implements AOSigner {
         if (up.getLength() == 0) {
             unsignedProperties = doc.createElement(XADES_SIGNATURE_PREFIX + ":UnsignedProperties");
         }
-        else unsignedProperties = (Element) up.item(0);
+        else {
+            unsignedProperties = (Element) up.item(0);
+        }
 
         unsignedProperties.appendChild(unsignedSignatureProperties);
 
@@ -2046,7 +2080,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // Se crea el que sera el nodo raiz del arbol
-        TreeNode treeRoot = new TreeNode("Datos");
+        final TreeNode treeRoot = new TreeNode("Datos");
 
         // Se crea el arbol componiendo las subrama de cada firma directa de los
         // datos
@@ -2077,7 +2111,7 @@ public final class AOXAdESSigner implements AOSigner {
                                          final Vector<String> arrayIds,
                                          final Vector<String> arrayRef) {
 
-        int max = arrayIds.size();
+        final int max = arrayIds.size();
 
         if (i < max && j > 0) {
             if (arrayIds.get(i).equals(arrayRef.get(j))) {
@@ -2228,7 +2262,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Listado de nodos de firma.
      * @return Devuelve {@code true} cuando todos los nodos sean firmas en este
      *         formato. */
-    private boolean checkSignNodes(Node rootNode, List<Node> signNodes) {
+    private boolean checkSignNodes(final Node rootNode, final List<Node> signNodes) {
 
         final String xadesNamespace = Utils.guessXAdESNamespaceURL(rootNode);
         for (final Node signNode : signNodes) {
@@ -2276,7 +2310,7 @@ public final class AOXAdESSigner implements AOSigner {
         return docAfirma;
     }
 
-    public AOSignInfo getSignInfo(byte[] sign) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
         if (sign == null) {
             throw new NullPointerException("No se han introducido datos para analizar");
         }
@@ -2326,7 +2360,9 @@ public final class AOXAdESSigner implements AOSigner {
         String mType = null;
 
         // Si no hay datos a analizar
-        if (sign == null) throw new NullPointerException("No se han introducido datos para analizar");
+        if (sign == null) {
+            throw new NullPointerException("No se han introducido datos para analizar");
+        }
 
         // Si no es una firma valida
         if (!isSign(sign)) {

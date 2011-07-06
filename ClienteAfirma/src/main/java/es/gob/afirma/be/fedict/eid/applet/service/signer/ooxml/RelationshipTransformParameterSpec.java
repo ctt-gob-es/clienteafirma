@@ -13,7 +13,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -55,7 +55,7 @@ public class RelationshipTransformParameterSpec implements TransformParameterSpe
 
     /** Adds a relationship reference for the given source identifier.
      * @param sourceId */
-    public void addRelationshipReference(String sourceId) {
+    public void addRelationshipReference(final String sourceId) {
         this.sourceIds.add(sourceId);
     }
 

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -46,7 +46,7 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
         try {
             this.uri = AOUtil.createURI(strUri);
         }
-        catch (AOException e) {
+        catch (final AOException e) {
             this.setError("La URI '" + strUri + "' no es valida", e); //$NON-NLS-1$ //$NON-NLS-2$
             throw new IllegalArgumentException(this.getErrorMessage(), e);
         }
@@ -59,7 +59,7 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
      *        Ruta del fichero.
      * @param parent
      *        Componente padre. */
-    public LoadFileAction(URI fileUri, Component parent) {
+    public LoadFileAction(final URI fileUri, final Component parent) {
         this.uri = fileUri;
         this.parent = parent;
     }
@@ -69,7 +69,7 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
      * original.
      * @param isBase64Encoded
      *        {@code true} si los datos del fichero est&aacute;n en base 64. */
-    public void setBase64Encoded(boolean isBase64Encoded) {
+    public void setBase64Encoded(final boolean isBase64Encoded) {
         this.base64Encoded = isBase64Encoded;
     }
 
@@ -78,7 +78,7 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
      * @param showDialog
      *        <code>true</code> si se desea que se muestre el
      *        di&aacute;logo, <code>false</code> en caso contrario */
-    public void setWaitDialog(boolean showDialog) {
+    public void setWaitDialog(final boolean showDialog) {
         this.waitDialog = showDialog;
     }
 

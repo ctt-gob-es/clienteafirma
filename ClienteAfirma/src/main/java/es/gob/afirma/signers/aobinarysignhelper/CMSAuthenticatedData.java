@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -63,17 +63,17 @@ import es.gob.afirma.ciphers.AOCipherConfig;
 
 /** Clase que implementa firma digital PKCS#7/CMS AuthenticatedData. La
  * Estructura del mensaje es la siguiente:<br>
- * 
+ *
  * <pre>
  * <code>
- * 
+ *
  * id-ct-authData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
  *        us(840) rsadsi(113549) pkcs(1) pkcs-9(9) smime(16)
  *        ct(1) 2 }
- * 
+ *
  *  The authenticated-data content type shall have ASN.1 type
  *  AuthenticatedData:
- * 
+ *
  *     AuthenticatedData ::= SEQUENCE {
  *       version CMSVersion,
  *       originatorInfo [0] IMPLICIT OriginatorInfo OPTIONAL,
@@ -84,16 +84,16 @@ import es.gob.afirma.ciphers.AOCipherConfig;
  *       authAttrs [2] IMPLICIT AuthAttributes OPTIONAL,
  *       mac MessageAuthenticationCode,
  *       unauthAttrs [3] IMPLICIT UnauthAttributes OPTIONAL }
- * 
+ *
  *     AuthAttributes ::= SET SIZE (1..MAX) OF Attribute
- * 
+ *
  *     UnauthAttributes ::= SET SIZE (1..MAX) OF Attribute
- * 
+ *
  *     MessageAuthenticationCode ::= OCTET STRING
- * 
+ *
  * </code>
  * </pre>
- * 
+ *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje AuthenticatedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
@@ -156,7 +156,7 @@ public final class CMSAuthenticatedData {
         }
 
         // 2. RECIPIENTINFOS
-        Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
 
         // 3. MACALGORITHM
         AlgorithmIdentifier macAlgorithm = null;
@@ -169,15 +169,15 @@ public final class CMSAuthenticatedData {
 
         // 4. DIGESTALGORITMIDENTIFIER
         AlgorithmIdentifier digAlgId;
-        String signatureAlgorithm = parameters.getSignatureAlgorithm();
+        final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         String digestAlgorithm = null;
 
-        int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with");
         if (with > 0) {
             digestAlgorithm = signatureAlgorithm.substring(0, with);
         }
 
-        AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
+        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
         try {
             digAlgId = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
         }
@@ -190,14 +190,14 @@ public final class CMSAuthenticatedData {
         // si se introduce el contenido o no
 
         ContentInfo encInfo = null;
-        ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
-        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-        byte[] content2 = parameters.getContent();
-        CMSProcessable msg = new CMSProcessableByteArray(content2);
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
+        final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        final byte[] content2 = parameters.getContent();
+        final CMSProcessable msg = new CMSProcessableByteArray(content2);
         try {
             msg.write(bOut);
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             throw new IOException("Error en la escritura del procesable CMS: " + ex);
         }
         encInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
@@ -212,7 +212,7 @@ public final class CMSAuthenticatedData {
         try {
             mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), cipherKey);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e);
         }
 
@@ -252,17 +252,17 @@ public final class CMSAuthenticatedData {
      * @return Los atributos firmados de la firma.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se encuentra un algoritmo v&aacute;lido. */
-    private ASN1Set generateSignedAtt(X509Certificate cert,
+    private ASN1Set generateSignedAtt(final X509Certificate cert,
                                       String digestAlgorithm,
-                                      byte[] datos,
-                                      Oid datatype,
-                                      boolean timestamp,
-                                      Map<Oid, byte[]> atrib) throws NoSuchAlgorithmException {
+                                      final byte[] datos,
+                                      final Oid datatype,
+                                      final boolean timestamp,
+                                      final Map<Oid, byte[]> atrib) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
         ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype.toString()))));
@@ -273,9 +273,15 @@ public final class CMSAuthenticatedData {
         }
 
         // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equals("SHA512")) digestAlgorithm = "SHA-512";
-        else if (digestAlgorithm.equals("SHA384")) digestAlgorithm = "SHA-384";
-        else if (digestAlgorithm.equals("SHA256")) digestAlgorithm = "SHA-256";
+        if (digestAlgorithm.equals("SHA512")) {
+            digestAlgorithm = "SHA-512";
+        }
+        else if (digestAlgorithm.equals("SHA384")) {
+            digestAlgorithm = "SHA-384";
+        }
+        else if (digestAlgorithm.equals("SHA256")) {
+            digestAlgorithm = "SHA-256";
+        }
 
         // Si nos viene el hash de fuera no lo calculamos
         final byte[] md = MessageDigest.getInstance(digestAlgorithm).digest(datos);
@@ -290,9 +296,9 @@ public final class CMSAuthenticatedData {
         // agregamos la lista de atributos a mayores.
         if (atrib.size() != 0) {
 
-            Iterator<Map.Entry<Oid, byte[]>> it = atrib.entrySet().iterator();
+            final Iterator<Map.Entry<Oid, byte[]>> it = atrib.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<Oid, byte[]> e = it.next();
+                final Map.Entry<Oid, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
@@ -325,25 +331,25 @@ public final class CMSAuthenticatedData {
      * @return La nueva firma AuthenticatedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
      *         nueva. */
-    public byte[] addOriginatorInfo(InputStream data, X509Certificate[] signerCertificateChain) {
+    public byte[] addOriginatorInfo(final InputStream data, final X509Certificate[] signerCertificateChain) {
         // boolean isValid = false;
         byte[] retorno = null;
 
-        ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1InputStream is = new ASN1InputStream(data);
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         try {
             dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
                 // Contenido de Data
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
-                AuthenticatedData auth = new AuthenticatedData((ASN1Sequence) doj.getObject());
+                final AuthenticatedData auth = new AuthenticatedData((ASN1Sequence) doj.getObject());
 
-                AlgorithmIdentifier digAlg = extractAOIfromAuth((ASN1Sequence) doj.getObject());
+                final AlgorithmIdentifier digAlg = extractAOIfromAuth((ASN1Sequence) doj.getObject());
 
                 // Obtenemos los originatorInfo
                 OriginatorInfo origInfo = auth.getOriginatorInfo();
@@ -369,16 +375,16 @@ public final class CMSAuthenticatedData {
                                           )).getDEREncoded();
             }
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de insercion: " + ex);
         }
 
         return retorno;
     }
 
-    private AlgorithmIdentifier extractAOIfromAuth(ASN1Sequence auth) {
+    private AlgorithmIdentifier extractAOIfromAuth(final ASN1Sequence auth) {
 
-        Enumeration<?> e = auth.getObjects();
+        final Enumeration<?> e = auth.getObjects();
         // Elemento 0 : version
         e.nextElement();
         // Elemento 1 : OriginatorInfo
@@ -389,9 +395,9 @@ public final class CMSAuthenticatedData {
         e.nextElement();
 
         // Elemento 4 : DigestAlgorithm
-        DERTaggedObject alg = (DERTaggedObject) e.nextElement();
-        ASN1Sequence content = (ASN1Sequence) alg.getObject();
-        AlgorithmIdentifier aoi = new AlgorithmIdentifier(content);
+        final DERTaggedObject alg = (DERTaggedObject) e.nextElement();
+        final ASN1Sequence content = (ASN1Sequence) alg.getObject();
+        final AlgorithmIdentifier aoi = new AlgorithmIdentifier(content);
 
         return aoi;
     }

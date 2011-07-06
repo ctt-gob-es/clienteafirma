@@ -39,10 +39,10 @@ public final class TestXAdES {
         assertNotNull("No se ha podido instanciar el Signer", signer);
         byte[] result = null;
         PrivateKeyEntry pke = null;
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (byte[] content : TEST_CONTENT) {
-                for (String algo : ALGOS) {
-                    for (Properties extraParams : XADES_MODES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final byte[] content : TEST_CONTENT) {
+                for (final String algo : ALGOS) {
+                    for (final Properties extraParams : XADES_MODES) {
 
                         System.out.println();
                         System.out.println();
@@ -53,8 +53,12 @@ public final class TestXAdES {
                                          + "', formato '"
                                          + extraParams.getProperty("format")
                                          + "' y contenido ");
-                        if (content.equals(TestUtils.BIN_CONTENT)) System.out.println("binario");
-                        else System.out.println("XML");
+                        if (content.equals(TestUtils.BIN_CONTENT)) {
+                            System.out.println("binario");
+                        }
+                        else {
+                            System.out.println("XML");
+                        }
 
                         if (AOConstants.AOKeyStore.WINDOWS.equals(kstore) && AOConstants.SIGN_ALGORITHM_SHA512WITHRSA.equals(algo)) {
                             System.out.println("Omitimos las pruebas en CAPI con SHA2 por errores conocidos de Java");
@@ -109,13 +113,15 @@ public final class TestXAdES {
             e.printStackTrace();
             xml = null;
         }
-        if (xml != null && xml.length == 0) xml = null;
+        if (xml != null && xml.length == 0) {
+            xml = null;
+        }
         assertNotNull("No se ha podido cargar el XML a contrafirmar", xml);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
-                for (Properties extraParams : XADES_MODES) {
-                    for (CounterSignTarget targetType : CS_TARGETS) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
+                for (final Properties extraParams : XADES_MODES) {
+                    for (final CounterSignTarget targetType : CS_TARGETS) {
 
                         System.out.println();
                         System.out.println();
@@ -179,12 +185,14 @@ public final class TestXAdES {
             e.printStackTrace();
             xml = null;
         }
-        if (xml != null && xml.length == 0) xml = null;
+        if (xml != null && xml.length == 0) {
+            xml = null;
+        }
         assertNotNull("No se ha podido cargar el XML a cofirmar", xml);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
-                for (Properties extraParams : XADES_MODES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
+                for (final Properties extraParams : XADES_MODES) {
 
                     System.out.println();
                     System.out.println();

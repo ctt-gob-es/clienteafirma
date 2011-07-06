@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -37,7 +37,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
     private Hashtable<String, KeyStore> storesByAlias;
 
-    private Vector<KeyStore> kss = new Vector<KeyStore>();
+    private final Vector<KeyStore> kss = new Vector<KeyStore>();
 
     /** Componente padre sobre el que montar los di&aacute;logos modales. */
     private Component parentComponent = null;
@@ -95,7 +95,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
             try {
                 ks = KeyStore.getInstance(AOConstants.AOKeyStore.MOZILLA.getName(), nssProvider);
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma")
                       .warning("No se ha podido obtener el KeyStore de nombre '" + AOConstants.AOKeyStore.MOZILLA.getName()
                                + "' del Provider 'sun.security.pkcs11.SunPKCS11', se continuara con los almacenes externos: "
@@ -142,7 +142,9 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
             }
         }
 
-        if (ks != null) kss.add(ks);
+        if (ks != null) {
+            kss.add(ks);
+        }
 
         // Vamos ahora con los almacenes externos
         final Hashtable<String, String> externalStores = MozillaKeyStoreUtilities.getMozillaPKCS11Modules();
@@ -156,11 +158,13 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
             }
             Logger.getLogger("es.gob.afirma").info(logStr.toString());
         }
-        else Logger.getLogger("es.gob.afirma").info("No se han encontrado modulos PKCS#11 externos instalados en Mozilla / Firefox");
+        else {
+            Logger.getLogger("es.gob.afirma").info("No se han encontrado modulos PKCS#11 externos instalados en Mozilla / Firefox");
+        }
 
         KeyStore tmpStore = null;
         Object descr;
-        for (Enumeration<String> e = externalStores.keys(); e.hasMoreElements();) {
+        for (final Enumeration<String> e = externalStores.keys(); e.hasMoreElements();) {
             descr = e.nextElement();
             try {
                 tmpStore =
@@ -186,7 +190,9 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
             Logger.getLogger("es.gob.afirma").info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas");
 
-            if (ks == null) ks = tmpStore;
+            if (ks == null) {
+                ks = tmpStore;
+            }
 
             tmpAlias = new Vector<String>(0).elements();
             try {
@@ -207,7 +213,9 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
             kss.add(tmpStore);
         }
 
-        if (kss.isEmpty()) throw new AOException("No se ha podido inicializar ningun almacen, interno o externo, de Mozilla Firefox");
+        if (kss.isEmpty()) {
+            throw new AOException("No se ha podido inicializar ningun almacen, interno o externo, de Mozilla Firefox");
+        }
 
         return kss;
     }
@@ -234,7 +242,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         }
         final String[] tmpAlias = new String[storesByAlias.size()];
         int i = 0;
-        for (Enumeration<String> e = storesByAlias.keys(); e.hasMoreElements();) {
+        for (final Enumeration<String> e = storesByAlias.keys(); e.hasMoreElements();) {
             tmpAlias[i] = e.nextElement().toString();
             i++;
         }
@@ -244,11 +252,15 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
     @Override
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) throws AOCancelledOperationException {
 
-        if (pssCallback == null) pssCallback = new NullPasswordCallback();
+        if (pssCallback == null) {
+            pssCallback = new NullPasswordCallback();
+        }
 
         final KeyStore tmpStore = storesByAlias.get(alias);
-        if (tmpStore == null) throw new NullPointerException("No hay ninguna almacen de Mozilla que contenga un certificado con el alias '" + alias
-                                                             + "'");
+        if (tmpStore == null) {
+            throw new NullPointerException("No hay ninguna almacen de Mozilla que contenga un certificado con el alias '" + alias
+                                                                 + "'");
+        }
         final KeyStore.PrivateKeyEntry keyEntry;
         try {
             keyEntry = (KeyStore.PrivateKeyEntry) tmpStore.getEntry(alias, new KeyStore.PasswordProtection(pssCallback.getPassword()));
@@ -289,9 +301,11 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         }
         for (final KeyStore ks : kss) {
             try {
-                if (ks.containsAlias(alias)) return (X509Certificate) ks.getCertificate(alias);
+                if (ks.containsAlias(alias)) {
+                    return (X509Certificate) ks.getCertificate(alias);
+                }
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").info("El KeyStore '" + ks
                                                        + "' no contenia o no pudo recuperar el certificado para el alias '"
                                                        + alias

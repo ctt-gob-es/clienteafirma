@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -51,7 +51,9 @@ public final class RelationshipsParser {
      * @return Identificador de relaci&oacute;n. */
     public String getRelationshipId(final String type) {
         for (final RelationShip relation : relations) {
-            if (relation.getType().equalsIgnoreCase(type)) return relation.getId();
+            if (relation.getType().equalsIgnoreCase(type)) {
+                return relation.getId();
+            }
         }
         return null;
     }
@@ -63,7 +65,9 @@ public final class RelationshipsParser {
      * @return Relaci&oacute;n. */
     public RelationShip getRelation(final String id) {
         for (final RelationShip relation : relations) {
-            if (relation.getId().equalsIgnoreCase(id)) return relation;
+            if (relation.getId().equalsIgnoreCase(id)) {
+                return relation;
+            }
         }
         return null;
     }
@@ -96,7 +100,9 @@ public final class RelationshipsParser {
 
         // Si no se ajusta a la estructura de las Relationships, devolvemos null
         if (!root.getNodeName().equals("Relationships") || root.getAttributeNode("xmlns") == null
-            || !root.getAttribute("xmlns").equals(RELATIONSHIPS_SCHEMA)) throw new AOException("El nodo principal no es una etiqueta Relationships");
+            || !root.getAttribute("xmlns").equals(RELATIONSHIPS_SCHEMA)) {
+            throw new AOException("El nodo principal no es una etiqueta Relationships");
+        }
 
         final NodeList relationsList = root.getChildNodes();
         final Vector<RelationShip> relationsVector = new Vector<RelationShip>();
@@ -121,12 +127,16 @@ public final class RelationshipsParser {
     private RelationShip getRelationship(final Node node) throws AOException {
 
         // Comprobamos que sea un nodo de relacion
-        if (!node.getNodeName().equals("Relationship")) throw new AOException("Se ha encontrado un nodo que es de relacion: " + node.getNodeName());
+        if (!node.getNodeName().equals("Relationship")) {
+            throw new AOException("Se ha encontrado un nodo que es de relacion: " + node.getNodeName());
+        }
 
         // Comprobamos que tenga todos sus atributos
         final NamedNodeMap attributes = node.getAttributes();
 
-        if (attributes.getNamedItem("Id") == null || attributes.getNamedItem("Type") == null || attributes.getNamedItem("Target") == null) throw new AOException("Se ha encontrado un nodo de relacion que no disponia de todos sus atributos");
+        if (attributes.getNamedItem("Id") == null || attributes.getNamedItem("Type") == null || attributes.getNamedItem("Target") == null) {
+            throw new AOException("Se ha encontrado un nodo de relacion que no disponia de todos sus atributos");
+        }
 
         // Creamos la relacion
         return new RelationShip(attributes.getNamedItem("Id").getNodeValue(),

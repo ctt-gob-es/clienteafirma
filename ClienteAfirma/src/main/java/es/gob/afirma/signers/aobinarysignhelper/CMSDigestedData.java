@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -27,7 +27,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
 
 /** Clase base para la implementaci&oacute;n del tipo DigestedData La Estructura
  * del mensaje es la siguiente:<br>
- * 
+ *
  * <pre>
  * <code>
  *  DigestedData ::= SEQUENCE {
@@ -35,11 +35,11 @@ import es.gob.afirma.misc.AOCryptoUtil;
  *        digestAlgorithm DigestAlgorithmIdentifier,
  *        encapContentInfo EncapsulatedContentInfo,
  *        digest Digest }
- * 
+ *
  *  Digest ::= OCTET STRING
  * </code>
  * </pre>
- * 
+ *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje DigestedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
@@ -63,21 +63,21 @@ public final class CMSDigestedData {
                                                                                                          IOException {
 
         // Obtenemos el algoritmo para hacer el digest
-        AlgorithmId digestAlgorithmId = AlgorithmId.get(AOCryptoUtil.getDigestAlgorithmName(digestAlgorithm));
+        final AlgorithmId digestAlgorithmId = AlgorithmId.get(AOCryptoUtil.getDigestAlgorithmName(digestAlgorithm));
         org.bouncycastle.asn1.x509.AlgorithmIdentifier digAlgId;
         try {
             digAlgId = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e);
         }
 
         // indicamos el tipo de contenido
-        ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
-        ContentInfo encInfo = new ContentInfo(contentTypeOID, null);
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
+        final ContentInfo encInfo = new ContentInfo(contentTypeOID, null);
 
         // digest
-        DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm).digest(content));
+        final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm).digest(content));
 
         // construimos el digestedData.
         return new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest)).getDEREncoded();

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -29,10 +29,10 @@ final class AOXMLTransform {
      *        Subtipo de la transformaci&oacute;n.
      * @param body
      *        Cuerpo de la transformaci&oacute;n. */
-    AOXMLTransform(String type, String subtype, String body) {
-
-        if (type == null) throw new NullPointerException("El tipo de una transformacion XML no puede ser nulo");
-
+    AOXMLTransform(final String type, final String subtype, final String body) {
+        if (type == null) {
+            throw new NullPointerException("El tipo de una transformacion XML no puede ser nulo");
+        }
         this.type = type;
         this.subtype = subtype;
         this.body = body;

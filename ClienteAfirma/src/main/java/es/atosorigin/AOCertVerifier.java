@@ -237,27 +237,27 @@ import es.gob.afirma.misc.AOUtil;
  * <code><pre>
  *      // Instanciamos la clase verificadora
  *      AOCertVerifier v = new AOCertVerifier();
- *      
+ *
  *      // Indicamos que verifique la validez temporal del certificado
  *      v.setCheckValidity(true);
- *      
+ *
  *      // Anadimos un cerificado raiz desde LDAP (DNIe CA)
  *      v.addRootCertificatesFromLdap(
- *          "ldap.dnie.es", 
+ *          "ldap.dnie.es",
  *          new LdapName("CN=AC RAIZ DNIE,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES")
  *      );
- * 
+ *
  *      // Anadimos un par de certificados raiz desde disco duro (DNIe VA)
  *      v.addRootCertificate(new FileInputStream(new File("c:\\AVDNIEFNMTSHA1.cer")));
  *      v.addRootCertificate(new FileInputStream(new File("c:\\AVDNIEFNMTSHA2.cer")));
  *      // Habilitamos el OCSP (DNIe SHA-1)
  *      v.enableOCSP(
- *          new URL("http://ocsp.dnielectronico.es:80"), 
+ *          new URL("http://ocsp.dnielectronico.es:80"),
  *          new LdapName("CN=AV DNIE FNMT,OU=FNMT,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES"),
  *          new LdapName("CN=AC DNIE 001,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES"),
  *          "34:23:43:b8:af:dd:e6:fd:4a:16:97:3f:bc:90:cc:b3"
  *      );
- *      
+ *
  *      // Verificamos el certificado de alias 'myAlias' que esta en el KeyStore 'myKeyStore'
  *      v.checkCertificate(
  *              myKeyStore.getCertificateChain("myAlias")
@@ -268,7 +268,7 @@ import es.gob.afirma.misc.AOUtil;
 
 public final class AOCertVerifier {
 
-    private Set<TrustAnchor> tas = new HashSet<TrustAnchor>();
+    private final Set<TrustAnchor> tas = new HashSet<TrustAnchor>();
 
     private boolean checkValidity = true;
 
@@ -354,7 +354,10 @@ public final class AOCertVerifier {
         }
 
         // Comprobamos que el nombre sea correcto
-        if (server.startsWith("ldap://")) server = server.replace("ldap://", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        if (server.startsWith("ldap://"))
+         {
+            server = server.replace("ldap://", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        }
         int port = 389;
         if (server.contains(":")) { //$NON-NLS-1$
             String tmpPort = server.substring(server.indexOf(":") + 1, server.length() //$NON-NLS-1$
@@ -377,7 +380,10 @@ public final class AOCertVerifier {
             }
             server = tmpRoot;
         }
-        if (server.contains("/")) server = server.substring(0, server.indexOf("/")); //$NON-NLS-1$ //$NON-NLS-2$
+        if (server.contains("/"))
+         {
+            server = server.substring(0, server.indexOf("/")); //$NON-NLS-1$ //$NON-NLS-2$
+        }
 
         final CertStore cs;
         try {
@@ -420,7 +426,7 @@ public final class AOCertVerifier {
      * @param c
      *        <code>true</code> si se desea comprobar la validez temporal
      *        del certificado, <code>false</code> en caso contrario */
-    public void setCheckValidity(boolean c) {
+    public void setCheckValidity(final boolean c) {
         checkValidity = c;
     }
 
@@ -485,21 +491,23 @@ public final class AOCertVerifier {
 
         errorMessage = null;
 
-        if (checkValidity || !verifyRevocation) for (Certificate c : certChain) {
-            try {
-                ((X509Certificate) c).checkValidity();
-            }
-            catch (final CertificateExpiredException e) {
-                errorMessage = Messages.getString("AOCertVerifier.0"); //$NON-NLS-1$
-                throw e;
-            }
-            catch (final CertificateNotYetValidException e) {
-                errorMessage = Messages.getString("AOCertVerifier.1"); //$NON-NLS-1$
-                throw e;
-            }
-            catch (final Exception e) {
-                errorMessage = Messages.getString("AOCertVerifier.2"); //$NON-NLS-1$
-                throw new AOException(errorMessage, e);
+        if (checkValidity || !verifyRevocation) {
+            for (final Certificate c : certChain) {
+                try {
+                    ((X509Certificate) c).checkValidity();
+                }
+                catch (final CertificateExpiredException e) {
+                    errorMessage = Messages.getString("AOCertVerifier.0"); //$NON-NLS-1$
+                    throw e;
+                }
+                catch (final CertificateNotYetValidException e) {
+                    errorMessage = Messages.getString("AOCertVerifier.1"); //$NON-NLS-1$
+                    throw e;
+                }
+                catch (final Exception e) {
+                    errorMessage = Messages.getString("AOCertVerifier.2"); //$NON-NLS-1$
+                    throw new AOException(errorMessage, e);
+                }
             }
         }
 
@@ -549,18 +557,18 @@ public final class AOCertVerifier {
             // el certificado no sea valido es que este revocado. En Java 7, la clase
             // CertificateRevokedException es publica y permite recuperar la fecha y el motivo
             // de la revocacion
-            Throwable cause = e.getCause();
-            Class<? extends Throwable> exceptionClass = cause != null ? cause.getClass() : e.getClass();
+            final Throwable cause = e.getCause();
+            final Class<? extends Throwable> exceptionClass = cause != null ? cause.getClass() : e.getClass();
             if (exceptionClass.getSimpleName().equals("CertificateRevokedException")) {
-                AOCertificateRevokedException cre = new AOCertificateRevokedException(Messages.getString("AOCertVerifier.8"), e);
+                final AOCertificateRevokedException cre = new AOCertificateRevokedException(Messages.getString("AOCertVerifier.8"), e);
                 try {
-                    Method getRevocationDateMethod = exceptionClass.getMethod("getRevocationDate", (Class[]) null);
+                    final Method getRevocationDateMethod = exceptionClass.getMethod("getRevocationDate", (Class[]) null);
                     cre.setRevocationDate((Date) getRevocationDateMethod.invoke(cause, (Object[]) null));
 
-                    Method getRevocationReasonMethod = exceptionClass.getMethod("getRevocationReason", (Class[]) null);
+                    final Method getRevocationReasonMethod = exceptionClass.getMethod("getRevocationReason", (Class[]) null);
                     cre.setRevocationReason((String) getRevocationReasonMethod.invoke(cause, (Object[]) null));
                 }
-                catch (Exception e2) {
+                catch (final Exception e2) {
                     // En java 6 estos metodos no existiran
                 }
                 throw cre;

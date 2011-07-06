@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -51,20 +51,20 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSData(byte[] data) {
+    public boolean isCMSData(final byte[] data) {
         boolean isValid = true;
         try {
-            ASN1InputStream is = new ASN1InputStream(data);
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1InputStream is = new ASN1InputStream(data);
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.data)) {
                 isValid = false;
             }
             else {
                 // Contenido de Data
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
                 /*
                  * Si no es un objeto de tipo Dara se pasa al manejo de la
@@ -73,7 +73,7 @@ public final class ValidateCMS {
                 new DEROctetString(doj.getObject());
             }
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
             // + ex);
             isValid = false;
@@ -86,31 +86,31 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSSignedData(byte[] data) {
+    public boolean isCMSSignedData(final byte[] data) {
         boolean isValid = true;
         try {
-            ASN1InputStream is = new ASN1InputStream(data);
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1InputStream is = new ASN1InputStream(data);
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.signedData)) {
                 isValid = false;
             }
             else {
                 // Contenido de SignedData
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-                SignedData sd = new SignedData(datos);
-                ASN1Set signerInfosSd = sd.getSignerInfos();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+                final SignedData sd = new SignedData(datos);
+                final ASN1Set signerInfosSd = sd.getSignerInfos();
 
                 for (int i = 0; isValid && i < signerInfosSd.size(); i++) {
-                    SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
                     isValid = verifySignerInfo(si);
                 }
             }
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
             // + ex);
             isValid = false;
@@ -124,10 +124,10 @@ public final class ValidateCMS {
      *        SignerInfo para la verificaci&oacute;n del p&aacute;rametro
      *        adecuado.
      * @return si contiene el par&aacute;metro. */
-    private boolean verifySignerInfo(SignerInfo si) {
+    private boolean verifySignerInfo(final SignerInfo si) {
         boolean isSignerValid = true;
-        ASN1Set attrib = si.getAuthenticatedAttributes();
-        Enumeration<?> e = attrib.getObjects();
+        final ASN1Set attrib = si.getAuthenticatedAttributes();
+        final Enumeration<?> e = attrib.getObjects();
         Attribute atribute;
         while (isSignerValid && e.hasMoreElements()) {
             atribute = new Attribute((ASN1Sequence) e.nextElement());
@@ -144,20 +144,20 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSDigestedData(byte[] data) {
+    public boolean isCMSDigestedData(final byte[] data) {
         boolean isValid = true;
         try {
-            ASN1InputStream is = new ASN1InputStream(data);
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1InputStream is = new ASN1InputStream(data);
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.digestedData)) {
                 isValid = false;
             }
             else {
                 // Contenido de Data
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
 
                 /*
                  * Estas variables no se usan, solo es para verificar que la
@@ -167,7 +167,7 @@ public final class ValidateCMS {
                 new DigestedData((ASN1Sequence) doj.getObject());
             }
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
             // + ex);
             isValid = false;
@@ -180,21 +180,21 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSEncryptedData(byte[] data) {
+    public boolean isCMSEncryptedData(final byte[] data) {
         boolean isValid = true;
         try {
-            ASN1InputStream is = new ASN1InputStream(data);
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1InputStream is = new ASN1InputStream(data);
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.encryptedData)) {
                 isValid = false;
             }
             else {
                 // Contenido de Data
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                ASN1Sequence asq = (ASN1Sequence) doj.getObject();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1Sequence asq = (ASN1Sequence) doj.getObject();
 
                 /*
                  * Si no es de tipo EncryptedData se pasa al manejo de la
@@ -204,7 +204,7 @@ public final class ValidateCMS {
                 EncryptedContentInfo.getInstance(asq.getObjectAt(1));
             }
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
             // + ex);
             isValid = false;
@@ -217,20 +217,20 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSEnvelopedData(byte[] data) {
+    public boolean isCMSEnvelopedData(final byte[] data) {
         boolean isValid = true;
         try {
-            ASN1InputStream is = new ASN1InputStream(data);
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1InputStream is = new ASN1InputStream(data);
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.envelopedData)) {
                 isValid = false;
             }
             else {
                 // Contenido de Data
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
                 /*
                  * Si no se construye el objeto correctamente, se pasa al manejo
                  * de la excepcion
@@ -239,7 +239,7 @@ public final class ValidateCMS {
             }
 
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
             // + ex);
             isValid = false;
@@ -253,32 +253,32 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSSignedAndEnvelopedData(byte[] data) {
+    public boolean isCMSSignedAndEnvelopedData(final byte[] data) {
         boolean isValid = true;
         try {
-            ASN1InputStream is = new ASN1InputStream(data);
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1InputStream is = new ASN1InputStream(data);
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.signedAndEnvelopedData)) {
                 isValid = false;
             }
             else {
                 // Contenido de SignedData
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                ASN1Sequence datos = (ASN1Sequence) doj.getObject();
-                SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
-                ASN1Set signerInfosSd = sd.getSignerInfos();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
+                final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
+                final ASN1Set signerInfosSd = sd.getSignerInfos();
 
                 for (int i = 0; i < signerInfosSd.size() && isValid; i++) {
-                    SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
+                    final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
                     isValid = verifySignerInfo(si);
                 }
             }
 
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
             // + ex);
             isValid = false;
@@ -290,28 +290,28 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSAuthenticatedData(byte[] data) {
+    public boolean isCMSAuthenticatedData(final byte[] data) {
         boolean isValid = true;
         // Leemos el fichero que contiene la firma.
-        ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1InputStream is = new ASN1InputStream(data);
 
         try {
             // Comenzamos a obtener los datos.
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID AuthenticatedData.
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.id_ct_authData)) {
                 isValid = false;
             }
             else {
                 // Contenido de AuthenticatedData
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                ASN1Sequence authenticatedData = (ASN1Sequence) doj.getObject();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1Sequence authenticatedData = (ASN1Sequence) doj.getObject();
                 AuthenticatedData.getInstance(authenticatedData);
             }
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo AuthenticatedData:  "
             // + ex);
             isValid = false;
@@ -324,29 +324,29 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSAuthenticatedEnvelopedData(byte[] data) {
+    public boolean isCMSAuthenticatedEnvelopedData(final byte[] data) {
         boolean isValid = true;
         // Leemos el fichero que contiene la firma.
-        ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1InputStream is = new ASN1InputStream(data);
 
         try {
             // Comenzamos a obtener los datos.
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID
             // AuthenticatedEnvelopedData.
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.id_ct_authEnvelopedData)) {
                 isValid = false;
             }
             else {
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                ASN1Sequence authenticatedEnvelopedData = (ASN1Sequence) doj.getObject();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1Sequence authenticatedEnvelopedData = (ASN1Sequence) doj.getObject();
                 AuthEnvelopedData.getInstance(authenticatedEnvelopedData);
             }
 
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo AuthenticatedEnvelopedData:  "
             // + ex);
             isValid = false;
@@ -358,27 +358,27 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSCompressedData(byte[] data) {
+    public boolean isCMSCompressedData(final byte[] data) {
         boolean isValid = true;
         // Leemos el fichero que contiene la firma.
-        ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1InputStream is = new ASN1InputStream(data);
         try {
             // Comenzamos a obtener los datos.
-            ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-            Enumeration<?> e = dsq.getObjects();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
+            final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID CompressedData.
-            DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+            final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(CMSObjectIdentifiers.compressedData)) {
                 isValid = false;
             }
             else {
                 // Contenido de CompressedData
-                ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-                ASN1Sequence compressedData = (ASN1Sequence) doj.getObject();
+                final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+                final ASN1Sequence compressedData = (ASN1Sequence) doj.getObject();
                 CompressedData.getInstance(compressedData);
             }
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo CompressedData:  "
             // + ex);
             isValid = false;

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -93,8 +93,8 @@ public final class AOCryptoUtil {
     public static AOSigner getSigner(final File signFile) {
 
         int nBytes = 0;
-        byte[] buffer = new byte[1024];
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final byte[] buffer = new byte[1024];
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final InputStream fis;
         try {
             fis = new FileInputStream(signFile);
@@ -111,12 +111,12 @@ public final class AOCryptoUtil {
         }
         catch (final Exception e) {}
 
-        AOSigner signer = AOSignerFactory.getSigner(baos.toByteArray());
+        final AOSigner signer = AOSignerFactory.getSigner(baos.toByteArray());
 
         try {
             baos.close();
         }
-        catch (Exception e) {}
+        catch (final Exception e) {}
 
         return signer;
     }
@@ -137,8 +137,12 @@ public final class AOCryptoUtil {
             || store == AOConstants.AOKeyStore.SINGLE
             || store == AOConstants.AOKeyStore.MOZILLA
             || store == AOConstants.AOKeyStore.MOZ_UNI
-            || store == AOConstants.AOKeyStore.PKCS11) pssCallback = new NullPasswordCallback();
-        else pssCallback = new UIPasswordCallback("Contrase\u00F1a del certificado", parent);
+            || store == AOConstants.AOKeyStore.PKCS11) {
+            pssCallback = new NullPasswordCallback();
+        }
+        else {
+            pssCallback = new UIPasswordCallback("Contrase\u00F1a del certificado", parent);
+        }
 
         return pssCallback;
     }
@@ -151,17 +155,22 @@ public final class AOCryptoUtil {
      *        Componente sobre el que se deben visualizar los
      *        di&aacute;logos modales.
      * @return Manejador para la solicitud de la clave. */
-    public static PasswordCallback getPreferredPCB(AOConstants.AOKeyStore kStore, Component parent) {
+    public static PasswordCallback getPreferredPCB(final AOConstants.AOKeyStore kStore, final Component parent) {
 
-        if (kStore == null) throw new NullPointerException("No se ha indicado el KeyStore del que desea " + //$NON-NLS-1$
-                                                           "obtener le PasswordCallBack"); //$NON-NLS-1$
+        if (kStore == null)
+         {
+            throw new NullPointerException("No se ha indicado el KeyStore del que desea " + //$NON-NLS-1$
+                                                               "obtener le PasswordCallBack"); //$NON-NLS-1$
+        }
 
         PasswordCallback pssCallback;
         if (kStore == AOConstants.AOKeyStore.WINDOWS || kStore == AOConstants.AOKeyStore.WINROOT
             || kStore == AOConstants.AOKeyStore.PKCS11
-            || kStore == AOConstants.AOKeyStore.APPLE) pssCallback = new NullPasswordCallback();
+            || kStore == AOConstants.AOKeyStore.APPLE) {
+            pssCallback = new NullPasswordCallback();
+        }
         else {
-            pssCallback = new UIPasswordCallback(Messages.getString("AOCryptoUtil.0", kStore.getDescription()), parent); //$NON-NLS-1$ 
+            pssCallback = new UIPasswordCallback(Messages.getString("AOCryptoUtil.0", kStore.getDescription()), parent); //$NON-NLS-1$
         }
         return pssCallback;
     }
@@ -182,9 +191,9 @@ public final class AOCryptoUtil {
             try {
                 isCert.close();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("No se pudo decodificar el certificado en Base64, se devolvera null: " + e);
             return null;
         }
@@ -197,25 +206,39 @@ public final class AOCryptoUtil {
      *        Nombre o variante del nombre del algoritmo de huella digital
      * @return Nombre del algoritmo de huella digital */
     public static String getDigestAlgorithmName(final String pseudoName) {
-        String upperPseudoName = pseudoName.toUpperCase();
+        final String upperPseudoName = pseudoName.toUpperCase();
         if (upperPseudoName.equals("SHA") || upperPseudoName.equals(DigestMethod.SHA1.toUpperCase())
             || upperPseudoName.startsWith("SHA1")
-            || upperPseudoName.startsWith("SHA-1")) return "SHA1";
+            || upperPseudoName.startsWith("SHA-1")) {
+            return "SHA1";
+        }
 
         if (upperPseudoName.equals(DigestMethod.SHA256.toUpperCase()) || upperPseudoName.startsWith("SHA256")
-            || upperPseudoName.startsWith("SHA-256")) return "SHA-256";
+            || upperPseudoName.startsWith("SHA-256")) {
+            return "SHA-256";
+        }
 
-        if (upperPseudoName.startsWith("SHA384") || upperPseudoName.startsWith("SHA-384")) return "SHA-384";
+        if (upperPseudoName.startsWith("SHA384") || upperPseudoName.startsWith("SHA-384")) {
+            return "SHA-384";
+        }
 
         if (upperPseudoName.equals(DigestMethod.SHA512.toUpperCase()) || upperPseudoName.startsWith("SHA512")
-            || upperPseudoName.startsWith("SHA-512")) return "SHA-512";
+            || upperPseudoName.startsWith("SHA-512")) {
+            return "SHA-512";
+        }
 
         if (upperPseudoName.equals(DigestMethod.RIPEMD160.toUpperCase()) || upperPseudoName.startsWith("RIPEMD160")
-            || upperPseudoName.startsWith("RIPEMD-160")) return "RIPEMD160";
+            || upperPseudoName.startsWith("RIPEMD-160")) {
+            return "RIPEMD160";
+        }
 
-        if (upperPseudoName.equals("MD5") || upperPseudoName.startsWith("MD5")) return "MD5";
+        if (upperPseudoName.equals("MD5") || upperPseudoName.startsWith("MD5")) {
+            return "MD5";
+        }
 
-        if (upperPseudoName.equals("MD2") || upperPseudoName.startsWith("MD2")) return "MD2";
+        if (upperPseudoName.equals("MD2") || upperPseudoName.startsWith("MD2")) {
+            return "MD2";
+        }
 
         throw new IllegalArgumentException("Algoritmo de huella digital no soportado: " + pseudoName);
     }
@@ -228,7 +251,7 @@ public final class AOCryptoUtil {
      *        Indica si debe insertarse un salto de l&iacute;nea cada 76
      *        caracteres.
      * @return Cadena en base 64. */
-    public static String encodeBase64(byte[] data, boolean chunked) {
+    public static String encodeBase64(final byte[] data, final boolean chunked) {
 
         try {
             return StringUtils.newStringUtf8(Base64.encodeBase64(data, chunked));

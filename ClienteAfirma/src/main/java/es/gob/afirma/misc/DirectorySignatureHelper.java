@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -98,7 +98,7 @@ public class DirectorySignatureHelper {
     private String inDir = null;
 
     /** Listado con el path de los ficheros firmados. */
-    private Vector<String> signedFilenames = new Vector<String>();
+    private final Vector<String> signedFilenames = new Vector<String>();
 
     /** Indica si se debe generar un fichero de log con los resultados de las
      * operaciones. */
@@ -121,7 +121,7 @@ public class DirectorySignatureHelper {
      *        Modo de firma.
      * @throws AOUnsupportedSignFormatException
      *         Cuando se indica un formato no soportado. */
-    public DirectorySignatureHelper(String algorithm, String format, String mode) throws AOUnsupportedSignFormatException {
+    public DirectorySignatureHelper(final String algorithm, final String format, final String mode) throws AOUnsupportedSignFormatException {
         if (algorithm == null || format == null || mode == null) {
             throw new NullPointerException("No se ha indicado una configuracion de algoritmo de firma valida");
         }
@@ -215,15 +215,15 @@ public class DirectorySignatureHelper {
      *         correctamente, <code>false</code> en caso contrario.
      * @throws AOException
      *         Error grave durante el proceso de firma masiva. */
-    public boolean massiveSign(MassiveType type,
+    public boolean massiveSign(final MassiveType type,
                                String startDir,
-                               boolean recurse,
-                               String outDir,
-                               boolean createOutDir,
-                               boolean originalFormat,
-                               PrivateKeyEntry keyEntry,
-                               X509Certificate cert,
-                               Properties config) throws AOException {
+                               final boolean recurse,
+                               final String outDir,
+                               final boolean createOutDir,
+                               final boolean originalFormat,
+                               final PrivateKeyEntry keyEntry,
+                               final X509Certificate cert,
+                               final Properties config) throws AOException {
 
         if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
             throw new NullPointerException("No se ha establecido el formato y modo de firma");
@@ -234,7 +234,7 @@ public class DirectorySignatureHelper {
             startDir = ".";
         }
 
-        File id = new File(startDir);
+        final File id = new File(startDir);
         this.inDir = id.getAbsolutePath();
         if (!id.exists() || !id.isDirectory()) {
             throw new AOException("El directorio de entrada no existe");
@@ -347,13 +347,13 @@ public class DirectorySignatureHelper {
      * @throws AOException
      *         Error grave durante el proceso de firma masiva. */
     public boolean massiveSign(MassiveType type,
-                               String[] filenames,
-                               String outDir,
-                               boolean createOutDir,
-                               boolean originalFormat,
-                               PrivateKeyEntry keyEntry,
-                               X509Certificate cert,
-                               Properties config) throws AOException {
+                               final String[] filenames,
+                               final String outDir,
+                               final boolean createOutDir,
+                               final boolean originalFormat,
+                               final PrivateKeyEntry keyEntry,
+                               final X509Certificate cert,
+                               final Properties config) throws AOException {
 
         if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
             throw new NullPointerException("No se ha establecido el formato y modo de firma");
@@ -454,7 +454,7 @@ public class DirectorySignatureHelper {
                                       final X509Certificate cert,
                                       final AOSigner configuredSigner,
                                       final boolean showHashes,
-                                      Properties config) throws AOException {
+                                      final Properties config) throws AOException {
 
         if (hashes == null || keyEntry == null || cert == null) {
             throw new NullPointerException("Los hashes a firmar y la clave y el certificado de firma no pueden ser nulos");
@@ -475,7 +475,7 @@ public class DirectorySignatureHelper {
         final AOSigner signer = (configuredSigner != null ? configuredSigner : this.defaultSigner);
 
         // Establecemos el algoritmo de Hash
-        int pos = this.algorithm.indexOf("with");
+        final int pos = this.algorithm.indexOf("with");
         if (pos == -1) {
             throw new AOException("El algoritmo '" + this.algorithm + "' no esta soportado para la firma de hashes");
         }
@@ -524,7 +524,7 @@ public class DirectorySignatureHelper {
     private File[] getFiles(final String[] filenames) {
         File tempFile = null;
         final Vector<File> vFiles = new Vector<File>(filenames.length);
-        for (String filename : filenames) {
+        for (final String filename : filenames) {
             tempFile = new File(filename);
             if (!tempFile.exists()) {
                 Logger.getLogger("es.gob.afirma").severe("El fichero '" + filename + "' no existe");
@@ -569,7 +569,7 @@ public class DirectorySignatureHelper {
         InputStream fis = null;
         byte[] dataToSign = null;
         final AOSigner signer = this.defaultSigner;
-        for (File file : files) {
+        for (final File file : files) {
 
             try {
                 this.preProcessFile(new File(file.getAbsolutePath()));
@@ -710,7 +710,7 @@ public class DirectorySignatureHelper {
             try {
                 originalData = AOUtil.getDataFromInputStream(getFileInputStream(file));
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 allOK = false;
                 continue;
             }
@@ -983,7 +983,7 @@ public class DirectorySignatureHelper {
             try {
                 createdParent = parentFile.mkdirs();
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe("Error al crearse la estructura de directorios del fichero '" + filename + "': " + e);
                 this.addLogRegistry(Level.SEVERE, "Error al crearse la estructura de directorios del fichero '" + filename + "'");
                 return false;
@@ -1080,7 +1080,7 @@ public class DirectorySignatureHelper {
      *         Cuando no se pudo leer el fichero. */
     private boolean isValidDataFile(final AOSigner signer, final File file) throws IOException {
         final InputStream is = this.getFileInputStream(file);
-        boolean isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
+        final boolean isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
         this.closeStream(is);
         return isValidDataFile;
     }
@@ -1166,7 +1166,7 @@ public class DirectorySignatureHelper {
         if (this.inDir != null) {
             return path.substring(this.inDir.length());
         }
-        int pos = path.indexOf(File.separator);
+        final int pos = path.indexOf(File.separator);
         if (pos != -1) {
             return path.substring(pos + 1);
         }

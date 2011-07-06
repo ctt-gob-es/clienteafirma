@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -306,7 +306,7 @@ public final class CipherManager {
     /** Establece la contrase&ntilde;a de cifrado.
      * @param cipherPassword
      *        Contrase&ntilde;a de cifrado. */
-    public void setCipherPassword(char[] cipherPassword) {
+    public void setCipherPassword(final char[] cipherPassword) {
         this.cipherPassword = cipherPassword.clone();
     }
 
@@ -388,22 +388,22 @@ public final class CipherManager {
 
             // Fichero de entrada
             if (fileUri == null) {
-                String fileName = AOUIManager.getLoadFileName(null, null, parent);
+                final String fileName = AOUIManager.getLoadFileName(null, null, parent);
                 try {
                     fileUri = AOUtil.createURI(fileName);
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e);
                 }
             }
 
             // En este punto, tenemos la URI de los datos de entrada
-            InputStream is = AOUtil.loadFile(fileUri, parent, true, fileBase64);
+            final InputStream is = AOUtil.loadFile(fileUri, parent, true, fileBase64);
             dataToCipher = AOUtil.getDataFromInputStream(is);
             try {
                 is.close();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
         }
 
         cipherData(dataToCipher);
@@ -429,7 +429,7 @@ public final class CipherManager {
 
         // Ya tenemos el stream con los datos, vamos a ver que Cipher uso
         final AOCipher cipher = new AOSunJCECipher();
-        Key cipherKey = getConfiguredKey(cipher, cipherConfig);
+        final Key cipherKey = getConfiguredKey(cipher, cipherConfig);
 
         // realizamos la operacion de cifrado
         cipheredData = cipher.cipher(dataToCipher, cipherConfig, cipherKey);
@@ -483,7 +483,7 @@ public final class CipherManager {
                 try {
                     saveCipherKey(config, cipherKey);
                 }
-                catch (AOMaxAttemptsExceededException e) {
+                catch (final AOMaxAttemptsExceededException e) {
                     JOptionPane.showMessageDialog(parent, AppletMessages.getString("SignApplet.43"), //$NON-NLS-1$
                                                   AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
                                                   JOptionPane.ERROR_MESSAGE);
@@ -555,7 +555,7 @@ public final class CipherManager {
             // Si no hay una informacion cofrada establecida, la tratamos de
             // leer desde fichero
             if (fileUri == null) {
-                String fileName = AOUIManager.getLoadFileName(null, null, parent);
+                final String fileName = AOUIManager.getLoadFileName(null, null, parent);
                 try {
                     fileUri = AOUtil.createURI(fileName);
                 }
@@ -570,7 +570,7 @@ public final class CipherManager {
             try {
                 is.close();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
         }
 
         decipherData(dataToDecipher);
@@ -590,7 +590,7 @@ public final class CipherManager {
 
         // Si no esta establecido el algoritmo de cifrado usamos el por
         // defecto, pero solo para esta ocasion
-        AOCipher decipher = new AOSunJCECipher();
+        final AOCipher decipher = new AOSunJCECipher();
         Key decipherKey = null;
 
         // Si el modo de clave es por password, generamos la clave a partir de
@@ -615,13 +615,13 @@ public final class CipherManager {
                     try {
                         decipherKey = getKeyFromCipherKeyStore();
                     }
-                    catch (AOCancelledOperationException e) {
+                    catch (final AOCancelledOperationException e) {
                         throw e;
                     }
-                    catch (AOException e) {
+                    catch (final AOException e) {
                         throw e;
                     }
-                    catch (Exception e) {
+                    catch (final Exception e) {
                         throw new AOException("Error al extraer una clave del almacen de clave de cifrado", e); //$NON-NLS-1$
                     }
                 }
@@ -711,7 +711,7 @@ public final class CipherManager {
     private void saveCipherKey(final AOCipherConfig config, final Key cipherKey) throws AOMaxAttemptsExceededException, AOException {
         // Preguntamos si se desea almacenar en el almacen de claves de cifrado
         // y si se acepta y no existe este almacen, lo creamos
-        int selectedOption = JOptionPane.showConfirmDialog(parent, AppletMessages.getString("SignApplet.40"), //$NON-NLS-1$
+        final int selectedOption = JOptionPane.showConfirmDialog(parent, AppletMessages.getString("SignApplet.40"), //$NON-NLS-1$
                                                            AppletMessages.getString("SignApplet.41"), //$NON-NLS-1$
                                                            JOptionPane.YES_NO_CANCEL_OPTION);
 
@@ -729,7 +729,7 @@ public final class CipherManager {
                 try {
                     cKs = new AOCipherKeyStoreHelper(cipherKeystorePass);
                 }
-                catch (IOException e) {
+                catch (final IOException e) {
                     throw new AOException("La contrasena del almacen de claves de cifrado no es valida", e);
                 }
             }
@@ -740,7 +740,7 @@ public final class CipherManager {
                     try {
                         cKs = new AOCipherKeyStoreHelper(new UIPasswordCallback(AppletMessages.getString("SignApplet.42"), parent).getPassword());
                     }
-                    catch (IOException e) {
+                    catch (final IOException e) {
                         if (numTries >= 3) {
                             throw new AOMaxAttemptsExceededException("Se ha sobrepasado el numero maximo de intentos en la insercion de la clave del almacen");
                         }
@@ -755,7 +755,7 @@ public final class CipherManager {
                                                         AppletMessages.getString("SignApplet.47"), //$NON-NLS-1$
                                                         JOptionPane.QUESTION_MESSAGE);
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     throw new AOException("Error al almacenar la clave de cifrado, la clave quedara sin almacenar");
                 }
                 alias += " (" + config.toString() + ")"; //$NON-NLS-1$ //$NON-NLS-2$

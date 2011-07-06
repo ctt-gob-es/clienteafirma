@@ -41,11 +41,13 @@ public class TestPDF {
             e.printStackTrace();
             pdf = null;
         }
-        if (pdf != null && pdf.length == 0) pdf = null;
+        if (pdf != null && pdf.length == 0) {
+            pdf = null;
+        }
         assertNotNull("No se ha podido cargar el PDF a firmar", pdf);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
                 System.out.println();
                 System.out.println();
                 System.out.println();
@@ -80,7 +82,7 @@ public class TestPDF {
                 catch (final Exception e) {
                     org.junit.Assert.fail("Error validando la firma generada: " + e);
                 }
-                
+
             }
         }
     }
@@ -103,11 +105,13 @@ public class TestPDF {
             e.printStackTrace();
             pdf = null;
         }
-        if (pdf != null && pdf.length == 0) pdf = null;
+        if (pdf != null && pdf.length == 0) {
+            pdf = null;
+        }
         assertNotNull("No se ha podido cargar el PDF a cofirmar", pdf);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
                 System.out.println();
                 System.out.println();
                 System.out.println();
@@ -143,7 +147,7 @@ public class TestPDF {
                 catch (final Exception e) {
                     org.junit.Assert.fail("Error validando la cofirma generada: " + e);
                 }
-                
+
             }
         }
     }

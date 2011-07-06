@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -43,9 +43,9 @@ import org.w3c.dom.Element;
  * @author Frank Cornelis */
 public class RelationshipComparator implements Comparator<Element> {
 
-    public int compare(Element element1, Element element2) {
-        String id1 = element1.getAttribute("Id");
-        String id2 = element2.getAttribute("Id");
+    public int compare(final Element element1, final Element element2) {
+        final String id1 = element1.getAttribute("Id");
+        final String id2 = element2.getAttribute("Id");
         return id1.compareTo(id2);
     }
 }

@@ -37,9 +37,9 @@ public final class TestCAdES {
         assertNotNull("No se ha podido instanciar el Signer", signer);
         byte[] result = null;
         PrivateKeyEntry pke = null;
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
-                for (Properties extraParams : CADES_MODES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
+                for (final Properties extraParams : CADES_MODES) {
                     System.out.println();
                     System.out.println();
                     System.out.println();
@@ -99,13 +99,15 @@ public final class TestCAdES {
             e.printStackTrace();
             csig = null;
         }
-        if (csig != null && csig.length == 0) csig = null;
+        if (csig != null && csig.length == 0) {
+            csig = null;
+        }
         assertNotNull("No se ha podido cargar el fichero de firmas CAdES a contrafirmar", csig);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
-                for (Properties extraParams : CADES_MODES) {
-                    for (CounterSignTarget targetType : CS_TARGETS) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
+                for (final Properties extraParams : CADES_MODES) {
+                    for (final CounterSignTarget targetType : CS_TARGETS) {
                         System.out.println();
                         System.out.println();
                         System.out.println();
@@ -176,12 +178,14 @@ public final class TestCAdES {
             e.printStackTrace();
             csig = null;
         }
-        if (csig != null && csig.length == 0) csig = null;
+        if (csig != null && csig.length == 0) {
+            csig = null;
+        }
         assertNotNull("No se ha podido cargar el fichero de firmas CAdES a cofirmar", csig);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
-                for (Properties extraParams : CADES_MODES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
+                for (final Properties extraParams : CADES_MODES) {
 
                     System.out.println();
                     System.out.println();

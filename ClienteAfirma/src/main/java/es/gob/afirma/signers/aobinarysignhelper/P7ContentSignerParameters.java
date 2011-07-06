@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -20,10 +20,10 @@ import es.gob.afirma.misc.AOConstants;
  * de firma. */
 public final class P7ContentSignerParameters {
 
-    private byte[] data;
-    private String sigAlgo;
-    private X509Certificate[] certChain;
-    private byte[] signature;
+    private final byte[] data;
+    private final String sigAlgo;
+    private final X509Certificate[] certChain;
+    private final byte[] signature;
 
     /** M&eacute;todo que asigna los datos pasados por par&aacute;metro a las
      * propiedades de la clase.

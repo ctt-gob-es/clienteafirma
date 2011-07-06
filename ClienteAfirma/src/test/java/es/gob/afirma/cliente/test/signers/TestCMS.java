@@ -37,9 +37,9 @@ public class TestCMS {
         assertNotNull("No se ha podido instanciar el Signer", signer);
         byte[] result = null;
         PrivateKeyEntry pke = null;
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
-                for (Properties extraParams : CMS_MODES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
+                for (final Properties extraParams : CMS_MODES) {
                     System.out.println();
                     System.out.println();
                     System.out.println();
@@ -99,13 +99,15 @@ public class TestCMS {
             e.printStackTrace();
             p7s = null;
         }
-        if (p7s != null && p7s.length == 0) p7s = null;
+        if (p7s != null && p7s.length == 0) {
+            p7s = null;
+        }
         assertNotNull("No se ha podido cargar el fichero de firmas CMS a contrafirmar", p7s);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
-                for (Properties extraParams : CMS_MODES) {
-                    for (CounterSignTarget targetType : CS_TARGETS) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
+                for (final Properties extraParams : CMS_MODES) {
+                    for (final CounterSignTarget targetType : CS_TARGETS) {
                         System.out.println();
                         System.out.println();
                         System.out.println();
@@ -176,12 +178,14 @@ public class TestCMS {
             e.printStackTrace();
             p7s = null;
         }
-        if (p7s != null && p7s.length == 0) p7s = null;
+        if (p7s != null && p7s.length == 0) {
+            p7s = null;
+        }
         assertNotNull("No se ha podido cargar el fichero de firmas CMS a cofirmar", p7s);
 
-        for (AOConstants.AOKeyStore kstore : KEYSTORES) {
-            for (String algo : ALGOS) {
-                for (Properties extraParams : CMS_MODES) {
+        for (final AOConstants.AOKeyStore kstore : KEYSTORES) {
+            for (final String algo : ALGOS) {
+                for (final Properties extraParams : CMS_MODES) {
 
                     System.out.println();
                     System.out.println();

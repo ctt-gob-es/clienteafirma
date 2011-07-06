@@ -163,8 +163,12 @@ public class TestUtils {
      * @return Primera clave privada apta para pruebas encontrada en el almac&eacute;n */
     public static PrivateKeyEntry getValidKeyEntryFromKeyStore(final AOConstants.AOKeyStore keyStore) {
 
-        if (AOKeyStore.WINDOWS.equals(keyStore) && (!Platform.OS.WINDOWS.equals(Platform.getOS()))) return null;
-        if (AOKeyStore.APPLE.equals(keyStore) && (!Platform.OS.MACOSX.equals(Platform.getOS()))) return null;
+        if (AOKeyStore.WINDOWS.equals(keyStore) && (!Platform.OS.WINDOWS.equals(Platform.getOS()))) {
+            return null;
+        }
+        if (AOKeyStore.APPLE.equals(keyStore) && (!Platform.OS.MACOSX.equals(Platform.getOS()))) {
+            return null;
+        }
 
         AOKeyStoreManager ksm = null;
         PasswordCallback pss = null;
@@ -213,8 +217,12 @@ public class TestUtils {
         else if (AOKeyStore.PKCS11.equals(keyStore)) {
             String p11lib = null;
             if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                if (new File("C:\\Windows\\SysWOW64\\UsrPkcs11.dll").exists()) p11lib = "C:\\Windows\\SysWOW64\\UsrPkcs11.dll";
-                else p11lib = "C:\\Windows\\System32\\UsrPkcs11.dll";
+                if (new File("C:\\Windows\\SysWOW64\\UsrPkcs11.dll").exists()) {
+                    p11lib = "C:\\Windows\\SysWOW64\\UsrPkcs11.dll";
+                }
+                else {
+                    p11lib = "C:\\Windows\\System32\\UsrPkcs11.dll";
+                }
             }
             else if (Platform.OS.LINUX.equals(Platform.getOS())) {
                 p11lib = "";
@@ -237,8 +245,10 @@ public class TestUtils {
         }
 
         // En este punto ya tenemos ksm
-        if (ksm == null) return null;
-        for (String alias : ksm.getAliases()) {
+        if (ksm == null) {
+            return null;
+        }
+        for (final String alias : ksm.getAliases()) {
             try {
                 return ksm.getKeyEntry(alias, pss);
             }
@@ -298,9 +308,11 @@ public class TestUtils {
      * @param sign Firma binaria
      * @return Respuesta del servicio de validaci&oacute;n
      * @throws Exception Si ocurre cualquier problema durante el proceso */
-    public static String verifyBinSignature(byte[] sign) throws Exception {
+    public static String verifyBinSignature(final byte[] sign) throws Exception {
 
-        if (sign == null) throw new NullPointerException("Los datos de firma a validar son nulos");
+        if (sign == null) {
+            throw new NullPointerException("Los datos de firma a validar son nulos");
+        }
 
         //final String endpointURL = "https://des-afirma.redinteradministrativa.es:443/afirmaws/services/DSSAfirmaVerify";
         // final String endpointURL = "http://217.15.39.2:8080/afirmaws/services/DSSAfirmaVerify";
@@ -319,7 +331,7 @@ public class TestUtils {
      * @param sign Firma XML
      * @return Respuesta del servicio de validaci&oacute;n
      * @throws Exception Si ocurre cualquier problema durante el proceso */
-    public static String verifyXMLSignature(byte[] sign) throws Exception {
+    public static String verifyXMLSignature(final byte[] sign) throws Exception {
         return "";
     }
 }

@@ -43,31 +43,31 @@ public final class UnwrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
         try {
             enveloperManager.unwrap(envelop);
         }
-        catch (AOCancelledOperationException e) {
+        catch (final AOCancelledOperationException e) {
             setError("Operacion cancelada por el usuario", e); //$NON-NLS-1$
             return false;
         }
-        catch (AOInvalidRecipientException e) {
+        catch (final AOInvalidRecipientException e) {
             setError("El usuario no es uno de los destinatarios del sobre", e); //$NON-NLS-1$
             return false;
         }
-        catch (AOInvalidFormatException e) {
+        catch (final AOInvalidFormatException e) {
             setError("No se ha proporcionado un envoltorio soportado", e); //$NON-NLS-1$
             return false;
         }
-        catch (IllegalArgumentException e) {
+        catch (final IllegalArgumentException e) {
             setError("Modo de clave no soportado", e); //$NON-NLS-1$
             return false;
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             setError("El envoltorio esta corrupto o no ha podido leerse", e); //$NON-NLS-1$
             return false;
         }
-        catch (AOException e) {
+        catch (final AOException e) {
             setError("Error durante el proceso de desensobrado", e); //$NON-NLS-1$
             return false;
         }
-        catch (CertificateEncodingException e) {
+        catch (final CertificateEncodingException e) {
             setError("El certificado del destinatario no es valido", e); //$NON-NLS-1$
             return false;
         }

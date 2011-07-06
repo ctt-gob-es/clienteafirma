@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -62,7 +62,7 @@ public final class CMSDecipherAuthenticatedData {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public byte[] decipherAuthenticatedData(byte[] cmsData, PrivateKeyEntry keyEntry) throws IOException,
+    public byte[] decipherAuthenticatedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                      CertificateEncodingException,
                                                                                      AOException,
                                                                                      AOInvalidRecipientException,
@@ -73,7 +73,7 @@ public final class CMSDecipherAuthenticatedData {
 
         Enumeration<?> elementRecipient;
         try {
-            ASN1Sequence authenticatedData = Utils.fetchWrappedData(cmsData);
+            final ASN1Sequence authenticatedData = Utils.fetchWrappedData(cmsData);
 
             authenticated = AuthenticatedData.getInstance(authenticatedData);
             elementRecipient = authenticated.getRecipientInfos().getObjects();
@@ -82,14 +82,14 @@ public final class CMSDecipherAuthenticatedData {
             throw new AOException("El fichero no contiene un tipo EnvelopedData", ex);
         }
 
-        X509Certificate userCert = (X509Certificate) keyEntry.getCertificate();
-        EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas(userCert, elementRecipient);
+        final X509Certificate userCert = (X509Certificate) keyEntry.getCertificate();
+        final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas(userCert, elementRecipient);
 
         // Asignamos la clave de descifrado del contenido.
         assignKey(encryptedKeyDatas.getEncryptedKey(), keyEntry, encryptedKeyDatas.getAlgEncryptedKey());
 
-        String macAlg = authenticated.getMacAlgorithm().getAlgorithm().toString();
-        ASN1Set authAttr = authenticated.getAuthAttrs();
+        final String macAlg = authenticated.getMacAlgorithm().getAlgorithm().toString();
+        final ASN1Set authAttr = authenticated.getAuthAttrs();
 
         byte[] macGenerada = null;
         try {
@@ -102,7 +102,7 @@ public final class CMSDecipherAuthenticatedData {
             throw new AOException("Error de codificacion", e);
         }
 
-        byte[] macObtenida = authenticated.getMac().getOctets();
+        final byte[] macObtenida = authenticated.getMac().getOctets();
 
         if (java.util.Arrays.equals(macGenerada, macObtenida)) {
             contenido = ((DEROctetString) authenticated.getEncapsulatedContentInfo().getContent()).getOctets();
@@ -111,7 +111,7 @@ public final class CMSDecipherAuthenticatedData {
         return contenido;
     }
 
-    private byte[] genMac(String encryptionAlg, byte[] content, SecretKey ciphKey) throws Exception {
+    private byte[] genMac(final String encryptionAlg, final byte[] content, final SecretKey ciphKey) throws Exception {
         // KeyGenerator kg = KeyGenerator.getInstance("HmacSHA512");
         // SecretKey sk = kg.generateKey();
         final Mac mac = Mac.getInstance(claveMac.getName());
@@ -131,29 +131,31 @@ public final class CMSDecipherAuthenticatedData {
      * @throws AOException
      *         Cuando no se pudo descifrar la clave con el certificado de
      *         usuario. */
-    private void assignKey(byte[] passCiphered, PrivateKeyEntry keyEntry, AlgorithmIdentifier algClave) throws AOException {
+    private void assignKey(final byte[] passCiphered, final PrivateKeyEntry keyEntry, final AlgorithmIdentifier algClave) throws AOException {
 
         AOCipherAlgorithm algorithm = null;
 
         // obtenemos el algoritmo usado para cifrar la pass
-        for (AOCipherAlgorithm algo : AOCipherAlgorithm.values()) {
+        for (final AOCipherAlgorithm algo : AOCipherAlgorithm.values()) {
             if (algo.getOid().equals(algClave.getAlgorithm().toString())) {
                 algorithm = algo;
                 break;
             }
         }
 
-        if (algorithm == null) throw new AOException("No se ha podido obtener el algoritmo para cifrar la contrasena");
+        if (algorithm == null) {
+            throw new AOException("No se ha podido obtener el algoritmo para cifrar la contrasena");
+        }
 
         claveMac = algorithm;
 
         // Desembolvemos la clave usada para cifrar el contenido
         // a partir de la clave privada del certificado del usuario.
         try {
-            byte[] encrypted = passCiphered;
+            final byte[] encrypted = passCiphered;
             // final Cipher cipher2 =
             // Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            Cipher cipher = createCipher(keyEntry.getPrivateKey().getAlgorithm());
+            final Cipher cipher = createCipher(keyEntry.getPrivateKey().getAlgorithm());
             cipher.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
             this.cipherKey = (SecretKey) cipher.unwrap(encrypted, algorithm.getName(), Cipher.SECRET_KEY);
         }
@@ -169,7 +171,7 @@ public final class CMSDecipherAuthenticatedData {
      * @return Cifrador.
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException */
-    private Cipher createCipher(String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
+    private Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
         return Cipher.getInstance(algName);
     }
 }

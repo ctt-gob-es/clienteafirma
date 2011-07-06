@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -115,7 +115,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
     /** Adds a signature facet to this XML signature service.
      * @param signatureFacet */
-    protected final void addSignatureFacet(SignatureFacet signatureFacet) {
+    protected final void addSignatureFacet(final SignatureFacet signatureFacet) {
         this.signatureFacets.add(signatureFacet);
     }
 
@@ -226,7 +226,9 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
         final XMLSignContext xmlSignContext = new DOMSignContext(signingKey, document);
         final URIDereferencer uriDereferencer = getURIDereferencer();
-        if (null != uriDereferencer) xmlSignContext.setURIDereferencer(uriDereferencer);
+        if (null != uriDereferencer) {
+            xmlSignContext.setURIDereferencer(uriDereferencer);
+        }
 
         final XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
 
@@ -243,7 +245,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
         // ds:SignedInfo
         final SignatureMethod signatureMethod = signatureFactory.newSignatureMethod(getSignatureMethod(digestAlgo), null);
-        SignedInfo signedInfo =
+        final SignedInfo signedInfo =
                 signatureFactory.newSignedInfo(signatureFactory.newCanonicalizationMethod(getCanonicalizationMethod(), (C14NMethodParameterSpec) null),
                                                signatureMethod,
                                                references);
@@ -264,31 +266,31 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
         // JSR105 ds:Signature creation
         final String signatureValueId = signatureId + "-signature-value";
-        javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, kif.newKeyInfo(content), // KeyInfo
+        final javax.xml.crypto.dsig.XMLSignature xmlSignature = signatureFactory.newXMLSignature(signedInfo, kif.newKeyInfo(content), // KeyInfo
                                                                                            objects,
                                                                                            signatureId,
                                                                                            signatureValueId);
 
         // ds:Signature Marshalling.
-        DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
+        final DOMXMLSignature domXmlSignature = (DOMXMLSignature) xmlSignature;
         Node documentNode = document.getDocumentElement();
         if (null == documentNode) {
             documentNode = document; // In case of an empty DOM document.
         }
-        String dsPrefix = null;
+        final String dsPrefix = null;
         domXmlSignature.marshal(documentNode, dsPrefix, (DOMCryptoContext) xmlSignContext);
 
         // Completion of undigested ds:References in the ds:Manifests.
         for (final XMLObject object : objects) {
 
             final List<XMLStructure> objectContentList = object.getContent();
-            for (XMLStructure objectContent : objectContentList) {
+            for (final XMLStructure objectContent : objectContentList) {
                 if (false == objectContent instanceof Manifest) {
                     continue;
                 }
                 final Manifest manifest = (Manifest) objectContent;
                 final List<Reference> manifestReferences = manifest.getReferences();
-                for (Reference manifestReference : manifestReferences) {
+                for (final Reference manifestReference : manifestReferences) {
                     if (null != manifestReference.getDigestValue()) {
                         continue;
                     }
@@ -300,7 +302,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
         // Completion of undigested ds:References.
         final List<Reference> signedInfoReferences = signedInfo.getReferences();
-        for (Reference signedInfoReference : signedInfoReferences) {
+        for (final Reference signedInfoReference : signedInfoReferences) {
             final DOMReference domReference = (DOMReference) signedInfoReference;
             if (null != domReference.getDigestValue()) {
                 // ds:Reference with external digest value

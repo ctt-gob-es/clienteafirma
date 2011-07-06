@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -68,16 +68,18 @@ public final class PasswordDialog extends JDialog {
      *        window from which this dialog is launched
      * @param title
      *        the title for the dialog box window */
-    public PasswordDialog(Dialog parent, String title) {
+    public PasswordDialog(final Dialog parent, final String title) {
         super(parent, title, true);
         setTitle(title);
-        if (parent != null) setLocationRelativeTo(parent);
+        if (parent != null) {
+            setLocationRelativeTo(parent);
+        }
     }
 
     /** Create this dialog with the given parent and the default title.
      * @param parent
      *        window from which this dialog is launched */
-    public PasswordDialog(Dialog parent) {
+    public PasswordDialog(final Dialog parent) {
         this(parent, null);
     }
 
@@ -86,16 +88,18 @@ public final class PasswordDialog extends JDialog {
      *        window from which this dialog is launched
      * @param title
      *        the title for the dialog box window */
-    public PasswordDialog(Frame parent, String title) {
+    public PasswordDialog(final Frame parent, final String title) {
         super(parent, title, true);
         setTitle(title);
-        if (parent != null) setLocationRelativeTo(parent);
+        if (parent != null) {
+            setLocationRelativeTo(parent);
+        }
     }
 
     /** Create this dialog with the given parent and the default title.
      * @param parent
      *        window from which this dialog is launched */
-    public PasswordDialog(Frame parent) {
+    public PasswordDialog(final Frame parent) {
         this(parent, null);
     }
 
@@ -118,9 +122,9 @@ public final class PasswordDialog extends JDialog {
 
         super.dialogInit();
 
-        KeyListener keyListener = new KeyAdapter() {
+        final KeyListener keyListener = new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {
+            public void keyPressed(final KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE || (e.getSource() == cancelButton && e.getKeyCode() == KeyEvent.VK_ENTER)) {
                     pressed_OK = false;
                     PasswordDialog.this.setVisible(false);
@@ -133,9 +137,9 @@ public final class PasswordDialog extends JDialog {
         };
         addKeyListener(keyListener);
 
-        ActionListener actionListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Object source = e.getSource();
+        final ActionListener actionListener = new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Object source = e.getSource();
                 if (source == pass1) {
                     // the user pressed enter in the pass1 field.
                     pass1.transferFocus();
@@ -144,7 +148,7 @@ public final class PasswordDialog extends JDialog {
                     // other actions close the dialog.
                     pressed_OK = (source == pass2 || source == okButton);
                     if (pressed_OK) {
-                        String password = new String(pass2.getPassword());
+                        final String password = new String(pass2.getPassword());
                         if (password.equals(new String(pass1.getPassword()))) {
                             if (password.length() > 1) {
                                 PasswordDialog.this.setVisible(false);
@@ -169,7 +173,9 @@ public final class PasswordDialog extends JDialog {
                             pass2.setText("");
                         }
                     }
-                    else PasswordDialog.this.setVisible(false);
+                    else {
+                        PasswordDialog.this.setVisible(false);
+                    }
                 }
             }
         };
@@ -227,7 +233,7 @@ public final class PasswordDialog extends JDialog {
     /** Establece el texto a mostrar para la solicitud de contrase&ntilde;a.
      * @param descriptionText
      *        Texto para la solicitud de contrase&ntilde;a (Unicode) */
-    public void setDescriptionText(String descriptionText) {
+    public void setDescriptionText(final String descriptionText) {
         this.descriptionLabel.setText(descriptionText == null ? "" : descriptionText);
         pack();
     }

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -113,7 +113,9 @@ public final class AOSignerFactory {
         // Cargamos un proveedor de seguridad con alias alternativos para los
         // algoritmos
         // de hash SHA-2, necesario para determinados signers.
-        if (Security.getProvider("AOSHA2AltNamesProvider") == null) Security.addProvider(new SHA2AltNamesProvider());
+        if (Security.getProvider("AOSHA2AltNamesProvider") == null) {
+            Security.addProvider(new SHA2AltNamesProvider());
+        }
 
         return signerFactory;
     }
@@ -126,7 +128,9 @@ public final class AOSignerFactory {
      * @return Manejador de firma */
     public static AOSigner getSigner(final byte[] signData) {
 
-        if (signData == null) throw new NullPointerException("No se han indicado datos de firma");
+        if (signData == null) {
+            throw new NullPointerException("No se han indicado datos de firma");
+        }
 
         // Inicializamos las referencias estaticas
         if (signerFactory == null) {
@@ -162,9 +166,9 @@ public final class AOSignerFactory {
     public final AOSigner getSigner(final String signerID) {
 
         if (signersID.contains(signerID)) {
-            for (int i = 0; i < ID_SIGNERS.length; i++) {
-                if (ID_SIGNERS[i][0].equals(signerID)) {
-                    return signers.get(ID_SIGNERS[i][1]);
+            for (final String[] element : ID_SIGNERS) {
+                if (element[0].equals(signerID)) {
+                    return signers.get(element[1]);
                 }
             }
         }
@@ -178,9 +182,9 @@ public final class AOSignerFactory {
      * @return Manejador de firma.
      * @see es.gob.afirma.misc.AOConstants#DEFAULT_SIGN_FORMAT */
     public final AOSigner getDefaultSigner() {
-        for (int i = 0; i < ID_SIGNERS.length; i++) {
-            if (ID_SIGNERS[i][0].equals(AOConstants.DEFAULT_SIGN_FORMAT)) {
-                AOSigner signer = signers.get(ID_SIGNERS[i][1]);
+        for (final String[] element : ID_SIGNERS) {
+            if (element[0].equals(AOConstants.DEFAULT_SIGN_FORMAT)) {
+                final AOSigner signer = signers.get(element[1]);
                 if (signer == null) {
                     Logger.getLogger("es.gob.afirma")
                           .severe("No se ha encontrado el manejador del formato de firma por defecto ('" + AOConstants.DEFAULT_SIGN_FORMAT + "')");
@@ -230,7 +234,7 @@ public final class AOSignerFactory {
      * @return Indentificadores de los formatos de firma soportados. */
     @Override
     public String toString() {
-        final StringBuilder exstr = new StringBuilder(); //$NON-NLS-1$
+        final StringBuilder exstr = new StringBuilder(); 
         for (final String format : signersID) {
             exstr.append(format).append("\n"); //$NON-NLS-1$
         }

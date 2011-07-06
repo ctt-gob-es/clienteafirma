@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -187,7 +187,7 @@ public final class AOUIManager {
         // mayúsculas y minúsculas
         final String[] finalOrderedAliases = aliassesByFriendlyName.values().toArray(new String[0]);
         Arrays.sort(finalOrderedAliases, new Comparator<String>() {
-            public int compare(String o1, String o2) {
+            public int compare(final String o1, final String o2) {
                 if (o1 == null && o2 == null) {
                     return 0;
                 }
@@ -203,7 +203,7 @@ public final class AOUIManager {
             }
         });
 
-        Object o = JOptionPane.showInputDialog(parentComponent, Messages.getString("AOUIManager.13"), //$NON-NLS-1$
+        final Object o = JOptionPane.showInputDialog(parentComponent, Messages.getString("AOUIManager.13"), //$NON-NLS-1$
                                                Messages.getString("AOUIManager.14"), //$NON-NLS-1$
                                                JOptionPane.PLAIN_MESSAGE,
                                                null,
@@ -219,18 +219,18 @@ public final class AOUIManager {
             throw new AOCancelledOperationException("Operacion de seleccion de certificado cancelada"); //$NON-NLS-1$
         }
 
-        for (String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
+        for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
             if (aliassesByFriendlyName.get(al).equals(certName)) {
                 if (checkValidity && kss != null) {
                     boolean rejected = false;
                     final AOCertVerifier cv = new AOCertVerifier();
-                    for (KeyStore ks : kss) {
+                    for (final KeyStore ks : kss) {
                         try {
                             if (!ks.containsAlias(al)) {
                                 continue;
                             }
                         }
-                        catch (Exception e) {
+                        catch (final Exception e) {
                             continue;
                         }
 
@@ -266,7 +266,9 @@ public final class AOUIManager {
                             if (JOptionPane.showConfirmDialog(parentComponent, cv.getErrorMessage() + Messages.getString("AOUIManager.8"), //$NON-NLS-1$
                                                               Messages.getString("AOUIManager.5"), //$NON-NLS-1$
                                                               JOptionPane.YES_NO_OPTION,
-                                                              JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) return al;
+                                                              JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                                return al;
+                            }
                             rejected = true;
                         }
 
@@ -316,7 +318,7 @@ public final class AOUIManager {
         if (extensions != null && extensions.length > 0) {
             jfc.setFileFilter(new ExtFilter(extensions, description));
         }
-        int ret = jfc.showOpenDialog(parentComponent);
+        final int ret = jfc.showOpenDialog(parentComponent);
         if (ret == JFileChooser.APPROVE_OPTION) {
             return jfc.getSelectedFile().getAbsolutePath();
         }
@@ -334,7 +336,7 @@ public final class AOUIManager {
         final JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         jfc.setDialogTitle(title);
-        int ret = jfc.showOpenDialog(parentComponent);
+        final int ret = jfc.showOpenDialog(parentComponent);
         if (ret == JFileChooser.APPROVE_OPTION) {
             return jfc.getSelectedFile().getAbsolutePath();
         }
@@ -362,7 +364,7 @@ public final class AOUIManager {
         boolean selectedFilename = false;
         String finalFilename = null;
         do {
-            int ret = jfc.showSaveDialog(parentComponent);
+            final int ret = jfc.showSaveDialog(parentComponent);
             if (ret == JFileChooser.APPROVE_OPTION) {
                 final File tempFile = jfc.getSelectedFile();
                 if (tempFile.exists()) {
@@ -373,7 +375,7 @@ public final class AOUIManager {
                                                       JOptionPane.WARNING_MESSAGE);
                         continue;
                     }
-                    int resp =
+                    final int resp =
                             JOptionPane.showConfirmDialog(parentComponent,
                                                           Messages.getString("AOUIManager.77") + "\r\n" + jfc.getSelectedFile().getAbsolutePath(), //$NON-NLS-1$ //$NON-NLS-2$
                                                           Messages.getString("AOUIManager.81"), //$NON-NLS-1$
@@ -436,15 +438,17 @@ public final class AOUIManager {
         }
 
         @Override
-        public boolean accept(File f) {
+        public boolean accept(final File f) {
             if (f.isDirectory()) {
                 return true;
             }
             // getExtension() pasa la extension a minusculas, no hace falta
             // el "ignoreCase"
             final String extension = getExtension(f);
-            for (int i = 0; i < extensions.length; i++) {
-                if (extensions[i].equalsIgnoreCase(extension)) return true;
+            for (final String extension2 : extensions) {
+                if (extension2.equalsIgnoreCase(extension)) {
+                    return true;
+                }
             }
             return false;
         }
@@ -481,7 +485,7 @@ public final class AOUIManager {
             try {
                 icon = Toolkit.getDefaultToolkit().getImage(AOUIManager.class.getResource("/resources/afirma_ico.png")); //$NON-NLS-1$
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de la aplicacion: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
@@ -577,7 +581,7 @@ public final class AOUIManager {
         }
         else if (signFormat.equals(AOConstants.SIGN_FORMAT_ODF)) {
             return new ExtFilter(new String[] {
-                    "odt", "ods", "odp"}, Messages.getString("AOUIManager.16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+                    "odt", "ods", "odp"}, Messages.getString("AOUIManager.16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ 
         }
 
         return null;
@@ -636,9 +640,9 @@ public final class AOUIManager {
     public static final String getOutFileName(final String inName, final String signFormat) {
 
         if (inName == null || inName.equals("")) {
-            throw new NullPointerException("El nombre de fichero no puede estar vacio"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new NullPointerException("El nombre de fichero no puede estar vacio"); //$NON-NLS-1$ 
         }
-        
+
 
         if (signFormat == null) {
             throw new NullPointerException("El formato de firma no puede ser nulo"); //$NON-NLS-1$
@@ -658,7 +662,7 @@ public final class AOUIManager {
         }
         if (signFormat.equals(AOConstants.SIGN_FORMAT_PDF) || signFormat.equals(AOConstants.SIGN_FORMAT_ODF)
             || signFormat.equals(AOConstants.SIGN_FORMAT_OOXML)) {
-            int i = inName.lastIndexOf('.');
+            final int i = inName.lastIndexOf('.');
             if (i > 0 && i < inName.length() - 1) {
                 return inName.substring(0, i) + ".signed" + inName.substring(i).toLowerCase(); //$NON-NLS-1$
             }
@@ -677,7 +681,7 @@ public final class AOUIManager {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
     public static final int[] showNodeSignSelectionPane(final es.gob.afirma.misc.tree.TreeModel treeModel, final Component parentComponent) throws AOCancelledOperationException {
-        TreeModel tree = convertToSwingModel(treeModel);
+        final TreeModel tree = convertToSwingModel(treeModel);
 
         final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
         treeRenderer.setLeafIcon(null);
@@ -688,14 +692,14 @@ public final class AOUIManager {
         arbolNodos.setRootVisible(false);
         arbolNodos.setCellRenderer(treeRenderer);
         arbolNodos.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        for (int i = 0; i < arbolNodos.getRowCount(); i++)
+        for (int i = 0; i < arbolNodos.getRowCount(); i++) {
             arbolNodos.expandRow(i);
+        }
         arbolNodos.addTreeExpansionListener(new TreeExpansionListener() {
-            public void treeCollapsed(TreeExpansionEvent event) {
+            public void treeCollapsed(final TreeExpansionEvent event) {
                 ((JTree) event.getSource()).expandPath(event.getPath());
             }
-
-            public void treeExpanded(TreeExpansionEvent event) {}
+            public void treeExpanded(final TreeExpansionEvent event) {}
         });
 
         // Seleccionamos el primer elemento para que siempre haya
@@ -746,7 +750,7 @@ public final class AOUIManager {
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
     public static final String[] showSignersSelectionPane(final es.gob.afirma.misc.tree.TreeModel treeModel, final Component parentComponent) throws AOException,
                                                                                                                                              AOCancelledOperationException {
-        TreeModel tree = convertToSwingModel(treeModel);
+        final TreeModel tree = convertToSwingModel(treeModel);
 
         final Set<String> signersSet = new HashSet<String>();
 
@@ -758,8 +762,9 @@ public final class AOUIManager {
         // de firmante
         final DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getRoot();
         try {
-            for (int i = 0; i < root.getChildCount(); i++)
+            for (int i = 0; i < root.getChildCount(); i++) {
                 getSigners((DefaultMutableTreeNode) root.getChildAt(i), signersSet);
+            }
         }
         catch (final Exception e) {
             throw new AOException("El arbol introducido contiene elementos no validos", e); //$NON-NLS-1$
@@ -801,8 +806,9 @@ public final class AOUIManager {
         // Devolvemos los firmantes seleccionados
         final Object[] selectedValues = jList.getSelectedValues();
         signers = new String[selectedValues.length];
-        for (int i = 0; i < selectedValues.length; i++)
+        for (int i = 0; i < selectedValues.length; i++) {
             signers[i] = (String) selectedValues[i];
+        }
         return signers;
     }
 
@@ -846,17 +852,18 @@ public final class AOUIManager {
         private boolean beep = false;
 
         @Override
-        public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
+        public void insertString(final int offset, final String str, final AttributeSet attr) throws BadLocationException {
             if (str == null) {
                 return;
             }
-            for (int i = 0; i < str.length(); i++)
+            for (int i = 0; i < str.length(); i++) {
                 if (acceptedChars.indexOf(String.valueOf(str.charAt(i))) == -1) {
                     if (beep) {
                         Toolkit.getDefaultToolkit().beep();
                     }
                     return;
                 }
+            }
             super.insertString(offset, str, attr);
         }
 
@@ -879,18 +886,19 @@ public final class AOUIManager {
         }
 
         @Override
-        public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
+        public void insertString(final int offset, final String str, final AttributeSet attr) throws BadLocationException {
             if (str == null) {
                 return;
             }
 
-            for (int i = 0; i < str.length(); i++)
+            for (int i = 0; i < str.length(); i++) {
                 if (str.charAt(i) < 32 || str.charAt(i) > 126) {
                     if (beep) {
                         Toolkit.getDefaultToolkit().beep();
                     }
                     return;
                 }
+            }
             super.insertString(offset, str, attr);
         }
 
@@ -954,7 +962,7 @@ public final class AOUIManager {
                             JOptionPane.showConfirmDialog(parentComponent,
                                                           Messages.getString("AOUIManager.77") + "\r\n" + file.getAbsolutePath(), Messages.getString("AOUIManager.85"), JOptionPane.YES_NO_CANCEL_OPTION); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     if (selectedOption == JOptionPane.CANCEL_OPTION) {
-                        Logger.getLogger("es.gob.afirma").info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$ //$NON-NLS-2$ 
+                        Logger.getLogger("es.gob.afirma").info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$ //$NON-NLS-2$
                         return null;
                     }
                     // Si se ha seleccionado la opcion YES (se desea
@@ -972,7 +980,7 @@ public final class AOUIManager {
                         fos.write(data);
                     }
                     catch (final Exception ex) {
-                        Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$ 
+                        Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
                         JOptionPane.showMessageDialog(parentComponent,
                                                       Messages.getString("AOUIManager.88"), Messages.getString("AOUIManager.89"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                         fos = null;
@@ -1005,19 +1013,19 @@ public final class AOUIManager {
      *         gen&eacute;rico de AFirma */
     public static DefaultTreeModel convertToSwingModel(final es.gob.afirma.misc.tree.TreeModel treeModel) {
         // Primero hay que obtener el objeto raiz
-        es.gob.afirma.misc.tree.TreeNode root = (es.gob.afirma.misc.tree.TreeNode) treeModel.getRoot();
-        Object rootObject = root.getUserObject();
+        final es.gob.afirma.misc.tree.TreeNode root = (es.gob.afirma.misc.tree.TreeNode) treeModel.getRoot();
+        final Object rootObject = root.getUserObject();
 
         // Iniciamos el DefaultTreeModel
-        DefaultMutableTreeNode rootSwing = new DefaultMutableTreeNode(rootObject);
-        DefaultTreeModel swingDefaultTreeModel = new DefaultTreeModel(rootSwing, treeModel.asksAllowsChildren());
+        final DefaultMutableTreeNode rootSwing = new DefaultMutableTreeNode(rootObject);
+        final DefaultTreeModel swingDefaultTreeModel = new DefaultTreeModel(rootSwing, treeModel.asksAllowsChildren());
 
         // Listado con los padres del modelo original
-        List<es.gob.afirma.misc.tree.TreeNode> parents = new ArrayList<es.gob.afirma.misc.tree.TreeNode>();
+        final List<es.gob.afirma.misc.tree.TreeNode> parents = new ArrayList<es.gob.afirma.misc.tree.TreeNode>();
         parents.add(root);
 
         // Listado con los padres que introduciremos en el modelo swing
-        List<DefaultMutableTreeNode> parentsSwing = new ArrayList<DefaultMutableTreeNode>();
+        final List<DefaultMutableTreeNode> parentsSwing = new ArrayList<DefaultMutableTreeNode>();
         parentsSwing.add(rootSwing);
 
         int nParent = 0;
@@ -1028,7 +1036,7 @@ public final class AOUIManager {
 
             node = parents.get(nParent);
 
-            int nNodes = node.getChildCount();
+            final int nNodes = node.getChildCount();
             for (int i = 0; i < nNodes; i++) {
                 // Tomamos el hijo de la lista de padres del arbol original
                 childNode = node.getChildAt(i);

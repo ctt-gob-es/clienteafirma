@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -105,7 +105,9 @@ public final class AOOOXMLSigner implements AOSigner {
 
     public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
 
-        if (sign == null) throw new NullPointerException("Los datos de firma introducidos son nulos");
+        if (sign == null) {
+            throw new NullPointerException("Los datos de firma introducidos son nulos");
+        }
 
         final InputStream contentTypesXml;
         final ZipEntry zipEntry;
@@ -144,18 +146,32 @@ public final class AOOOXMLSigner implements AOSigner {
 
     public String getSignedName(final String originalName, final String inText) {
         final String inTextInt = (inText != null ? inText : "");
-        if (originalName == null) return inTextInt + ".ooxml";
+        if (originalName == null) {
+            return inTextInt + ".ooxml";
+        }
         final String originalNameLC = originalName.toLowerCase();
-        if (originalNameLC.length() <= 4) return originalName + inTextInt + ".ooxml";
-        if (originalNameLC.endsWith(".docx")) return originalName.substring(0, originalName.length() - 4) + inTextInt + ".docx";
-        if (originalNameLC.endsWith(".xlsx")) return originalName.substring(0, originalName.length() - 4) + inTextInt + ".xlsx";
-        if (originalNameLC.endsWith(".pptx")) return originalName.substring(0, originalName.length() - 4) + inTextInt + ".pptx";
-        if (originalNameLC.endsWith(".ppsx")) return originalName.substring(0, originalName.length() - 4) + inTextInt + ".ppsx";
+        if (originalNameLC.length() <= 4) {
+            return originalName + inTextInt + ".ooxml";
+        }
+        if (originalNameLC.endsWith(".docx")) {
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".docx";
+        }
+        if (originalNameLC.endsWith(".xlsx")) {
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".xlsx";
+        }
+        if (originalNameLC.endsWith(".pptx")) {
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".pptx";
+        }
+        if (originalNameLC.endsWith(".ppsx")) {
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".ppsx";
+        }
         return originalName + inTextInt + ".ooxml";
     }
 
     public TreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
-        if (sign == null) throw new NullPointerException("Los datos de firma introducidos son nulos");
+        if (sign == null) {
+            throw new NullPointerException("Los datos de firma introducidos son nulos");
+        }
 
         if (!isSign(sign)) {
             Logger.getLogger("es.gob.afirma").severe("La firma indicada no es de tipo OOXML");
@@ -168,7 +184,7 @@ public final class AOOOXMLSigner implements AOSigner {
         final AOXMLDSigSigner xmldsigSigner = new AOXMLDSigSigner();
 
         // Recuperamos las firmas individuales del documento y creamos el arbol
-        TreeNode tree = new TreeNode("Datos");
+        final TreeNode tree = new TreeNode("Datos");
         try {
             for (final byte[] elementSign : OOXMLUtil.getOOXMLSignatures(sign)) {
 
@@ -260,12 +276,24 @@ public final class AOOOXMLSigner implements AOSigner {
 
         // Cogemos el algoritmo de digest
         String digestAlgo;
-        if (algorithm == null) digestAlgo = "SHA1";
-        else if (algorithm.startsWith("SHA-1") || algorithm.startsWith("SHA1") || algorithm.startsWith("SHAwith")) digestAlgo = "SHA1";
-        else if (algorithm.startsWith("SHA-512") || algorithm.startsWith("SHA512")) digestAlgo = "SHA512";
-        else if (algorithm.startsWith("SHA-384") || algorithm.startsWith("SHA384")) digestAlgo = "SHA384";
-        else if (algorithm.startsWith("SHA-256") || algorithm.startsWith("SHA256")) digestAlgo = "SHA256";
-        else if (algorithm.startsWith("RIPEND-160") || algorithm.startsWith("RIPEND160")) digestAlgo = "RIPEND160";
+        if (algorithm == null) {
+            digestAlgo = "SHA1";
+        }
+        else if (algorithm.startsWith("SHA-1") || algorithm.startsWith("SHA1") || algorithm.startsWith("SHAwith")) {
+            digestAlgo = "SHA1";
+        }
+        else if (algorithm.startsWith("SHA-512") || algorithm.startsWith("SHA512")) {
+            digestAlgo = "SHA512";
+        }
+        else if (algorithm.startsWith("SHA-384") || algorithm.startsWith("SHA384")) {
+            digestAlgo = "SHA384";
+        }
+        else if (algorithm.startsWith("SHA-256") || algorithm.startsWith("SHA256")) {
+            digestAlgo = "SHA256";
+        }
+        else if (algorithm.startsWith("RIPEND-160") || algorithm.startsWith("RIPEND160")) {
+            digestAlgo = "RIPEND160";
+        }
         else {
             Logger.getLogger("es.gob.afirma").warning("El algoritmo de firma '" + algorithm
                                                       + "' no esta soportado en OOXML, se utilizara SHA1 con RSA");
@@ -287,7 +315,9 @@ public final class AOOOXMLSigner implements AOSigner {
         }
 
         // Pasamos la cadena de certificacion a un vector
-        if (keyEntry == null) throw new AOException("No se ha proporcionado una clave valida");
+        if (keyEntry == null) {
+            throw new AOException("No se ha proporcionado una clave valida");
+        }
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();
@@ -296,9 +326,11 @@ public final class AOOOXMLSigner implements AOSigner {
         }
         else {
             final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) xCerts = new X509Certificate[] {
-                (X509Certificate) cert
-            };
+            if (cert instanceof X509Certificate) {
+                xCerts = new X509Certificate[] {
+                    (X509Certificate) cert
+                };
+            }
         }
 
         final Vector<X509Certificate> certChain = new Vector<X509Certificate>(xCerts.length);

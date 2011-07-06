@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -28,20 +28,20 @@ import org.bouncycastle.asn1.cms.EncryptedContentInfo;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 public final class SignedAndEnvelopedData extends ASN1Encodable {
 
-    private DERInteger version;
-    private ASN1Set recipientInfos;
-    private ASN1Set digestAlgorithms;
-    private EncryptedContentInfo encryptedContentInfo;
+    private final DERInteger version;
+    private final ASN1Set recipientInfos;
+    private final ASN1Set digestAlgorithms;
+    private final EncryptedContentInfo encryptedContentInfo;
     private ASN1Set certificates;
     private ASN1Set crls;
-    private ASN1Set signerInfos;
+    private final ASN1Set signerInfos;
 
-    SignedAndEnvelopedData(ASN1Set recipientInfos,
-                           ASN1Set digestAlgorithms,
-                           EncryptedContentInfo encryptedContentInfo,
-                           ASN1Set certificates,
-                           ASN1Set crls,
-                           ASN1Set signerInfos) {
+    SignedAndEnvelopedData(final ASN1Set recipientInfos,
+                           final ASN1Set digestAlgorithms,
+                           final EncryptedContentInfo encryptedContentInfo,
+                           final ASN1Set certificates,
+                           final ASN1Set crls,
+                           final ASN1Set signerInfos) {
 
         this.version = new DERInteger(1);// Always 1
         this.recipientInfos = recipientInfos;
@@ -52,7 +52,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
         this.signerInfos = signerInfos;
     }
 
-    SignedAndEnvelopedData(ASN1Sequence seq) {
+    SignedAndEnvelopedData(final ASN1Sequence seq) {
         int index = 0;
         this.version = (DERInteger) seq.getObjectAt(index++);
         this.recipientInfos = ASN1Set.getInstance(seq.getObjectAt(index++));
@@ -83,7 +83,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
      * @exception IllegalArgumentException
      *            if the object held by the tagged object cannot be
      *            converted. */
-    static SignedAndEnvelopedData getInstance(ASN1TaggedObject obj, boolean explicit) {
+    static SignedAndEnvelopedData getInstance(final ASN1TaggedObject obj, final boolean explicit) {
         return getInstance(ASN1Sequence.getInstance(obj, explicit));
     }
 
@@ -92,7 +92,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
      *        the object we want converted.
      * @exception IllegalArgumentException
      *            if the object cannot be converted. */
-    static SignedAndEnvelopedData getInstance(Object obj) {
+    static SignedAndEnvelopedData getInstance(final Object obj) {
         if (obj == null || obj instanceof SignedAndEnvelopedData) {
             return (SignedAndEnvelopedData) obj;
         }
@@ -133,7 +133,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
     }
 
     /** Produce an object suitable for an ASN1OutputStream.
-     * 
+     *
      * <pre>
      *    SignedAndEnvelopedData ::= SEQUENCE {
      *    version Version,
@@ -146,11 +146,11 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
      *    crls
      *      [1] IMPLICIT CertificateRevocationLists OPTIONAL,
      *    signerInfos SignerInfos }
-     * 
+     *
      * </pre> */
     @Override
     public DERObject toASN1Object() {
-        ASN1EncodableVector v = new ASN1EncodableVector();
+        final ASN1EncodableVector v = new ASN1EncodableVector();
 
         v.add(version);
         v.add(recipientInfos);

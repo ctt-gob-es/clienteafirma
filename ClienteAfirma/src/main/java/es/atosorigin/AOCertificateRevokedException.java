@@ -27,7 +27,7 @@ public class AOCertificateRevokedException extends Exception {
         return revocationDate;
     }
 
-    public void setRevocationDate(Date revocationDate) {
+    public void setRevocationDate(final Date revocationDate) {
         this.revocationDate = revocationDate;
     }
 
@@ -35,7 +35,7 @@ public class AOCertificateRevokedException extends Exception {
         return revocationReason;
     }
 
-    public void setRevocationReason(String revocationReason) {
+    public void setRevocationReason(final String revocationReason) {
         this.revocationReason = revocationReason;
     }
 }

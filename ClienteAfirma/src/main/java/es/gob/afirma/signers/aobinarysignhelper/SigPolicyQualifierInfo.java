@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -21,28 +21,28 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 /** Signature Policy qualifiers, tipo especial para CADES-EPES
- * 
+ *
  * <pre>
  *   SigPolicyQualifierInfo ::= SEQUENCE {
  *       SigPolicyQualifierId  SigPolicyQualifierId,
  *       SigQualifier          ANY DEFINED BY policyQualifierId }
  * </pre>
- * 
+ *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un Signature Policy qualifiers basandose en BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> de la clase
  * Policy qualifiers. */
 final class SigPolicyQualifierInfo extends ASN1Encodable {
 
-    private DERObjectIdentifier SigPolicyQualifierId;
-    private DEREncodable SigQualifier;
+    private final DERObjectIdentifier SigPolicyQualifierId;
+    private final DEREncodable SigQualifier;
 
     /** Creates a new <code>SigPolicyQualifierInfo</code> instance.
      * @param SigPolicyQualifierId
      *        Valor <code>PolicyQualifierId</code>
      * @param SigQualifier
      *        Es el calificador, definido en el campo de arriba. */
-    public SigPolicyQualifierInfo(DERObjectIdentifier SigPolicyQualifierId, DEREncodable SigQualifier) {
+    public SigPolicyQualifierInfo(final DERObjectIdentifier SigPolicyQualifierId, final DEREncodable SigQualifier) {
         this.SigPolicyQualifierId = SigPolicyQualifierId;
         this.SigQualifier = SigQualifier;
     }
@@ -51,7 +51,7 @@ final class SigPolicyQualifierInfo extends ASN1Encodable {
      * cPSuri.
      * @param cps
      *        El CPS (certification practice statement) uri como <code>String</code>. */
-    public SigPolicyQualifierInfo(String cps) {
+    public SigPolicyQualifierInfo(final String cps) {
         SigPolicyQualifierId = PKCSObjectIdentifiers.id_spq_ets_uri;
         SigQualifier = new DERIA5String(cps);
     }
@@ -59,7 +59,7 @@ final class SigPolicyQualifierInfo extends ASN1Encodable {
     /** Crea una nueva estancia de <code>SigPolicyQualifierInfo</code> .
      * @param as
      *        Estructura X509 codificada como ASN1Sequence. */
-    public SigPolicyQualifierInfo(ASN1Sequence as) {
+    public SigPolicyQualifierInfo(final ASN1Sequence as) {
         if (as.size() != 2) {
             throw new IllegalArgumentException("Bad sequence size: " + as.size());
         }
@@ -72,9 +72,13 @@ final class SigPolicyQualifierInfo extends ASN1Encodable {
      * @param as
      *        Objeto a estanciar.
      * @return Estancia a partir del objeto pasado por par&aacute;metro. */
-    public static SigPolicyQualifierInfo getInstance(Object as) {
-        if (as instanceof SigPolicyQualifierInfo) return (SigPolicyQualifierInfo) as;
-        else if (as instanceof ASN1Sequence) return new SigPolicyQualifierInfo((ASN1Sequence) as);
+    public static SigPolicyQualifierInfo getInstance(final Object as) {
+        if (as instanceof SigPolicyQualifierInfo) {
+            return (SigPolicyQualifierInfo) as;
+        }
+        else if (as instanceof ASN1Sequence) {
+            return new SigPolicyQualifierInfo((ASN1Sequence) as);
+        }
         throw new IllegalArgumentException("unknown object in getInstance.");
     }
 

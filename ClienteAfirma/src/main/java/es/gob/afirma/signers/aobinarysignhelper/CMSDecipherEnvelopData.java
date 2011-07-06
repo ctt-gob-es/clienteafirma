@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -52,7 +52,7 @@ public final class CMSDecipherEnvelopData {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public byte[] dechiperEnvelopData(byte[] cmsData, PrivateKeyEntry keyEntry) throws IOException,
+    public byte[] dechiperEnvelopData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                CertificateEncodingException,
                                                                                AOException,
                                                                                AOInvalidRecipientException,
@@ -64,7 +64,7 @@ public final class CMSDecipherEnvelopData {
 
         try {
             // Contenido de EnvelopedData
-            ASN1Sequence contentEnvelopedData = Utils.fetchWrappedData(cmsData);
+            final ASN1Sequence contentEnvelopedData = Utils.fetchWrappedData(cmsData);
 
             enveloped = EnvelopedData.getInstance(contentEnvelopedData);
             elementRecipient = enveloped.getRecipientInfos().getObjects();
@@ -73,27 +73,27 @@ public final class CMSDecipherEnvelopData {
             throw new AOException("El fichero no contiene un tipo EnvelopedData", ex);
         }
 
-        EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas((X509Certificate) keyEntry.getCertificate(), elementRecipient);
+        final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas((X509Certificate) keyEntry.getCertificate(), elementRecipient);
 
         // Obtenemos el contenido cifrado
-        EncryptedContentInfo contenidoCifrado = enveloped.getEncryptedContentInfo();
+        final EncryptedContentInfo contenidoCifrado = enveloped.getEncryptedContentInfo();
 
         // Obtenemos el algoritmo usado para cifrar la clave generada.
-        AlgorithmIdentifier algClave = contenidoCifrado.getContentEncryptionAlgorithm();
+        final AlgorithmIdentifier algClave = contenidoCifrado.getContentEncryptionAlgorithm();
 
         // Asignamos la clave de descifrado del contenido.
-        KeyAsigned keyAsigned = Utils.assignKey(encryptedKeyDatas.getEncryptedKey(), keyEntry, algClave);
+        final KeyAsigned keyAsigned = Utils.assignKey(encryptedKeyDatas.getEncryptedKey(), keyEntry, algClave);
 
         // Desciframos el contenido.
         final byte[] deciphered;
-        byte[] contCifrado = contenidoCifrado.getEncryptedContent().getOctets();
+        final byte[] contCifrado = contenidoCifrado.getEncryptedContent().getOctets();
         try {
             deciphered = Utils.deCipherContent(contCifrado, keyAsigned.getConfig(), keyAsigned.getCipherKey());
         }
-        catch (InvalidKeyException ex) {
+        catch (final InvalidKeyException ex) {
             throw ex;
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             throw new AOException("Error al descifrar los contenidos del sobre digital", ex);
         }
         return deciphered;

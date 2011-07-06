@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -49,18 +49,18 @@ public final class CMSInformation {
      *         datos
      * @throws AOInvalidFormatException
      *         Error de formato no v&aacute;lido. */
-    public String getInformation(byte[] data) throws IOException, AOInvalidFormatException {
+    public String getInformation(final byte[] data) throws IOException, AOInvalidFormatException {
         String datos = "";
 
-        ASN1InputStream is = new ASN1InputStream(data);
+        final ASN1InputStream is = new ASN1InputStream(data);
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         ASN1Sequence dsq = null;
         dsq = (ASN1Sequence) is.readObject();
-        Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID Data
-        DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
+        final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
         // Contenido a obtener informacion
-        ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
         if (doi.equals(PKCSObjectIdentifiers.data)) {
             datos = Utils.getFromData();
         }
@@ -97,18 +97,18 @@ public final class CMSInformation {
 
     /** Obtiene la informaci&oacute;n de un tipo Digested Data.
      * @return Representaci&oacute;n de los datos. */
-    private String getFromDigestedData(ASN1TaggedObject doj) {
+    private String getFromDigestedData(final ASN1TaggedObject doj) {
         String detalle = "";
         detalle = detalle + "Tipo: DigestedData\n";
 
         // obtenemos el digestedData
-        DigestedData dd = new DigestedData((ASN1Sequence) doj.getObject());
+        final DigestedData dd = new DigestedData((ASN1Sequence) doj.getObject());
 
         // obtenemos la version
         detalle = detalle + "Version: " + dd.getVersion() + "\n";
 
         // obtenemos el algoritmo
-        AlgorithmIdentifier ai = dd.getDigestAlgorithm();
+        final AlgorithmIdentifier ai = dd.getDigestAlgorithm();
         detalle = detalle + "Algoritmo de firma: " + ai.getAlgorithm() + "\n";
 
         // obtenemos el tipo de contenido
@@ -119,10 +119,10 @@ public final class CMSInformation {
 
     /** Obtiene la informaci&oacute;n de un tipo Compressed Data.
      * @return Representaci&oacute;n de los datos. */
-    private String getFromCompressedData(ASN1TaggedObject doj) {
+    private String getFromCompressedData(final ASN1TaggedObject doj) {
         String detalle = "";
         detalle = detalle + "Tipo: CompressedData\n";
-        CompressedData ed = new CompressedData((ASN1Sequence) doj.getObject());
+        final CompressedData ed = new CompressedData((ASN1Sequence) doj.getObject());
 
         // obtenemos la version
         detalle = detalle + "Version: " + ed.getVersion() + "\n";

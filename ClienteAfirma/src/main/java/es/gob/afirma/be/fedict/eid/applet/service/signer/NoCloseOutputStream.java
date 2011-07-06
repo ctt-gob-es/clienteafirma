@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see 
+ * License along with this software; if not, see
  * http://www.gnu.org/licenses/.
  */
 
@@ -47,7 +47,7 @@ public class NoCloseOutputStream extends ProxyOutputStream {
 
     /** Main constructor.
      * @param proxy */
-    public NoCloseOutputStream(OutputStream proxy) {
+    public NoCloseOutputStream(final OutputStream proxy) {
         super(proxy);
     }
 

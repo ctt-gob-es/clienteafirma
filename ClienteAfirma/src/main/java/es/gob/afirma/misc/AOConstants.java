@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -192,7 +192,7 @@ public final class AOConstants {
             return DEFAULT_CIPHER_ALGO;
         }
 
-        private AOCipherAlgorithm(String n, String d, boolean p, boolean k, String oi) {
+        private AOCipherAlgorithm(final String n, final String d, final boolean p, final boolean k, final String oi) {
             name = n;
             description = d;
             password = p;
@@ -242,8 +242,8 @@ public final class AOConstants {
          * @param algorithmName
          *        Nombre del algoritmo.
          * @return Algoritmo solicitado. */
-        public static AOCipherAlgorithm getValueOf(String algorithmName) {
-            for (AOCipherAlgorithm algorithm : AOCipherAlgorithm.values()) {
+        public static AOCipherAlgorithm getValueOf(final String algorithmName) {
+            for (final AOCipherAlgorithm algorithm : AOCipherAlgorithm.values()) {
                 if (algorithm.getName().equalsIgnoreCase(algorithmName)) {
                     return algorithm;
                 }
@@ -265,7 +265,7 @@ public final class AOConstants {
 
         private String description;
 
-        private AOCipherPadding(String n, String d) {
+        private AOCipherPadding(final String n, final String d) {
             name = n;
             description = d;
         }
@@ -286,9 +286,12 @@ public final class AOConstants {
          * @param paddingName
          *        Nombre del algoritmo de relleno.
          * @return Agoritmo de relleno solicitado. */
-        public static AOCipherPadding getValueOf(String paddingName) {
-            for (AOCipherPadding padding : AOCipherPadding.values())
-                if (padding.getName().equals(paddingName)) return padding;
+        public static AOCipherPadding getValueOf(final String paddingName) {
+            for (final AOCipherPadding padding : AOCipherPadding.values()) {
+                if (padding.getName().equals(paddingName)) {
+                    return padding;
+                }
+            }
             return null;
         }
     }
@@ -311,7 +314,7 @@ public final class AOConstants {
         private String name;
         private String description;
 
-        private AOCipherBlockMode(String n, String d) {
+        private AOCipherBlockMode(final String n, final String d) {
             name = n;
             description = d;
         }
@@ -333,8 +336,8 @@ public final class AOConstants {
          * @param blockModeName
          *        Nombre del modo de bloque.
          * @return Modo de bloque solicitado. */
-        public static AOCipherBlockMode getValueOf(String blockModeName) {
-            for (AOCipherBlockMode blockMode : AOCipherBlockMode.values()) {
+        public static AOCipherBlockMode getValueOf(final String blockModeName) {
+            for (final AOCipherBlockMode blockMode : AOCipherBlockMode.values()) {
                 if (blockMode.getName().equals(blockModeName)) {
                     return blockMode;
                 }
@@ -527,7 +530,7 @@ public final class AOConstants {
         // "WIExplorerMy")
         ;
 
-        private AOKeyStore(String d, int o, String n) {
+        private AOKeyStore(final String d, final int o, final String n) {
             description = d;
             ordinal = o;
             name = n;

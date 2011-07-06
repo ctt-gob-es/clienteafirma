@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -27,21 +27,21 @@ import es.gob.afirma.misc.AOCryptoUtil;
 
 /** Clase que implementa firma digital PKCS#7/CMS EncryptedData. La Estructura
  * del mensaje es la siguiente:<br>
- * 
+ *
  * <pre>
  * <code>
- * 
+ *
  *  id-encryptedData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
  *          us(840) rsadsi(113549) pkcs(1) pkcs7(7) 6 }
- * 
+ *
  *  EncryptedData ::= SEQUENCE {
  *        version CMSVersion,
  *        encryptedContentInfo EncryptedContentInfo,
  *        unprotectedAttrs [1] IMPLICIT UnprotectedAttributes OPTIONAL }
- * 
+ *
  * </code>
  * </pre>
- * 
+ *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje EncryptedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
@@ -65,10 +65,10 @@ public final class CMSEncryptedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    public byte[] genEncryptedData(byte[] data, String digAlg, AOCipherConfig config, Key cipherKey, Oid dataType, Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
+    public byte[] genEncryptedData(final byte[] data, final String digAlg, final AOCipherConfig config, final Key cipherKey, final Oid dataType, final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
 
         // Datos previos &uacute;tiles
-        String digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(digAlg);
+        final String digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(digAlg);
 
         // generamos el contenedor de cifrado
         EncryptedContentInfo encInfo = null;
@@ -76,7 +76,7 @@ public final class CMSEncryptedData {
             // 3. ENCRIPTEDCONTENTINFO
             encInfo = Utils.getEncryptedContentInfo(data, cipherKey, config);
         }
-        catch (Exception ex) {
+        catch (final Exception ex) {
             Logger.getLogger("es.gob.afirma").severe("Error durante el proceso cifrado: " + ex);
         }
 
