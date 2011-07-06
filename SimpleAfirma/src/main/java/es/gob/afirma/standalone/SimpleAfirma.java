@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -154,7 +154,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
         loadMainApp(true);
     }
-    
+
     private void loadDefaultKeyStore() {
         this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         try {
@@ -180,7 +180,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
         if (DNIeManager.BLOWN_DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG) System.out.println("Recibido evento de BLOWN DNI INSERTED");  //$NON-NLS-1$
+            if (DEBUG)
+             {
+                System.out.println("Recibido evento de BLOWN DNI INSERTED");  //$NON-NLS-1$
+            }
             loadDefaultKeyStore();
             loadMainApp(true);
             UIUtils.showErrorMessage(
@@ -192,7 +195,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             return;
         }
         else if (DNIeManager.CARD_EXCEPTION.equals(evt.getPropertyName())) {
-            if (DEBUG) System.out.println("Recibido evento de CARD EXCEPTION"); //$NON-NLS-1$
+            if (DEBUG)
+             {
+                System.out.println("Recibido evento de CARD EXCEPTION"); //$NON-NLS-1$
+            }
             UIUtils.showErrorMessage(
                     this.container,
                     Messages.getString("SimpleAfirma.1"), //$NON-NLS-1$
@@ -202,7 +208,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             return;
         }
         else if (DNIeManager.NOT_DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG) System.out.println("Recibido evento de NOT DNI INSERTED"); //$NON-NLS-1$
+            if (DEBUG)
+             {
+                System.out.println("Recibido evento de NOT DNI INSERTED"); //$NON-NLS-1$
+            }
             UIUtils.showErrorMessage(
                     this.container,
                     Messages.getString("SimpleAfirma.12"), //$NON-NLS-1$
@@ -212,7 +221,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             return;
         }
         else if (DNIeManager.DNI_INSERTED.equals(evt.getPropertyName())) {
-            if (DEBUG) System.out.println("Recibido evento de DNI INSERTED"); //$NON-NLS-1$
+            if (DEBUG)
+             {
+                System.out.println("Recibido evento de DNI INSERTED"); //$NON-NLS-1$
+            }
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             try {
                 new SimpleKeyStoreManagerWorker(this, null, true).execute();
@@ -231,10 +243,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     }
 
-    /** Carga el panel de firma en el interfaz. 
+    /** Carga el panel de firma en el interfaz.
      * @param firstTime <code>true</code> si se la primera vez que se carga, <code>en caso contrario</code>
      */
-    public void loadMainApp(final boolean firstTime) { 
+    public void loadMainApp(final boolean firstTime) {
         if (this.window != null) {
         	this.window.setTitle(Messages.getString("SimpleAfirma.10")); //$NON-NLS-1$
             if (Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -356,7 +368,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      *        C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
      *        indica error y cero indica salida normal */
     public void closeApplication(final int exitCode) {
-        if (this.window != null) this.window.dispose();
+        if (this.window != null) {
+            this.window.dispose();
+        }
         System.exit(exitCode);
     }
 
@@ -394,7 +408,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
         this.container.repaint();
         this.currentPanel = newPanel;
-        if (this.window != null) this.window.repaint();
+        if (this.window != null) {
+            this.window.repaint();
+        }
     }
 
     private Locale buildLocale(final String locale) {
@@ -537,9 +553,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
      *        Par&aacute;metros en l&iacute;nea de comandos */
     public static void main(final String[] args) {
         if (args != null && args.length > 0) {
-            File signFile = new File(args[0]);
+            final File signFile = new File(args[0]);
             if (signFile.exists() && signFile.isFile() && signFile.canRead()) {
-                VisorFirma visor = new VisorFirma(new File(args[0]));
+                final VisorFirma visor = new VisorFirma(new File(args[0]));
                 visor.initialize(false, null);
             }
             else {
@@ -550,5 +566,5 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             new SimpleAfirma().initialize(false);
         }
     }
-    
+
 }

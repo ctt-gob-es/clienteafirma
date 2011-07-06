@@ -36,7 +36,7 @@ public final class DNIePasswordCallback extends PasswordCallback {
      * la inserci&oacute;n de la contrase&ntilde;a.
      */
     private final Component parent;
-    
+
     @Override
     public char[] getPassword() {
         final String text = Messages.getString("DNIePasswordCallback.1"); //$NON-NLS-1$
@@ -48,7 +48,7 @@ public final class DNIePasswordCallback extends PasswordCallback {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(lbText);
         panel.add(pwd);
-        
+
         final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, new ImageIcon(this.getClass().getResource("/resources/dnie_logo.png"))) { //$NON-NLS-1$
             private static final long serialVersionUID = -3012522768561175760L;
             @Override

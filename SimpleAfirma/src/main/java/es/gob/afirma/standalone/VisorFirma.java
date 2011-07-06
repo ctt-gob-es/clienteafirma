@@ -33,10 +33,10 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
     private JFrame window;
     private Container container = null;
     private JPanel currentPanel;
-    
+
     /** Fichero de firma. */
     private File signFile;
-    
+
     public VisorFirma(final File signFile) {
         this.signFile = signFile;
         this.setLookAndFeel();
@@ -99,13 +99,13 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
             );
         }
     }
-    
+
     public void initialize(final boolean asApplet, final File sigFile) {
 
         if (sigFile != null) {
             this.signFile = sigFile;
         }
-        
+
         // Cargamos las preferencias establecidas
         this.preferences = Preferences.userNodeForPackage(SimpleAfirma.class);
         setDefaultLocale(buildLocale(this.preferences.get(SimpleAfirma.PREFERENCES_LOCALE, Locale.getDefault().toString())));
@@ -116,16 +116,16 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
         else {
             this.currentPanel = new VisorPanel(this.signFile, null, this);
             this.container = new MainScreen(this, this.currentPanel);
-            
+
             if (this.window != null) {
                 this.window.dispose();
             }
-            
+
             this.window = (JFrame) this.container;
             this.window.setTitle(Messages.getString("VisorFirma.0"));  //$NON-NLS-1$
         }
     }
-    
+
     private Locale buildLocale(final String locale) {
         final String[] frags = locale.split("_"); //$NON-NLS-1$
         if (frags.length == 1) {
@@ -138,7 +138,7 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
             return new Locale(frags[0], frags[1], frags[2]);
         }
     }
-    
+
     /** Listado de localizaciones soportadas por la aplicaci&oacute;n. */
     private static Locale[] locales = new Locale[] {
             Locale.getDefault(), new Locale("en") //$NON-NLS-1$
@@ -160,7 +160,7 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
             Messages.changeLocale();
         }
     }
-    
+
     /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
      * @param key
      *        Clave de la preferencia.
@@ -180,18 +180,18 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
         this.preferences.put(key, value);
     }
 
-    
+
     @Override
-    public void windowClosing(WindowEvent e) {
+    public void windowClosing(final WindowEvent e) {
         closeApplication(0);
     }
-    @Override public void windowOpened(WindowEvent e) { }
-    @Override public void windowClosed(WindowEvent e) { }
-    @Override public void windowIconified(WindowEvent e) { }
-    @Override public void windowDeiconified(WindowEvent e) { }
-    @Override public void windowActivated(WindowEvent e) { }
-    @Override public void windowDeactivated(WindowEvent e) { }
-    
+    @Override public void windowOpened(final WindowEvent e) { }
+    @Override public void windowClosed(final WindowEvent e) { }
+    @Override public void windowIconified(final WindowEvent e) { }
+    @Override public void windowDeiconified(final WindowEvent e) { }
+    @Override public void windowActivated(final WindowEvent e) { }
+    @Override public void windowDeactivated(final WindowEvent e) { }
+
     /** Cierra la aplicaci&oacute;n.
      * @param exitCode
      *        C&oacute;digo de cierre de la aplicaci&oacute;n (negativo
@@ -202,7 +202,7 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
         }
         System.exit(exitCode);
     }
-    
+
     @Override
     public void actionPerformed(final ActionEvent e) {
         final File sgFile = FileUIManager.openFile(VisorFirma.this.window, null, null, Messages.getString("VisorFirma.1")); //$NON-NLS-1$

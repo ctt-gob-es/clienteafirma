@@ -20,7 +20,7 @@ public final class UIUtils {
      * @param title Titulo de la ventana de error
      * @param messageType Tipo de mensaje
      */
-    public static void showErrorMessage(final Component parent, final Object message, final String title, final int messageType) { 
+    public static void showErrorMessage(final Component parent, final Object message, final String title, final int messageType) {
 
         JOptionPane.showOptionDialog(
                 parent,

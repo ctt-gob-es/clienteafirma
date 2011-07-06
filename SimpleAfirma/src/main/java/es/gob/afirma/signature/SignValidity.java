@@ -17,7 +17,7 @@ public final class SignValidity {
         /** Firma generada en la misma aplicaci&oacute;n, se considera siempre v&aacute;lida. */
         GENERATED
     }
-    
+
     /** Errores que invalidan una firma o impiden conocer si es v&aacute;lida o no. */
     public enum VALIDITY_ERROR {
         /** Cuando no se puede comprobar la validez por no tener los datos firmados. */
@@ -39,13 +39,13 @@ public final class SignValidity {
         /** Cuando existe alg&uacute;n problema con las CRLs incrustadas en la firma. */
         CRL_PROBLEM
     }
-    
+
     /** Validez de la firma. */
     private final SIGN_DETAIL_TYPE validity;
-    
+
     /** Error que invalida la firma o hace que la validez sea desconocida. */
     private final VALIDITY_ERROR error;
-    
+
     /**
      * Identifica la validez de una firma.
      * @param type Validez de la firma.
@@ -69,7 +69,7 @@ public final class SignValidity {
      * se devolver&aacute; {@code null}.
      * @return Error que invalida la firma o impide comprobar su validez.
      */
-    public VALIDITY_ERROR getError() { 
+    public VALIDITY_ERROR getError() {
         return this.error;
     }
 }

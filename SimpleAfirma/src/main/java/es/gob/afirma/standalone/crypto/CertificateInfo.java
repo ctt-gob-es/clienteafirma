@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -29,7 +29,7 @@ public final class CertificateInfo {
 
     /** Icono ilustrativo del Certificado. */
     private final Icon icon;
-    
+
     private final String iconTooltip;
 
     /** Texto descriptivo del certificado. */
@@ -37,12 +37,12 @@ public final class CertificateInfo {
 
     /** Construye el objeto con la informaci&oacute;n del certificado.
      * @param cert Certificado al cual se refierre la informaci&oacute;n
-     * @param description Texto descriptivo del certificado. 
+     * @param description Texto descriptivo del certificado.
      * @param ocsp Configuraci&oacute;n de OCSP para la validaci&oacute;n del certificado
      * @param i Icono para el certificado
      * @param iTooltip <i>Tooltip</i> para el icono del certificado */
     public CertificateInfo(final X509Certificate cert, final String description, final AOCertVerifier ocsp, final Icon i, final String iTooltip) {
-        
+
     	if (description == null || "".equals(description)) {  //$NON-NLS-1$
         	if (cert == null) {
         		this.descriptionText = Messages.getString("CertificateInfo.0"); //$NON-NLS-1$
@@ -54,23 +54,23 @@ public final class CertificateInfo {
         else {
             this.descriptionText = "<html>" + ((Platform.OS.MACOSX.equals(Platform.getOS())) ? "<br>" : "") + "<a href=\"#\">" + description + "</a>" + "</html>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
         }
-        
+
     	this.ocspConfig = ocsp;
-        
+
         if (i == null) {
         	this.icon = new ImageIcon(this.getClass().getResource("/resources/default_cert_ico.png")); //$NON-NLS-1$
         }
         else {
         	this.icon = i;
         }
-        
+
         if (iTooltip == null) {
         	this.iconTooltip = Messages.getString("CertificateInfo.3"); //$NON-NLS-1$
         }
         else {
         	this.iconTooltip = iTooltip;
         }
-        
+
     }
 
     /**
@@ -81,14 +81,14 @@ public final class CertificateInfo {
         return this.ocspConfig;
     }
 
-    
+
     /** Obtiene el icono del certificado.
      * @return Icono del certificado
      */
     public Icon getIcon() {
         return this.icon;
     }
-    
+
     /** Obtiene el texto del <i>tooltip</i> para el icono del certificado.
      * @return Texto del <i>tooltip</i> para el icono del certificado.
      */

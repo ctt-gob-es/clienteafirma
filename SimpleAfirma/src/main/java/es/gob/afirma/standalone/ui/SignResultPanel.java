@@ -25,10 +25,10 @@ import es.gob.afirma.standalone.SimpleAfirma;
 final class SignResultPanel extends JPanel {
 
     private static final long serialVersionUID = -7982793036430571363L;
-    
+
     private final JEditorPane descTextLabel = new JEditorPane();
     private final JLabel resultTextLabel = new JLabel();
-    
+
     SignResultPanel(final SignValidity validity) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -37,7 +37,7 @@ final class SignResultPanel extends JPanel {
             }
         });
     }
-    
+
     private void createUI(final SignValidity validity) {
 
         final JSVGCanvas resultOperationIcon = new JSVGCanvas();
@@ -87,7 +87,7 @@ final class SignResultPanel extends JPanel {
         });
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
- 
+
         String errorMessage;
         final String resultOperationIconTooltip;
         switch (validity.getValidity()) {
@@ -137,12 +137,12 @@ final class SignResultPanel extends JPanel {
                 break;
         }
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);
-        
+
         this.resultTextLabel.setFont(this.getFont().deriveFont(Font.BOLD, this.getFont().getSize() + 8));
 
         this.setLayout(new GridBagLayout());
         setBackground(SimpleAfirma.WINDOW_COLOR);
-        
+
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;

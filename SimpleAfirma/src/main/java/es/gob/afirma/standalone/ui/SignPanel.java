@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -114,7 +114,7 @@ public final class SignPanel extends JPanel {
 
     /** Indica si la operaci&oacute;n a realizar es una cofirma. */
     private boolean cosign = false;
-    
+
     private File currentFile = null;
 
     private boolean isXML(final byte[] data) {
@@ -185,12 +185,13 @@ public final class SignPanel extends JPanel {
             AOSignInfo info = null;
             try {
                 info = this.signer.getSignInfo(data);
-            } 
+            }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("no se pudo extraer la informacion de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
-            if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner)
+            if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner) {
                 iconPath = FILE_ICON_XML;
+            }
             else {
                 iconPath = FILE_ICON_BINARY;
             }
@@ -249,7 +250,7 @@ public final class SignPanel extends JPanel {
         if (this.saf.isKeyStoreReady()) {
             setSignCommandEnabled(true);
         }
-        else { 
+        else {
             this.signButton.setText(""); //$NON-NLS-1$
             this.signButton.setIcon(new ImageIcon(this.getClass().getResource("/resources/progress.gif"))); //$NON-NLS-1$
         }
@@ -364,11 +365,11 @@ public final class SignPanel extends JPanel {
     /** Construye el panel de firma, en el que se selecciona y se firma un fichero.
      * @param win Ventana de primer nivel, para el cambio de t&iacute;tulo en la carga de fichero
      * @param sa Clase principal, para proporcionar el <code>AOKeyStoreManager</code> necesario para
-     *        realizar las firmas y cambiar de panel al finalizar una firma 
+     *        realizar las firmas y cambiar de panel al finalizar una firma
      * @param firstTime <code>true</code> si se la primera vez que se muestra este panel en la
      * aplicaci&oacute;n, <code>false</code> en caso contrario
      */
-    public SignPanel(final JFrame win, final SimpleAfirma sa, final boolean firstTime) { 
+    public SignPanel(final JFrame win, final SimpleAfirma sa, final boolean firstTime) {
         super(true);
         this.window = win;
         this.saf = sa;
@@ -385,7 +386,9 @@ public final class SignPanel extends JPanel {
             this.setBackground(SimpleAfirma.WINDOW_COLOR);
 
             SignPanel.this.selectButton.setText(Messages.getString("SignPanel.32")); //$NON-NLS-1$
-            if (al != null) SignPanel.this.selectButton.addActionListener(al);
+            if (al != null) {
+                SignPanel.this.selectButton.addActionListener(al);
+            }
             SignPanel.this.selectButton.setMnemonic('S');
             SignPanel.this.selectButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignPanel.33") //$NON-NLS-1$
                                        );
@@ -394,27 +397,35 @@ public final class SignPanel extends JPanel {
             SignPanel.this.selectButton.requestFocusInWindow();
             SignPanel.this.selectButton.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent arg0) {
+                public void actionPerformed(final ActionEvent arg0) {
 
                     String fileToLoad;
 
                     if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                        if (SignPanel.this.saf.getCurrentDir() == null) SignPanel.this.saf.setCurrentDir(new File(Platform.getUserHome()));
+                        if (SignPanel.this.saf.getCurrentDir() == null) {
+                            SignPanel.this.saf.setCurrentDir(new File(Platform.getUserHome()));
+                        }
                         final FileDialog fd = new FileDialog((Frame) null, Messages.getString("SignPanel.35")); //$NON-NLS-1$
                         fd.setDirectory(SignPanel.this.saf.getCurrentDir().getAbsolutePath());
                         fd.setVisible(true);
-                        if (fd.getFile() == null) return;
+                        if (fd.getFile() == null) {
+                            return;
+                        }
                         SignPanel.this.saf.setCurrentDir(new File(fd.getDirectory()));
                         fileToLoad = fd.getDirectory() + fd.getFile();
                     }
                     else {
                         final JFileChooser fc = new JFileChooser();
-                        if (SignPanel.this.saf.getCurrentDir() != null) fc.setCurrentDirectory(SignPanel.this.saf.getCurrentDir());
+                        if (SignPanel.this.saf.getCurrentDir() != null) {
+                            fc.setCurrentDirectory(SignPanel.this.saf.getCurrentDir());
+                        }
                         if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(UpperPanel.this)) {
                             SignPanel.this.saf.setCurrentDir(fc.getCurrentDirectory());
                             fileToLoad = fc.getSelectedFile().getAbsolutePath();
                         }
-                        else return;
+                        else {
+                            return;
+                        }
                     }
 
                     try {
@@ -503,7 +514,9 @@ public final class SignPanel extends JPanel {
             signPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
             SignPanel.this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
             SignPanel.this.signButton.setMnemonic('F');
-            if (al != null) SignPanel.this.signButton.addActionListener(al);
+            if (al != null) {
+                SignPanel.this.signButton.addActionListener(al);
+            }
             SignPanel.this.signButton.setEnabled(false);
             signPanel.add(SignPanel.this.signButton);
             SignPanel.this.signButton.addActionListener(new ActionListener() {
@@ -543,7 +556,7 @@ public final class SignPanel extends JPanel {
             this.setBackground(SimpleAfirma.WINDOW_COLOR);
             this.setBorder(BorderFactory.createLineBorder(Color.black));
             this.setLayout(new GridBagLayout());
-            
+
             final JLabel pathLabel = new JLabel(filePath);
             pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 4f));
 
@@ -585,8 +598,8 @@ public final class SignPanel extends JPanel {
 
             // Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
             this.setDropTarget(SignPanel.this.dropTarget);
-            
-            
+
+
             final GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH;
             c.weightx = 0.0;
@@ -624,11 +637,11 @@ public final class SignPanel extends JPanel {
 
         try {
             if (ksm.getKeyStores().get(0).containsAlias(DNIE_SIGNATURE_ALIAS) || ksm.getCertificate(DNIE_SIGNATURE_ALIAS).getIssuerX500Principal().toString().contains("DNIE")) { //$NON-NLS-1$
-                alias = DNIE_SIGNATURE_ALIAS; 
+                alias = DNIE_SIGNATURE_ALIAS;
             }
         }
         catch(final Exception e) {}
-        
+
         if (alias == null) {
             try {
                 alias = AOUIManager.showCertSelectionDialog(ksm.getAliases(), ksm.getKeyStores(),
@@ -667,7 +680,7 @@ public final class SignPanel extends JPanel {
                 signResult = this.signer.cosign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
                                           ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), this)),
                                           p);
-            } 
+            }
             else {
                 signResult = this.signer.sign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
                         ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), this)),
@@ -732,7 +745,9 @@ public final class SignPanel extends JPanel {
         boolean nameMissingExtension = true;
 
         if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            if (this.saf.getCurrentDir() == null) this.saf.setCurrentDir(new File(Platform.getUserHome()));
+            if (this.saf.getCurrentDir() == null) {
+                this.saf.setCurrentDir(new File(Platform.getUserHome()));
+            }
             final FileDialog fd = new FileDialog(this.window, Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
             fd.setDirectory(this.saf.getCurrentDir().getAbsolutePath());
             fd.setFile(newFileName);
@@ -757,7 +772,9 @@ public final class SignPanel extends JPanel {
         }
         else {
             final JFileChooser fc = new JFileChooser();
-            if (this.saf.getCurrentDir() != null) fc.setCurrentDirectory(this.saf.getCurrentDir());
+            if (this.saf.getCurrentDir() != null) {
+                fc.setCurrentDirectory(this.saf.getCurrentDir());
+            }
             fc.setSelectedFile(new File(newFileName));
             fc.setFileFilter(new FileFilter() {
                 @Override
@@ -830,19 +847,27 @@ public final class SignPanel extends JPanel {
         }
         finally {
             try {
-                if (bos != null) bos.flush();
+                if (bos != null) {
+                    bos.flush();
+                }
             }
             catch (final Exception e) {}
             try {
-                if (fos != null) fos.flush();
+                if (fos != null) {
+                    fos.flush();
+                }
             }
             catch (final Exception e) {}
             try {
-                if (bos != null) bos.close();
+                if (bos != null) {
+                    bos.close();
+                }
             }
             catch (final Exception e) {}
             try {
-                if (fos != null) fos.close();
+                if (fos != null) {
+                    fos.close();
+                }
             }
             catch (final Exception e) {}
         }

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -47,19 +47,23 @@ public final class DNIeWaitPanel extends JPanel {
         //this.noDNIPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         this.noDNIPanel.setLayout(new GridBagLayout());
         this.noDNIPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-        
+
         this.noDNIButton.setText(Messages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
-        if (al != null) this.noDNIButton.addActionListener(al);
+        if (al != null) {
+            this.noDNIButton.addActionListener(al);
+        }
         this.noDNIButton.setMnemonic('n');
         this.noDNIButton.getAccessibleContext().setAccessibleDescription(Messages.getString("DNIeWaitPanel.1")); //$NON-NLS-1$
         this.noDNIButton.getAccessibleContext().setAccessibleName(Messages.getString("DNIeWaitPanel.2")); //$NON-NLS-1$
-        if (kl != null) this.noDNIButton.addKeyListener(kl);
+        if (kl != null) {
+            this.noDNIButton.addKeyListener(kl);
+        }
         this.noDNIButton.requestFocus();
         this.noDNIPanel.add(this.noDNIButton);
 
         // Texto informativo
-        ResizingTextPanel textPanel = new ResizingTextPanel(Messages.getString("DNIeWaitPanel.3")); //$NON-NLS-1$
-                
+        final ResizingTextPanel textPanel = new ResizingTextPanel(Messages.getString("DNIeWaitPanel.3")); //$NON-NLS-1$
+
         textPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
         textPanel.setFocusable(false);
 

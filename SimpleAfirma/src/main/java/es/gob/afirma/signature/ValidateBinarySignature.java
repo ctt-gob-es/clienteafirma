@@ -31,12 +31,12 @@ import es.gob.afirma.signers.AOSigner;
  * @author Carlos Gamuci
  */
 public final class ValidateBinarySignature {
-	
+
     /**
      * Valida una firma binaria (CMS/CAdES). Si se especifican los datos que se firmaron
      * se comprobar&aacute; que efectivamente fueron estos, mientras que si no se indican
      * se extraer&aacute;n de la propia firma. Si la firma no contiene los datos no se realizara
-     * esta comprobaci&oacute;n. 
+     * esta comprobaci&oacute;n.
      * @param sign Firma binaria
      * @param data Datos firmados o {@code null} si se desea comprobar contra los datos incrustados
      * en la firma.
@@ -46,7 +46,7 @@ public final class ValidateBinarySignature {
     	if (sign == null) {
     		throw new NullPointerException("La firma a validar no puede ser nula"); //$NON-NLS-1$
     	}
-    	
+
     	AOSigner signer = new AOCMSSigner();
     	if (!signer.isSign(sign)) {
     	    signer = new AOCAdESSigner();
@@ -54,9 +54,9 @@ public final class ValidateBinarySignature {
     	        return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
     	    }
     	}
-    	
+
     	Security.addProvider(new BouncyCastleProvider());
-    	
+
     	try {
     	    byte[] signedData = null;
     	    if (data == null) {
@@ -66,32 +66,32 @@ public final class ValidateBinarySignature {
     	        }
     	    }
     	    verifySignatures(sign, data != null ? data : signedData);
-    	} catch (CertStoreException e) {
+    	} catch (final CertStoreException e) {
     	    // Ocurrio un error al recuperar los certificados o estos no son validos
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_PROBLEM);
-        } catch (CertificateExpiredException e) {
+        } catch (final CertificateExpiredException e) {
          // Certificado caducado
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
-        } catch (CertificateNotYetValidException e) {
+        } catch (final CertificateNotYetValidException e) {
          // Certificado aun no valido
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (final NoSuchAlgorithmException e) {
          // Algoritmo no reconocido
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED);
-        } catch (NoMatchDataException e) {
+        } catch (final NoMatchDataException e) {
          // Los datos indicados no coinciden con los datos de firma
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
-        } catch (CRLException e) {
+        } catch (final CRLException e) {
          // Problema en la validacion de las CRLs de la firma
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // La firma no es una firma binaria valida
             return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
         }
-    	
+
     	return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
     }
-    
+
     /**
      * Verifica la valides de una firma. Si la firma es v&aacute;lida, no hace nada. Si no es
      * v&aacute;lida, lanza una excepci&oacute;n.
@@ -101,59 +101,59 @@ public final class ValidateBinarySignature {
      * @throws CertStoreException Cuando se encuentra un error en los certificados de
      * firma o estos no pueden recuperarse.
      * @throws CertificateExpiredException Cuando el certificado est&aacute;a caducado.
-     * @throws CertificateNotYetValidException Cuando el certificado aun no es v&aacute;lido.  
+     * @throws CertificateNotYetValidException Cuando el certificado aun no es v&aacute;lido.
      * @throws NoSuchAlgorithmException Cuando no se reconoce o soporta alguno de los
      * algoritmos utilizados en la firma.
      * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
      * @throws CRLException Cuando ocurre un error con las CRL de la firma.
      * @throws Exception Cuando la firma resulte no v&aacute;lida.
      */
-    private static void verifySignatures(byte[] sign, byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
-        
+    private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
+
         final String BC = BouncyCastleProvider.PROVIDER_NAME;
-        
-        CMSSignedData s = new CMSSignedData(sign);
-        CertStore certStore = s.getCertificatesAndCRLs("Collection", BC);  //$NON-NLS-1$
-        SignerInformationStore signers = s.getSignerInfos();
-        Iterator<?> it = signers.getSigners().iterator();
+
+        final CMSSignedData s = new CMSSignedData(sign);
+        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BC);  //$NON-NLS-1$
+        final SignerInformationStore signers = s.getSignerInfos();
+        final Iterator<?> it = signers.getSigners().iterator();
 
         while (it.hasNext()) {
-            SignerInformation signer = (SignerInformation) it.next();
-            Iterator<?> certIt = certStore.getCertificates(signer.getSID()).iterator();
-            X509Certificate cert = (X509Certificate) certIt.next();
+            final SignerInformation signer = (SignerInformation) it.next();
+            final Iterator<?> certIt = certStore.getCertificates(signer.getSID()).iterator();
+            final X509Certificate cert = (X509Certificate) certIt.next();
 
             if (!signer.verify(cert, BC)) {
                 throw new Exception("Firma no valida"); //$NON-NLS-1$
             }
-            
+
             if (data != null) {
                 if (signer.getDigestAlgorithmID() == null) {
                     throw new CMSException("No se ha podido localizar el algoritmo de huella digital"); //$NON-NLS-1$
                 }
-                
+
                 String mdAlgorithm;
-                String mdAlgorithmOID = signer.getDigestAlgorithmID().getAlgorithm().toString();
+                final String mdAlgorithmOID = signer.getDigestAlgorithmID().getAlgorithm().toString();
                 if (AlgorithmId.MD2_oid.toString().equals(mdAlgorithmOID)) {
                     mdAlgorithm = "MD2"; //$NON-NLS-1$
-                } 
+                }
                 else if (AlgorithmId.MD5_oid.toString().equals(mdAlgorithmOID)) {
                     mdAlgorithm = "MD5"; //$NON-NLS-1$
-                } 
+                }
                 else if (AlgorithmId.SHA_oid.toString().equals(mdAlgorithmOID)) {
                     mdAlgorithm = "SHA1"; //$NON-NLS-1$
-                } 
+                }
                 else if (AlgorithmId.SHA256_oid.toString().equals(mdAlgorithmOID)) {
                     mdAlgorithm = "SHA256"; //$NON-NLS-1$
-                } 
+                }
                 else if (AlgorithmId.SHA384_oid.toString().equals(mdAlgorithmOID)) {
                     mdAlgorithm = "SHA384"; //$NON-NLS-1$
-                } 
+                }
                 else if (AlgorithmId.SHA512_oid.toString().equals(mdAlgorithmOID)) {
                     mdAlgorithm = "SHA512"; //$NON-NLS-1$
                 } else {
                     throw new NoSuchAlgorithmException("Algoritmo de huella digital no reconocido"); //$NON-NLS-1$
                 }
-                
+
                 if (!MessageDigest.isEqual(MessageDigest.getInstance(mdAlgorithm).digest(data),
                         signer.getContentDigest())) {
                     throw new NoMatchDataException("Los datos introducidos no coinciden con los firmados"); //$NON-NLS-1$
@@ -174,7 +174,7 @@ public final class ValidateBinarySignature {
 //          AOUtil.getDataFromInputStream(AOUtil.loadFile(
 //                  AOUtil.createURI("C:\\Users\\A122466\\Desktop\\borrar\\evisor.properties.csig2.csig"), null, false)),
 //          null);
-//  
+//
 //  System.out.println("OK");
 //}
 }

@@ -8,8 +8,8 @@ public class NoMatchDataException extends Exception {
     public NoMatchDataException() {
         super();
     }
-    
-    public NoMatchDataException(String message) {
+
+    public NoMatchDataException(final String message) {
         super(message);
     }
 }

@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -42,10 +42,10 @@ public final class SignDetailPanel extends JPanel {
 
     /** Referencia a la aplicaci&ocute;n de firma. */
     private final SimpleAfirma saf;
-    
+
     /** Bot&oacute;n para volver a la pantalla anterior. */
-    private JButton returnButton = new JButton();
-    
+    private final JButton returnButton = new JButton();
+
     /** Construye el panel para mostrar el detalle de una firma electr&oacute;nica.
      * @param saf Referencia a la misma aplicaci&oacute;n
      * @param sig Firma electr&oacute;nica que se desea visualizar
@@ -96,11 +96,15 @@ public final class SignDetailPanel extends JPanel {
                 }
                 finally {
                     try {
-                        if (fis != null) fis.close();
+                        if (fis != null) {
+                            fis.close();
+                        }
                     }
                     catch (final Exception e) {}
                     try {
-                        if (bis != null) bis.close();
+                        if (bis != null) {
+                            bis.close();
+                        }
                     }
                     catch (final Exception e) {}
                 }
@@ -111,7 +115,7 @@ public final class SignDetailPanel extends JPanel {
         final JPanel componentPanel = new SignDataPanel(new File(sigPath), sig, fileTypeIcon, signingCert);
 
         final JPanel returnPanel = new JPanel(true);
-        returnPanel.setLayout(new BoxLayout(returnPanel, BoxLayout.Y_AXIS)); 
+        returnPanel.setLayout(new BoxLayout(returnPanel, BoxLayout.Y_AXIS));
         returnPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
         this.returnButton.setText(Messages.getString("SignDetailPanel.0")); //$NON-NLS-1$
         this.returnButton.setMnemonic('m');
@@ -140,7 +144,7 @@ public final class SignDetailPanel extends JPanel {
         c.insets = new Insets(0, 11, 11, 11);
         add(returnPanel, c);
     }
-    
+
     /** Vuelve a la pantalla de selecci&oacute;n de fichero para la firma. */
     private void goToBack() {
         this.saf.loadMainApp(false);

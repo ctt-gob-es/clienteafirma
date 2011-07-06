@@ -17,7 +17,9 @@ class DnieCertAnalyzer extends CertAnalyzer {
 
 	@Override
 	public boolean isValidCert(final X509Certificate cert) {
-		if (cert == null) return false;
+		if (cert == null) {
+            return false;
+        }
 		if (AOUtil.getCN(cert.getIssuerX500Principal().toString()).startsWith("AC DNIE") || AOUtil.getCN(cert.getIssuerX500Principal().toString()).startsWith("AC RAIZ DNIE")) { //$NON-NLS-1$ //$NON-NLS-2$
 		    return true;
 		}
@@ -32,14 +34,25 @@ class DnieCertAnalyzer extends CertAnalyzer {
 	        String nombre = null;
 	        String apellido = null;
 	        for(final Rdn rdn : dniSubject.getRdns()) {
-	            if (rdn.getType().equalsIgnoreCase("GIVENNAME")) nombre = rdn.getValue().toString(); //$NON-NLS-1$
-	            else if (rdn.getType().equalsIgnoreCase("SURNAME")) apellido = rdn.getValue().toString(); //$NON-NLS-1$
+	            if (rdn.getType().equalsIgnoreCase("GIVENNAME")) {
+                    nombre = rdn.getValue().toString(); //$NON-NLS-1$
+                }
+                else if (rdn.getType().equalsIgnoreCase("SURNAME"))
+                 {
+                    apellido = rdn.getValue().toString(); //$NON-NLS-1$
+                }
 	        }
 	        if (nombre != null || apellido != null) {
-	            if (nombre != null) titular = nombre;
+	            if (nombre != null) {
+                    titular = nombre;
+                }
 	            if (apellido != null) {
-	                if (titular != null) titular = titular + " " + apellido; //$NON-NLS-1$
-	                else titular = apellido;
+	                if (titular != null) {
+                        titular = titular + " " + apellido; //$NON-NLS-1$
+                    }
+                    else {
+                        titular = apellido;
+                    }
 	            }
 	        }
 	    }
@@ -49,19 +62,19 @@ class DnieCertAnalyzer extends CertAnalyzer {
 	    System.out.println();
 		return new CertificateInfo(cert, Messages.getString("DnieCertAnalyzer.2") + ((titular != null) ? (" " + Messages.getString("DnieCertAnalyzer.0") + " " + titular) : ""), getDNIeCertVerifier(), new ImageIcon(this.getClass().getResource("/resources/dnie_cert_ico.png")), Messages.getString("DnieCertAnalyzer.4")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 	}
-	
+
 	/**
 	 * Obtiene un validador de certificados DNIe v&iacute;a OCSP.
 	 * @return Validador de certificados de DNIe
 	 */
 	private AOCertVerifier getDNIeCertVerifier() {
-		
+
 		// Instanciamos la clase verificadora
-		AOCertVerifier v = new AOCertVerifier();
-		 		
+		final AOCertVerifier v = new AOCertVerifier();
+
 		// Indicamos que verifique la validez temporal del certificado
 		v.setCheckValidity(true);
-		
+
 		// Anadimos los cerificados CA desde LDAP
 		try {
 			v.addRootCertificatesFromLdap(
@@ -99,7 +112,7 @@ class DnieCertAnalyzer extends CertAnalyzer {
         catch(final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el certificado CA 003 del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
-		
+
 		// Anadimos los certificados raiz de las VA desde LDAP
 		try {
             v.addRootCertificatesFromLdap(
@@ -110,7 +123,7 @@ class DnieCertAnalyzer extends CertAnalyzer {
         catch(final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido anadir el certificado VA FNMT raiz del DNIe: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
-		
+
 		// Habilitamos el OCSP (DNIe SHA-1)
 		try {
 			v.enableOCSP(
@@ -123,7 +136,7 @@ class DnieCertAnalyzer extends CertAnalyzer {
 		catch(final Exception e) {
 			Logger.getLogger("es.gob.afirma").severe("No se ha podido habilitar la validacion OCSP, la validacion puede ser incompleta: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		return v;
 	}
 

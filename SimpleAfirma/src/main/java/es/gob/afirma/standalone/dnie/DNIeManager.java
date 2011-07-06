@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -88,7 +88,9 @@ public final class DNIeManager {
      * @return <code>true</code> si el ATR proporcionado es de un DNIe, <code>false</code> si no lo es */
     private static boolean itsDNIe(final byte[] atr) throws BlownDNIeException {
 
-        if (atr == null) return false;
+        if (atr == null) {
+            return false;
+        }
 
         // Si el ATR termina en 65-81 es que el DNIe esta estropeado
         if (atr.length > 1 && atr[atr.length - 2] == (byte) 0x65 && atr[atr.length - 1] == (byte) 0x81) {
@@ -100,7 +102,9 @@ public final class DNIeManager {
         // 3b,7f,00,00,00,00,6a,44,4e,49,65,00,00,00,00,00,00,00,90,00
         // ff,ff,00,ff,ff,ff,ff,ff,ff,ff,ff,00,00,00,00,00,00,00,ff,ff
 
-        if (atr.length != 20) return false;
+        if (atr.length != 20) {
+            return false;
+        }
         if (atr[0] == (byte) 0x3B && atr[1] == (byte) 0x7F
             && atr[6] == (byte) 0x6A
             && atr[7] == (byte) 0x44
@@ -108,7 +112,9 @@ public final class DNIeManager {
             && atr[9] == (byte) 0x49
             && atr[10] == (byte) 0x65
             && atr[18] == (byte) 0x90
-            && atr[19] == (byte) 0x00) return true;
+            && atr[19] == (byte) 0x00) {
+            return true;
+        }
 
         return false;
     }
@@ -120,12 +126,16 @@ public final class DNIeManager {
         private final CardTerminal cardTerminal;
 
         CardTerminalMonitor(final CardTerminal terminal, final PropertyChangeListener pcl) {
-            if (pcl != null) this.addPropertyChangeListener(pcl);
+            if (pcl != null) {
+                this.addPropertyChangeListener(pcl);
+            }
             this.cardTerminal = terminal;
         }
 
         void startMonitoring() {
-            if (this.cardTerminal == null) return;
+            if (this.cardTerminal == null) {
+                return;
+            }
             Card card = null;
             boolean validCard = true;
             while (true) {
@@ -144,7 +154,7 @@ public final class DNIeManager {
                         }
                         validCard = false;
                         firePropertyChange(CARD_EXCEPTION, "", this.cardTerminal.getName()); //$NON-NLS-1$
-                        
+
                         try {
                             this.cardTerminal.waitForCardAbsent(0);
                         }

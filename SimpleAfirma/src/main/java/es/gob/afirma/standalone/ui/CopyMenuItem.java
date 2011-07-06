@@ -19,7 +19,7 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 	private static final long serialVersionUID = 1750985678317829383L;
 
 	private final JTextComponent textComponent;
-	
+
 	private void createUI() {
 		final JMenuItem copyItem = new JMenuItem(Messages.getString("CopyMenuItem.0")); //$NON-NLS-1$
 		copyItem.addActionListener(new ActionListener() {
@@ -34,7 +34,7 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 		});
 		add(copyItem);
 	}
-	
+
 	CopyMenuItem(final JTextComponent tc) {
 		this.textComponent = tc;
         createUI();
@@ -42,5 +42,5 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 
 	@Override
 	public void lostOwnership(final Clipboard clipboard, final Transferable contents) {}
-	
+
 }

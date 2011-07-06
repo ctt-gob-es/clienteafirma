@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo licencia GPL version 3 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -102,22 +102,30 @@ public final class MainMenu extends JMenuBar {
             public void actionPerformed(final ActionEvent ae) {
                 String fileToLoad;
                 if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-                    if (MainMenu.this.saf.getCurrentDir() == null) MainMenu.this.saf.setCurrentDir(new File(Platform.getUserHome()));
+                    if (MainMenu.this.saf.getCurrentDir() == null) {
+                        MainMenu.this.saf.setCurrentDir(new File(Platform.getUserHome()));
+                    }
                     final FileDialog fd = new FileDialog((Frame) null, Messages.getString("MainMenu.4")); //$NON-NLS-1$
                     fd.setDirectory(MainMenu.this.saf.getCurrentDir().getAbsolutePath());
                     fd.setVisible(true);
-                    if (fd.getFile() == null) return;
+                    if (fd.getFile() == null) {
+                        return;
+                    }
                     MainMenu.this.saf.setCurrentDir(new File(fd.getDirectory()));
                     fileToLoad = fd.getDirectory() + fd.getFile();
                 }
                 else {
                     final JFileChooser fc = new JFileChooser();
-                    if (MainMenu.this.saf.getCurrentDir() != null) fc.setCurrentDirectory(MainMenu.this.saf.getCurrentDir());
+                    if (MainMenu.this.saf.getCurrentDir() != null) {
+                        fc.setCurrentDirectory(MainMenu.this.saf.getCurrentDir());
+                    }
                     if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(MainMenu.this)) {
                         MainMenu.this.saf.setCurrentDir(fc.getCurrentDirectory());
                         fileToLoad = fc.getSelectedFile().getAbsolutePath();
                     }
-                    else return;
+                    else {
+                        return;
+                    }
                 }
                 MainMenu.this.saf.loadFileToSign(fileToLoad);
             }
@@ -131,7 +139,7 @@ public final class MainMenu extends JMenuBar {
         this.firmarMenuItem.setEnabled(false);
         this.firmarMenuItem.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 MainMenu.this.saf.signLoadedFile();
             }
         });
@@ -215,13 +223,13 @@ public final class MainMenu extends JMenuBar {
         // Separador para que la ayuda quede a la derecha, se ignora en Mac OS X
         this.add(Box.createHorizontalGlue());
 
-if (!Platform.OS.MACOSX.equals(Platform.getOS())) {        
+if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
         final JMenu menuAyuda = new JMenu(Messages.getString("MainMenu.9")); //$NON-NLS-1$
         menuAyuda.setMnemonic(KeyEvent.VK_Y);
         menuAyuda.getAccessibleContext().setAccessibleDescription(
               Messages.getString("MainMenu.10") //$NON-NLS-1$
         );
-            
+
 //            final JMenuItem ayudaMenuItem = new JMenuItem(Messages.getString("MainMenu.11")); //$NON-NLS-1$
 //            ayudaMenuItem.setAccelerator(KeyStroke.getKeyStroke("F1")); //$NON-NLS-1$
 //            ayudaMenuItem.getAccessibleContext().setAccessibleDescription(
@@ -253,10 +261,10 @@ if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             acercaMenuItem.setMnemonic(KeyEvent.VK_R);
             menuAyuda.add(acercaMenuItem);
         }
- 
+
         this.add(menuAyuda);
 }
-        
+
         // Los mnemonicos en elementos de menu violan las normas de interfaz de Apple,
         // asi que prescindimos de ellos en Mac OS X
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
@@ -287,19 +295,25 @@ if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
     /** Habilita o deshabilita el men&uacute; de operaciones sobre ficheros.
      * @param en <code>true</code> para habilitar las operaciones sobre ficheros, <code>false</code> para deshabilitarlas */
     public void setEnabledOpenCommand(final boolean en) {
-        if (this.abrirMenuItem != null) this.abrirMenuItem.setEnabled(en);
+        if (this.abrirMenuItem != null) {
+            this.abrirMenuItem.setEnabled(en);
+        }
     }
 
     /** Habilita o deshabilita el elemento de men&uacute; de firma de fichero.
      * @param en <code>true</code> para habilitar el elemento de men&uacute; de firma de fichero, <code>false</code> para deshabilitarlo */
     public void setEnabledSignCommand(final boolean en) {
-        if (this.firmarMenuItem != null) this.firmarMenuItem.setEnabled(en);
+        if (this.firmarMenuItem != null) {
+            this.firmarMenuItem.setEnabled(en);
+        }
     }
-    
+
     /** Habilita o deshabilita el men&uacute; de fichero.
      * @param en <code>true</code> para habilitar el men&uacute; de fichero, <code>false</code> para deshabilitarlo */
     public void setEnabledFileMenu(final boolean en) {
-    	if (this.menuArchivo != null) this.menuArchivo.setEnabled(en);
+    	if (this.menuArchivo != null) {
+            this.menuArchivo.setEnabled(en);
+        }
     }
 
     private void showAbout() {

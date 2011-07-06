@@ -7,7 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
-    
+
     /** Version ID */
     private static final long serialVersionUID = 335850028229506214L;
 

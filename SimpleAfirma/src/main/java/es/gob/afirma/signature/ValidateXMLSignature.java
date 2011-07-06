@@ -45,19 +45,19 @@ public final class ValidateXMLSignature {
         Document doc;
         try {
             doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CORRUPTED_SIGN);
         }
 
         // Find Signature element
-        final NodeList nl = 
+        final NodeList nl =
             doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature"); //$NON-NLS-1$
         if (nl.getLength() == 0) {
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_SIGN);
         }
 
         try {
-            // Create a DOM XMLSignatureFactory that will be used to unmarshal the 
+            // Create a DOM XMLSignatureFactory that will be used to unmarshal the
             // document containing the XMLSignature
             final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", //$NON-NLS-1$
                     (Provider) Class.forName(System.getProperty
@@ -72,11 +72,11 @@ public final class ValidateXMLSignature {
             return fac.unmarshalXMLSignature(valContext).validate(valContext) ?
                     new SignValidity(SIGN_DETAIL_TYPE.OK, null) :
                     new SignValidity(SIGN_DETAIL_TYPE.KO, null);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, null);
         }
     }
-    
+
     /**
      * KeySelector which retrieves the public key out of the
      * KeyValue element and returns it.
@@ -101,7 +101,7 @@ public final class ValidateXMLSignature {
                     final PublicKey pk;
                     try {
                         pk = ((KeyValue)xmlStructure).getPublicKey();
-                    } 
+                    }
                     catch (final KeyException ke) {
                         throw new KeySelectorException(ke);
                     }
@@ -119,11 +119,11 @@ public final class ValidateXMLSignature {
             if (algName.equalsIgnoreCase("DSA") && //$NON-NLS-1$
                     algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)) {
                 return true;
-            } 
+            }
             else if (algName.equalsIgnoreCase("RSA") && //$NON-NLS-1$
                     algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1)) {
                 return true;
-            } 
+            }
             else {
                 return false;
             }
@@ -131,7 +131,7 @@ public final class ValidateXMLSignature {
     }
 
     private static final class SimpleKeySelectorResult implements KeySelectorResult {
-        private PublicKey pk;
+        private final PublicKey pk;
         SimpleKeySelectorResult(final PublicKey pk) {
             this.pk = pk;
         }

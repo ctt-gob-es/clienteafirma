@@ -11,7 +11,7 @@ import es.gob.afirma.signers.AOPDFSigner;
  * @author Carlos Gamuci
  */
 public class DataAnalizerUtil {
-    
+
     /**
      * Comprueba si los datos introducidos se corresponden a un fichero XML.
      * @param data Datos a analizar.
@@ -26,11 +26,11 @@ public class DataAnalizerUtil {
         }
         return true;
     }
-    
+
     /**
      * Comprueba si los datos introducidos se corresponden a un fichero PDF.
      * @param data Datos a analizar.
-     * @return Devuelve {@code true} si los datos son PDF. 
+     * @return Devuelve {@code true} si los datos son PDF.
      */
     public static boolean isPDF(final byte[] data) {
         try {

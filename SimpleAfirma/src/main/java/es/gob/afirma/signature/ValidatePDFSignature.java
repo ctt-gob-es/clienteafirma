@@ -8,7 +8,7 @@ import com.lowagie.text.pdf.PdfReader;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
 public final class ValidatePDFSignature {
-	
+
     /**
      * Valida las firma de un documento PDF.
      * @param sign Documento PDF
@@ -27,7 +27,7 @@ public final class ValidatePDFSignature {
 		   // Con una unica firma que falle damos por malo todo el PDF
 		   if (!af.verifySignature(o.toString()).verify()) {
 			   return false;
-		   }		   
+		   }
     	}
     	return true;
     }

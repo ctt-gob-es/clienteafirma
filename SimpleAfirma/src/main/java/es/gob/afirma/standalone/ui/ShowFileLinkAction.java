@@ -17,22 +17,22 @@ import es.gob.afirma.standalone.Messages;
  */
 final class ShowFileLinkAction {
 
-    private String text;
-    private byte[] data;
-    
+    private final String text;
+    private final byte[] data;
+
     ShowFileLinkAction(final String text, final byte[] data) {
         this.text = text;
         this.data = data;
     }
 
     void action() {
-        
+
         if (this.data == null) {
             return;
         }
-        
-        String ext = this.getCommonDataExtension(this.data);
-        
+
+        final String ext = this.getCommonDataExtension(this.data);
+
         // Si conocemos la extension, intentamos abrir el fichero. Si no, permitimos
         // guardarlo con la extension que se desee.
         if (ext != null) {
@@ -55,7 +55,7 @@ final class ShowFileLinkAction {
                         JOptionPane.ERROR_MESSAGE
                 );
             }
-        } 
+        }
         else {
             FileUIManager.saveFile(
                     null,
@@ -67,11 +67,11 @@ final class ShowFileLinkAction {
             );
         }
     }
-    
+
     private String getCommonDataExtension(final byte[] dat) {
         return new MimeHelper(dat).getExtension();
     }
-    
+
     @Override
     public String toString() {
         return this.text;
