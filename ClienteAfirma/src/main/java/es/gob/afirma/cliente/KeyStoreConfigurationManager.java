@@ -158,8 +158,8 @@ final class KeyStoreConfigurationManager {
     private void initKeyStore(final String path, final String password) throws AOCancelledOperationException, AOKeystoreAlternativeException {
 
         if (this.showLoadingWarning) {
-            JOptionPane.showMessageDialog(this.parent, AppletMessages.getString("SignApplet.13"), //$NON-NLS-1$
-                                          AppletMessages.getString("SignApplet.658"), //$NON-NLS-1$
+            JOptionPane.showMessageDialog(this.parent, "Si desea usar su DNI electr\u00F3nico o cualquier otra tarjeta\r\ninteligente criptogr\u00E1fica / almac\u00E9n de certificados\r\n extra\u00EDble (USB, PCMCIA, etc.), por favor, ins\u00E9rtelo ahora\r\ny pulse el bot\u00F3n Aceptar.",
+                                          "Advertencia",
                                           JOptionPane.WARNING_MESSAGE);
         }
 

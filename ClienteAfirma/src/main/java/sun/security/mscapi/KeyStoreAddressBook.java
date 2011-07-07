@@ -31,7 +31,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
         /** Construye el <code>SPI</code> del KeyStore <i>CA</i> de CAPI. */
         public CA() {
-            super("CA");
+            super("CA"); //$NON-NLS-1$
         }
     }
 
@@ -40,7 +40,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         /** Construye el <code>SPI</code> del KeyStore <i>ADDRESSBOOK</i> de
          * CAPI. */
         public ADDRESSBOOK() {
-            super("ADDRESSBOOK");
+            super("ADDRESSBOOK"); //$NON-NLS-1$
         }
     }
 
@@ -92,7 +92,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * password parameter when passed to the load or store methods. The mode is
      * enabled by default.
      */
-    private static final String KEYSTORE_COMPATIBILITY_MODE_PROP = "sun.security.mscapi.keyStoreCompatibilityMode";
+    private static final String KEYSTORE_COMPATIBILITY_MODE_PROP = "sun.security.mscapi.keyStoreCompatibilityMode"; //$NON-NLS-1$
     private final boolean keyStoreCompatibilityMode;
 
     /* The keystore entries. */
@@ -117,19 +117,19 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
             }
             for (final java.lang.reflect.Method m : nativeWrapper.getClass().getSuperclass().getDeclaredMethods()) {
                 m.setAccessible(true);
-                if (m.getName().equals("loadKeysOrCertificateChains")) {
+                if (m.getName().equals("loadKeysOrCertificateChains")) { //$NON-NLS-1$
                     loadKeysOrCertificateChains = m;
                 }
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.atosorigin").severe("No se han podido obtener los metodos de acceso a sunmscapi.dll: " + e);
+            Logger.getLogger("es.atosorigin").severe("No se han podido obtener los metodos de acceso a sunmscapi.dll: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Get the compatibility mode
-        final String prop = AccessController.doPrivileged(new GetPropertyAction(KEYSTORE_COMPATIBILITY_MODE_PROP));
+        final String prop = AccessController.doPrivileged(new GetPropertyAction(KEYSTORE_COMPATIBILITY_MODE_PROP)).toString();
 
-        if ("false".equalsIgnoreCase(prop)) {
+        if ("false".equalsIgnoreCase(prop)) { //$NON-NLS-1$
             keyStoreCompatibilityMode = false;
         }
         else {
@@ -202,11 +202,11 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         java.lang.reflect.Method getCertificateChain = null;
         for (final Object o : entries) {
             for (final java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
-                if (m.getName().equals("getAlias")) {
+                if (m.getName().equals("getAlias")) { //$NON-NLS-1$
                     m.setAccessible(true);
                     getAlias = m;
                 }
-                else if (m.getName().equals("getCertificateChain")) {
+                else if (m.getName().equals("getCertificateChain")) { //$NON-NLS-1$
                     m.setAccessible(true);
                     getCertificateChain = m;
                 }
@@ -288,7 +288,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            if this operation fails. */
     @Override
     public final void engineSetKeyEntry(final String alias, final byte[] key, final Certificate[] chain) throws KeyStoreException {
-        throw new UnsupportedOperationException("Cannot assign the encoded key to the given alias.");
+        throw new UnsupportedOperationException("Cannot assign the encoded key to the given alias."); //$NON-NLS-1$
     }
 
     /** Assigns the given certificate to the given alias.
@@ -333,13 +333,13 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
             public String nextElement() {
                 final Object o = iter.next();
                 for (final java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
-                    if (m.getName().equals("getAlias")) {
+                    if (m.getName().equals("getAlias")) { //$NON-NLS-1$
                         m.setAccessible(true);
                         try {
                             return m.invoke(o, new Object[0]).toString();
                         }
                         catch (final Exception e) {
-                            Logger.getLogger("es.atosorigin").severe("No se ha podido invocar a sunmscapi.dll para obtener los alias: " + e);
+                            Logger.getLogger("es.atosorigin").severe("No se ha podido invocar a sunmscapi.dll para obtener los alias: " + e);  //$NON-NLS-1$//$NON-NLS-2$
                             return null;
                         }
                     }
@@ -426,10 +426,10 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     @Override
     public final void engineStore(final OutputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
         if (stream != null && !keyStoreCompatibilityMode) {
-            throw new IOException("Keystore output stream must be null");
+            throw new IOException("Keystore output stream must be null"); //$NON-NLS-1$
         }
         if (password != null && !keyStoreCompatibilityMode) {
-            throw new IOException("Keystore password must be null");
+            throw new IOException("Keystore password must be null"); //$NON-NLS-1$
         }
     }
 
@@ -460,11 +460,11 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     @Override
     public final void engineLoad(final InputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
         if (stream != null && !keyStoreCompatibilityMode) {
-            throw new IOException("Keystore input stream must be null");
+            throw new IOException("Keystore input stream must be null"); //$NON-NLS-1$
         }
 
         if (password != null && !keyStoreCompatibilityMode) {
-            throw new IOException("Keystore password must be null");
+            throw new IOException("Keystore password must be null"); //$NON-NLS-1$
         }
 
         /*
@@ -472,7 +472,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
          */
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkPermission(new SecurityPermission("authProvider.SunMSCAPI"));
+            sm.checkPermission(new SecurityPermission("authProvider.SunMSCAPI")); //$NON-NLS-1$
         }
 
         // Clear all key entries
