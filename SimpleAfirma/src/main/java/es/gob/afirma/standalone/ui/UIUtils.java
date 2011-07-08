@@ -4,6 +4,8 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.misc.Platform;
+import es.gob.afirma.misc.WinRegistryWrapper;
 import es.gob.afirma.standalone.Messages;
 
 /**
@@ -21,7 +23,6 @@ public final class UIUtils {
      * @param messageType Tipo de mensaje
      */
     public static void showErrorMessage(final Component parent, final Object message, final String title, final int messageType) {
-
         JOptionPane.showOptionDialog(
                 parent,
                 message,
@@ -29,10 +30,29 @@ public final class UIUtils {
                 JOptionPane.OK_OPTION,
                 messageType,
                 null,
-                new Object[] {
+                new String[] {
                     Messages.getString(Messages.getString("UIUtils.0")) //$NON-NLS-1$
                 },
                 Messages.getString(Messages.getString("UIUtils.0")) //$NON-NLS-1$
         );
     }
+    
+    static boolean hasAssociatedApplication(String extension) {
+        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            if (extension == null || "".equals(extension)) { //$NON-NLS-1$
+                return false;
+            }
+            if (!extension.startsWith(".")) { //$NON-NLS-1$
+                extension = "." + extension; //$NON-NLS-1$
+            }       
+            final Object o = WinRegistryWrapper.get(WinRegistryWrapper.HKEY_CLASSES_ROOT, extension, ""); //$NON-NLS-1$
+            if (o == null) {
+                return false;
+            }
+            return (WinRegistryWrapper.get(WinRegistryWrapper.HKEY_CLASSES_ROOT, o.toString() + "\\shell\\open\\command", "") != null);  //$NON-NLS-1$//$NON-NLS-2$
+        }
+        return true;
+    }
+    
+    
 }

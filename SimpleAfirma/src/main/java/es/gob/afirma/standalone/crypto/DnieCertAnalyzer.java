@@ -34,12 +34,11 @@ class DnieCertAnalyzer extends CertAnalyzer {
 	        String nombre = null;
 	        String apellido = null;
 	        for(final Rdn rdn : dniSubject.getRdns()) {
-	            if (rdn.getType().equalsIgnoreCase("GIVENNAME")) {
-                    nombre = rdn.getValue().toString(); //$NON-NLS-1$
+	            if (rdn.getType().equalsIgnoreCase("GIVENNAME")) { //$NON-NLS-1$
+                    nombre = rdn.getValue().toString();
                 }
-                else if (rdn.getType().equalsIgnoreCase("SURNAME"))
-                 {
-                    apellido = rdn.getValue().toString(); //$NON-NLS-1$
+                else if (rdn.getType().equalsIgnoreCase("SURNAME")) { //$NON-NLS-1$
+                    apellido = rdn.getValue().toString();
                 }
 	        }
 	        if (nombre != null || apellido != null) {

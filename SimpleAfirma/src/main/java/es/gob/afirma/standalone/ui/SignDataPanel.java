@@ -9,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -36,7 +38,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -95,6 +96,7 @@ final class SignDataPanel extends JPanel {
         filePath.setBorder(BorderFactory.createEmptyBorder());
         filePath.setBackground(SimpleAfirma.WINDOW_COLOR);
         filePath.setEditable(false);
+        filePath.setFocusable(false);
         filePath.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
         filePath.addMouseListener(new MouseAdapter() {
@@ -163,6 +165,7 @@ final class SignDataPanel extends JPanel {
             }
             final JLabel iconLabel = new JLabel(new ImageIcon(SignDetailPanel.class.getResource(fileIcon)));
             iconLabel.setToolTipText(fileTooltip);
+            iconLabel.setFocusable(false);
             filePathPanel.add(iconLabel);
         }
 
@@ -186,21 +189,26 @@ final class SignDataPanel extends JPanel {
 	            this.certIcon.setIcon(certInfo.getIcon());
 	            this.certIcon.setToolTipText(certInfo.getIconTooltip());
 
-	            this.certDescription.setEditable(false);
+	            // Para que se detecten apropiadamente los hipervinculos hay que establecer
+	            // el tipo de contenido antes que el contenido
 	            this.certDescription.setContentType("text/html"); //$NON-NLS-1$
+	                            
+	            this.certDescription.setEditable(false);
 	            this.certDescription.setOpaque(false);
 	            this.certDescription.setText(certInfo.getDescriptionText());
 	            this.certDescription.setToolTipText(Messages.getString("SignDataPanel.12")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.13")); //$NON-NLS-1$
 	            this.certDescription.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.14")); //$NON-NLS-1$
-	            this.certDescription.addHyperlinkListener(new HyperlinkListener() {
-	                @Override
-	                public void hyperlinkUpdate(final HyperlinkEvent he) {
-	                    if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType())) {
-	                        openCertificate(cert);
-	                    }
-	                }
-	            });
+	            
+	            final EditorFocusManager editorFocusManager = new EditorFocusManager (this.certDescription, new EditorFocusManagerAction() {
+                    @Override
+                    public void openHyperLink(final HyperlinkEvent he, final int linkIndex) {
+                        openCertificate(cert);
+                    }
+                });
+                this.certDescription.addFocusListener(editorFocusManager);
+                this.certDescription.addKeyListener(editorFocusManager);
+	            this.certDescription.addHyperlinkListener(editorFocusManager);
 
 	            if (certInfo.getCertVerifier() != null) {
 	                this.validateCertButton = new JButton();
@@ -385,8 +393,6 @@ final class SignDataPanel extends JPanel {
 //        } catch (Exception e) { }
 
         final JTree tree = new JTree(root);
-        tree.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-
         tree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(final TreeSelectionEvent e) {

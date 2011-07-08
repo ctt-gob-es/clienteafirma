@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.net.URI;
 import java.util.logging.Logger;
 
 import javax.swing.JEditorPane;
@@ -13,7 +14,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
@@ -40,7 +40,12 @@ final class SignResultPanel extends JPanel {
 
     private void createUI(final SignValidity validity) {
 
+        // Para que se detecten apropiadamente los hipervinculos hay que establecer
+        // el tipo de contenido antes que el contenido
+        this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
+        
         final JSVGCanvas resultOperationIcon = new JSVGCanvas();
+        resultOperationIcon.setFocusable(false);
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         try {
@@ -66,28 +71,6 @@ final class SignResultPanel extends JPanel {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el icono de resultado o validez de firma, este no se mostrara: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        this.descTextLabel.setContentType("text/html"); //$NON-NLS-1$
-        this.descTextLabel.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(final HyperlinkEvent he) {
-                if (HyperlinkEvent.EventType.ACTIVATED.equals(he.getEventType())) {
-                    try {
-                        Desktop.getDesktop().browse(he.getURL().toURI());
-                    }
-                    catch (final Exception e) {
-                        UIUtils.showErrorMessage(
-                                SignResultPanel.this,
-                                Messages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
-                                Messages.getString("SignResultPanel.1"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                    }
-                }
-            }
-        });
-        this.descTextLabel.setEditable(false);
-        this.descTextLabel.setOpaque(false);
-
         String errorMessage;
         final String resultOperationIconTooltip;
         switch (validity.getValidity()) {
@@ -111,11 +94,12 @@ final class SignResultPanel extends JPanel {
                     case CERTIFICATE_PROBLEM: errorMessage = Messages.getString("SignResultPanel.18"); break; //$NON-NLS-1$
                     case NO_MATCH_DATA: errorMessage = Messages.getString("SignResultPanel.19"); break; //$NON-NLS-1$
                     case CRL_PROBLEM: errorMessage = Messages.getString("SignResultPanel.20"); break; //$NON-NLS-1$
-                    case ALGORITHM_NOT_SUPPORTED: errorMessage = Messages.getString("SignResultPanel.17"); break; //$NON-NLS-1$
+                    case ALGORITHM_NOT_SUPPORTED: errorMessage = Messages.getString("SignResultPanel.22"); break; //$NON-NLS-1$
                     default:
                         errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                     }
-                } else {
+                } 
+                else {
                     errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 }
                 this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -129,7 +113,8 @@ final class SignResultPanel extends JPanel {
                     default:
                         errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                     }
-                } else {
+                } 
+                else {
                     errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                 }
                 this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -138,6 +123,35 @@ final class SignResultPanel extends JPanel {
         }
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);
 
+        final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {  
+            @Override
+            public void openHyperLink(final HyperlinkEvent he, int linkIndex) {
+                try {
+                    if (he.getURL() != null) {
+                        Desktop.getDesktop().browse(he.getURL().toURI());
+                    }
+                    else {
+                        Desktop.getDesktop().browse(new URI(Messages.getString("SignResultPanel.23." + linkIndex))); //$NON-NLS-1$
+                    }
+                }
+                catch (final Exception e) {
+                    UIUtils.showErrorMessage(
+                        SignResultPanel.this,
+                        Messages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
+                        Messages.getString("SignResultPanel.1"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        });
+        
+        this.descTextLabel.addFocusListener(editorFocusManager);
+        this.descTextLabel.addHyperlinkListener(editorFocusManager);
+        this.descTextLabel.addKeyListener(editorFocusManager);
+        this.descTextLabel.setEditable(false);
+        this.descTextLabel.setOpaque(false);
+        this.descTextLabel.requestFocusInWindow();
+        
         this.resultTextLabel.setFont(this.getFont().deriveFont(Font.BOLD, this.getFont().getSize() + 8));
 
         this.setLayout(new GridBagLayout());
