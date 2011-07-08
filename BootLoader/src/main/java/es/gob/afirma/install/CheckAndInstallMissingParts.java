@@ -499,12 +499,11 @@ final class CheckAndInstallMissingParts {
     private String getNssRemoteVersion() throws IOException {
         final File versionTempFile = AOInstallUtils.createTempFile();;
         try {
-            AOInstallUtils.copyFileFromURL(AOBootUtil.createURLFile(installFilesCodeBase, os.toString() + "_nss_"
-                                                                                          + Platform.getOsArch()
-                                                                                          + "_JRE"
-                                                                                          + Platform.getOsArch()
-                                                                                          + ".txt"),
-                                           versionTempFile);
+            AOInstallUtils.copyFileFromURL(
+                    AOBootUtil.createURLFile(
+                            installFilesCodeBase,
+                            os.toString() + "_nss_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".txt"),
+                    versionTempFile);
         }
         catch (final Exception e) {
             throw new IOException("No se pudo comprobar la version remota de NSS: " + e);
