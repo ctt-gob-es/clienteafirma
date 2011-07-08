@@ -23,10 +23,10 @@ public final class WinRegistryWrapper {
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             // Cargamos la libreria nativa 'deploy.dll'
             try {
-                AOUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll");
+                AOUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll"); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll': " + e);
+                Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll': " + e);  //$NON-NLS-1$//$NON-NLS-2$
             }
         }
     }
@@ -42,6 +42,9 @@ public final class WinRegistryWrapper {
 
     /** Clave <i>HKEY_CURRENT_USER</i> del registro de Windows. */
     public static final int HKEY_CURRENT_USER = 0x80000001;
+    
+    /** Clave <i>HKEY_CLASSES_ROOT</i> del registro de Windows. */
+    public static final int HKEY_CLASSES_ROOT = 0x80000000;
 
     /** Obtiene una clave del registro de Windows.
      * @param hKey
@@ -57,10 +60,10 @@ public final class WinRegistryWrapper {
             return WinRegistry.get(hKey, path, name);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("No se ha podido obtener la clave de registro con ruta '" + path
-                                                     + "' y nombre '"
+            Logger.getLogger("es.gob.afirma").severe("No se ha podido obtener la clave de registro con ruta '" + path //$NON-NLS-1$ //$NON-NLS-2$
+                                                     + "' y nombre '" //$NON-NLS-1$
                                                      + name
-                                                     + "', se devolvera null: "
+                                                     + "', se devolvera null: " //$NON-NLS-1$
                                                      + e);
         }
         return null;
@@ -81,10 +84,10 @@ public final class WinRegistryWrapper {
             return WinRegistry.getString(hKey, path, name);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("No se ha podido obtener la clave de registro con ruta '" + path
-                                                     + "' y nombre '"
+            Logger.getLogger("es.gob.afirma").severe("No se ha podido obtener la clave de registro con ruta '" + path  //$NON-NLS-1$//$NON-NLS-2$
+                                                     + "' y nombre '" //$NON-NLS-1$
                                                      + name
-                                                     + "', se devolvera null: "
+                                                     + "', se devolvera null: " //$NON-NLS-1$
                                                      + e);
         }
         return null;
@@ -106,10 +109,10 @@ public final class WinRegistryWrapper {
             return WinRegistry.setStringValue(hKey, path, name, value);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("No se ha podido establecer la clave de registro con ruta '" + path
-                                                     + "' y nombre '"
+            Logger.getLogger("es.gob.afirma").severe("No se ha podido establecer la clave de registro con ruta '" + path //$NON-NLS-1$ //$NON-NLS-2$
+                                                     + "' y nombre '" //$NON-NLS-1$
                                                      + name
-                                                     + "', se devolvera false: "
+                                                     + "', se devolvera false: " //$NON-NLS-1$
                                                      + e);
         }
         return false;
