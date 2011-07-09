@@ -9,11 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,10 +35,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import es.gob.afirma.misc.Platform;
@@ -63,11 +57,6 @@ final class SignDataPanel extends JPanel {
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";  //$NON-NLS-1$
     private static final String FILE_ICON_XML = "/resources/icon_xml.png"; //$NON-NLS-1$
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.png"; //$NON-NLS-1$
-
-    // Como los cursores los usamos dentro de un MouseMotionListener los precreamos para
-    // evitar que se creen objetos solo por mover el raton
-    private static final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
-    private static final Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
 
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
@@ -385,60 +374,29 @@ final class SignDataPanel extends JPanel {
         treeRenderer.setClosedIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.collapsedIcon")); //$NON-NLS-1$
         treeRenderer.setOpenIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon")); //$NON-NLS-1$
 
-//        // Modificamos la propiedad interna de la clase que imprime el fondo de los elementos
-//        try {
-//            Field field = treeRenderer.getClass().getField("fillBackground");
-//            field.setAccessible(true);
-//            field.setBoolean(treeRenderer, false);
-//        } catch (Exception e) { }
-
         final JTree tree = new JTree(root);
-        tree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(final TreeSelectionEvent e) {
-                final DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-                if (node == null) {
-                    return;
-                }
-                final Object nodeInfo = node.getUserObject();
-                if (nodeInfo instanceof AOSimpleSignInfo) {
-                    openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0]);
-                }
-                else if (nodeInfo instanceof ShowFileLinkAction) {
-                    ((ShowFileLinkAction) nodeInfo).action();
-                }
-            }
-        });
         tree.setCellRenderer(treeRenderer);
         tree.setRootVisible(false);
         tree.putClientProperty("JTree.lineStyle", "None"); //$NON-NLS-1$ //$NON-NLS-2$
         tree.getSelectionModel().setSelectionMode(
                 TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.addMouseMotionListener(new MouseMotionListener() {
-			@Override
-			public void mouseMoved(final MouseEvent e) {
-				final TreePath path = tree.getPathForLocation((int) e.getPoint().getX(), (int) e.getPoint().getY());
-				if (path != null) {
-					if (path.getLastPathComponent() instanceof DefaultMutableTreeNode) {
-						final Object o = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-						if (o instanceof ShowFileLinkAction || o instanceof AOSimpleSignInfo) {
-							tree.setCursor(HAND_CURSOR);
-						}
-						else {
-							tree.setCursor(DEFAULT_CURSOR);
-						}
-					}
-					else {
-						tree.setCursor(DEFAULT_CURSOR);
-					}
-				}
-				else {
-					tree.setCursor(DEFAULT_CURSOR);
-				}
-			}
-			@Override
-			public void mouseDragged(final MouseEvent e) {}
-		});
+        
+        final TreeFocusManager treeFocusManager = new TreeFocusManager(tree, new TreeFocusManagerAction() {
+            @Override
+            public void openTreeNode(final Object nodeInfo) {
+                if (nodeInfo instanceof AOSimpleSignInfo) {
+                    openCertificate(((AOSimpleSignInfo) nodeInfo).getCerts()[0]);
+                }
+                else if (nodeInfo instanceof ShowFileLinkAction) {
+                    ((ShowFileLinkAction) nodeInfo).action();
+                }  
+            }
+        });
+        
+        tree.addMouseMotionListener(treeFocusManager);
+        tree.addFocusListener(treeFocusManager);
+        tree.addMouseListener(treeFocusManager);
+        tree.addKeyListener(treeFocusManager);
 
         for (int i = 0; i < tree.getRowCount(); i++) {
             tree.expandRow(i);

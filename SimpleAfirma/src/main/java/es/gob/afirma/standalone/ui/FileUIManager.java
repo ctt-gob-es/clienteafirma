@@ -16,6 +16,9 @@ import javax.swing.filechooser.FileFilter;
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.standalone.Messages;
 
+/**
+ * Utilidades para el tratamiento de ficheros (apertura, guardado, etc.).
+ */
 public final class FileUIManager {
 
     /**
@@ -147,6 +150,15 @@ public final class FileUIManager {
         return outputFile;
     }
 
+    
+    /**
+     * Muestra un di&aacute;logo para la apertura de un fichero.
+     * @param parent Componente padre, para la modalidad
+     * @param exts Posibles extensiones que asignar al fichero.
+     * @param currentDir Directorio actual.
+     * @param title T&iacute;tulo del di&aacute;logo de apertura
+     * @return Fichero seleccionado desde el di&aacute;logo
+     */
     public static File openFile(final Frame parent, File currentDir, final String[] exts, final String title) {
 
         if (currentDir == null) {
