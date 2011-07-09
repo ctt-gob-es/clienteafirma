@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.smartcardio.TerminalFactory;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -141,7 +142,7 @@ public final class SignPanel extends JPanel {
             errorMessage = Messages.getString("SignPanel.3"); //$NON-NLS-1$
         }
         else if (!file.canRead()) {
-            errorMessage = ""; //$NON-NLS-1$
+            errorMessage = Messages.getString("SignPanel.7"); //$NON-NLS-1$
         }
         else if (file.length() < 1) {
             errorMessage = Messages.getString("SignPanel.5"); //$NON-NLS-1$
@@ -450,8 +451,19 @@ public final class SignPanel extends JPanel {
             welcomeLabel.setForeground(new Color(3399));
             this.add(welcomeLabel, BorderLayout.PAGE_START);
 
-            final String intro = Messages.getString("SignPanel.40") //$NON-NLS-1$
-            ;
+            String intro = Messages.getString("SignPanel.40"); //$NON-NLS-1$
+            
+            try {
+                int nReaders = TerminalFactory.getDefault().terminals().list().size();
+                if (nReaders == 1) {
+                    intro = intro + Messages.getString("SignPanel.2"); //$NON-NLS-1$
+                }
+                else if (nReaders > 1) {
+                    intro = intro + Messages.getString("SignPanel.4"); //$NON-NLS-1$
+                }
+            }
+            catch(Exception e) {}
+            
             final JLabel introText = new JLabel(intro);
             introText.setLabelFor(SignPanel.this.selectButton);
             introText.setFocusable(false);
@@ -576,29 +588,8 @@ public final class SignPanel extends JPanel {
             detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
             detailPanel.add(sizeLabel);
 
-            final JButton openFileButton = new JButton(Messages.getString("SignPanel.51")); //$NON-NLS-1$
-            openFileButton.setMnemonic('v');
-            openFileButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent ae) {
-                    try {
-                        Desktop.getDesktop().open(new File(filePath));
-                    }
-                    catch (final IOException e) {
-                        UIUtils.showErrorMessage(
-                                FilePanel.this,
-                                Messages.getString("SignPanel.53"), //$NON-NLS-1$
-                                Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                        return;
-                    }
-                }
-            });
-
             // Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
             this.setDropTarget(SignPanel.this.dropTarget);
-
 
             final GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH;
@@ -622,7 +613,29 @@ public final class SignPanel extends JPanel {
             c.gridx = 2;
             c.insets = new Insets(11, 6, 11, 11);
             c.anchor = GridBagConstraints.NORTHEAST;
-            this.add(openFileButton, c);
+            
+            if (UIUtils.hasAssociatedApplication(filePath.substring(filePath.lastIndexOf(".")))) { //$NON-NLS-1$
+                final JButton openFileButton = new JButton(Messages.getString("SignPanel.51")); //$NON-NLS-1$
+                openFileButton.setMnemonic('v');
+                openFileButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(final ActionEvent ae) {
+                        try {
+                            Desktop.getDesktop().open(new File(filePath));
+                        }
+                        catch (final IOException e) {
+                            UIUtils.showErrorMessage(
+                                    FilePanel.this,
+                                    Messages.getString("SignPanel.53"), //$NON-NLS-1$
+                                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+                            return;
+                        }
+                    }
+                });
+                this.add(openFileButton, c);
+            }
         }
     }
 

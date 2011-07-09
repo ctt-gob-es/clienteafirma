@@ -525,7 +525,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     private void createUI() {
         this.setBackground(SimpleAfirma.WINDOW_COLOR);
-        this.setSize(new Dimension(700, 500));
+        this.setSize(new Dimension(780, 500));
         this.setLayout(new BorderLayout());
         this.currentPanel = new DNIeWaitPanel(this, this, this);
         this.add(this.currentPanel, BorderLayout.CENTER);

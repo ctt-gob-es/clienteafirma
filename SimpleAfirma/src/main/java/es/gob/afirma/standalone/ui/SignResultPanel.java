@@ -103,7 +103,7 @@ final class SignResultPanel extends JPanel {
                     errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 }
                 this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-                resultOperationIconTooltip = Messages.getString("SignResultPanel.7"); //$NON-NLS-1$
+                resultOperationIconTooltip = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 break;
             default:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.11")); //$NON-NLS-1$

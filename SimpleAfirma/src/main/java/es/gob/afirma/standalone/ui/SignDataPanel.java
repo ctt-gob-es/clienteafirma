@@ -104,7 +104,7 @@ final class SignDataPanel extends JPanel {
 
         // Boton de apertura del fichero firmado
         JButton openFileButton = null;
-        if (signFile != null) {
+        if (signFile != null && UIUtils.hasAssociatedApplication(signFile.getName().substring(signFile.getName().lastIndexOf(".")))) { //$NON-NLS-1$
             openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
             openFileButton.setPreferredSize(new Dimension(150, 24));
             openFileButton.setMnemonic('v');

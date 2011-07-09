@@ -48,7 +48,7 @@ public final class MainScreen extends JFrame {
     private void createUI(final WindowListener wlist, final JPanel firstPanel) {
 
         this.setBackground(SimpleAfirma.WINDOW_COLOR);
-        this.setSize(new Dimension(700, 500));
+        this.setSize(new Dimension(780, 500));
         this.setLayout(new BorderLayout());
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
