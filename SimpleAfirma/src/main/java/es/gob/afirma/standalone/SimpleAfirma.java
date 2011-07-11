@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -79,6 +80,18 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
     public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB()); //$NON-NLS-1$
+    
+    public static final boolean HIGH_CONTRAST;
+    
+    static {
+        final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
+        if (highContrast instanceof Boolean) {
+            HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
+        }
+        else {
+            HIGH_CONTRAST = false;
+        }
+    }
 
     /** Construye la aplicaci&oacute;n principal y establece el
      * <i>Look&Field</i>. */
@@ -269,16 +282,18 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     private void setLookAndFeel() {
 
-        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
-        UIManager.put("OptionPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("RootPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("TextPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("TextArea.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("InternalFrameTitlePane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("InternalFrame.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("Panel.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("Label.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("PopupMenuSeparator.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+        if (!HIGH_CONTRAST) {
+            UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
+            UIManager.put("OptionPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("RootPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("TextPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("TextArea.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("InternalFrameTitlePane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("InternalFrame.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("Panel.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("Label.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("PopupMenuSeparator.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
+        }
 
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
@@ -293,15 +308,17 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        else {
+        else { 
             try {
-                for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
-                        UIManager.setLookAndFeel(info.getClassName());
-                        Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                        "Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
-                        );
-                        return;
+                if (!HIGH_CONTRAST) {
+                    for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
+                            UIManager.setLookAndFeel(info.getClassName());
+                            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+                            "Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
+                            );
+                            return;
+                        }
                     }
                 }
             }
