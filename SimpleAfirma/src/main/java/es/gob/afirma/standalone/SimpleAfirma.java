@@ -15,6 +15,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -83,7 +84,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     
     public static final boolean HIGH_CONTRAST;
     
+    public static final Font DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes());
+    
     static {
+        
+        System.out.println("Tamano inicial: " + DEFAULT_FONT.getSize());
+        
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
         if (highContrast instanceof Boolean) {
             HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();

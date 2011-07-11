@@ -2,7 +2,6 @@ package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
@@ -15,6 +14,7 @@ import java.util.Vector;
 
 import javax.accessibility.AccessibleHyperlink;
 import javax.accessibility.AccessibleHypertext;
+import javax.jws.Oneway;
 import javax.swing.JEditorPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -25,6 +25,8 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.html.HTMLDocument;
+
+import es.gob.afirma.standalone.SimpleAfirma;
 
 final class EditorFocusManager extends KeyAdapter implements FocusListener, HyperlinkListener, ComponentListener {
     
@@ -45,8 +47,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         this.displayPane = displayPane;
         this.hlAction = efma;
         
-        final Font font = UIManager.getFont("Label.font"); //$NON-NLS-1$
-        final String bodyRule = "body { font-family: " + font.getFamily() + "; font-size: " + font.getSize() + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        final String bodyRule = "body { font-family: " + SimpleAfirma.DEFAULT_FONT.getFamily() + "; font-size: " + SimpleAfirma.DEFAULT_FONT.getSize() + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
         
         final StyleContext sc = new StyleContext();
@@ -169,23 +170,11 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         }
     }
     
-    @Override
-    public void componentResized(final ComponentEvent e) {
-        boolean hadFocus = false;
-        final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), UIManager.getFont("Label.font").getSize()); //$NON-NLS-1$
-        final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + bestFontSize + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
-    }
-    
-    @Override public void componentMoved(final ComponentEvent e) {}
-    @Override public void componentHidden(final ComponentEvent e) {}
-    @Override public void componentShown(final ComponentEvent e) {}
-    
     private int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final int minSize) {
         
-        final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + "%f%" + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        final String bodyRule = "body { font-family: " + SimpleAfirma.DEFAULT_FONT.getFamily() + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         
-        for (int i=minSize;i<100;i++) {
+        for (int i = minSize; i < 100; i++) {
             
             final JEditorPane editorPane = new JEditorPane("text/html", text); //$NON-NLS-1$
             
@@ -203,7 +192,23 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
                 return i-1;
             }
         }
-        
         return minSize;
     }
+
+    private boolean editorFirstShow = true;
+    @Override public void componentResized(ComponentEvent e) {
+        if (editorFirstShow) {
+            final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), UIManager.getFont("Label.font").getSize()); //$NON-NLS-1$
+            final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + bestFontSize + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
+            editorFirstShow = false;
+        }
+    }
+
+    @Override public void componentMoved(ComponentEvent e) { }
+
+    @Override public void componentHidden(ComponentEvent e) { }
+    
+    @Override public void componentShown(ComponentEvent e) { }
+
 }
