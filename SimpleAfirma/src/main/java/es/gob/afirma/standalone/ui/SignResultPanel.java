@@ -1,5 +1,6 @@
 package es.gob.afirma.standalone.ui;
 
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -152,9 +153,10 @@ final class SignResultPanel extends JPanel {
         
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
-        this.descTextLabel.requestFocusInWindow();
         
-        this.resultTextLabel.setFont(this.getFont().deriveFont(Font.BOLD, this.getFont().getSize() + 8));
+        this.resultTextLabel.setFont(this.getFont().deriveFont(Font.PLAIN, 26));
+        this.resultTextLabel.setForeground(new Color(3399));
+        this.resultTextLabel.setLabelFor(this.descTextLabel);
 
         this.setLayout(new GridBagLayout());
         setBackground(SimpleAfirma.WINDOW_COLOR);

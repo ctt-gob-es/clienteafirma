@@ -82,8 +82,10 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
     public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB()); //$NON-NLS-1$
     
+    /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     public static final boolean HIGH_CONTRAST;
     
+    /** Tipo de letra por defecto del sistema operativo. */
     public static final Font DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes());
     
     static {
