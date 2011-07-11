@@ -198,6 +198,7 @@ final class SignDataPanel extends JPanel {
                 this.certDescription.addFocusListener(editorFocusManager);
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
+	            this.certDescription.addComponentListener(editorFocusManager);
 
 	            if (certInfo.getCertVerifier() != null) {
 	                this.validateCertButton = new JButton();

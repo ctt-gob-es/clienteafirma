@@ -1,7 +1,10 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -13,6 +16,8 @@ import java.util.Vector;
 import javax.accessibility.AccessibleHyperlink;
 import javax.accessibility.AccessibleHypertext;
 import javax.swing.JEditorPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -21,7 +26,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.html.HTMLDocument;
 
-final class EditorFocusManager extends KeyAdapter implements FocusListener, HyperlinkListener {
+final class EditorFocusManager extends KeyAdapter implements FocusListener, HyperlinkListener, ComponentListener {
     
     private final JEditorPane displayPane;
     
@@ -162,5 +167,43 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
                 this.hlAction.openHyperLink(he, this.selectedLink);
             }
         }
+    }
+    
+    @Override
+    public void componentResized(final ComponentEvent e) {
+        boolean hadFocus = false;
+        final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), UIManager.getFont("Label.font").getSize()); //$NON-NLS-1$
+        final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + bestFontSize + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
+    }
+    
+    @Override public void componentMoved(final ComponentEvent e) {}
+    @Override public void componentHidden(final ComponentEvent e) {}
+    @Override public void componentShown(final ComponentEvent e) {}
+    
+    private int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final int minSize) {
+        
+        final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + "%f%" + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        
+        for (int i=minSize;i<100;i++) {
+            
+            final JEditorPane editorPane = new JEditorPane("text/html", text); //$NON-NLS-1$
+            
+            ((HTMLDocument) editorPane.getDocument()).getStyleSheet().addRule(bodyRule.replace("%f%", Integer.toString(i))); //$NON-NLS-1$
+            
+            editorPane.setSize(width, Integer.MAX_VALUE);
+            editorPane.setEditable(false);
+            
+            final JPopupMenu popup = new JPopupMenu();
+            popup.add(new JScrollPane(editorPane));
+            final Dimension d = popup.getPreferredSize();
+            popup.setPopupSize(Math.min(width, d.width), d.height);
+            
+            if (popup.getPreferredSize().height > height) {
+                return i-1;
+            }
+        }
+        
+        return minSize;
     }
 }

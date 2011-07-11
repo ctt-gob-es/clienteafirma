@@ -148,6 +148,8 @@ final class SignResultPanel extends JPanel {
         this.descTextLabel.addFocusListener(editorFocusManager);
         this.descTextLabel.addHyperlinkListener(editorFocusManager);
         this.descTextLabel.addKeyListener(editorFocusManager);
+        this.descTextLabel.addComponentListener(editorFocusManager);
+        
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
         this.descTextLabel.requestFocusInWindow();
