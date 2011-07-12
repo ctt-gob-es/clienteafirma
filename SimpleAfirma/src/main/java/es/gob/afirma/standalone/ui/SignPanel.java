@@ -1,5 +1,4 @@
 /*
- * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
@@ -45,6 +44,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -59,15 +59,22 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.html.HTMLDocument;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -119,6 +126,8 @@ public final class SignPanel extends JPanel {
     private final JButton selectButton = new JButton();
 
     private final SimpleAfirma saf;
+    
+    private ProgressMonitor pm = new ProgressMonitor(SignPanel.this, Messages.getString("SignPanel.15"), "", 0, 1000);  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Indica si la operaci&oacute;n a realizar es una cofirma. */
     private boolean cosign = false;
@@ -269,6 +278,7 @@ public final class SignPanel extends JPanel {
     }
 
     private void createUI(final ActionListener al, final boolean firstTime) {
+        
         this.setBackground(SimpleAfirma.WINDOW_COLOR);
         this.setLayout(new GridLayout(2, 1));
         this.add(new UpperPanel(al, firstTime));
@@ -649,254 +659,7 @@ public final class SignPanel extends JPanel {
 
     /** Firma el fichero actualmente cargado. */
     public void sign() {
-        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        
-        try { Thread.sleep(10000); } catch(final Exception e) {}
-        
-        if (this.signer == null || this.dataToSign == null || this.saf == null) {
-            return;
-        }
-        final AOKeyStoreManager ksm = this.saf.getAOKeyStoreManager();
-        String alias = null;
-
-        try {
-            if (ksm.getKeyStores().get(0).containsAlias(DNIE_SIGNATURE_ALIAS) || ksm.getCertificate(DNIE_SIGNATURE_ALIAS).getIssuerX500Principal().toString().contains("DNIE")) { //$NON-NLS-1$
-                alias = DNIE_SIGNATURE_ALIAS;
-            }
-        }
-        catch(final Exception e) {}
-
-        if (alias == null) {
-            try {
-                alias = AOUIManager.showCertSelectionDialog(ksm.getAliases(), ksm.getKeyStores(),
-                                                            this,
-                                                            true,
-                                                            true,
-                                                            false);
-            }
-            catch (final AOCertificatesNotFoundException e) {
-                UIUtils.showErrorMessage(
-                        this,
-                        Messages.getString("SignPanel.55"), //$NON-NLS-1$
-                        Messages.getString("SignPanel.19"), //$NON-NLS-1$
-                        JOptionPane.WARNING_MESSAGE
-                );
-                return;
-            }
-            catch (final AOCancelledOperationException e) {
-                return;
-            }
-            finally {
-                this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        }
-
-        final Properties p = new Properties();
-        p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
-        p.put("signingCertificateV2", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-        p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
-
-        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-        final byte[] signResult;
-        try {
-            if (this.cosign) {
-                signResult = this.signer.cosign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
-                                          ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), this)),
-                                          p);
-            }
-            else {
-                signResult = this.signer.sign(this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
-                        ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), this)),
-                        p);
-            }
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            UIUtils.showErrorMessage(
-                    SignPanel.this,
-                    Messages.getString("SignPanel.65"), //$NON-NLS-1$
-                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-        catch(final OutOfMemoryError ooe) {
-            Logger.getLogger("es.gob.afirma").severe("Falta de memoria en el proceso de firma: " + ooe); //$NON-NLS-1$ //$NON-NLS-2$
-            UIUtils.showErrorMessage(
-                SignPanel.this,
-                Messages.getString("SignPanel.1"), //$NON-NLS-1$
-                Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-        finally {
-            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        }
-        setSignCommandEnabled(false);
-
-        String newFileName = this.currentFile.getName();
-        String[] filterExtensions;
-        String filterDescription;
-        if (this.signer instanceof AOPDFSigner) {
-            if (!newFileName.toLowerCase().endsWith(".pdf")) { //$NON-NLS-1$
-                newFileName = newFileName + ".pdf"; //$NON-NLS-1$
-            }
-            newFileName = newFileName.substring(0, newFileName.length() - 4).replace(".", "_") + "_signed.pdf"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            filterExtensions = new String[] {
-                ".pdf"}; //$NON-NLS-1$
-            filterDescription = Messages.getString("SignPanel.72"); //$NON-NLS-1$
-        }
-        else if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner) {
-            newFileName = newFileName.replace(".", "_") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            filterExtensions = new String[] {
-                    ".xsig", ".xml"}; //$NON-NLS-1$ //$NON-NLS-2$
-            filterDescription = Messages.getString("SignPanel.76"); //$NON-NLS-1$
-        }
-        else {
-            newFileName = newFileName.replace(".", "_") + ".csig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            filterExtensions = new String[] {
-                    ".csig", ".p7s"}; //$NON-NLS-1$ //$NON-NLS-2$
-            filterDescription = Messages.getString("SignPanel.80"); //$NON-NLS-1$
-        }
-
-        final String fDescription = filterDescription;
-        final String[] fExtensions = filterExtensions;
-
-        // Para las comprobaciones de si el usuario ha teclado la extension o espera que
-        // la aplicacion la anada sola
-        boolean nameMissingExtension = true;
-
-        if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            if (this.saf.getCurrentDir() == null) {
-                this.saf.setCurrentDir(new File(Platform.getUserHome()));
-            }
-            final FileDialog fd = new FileDialog(this.window, Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
-            fd.setDirectory(this.saf.getCurrentDir().getAbsolutePath());
-            fd.setFile(newFileName);
-            fd.setFilenameFilter(new FilenameFilter() {
-                @Override
-                public boolean accept(final File dir, final String name) {
-                    for (final String ext : fExtensions) {
-                        if (name.endsWith(ext)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            });
-            fd.setVisible(true);
-            if (fd.getFile() == null) {
-            	setSignCommandEnabled(true);
-            	return;
-            }
-            this.saf.setCurrentDir(new File(fd.getDirectory()));
-            newFileName = fd.getDirectory() + fd.getFile();
-        }
-        else {
-            final JFileChooser fc = new JFileChooser();
-            if (this.saf.getCurrentDir() != null) {
-                fc.setCurrentDirectory(this.saf.getCurrentDir());
-            }
-            fc.setSelectedFile(new File(newFileName));
-            fc.setFileFilter(new FileFilter() {
-                @Override
-                public boolean accept(final File file) {
-                    for (final String ext : fExtensions) {
-                        if (file.getName().endsWith(ext)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-
-                @Override
-                public String getDescription() {
-                    return fDescription;
-                }
-            });
-            if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(this.window)) {
-                this.saf.setCurrentDir(fc.getCurrentDirectory());
-                newFileName = fc.getSelectedFile().getAbsolutePath();
-            }
-            else {
-                return;
-            }
-        }
-
-        // Anadimos la extension si es necesario
-        for (final String ext : fExtensions) {
-            if (newFileName.toLowerCase().endsWith(ext)) {
-                nameMissingExtension = false;
-            }
-        }
-        newFileName = newFileName + (nameMissingExtension ? fExtensions[0] : ""); //$NON-NLS-1$
-
-        // Cuando se usa un FileDialog la confirmacion de sobreescritura la gestiona
-        // el sistema operativo, pero en Mac hay comportamiento extrano con la extension
-
-        final File outputFile = new File(newFileName);
-
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            if (newFileName.toLowerCase().endsWith(".pdf") && outputFile.exists()) { //$NON-NLS-1$
-                if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(SignPanel.this, Messages.getString("SignPanel.84"), //$NON-NLS-1$
-                                                                           Messages.getString("SignPanel.19"), //$NON-NLS-1$
-                                                                           JOptionPane.YES_NO_OPTION,
-                                                                           JOptionPane.WARNING_MESSAGE)) {
-                    setSignCommandEnabled(true);
-                    return;
-                }
-            }
-        }
-
-        OutputStream fos = null;
-        OutputStream bos = null;
-        try {
-            fos = new FileOutputStream(outputFile);
-            bos = new BufferedOutputStream(fos);
-            bos.write(signResult);
-        }
-        catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
-            );
-            UIUtils.showErrorMessage(
-                    this,
-                    Messages.getString("SignPanel.88"), //$NON-NLS-1$
-                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
-            );
-            setSignCommandEnabled(true);
-        }
-        finally {
-            try {
-                if (bos != null) {
-                    bos.flush();
-                }
-            }
-            catch (final Exception e) {}
-            try {
-                if (fos != null) {
-                    fos.flush();
-                }
-            }
-            catch (final Exception e) {}
-            try {
-                if (bos != null) {
-                    bos.close();
-                }
-            }
-            catch (final Exception e) {}
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            }
-            catch (final Exception e) {}
-        }
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
+        new SignTask().execute();
     }
 
     /** M&eacute;todo para indicar a la clase que el <code>AOKeyStoreManager</code> est&aacute; listo para usarse. */
@@ -915,5 +678,277 @@ public final class SignPanel extends JPanel {
         this.signButton.setEnabled(e);
         this.saf.setSignMenuCommandEnabled(e);
     }
+    
+    private final class SignTask extends SwingWorker<Void, Void> {
+        @Override
+        public Void doInBackground() {
+            
+            SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            
+            if (SignPanel.this.signer == null || SignPanel.this.dataToSign == null || SignPanel.this.saf == null) {
+                return null;
+            }
+            final AOKeyStoreManager ksm = SignPanel.this.saf.getAOKeyStoreManager();
+            String alias = null;
 
+            try {
+                if (ksm.getKeyStores().get(0).containsAlias(DNIE_SIGNATURE_ALIAS) || ksm.getCertificate(DNIE_SIGNATURE_ALIAS).getIssuerX500Principal().toString().contains("DNIE")) { //$NON-NLS-1$
+                    alias = DNIE_SIGNATURE_ALIAS;
+                }
+            }
+            catch(final Exception e) {}
+
+            if (alias == null) {
+                try {
+                    alias = AOUIManager.showCertSelectionDialog(ksm.getAliases(), ksm.getKeyStores(),
+                                                                SignPanel.this,
+                                                                true,
+                                                                true,
+                                                                false);
+                }
+                catch (final AOCertificatesNotFoundException e) {
+                    UIUtils.showErrorMessage(
+                            SignPanel.this,
+                            Messages.getString("SignPanel.55"), //$NON-NLS-1$
+                            Messages.getString("SignPanel.19"), //$NON-NLS-1$
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                    return null;
+                }
+                catch (final AOCancelledOperationException e) {
+                    return null;
+                }
+                finally {
+                    SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+
+            final Properties p = new Properties();
+            p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+            p.put("signingCertificateV2", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+
+            setSignCommandEnabled(false);
+            
+            SignPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            
+            SignPanel.this.pm.setProgress(999);
+            
+            // Deshabilitamos la posibilidad de cancelar el dialogo de espera
+            try {
+                final JDialog dialog = (JDialog) SignPanel.this.pm.getAccessibleContext().getAccessibleParent();
+                dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+                ((JOptionPane)dialog.getContentPane().getComponent(0)).setOptions(new Object[]{});
+            }
+            catch(final Exception e) {}
+            
+            try { Thread.sleep(5000); } catch(Exception e) {}
+
+            final byte[] signResult;
+            try {
+                if (SignPanel.this.cosign) {
+                    signResult = SignPanel.this.signer.cosign(SignPanel.this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
+                                              ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), SignPanel.this)),
+                                              p);
+                }
+                else {
+                    signResult = SignPanel.this.signer.sign(SignPanel.this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
+                            ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), SignPanel.this)),
+                            p);
+                }
+            }
+            catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                UIUtils.showErrorMessage(
+                        SignPanel.this,
+                        Messages.getString("SignPanel.65"), //$NON-NLS-1$
+                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
+                );
+                setSignCommandEnabled(true);
+                return null;
+            }
+            catch(final OutOfMemoryError ooe) {
+                Logger.getLogger("es.gob.afirma").severe("Falta de memoria en el proceso de firma: " + ooe); //$NON-NLS-1$ //$NON-NLS-2$
+                UIUtils.showErrorMessage(
+                    SignPanel.this,
+                    Messages.getString("SignPanel.1"), //$NON-NLS-1$
+                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
+                setSignCommandEnabled(true);
+                return null;
+            }
+            finally {
+                SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                SignPanel.this.pm.setProgress(1000);
+            }
+
+            String newFileName = SignPanel.this.currentFile.getName();
+            String[] filterExtensions;
+            String filterDescription;
+            if (SignPanel.this.signer instanceof AOPDFSigner) {
+                if (!newFileName.toLowerCase().endsWith(".pdf")) { //$NON-NLS-1$
+                    newFileName = newFileName + ".pdf"; //$NON-NLS-1$
+                }
+                newFileName = newFileName.substring(0, newFileName.length() - 4).replace(".", "_") + "_signed.pdf"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                filterExtensions = new String[] {
+                    ".pdf"}; //$NON-NLS-1$
+                filterDescription = Messages.getString("SignPanel.72"); //$NON-NLS-1$
+            }
+            else if (SignPanel.this.signer instanceof AOXMLDSigSigner || SignPanel.this.signer instanceof AOXAdESSigner) {
+                newFileName = newFileName.replace(".", "_") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                filterExtensions = new String[] {
+                        ".xsig", ".xml"}; //$NON-NLS-1$ //$NON-NLS-2$
+                filterDescription = Messages.getString("SignPanel.76"); //$NON-NLS-1$
+            }
+            else {
+                newFileName = newFileName.replace(".", "_") + ".csig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                filterExtensions = new String[] {
+                        ".csig", ".p7s"}; //$NON-NLS-1$ //$NON-NLS-2$
+                filterDescription = Messages.getString("SignPanel.80"); //$NON-NLS-1$
+            }
+
+            final String fDescription = filterDescription;
+            final String[] fExtensions = filterExtensions;
+
+            // Para las comprobaciones de si el usuario ha teclado la extension o espera que
+            // la aplicacion la anada sola
+            boolean nameMissingExtension = true;
+
+            if (Platform.OS.MACOSX.equals(Platform.getOS()) || Platform.OS.WINDOWS.equals(Platform.getOS())) {
+                if (SignPanel.this.saf.getCurrentDir() == null) {
+                    SignPanel.this.saf.setCurrentDir(new File(Platform.getUserHome()));
+                }
+                final FileDialog fd = new FileDialog(SignPanel.this.window, Messages.getString("SignPanel.81"), FileDialog.SAVE); //$NON-NLS-1$
+                fd.setDirectory(SignPanel.this.saf.getCurrentDir().getAbsolutePath());
+                fd.setFile(newFileName);
+                fd.setFilenameFilter(new FilenameFilter() {
+                    @Override
+                    public boolean accept(final File dir, final String name) {
+                        for (final String ext : fExtensions) {
+                            if (name.endsWith(ext)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                });
+                fd.setVisible(true);
+                if (fd.getFile() == null) {
+                    setSignCommandEnabled(true);
+                    return null;
+                }
+                SignPanel.this.saf.setCurrentDir(new File(fd.getDirectory()));
+                newFileName = fd.getDirectory() + fd.getFile();
+            }
+            else {
+                final JFileChooser fc = new JFileChooser();
+                if (SignPanel.this.saf.getCurrentDir() != null) {
+                    fc.setCurrentDirectory(SignPanel.this.saf.getCurrentDir());
+                }
+                fc.setSelectedFile(new File(newFileName));
+                fc.setFileFilter(new FileFilter() {
+                    @Override
+                    public boolean accept(final File file) {
+                        for (final String ext : fExtensions) {
+                            if (file.getName().endsWith(ext)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return fDescription;
+                    }
+                });
+                if (JFileChooser.APPROVE_OPTION == fc.showSaveDialog(SignPanel.this.window)) {
+                    SignPanel.this.saf.setCurrentDir(fc.getCurrentDirectory());
+                    newFileName = fc.getSelectedFile().getAbsolutePath();
+                }
+                else {
+                    return null;
+                }
+            }
+
+            // Anadimos la extension si es necesario
+            for (final String ext : fExtensions) {
+                if (newFileName.toLowerCase().endsWith(ext)) {
+                    nameMissingExtension = false;
+                }
+            }
+            newFileName = newFileName + (nameMissingExtension ? fExtensions[0] : ""); //$NON-NLS-1$
+
+            // Cuando se usa un FileDialog la confirmacion de sobreescritura la gestiona
+            // el sistema operativo, pero en Mac hay comportamiento extrano con la extension
+
+            final File outputFile = new File(newFileName);
+
+            if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+                if (newFileName.toLowerCase().endsWith(".pdf") && outputFile.exists()) { //$NON-NLS-1$
+                    if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(SignPanel.this, Messages.getString("SignPanel.84"), //$NON-NLS-1$
+                                                                               Messages.getString("SignPanel.19"), //$NON-NLS-1$
+                                                                               JOptionPane.YES_NO_OPTION,
+                                                                               JOptionPane.WARNING_MESSAGE)) {
+                        setSignCommandEnabled(true);
+                        return null;
+                    }
+                }
+            }
+
+            OutputStream fos = null;
+            OutputStream bos = null;
+            try {
+                fos = new FileOutputStream(outputFile);
+                bos = new BufferedOutputStream(fos);
+                bos.write(signResult);
+            }
+            catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+                "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
+                );
+                UIUtils.showErrorMessage(
+                        SignPanel.this,
+                        Messages.getString("SignPanel.88"), //$NON-NLS-1$
+                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                        JOptionPane.ERROR_MESSAGE
+                );
+                setSignCommandEnabled(true);
+            }
+            finally {
+                try {
+                    if (bos != null) {
+                        bos.flush();
+                    }
+                }
+                catch (final Exception e) {}
+                try {
+                    if (fos != null) {
+                        fos.flush();
+                    }
+                }
+                catch (final Exception e) {}
+                try {
+                    if (bos != null) {
+                        bos.close();
+                    }
+                }
+                catch (final Exception e) {}
+                try {
+                    if (fos != null) {
+                        fos.close();
+                    }
+                }
+                catch (final Exception e) {}
+            }
+            SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            SignPanel.this.saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));
+        
+            return null;
+        }
+        
+    }
+    
 }
