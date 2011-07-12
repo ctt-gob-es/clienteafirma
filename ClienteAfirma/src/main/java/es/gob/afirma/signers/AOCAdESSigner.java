@@ -50,7 +50,6 @@ import es.gob.afirma.signers.aobinarysignhelper.ObtainContentSignedData;
 import es.gob.afirma.signers.aobinarysignhelper.P7ContentSignerParameters;
 import es.gob.afirma.signers.aobinarysignhelper.ReadNodesTree;
 import es.gob.afirma.signers.aobinarysignhelper.ValidateCADES;
-import es.gob.afirma.signers.aobinarysignhelper.ValidateCMS;
 import es.gob.afirma.signers.beans.AOSignInfo;
 
 /** Manejador de firmas binarias CADES.
