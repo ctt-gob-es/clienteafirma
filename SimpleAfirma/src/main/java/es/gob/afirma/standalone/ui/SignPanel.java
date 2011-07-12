@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -68,6 +69,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.ProgressMonitor;
@@ -741,6 +743,21 @@ public final class SignPanel extends JPanel {
                 ((JOptionPane)dialog.getContentPane().getComponent(0)).setOptions(new Object[]{});
             }
             catch(final Exception e) {}
+            
+            try {
+                Class<?> progressMonitorClass = Class.forName("javax.swing.ProgressMonitor"); //$NON-NLS-1$
+                Field jProgressBarField = progressMonitorClass.getDeclaredField("myBar"); //$NON-NLS-1$
+                jProgressBarField.setAccessible(true);
+                JProgressBar progressBar = (JProgressBar) jProgressBarField.get(SignPanel.this.pm);
+                
+                Class<?> jProgressBarClass = Class.forName("javax.swing.JProgressBar"); //$NON-NLS-1$
+                Method setIndeterminateMethod = jProgressBarClass.getMethod("setIndeterminate", Boolean.TYPE); //$NON-NLS-1$
+                setIndeterminateMethod.invoke(progressBar, Boolean.TRUE);
+
+            } catch (Exception e) {
+                Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+                        "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
+            }
             
             try { Thread.sleep(5000); } catch(Exception e) {}
 
