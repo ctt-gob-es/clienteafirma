@@ -227,8 +227,7 @@ public class PanelDestinatarios extends JDialogWizard {
 		if (certDest.getAlias() != null && !certDest.equals("")) {
 			boolean copiar = true;
 			for (int i = 0; i < listaModel.getSize(); i++){
-				CertificateDestiny c = (CertificateDestiny) listaModel.getElementAt(i);
-				if (certDest.getAlias().equals(c.getAlias())){
+				if (certDest.getAlias().equals((String) listaModel.getElementAt(i))){
 					copiar = false;
 				}
 			}
