@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.Key;
@@ -263,7 +264,7 @@ public class PanelContrasenia extends JDialogWizard {
                 JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             else {
                 // Almacenamos el fichero de salida de la operacion
-                String path = AOUIManager.saveDataToFile(this, result, null, null);
+                String path = AOUIManager.saveDataToFile(this, result, new File(new File(rutaFichero).getParentFile(), "cifrado"), null);
                 if (path == null) {
 					return false;
 				}

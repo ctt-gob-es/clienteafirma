@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.Key;
@@ -388,7 +389,7 @@ public class PanelClaveCifrado extends JDialogWizard {
 				return false;
 			} else {
 				// Almacenamos el fichero de salida de la operacion
-				String path = AOUIManager.saveDataToFile(this, result, null, null);
+				String path = AOUIManager.saveDataToFile(this, result, new File(new File(rutaFichero).getParentFile(), "cifrado"), null);
 				if (path == null) {
 					return false;
 				}
