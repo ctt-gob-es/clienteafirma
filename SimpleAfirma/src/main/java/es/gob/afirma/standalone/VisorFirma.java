@@ -22,6 +22,10 @@ import es.gob.afirma.standalone.ui.FileUIManager;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.VisorPanel;
 
+/**
+ * Ventana para la visualizaci&oacute;n de datos de firma.
+ * @author Carlos Gamuci
+ */
 public class VisorFirma extends JApplet implements WindowListener, ActionListener {
 
     /** Serial ID */
@@ -37,6 +41,10 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
     /** Fichero de firma. */
     private File signFile;
 
+    /**
+     * Crea la pantalla para la visualizaci&oacute;n de la informaci&oacute;n de la firma indicada.
+     * @param signFile Fichero de firma.
+     */
     public VisorFirma(final File signFile) {
         this.signFile = signFile;
         this.setLookAndFeel();
@@ -100,6 +108,11 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
         }
     }
 
+    /**
+     * Reinicia la pantalla con los datos de una nueva firma.
+     * @param asApplet Indica que si se desea cargar la pantalla en forma de applet. 
+     * @param sigFile Nuevo fichero de firma.
+     */
     public void initialize(final boolean asApplet, final File sigFile) {
 
         if (sigFile != null) {

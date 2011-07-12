@@ -13,6 +13,10 @@ package es.gob.afirma.standalone.crypto;
 import es.gob.afirma.misc.tree.TreeModel;
 import es.gob.afirma.signers.beans.AOSignInfo;
 
+/**
+ * Informaci&oacute;n extra&iacute;da de una firma.
+ * @author Carlos Gamuci
+ */
 public final class CompleteSignInfo {
 
     private byte[] signData;
@@ -23,10 +27,19 @@ public final class CompleteSignInfo {
 
     private TreeModel signsTree;
 
+    /**
+     * Recupera la firma de la que se extraen los datos.
+     * @return Firma.
+     * @see #setSignData(byte[])
+     */
     public byte[] getSignData() {
         return this.signData;
     }
 
+    /**
+     * Establece la firma de la que se extraen los datos.
+     * @param signData Firma.
+     */
     public void setSignData(final byte[] signData) {
         this.signData = signData;
     }

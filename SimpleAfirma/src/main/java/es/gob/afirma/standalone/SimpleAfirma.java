@@ -86,12 +86,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     public static final boolean HIGH_CONTRAST;
     
     /** Tipo de letra por defecto del sistema operativo. */
-    public static final Font DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes());
-    
-    static {
-        
-        System.out.println("Tamano inicial: " + DEFAULT_FONT.getSize());
-        
+    public static final Font DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes()); //$NON-NLS-1$
+     
+    static {        
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
         if (highContrast instanceof Boolean) {
             HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();

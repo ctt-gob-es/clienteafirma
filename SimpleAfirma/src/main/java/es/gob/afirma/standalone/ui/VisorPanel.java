@@ -49,9 +49,13 @@ public final class VisorPanel extends JPanel {
     private ActionListener actionListener = null;
 
 
-    /** Construye un panel de espera a insercci&oacute;n de DNIe.
+    /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
+     * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir
+     * alguno de los dos par&aacute;metros. 
+     * @param signFile Fichero de firma.
+     * @param sign Firma.
      * @param al ActionListener para el control de los botones
-     * @param safirma SimpleAfirma para establecer el <code>Locale</code> seleccionado en el men&uacute; desplegable */
+     */
     public VisorPanel(final File signFile, final byte[] sign, final ActionListener al) {
         super(true);
         this.actionListener = al;
