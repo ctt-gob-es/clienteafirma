@@ -214,7 +214,7 @@ public class PanelDestinatarios extends JDialogWizard {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
 		} catch (Exception e) {
-		    //e.printStackTrace();
+		    e.printStackTrace();
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
 			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.abrir.almacen"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);

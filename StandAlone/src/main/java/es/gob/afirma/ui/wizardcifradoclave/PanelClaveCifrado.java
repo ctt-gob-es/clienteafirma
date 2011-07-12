@@ -38,7 +38,6 @@ import es.gob.afirma.callbacks.UIPasswordCallback;
 import es.gob.afirma.ciphers.AOCipherConfig;
 import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCipherAlgorithmException;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOInvalidKeyException;
 import es.gob.afirma.misc.AOCryptoUtil;
@@ -288,7 +287,7 @@ public class PanelClaveCifrado extends JDialogWizard {
 	 * @throws AOException Cuando se produce un error al auto generar las claves.
 	 * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado no esta soportado.
 	 */
-	private void generateKey(AOCipherConfig algorithmConfig) throws AOInvalidKeyException, AOCipherAlgorithmException, AOException, NoSuchAlgorithmException {
+	private void generateKey(AOCipherConfig algorithmConfig) throws AOInvalidKeyException, AOException, NoSuchAlgorithmException {
 		cipherKey = cipherConfig.getCipher().generateKey(algorithmConfig);
 	}
 	
