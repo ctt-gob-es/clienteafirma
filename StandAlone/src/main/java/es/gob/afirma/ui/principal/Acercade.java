@@ -148,9 +148,6 @@ public class Acercade extends JFrame {
 		return version.toString();
 	}
 	
-	/**
-	 * @param args the command line arguments
-	 */
 	public static void main() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {

@@ -101,8 +101,9 @@ public class PanelMultifirma extends JDialogWizard {
 
 	/**
 	 * Carga el modelo del arbol y del listado con el archivo de firma seleccionado
-	 * @param rutaFichero	Ruta del fichero de firma
-	 * @return	True o false si se ha cargado correctamente
+	 * @param signPath	Ruta del fichero de firma
+	 * @param sign Firma
+	 * @return	{@code true} si se ha cargado correctamente.
 	 */
 	public Boolean cargarDatos(String signPath, byte[] sign) {
 		this.rutaFichero = signPath;
