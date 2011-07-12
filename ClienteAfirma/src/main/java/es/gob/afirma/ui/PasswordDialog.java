@@ -150,7 +150,7 @@ public final class PasswordDialog extends JDialog {
                     if (pressed_OK) {
                         final String password = new String(pass2.getPassword());
                         if (password.equals(new String(pass1.getPassword()))) {
-                            if (password.length() > 1) {
+                            if (password.length() > 0) {
                                 PasswordDialog.this.setVisible(false);
                             }
                             else {
