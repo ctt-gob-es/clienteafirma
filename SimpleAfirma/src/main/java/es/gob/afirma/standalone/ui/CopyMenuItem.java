@@ -12,16 +12,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
 
-import es.gob.afirma.standalone.Messages;
-
 final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 
 	private static final long serialVersionUID = 1750985678317829383L;
 
 	private final JTextComponent textComponent;
 
-	private void createUI() {
-		final JMenuItem copyItem = new JMenuItem(Messages.getString("CopyMenuItem.0")); //$NON-NLS-1$
+	private void createUI(final String text) {
+		final JMenuItem copyItem = new JMenuItem(text);
 		copyItem.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent ae) {
@@ -35,9 +33,9 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 		add(copyItem);
 	}
 
-	CopyMenuItem(final JTextComponent tc) {
+	CopyMenuItem(final JTextComponent tc, final String text) {
 		this.textComponent = tc;
-        createUI();
+        createUI(text);
 	}
 
 	@Override

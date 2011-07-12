@@ -261,6 +261,7 @@ public final class SignPanel extends JPanel {
         else {
             this.signButton.setText(""); //$NON-NLS-1$
             this.signButton.setIcon(new ImageIcon(this.getClass().getResource("/resources/progress.gif"))); //$NON-NLS-1$
+            this.signButton.setToolTipText(Messages.getString("SignPanel.13")); //$NON-NLS-1$
         }
 
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -649,6 +650,9 @@ public final class SignPanel extends JPanel {
     /** Firma el fichero actualmente cargado. */
     public void sign() {
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        
+        try { Thread.sleep(10000); } catch(final Exception e) {}
+        
         if (this.signer == null || this.dataToSign == null || this.saf == null) {
             return;
         }
@@ -906,6 +910,7 @@ public final class SignPanel extends JPanel {
         if (e) {
             this.signButton.setIcon(null);
             this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
+            this.signButton.setToolTipText(null);
         }
         this.signButton.setEnabled(e);
         this.saf.setSignMenuCommandEnabled(e);

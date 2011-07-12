@@ -80,7 +80,7 @@ public final class SignDetailPanel extends JPanel {
             if (!signFile.exists()) {
                 Logger.getLogger("es.gob.afirma").severe("La ruta de firma proporcionada no corresponde a ningun fichero");  //$NON-NLS-1$ //$NON-NLS-2$
             }
-            else if (signFile.canRead()) {
+            else if (!signFile.canRead()) {
                 Logger.getLogger("es.gob.afirma").severe("No se tienen permisos de lectura del fichero indicado");  //$NON-NLS-1$//$NON-NLS-2$
             }
             else {

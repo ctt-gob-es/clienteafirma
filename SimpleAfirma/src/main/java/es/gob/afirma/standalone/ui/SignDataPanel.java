@@ -81,19 +81,17 @@ final class SignDataPanel extends JPanel {
         final JTextField filePath = new JTextField();
         filePath.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.0")); //$NON-NLS-1$
         filePath.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.1")); //$NON-NLS-1$
-        filePath.setFont(this.getFont().deriveFont(this.getFont().getSize() + 2));
         filePath.setBorder(BorderFactory.createEmptyBorder());
         filePath.setBackground(SimpleAfirma.WINDOW_COLOR);
         filePath.setEditable(false);
         filePath.setFocusable(false);
-        filePath.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
         filePath.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(final MouseEvent me) {
                 // me.isPopupTrigger() depende del Look & Feel y no se puede usar
                 if (me.getButton() == MouseEvent.BUTTON3 && me.getClickCount() == 1) {
-                    new CopyMenuItem(filePath).show(me.getComponent(), me.getX(), me.getY());
+                    new CopyMenuItem(filePath, Messages.getString("SignDataPanel.30")).show(me.getComponent(), me.getX(), me.getY()); //$NON-NLS-1$
                 }
             }
         });
