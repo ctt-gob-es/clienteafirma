@@ -34,6 +34,8 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -57,13 +59,17 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.html.HTMLDocument;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
@@ -87,6 +93,7 @@ import es.gob.afirma.ui.AOUIManager;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+@SuppressWarnings("unused")
 public final class SignPanel extends JPanel {
 
     private static final long serialVersionUID = -4828575650695534417L;

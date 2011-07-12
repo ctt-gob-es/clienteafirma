@@ -1,15 +1,8 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
 
-import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
-import javax.swing.text.html.HTMLDocument;
 
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.misc.WinRegistryWrapper;

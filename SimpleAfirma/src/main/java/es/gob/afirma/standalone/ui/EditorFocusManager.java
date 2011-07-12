@@ -14,7 +14,6 @@ import java.util.Vector;
 
 import javax.accessibility.AccessibleHyperlink;
 import javax.accessibility.AccessibleHypertext;
-import javax.jws.Oneway;
 import javax.swing.JEditorPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -172,7 +171,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
     
     private int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final int minSize) {
         
-        final String bodyRule = "body { font-family: " + SimpleAfirma.DEFAULT_FONT.getFamily() + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        final String bodyRule = "body { font-family: " + SimpleAfirma.DEFAULT_FONT.getFamily() + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$
         
         for (int i = minSize; i < 100; i++) {
             
@@ -197,11 +196,11 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
 
     private boolean editorFirstShow = true;
     @Override public void componentResized(ComponentEvent e) {
-        if (editorFirstShow) {
+        if (this.editorFirstShow) {
             final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), UIManager.getFont("Label.font").getSize()); //$NON-NLS-1$
             final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + bestFontSize + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
-            editorFirstShow = false;
+            this.editorFirstShow = false;
         }
     }
 
