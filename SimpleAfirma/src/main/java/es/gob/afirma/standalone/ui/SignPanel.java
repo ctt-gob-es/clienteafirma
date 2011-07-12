@@ -884,6 +884,7 @@ public final class SignPanel extends JPanel {
                     newFileName = fc.getSelectedFile().getAbsolutePath();
                 }
                 else {
+                    setSignCommandEnabled(true);
                     return null;
                 }
             }
@@ -901,18 +902,6 @@ public final class SignPanel extends JPanel {
 
             final File outputFile = new File(newFileName);
 
-            if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-                if (newFileName.toLowerCase().endsWith(".pdf") && outputFile.exists()) { //$NON-NLS-1$
-                    if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(SignPanel.this, Messages.getString("SignPanel.84"), //$NON-NLS-1$
-                                                                               Messages.getString("SignPanel.19"), //$NON-NLS-1$
-                                                                               JOptionPane.YES_NO_OPTION,
-                                                                               JOptionPane.WARNING_MESSAGE)) {
-                        setSignCommandEnabled(true);
-                        return null;
-                    }
-                }
-            }
-
             OutputStream fos = null;
             OutputStream bos = null;
             try {
@@ -922,7 +911,7 @@ public final class SignPanel extends JPanel {
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-                "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
+                  "No se ha podido guardar el resultado de la firma: " + e //$NON-NLS-1$
                 );
                 UIUtils.showErrorMessage(
                         SignPanel.this,

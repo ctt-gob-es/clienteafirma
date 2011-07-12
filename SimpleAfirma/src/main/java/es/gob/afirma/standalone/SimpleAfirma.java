@@ -93,7 +93,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         if (highContrast instanceof Boolean) {
             HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
         }
-        else {
+        // En Linux usmos siempre una configuraci—n como si se usase combinacion de colores
+        // de alto contraste
+        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+            HIGH_CONTRAST = true;
+        }
+        else{
             HIGH_CONTRAST = false;
         }
     }
