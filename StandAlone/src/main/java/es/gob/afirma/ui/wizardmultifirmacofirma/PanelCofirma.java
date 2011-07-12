@@ -36,6 +36,7 @@ import javax.swing.JTextField;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.KeyStoreConfiguration;
+import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
@@ -332,7 +333,10 @@ public class PanelCofirma extends JDialogWizard {
 		
 		Properties prop = GeneralConfig.getSignConfig();
 		prop.setProperty("uri", filepath);
-
+		
+		// Respetaremos si la firma original contenia o no los datos firmados
+		prop.setProperty("mode", signer.getData(sign) == null ? AOConstants.SIGN_MODE_EXPLICIT : AOConstants.SIGN_MODE_IMPLICIT);
+		
 		// Realizamos la cofirma
 		return signer.cosign(data, sign, GeneralConfig.getSignAlgorithm(),	keyEntry, prop);
 	}
