@@ -23,6 +23,13 @@ public final class UIUtils {
      * @param messageType Tipo de mensaje
      */
     public static void showErrorMessage(final Component parent, final Object message, final String title, final int messageType) {
+        
+        // Hay un error extrano por el que no llega el texto acotado por admiraciones
+        String buttonTxt = Messages.getString(Messages.getString("UIUtils.0")); //$NON-NLS-1$
+        if (buttonTxt.startsWith("!") && buttonTxt.endsWith("!")) { //$NON-NLS-1$ //$NON-NLS-2$
+            buttonTxt = buttonTxt.substring(1, buttonTxt.length()-1);
+        }
+        
         JOptionPane.showOptionDialog(
                 parent,
                 message,
@@ -31,9 +38,9 @@ public final class UIUtils {
                 messageType,
                 null,
                 new String[] {
-                    Messages.getString(Messages.getString("UIUtils.0")) //$NON-NLS-1$
+                              buttonTxt
                 },
-                Messages.getString(Messages.getString("UIUtils.0")) //$NON-NLS-1$
+                buttonTxt
         );
     }
     

@@ -43,7 +43,6 @@ import es.gob.afirma.signers.AOPDFSigner;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.signers.beans.AOSimpleSignInfo;
-import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
@@ -55,8 +54,7 @@ final class SignDataPanel extends JPanel {
     private static final long serialVersionUID = 4956746943438652928L;
 
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";  //$NON-NLS-1$
-    private static final String FILE_ICON_XML = "/resources/icon_xml.png"; //$NON-NLS-1$
-    private static final String FILE_ICON_BINARY = "/resources/icon_binary.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_SIGN = "/resources/icon_sign.png"; //$NON-NLS-1$
 
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
@@ -100,9 +98,37 @@ final class SignDataPanel extends JPanel {
         this.filePathText.setText(Messages.getString("SignDataPanel.2")); //$NON-NLS-1$
         this.filePathText.setLabelFor(filePath);
 
+        final JPanel filePathPanel = new JPanel();
+        filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        filePathPanel.setLayout(new BoxLayout(filePathPanel, BoxLayout.X_AXIS));
+        filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
+        filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+
+        final boolean isPDF = new AOPDFSigner().isValidDataFile(sign);
+        
+        if (fileTypeIcon != null) {
+            filePathPanel.add(fileTypeIcon);
+        }
+        else {
+            final String fileIcon;
+            final String fileTooltip;
+            if (isPDF) {
+                fileIcon = FILE_ICON_PDF;
+                fileTooltip = Messages.getString("SignDataPanel.9"); //$NON-NLS-1$
+            }
+            else {
+                fileIcon = FILE_ICON_SIGN;
+                fileTooltip = Messages.getString("SignDataPanel.31"); //$NON-NLS-1$
+            }
+            final JLabel iconLabel = new JLabel(new ImageIcon(SignDetailPanel.class.getResource(fileIcon)));
+            iconLabel.setToolTipText(fileTooltip);
+            iconLabel.setFocusable(false);
+            filePathPanel.add(iconLabel);
+        }
+        
         // Boton de apertura del fichero firmado
         JButton openFileButton = null;
-        if (signFile != null && UIUtils.hasAssociatedApplication(signFile.getName().substring(signFile.getName().lastIndexOf(".")))) { //$NON-NLS-1$
+        if (isPDF && signFile != null && UIUtils.hasAssociatedApplication(signFile.getName().substring(signFile.getName().lastIndexOf(".")))) { //$NON-NLS-1$
             openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
             openFileButton.setPreferredSize(new Dimension(150, 24));
             openFileButton.setMnemonic('v');
@@ -127,34 +153,6 @@ final class SignDataPanel extends JPanel {
             });
         }
 
-        final JPanel filePathPanel = new JPanel();
-        filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        filePathPanel.setLayout(new BoxLayout(filePathPanel, BoxLayout.X_AXIS));
-        filePathPanel.add(Box.createRigidArea(new Dimension(0, 40)));
-        filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-        if (fileTypeIcon != null) {
-            filePathPanel.add(fileTypeIcon);
-        }
-        else {
-            String fileIcon;
-            String fileTooltip;
-            if (new AOPDFSigner().isValidDataFile(sign)) {
-                fileIcon = FILE_ICON_PDF;
-                fileTooltip = Messages.getString("SignDataPanel.9"); //$NON-NLS-1$
-            }
-            else if (DataAnalizerUtil.isXML(sign)) {
-                fileIcon = FILE_ICON_XML;
-                fileTooltip = Messages.getString("SignDataPanel.10"); //$NON-NLS-1$
-            }
-            else {
-                fileIcon = FILE_ICON_BINARY;
-                fileTooltip = Messages.getString("SignDataPanel.11"); //$NON-NLS-1$
-            }
-            final JLabel iconLabel = new JLabel(new ImageIcon(SignDetailPanel.class.getResource(fileIcon)));
-            iconLabel.setToolTipText(fileTooltip);
-            iconLabel.setFocusable(false);
-            filePathPanel.add(iconLabel);
-        }
 
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         filePathPanel.add(filePath);

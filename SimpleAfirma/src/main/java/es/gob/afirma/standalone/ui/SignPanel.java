@@ -33,8 +33,6 @@ import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -61,24 +59,17 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.text.html.HTMLDocument;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
@@ -102,7 +93,6 @@ import es.gob.afirma.ui.AOUIManager;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-@SuppressWarnings("unused")
 public final class SignPanel extends JPanel {
 
     private static final long serialVersionUID = -4828575650695534417L;
@@ -113,6 +103,7 @@ public final class SignPanel extends JPanel {
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_XML = "/resources/icon_xml.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg"; //$NON-NLS-1$
+    private static final String FILE_ICON_SIGN = "/resources/icon_sign.svg"; //$NON-NLS-1$
 
     private AOSigner signer;
     private byte[] dataToSign = null;
@@ -208,12 +199,7 @@ public final class SignPanel extends JPanel {
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("no se pudo extraer la informacion de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
-            if (this.signer instanceof AOXMLDSigSigner || this.signer instanceof AOXAdESSigner) {
-                iconPath = FILE_ICON_XML;
-            }
-            else {
-                iconPath = FILE_ICON_BINARY;
-            }
+            iconPath = FILE_ICON_SIGN;
             iconTooltip = Messages.getString("SignPanel.6") + (info != null ? info.getFormat() : ""); //$NON-NLS-1$ //$NON-NLS-2$
             fileDescription = "Documento de firma"; //$NON-NLS-1$
             this.cosign = true;
@@ -527,16 +513,12 @@ public final class SignPanel extends JPanel {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-            SignPanel.this.filePanel = new ResizingTextPanel(Messages.getString("SignPanel.41") //$NON-NLS-1$
-                    );
+            SignPanel.this.filePanel = new ResizingTextPanel(Messages.getString("SignPanel.41")); //$NON-NLS-1$
             SignPanel.this.filePanel.setBackground(Color.DARK_GRAY);
             SignPanel.this.filePanel.setForeground(Color.LIGHT_GRAY);
-            SignPanel.this.filePanel.getAccessibleContext().setAccessibleDescription(Messages.getString("SignPanel.42") //$NON-NLS-1$
-                                    );
-            SignPanel.this.filePanel.getAccessibleContext().setAccessibleName(Messages.getString("SignPanel.43") //$NON-NLS-1$
-                                    );
-            SignPanel.this.filePanel.setToolTipText(Messages.getString("SignPanel.42") //$NON-NLS-1$
-            );
+            SignPanel.this.filePanel.getAccessibleContext().setAccessibleDescription(Messages.getString("SignPanel.42")); //$NON-NLS-1$
+            SignPanel.this.filePanel.getAccessibleContext().setAccessibleName(Messages.getString("SignPanel.43")); //$NON-NLS-1$
+            SignPanel.this.filePanel.setToolTipText(Messages.getString("SignPanel.42")); //$NON-NLS-1$
             SignPanel.this.filePanel.setFocusable(false);
             SignPanel.this.filePanel.setDropTarget(SignPanel.this.dropTarget);
 
@@ -544,7 +526,12 @@ public final class SignPanel extends JPanel {
 
             final JPanel signPanel = new JPanel(true);
             signPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-            SignPanel.this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
+            if (!SignPanel.this.cosign) {
+                SignPanel.this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
+            }
+            else {
+                SignPanel.this.signButton.setText(Messages.getString("SignPanel.16")); //$NON-NLS-1$
+            }
             SignPanel.this.signButton.setMnemonic('F');
             if (al != null) {
                 SignPanel.this.signButton.addActionListener(al);
@@ -674,7 +661,12 @@ public final class SignPanel extends JPanel {
     private void setSignCommandEnabled(final boolean e) {
         if (e) {
             this.signButton.setIcon(null);
-            this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
+            if (!this.cosign) {
+                this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
+            }
+            else {
+                SignPanel.this.signButton.setText(Messages.getString("SignPanel.16")); //$NON-NLS-1$
+            }
             this.signButton.setToolTipText(null);
         }
         this.signButton.setEnabled(e);
@@ -745,16 +737,22 @@ public final class SignPanel extends JPanel {
             catch(final Exception e) {}
             
             try {
-                Class<?> progressMonitorClass = Class.forName("javax.swing.ProgressMonitor"); //$NON-NLS-1$
-                Field jProgressBarField = progressMonitorClass.getDeclaredField("myBar"); //$NON-NLS-1$
+                final Class<?> progressMonitorClass = Class.forName("javax.swing.ProgressMonitor"); //$NON-NLS-1$
+                final Field jProgressBarField = progressMonitorClass.getDeclaredField("myBar"); //$NON-NLS-1$
                 jProgressBarField.setAccessible(true);
                 JProgressBar progressBar = (JProgressBar) jProgressBarField.get(SignPanel.this.pm);
                 
-                Class<?> jProgressBarClass = Class.forName("javax.swing.JProgressBar"); //$NON-NLS-1$
-                Method setIndeterminateMethod = jProgressBarClass.getMethod("setIndeterminate", Boolean.TYPE); //$NON-NLS-1$
+                final Class<?> jProgressBarClass = Class.forName("javax.swing.JProgressBar"); //$NON-NLS-1$
+                final Method setIndeterminateMethod = jProgressBarClass.getMethod("setIndeterminate", Boolean.TYPE); //$NON-NLS-1$
                 setIndeterminateMethod.invoke(progressBar, Boolean.TRUE);
+                
+                if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+                    final Method putCLientPropertyMethod = jProgressBarClass.getMethod("putClientProperty", Object.class, Object.class); //$NON-NLS-1$
+                    putCLientPropertyMethod.invoke(progressBar, "JProgressBar.style", "circular"); //$NON-NLS-1$ //$NON-NLS-2$
+                }
 
-            } catch (Exception e) {
+            } 
+            catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
                         "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
             }
