@@ -44,6 +44,7 @@ import es.gob.afirma.callbacks.UIPasswordCallback;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOCertificateKeyException;
 import es.gob.afirma.exceptions.AOException;
+import es.gob.afirma.exceptions.AOFormatFileException;
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.KeyStoreConfiguration;
@@ -192,10 +193,16 @@ public class Firma extends JPanel {
 		if(GeneralConfig.isAvanzados()) {
 			// XAdES Enveloping (Solo en la vista avanzada)
 			formatosL.add("XAdES Enveloping");
+			formatosV.add(AOConstants.SIGN_FORMAT_XADES_ENVELOPING);
 			// XAdES Enveloped (Solo en la vista avanzada)
 			formatosL.add("XAdES Enveloped");
-			formatosV.add(AOConstants.SIGN_FORMAT_XADES_ENVELOPING);
 			formatosV.add(AOConstants.SIGN_FORMAT_XADES_ENVELOPED);
+			// OOXML (Solo en la vista avanzada)
+            formatosL.add("OOXML");
+            formatosV.add(AOConstants.SIGN_FORMAT_OOXML);
+            // ODF (Solo en la vista avanzada)
+            formatosL.add("ODF");
+            formatosV.add(AOConstants.SIGN_FORMAT_ODF);
 		}
 		comboFormato.setModel(new DefaultComboBoxModel(formatosL.toArray()));
 		add(comboFormato, c);
@@ -420,13 +427,17 @@ public class Firma extends JPanel {
 							privateKeyEntry,
 							prop
 					);
+				} catch (AOFormatFileException e) {
+				    logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
+                    JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+                    return;
 				} catch (AOException e) {
-					logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
 					e.printStackTrace();
 					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 					return;
 				} catch (Exception e) {
-					logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+					logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
 					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 					return;
 				}
