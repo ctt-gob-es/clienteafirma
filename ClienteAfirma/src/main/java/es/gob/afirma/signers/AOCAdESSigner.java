@@ -257,7 +257,8 @@ public final class AOCAdESSigner implements AOSigner {
             catch (final Exception e) {}
 
             // Si la firma que nos introducen es SignedData
-            final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+            //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+            final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
             if (signedData) {
 
                 final String mode = extraParams.getProperty("mode", AOConstants.DEFAULT_SIGN_MODE);
@@ -336,7 +337,8 @@ public final class AOCAdESSigner implements AOSigner {
         catch (final Exception e) {}
 
         // Si la firma que nos introducen es SignedData
-        final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+        //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+        final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
         if (signedData) {
             try {
                 return new CadesCoSigner().coSigner(typeAlgorithm,
@@ -437,7 +439,8 @@ public final class AOCAdESSigner implements AOSigner {
         byte[] dataSigned = null;
 
         // Si la firma que nos introducen es SignedData
-        final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+        //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
+        final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
         if (signedData) {
             try {
                 // CASO DE FIRMA DE ARBOL
@@ -857,7 +860,7 @@ public final class AOCAdESSigner implements AOSigner {
     }
 
     /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
-     * Se realiza la verificaciÃƒÂ³n sobre los los siguientes tipos de CMS
+     * Se realiza la verificaci&oacute;n sobre los los siguientes tipos de CMS
      * reconocidos:
      * <ul>
      * <li>Data</li>
@@ -1029,7 +1032,7 @@ public final class AOCAdESSigner implements AOSigner {
             catch (final Exception ex) {
                 // Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto en el envoltorio CMS: "
                 // + ex);
-                throw new AOException("Error al asignar el OID por defecto en el envoltorio CMS", ex);
+                throw new AOException("Error al asignar el OID por defecto en el envoltorio CAdES", ex);
             }
         }
 
@@ -1056,7 +1059,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         }
         catch (final Exception e) {
-            throw new AOException("Error generando el enveloped de CMS", e);
+            throw new AOException("Error generando el enveloped de CAdES", e);
         }
         return dataSigned;
     }
@@ -1070,8 +1073,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     public void setDataObjectFormat(final String description, final Oid objectIdentifier, final javax.activation.MimeType mimeType, final String encoding) {
         // No permitimos el cambio del tipo de dato. CMS/CAdES establece que
-        // siempre
-        // sera de tipo DATA
+        // siempre sera de tipo DATA
         // this.dataType = objectIdentifier;
     }
 
