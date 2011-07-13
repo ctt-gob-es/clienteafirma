@@ -25,7 +25,7 @@ import com.apple.eawt.event.MagnificationEvent;
 import com.apple.eawt.event.MagnificationListener;
 
 import es.gob.afirma.misc.Platform;
-import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.LookAndFeelManager;
 
 /** Pantalla principal de la aplicaci&oacute;n de Firma F&aacute;cil con AFirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -46,8 +46,9 @@ public final class MainScreen extends JFrame {
     }
 
     private void createUI(final WindowListener wlist, final JPanel firstPanel) {
-
-        this.setBackground(SimpleAfirma.WINDOW_COLOR);
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
         this.setSize(new Dimension(780, 500));
         this.setLayout(new BorderLayout());
         this.setLocationRelativeTo(null);

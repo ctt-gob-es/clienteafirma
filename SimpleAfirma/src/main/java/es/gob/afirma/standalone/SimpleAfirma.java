@@ -11,12 +11,9 @@
 package es.gob.afirma.standalone;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -32,13 +29,10 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import javax.swing.JApplet;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.misc.Platform;
@@ -79,34 +73,12 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
     private File currentDir;
 
-    /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
-    public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB()); //$NON-NLS-1$
-    
-    /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
-    public static final boolean HIGH_CONTRAST;
-    
-    /** Tipo de letra por defecto del sistema operativo. */
-    public static final Font DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes()); //$NON-NLS-1$
-     
-    static {        
-        final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
-        if (highContrast instanceof Boolean) {
-            HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
-        }
-        // En Linux usmos siempre una configuraci—n como si se usase combinacion de colores
-        // de alto contraste
-        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
-            HIGH_CONTRAST = true;
-        }
-        else{
-            HIGH_CONTRAST = false;
-        }
-    }
+   
 
     /** Construye la aplicaci&oacute;n principal y establece el
      * <i>Look&Field</i>. */
     public SimpleAfirma() {
-        setLookAndFeel();
+       LookAndFeelManager. applyLookAndFeel();
         this.mainMenu = new MainMenu(this.window, this);
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             try {
@@ -288,69 +260,6 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
         this.container.repaint();
         this.currentPanel = newPanel;
-    }
-
-    private void setLookAndFeel() {
-
-        if (!HIGH_CONTRAST) {
-            UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
-            UIManager.put("OptionPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("RootPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("TextPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("TextArea.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("InternalFrameTitlePane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("InternalFrame.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("Panel.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("Label.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-            UIManager.put("PopupMenuSeparator.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        }
-
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        JDialog.setDefaultLookAndFeelDecorated(true);
-
-        // Propiedades especificas para Mac OS X
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.antialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.textantialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.rendering", "quality"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.graphics.EnableQ2DX", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        else { 
-            try {
-                if (!HIGH_CONTRAST) {
-                    for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                        if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
-                            UIManager.setLookAndFeel(info.getClassName());
-                            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                            "Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
-                            );
-                            return;
-                        }
-                    }
-                }
-            }
-            catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                "No se ha podido establecer el 'Look&Feel' Nimbus: " + e //$NON-NLS-1$
-                );
-            }
-        }
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-            "Establecido 'Look&Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
-            );
-        }
-        catch (final Exception e2) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-            "No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
-            );
-        }
-
     }
 
     @Override
@@ -551,7 +460,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     // ***********************************************
 
     private void createUI() {
-        this.setBackground(SimpleAfirma.WINDOW_COLOR);
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
         this.setSize(new Dimension(780, 500));
         this.setLayout(new BorderLayout());
         this.currentPanel = new DNIeWaitPanel(this, this, this);

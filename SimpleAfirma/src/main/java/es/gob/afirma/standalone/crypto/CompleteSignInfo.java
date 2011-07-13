@@ -44,26 +44,50 @@ public final class CompleteSignInfo {
         this.signData = signData;
     }
 
+    /**
+     * Recupera la informaci&oacute;n general de la firma.
+     * @return Informaci&oacute;n general de la firma.
+     */
     public AOSignInfo getSignInfo() {
         return this.signInfo;
     }
 
+    /**
+     * Establece la informaci&oacute;n general de la firma.
+     * @param signInfo Informaci&oacute;n general de la firma.
+     */
     public void setSignInfo(final AOSignInfo signInfo) {
         this.signInfo = signInfo;
     }
 
+    /**
+     * Recupera el &aacute;rbol de firma con los datos de cada firma individucal.
+     * @return &Aacute;rbol de firma.
+     */
     public TreeModel getSignsTree() {
         return this.signsTree;
     }
 
+    /**
+     * Establece el &aacute;rbol de firma con los datos de cada firma individucal.
+     * @param signsTree &Aacute;rbol de firma.
+     */
     public void setSignsTree(final TreeModel signsTree) {
         this.signsTree = signsTree;
     }
 
+    /**
+     * Recupera los datos que se firmaon.
+     * @return Datos que se firmaron.
+     */
     public byte[] getData() {
         return this.data;
     }
 
+    /**
+     * Establece los datos que se firmaon.
+     * @param data Datos que se firmaron.
+     */
     public void setData(final byte[] data) {
         this.data = data;
     }

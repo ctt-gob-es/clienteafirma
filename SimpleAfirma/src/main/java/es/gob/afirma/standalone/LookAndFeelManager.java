@@ -1,0 +1,135 @@
+package es.gob.afirma.standalone;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.util.logging.Logger;
+
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+
+import es.gob.afirma.misc.Platform;
+
+/**
+ * Maneja el LookAndFeel aplicado al aplicativo.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ * @author Carlos Gamuci
+ */
+public class LookAndFeelManager {
+
+    /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
+    public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB()); //$NON-NLS-1$
+    
+    /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
+    public static final boolean HIGH_CONTRAST;
+    
+    /** Tama&ntilde;o m&aacute;ximo de las fuentes por defecto antes de considerarse grandes. */
+    private static final int LARGE_FONT_LIMIT = 12;
+    
+    /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
+    public static final boolean LARGE_FONT;
+    
+    /** Tipo de letra por defecto del sistema operativo. */
+    public static final Font DEFAULT_FONT;
+     
+    static {        
+        final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
+        if (highContrast instanceof Boolean) {
+            HIGH_CONTRAST = ((Boolean) highContrast).booleanValue();
+        }
+        // En Linux usmos siempre una configuracion como si se usase combinacion de colores
+        // de alto contraste
+        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+            HIGH_CONTRAST = true;
+        }
+        else {
+            HIGH_CONTRAST = false;
+        }
+        
+        final  Object defaultFontHeight = Toolkit.getDefaultToolkit().getDesktopProperty("win.defaultGUI.font.height"); //$NON-NLS-1$
+        if (defaultFontHeight != null && defaultFontHeight instanceof Integer) {
+           LARGE_FONT = ((Integer) defaultFontHeight) > LARGE_FONT_LIMIT;
+           DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes()).deriveFont(((Integer) defaultFontHeight).floatValue()) ; //$NON-NLS-1$
+        }
+        // En Linux usmos siempre una configuracion como si se detectase un tamano de fuente grande 
+        else if (Platform.OS.LINUX.equals(Platform.getOS())) {
+            LARGE_FONT = true;
+            DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes()); //$NON-NLS-1$
+        }
+        else {
+            LARGE_FONT = false;
+            DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes()); //$NON-NLS-1$
+        }
+    }
+    
+    /**
+     * Establece el decorado de la aplicaci&oacute;n.
+     * @param defaultLookAndFeel Indica que se aplique la decoraci&oacute;n por defecto del sistema.
+     */
+    public static void applyLookAndFeel() {
+
+        final boolean defaultLookAndFeel = HIGH_CONTRAST || LARGE_FONT;
+        
+        if (!defaultLookAndFeel) {
+            UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
+            UIManager.put("OptionPane.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("RootPane.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("TextPane.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("TextArea.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("InternalFrameTitlePane.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("InternalFrame.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("Panel.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("Label.background", WINDOW_COLOR); //$NON-NLS-1$
+            UIManager.put("PopupMenuSeparator.background", WINDOW_COLOR); //$NON-NLS-1$
+        }
+
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        JDialog.setDefaultLookAndFeelDecorated(true);
+
+        // Propiedades especificas para Mac OS X
+        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            System.setProperty("apple.awt.antialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            System.setProperty("apple.awt.textantialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            System.setProperty("apple.awt.rendering", "quality"); //$NON-NLS-1$ //$NON-NLS-2$
+            System.setProperty("apple.awt.graphics.EnableQ2DX", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+            System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        else { 
+            try {
+                if (!defaultLookAndFeel) {
+                    for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
+                            UIManager.setLookAndFeel(info.getClassName());
+                            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+                            "Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
+                            );
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (final Exception e) {
+                Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+                "No se ha podido establecer el 'Look&Feel' Nimbus: " + e //$NON-NLS-1$
+                );
+            }
+        }
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+            "Establecido 'Look&Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
+            );
+        }
+        catch (final Exception e2) {
+            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            "No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
+            );
+        }
+
+    }
+}

@@ -15,6 +15,7 @@ import java.util.Vector;
 import javax.accessibility.AccessibleHyperlink;
 import javax.accessibility.AccessibleHypertext;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
@@ -25,7 +26,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.html.HTMLDocument;
 
-import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.LookAndFeelManager;
 
 final class EditorFocusManager extends KeyAdapter implements FocusListener, HyperlinkListener, ComponentListener {
     
@@ -46,8 +47,15 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         this.displayPane = displayPane;
         this.hlAction = efma;
         
-        final String bodyRule = "body { font-family: " + SimpleAfirma.DEFAULT_FONT.getFamily() + "; font-size: " + SimpleAfirma.DEFAULT_FONT.getSize() + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        final String bodyRule = "body { font-family: " + LookAndFeelManager.DEFAULT_FONT.getFamily() + "; font-size: " + LookAndFeelManager.DEFAULT_FONT.getSize() + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
+
+        if (LookAndFeelManager.HIGH_CONTRAST) {
+            final Color color = new JLabel().getForeground();
+            final String colorConfig = "rgb(" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            final String highContrastColorRule = "body {color: " + colorConfig + "; }";  //$NON-NLS-1$//$NON-NLS-2$
+            ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(highContrastColorRule);
+        }
         
         final StyleContext sc = new StyleContext();
         this.linkUnfocusedStyle = sc.addStyle("linkUnfocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
@@ -171,7 +179,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
     
     private int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final int minSize) {
         
-        final String bodyRule = "body { font-family: " + SimpleAfirma.DEFAULT_FONT.getFamily() + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$
+        final String bodyRule = "body { font-family: " + LookAndFeelManager.DEFAULT_FONT.getFamily() + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$
         
         for (int i = minSize; i < 100; i++) {
             

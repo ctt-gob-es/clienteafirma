@@ -43,8 +43,8 @@ import es.gob.afirma.signers.AOPDFSigner;
 import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.signers.beans.AOSimpleSignInfo;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
-import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
@@ -73,14 +73,12 @@ final class SignDataPanel extends JPanel {
 
     private void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
 
-        setBackground(SimpleAfirma.WINDOW_COLOR);
-
         // Texto con la ruta del fichero
         final JTextField filePath = new JTextField();
         filePath.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.0")); //$NON-NLS-1$
         filePath.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.1")); //$NON-NLS-1$
         filePath.setBorder(BorderFactory.createEmptyBorder());
-        filePath.setBackground(SimpleAfirma.WINDOW_COLOR);
+        
         filePath.setEditable(false);
         filePath.setFocusable(false);
         filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
@@ -161,7 +159,7 @@ final class SignDataPanel extends JPanel {
             filePathPanel.add(openFileButton);
             filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         }
-        filePathPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
+        
 
         JPanel certDescPanel = null;
 
@@ -237,7 +235,9 @@ final class SignDataPanel extends JPanel {
                 certDescPanel.add(this.validateCertButton);
                 certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
             }
-            certDescPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
+            if (!LookAndFeelManager.HIGH_CONTRAST) {
+                certDescPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            }
 
             this.certDescText.setText(Messages.getString("SignDataPanel.21")); //$NON-NLS-1$
             this.certDescText.setLabelFor(this.certDescription);
@@ -260,8 +260,15 @@ final class SignDataPanel extends JPanel {
         final JLabel detailPanelText = new JLabel(Messages.getString("SignDataPanel.22")); //$NON-NLS-1$
         detailPanelText.setLabelFor(detailPanel);
 
+        // Establecemos la configuracion de color
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            setBackground(LookAndFeelManager.WINDOW_COLOR);
+            filePath.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            filePathPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
+        
         this.setLayout(new GridBagLayout());
-
+        
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
@@ -371,6 +378,7 @@ final class SignDataPanel extends JPanel {
         treeRenderer.setOpenIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon")); //$NON-NLS-1$
 
         final JTree tree = new JTree(root);
+        tree.setShowsRootHandles(true);
         tree.setCellRenderer(treeRenderer);
         tree.setRootVisible(false);
         tree.putClientProperty("JTree.lineStyle", "None"); //$NON-NLS-1$ //$NON-NLS-2$

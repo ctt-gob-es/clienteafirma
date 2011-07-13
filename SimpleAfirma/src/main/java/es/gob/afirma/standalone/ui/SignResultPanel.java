@@ -2,6 +2,7 @@ package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -20,8 +21,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.batik.swing.JSVGCanvas;
 
 import es.gob.afirma.signature.SignValidity;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
-import es.gob.afirma.standalone.SimpleAfirma;
 
 final class SignResultPanel extends JPanel {
 
@@ -122,6 +123,7 @@ final class SignResultPanel extends JPanel {
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.13"); //$NON-NLS-1$
                 break;
         }
+        resultOperationIcon.setPreferredSize(new Dimension(120, 120));
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);
 
         final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {  
@@ -149,18 +151,21 @@ final class SignResultPanel extends JPanel {
         this.descTextLabel.addFocusListener(editorFocusManager);
         this.descTextLabel.addHyperlinkListener(editorFocusManager);
         this.descTextLabel.addKeyListener(editorFocusManager);
-        this.descTextLabel.addComponentListener(editorFocusManager);
         
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
         
         this.resultTextLabel.setFont(this.getFont().deriveFont(Font.PLAIN, 26));
-        this.resultTextLabel.setForeground(new Color(3399));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
 
+        // Establecemos la configuracion de color
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            setBackground(LookAndFeelManager.WINDOW_COLOR);
+            this.resultTextLabel.setForeground(new Color(3399));
+        }
+        
         this.setLayout(new GridBagLayout());
-        setBackground(SimpleAfirma.WINDOW_COLOR);
-
+        
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.0;

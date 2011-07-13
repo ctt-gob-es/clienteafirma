@@ -87,6 +87,7 @@ import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.signers.AOXAdESSigner;
 import es.gob.afirma.signers.AOXMLDSigSigner;
 import es.gob.afirma.signers.beans.AOSignInfo;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.ui.AOUIManager;
@@ -266,8 +267,9 @@ public final class SignPanel extends JPanel {
     }
 
     private void createUI(final ActionListener al, final boolean firstTime) {
-        
-        this.setBackground(SimpleAfirma.WINDOW_COLOR);
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
         this.setLayout(new GridLayout(2, 1));
         this.add(new UpperPanel(al, firstTime));
         this.lowerPanel = new LowerPanel(al);
@@ -387,11 +389,15 @@ public final class SignPanel extends JPanel {
 
         private static final long serialVersionUID = 533243192995645135L;
 
+        private UpperPanel(final ActionListener al, final boolean firstTime) {
+            super(true);
+            createUI(al, firstTime);
+        }
+        
         private void createUI(final ActionListener al, final boolean firstTime) {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-            this.setBackground(SimpleAfirma.WINDOW_COLOR);
-
+            
             SignPanel.this.selectButton.setText(Messages.getString("SignPanel.32")); //$NON-NLS-1$
             if (al != null) {
                 SignPanel.this.selectButton.addActionListener(al);
@@ -454,7 +460,6 @@ public final class SignPanel extends JPanel {
             welcomeLabel.setFocusable(false);
             welcomeLabel.setFont(welcomeLabel.getFont().deriveFont(Font.PLAIN, 26));
             welcomeLabel.setLabelFor(SignPanel.this.selectButton);
-            welcomeLabel.setForeground(new Color(3399));
             this.add(welcomeLabel, BorderLayout.PAGE_START);
 
             String intro = Messages.getString("SignPanel.40"); //$NON-NLS-1$
@@ -476,22 +481,21 @@ public final class SignPanel extends JPanel {
 
             final JPanel introPanel = new JPanel(new BorderLayout());
             introPanel.add(introText, BorderLayout.PAGE_START);
-            introPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-
             this.add(introPanel, BorderLayout.CENTER);
 
             final JPanel selectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT), true);
-            selectPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
             selectPanel.add(SignPanel.this.selectButton);
             this.add(selectPanel, BorderLayout.PAGE_END);
 
+            // Configuramos el color
+            if (!LookAndFeelManager.HIGH_CONTRAST) {
+                this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+                introPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+                selectPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+                welcomeLabel.setForeground(new Color(3399));
+            }
+           
         }
-
-        private UpperPanel(final ActionListener al, final boolean firstTime) {
-            super(true);
-            createUI(al, firstTime);
-        }
-
     }
 
     private final class LowerPanel extends JPanel {
@@ -509,13 +513,10 @@ public final class SignPanel extends JPanel {
         }
 
         private void createUI(final ActionListener al) {
-            this.setBackground(SimpleAfirma.WINDOW_COLOR);
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
             SignPanel.this.filePanel = new ResizingTextPanel(Messages.getString("SignPanel.41")); //$NON-NLS-1$
-            SignPanel.this.filePanel.setBackground(Color.DARK_GRAY);
-            SignPanel.this.filePanel.setForeground(Color.LIGHT_GRAY);
             SignPanel.this.filePanel.getAccessibleContext().setAccessibleDescription(Messages.getString("SignPanel.42")); //$NON-NLS-1$
             SignPanel.this.filePanel.getAccessibleContext().setAccessibleName(Messages.getString("SignPanel.43")); //$NON-NLS-1$
             SignPanel.this.filePanel.setToolTipText(Messages.getString("SignPanel.42")); //$NON-NLS-1$
@@ -524,8 +525,7 @@ public final class SignPanel extends JPanel {
 
             this.add(SignPanel.this.filePanel, BorderLayout.CENTER);
 
-            final JPanel signPanel = new JPanel(true);
-            signPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
+            final JPanel buttonPanel = new JPanel(true);
             if (!SignPanel.this.cosign) {
                 SignPanel.this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
             }
@@ -537,7 +537,7 @@ public final class SignPanel extends JPanel {
                 SignPanel.this.signButton.addActionListener(al);
             }
             SignPanel.this.signButton.setEnabled(false);
-            signPanel.add(SignPanel.this.signButton);
+            buttonPanel.add(SignPanel.this.signButton);
             SignPanel.this.signButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent ae) {
@@ -545,7 +545,15 @@ public final class SignPanel extends JPanel {
                 }
             });
 
-            this.add(signPanel, BorderLayout.PAGE_END);
+            // Establecemos la configuracion de color
+            if (!LookAndFeelManager.HIGH_CONTRAST) {
+                this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+                SignPanel.this.filePanel.setBackground(Color.DARK_GRAY);
+                SignPanel.this.filePanel.setForeground(Color.LIGHT_GRAY);
+                buttonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            }
+            
+            this.add(buttonPanel, BorderLayout.PAGE_END);
         }
     }
 
@@ -572,7 +580,7 @@ public final class SignPanel extends JPanel {
                               final String filePath,
                               final String fileDescription,
                               final Date fileLastModified) {
-            this.setBackground(SimpleAfirma.WINDOW_COLOR);
+            
             this.setBorder(BorderFactory.createLineBorder(Color.black));
             this.setLayout(new GridBagLayout());
 
@@ -586,7 +594,6 @@ public final class SignPanel extends JPanel {
             final JLabel sizeLabel = new JLabel(Messages.getString("SignPanel.49") + fileSize + " KB"); //$NON-NLS-1$ //$NON-NLS-2$
 
             final JPanel detailPanel = new JPanel();
-            detailPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
             detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
             detailPanel.add(pathLabel);
             detailPanel.add(Box.createRigidArea(new Dimension(0, 8)));
@@ -598,6 +605,12 @@ public final class SignPanel extends JPanel {
             // Puede arrastrarse un fichero a cualquiera de estos componentes para cargarlo
             this.setDropTarget(SignPanel.this.dropTarget);
 
+            // Establecemos la configuracion de color
+            if (!LookAndFeelManager.HIGH_CONTRAST) {
+                this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+                detailPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            }
+            
             final GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH;
             c.weightx = 0.0;
@@ -737,17 +750,15 @@ public final class SignPanel extends JPanel {
             catch(final Exception e) {}
             
             try {
-                final Class<?> progressMonitorClass = Class.forName("javax.swing.ProgressMonitor"); //$NON-NLS-1$
-                final Field jProgressBarField = progressMonitorClass.getDeclaredField("myBar"); //$NON-NLS-1$
+                final Field jProgressBarField = ProgressMonitor.class.getDeclaredField("myBar"); //$NON-NLS-1$
                 jProgressBarField.setAccessible(true);
                 JProgressBar progressBar = (JProgressBar) jProgressBarField.get(SignPanel.this.pm);
                 
-                final Class<?> jProgressBarClass = Class.forName("javax.swing.JProgressBar"); //$NON-NLS-1$
-                final Method setIndeterminateMethod = jProgressBarClass.getMethod("setIndeterminate", Boolean.TYPE); //$NON-NLS-1$
+                final Method setIndeterminateMethod = JProgressBar.class.getMethod("setIndeterminate", Boolean.TYPE); //$NON-NLS-1$
                 setIndeterminateMethod.invoke(progressBar, Boolean.TRUE);
                 
                 if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-                    final Method putCLientPropertyMethod = jProgressBarClass.getMethod("putClientProperty", Object.class, Object.class); //$NON-NLS-1$
+                    final Method putCLientPropertyMethod = JProgressBar.class.getMethod("putClientProperty", Object.class, Object.class); //$NON-NLS-1$
                     putCLientPropertyMethod.invoke(progressBar, "JProgressBar.style", "circular"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 

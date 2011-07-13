@@ -7,17 +7,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.Locale;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import javax.swing.JApplet;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 
-import es.gob.afirma.misc.Platform;
 import es.gob.afirma.standalone.ui.FileUIManager;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.VisorPanel;
@@ -47,65 +42,7 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
      */
     public VisorFirma(final File signFile) {
         this.signFile = signFile;
-        this.setLookAndFeel();
-    }
-
-    private void setLookAndFeel() {
-
-        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
-        UIManager.put("OptionPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("RootPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("TextPane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("TextArea.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("InternalFrameTitlePane.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("InternalFrame.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("Panel.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("Label.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-        UIManager.put("PopupMenuSeparator.background", SimpleAfirma.WINDOW_COLOR); //$NON-NLS-1$
-
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        JDialog.setDefaultLookAndFeelDecorated(true);
-
-        // Propiedades especificas para Mac OS X
-        if (Platform.OS.MACOSX.equals(Platform.getOS())) {
-            System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.antialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.textantialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.rendering", "quality"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.graphics.EnableQ2DX", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.awt.graphics.EnableDeferredUpdates", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-            System.setProperty("apple.laf.useScreenMenuBar", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        else {
-            try {
-                for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) { //$NON-NLS-1$
-                        UIManager.setLookAndFeel(info.getClassName());
-                        Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                        "Establecido 'Look&Feel' Nimbus" //$NON-NLS-1$
-                        );
-                        return;
-                    }
-                }
-            }
-            catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                "No se ha podido establecer el 'Look&Feel' Nimbus: " + e //$NON-NLS-1$
-                );
-            }
-        }
-
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-            "Establecido 'Look&Feel' " + UIManager.getLookAndFeel().getName() //$NON-NLS-1$
-            );
-        }
-        catch (final Exception e2) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-            "No se ha podido establecer ningun 'Look&Feel': " + e2 //$NON-NLS-1$
-            );
-        }
+        LookAndFeelManager.applyLookAndFeel();
     }
 
     /**

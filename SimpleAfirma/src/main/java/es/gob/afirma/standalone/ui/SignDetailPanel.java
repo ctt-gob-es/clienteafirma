@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 
 import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.signature.SignValidity;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 
@@ -71,8 +72,6 @@ public final class SignDetailPanel extends JPanel {
                           final X509Certificate signingCert,
                           final SignValidity signValidity,
                           final JComponent fileTypeIcon) {
-
-        this.setBackground(SimpleAfirma.WINDOW_COLOR);
 
         // Cargamos los datos de firma si no nos los proporcionaron en el constructor
         if (sig == null && sigPath != null) {
@@ -116,7 +115,7 @@ public final class SignDetailPanel extends JPanel {
 
         final JPanel returnPanel = new JPanel(true);
         returnPanel.setLayout(new BoxLayout(returnPanel, BoxLayout.Y_AXIS));
-        returnPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
+
         this.returnButton.setText(Messages.getString("SignDetailPanel.0")); //$NON-NLS-1$
         this.returnButton.setMnemonic('m');
         this.returnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -128,6 +127,12 @@ public final class SignDetailPanel extends JPanel {
             }
         });
 
+        // Establecemos la configuracion de color
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            returnPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
+        
         setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();

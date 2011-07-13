@@ -24,6 +24,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
 
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 
@@ -39,15 +40,14 @@ public final class DNIeWaitPanel extends JPanel {
 //    private final SimpleAfirma saf;
 
     private void createUI(final KeyListener kl, final ActionListener al) {
-        this.setBackground(SimpleAfirma.WINDOW_COLOR);
+        
         this.setLayout(new GridBagLayout());
         this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         // Boton para saltar de pantalla
         //this.noDNIPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         this.noDNIPanel.setLayout(new GridBagLayout());
-        this.noDNIPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
-
+        
         this.noDNIButton.setText(Messages.getString("DNIeWaitPanel.0")); //$NON-NLS-1$
         if (al != null) {
             this.noDNIButton.addActionListener(al);
@@ -64,7 +64,6 @@ public final class DNIeWaitPanel extends JPanel {
         // Texto informativo
         final ResizingTextPanel textPanel = new ResizingTextPanel(Messages.getString("DNIeWaitPanel.3")); //$NON-NLS-1$
 
-        textPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
         textPanel.setFocusable(false);
 
         // Imagen central
@@ -82,6 +81,13 @@ public final class DNIeWaitPanel extends JPanel {
         }
         vectorDNIeHelpPicture.setFocusable(false);
 
+        // Configuramos los colores
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            this.noDNIPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+            textPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
+        
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;

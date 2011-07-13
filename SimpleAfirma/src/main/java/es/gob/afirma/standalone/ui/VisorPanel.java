@@ -32,8 +32,8 @@ import es.gob.afirma.signature.ValidateXMLSignature;
 import es.gob.afirma.signers.AOCAdESSigner;
 import es.gob.afirma.signers.AOCMSSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
+import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
-import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
@@ -63,7 +63,9 @@ public final class VisorPanel extends JPanel {
     }
 
     private void createUI(final File signFile, final byte[] sign) {
-        this.setBackground(SimpleAfirma.WINDOW_COLOR);
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            this.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
         this.setLayout(new GridBagLayout());
         this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
@@ -104,13 +106,18 @@ public final class VisorPanel extends JPanel {
 
         final JPanel bottonPanel = new JPanel(true);
         bottonPanel.setLayout(new BoxLayout(bottonPanel, BoxLayout.Y_AXIS));
-        bottonPanel.setBackground(SimpleAfirma.WINDOW_COLOR);
+        
         this.openSign.setText(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
         this.openSign.setMnemonic('a');
         this.openSign.setAlignmentX(Component.CENTER_ALIGNMENT);
         bottonPanel.add(this.openSign);
         this.openSign.addActionListener(this.actionListener);
 
+        // Establecemos la configuracion de color
+        if (!LookAndFeelManager.HIGH_CONTRAST) {
+            bottonPanel.setBackground(LookAndFeelManager.WINDOW_COLOR);
+        }
+        
         setLayout(new GridBagLayout());
 
         final GridBagConstraints c = new GridBagConstraints();
