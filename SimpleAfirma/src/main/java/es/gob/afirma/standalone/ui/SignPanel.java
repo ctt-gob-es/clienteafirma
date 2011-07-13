@@ -655,6 +655,10 @@ public final class SignPanel extends JPanel {
                     }
                 });
                 this.add(openFileButton, c);
+                pathLabel.setLabelFor(openFileButton);
+                descLabel.setLabelFor(openFileButton);
+                dateLabel.setLabelFor(openFileButton);
+                sizeLabel.setLabelFor(openFileButton);
             }
         }
     }

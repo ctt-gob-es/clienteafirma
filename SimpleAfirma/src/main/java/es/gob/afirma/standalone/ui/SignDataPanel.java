@@ -374,8 +374,8 @@ final class SignDataPanel extends JPanel {
         //final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
         final LinksTreeCellRenderer treeRenderer = new LinksTreeCellRenderer();
         treeRenderer.setLeafIcon(null);
-        treeRenderer.setClosedIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.collapsedIcon")); //$NON-NLS-1$
-        treeRenderer.setOpenIcon(Platform.OS.WINDOWS.equals(Platform.getOS()) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon")); //$NON-NLS-1$
+        treeRenderer.setClosedIcon((Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) ? null : UIManager.getDefaults().getIcon("Tree.collapsedIcon")); //$NON-NLS-1$
+        treeRenderer.setOpenIcon((Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon")); //$NON-NLS-1$
 
         final JTree tree = new JTree(root);
         tree.setShowsRootHandles(true);
