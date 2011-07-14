@@ -2,6 +2,7 @@ package es.gob.afirma.standalone.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
@@ -47,9 +48,10 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         this.displayPane = displayPane;
         this.hlAction = efma;
         
-        final String bodyRule = "body { font-family: " + LookAndFeelManager.DEFAULT_FONT.getFamily() + "; font-size: " + LookAndFeelManager.DEFAULT_FONT.getSize() + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        final Font defaultFont = new Font(new JLabel().getFont().getAttributes());
+        final String bodyRule = "body { font-family: " + defaultFont.getFamily() + "; font-size: " + defaultFont.getSize() + "pt; }";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
-
+        
         if (LookAndFeelManager.HIGH_CONTRAST) {
             final Color color = new JLabel().getForeground();
             final String colorConfig = "rgb(" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -177,9 +179,9 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         }
     }
     
-    private int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final int minSize) {
+    private int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final String fontFamily, final int minSize) {
         
-        final String bodyRule = "body { font-family: " + LookAndFeelManager.DEFAULT_FONT.getFamily() + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$
+        final String bodyRule = "body { font-family: " + fontFamily + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$
         
         for (int i = minSize; i < 100; i++) {
             
@@ -205,7 +207,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
     private boolean editorFirstShow = true;
     @Override public void componentResized(ComponentEvent e) {
         if (this.editorFirstShow) {
-            final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), UIManager.getFont("Label.font").getSize()); //$NON-NLS-1$
+            final int bestFontSize = getBestFontSizeForJOptionPane(this.displayPane.getWidth(), this.displayPane.getHeight(), this.displayPane.getText(), UIManager.getFont("Label.font").getFamily(), UIManager.getFont("Label.font").getSize()); //$NON-NLS-1$ //$NON-NLS-2$
             final String bodyRule = "body { font-family: " + UIManager.getFont("Label.font").getFamily() + "; font-size: " + bestFontSize + "pt; }"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             ((HTMLDocument) this.displayPane.getDocument()).getStyleSheet().addRule(bodyRule);
             this.editorFirstShow = false;

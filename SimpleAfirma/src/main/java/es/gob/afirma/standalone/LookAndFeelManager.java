@@ -1,7 +1,6 @@
 package es.gob.afirma.standalone;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.util.logging.Logger;
 
@@ -30,9 +29,6 @@ public class LookAndFeelManager {
     
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
     public static final boolean LARGE_FONT;
-    
-    /** Tipo de letra por defecto del sistema operativo. */
-    public static final Font DEFAULT_FONT;
      
     static {        
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$
@@ -51,16 +47,13 @@ public class LookAndFeelManager {
         final  Object defaultFontHeight = Toolkit.getDefaultToolkit().getDesktopProperty("win.defaultGUI.font.height"); //$NON-NLS-1$
         if (defaultFontHeight != null && defaultFontHeight instanceof Integer) {
            LARGE_FONT = ((Integer) defaultFontHeight) > LARGE_FONT_LIMIT;
-           DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes()).deriveFont(((Integer) defaultFontHeight).floatValue()) ; //$NON-NLS-1$
         }
         // En Linux usmos siempre una configuracion como si se detectase un tamano de fuente grande 
         else if (Platform.OS.LINUX.equals(Platform.getOS())) {
             LARGE_FONT = true;
-            DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes()); //$NON-NLS-1$
         }
         else {
             LARGE_FONT = false;
-            DEFAULT_FONT = new Font(UIManager.getFont("Label.font").getAttributes()); //$NON-NLS-1$
         }
     }
     
