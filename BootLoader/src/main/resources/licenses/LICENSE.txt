@@ -2,5 +2,5 @@
 Este fichero forma parte de la distribución del cliente @firma e indica las condiciones de licencia
 del mismo.
 
-El Cliente @firma se encuentra bajo licencia GNU GPL versión 3.0, o superiores,
+El Cliente @firma se encuentra bajo licencia GNU GPL versión 2.0,
 cuyo texto completo se encuentra en el fichero adjunto "GPL.txt".
