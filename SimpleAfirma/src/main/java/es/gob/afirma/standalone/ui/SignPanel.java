@@ -526,6 +526,7 @@ public final class SignPanel extends JPanel {
             this.add(SignPanel.this.filePanel, BorderLayout.CENTER);
 
             final JPanel buttonPanel = new JPanel(true);
+            SignPanel.this.signButton.setPreferredSize(new Dimension(160, 27));
             if (!SignPanel.this.cosign) {
                 SignPanel.this.signButton.setText(Messages.getString("SignPanel.45")); //$NON-NLS-1$
             }
