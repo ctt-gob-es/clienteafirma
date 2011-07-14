@@ -26,7 +26,7 @@ final class MacHelpHooker {
     private static native void showHelp();
     
     static boolean isMacHelpAvailable() {
-        return true;//loaded;
+        return loaded;
     }
 
 }
