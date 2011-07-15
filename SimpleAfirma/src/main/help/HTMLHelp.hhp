@@ -1,0 +1,28 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=HTMLHelp.chm
+Contents file=Table of Contents.hhc
+Default topic=Spanish.lproj\SimpleAfirma.html
+Display compile progress=No
+Language=0xc0a Español (España, internacional)
+
+
+[FILES]
+shrd\icon_binary.png
+shrd\icon_pdf.png
+shrd\icon_sign.png
+shrd\icon_xml.png
+shrd\logo_cliente.png
+shrd\mptap.gif
+Spanish.lproj\SimpleAfirma.html
+Spanish.lproj\gfx\pantalladetalle_mini.png
+Spanish.lproj\gfx\pantallaespera_mini.png
+Spanish.lproj\gfx\pantallafirma1_mini.png
+Spanish.lproj\gfx\pantallafirma2_mini.png
+Spanish.lproj\pgs\Licencia.html
+Spanish.lproj\pgs\PantallaDetalle.html
+Spanish.lproj\pgs\PantallaEspera.html
+Spanish.lproj\pgs\PantallaFirma.html
+
+[INFOTYPES]
+
