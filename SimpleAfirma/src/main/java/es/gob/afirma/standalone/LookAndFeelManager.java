@@ -67,7 +67,7 @@ public class LookAndFeelManager {
         
         if (!defaultLookAndFeel) {
             UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
-            UIManager.put("OptionPane.background", WINDOW_COLOR); //$NON-NLS-1$
+            //UIManager.put("OptionPane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("RootPane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("TextPane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("TextArea.background", WINDOW_COLOR); //$NON-NLS-1$

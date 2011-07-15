@@ -586,7 +586,7 @@ public final class SignPanel extends JPanel {
             this.setLayout(new GridBagLayout());
 
             final JLabel pathLabel = new JLabel(filePath);
-            pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 4f));
+            pathLabel.setFont(pathLabel.getFont().deriveFont(Font.BOLD, pathLabel.getFont().getSize() + 3f));
 
             final JLabel descLabel = new JLabel(Messages.getString("SignPanel.46") + fileDescription); //$NON-NLS-1$
             final JLabel dateLabel = new JLabel(Messages.getString("SignPanel.47") + //$NON-NLS-1$
