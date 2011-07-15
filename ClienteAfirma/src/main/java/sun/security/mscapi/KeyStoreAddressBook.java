@@ -3,7 +3,6 @@ package sun.security.mscapi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.AccessController;
 import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
 import java.security.NoSuchAlgorithmException;
@@ -18,8 +17,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.logging.Logger;
-
-import sun.security.action.GetPropertyAction;
 
 /** <code>sun.security.mscapi.KeyStore</code> modificada para acceder a los
  * almacenes de CAPI <i>ADDRESSBOOK</i> y <i>CA</i>.
@@ -86,15 +83,6 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     };
 
-    /*
-     * Compatibility mode: for applications that assume keystores are
-     * stream-based this mode tolerates (but ignores) a non-null stream or
-     * password parameter when passed to the load or store methods. The mode is
-     * enabled by default.
-     */
-    private static final String KEYSTORE_COMPATIBILITY_MODE_PROP = "sun.security.mscapi.keyStoreCompatibilityMode"; //$NON-NLS-1$
-    private final boolean keyStoreCompatibilityMode;
-
     /* The keystore entries. */
     private final Collection<KeyEntry> entries = new ArrayList<KeyEntry>();
 
@@ -124,16 +112,6 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
         catch (final Exception e) {
             Logger.getLogger("es.atosorigin").severe("No se han podido obtener los metodos de acceso a sunmscapi.dll: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        // Get the compatibility mode
-        final String prop = AccessController.doPrivileged(new GetPropertyAction(KEYSTORE_COMPATIBILITY_MODE_PROP)).toString();
-
-        if ("false".equalsIgnoreCase(prop)) { //$NON-NLS-1$
-            keyStoreCompatibilityMode = false;
-        }
-        else {
-            keyStoreCompatibilityMode = true;
         }
 
         this.storeName = storeName;
@@ -424,14 +402,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            if compatibility mode is disabled and either parameter is
      *            non-null. */
     @Override
-    public final void engineStore(final OutputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
-        if (stream != null && !keyStoreCompatibilityMode) {
-            throw new IOException("Keystore output stream must be null"); //$NON-NLS-1$
-        }
-        if (password != null && !keyStoreCompatibilityMode) {
-            throw new IOException("Keystore password must be null"); //$NON-NLS-1$
-        }
-    }
+    public final void engineStore(final OutputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {}
 
     /** Loads the keystore.
      * A compatibility mode is supported for applications that assume keystores
@@ -459,13 +430,6 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            this provider's <code>getName</code> method. */
     @Override
     public final void engineLoad(final InputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
-        if (stream != null && !keyStoreCompatibilityMode) {
-            throw new IOException("Keystore input stream must be null"); //$NON-NLS-1$
-        }
-
-        if (password != null && !keyStoreCompatibilityMode) {
-            throw new IOException("Keystore password must be null"); //$NON-NLS-1$
-        }
 
         /*
          * Use the same security check as AuthProvider.login
@@ -507,4 +471,16 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
     }
 
+//    public static void main(String args[]) {
+//        AOKeyStoreManager ksm = null;
+//        try {
+//            ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(AOConstants.AOKeyStore.WINADDRESSBOOK, null, null, null, null);
+//        }
+//        catch (final Exception e) {
+//            e.printStackTrace();
+//        }
+//        for (String a : ksm.getAliases()) {
+//            System.out.println(a);
+//        }
+//    }
 }
