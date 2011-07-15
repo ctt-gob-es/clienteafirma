@@ -9,25 +9,25 @@
 </OBJECT>
 <UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Firma f&aacute;cil">
+		<param name="Name" value="Firma f&aacute;cil con @firma">
 		<param name="Local" value="Spanish.lproj\SimpleAfirma.html">
 		<param name="ImageNumber" value="1">
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Inserci&oacute;n del DNIe">
+			<param name="Name" value="Esperando a la inserci&oacute;n del DNIe...">
 			<param name="Local" value="Spanish.lproj\pgs\PantallaEspera.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Firma de documentos">
+			<param name="Name" value="Firma electr&oacute;nica de documentos">
 			<param name="Local" value="Spanish.lproj\pgs\PantallaFirma.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Detalle de firma">
+			<param name="Name" value="Detalle de las firma una vez completadas">
 			<param name="Local" value="Spanish.lproj\pgs\PantallaDetalle.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="LIcencia">
+			<param name="Name" value="Licencia de uso y distribuci&oacute;n">
 			<param name="Local" value="Spanish.lproj\pgs\Licencia.html">
 			</OBJECT>
 	</UL>
