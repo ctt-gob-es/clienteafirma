@@ -341,7 +341,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         this.container.add(newPanel, BorderLayout.CENTER);
         if (this.window != null && fileName != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", new File(fileName)); //$NON-NLS-1$
-            this.window.setTitle(this.window.getTitle().substring(0, this.window.getTitle().indexOf('-')) + "- " + new File(fileName).getName()); //$NON-NLS-1$
+            this.window.setTitle(Messages.getString("SimpleAfirma.10") + " - " + new File(fileName).getName()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (this.currentPanel != null) {
             this.currentPanel.setVisible(false);

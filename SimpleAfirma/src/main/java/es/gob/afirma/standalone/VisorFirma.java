@@ -75,7 +75,8 @@ public class VisorFirma extends JApplet implements WindowListener {
             }
 
             this.window = (JFrame) this.container;
-            this.window.setTitle(Messages.getString("VisorFirma.0"));  //$NON-NLS-1$
+            this.window.getRootPane().putClientProperty("Window.documentFile", this.signFile); //$NON-NLS-1$
+            this.window.setTitle(Messages.getString("VisorFirma.0") + ((this.signFile != null) ? (" - " + this.signFile.getAbsolutePath()) : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
     }
 

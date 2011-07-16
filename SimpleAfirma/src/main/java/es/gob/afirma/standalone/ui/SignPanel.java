@@ -249,7 +249,7 @@ public final class SignPanel extends JPanel {
 
         if (this.window != null) {
             this.window.getRootPane().putClientProperty("Window.documentFile", new File(filename)); //$NON-NLS-1$
-            this.window.setTitle(this.window.getTitle() + " - " + new File(filename).getName()); //$NON-NLS-1$
+            this.window.setTitle(Messages.getString("SimpleAfirma.10") + " - " + new File(filename).getName()); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         this.currentFile = file;
