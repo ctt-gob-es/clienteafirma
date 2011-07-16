@@ -10,17 +10,17 @@
 
 package es.gob.afirma.standalone.ui;
 
-import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -34,6 +34,7 @@ import es.gob.afirma.signers.AOCMSSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
+import es.gob.afirma.standalone.VisorFirma;
 
 /** Panel para la espera y detecci&oacute;n autom&aacute;tica de insercci&oacute;n de DNIe.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
@@ -43,10 +44,8 @@ public final class VisorPanel extends JPanel {
 
     /** Version ID */
     private static final long serialVersionUID = 8309157734617505338L;
-
-    private final JButton openSign = new JButton();
-
-    private ActionListener actionListener = null;
+    
+    private final VisorFirma visorFirma;
 
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
@@ -54,25 +53,27 @@ public final class VisorPanel extends JPanel {
      * alguno de los dos par&aacute;metros. 
      * @param signFile Fichero de firma.
      * @param sign Firma.
-     * @param al ActionListener para el control de los botones
+     * @param vf VisorFirma para las acciones de los botones
+     * @param allowReload <code>true</code> si se desea dar a usuario la opci&oacute;n de ver otras firmas en el
+     *                    visor carg&aacute;ndolas mediante un bot&oacute;n, <code>false</code> en caso contrario
      */
-    public VisorPanel(final File signFile, final byte[] sign, final ActionListener al) {
+    public VisorPanel(final File signFile, final byte[] sign, final VisorFirma vf, final boolean allowReload) {
         super(true);
-        this.actionListener = al;
-        createUI(signFile, sign);
+        this.visorFirma = vf;
+        createUI(signFile, sign, allowReload);
     }
 
-    private void createUI(final File signFile, final byte[] sign) {
+    private void createUI(final File signFile, final byte[] sign, final boolean addReloadButton) {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             this.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
         this.setLayout(new GridBagLayout());
         this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        openSign(signFile, sign);
+        openSign(signFile, sign, addReloadButton);
     }
 
-    private void openSign(final File signFile, byte[] sign) {
+    private void openSign(final File signFile, byte[] sign, final boolean addRealoadButton) {
 
         if (signFile == null && sign == null) {
             Logger.getLogger("es.gob.afirma").warning("Se ha intentado abrir una firma nula");  //$NON-NLS-1$ //$NON-NLS-2$
@@ -105,13 +106,34 @@ public final class VisorPanel extends JPanel {
         final JPanel dataPanel = new SignDataPanel(signFile, sign, null, null);
 
         final JPanel bottonPanel = new JPanel(true);
-        bottonPanel.setLayout(new BoxLayout(bottonPanel, BoxLayout.Y_AXIS));
+        bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
         
-        this.openSign.setText(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
-        this.openSign.setMnemonic('a');
-        this.openSign.setAlignmentX(Component.CENTER_ALIGNMENT);
-        bottonPanel.add(this.openSign);
-        this.openSign.addActionListener(this.actionListener);
+        if (addRealoadButton) {
+            final JButton openSign = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
+            openSign.setMnemonic('V');
+            bottonPanel.add(openSign);
+            openSign.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    if (VisorPanel.this.visorFirma != null) {
+                        VisorPanel.this.visorFirma.loadNewSign();
+                    }
+                }
+            });
+        }
+        
+        final JButton closeVisor = new JButton(Messages.getString("VisorPanel.0")); //$NON-NLS-1$
+        closeVisor.setMnemonic('C');
+        closeVisor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (VisorPanel.this.visorFirma != null) {
+                    VisorPanel.this.visorFirma.closeApplication(0);
+                }
+                
+            }
+        });
+        bottonPanel.add(closeVisor);
 
         // Establecemos la configuracion de color
         if (!LookAndFeelManager.HIGH_CONTRAST) {
@@ -135,6 +157,7 @@ public final class VisorPanel extends JPanel {
         add(bottonPanel, c);
 
         repaint();
+        
     }
 
     /**
@@ -144,12 +167,13 @@ public final class VisorPanel extends JPanel {
      * @throws Exception Cuando los datos introducidos no se corresponden con una firma.
      */
     private SignValidity validateSign(final byte[] sign) throws Exception {
-
         if (DataAnalizerUtil.isPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
-        } else if (DataAnalizerUtil.isXML(sign)) {
+        } 
+        else if (DataAnalizerUtil.isXML(sign)) {
             return ValidateXMLSignature.validate(sign);
-        } else if(new AOCMSSigner().isSign(sign) || new AOCAdESSigner().isSign(sign)) {
+        } 
+        else if(new AOCMSSigner().isSign(sign) || new AOCAdESSigner().isSign(sign)) {
             return ValidateBinarySignature.validate(sign, null);
         }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);

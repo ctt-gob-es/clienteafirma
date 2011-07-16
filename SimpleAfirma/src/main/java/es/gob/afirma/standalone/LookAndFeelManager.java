@@ -16,7 +16,7 @@ import es.gob.afirma.misc.Platform;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * @author Carlos Gamuci
  */
-public class LookAndFeelManager {
+public final class LookAndFeelManager {
 
     /** Color de fondo por defecto para los JPanel, JFrame y Applet. */
     public static final Color WINDOW_COLOR = new Color(UIManager.getColor("window").getRGB()); //$NON-NLS-1$
@@ -61,13 +61,12 @@ public class LookAndFeelManager {
      * Establece el decorado de la aplicaci&oacute;n.
      * @param defaultLookAndFeel Indica que se aplique la decoraci&oacute;n por defecto del sistema.
      */
-    public static void applyLookAndFeel() {
+    static void applyLookAndFeel() {
 
         final boolean defaultLookAndFeel = HIGH_CONTRAST || LARGE_FONT;
         
         if (!defaultLookAndFeel) {
             UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE); //$NON-NLS-1$
-            //UIManager.put("OptionPane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("RootPane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("TextPane.background", WINDOW_COLOR); //$NON-NLS-1$
             UIManager.put("TextArea.background", WINDOW_COLOR); //$NON-NLS-1$
@@ -83,6 +82,7 @@ public class LookAndFeelManager {
 
         // Propiedades especificas para Mac OS X
         if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            UIManager.put("OptionPane.background", WINDOW_COLOR); //$NON-NLS-1$
             System.setProperty("apple.awt.brushMetalLook", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.antialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$
             System.setProperty("apple.awt.textantialiasing", "true"); //$NON-NLS-1$ //$NON-NLS-2$

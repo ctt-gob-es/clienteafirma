@@ -1,8 +1,6 @@
 package es.gob.afirma.standalone;
 
 import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -21,7 +19,7 @@ import es.gob.afirma.standalone.ui.VisorPanel;
  * Ventana para la visualizaci&oacute;n de datos de firma.
  * @author Carlos Gamuci
  */
-public class VisorFirma extends JApplet implements WindowListener, ActionListener {
+public class VisorFirma extends JApplet implements WindowListener {
 
     /** Serial ID */
     private static final long serialVersionUID = 7060676034863587322L;
@@ -32,6 +30,8 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
     private JFrame window;
     private Container container = null;
     private JPanel currentPanel;
+    
+    private final boolean standalone;
 
     /** Fichero de firma. */
     private File signFile;
@@ -39,9 +39,12 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
     /**
      * Crea la pantalla para la visualizaci&oacute;n de la informaci&oacute;n de la firma indicada.
      * @param signFile Fichero de firma.
+     * @param standalone <code>true</code> si el visor se ha arrancado como aplicaci&oacute;n independiente,
+     *                   <code>false</code> si se ha arrancado desde otra aplicaci&oacute;n Java
      */
-    public VisorFirma(final File signFile) {
+    public VisorFirma(final File signFile, final boolean standalone) {
         this.signFile = signFile;
+        this.standalone = standalone;
         LookAndFeelManager.applyLookAndFeel();
     }
 
@@ -64,7 +67,7 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
             this.container = this;
         }
         else {
-            this.currentPanel = new VisorPanel(this.signFile, null, this);
+            this.currentPanel = new VisorPanel(this.signFile, null, this, this.standalone);
             this.container = new MainScreen(this, this.currentPanel);
 
             if (this.window != null) {
@@ -91,8 +94,8 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
 
     /** Listado de localizaciones soportadas por la aplicaci&oacute;n. */
     private static Locale[] locales = new Locale[] {
-            Locale.getDefault(), new Locale("en") //$NON-NLS-1$
-            };
+        Locale.getDefault(), new Locale("en") //$NON-NLS-1$
+    };
 
     /** Obtiene los idiomas disponibles para la aplicaci&oacute;n
      * @return Locales disponibles para la aplicaci&oacute;n */
@@ -150,11 +153,14 @@ public class VisorFirma extends JApplet implements WindowListener, ActionListene
         if (this.window != null) {
             this.window.dispose();
         }
-        System.exit(exitCode);
+        if (this.standalone) {
+            System.exit(exitCode);
+        }
     }
 
-    @Override
-    public void actionPerformed(final ActionEvent e) {
+
+    /** Carga una nueva firma en el Visor, preguntando al usuario por el fichero de firma. */
+    public void loadNewSign() {
         final File sgFile = FileUIManager.openFile(VisorFirma.this.window, null, null, Messages.getString("VisorFirma.1")); //$NON-NLS-1$
         if (sgFile == null) {
             return;

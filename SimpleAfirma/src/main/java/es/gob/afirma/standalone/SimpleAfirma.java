@@ -279,7 +279,9 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             showHelp();
         }
         else {
-            System.out.println("Tecla pulsada: " + ke.getKeyCode()); //$NON-NLS-1$
+            if (ke!=null) {
+                System.out.println("Tecla pulsada: " + ke.getKeyCode()); //$NON-NLS-1$
+            }
         }
     }
 
@@ -509,8 +511,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         if (args != null && args.length > 0) {
             final File signFile = new File(args[0]);
             if (signFile.exists() && signFile.isFile() && signFile.canRead()) {
-                final VisorFirma visor = new VisorFirma(new File(args[0]));
-                visor.initialize(false, null);
+                new VisorFirma(new File(args[0]), true).initialize(false, null);
             }
             else {
                 System.out.println(Messages.getString("SimpleAfirma.2")); //$NON-NLS-1$

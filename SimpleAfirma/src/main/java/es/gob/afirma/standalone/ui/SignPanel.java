@@ -90,6 +90,7 @@ import es.gob.afirma.signers.beans.AOSignInfo;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
+import es.gob.afirma.standalone.VisorFirma;
 import es.gob.afirma.ui.AOUIManager;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
@@ -635,23 +636,31 @@ public final class SignPanel extends JPanel {
             c.insets = new Insets(11, 6, 11, 11);
             c.anchor = GridBagConstraints.NORTHEAST;
             
-            if (UIUtils.hasAssociatedApplication(filePath.substring(filePath.lastIndexOf(".")))) { //$NON-NLS-1$
+            // Si es una firma la abriremos desde el mismo aplicativo
+            final boolean isSign = filePath.endsWith(".csig") || filePath.endsWith(".xsig"); //$NON-NLS-1$ //$NON-NLS-2$
+            
+            if (isSign || UIUtils.hasAssociatedApplication(filePath.substring(filePath.lastIndexOf(".")))) { //$NON-NLS-1$
                 final JButton openFileButton = new JButton(Messages.getString("SignPanel.51")); //$NON-NLS-1$
                 openFileButton.setMnemonic('v');
                 openFileButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent ae) {
-                        try {
-                            Desktop.getDesktop().open(new File(filePath));
+                        if (isSign) {
+                            new VisorFirma(new File(filePath), false).initialize(false, null);
                         }
-                        catch (final IOException e) {
-                            UIUtils.showErrorMessage(
-                                    FilePanel.this,
-                                    Messages.getString("SignPanel.53"), //$NON-NLS-1$
-                                    Messages.getString("SignPanel.25"), //$NON-NLS-1$
-                                    JOptionPane.ERROR_MESSAGE
-                            );
-                            return;
+                        else {
+                            try {
+                                Desktop.getDesktop().open(new File(filePath));
+                            }
+                            catch (final IOException e) {
+                                UIUtils.showErrorMessage(
+                                        FilePanel.this,
+                                        Messages.getString("SignPanel.53"), //$NON-NLS-1$
+                                        Messages.getString("SignPanel.25"), //$NON-NLS-1$
+                                        JOptionPane.ERROR_MESSAGE
+                                );
+                                return;
+                            }
                         }
                     }
                 });

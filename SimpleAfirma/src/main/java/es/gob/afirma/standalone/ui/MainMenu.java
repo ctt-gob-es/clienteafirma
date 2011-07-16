@@ -244,7 +244,7 @@ public final class MainMenu extends JMenuBar {
             this.ayudaMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    saf.showHelp();
+                    MainMenu.this.saf.showHelp();
                 }
             });
             menuAyuda.add(this.ayudaMenuItem);
