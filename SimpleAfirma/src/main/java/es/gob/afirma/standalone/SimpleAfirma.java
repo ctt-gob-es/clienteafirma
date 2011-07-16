@@ -13,6 +13,7 @@ package es.gob.afirma.standalone;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -274,8 +275,11 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             loadDefaultKeyStore();
             loadMainApp(true);
         }
-        else if (ke != null && ke.getKeyCode() == KeyEvent.VK_F1) {
-            System.out.println("Carga de la ayuda: " + this.currentPanel.getClass() + ", " + getLocale()); //$NON-NLS-1$ //$NON-NLS-2$
+        else if (ke != null && ke.getKeyCode() == KeyEvent.VK_F1 && (!Platform.OS.MACOSX.equals(Platform.getOS()))) {
+            showHelp();
+        }
+        else {
+            System.out.println("Tecla pulsada: " + ke.getKeyCode()); //$NON-NLS-1$
         }
     }
 
@@ -432,6 +436,18 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     public void signLoadedFile() {
         if (this.currentPanel instanceof SignPanel) {
             ((SignPanel) this.currentPanel).sign();
+        }
+    }
+    
+    /** Muestra la ayuda de la aplicaci&oacute;n. */
+    public void showHelp() {
+        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            try {
+                Desktop.getDesktop().open(new File(ClassLoader.getSystemResource("FirmaFacil.chm").toURI())); //$NON-NLS-1$
+            }
+            catch(final Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
