@@ -11,7 +11,6 @@
 package es.gob.afirma.standalone.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.WindowListener;
 import java.util.logging.Logger;
@@ -35,21 +34,23 @@ public final class MainScreen extends JFrame {
 
     /** Construye la pantalla principal de la aplicaci&oacute;n.
      * @param wlist WindowListener para el control del cierre de la ventana
-     * @param firstPanel Primer panel que debe mostrar la aplicaci&oacute;n */
-    public MainScreen(final WindowListener wlist, final JPanel firstPanel) {
+     * @param firstPanel Primer panel que debe mostrar la aplicaci&oacute;n 
+     * @param width Ancho de la ventana
+     * @param height Alto de la ventana */
+    public MainScreen(final WindowListener wlist, final JPanel firstPanel, final int width, final int height) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                createUI(wlist, firstPanel);
+                createUI(wlist, firstPanel, width, height);
             }
         });
     }
 
-    private void createUI(final WindowListener wlist, final JPanel firstPanel) {
+    private void createUI(final WindowListener wlist, final JPanel firstPanel, final int width, final int height) {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             this.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }
-        this.setSize(new Dimension(780, 500));
+        this.setSize(width, height);
         this.setLayout(new BorderLayout());
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

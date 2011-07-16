@@ -138,7 +138,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
         else {
             this.currentPanel = new DNIeWaitPanel(this, this, this);
-            this.container = new MainScreen(this, this.currentPanel);
+            this.container = new MainScreen(this, this.currentPanel, 780, 500);
             this.window = (JFrame) this.container;
             this.window.setTitle(Messages.getString("SimpleAfirma.10")); //$NON-NLS-1$
         }
