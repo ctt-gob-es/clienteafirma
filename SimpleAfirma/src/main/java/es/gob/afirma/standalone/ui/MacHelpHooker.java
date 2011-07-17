@@ -4,7 +4,10 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.misc.Platform;
 
-final class MacHelpHooker {
+/** Clase de enlace con la ayuda nativa de Mac OS X.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
+public final class MacHelpHooker {
     
     private static boolean loaded = false;
     
@@ -23,9 +26,15 @@ final class MacHelpHooker {
         }
     }
     
-    private static native void showHelp();
+    /** Muestra la ayuda de la aplicaci&oacute;n en Mac OS X con formato Apple Help (que debe estar declara en el
+     * <code>Info.plist</code> del empaquetado <code>.app</code>). */
+    public static native void showHelp();
     
-    static boolean isMacHelpAvailable() {
+    /** Indica si es posible mostrar la ayuda nativa Apple Help.
+     * @return <code>true</code> si se detecta Mac OS X y la biblioteca nativa de enlace (<code>JavaHelpHook.jnilib</code>)
+     *         est&aacute; disponible, <code>false</code> en caso contrario
+     */
+    public static boolean isMacHelpAvailable() {
         return loaded;
     }
 

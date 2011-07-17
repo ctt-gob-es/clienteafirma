@@ -42,6 +42,7 @@ import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.dnie.DNIeManager;
 import es.gob.afirma.standalone.dnie.DNIeManagerException;
 import es.gob.afirma.standalone.ui.DNIeWaitPanel;
+import es.gob.afirma.standalone.ui.MacHelpHooker;
 import es.gob.afirma.standalone.ui.MainMenu;
 import es.gob.afirma.standalone.ui.MainScreen;
 import es.gob.afirma.standalone.ui.SignDetailPanel;
@@ -446,11 +447,21 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             try {
                 Desktop.getDesktop().open(new File(ClassLoader.getSystemResource("FirmaFacil.chm").toURI())); //$NON-NLS-1$
+                return;
             }
             catch(final Exception e) {
-                e.printStackTrace();
+                Logger.getLogger("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$
             }
         }
+        else if (MacHelpHooker.isMacHelpAvailable()) {
+            MacHelpHooker.showHelp();
+            return;
+        }
+
+        // Ultimo recurso, si no es Windows, es Mac OS X pero no disponemos de Apple Help, o es otro
+        // sistema operativo (Linux, Solaris), cargamos JavaHelp
+        
+        //TODO: CARGA AQUI JAVAHELP
     }
 
     /** Carga el fichero a firmar. Este m&eacute;todo se situa aqu&iacute; para

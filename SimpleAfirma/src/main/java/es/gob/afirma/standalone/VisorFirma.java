@@ -94,7 +94,7 @@ public class VisorFirma extends JApplet implements WindowListener {
     }
 
     /** Listado de localizaciones soportadas por la aplicaci&oacute;n. */
-    private static Locale[] locales = new Locale[] {
+    private static final Locale[] locales = new Locale[] {
         Locale.getDefault(), new Locale("en") //$NON-NLS-1$
     };
 
@@ -139,6 +139,7 @@ public class VisorFirma extends JApplet implements WindowListener {
     public void windowClosing(final WindowEvent e) {
         closeApplication(0);
     }
+    
     @Override public void windowOpened(final WindowEvent e) { }
     @Override public void windowClosed(final WindowEvent e) { }
     @Override public void windowIconified(final WindowEvent e) { }
