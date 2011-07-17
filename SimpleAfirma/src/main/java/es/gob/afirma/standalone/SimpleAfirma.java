@@ -450,7 +450,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 return;
             }
             catch(final Exception e) {
-                Logger.getLogger("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$
+                Logger.getLogger("es.gob.afirma").warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
         else if (MacHelpHooker.isMacHelpAvailable()) {
