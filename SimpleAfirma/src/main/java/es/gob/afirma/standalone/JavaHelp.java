@@ -25,21 +25,21 @@ import javax.swing.JFrame;
  */
 public class JavaHelp {
 	
-	private static Hashtable<String, Component> components = new Hashtable<String, Component>();
-	private static HelpBroker helpBroker = null;
+	private static final Hashtable<String, Component> components = new Hashtable<String, Component>();
+	private static HelpBroker helpBroker;
 	private static HelpSet helpset = null;
  
 	static {
         try {
             // Cargamos el archivo de datos de la ayuda
-            URL hsURL = HelpBroker.class.getResource("/help/help_set-es_ES.hs"); //$NON-NLS-1$
+            final URL hsURL = HelpBroker.class.getResource("/help/help_set-es_ES.hs"); //$NON-NLS-1$
             
             // Creamos la ventana de ayuda
-            HelpSet helpset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
-            helpBroker = helpset.createHelpBroker();
+            final HelpSet hset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
+            helpBroker = hset.createHelpBroker();
             helpBroker.initPresentation();
-            WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
-            JFrame helpwindow = (JFrame) wp.getHelpWindow();
+            final WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
+            final JFrame helpwindow = (JFrame) wp.getHelpWindow();
             
             // Introducimos el icono en la ventana
             helpwindow.setIconImage(
@@ -47,7 +47,8 @@ public class JavaHelp {
                             JavaHelp.class.getClassLoader().getResource("resources/afirma_ico.png") //$NON-NLS-1$
                     )
             ); 
-        } catch (Exception ex) {
+        } 
+        catch (final Exception ex) {
             ex.printStackTrace();
         }
 	}
@@ -59,14 +60,15 @@ public class JavaHelp {
 	public static void change(String language) {
 		try {
 			// Carga el nuevo archivos de datos para ese idioma
-			URL hsURL = HelpBroker.class.getResource("/help/help_set-" + language + ".hs");  //$NON-NLS-1$//$NON-NLS-2$
+			final URL hsURL = HelpBroker.class.getResource("/help/help_set-" + language + ".hs");  //$NON-NLS-1$//$NON-NLS-2$
 			helpset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
 			helpBroker = helpset.createHelpBroker();
-			for (String key : components.keySet().toArray(new String[0])) {
+			for (final String key : components.keySet().toArray(new String[0])) {
 				helpBroker.enableHelpKey(components.get(key), key, helpset);
 			}
 
-		} catch (Exception ex) {
+		} 
+		catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -76,7 +78,7 @@ public class JavaHelp {
 	 * @param component	Componente que se va a mostrar al pulsar la tecla
 	 * @param key		Tecla que se debe pulsar para mostrar la ventana
 	 */
-	public static void enableHelpKey(Component component, String key) {
+	public static void enableHelpKey(final Component component, final String key) {
 		components.put(key, component);
 		helpBroker.enableHelpKey(component, key, helpset);
 	}
