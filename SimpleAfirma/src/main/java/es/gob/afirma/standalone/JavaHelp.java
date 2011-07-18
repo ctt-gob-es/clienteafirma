@@ -23,7 +23,7 @@ import javax.swing.JFrame;
 /**
  * Clase con utilidades relacionadas con la ayuda de la aplicacion
  */
-public class JavaHelp {
+final class JavaHelp {
 	
 	private static final Hashtable<String, Component> components = new Hashtable<String, Component>();
 	private static HelpBroker helpBroker;
@@ -57,7 +57,7 @@ public class JavaHelp {
 	 * Cambia el idioma de la ayuda
 	 * @param language	Idioma al que se debe cambiar
 	 */
-	public static void change(String language) {
+	static void change(final String language) {
 		try {
 			// Carga el nuevo archivos de datos para ese idioma
 			final URL hsURL = HelpBroker.class.getResource("/help/help_set-" + language + ".hs");  //$NON-NLS-1$//$NON-NLS-2$
@@ -78,7 +78,7 @@ public class JavaHelp {
 	 * @param component	Componente que se va a mostrar al pulsar la tecla
 	 * @param key		Tecla que se debe pulsar para mostrar la ventana
 	 */
-	public static void enableHelpKey(final Component component, final String key) {
+    static void enableHelpKey(final Component component, final String key) {
 		components.put(key, component);
 		helpBroker.enableHelpKey(component, key, helpset);
 	}
@@ -86,7 +86,7 @@ public class JavaHelp {
 	/**
 	 * Visualiza la ayuda por la p&aacute;gina principal.
 	 */
-	public static void showHelp() {
+	static void showHelp() {
 		helpBroker.setDisplayed(true);
 		helpBroker.setCurrentID("SimpleAfirma"); //$NON-NLS-1$
 	}
