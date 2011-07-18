@@ -460,8 +460,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
 
         // Ultimo recurso, si no es Windows, es Mac OS X pero no disponemos de Apple Help, o es otro
         // sistema operativo (Linux, Solaris), cargamos JavaHelp
-        
-        //TODO: CARGA AQUI JAVAHELP
+        JavaHelp.showHelp();
     }
 
     /** Carga el fichero a firmar. Este m&eacute;todo se situa aqu&iacute; para
