@@ -105,13 +105,13 @@ final class AOJarVerifier {
             if (man != null) {
                 final Enumeration<JarEntry> e = entriesVec.elements();
 
-                long now = System.currentTimeMillis();
+                final long now = System.currentTimeMillis();
 
                 while (e.hasMoreElements()) {
                     final JarEntry je = e.nextElement();
                     final String name = je.getName();
                     final CodeSigner[] signers = je.getCodeSigners();
-                    boolean isSigned = (signers != null);
+                    final boolean isSigned = (signers != null);
                     anySigned |= isSigned;
                     hasUnsignedEntry |= !je.isDirectory() && !isSigned && !signatureRelated(name);
 
@@ -119,15 +119,15 @@ final class AOJarVerifier {
                         for (final CodeSigner cs : signers) {
                             final Certificate cert = cs.getSignerCertPath().getCertificates().get(0);
                             if (cert instanceof X509Certificate) {
-                                long notAfter = ((X509Certificate) cert).getNotAfter().getTime();
+                                final long notAfter = ((X509Certificate) cert).getNotAfter().getTime();
                                 if (notAfter < now) {
-                                    hasExpiredCert = true;
+                                    this.hasExpiredCert = true;
                                 }
                                 else if (notAfter < now + SIX_MONTHS) {
-                                    hasExpiringCert = true;
+                                    this.hasExpiringCert = true;
                                 }
                                 else if (((X509Certificate) cert).getNotBefore().getTime() > now) {
-                                    notYetValidCert = true;
+                                    this.notYetValidCert = true;
                                 }
                                 ((X509Certificate) cert).verify(pkCA);
                                 if (signerCert != null) {
@@ -157,15 +157,15 @@ final class AOJarVerifier {
                 throw new SecurityException("Hay entradas sin firmar en el fichero ZIP/JAR");
             }
 
-            if (hasExpiringCert) {
+            if (this.hasExpiringCert) {
                 Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses");
             }
 
-            if (hasExpiredCert) {
+            if (this.hasExpiredCert) {
                 Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado");
             }
 
-            if (notYetValidCert) {
+            if (this.notYetValidCert) {
                 Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido");
             }
 
@@ -193,7 +193,7 @@ final class AOJarVerifier {
     private boolean signatureRelated(final String name) {
         final String ucName = name.toUpperCase();
         if (ucName.equals(JarFile.MANIFEST_NAME) || ucName.equals(META_INF)
-            || (ucName.startsWith(SIG_PREFIX) && ucName.indexOf("/") == ucName.lastIndexOf("/"))) {
+                || (ucName.startsWith(SIG_PREFIX) && ucName.indexOf("/") == ucName.lastIndexOf("/"))) {
             return true;
         }
 

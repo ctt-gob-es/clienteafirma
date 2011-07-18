@@ -8,8 +8,9 @@ public final class WinRegistry {
         initIDs();
     }
 
+    private WinRegistry() {}
+    
     private static final int KEY_READ = 0x20019;
-    private static final int KEY_WRITE = 0x20006;
 
     private static final int REG_SZ = 0x1;
     private static final int REG_DWORD = 0x4;
@@ -77,9 +78,11 @@ public final class WinRegistry {
     private static Object get(final int hKey, final String path, final String name) {
         final int key = sysOpenKey(hKey, path, KEY_READ);
         if (key != 0) {
-            KeyValue keyValue = sysQueryKey(key, name);
+            final KeyValue keyValue = sysQueryKey(key, name);
             sysCloseKey(key);
-            if (keyValue != null) return keyValue.getValue();
+            if (keyValue != null) {
+                return keyValue.getValue();
+            }
         }
         return null;
     }

@@ -11,7 +11,7 @@ public final class WinRegistryWrapper {
     static {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             try {
-                AOBootUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll"); //$NON-NLS-1$ //$NON-NLS-2$
+                AOBootUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll"); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll', no se podra acceder al registro de Windows: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -38,9 +38,9 @@ public final class WinRegistryWrapper {
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "No se ha podido obtener la clave de registro con ruta '" + //$NON-NLS-1$
-                    path
-                    + "' y nombre '" + name + "', se devolvera null: " + e //$NON-NLS-1$ //$NON-NLS-2$
+                                                      "No se ha podido obtener la clave de registro con ruta '" + //$NON-NLS-1$
+                                                      path
+                                                      + "' y nombre '" + name + "', se devolvera null: " + e //$NON-NLS-1$ //$NON-NLS-2$
             );
         }
         return null;

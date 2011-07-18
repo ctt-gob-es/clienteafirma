@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 package es.gob.afirma.install;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarOutputStream;
@@ -59,20 +60,17 @@ final class AOInstallUtils {
      * @param pack200Filename Nombre del del fichero Pack200 origen, incluyendo ruta
      * @param targetJarFilename Nombre del fichero de salida, incluyendo ruta
      * @throws AOException Cuando ocurre un error durante el desempaquetado. */
-    static void unpack(final String pack200Filename, String targetJarFilename) throws AOException {
+    static void unpack(final String pack200Filename, final String targetJarFilename) throws AOException {
         if (pack200Filename == null) {
-            throw new NullPointerException("El Pack200 origen no puede ser nulo");
+            throw new IllegalArgumentException("El Pack200 origen no puede ser nulo");
         }
         if (targetJarFilename == null) {
-            throw new NullPointerException("El JAR de destino no puede ser nulo");
+            throw new IllegalArgumentException("El JAR de destino no puede ser nulo");
         }
         createDirectory(new File(targetJarFilename).getParentFile());
         try {
             unpack200gunzip(AOBootUtil.loadFile(AOBootUtil.createURI(pack200Filename), null, false),
                             new FileOutputStream(new File(targetJarFilename)));
-        }
-        catch (final AOException e) {
-            throw e;
         }
         catch (final Exception e) {
             throw new AOException("Error al desempaquetar el fichero '" + pack200Filename + "'", e);
@@ -86,10 +84,10 @@ final class AOInstallUtils {
     /** Descomprime un JAR comprimido con Pack200 y GZip.
      * @param packgz <i>jar.pack.gz</i> original
      * @param jar JAR resultante del desempaquetado
-     * @throws Exception Si ocurre cualquier problema durante la descompresi&oacute;n */
-    private static void unpack200gunzip(final InputStream packgz, final OutputStream jar) throws Exception {
+     * @throws IOException Si ocurre cualquier problema durante la descompresi&oacute;n */
+    private static void unpack200gunzip(final InputStream packgz, final OutputStream jar) throws IOException {
         if (packgz == null) {
-            throw new NullPointerException("El pack.gz es nulo");
+            throw new IllegalArgumentException("El pack.gz es nulo");
         }
         final InputStream is = new GZIPInputStream(packgz);
         final Unpacker u = java.util.jar.Pack200.newUnpacker();
@@ -112,7 +110,7 @@ final class AOInstallUtils {
     private static void unzip(final ZipFile zipFile, File destDirectory) throws AOException, IOException {
 
         if (zipFile == null) {
-            throw new NullPointerException("El fichero Zip no puede ser nulo"); //$NON-NLS-1$
+            throw new IllegalArgumentException("El fichero Zip no puede ser nulo"); //$NON-NLS-1$
         }
         if (destDirectory == null) {
             destDirectory = new File("."); //$NON-NLS-1$
@@ -168,8 +166,10 @@ final class AOInstallUtils {
     /** Copia un fichero indicado por una URL en un directorio local del sistema.
      * @param file Fichero que se desea copiar.
      * @param dirDest Directorio local.
-     * @throws Exception Ocurri&oacute; un error durante la copia del fichero. */
-    static void copyFileFromURL(final URL file, final File fileDest) throws Exception {
+     * @throws URISyntaxException Si la URI proporcionada no tiene una sintaxis v&aacute;lifa
+     * @throws AOException Si ocurre cualquier otro error durante la copia
+     * @throws IOException Si ocurre un error de entrada/salida */
+    static void copyFileFromURL(final URL file, final File fileDest) throws IOException, AOException, URISyntaxException {
         copyFileFromURL(file, fileDest.getParentFile(), fileDest.getName());
     }
 
@@ -178,14 +178,16 @@ final class AOInstallUtils {
      * @param dirDest Directorio local.
      * @param newFilename Nombre con el que se almacenar&aacute; el fichero. Si se indica <code>null</code> se almacena con el mismo nombre que
      *        tuviese el fichero remoto.
-     * @throws Exception Ocurri&oacute; un error durante la copia del fichero. */
-    private static void copyFileFromURL(final URL urlFile, final File dirDest, final String newFilename) throws Exception {
+     * @throws IOException Si ocurren errores de entrada/salida
+     * @throws URISyntaxException Si la URO proporcionada no tiene una sintaxis v&aacute;lida
+     * @throws AOException Si ocurre cualquier otro problema durante la copia */
+    private static void copyFileFromURL(final URL urlFile, final File dirDest, final String newFilename) throws IOException, AOException, URISyntaxException {
 
         if (urlFile == null) {
-            throw new NullPointerException("La URL al fichero remoto no puede ser nula"); //$NON-NLS-1$
+            throw new IllegalArgumentException("La URL al fichero remoto no puede ser nula"); //$NON-NLS-1$
         }
         if (dirDest == null) {
-            throw new NullPointerException("El directorio destino no puede ser nulo"); //$NON-NLS-1$
+            throw new IllegalArgumentException("El directorio destino no puede ser nulo"); //$NON-NLS-1$
         }
 
         // Obtenemos el nombre del fichero destino a partir del directorio de destino y el nombre del nuevo
@@ -276,12 +278,14 @@ final class AOInstallUtils {
      * @return Devuelve <code>true</code> si el directorio se borr&oacute; completamente, <code>false</code> si no se pudo borrar el directorio o
      *         alguno de los ficheros que contiene. */
     static boolean deleteDir(final File dir) {
-        if (dir == null || !dir.exists()) return true;
+        if (dir == null || !dir.exists()) {
+            return true;
+        }
         boolean success = true;
 
         // Si es un directorio, borramos su contenido
         if (dir.isDirectory()) {
-            for (File child : dir.listFiles()) {
+            for (final File child : dir.listFiles()) {
                 if (!deleteDir(child)) {
                     success = false;
                 }
@@ -302,9 +306,11 @@ final class AOInstallUtils {
      * @param remoteFile Ruta del fichero a instalar.
      * @param installationFile Ruta en donde se instalar&aacute;a el fichero.
      * @param signingCa CA que se debe verificar. Nulo cuando no proceda.
-     * @throws SecurityException Cuando ocurre un error al validar la firma del fichero.
-     * @throws Exception */
-    static void installFile(final URL remoteFile, final File installationFile, final SigningCA signingCa) throws Exception {
+     * @throws URISyntaxException Si la URI proporcionada no tiene una sintaxis v&aacute;lida
+     * @throws AOException Si ocurre cualquier otro error durante la copia
+     * @throws IOException Si ocurre un error de entrada/salida
+     * @throws SecurityException Cuando ocurre un error al validar la firma del fichero */
+    static void installFile(final URL remoteFile, final File installationFile, final SigningCA signingCa) throws IOException, AOException, URISyntaxException {
 
         if (signingCa == null) {
             copyFileFromURL(remoteFile, installationFile);
@@ -329,12 +335,16 @@ final class AOInstallUtils {
      * @param remoteFile Nombre del fichero a instalar.
      * @param installationDir Directorio local en donde descomprimir el Zip.
      * @param signingCa CA que se debe verificar.
-     * @throws SecurityException Cuando ocurre un error al validar la firma del fichero.
-     * @throws Exception */
-    static void installZip(final URL remoteFile, final File installationDir, final SigningCA signingCa) throws Exception {
+     * @throws URISyntaxException Si la URI proporcionada no tiene una sintaxis v&aacute;lida
+     * @throws AOException Si ocurre cualquier otro error durante la copia
+     * @throws IOException Si ocurre un error de entrada/salida
+     * @throws SecurityException Cuando ocurre un error al validar la firma del fichero */
+    static void installZip(final URL remoteFile, final File installationDir, final SigningCA signingCa) throws IOException, AOException, URISyntaxException {
         final File tempFile = createTempFile();
         copyFileFromURL(remoteFile, tempFile);
-        if (signingCa != null) checkSign(tempFile, signingCa);
+        if (signingCa != null) {
+            checkSign(tempFile, signingCa);
+        }
         AOInstallUtils.unzip(new ZipFile(tempFile), installationDir);
         tempFile.deleteOnExit();
     }
@@ -352,7 +362,7 @@ final class AOInstallUtils {
         new AOJarVerifier().verifyJar(jarFile.getAbsolutePath(), ca.getCACertificate(), ca.getSigningCertificate());
     }
 
-    private static void createDirectory(File dir) {
+    private static void createDirectory(final File dir) {
         if (dir == null) {
             Logger.getLogger("es.gob.afirma").warning("Se ha pedido crear un directorio nulo, se ignorara la peticion");
             return;
@@ -367,14 +377,14 @@ final class AOInstallUtils {
                 if (dir.delete()) {
                     if (dir.mkdir()) {
                         Logger.getLogger("es.gob.afirma")
-                              .warning("'" + dir.getAbsolutePath()
-                                       + "' ya existia como fichero, se ha borrado y se ha creado un directorio con el mismo nombre");
+                        .warning("'" + dir.getAbsolutePath()
+                                 + "' ya existia como fichero, se ha borrado y se ha creado un directorio con el mismo nombre");
                         return;
                     }
 
                     Logger.getLogger("es.gob.afirma")
-                          .severe("'" + dir.getAbsolutePath()
-                                  + "' ya existia como fichero y se ha borrado, pero no se ha podido crear un directorio con el mismo nombre");
+                    .severe("'" + dir.getAbsolutePath()
+                            + "' ya existia como fichero y se ha borrado, pero no se ha podido crear un directorio con el mismo nombre");
                     return;
                 }
                 Logger.getLogger("es.gob.afirma").severe("'" + dir.getAbsolutePath() + "' ya existe como fichero y no se ha podido borrar");

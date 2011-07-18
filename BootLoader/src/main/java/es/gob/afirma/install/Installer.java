@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -76,7 +76,7 @@ final class Installer {
             public Boolean run() {
                 if (!afirmaDir.exists()) {
                     Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                    "El directorio de instalacion no existe, se omitira la operacion" //$NON-NLS-1$
+                                                            "El directorio de instalacion no existe, se omitira la operacion" //$NON-NLS-1$
                     );
                     return true;
                 }
@@ -89,7 +89,7 @@ final class Installer {
                 }
                 catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                    "No se ha podido eliminar el directorio de instalacion: " + e //$NON-NLS-1$
+                                                               "No se ha podido eliminar el directorio de instalacion: " + e //$NON-NLS-1$
                     );
                     JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString("Installer.13"), //$NON-NLS-1$
                                                   Messages.getString("Installer.12"), //$NON-NLS-1$
@@ -98,14 +98,16 @@ final class Installer {
                 }
             }
 
-            private void fileDelete(final File srcFile) throws Exception {
+            private void fileDelete(final File srcFile) {
                 if (srcFile.isDirectory()) {
-                    for (File f : srcFile.listFiles()) {
+                    for (final File f : srcFile.listFiles()) {
                         fileDelete(f);
                     }
                     srcFile.delete();
                 }
-                else srcFile.delete();
+                else {
+                    srcFile.delete();
+                }
             }
         });
 
@@ -118,9 +120,9 @@ final class Installer {
      * @param parentComponent Componente padre sobre el que se muestran los di&aacute;logos.
      * @return Indica si se ha aceptado o no el acuerdo de licencia. */
     private boolean prepareInstall() {
-        JOptionPane.showMessageDialog(parentComponent,
+        JOptionPane.showMessageDialog(this.parentComponent,
                                       Messages.getString("Installer.0"), Messages.getString("Installer.1"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-        final boolean accepted = new LicenceDialogPanel(parentComponent).showDisclaimer();
+        final boolean accepted = new LicenceDialogPanel(this.parentComponent).showDisclaimer();
         if (accepted) {
             Logger.getLogger("es.gob.afirma").info("Se ha aceptado el acuerdo de licencia"); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -136,65 +138,81 @@ final class Installer {
         boolean licenciaMostrada = false;
 
         try {
-            if (enviromentInstaller.isEndorsedJava5AFirmaDependenciesNeeded()) {
-                if (!licenciaMostrada && !prepareInstall()) return;
+            if (this.enviromentInstaller.isEndorsedJava5AFirmaDependenciesNeeded()) {
+                if (!licenciaMostrada && !prepareInstall()) {
+                    return;
+                }
                 licenciaMostrada = true;
                 Logger.getLogger("es.gob.afirma").info("Instalando dependencias de @firma para Java 5..."); //$NON-NLS-1$ //$NON-NLS-2$
-                enviromentInstaller.installEndorsedJava5AFirmaDependencies();
+                this.enviromentInstaller.installEndorsedJava5AFirmaDependencies();
             }
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "Error instalando las dependencias para Java 5, la ejecucion sobre Java 5 puede fallar: " + e //$NON-NLS-1$
+                                                      "Error instalando las dependencias para Java 5, la ejecucion sobre Java 5 puede fallar: " + e //$NON-NLS-1$
             );
-            if (AfirmaBootLoader.DEBUG) e.printStackTrace();
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
             allOK = false;
         }
 
         try {
-            if (enviromentInstaller.isEndorsedXalanNeeded()) {
-                if (!licenciaMostrada && !prepareInstall()) return;
+            if (this.enviromentInstaller.isEndorsedXalanNeeded()) {
+                if (!licenciaMostrada && !prepareInstall()) {
+                    return;
+                }
                 licenciaMostrada = true;
                 Logger.getLogger("es.gob.afirma").info("Instalando Apache XALAN..."); //$NON-NLS-1$ //$NON-NLS-2$
-                enviromentInstaller.installEndorsedXalan();
+                this.enviromentInstaller.installEndorsedXalan();
             }
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e//$NON-NLS-1$
+                                                      "Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e//$NON-NLS-1$
             );
-            if (AfirmaBootLoader.DEBUG) e.printStackTrace();
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
             allOK = false;
         }
 
         try {
-            if (enviromentInstaller.isNSSNeeded()) {
-                if (!licenciaMostrada && !prepareInstall()) return;
+            if (this.enviromentInstaller.isNSSNeeded()) {
+                if (!licenciaMostrada && !prepareInstall()) {
+                    return;
+                }
                 licenciaMostrada = true;
                 Logger.getLogger("es.gob.afirma").info("Instalando NSS..."); //$NON-NLS-1$ //$NON-NLS-2$
-                enviromentInstaller.installNSS();
+                this.enviromentInstaller.installNSS();
             }
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
+                                                      "Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
             );
-            if (AfirmaBootLoader.DEBUG) e.printStackTrace();
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
             allOK = false;
         }
 
         try {
-            if (enviromentInstaller.isNSSConfigurationNeeded()) {
-                if (!licenciaMostrada && !prepareInstall()) return;
+            if (this.enviromentInstaller.isNSSConfigurationNeeded()) {
+                if (!licenciaMostrada && !prepareInstall()) {
+                    return;
+                }
                 licenciaMostrada = true;
-                enviromentInstaller.configureNSS(parentComponent);
+                this.enviromentInstaller.configureNSS(this.parentComponent);
             }
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
+                                                      "Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
             );
-            if (AfirmaBootLoader.DEBUG) e.printStackTrace();
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
             JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString(Messages.getString("Installer.18")), //$NON-NLS-1$
                                           Messages.getString("Installer.26"), //$NON-NLS-1$
                                           JOptionPane.WARNING_MESSAGE);
@@ -202,43 +220,55 @@ final class Installer {
         }
 
         try {
-            if (enviromentInstaller.isSunMSCAPINeeded()) {
-                if (!licenciaMostrada && !prepareInstall()) return;
+            if (this.enviromentInstaller.isSunMSCAPINeeded()) {
+                if (!licenciaMostrada && !prepareInstall()) {
+                    return;
+                }
                 licenciaMostrada = true;
                 Logger.getLogger("es.gob.afirma").info("Instalando SunMSCAPI..."); //$NON-NLS-1$ //$NON-NLS-2$
-                enviromentInstaller.installSunMSCAPI();
+                this.enviromentInstaller.installSunMSCAPI();
             }
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "Error instalando SunMSCAPI, la ejecucion sobre Java 64 bits o Java 5 puede fallar: " + e //$NON-NLS-1$
+                                                      "Error instalando SunMSCAPI, la ejecucion sobre Java 64 bits o Java 5 puede fallar: " + e //$NON-NLS-1$
             );
-            if (AfirmaBootLoader.DEBUG) e.printStackTrace();
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
             allOK = false;
         }
 
         try {
-            if (enviromentInstaller.isSunPKCS11Needed()) {
-                if (!licenciaMostrada && !prepareInstall()) return;
+            if (this.enviromentInstaller.isSunPKCS11Needed()) {
+                if (!licenciaMostrada && !prepareInstall()) {
+                    return;
+                }
                 licenciaMostrada = true;
                 Logger.getLogger("es.gob.afirma").info("Instalando SunPKCS11..."); //$NON-NLS-1$ //$NON-NLS-2$
-                enviromentInstaller.installSunPKCS11();
+                this.enviromentInstaller.installSunPKCS11();
             }
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "Error instalando SunPKCS11, la ejecucion sobre Java 64 bits puede fallar: " + e //$NON-NLS-1$
+                                                      "Error instalando SunPKCS11, la ejecucion sobre Java 64 bits puede fallar: " + e //$NON-NLS-1$
             );
-            if (AfirmaBootLoader.DEBUG) e.printStackTrace();
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
             allOK = false;
         }
 
-        if (licenciaMostrada && allOK) JOptionPane.showMessageDialog(parentComponent, Messages.getString("Installer.23"), //$NON-NLS-1$
-                                                                     Messages.getString("Installer.24"), //$NON-NLS-1$
-                                                                     JOptionPane.INFORMATION_MESSAGE);
-        else if (licenciaMostrada) JOptionPane.showMessageDialog(parentComponent, Messages.getString("Installer.25"), //$NON-NLS-1$
-                                                                 Messages.getString("Installer.26"), //$NON-NLS-1$
-                                                                 JOptionPane.ERROR_MESSAGE);
+        if (licenciaMostrada && allOK) {
+            JOptionPane.showMessageDialog(this.parentComponent, Messages.getString("Installer.23"), //$NON-NLS-1$
+                                          Messages.getString("Installer.24"), //$NON-NLS-1$
+                                          JOptionPane.INFORMATION_MESSAGE);
+        }
+        else if (licenciaMostrada) {
+            JOptionPane.showMessageDialog(this.parentComponent, Messages.getString("Installer.25"), //$NON-NLS-1$
+                                          Messages.getString("Installer.26"), //$NON-NLS-1$
+                                          JOptionPane.ERROR_MESSAGE);
+        }
 
     }
 

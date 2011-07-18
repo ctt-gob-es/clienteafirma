@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
@@ -44,7 +44,7 @@ public final class Platform {
     }
 
     /** Directorio endorsed de la distribuci&oacute;n Java. */
-    static String endorsedDir = null;
+    private static String endorsedDir = null;
 
     /** Sistema operativo. */
     private static OS os;
@@ -76,7 +76,7 @@ public final class Platform {
     /*
      *  Se realiza una inicializacion automatica con las propiedades de la plataforma.
      *  Si falla la incializacion automatica el usuario debera reintentarlo manualmente.
-     *  Esto puede ocurrir, por ejemplo, en applets en donde no se controlan los priilegios.  
+     *  Esto puede ocurrir, por ejemplo, en applets en donde no se controlan los priilegios.
      */
     static {
         init();
@@ -116,9 +116,9 @@ public final class Platform {
             initialized = true;
             final String jreVersion = System.getProperty("java.version");
             if (jreVersion.startsWith("1.0") || jreVersion.startsWith("1.1")
-                || jreVersion.startsWith("1.2")
-                || jreVersion.startsWith("1.3")
-                || jreVersion.startsWith("1.4")) {
+                    || jreVersion.startsWith("1.2")
+                    || jreVersion.startsWith("1.3")
+                    || jreVersion.startsWith("1.4")) {
                 javaVersion = JREVER.J4;
             }
             else if (jreVersion.startsWith("1.5")) {

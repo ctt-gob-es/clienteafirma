@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 package es.gob.afirma.misc;
@@ -39,9 +39,9 @@ public final class AOBootUtil {
 
     /** Esquemas de ruta soportados. */
     private static final String[] SUPPORTED_URI_SCHEMES = new String[] {
-            "http", //$NON-NLS-1$
-            "https", //$NON-NLS-1$
-            "file" //$NON-NLS-1$
+                                                                        "http", //$NON-NLS-1$
+                                                                        "https", //$NON-NLS-1$
+                                                                        "file" //$NON-NLS-1$
     };
 
     /** Crea una URI a partir de un nombre de fichero local o una URL.
@@ -70,8 +70,8 @@ public final class AOBootUtil {
 
         // Comprobamos si es un esquema soportado
         final String scheme = uri.getScheme();
-        for (int i = 0; i < SUPPORTED_URI_SCHEMES.length; i++) {
-            if (SUPPORTED_URI_SCHEMES[i].equals(scheme)) {
+        for (final String element : SUPPORTED_URI_SCHEMES) {
+            if (element.equals(scheme)) {
                 return uri;
             }
         }
@@ -108,7 +108,7 @@ public final class AOBootUtil {
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
 
         if (uri == null) {
-            throw new NullPointerException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
+            throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
         }
 
         javax.swing.ProgressMonitor pm = null;
@@ -120,21 +120,15 @@ public final class AOBootUtil {
                 // Retiramos el "file://" de la uri
                 String path = uri.getSchemeSpecificPart();
                 if (path.startsWith("//")) {
-                    path = path.substring(2); //$NON-NLS-1$
+                    path = path.substring(2);
                 }
                 // Cuidado, el ProgressMonitor no se entera del tamano de los ficheros grandes:
                 // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6445283
                 if (waitDialog) {
-                    return new BufferedInputStream(new ProgressMonitorInputStream(c, Messages.getString("AOBootUtil.0") + " " + path, //$NON-NLS-1$ //$NON-NLS-2$                
-                                                                                             new FileInputStream(new File(path))));
+                    return new BufferedInputStream(new ProgressMonitorInputStream(c, Messages.getString("AOBootUtil.0") + " " + path, //$NON-NLS-1$ //$NON-NLS-2$
+                                                                                  new FileInputStream(new File(path))));
                 }
                 return new BufferedInputStream(new FileInputStream(new File(path)));
-            }
-            catch (final NullPointerException e) {
-                throw e;
-            }
-            catch (final FileNotFoundException e) {
-                throw e;
             }
             catch (final Exception e) {
                 throw new AOException("Ocurrio un error intentando abrir un archivo en almacenamiento local: " + e); //$NON-NLS-1$
@@ -144,8 +138,8 @@ public final class AOBootUtil {
         final InputStream tmpStream;
         try {
             if (waitDialog) {
-                ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(c, Messages.getString("AOBootUtil.0") + uri.toURL().toString(), //$NON-NLS-1$
-                                                                                 uri.toURL().openStream());
+                final ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(c, Messages.getString("AOBootUtil.0") + uri.toURL().toString(), //$NON-NLS-1$
+                                                                                       uri.toURL().openStream());
                 pm = pmis.getProgressMonitor();
                 // pm.setMillisToDecideToPopup(0);
                 // pm.setMillisToPopup(0);
@@ -252,11 +246,11 @@ public final class AOBootUtil {
             try {
                 in.close();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
             try {
                 out.close();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("No se ha podido copiar el fichero origen '" + source.getName()
@@ -295,9 +289,9 @@ public final class AOBootUtil {
         }
         final StringBuilder version = new StringBuilder();
         version.append(p.getProperty("version.mayor", "0")).append(".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               .append(p.getProperty("version.minor", "0")).append(".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               .append(p.getProperty("version.build", "0")).append(" ") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-               .append(p.getProperty("build", "")); //$NON-NLS-1$ //$NON-NLS-2$
+        .append(p.getProperty("version.minor", "0")).append(".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        .append(p.getProperty("version.build", "0")).append(" ") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        .append(p.getProperty("build", "")); //$NON-NLS-1$ //$NON-NLS-2$
         if (p.containsKey("java")) {//$NON-NLS-1$
             version.append(" para Java ").append(p.getProperty("java")).append(" o superior"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
@@ -321,11 +315,11 @@ public final class AOBootUtil {
             try {
                 is.close();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
             try {
                 zipFile.close();
             }
-            catch (Exception e) {}
+            catch (final Exception e) {}
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").warning("No se ha podido identificar el cliente de firma instalado"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -339,13 +333,13 @@ public final class AOBootUtil {
     public static void loadNativeLibrary(final String path) {
 
         boolean copyOK = false;
-        int pos = path.lastIndexOf('.');
+        final int pos = path.lastIndexOf('.');
         final File file = new File(path);
         File tempLibrary = null;
         try {
             tempLibrary =
-                    File.createTempFile(pos < 1 ? file.getName() : file.getName().substring(0, file.getName().indexOf('.')),
-                                        pos < 1 || pos == path.length() - 1 ? null : path.substring(pos));
+                File.createTempFile(pos < 1 ? file.getName() : file.getName().substring(0, file.getName().indexOf('.')),
+                                            pos < 1 || pos == path.length() - 1 ? null : path.substring(pos));
 
             // Copiamos el fichero
             copyOK = copyFile(file, tempLibrary);
@@ -369,7 +363,7 @@ public final class AOBootUtil {
             return new Object[0];
         }
         if (jsMethodParams instanceof Object[]) {
-            return (Object[]) jsMethodParams;   
+            return (Object[]) jsMethodParams;
         }
         if (jsMethodParams instanceof String) {
             return ((String) jsMethodParams).split(",");

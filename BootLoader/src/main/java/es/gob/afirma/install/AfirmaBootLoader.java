@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 package es.gob.afirma.install;
@@ -37,7 +37,7 @@ public final class AfirmaBootLoader extends JApplet {
     private URL codeBase = null;
 
     static {
-        logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$ 
+        logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     }
 
     @Override
@@ -57,10 +57,10 @@ public final class AfirmaBootLoader extends JApplet {
     public boolean setBaseDownloadURL(final String url) {
         logger.info("Invocando setBaseDownloadURL(String)"); //$NON-NLS-1$
         try {
-            codeBase = new URL(url);
+            this.codeBase = new URL(url);
         }
         catch (final Exception e) {
-            logger.severe("La URL establecida es incorrecta, se usara la original (" + codeBase.toString() + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+            logger.severe("La URL establecida es incorrecta, se usara la original (" + this.codeBase.toString() + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
             );
             return false;
         }
@@ -103,7 +103,7 @@ public final class AfirmaBootLoader extends JApplet {
                     public void run() {
 
                         // Configuramos el instalador
-                        final Installer installer = new Installer(AfirmaBootLoader.this, codeBase, build);
+                        final Installer installer = new Installer(AfirmaBootLoader.this, AfirmaBootLoader.this.codeBase, build);
 
                         // Instalamos
                         installer.install();
@@ -121,8 +121,8 @@ public final class AfirmaBootLoader extends JApplet {
     /** Desinstala localmente las dependecias de entorno operativo del Cliente de Firma.
      * @return Devuelve <code>true</code> si se desinstalaron correctamente, <code>false</code> en caso contrario */
     public boolean desinstalar() {
-        logger.info("Invocando desinstalar()"); //$NON-NLS-1$ //$NON-NLS-2$
-        return new Installer(AfirmaBootLoader.this, codeBase, null).uninstall();
+        logger.info("Invocando desinstalar()"); //$NON-NLS-1$
+        return new Installer(AfirmaBootLoader.this, this.codeBase, null).uninstall();
     }
 
     /** Recupera la versi&oacute;n del BootLoader.
@@ -133,7 +133,7 @@ public final class AfirmaBootLoader extends JApplet {
         try {
             is.close();
         }
-        catch (Exception e) {}
+        catch (final Exception e) {}
         return idVersion;
     }
 

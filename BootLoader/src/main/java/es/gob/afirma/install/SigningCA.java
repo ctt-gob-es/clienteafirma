@@ -1,10 +1,10 @@
 /*
- * Este fichero forma parte del Cliente @firma. 
+ * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2 segun las
- * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este 
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 package es.gob.afirma.install;
@@ -23,25 +23,25 @@ enum SigningCA {
      * @param caCertificatePath Ruta interna de la CA. */
     private SigningCA(final String caCertificatePath, final String sigCertificatePath) {
         try {
-            caCert =
-                    (X509Certificate) CertificateFactory.getInstance("X.509")
-                                                        .generateCertificate(AOInstallUtils.class.getResourceAsStream(caCertificatePath));
+            this.caCert =
+                (X509Certificate) CertificateFactory.getInstance("X.509")
+                .generateCertificate(AOInstallUtils.class.getResourceAsStream(caCertificatePath));
         }
         catch (final Exception e) {
             throw new UnsupportedOperationException("No se ha podido cargar el certificado raiz: " + caCertificatePath, e);
         }
         if (sigCertificatePath != null) {
             try {
-                sgCert =
-                        (X509Certificate) CertificateFactory.getInstance("X.509")
-                                                            .generateCertificate(AOInstallUtils.class.getResourceAsStream(sigCertificatePath));
+                this.sgCert =
+                    (X509Certificate) CertificateFactory.getInstance("X.509")
+                    .generateCertificate(AOInstallUtils.class.getResourceAsStream(sigCertificatePath));
             }
             catch (final Exception e) {
                 throw new UnsupportedOperationException("No se ha podido cargar el certificado firmante: " + sigCertificatePath, e);
             }
         }
         else {
-            sgCert = null;
+            this.sgCert = null;
         }
     }
 
@@ -49,11 +49,11 @@ enum SigningCA {
     private final X509Certificate sgCert;
 
     X509Certificate getCACertificate() {
-        return caCert;
+        return this.caCert;
     }
 
     X509Certificate getSigningCertificate() {
-        return sgCert;
+        return this.sgCert;
     }
 
 }
