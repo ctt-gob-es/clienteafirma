@@ -177,14 +177,14 @@ public final class AOUIManager {
 
         // Si se ha pedido que se seleccione automaticamente un certificado, se
         // seleccionara
-        // si hay mas de un ceretificado que se ajuste al filtro, se dera a
+        // si hay mas de un ceretificado que se ajuste al filtro, se dara a
         // elegir
         if (mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
             return aliassesByFriendlyName.keys().nextElement();
         }
 
         // Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
-        // mayúsculas y minúsculas
+        // mayusculas y minúsculas
         final String[] finalOrderedAliases = aliassesByFriendlyName.values().toArray(new String[0]);
         Arrays.sort(finalOrderedAliases, new Comparator<String>() {
             public int compare(final String o1, final String o2) {

@@ -201,6 +201,7 @@ public final class KeyStoreUtilities {
                         if ("KeychainStore".equals(ks.getType())) {
                             final PrivateKey key;
                             try {
+                                Logger.getLogger("es.gob.afirma").info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas");
                                 key = (PrivateKey) ks.getKey(al, "dummy".toCharArray());
                             }
                             catch (final Exception e) {
