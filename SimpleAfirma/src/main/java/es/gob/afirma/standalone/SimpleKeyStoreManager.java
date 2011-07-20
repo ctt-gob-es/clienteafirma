@@ -29,7 +29,7 @@ import es.gob.afirma.standalone.ui.DNIePasswordCallback;
 /** Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe
  * v&iacute;a PKCS#11 o el <code>KeyStore</code> por defecto del sistema operativo
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class SimpleKeyStoreManager {
+final class SimpleKeyStoreManager {
 
     private SimpleKeyStoreManager() {}
 
@@ -87,7 +87,7 @@ public final class SimpleKeyStoreManager {
      * @param parent Componente padre para la modalidad
      * @return <code>KeyStore</code> apropiado
      * @throws AOKeyStoreManagerException Si ocurre cualquier problema durante la obtenci&oacute;n del <code>KeyStore</code> */
-    public static AOKeyStoreManager getKeyStore(final boolean dnie, final Component parent) throws AOKeyStoreManagerException {
+    static AOKeyStoreManager getKeyStore(final boolean dnie, final Component parent) throws AOKeyStoreManagerException {
 
         if (dnie) {
             final String lib = getPKCS11DNIeLib();

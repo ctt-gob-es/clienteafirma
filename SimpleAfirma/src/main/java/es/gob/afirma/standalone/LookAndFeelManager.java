@@ -28,7 +28,7 @@ public final class LookAndFeelManager {
     private static final int LARGE_FONT_LIMIT = 12;
     
     /** Indica si el sistema operativo tiene activada una combinaci&oacute;n de colores de alto contraste. */
-    public static final boolean LARGE_FONT;
+    private static final boolean LARGE_FONT;
      
     static {        
         final Object highContrast = Toolkit.getDefaultToolkit().getDesktopProperty("win.highContrast.on"); //$NON-NLS-1$

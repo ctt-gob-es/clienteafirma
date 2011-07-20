@@ -41,7 +41,7 @@ public final class CertificateInfo {
      * @param ocsp Configuraci&oacute;n de OCSP para la validaci&oacute;n del certificado
      * @param i Icono para el certificado
      * @param iTooltip <i>Tooltip</i> para el icono del certificado */
-    public CertificateInfo(final X509Certificate cert, final String description, final AOCertVerifier ocsp, final Icon i, final String iTooltip) {
+    CertificateInfo(final X509Certificate cert, final String description, final AOCertVerifier ocsp, final Icon i, final String iTooltip) {
 
     	if (description == null || "".equals(description)) {  //$NON-NLS-1$
         	if (cert == null) {

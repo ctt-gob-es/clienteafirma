@@ -53,35 +53,35 @@ final class JavaHelp {
         }
 	}
 
-	/**
-	 * Cambia el idioma de la ayuda
-	 * @param language	Idioma al que se debe cambiar
-	 */
-	static void change(final String language) {
-		try {
-			// Carga el nuevo archivos de datos para ese idioma
-			final URL hsURL = HelpBroker.class.getResource("/help/help_set-" + language + ".hs");  //$NON-NLS-1$//$NON-NLS-2$
-			helpset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
-			helpBroker = helpset.createHelpBroker();
-			for (final String key : components.keySet().toArray(new String[0])) {
-				helpBroker.enableHelpKey(components.get(key), key, helpset);
-			}
+//	/**
+//	 * Cambia el idioma de la ayuda
+//	 * @param language	Idioma al que se debe cambiar
+//	 */
+//	static void change(final String language) {
+//		try {
+//			// Carga el nuevo archivos de datos para ese idioma
+//			final URL hsURL = HelpBroker.class.getResource("/help/help_set-" + language + ".hs");  //$NON-NLS-1$//$NON-NLS-2$
+//			helpset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
+//			helpBroker = helpset.createHelpBroker();
+//			for (final String key : components.keySet().toArray(new String[0])) {
+//				helpBroker.enableHelpKey(components.get(key), key, helpset);
+//			}
+//
+//		} 
+//		catch (final Exception ex) {
+//			ex.printStackTrace();
+//		}
+//	}
 
-		} 
-		catch (final Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	/**
-	 * Activa el acceso a la ventana de ayuda por la pulsacion de una tecla
-	 * @param component	Componente que se va a mostrar al pulsar la tecla
-	 * @param key		Tecla que se debe pulsar para mostrar la ventana
-	 */
-    static void enableHelpKey(final Component component, final String key) {
-		components.put(key, component);
-		helpBroker.enableHelpKey(component, key, helpset);
-	}
+//	/**
+//	 * Activa el acceso a la ventana de ayuda por la pulsacion de una tecla
+//	 * @param component	Componente que se va a mostrar al pulsar la tecla
+//	 * @param key		Tecla que se debe pulsar para mostrar la ventana
+//	 */
+//    static void enableHelpKey(final Component component, final String key) {
+//		components.put(key, component);
+//		helpBroker.enableHelpKey(component, key, helpset);
+//	}
 	
 	/**
 	 * Visualiza la ayuda por la p&aacute;gina principal.
@@ -90,4 +90,5 @@ final class JavaHelp {
 		helpBroker.setDisplayed(true);
 		helpBroker.setCurrentID("SimpleAfirma"); //$NON-NLS-1$
 	}
+	
 }

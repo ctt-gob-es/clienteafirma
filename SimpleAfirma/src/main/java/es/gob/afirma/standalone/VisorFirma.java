@@ -93,16 +93,16 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
     }
 
-    /** Listado de localizaciones soportadas por la aplicaci&oacute;n. */
-    private static final Locale[] locales = new Locale[] {
-        Locale.getDefault(), new Locale("en") //$NON-NLS-1$
-    };
+//    /** Listado de localizaciones soportadas por la aplicaci&oacute;n. */
+//    private static final Locale[] locales = new Locale[] {
+//        Locale.getDefault(), new Locale("en") //$NON-NLS-1$
+//    };
 
-    /** Obtiene los idiomas disponibles para la aplicaci&oacute;n
-     * @return Locales disponibles para la aplicaci&oacute;n */
-    public static Locale[] getAvailableLocales() {
-        return locales;
-    }
+//    /** Obtiene los idiomas disponibles para la aplicaci&oacute;n
+//     * @return Locales disponibles para la aplicaci&oacute;n */
+//    public static Locale[] getAvailableLocales() {
+//        return locales;
+//    }
 
     /** Establece el idioma de la aplicaci&oacute;n.
      * @param l
@@ -115,22 +115,22 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
     }
 
-    /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
-     * @param key
-     *        Clave de la preferencia.
-     * @param defaultValue
-     *        Valor por defecto.
-     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
-    public String getPreference(final String key, final String defaultValue) {
-        return this.preferences.get(key, defaultValue);
-    }
+//    /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
+//     * @param key
+//     *        Clave de la preferencia.
+//     * @param defaultValue
+//     *        Valor por defecto.
+//     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
+//    public String getPreference(final String key, final String defaultValue) {
+//        return this.preferences.get(key, defaultValue);
+//    }
 
     /** Establece una preferencia para la aplicaci&oacute;n.
      * @param key
      *        Clave de la preferencia.
      * @param value
      *        Valor asignado. */
-    public void setPreference(final String key, final String value) {
+    private void setPreference(final String key, final String value) {
         this.preferences.put(key, value);
     }
 

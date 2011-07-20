@@ -36,7 +36,7 @@ public class Messages {
     }
 
     /** Cambia la localizaci&oacute;n a la establecida por defecto. */
-    public static void changeLocale() {
+    static void changeLocale() {
         bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
     }
 }
