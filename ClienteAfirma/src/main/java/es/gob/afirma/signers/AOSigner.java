@@ -18,7 +18,6 @@ import org.ietf.jgss.Oid;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.exceptions.AOInvalidFormatException;
 import es.gob.afirma.exceptions.AOUnsupportedSignFormatException;
-import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOSignConstants;
 import es.gob.afirma.misc.tree.TreeModel;
 import es.gob.afirma.signers.beans.AOSignInfo;

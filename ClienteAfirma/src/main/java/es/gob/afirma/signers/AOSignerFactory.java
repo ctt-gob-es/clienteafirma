@@ -129,7 +129,7 @@ public final class AOSignerFactory {
     public static AOSigner getSigner(final byte[] signData) {
 
         if (signData == null) {
-            throw new NullPointerException("No se han indicado datos de firma");
+            throw new IllegalArgumentException("No se han indicado datos de firma");
         }
 
         // Inicializamos las referencias estaticas

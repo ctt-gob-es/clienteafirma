@@ -71,10 +71,10 @@ public class OOXMLURIDereferencer implements URIDereferencer {
     public Data dereference(final URIReference uriReference, final XMLCryptoContext context) throws URIReferenceException {
 
         if (null == uriReference) {
-            throw new NullPointerException("URIReference cannot be null");
+            throw new IllegalArgumentException("URIReference cannot be null");
         }
         if (null == context) {
-            throw new NullPointerException("XMLCrytoContext cannot be null");
+            throw new IllegalArgumentException("XMLCrytoContext cannot be null");
         }
 
         String uri = uriReference.getURI();

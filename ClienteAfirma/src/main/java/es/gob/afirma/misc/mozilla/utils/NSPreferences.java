@@ -61,7 +61,7 @@ public final class NSPreferences {
     public static String getFireFoxUserProfileDirectory(final File iniFile) throws IOException {
 
         if (iniFile == null) {
-            throw new NullPointerException("El fichero INI es nulo y no se podra determinar el directorio del usuario de firefox");
+            throw new IllegalArgumentException("El fichero INI es nulo y no se podra determinar el directorio del usuario de firefox");
         }
 
         if (!iniFile.exists() || !iniFile.isFile()) {
@@ -183,10 +183,10 @@ public final class NSPreferences {
     /** Clase que almacena la configuraci&oacute;n para la identificacion de un
      * perfil de Mozilla Firefox. */
     private static final class FirefoxProfile {
-        String name = null;
-        boolean isRelative = true;
-        String path = null;
-        String absolutePath = null;
-        boolean isDefault = false;
+        private String name = null;
+        private boolean isRelative = true;
+        private String path = null;
+        private String absolutePath = null;
+        private boolean isDefault = false;
     }
 }

@@ -359,7 +359,7 @@ public class AOKeyStoreManager {
                 p11lib = params[0].toString();
             }
             else {
-                throw new NullPointerException("No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula");
+                throw new IllegalArgumentException("No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula");
             }
 
             // Numero de lector
@@ -560,7 +560,7 @@ public class AOKeyStoreManager {
         }
 
         if (ks == null) {
-            throw new NullPointerException("Se han pedido claves a un almacen no inicializado");
+            throw new IllegalStateException("Se han pedido claves a un almacen no inicializado");
         }
 
         final KeyStore.PrivateKeyEntry keyEntry;
@@ -715,7 +715,7 @@ public class AOKeyStoreManager {
     public String[] getAliases() {
 
         if (ks == null) {
-            throw new NullPointerException("Se han pedido los alias de un almacen no inicializado");
+            throw new IllegalStateException("Se han pedido los alias de un almacen no inicializado");
         }
 
         Logger.getLogger("es.gob.afirma").info("Solicitando los alias al KeyStore (" + ks.getProvider() + ")");

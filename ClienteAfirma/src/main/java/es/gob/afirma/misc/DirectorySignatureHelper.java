@@ -123,7 +123,7 @@ public class DirectorySignatureHelper {
      *         Cuando se indica un formato no soportado. */
     public DirectorySignatureHelper(final String algorithm, final String format, final String mode) throws AOUnsupportedSignFormatException {
         if (algorithm == null || format == null || mode == null) {
-            throw new NullPointerException("No se ha indicado una configuracion de algoritmo de firma valida");
+            throw new IllegalArgumentException("No se ha indicado una configuracion de algoritmo de firma valida");
         }
         this.algorithm = algorithm;
         this.format = format;
@@ -226,7 +226,7 @@ public class DirectorySignatureHelper {
                                final Properties config) throws AOException {
 
         if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
-            throw new NullPointerException("No se ha establecido el formato y modo de firma");
+            throw new IllegalArgumentException("No se ha establecido el formato y modo de firma");
         }
 
         if (startDir == null) {
@@ -356,7 +356,7 @@ public class DirectorySignatureHelper {
                                final Properties config) throws AOException {
 
         if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
-            throw new NullPointerException("No se ha establecido el formato y modo de firma");
+            throw new IllegalArgumentException("No se ha establecido el formato y modo de firma");
         }
 
         final Properties signConfig = (Properties) config.clone();
@@ -457,11 +457,11 @@ public class DirectorySignatureHelper {
                                       final Properties config) throws AOException {
 
         if (hashes == null || keyEntry == null || cert == null) {
-            throw new NullPointerException("Los hashes a firmar y la clave y el certificado de firma no pueden ser nulos");
+            throw new IllegalArgumentException("Los hashes a firmar y la clave y el certificado de firma no pueden ser nulos");
         }
 
         if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
-            throw new NullPointerException("No se ha establecido el formato y modo de firma");
+            throw new IllegalArgumentException("No se ha establecido el formato y modo de firma");
         }
 
         // Comprobamos que no se nos haya introducido un signer de distinto tipo
@@ -1274,7 +1274,7 @@ public class DirectorySignatureHelper {
      * @return Resultado del an&aacute;lisis. */
     private static AOSigner determineType(final File file) throws Exception {
         if (file == null) {
-            throw new NullPointerException("Se ha introducido un fichero de firma nulo");
+            throw new IllegalArgumentException("Se ha introducido un fichero de firma nulo");
         }
         if (!file.exists() || !file.isFile()) {
             throw new FileNotFoundException("El archivo indicado no existe o no es un fichero de datos");

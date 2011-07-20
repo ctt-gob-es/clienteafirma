@@ -40,7 +40,7 @@ public final class UnwrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
     public UnwrapAction(final EnveloperManager enveloperManager, final byte[] envelop) {
 
         if (enveloperManager == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("El EnveloperManager no puede ser nulo");
         }
 
         this.enveloperManager = enveloperManager;

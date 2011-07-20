@@ -532,7 +532,7 @@ public final class AOCMSSigner implements AOSigner {
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException, AOException {
 
         if (signData == null) {
-            throw new NullPointerException("Se han introducido datos nulos para su comprobacion");
+            throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion");
         }
 
         if (!CMSHelper.isCMSValid(signData)) {
@@ -549,7 +549,7 @@ public final class AOCMSSigner implements AOSigner {
     public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
 
         if (signData == null) {
-            throw new NullPointerException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar");
         }
 
         if (!isSign(signData)) {

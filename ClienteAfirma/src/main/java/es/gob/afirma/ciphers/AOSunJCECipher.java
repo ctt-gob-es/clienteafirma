@@ -214,10 +214,10 @@ public final class AOSunJCECipher implements AOCipher {
 
     public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws AOException {
         if (base64Key == null || base64Key.length() < 1) {
-            throw new NullPointerException("La clave a descodificar no puede ser nula ni vacia");
+            throw new IllegalArgumentException("La clave a descodificar no puede ser nula ni vacia");
         }
         if (algorithmConfig == null) {
-            throw new NullPointerException("La configuracion de cifrado no puede ser nula");
+            throw new IllegalArgumentException("La configuracion de cifrado no puede ser nula");
         }
 
         try {
@@ -231,10 +231,10 @@ public final class AOSunJCECipher implements AOCipher {
     public Key decodePassphrase(final char[] passphrase, final AOCipherConfig algorithmConfig, final Object[] params) throws AOException {
 
         if (passphrase == null || passphrase.length < 1) {
-            throw new NullPointerException("La contrase\u00F1a para la generacion de la clave no puede ser nula ni vacia");
+            throw new IllegalArgumentException("La contrase\u00F1a para la generacion de la clave no puede ser nula ni vacia");
         }
         if (algorithmConfig == null) {
-            throw new NullPointerException("La configuracion de cifrado no puede ser nula");
+            throw new IllegalArgumentException("La configuracion de cifrado no puede ser nula");
         }
 
         try {

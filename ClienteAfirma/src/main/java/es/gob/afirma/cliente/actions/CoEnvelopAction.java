@@ -33,7 +33,7 @@ public final class CoEnvelopAction extends BasicPrivilegedAction<Boolean, byte[]
      *        Envoltorio */
     public CoEnvelopAction(final EnveloperManager enveloperManager, final byte[] envelop) {
         if (enveloperManager == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("El EnverloperManager no puede ser nulo");
         }
 
         this.enveloperManager = enveloperManager;

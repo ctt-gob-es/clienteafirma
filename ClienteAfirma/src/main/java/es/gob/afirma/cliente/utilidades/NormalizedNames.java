@@ -10,7 +10,6 @@
 
 package es.gob.afirma.cliente.utilidades;
 
-import es.gob.afirma.keystores.AOKeyStoreManager;
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOConstants.AOKeyStore;
 

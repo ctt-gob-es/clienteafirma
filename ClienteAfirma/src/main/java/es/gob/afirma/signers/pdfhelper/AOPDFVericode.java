@@ -64,7 +64,7 @@ public final class AOPDFVericode {
     public static BufferedImage getVericode(final Image logo, final String upperText, final String bottomText, final String code, final VericodeOrientation direction) throws AOException {
 
         if (code == null) {
-            throw new NullPointerException("No se ha indicado el codigo que se desea generar");
+            throw new IllegalArgumentException("No se ha indicado el codigo que se desea generar");
         }
 
         // Tamanyo del logo
@@ -124,7 +124,7 @@ public final class AOPDFVericode {
     private static BufferedImage rotateImage(final BufferedImage image, final VericodeOrientation direction) {
 
         if (image == null) {
-            throw new NullPointerException("No se ha indicado la imagen que se desea rotar");
+            throw new IllegalArgumentException("No se ha indicado la imagen que se desea rotar");
         }
 
         BufferedImage rotatedImage = image;

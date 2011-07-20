@@ -417,7 +417,7 @@ public final class CoSignerEnveloped {
             // En este caso no puedo usar un hash de fuera, ya que no me han
             // pasado datos ni
             // huellas digitales, solo un fichero de firma
-            throw new NullPointerException("No se puede crear la firma ya que no se ha encontrado un hash valido.");
+            throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un hash valido.");
         }
 
         ASN1OctetString sign2 = null;

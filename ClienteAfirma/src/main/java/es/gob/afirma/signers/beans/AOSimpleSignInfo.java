@@ -52,7 +52,7 @@ public final class AOSimpleSignInfo {
     public AOSimpleSignInfo(final X509Certificate[] chainCert, final Date signingTime) {
 
         if (chainCert == null || chainCert.length == 0 || chainCert[0] == null) {
-            throw new NullPointerException("No se ha introducido la cadena de certificaci&oacute;n.");
+            throw new IllegalArgumentException("No se ha introducido la cadena de certificacion.");
         }
 
         this.certs = chainCert.clone();

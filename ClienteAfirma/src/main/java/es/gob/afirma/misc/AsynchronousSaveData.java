@@ -53,7 +53,7 @@ public final class AsynchronousSaveData implements Runnable {
                                 final Frame p,
                                 final boolean errorDialog) {
         if (data == null || data.length == 0) {
-            throw new NullPointerException("Los datos a guardar no pueden ser nulos");
+            throw new IllegalArgumentException("Los datos a guardar no pueden ser nulos");
         }
         dataToSave = data.clone();
         savingTarget = fileName;

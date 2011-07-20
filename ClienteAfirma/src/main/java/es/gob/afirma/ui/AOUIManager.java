@@ -417,8 +417,8 @@ public final class AOUIManager {
      * @version 0.3 */
     public final static class ExtFilter extends FileFilter implements java.io.FileFilter {
 
-        String[] extensions;
-        String description;
+        private String[] extensions;
+        private String description;
 
         /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
          * @param exts
@@ -428,7 +428,7 @@ public final class AOUIManager {
          *        las extensiones */
         public ExtFilter(final String[] exts, String desc) {
             if (exts == null || exts.length < 1) {
-                throw new NullPointerException("No se puede crear un filtro vacio"); //$NON-NLS-1$
+                throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
             }
             if (desc == null || desc.length() < 1) {
                 desc = Messages.getString("AOUIManager.0"); //$NON-NLS-1$
@@ -640,12 +640,12 @@ public final class AOUIManager {
     public static final String getOutFileName(final String inName, final String signFormat) {
 
         if (inName == null || inName.equals("")) {
-            throw new NullPointerException("El nombre de fichero no puede estar vacio"); //$NON-NLS-1$ 
+            throw new IllegalArgumentException("El nombre de fichero no puede estar vacio"); //$NON-NLS-1$ 
         }
 
 
         if (signFormat == null) {
-            throw new NullPointerException("El formato de firma no puede ser nulo"); //$NON-NLS-1$
+            throw new IllegalArgumentException("El formato de firma no puede ser nulo"); //$NON-NLS-1$
         }
 
         if (signFormat.equals(AOConstants.SIGN_FORMAT_CMS) || signFormat.equals(AOConstants.SIGN_FORMAT_CADES)) {
@@ -926,7 +926,7 @@ public final class AOUIManager {
 
         if (data == null) {
             Logger.getLogger("es.gob.afirma").warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
-            throw new NullPointerException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
         }
 
         String filename = null;

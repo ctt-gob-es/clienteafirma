@@ -179,7 +179,7 @@ final class KeyStoreConfigurationManager {
     void changeKeyStore(final AOKeyStore keyStore) {
 
         if (keyStore == null) {
-            throw new NullPointerException("Es obligatorio asignar un almacen de claves"); //$NON-NLS-1$
+            throw new IllegalArgumentException("Es obligatorio asignar un almacen de claves"); //$NON-NLS-1$
         }
 
         this.ks = keyStore;

@@ -66,7 +66,7 @@ final class AOSecMod {
             }
         }
 
-        throw new NullPointerException("Intento fallido: " + libName);
+        throw new UnsupportedOperationException("Intento fallido: " + libName);
 
     }
 

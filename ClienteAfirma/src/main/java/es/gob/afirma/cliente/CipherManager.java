@@ -424,7 +424,7 @@ public final class CipherManager {
     public void cipherData(final byte[] dataToCipher) throws NoSuchAlgorithmException, AOException {
 
         if (dataToCipher == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Los datos a crifar no pueden ser nulos");
         }
 
         // Ya tenemos el stream con los datos, vamos a ver que Cipher uso

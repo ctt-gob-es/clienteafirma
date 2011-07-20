@@ -31,14 +31,38 @@ public class DigestInfo implements Serializable {
      * @param digestAlgo
      * @param description */
     public DigestInfo(final byte[] digestValue, final String digestAlgo, final String description) {
-        this.digestValue = digestValue;
+        this.digestValue = digestValue.clone();
         this.digestAlgo = digestAlgo;
         this.description = description;
     }
 
-    public final byte[] digestValue;
+    private final byte[] digestValue;
+    
+    /**
+     * Obtiene la huella digital.
+     * @return Huella digital
+     */
+    public byte[] getDigestValue() {
+        return this.digestValue.clone();
+    }
 
-    public final String description;
+    private final String description;
+    
+    /**
+     * Obtiene la descripci&oacute;n.
+     * @return Descripci&oacute;n
+     */
+    public String getDescription() {
+        return this.description;
+    }
 
-    public final String digestAlgo;
+    private final String digestAlgo;
+    
+    /**
+     * Obtiene el algoritmo de huella digital.
+     * @return Algoritmo de huella digital
+     */
+    public String getDigestAlgo() {
+        return digestAlgo;
+    }
 }

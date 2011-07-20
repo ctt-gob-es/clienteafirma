@@ -88,7 +88,7 @@ final class BrowserDialog extends JDialog {
             if (hl.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED) && hl.getDescription().startsWith("afirma:saveFile(")) {
                 final String strId = hl.getDescription().substring(hl.getDescription().indexOf('(') + 1, hl.getDescription().indexOf(')'));
                 final int id = Integer.parseInt(strId);
-                final Attachment fich = AFirmaWebSignHTMLDocument.files.get(id);
+                final Attachment fich = AFirmaWebSignHTMLDocument.getAttachedFiles().get(id);
                 Logger.getLogger("es.gob.afirma").info("FICH: " + fich);
 
                 final int r =

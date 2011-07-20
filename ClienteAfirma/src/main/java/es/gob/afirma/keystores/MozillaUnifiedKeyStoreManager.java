@@ -258,7 +258,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
         final KeyStore tmpStore = storesByAlias.get(alias);
         if (tmpStore == null) {
-            throw new NullPointerException("No hay ninguna almacen de Mozilla que contenga un certificado con el alias '" + alias
+            throw new IllegalStateException("No hay ningun almacen de Mozilla que contenga un certificado con el alias '" + alias
                                                                  + "'");
         }
         final KeyStore.PrivateKeyEntry keyEntry;

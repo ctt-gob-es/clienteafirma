@@ -61,7 +61,7 @@ public final class CADESDigestedData {
      *         datos */
     public byte[] genDigestedData(final P7ContentSignerParameters parameters, final Oid dataType) throws NoSuchAlgorithmException, IOException {
         if (parameters == null) {
-            throw new NullPointerException("Los parametros no pueden ser nulos");
+            throw new IllegalArgumentException("Los parametros no pueden ser nulos");
         }
         // Obtenemos el algoritmo para "digestear"
         final String digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(parameters.getSignatureAlgorithm());

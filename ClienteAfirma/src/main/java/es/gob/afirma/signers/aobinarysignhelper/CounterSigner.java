@@ -75,9 +75,8 @@ import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
  * peculiaridad de que es una Contrafirma. */
 public final class CounterSigner {
 
-    int actualIndex = 0;
-    // Oid actualOid=null;
-    ASN1Set signedAttr2;
+    private int actualIndex = 0;
+    private ASN1Set signedAttr2;
     private Map<Oid, byte[]> atrib2 = new HashMap<Oid, byte[]>();
     private Map<Oid, byte[]> uatrib2 = new HashMap<Oid, byte[]>();
 

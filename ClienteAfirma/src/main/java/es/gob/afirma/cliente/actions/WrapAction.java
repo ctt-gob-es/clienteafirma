@@ -40,7 +40,7 @@ public final class WrapAction extends BasicPrivilegedAction<Boolean, byte[]> {
     public WrapAction(final EnveloperManager enveloperManager, final byte[] data) {
 
         if (enveloperManager == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("El EnveloperManager no puede ser nulo");
         }
 
         this.enveloperManager = enveloperManager;

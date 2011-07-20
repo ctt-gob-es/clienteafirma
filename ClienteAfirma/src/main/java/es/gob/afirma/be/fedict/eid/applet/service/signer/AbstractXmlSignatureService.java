@@ -347,12 +347,12 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
             return;
         }
         for (final DigestInfo digestInfo : digestInfos) {
-            references.add(signatureFactory.newReference(FilenameUtils.getName(new File(digestInfo.description).toURI().toURL().getFile()),
-                                                         signatureFactory.newDigestMethod(getXmlDigestAlgo(digestInfo.digestAlgo), null),
+            references.add(signatureFactory.newReference(FilenameUtils.getName(new File(digestInfo.getDescription()).toURI().toURL().getFile()),
+                                                         signatureFactory.newDigestMethod(getXmlDigestAlgo(digestInfo.getDigestAlgo()), null),
                                                          null,
                                                          null,
                                                          null,
-                                                         digestInfo.digestValue));
+                                                         digestInfo.getDigestValue()));
         }
     }
 

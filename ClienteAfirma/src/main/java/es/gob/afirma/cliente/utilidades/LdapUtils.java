@@ -32,10 +32,10 @@ public final class LdapUtils {
      *         recuperaci&oacute;n. */
     public static X509Certificate getCertificate(final String server, final int port, final String principal) throws Exception {
         if (server == null || "".equals(server)) {
-            throw new NullPointerException("El servidor no puede ser nulo ni vacio");
+            throw new IllegalArgumentException("El servidor no puede ser nulo ni vacio");
         }
         if (principal == null || "".equals(principal)){
-            throw new NullPointerException("El Principal del Certificado no puede ser nulo ni vacio");
+            throw new IllegalArgumentException("El Principal del Certificado no puede ser nulo ni vacio");
         }
 
         final X509CertSelector certSelector = new X509CertSelector();

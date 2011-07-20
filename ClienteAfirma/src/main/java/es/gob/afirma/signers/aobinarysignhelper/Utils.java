@@ -165,7 +165,7 @@ final class Utils {
     public static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest) throws NullPointerException {
         // Comprobamos que el archivo a tratar no sea nulo.
         if (certDest == null || certDest.length == 0) {
-            throw new NullPointerException("No se pueden envolver datos sin certificados destino.");
+            throw new IllegalArgumentException("No se pueden envolver datos sin certificados destino.");
         }
 
         // Asignamos la clave de cifrado

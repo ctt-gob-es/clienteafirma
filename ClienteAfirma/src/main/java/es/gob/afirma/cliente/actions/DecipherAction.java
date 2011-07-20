@@ -37,7 +37,7 @@ public final class DecipherAction extends BasicPrivilegedAction<Boolean, Void> {
     public DecipherAction(final CipherManager cipherManager, final byte[] data) {
 
         if (cipherManager == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException("El CipherManager no puede ser nulo");
         }
 
         this.cipherManager = cipherManager;

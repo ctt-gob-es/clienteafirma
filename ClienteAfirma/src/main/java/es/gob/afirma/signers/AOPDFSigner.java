@@ -818,7 +818,7 @@ public final class AOPDFSigner implements AOSigner {
     public AOSignInfo getSignInfo(final byte[] data) throws AOInvalidFormatException, AOException {
         if (data == null)
          {
-            throw new NullPointerException("No se han introducido datos para analizar"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
         if (!isSign(data)) {
@@ -835,7 +835,7 @@ public final class AOPDFSigner implements AOSigner {
     public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
         if (sign == null)
          {
-            throw new NullPointerException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
+            throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
         }
 
         if (!this.isSign(sign))

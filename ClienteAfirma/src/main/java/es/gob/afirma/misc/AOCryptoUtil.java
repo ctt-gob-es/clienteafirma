@@ -159,7 +159,7 @@ public final class AOCryptoUtil {
 
         if (kStore == null)
          {
-            throw new NullPointerException("No se ha indicado el KeyStore del que desea " + //$NON-NLS-1$
+            throw new IllegalArgumentException("No se ha indicado el KeyStore del que desea " + //$NON-NLS-1$
                                                                "obtener le PasswordCallBack"); //$NON-NLS-1$
         }
 

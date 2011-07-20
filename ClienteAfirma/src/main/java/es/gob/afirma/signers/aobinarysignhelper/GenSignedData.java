@@ -143,7 +143,7 @@ public final class GenSignedData {
                                      final byte[] messageDigest) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
 
         if (parameters == null) {
-            throw new NullPointerException("Los parametros no pueden ser nulos");
+            throw new IllegalArgumentException("Los parametros no pueden ser nulos");
         }
 
         // 1. VERSION

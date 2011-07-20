@@ -185,9 +185,9 @@ public final class AOCipherKeyStoreHelper {
      *         Cuando la contrase&ntilde;a es incorrecta. */
     public AOCipherKeyStoreHelper(final char[] p) throws AOException, IOException {
         if (p == null) {
-            throw new NullPointerException("Se necesita una contrasena para instanciar la clase");
+            throw new IllegalArgumentException("Se necesita una contrasena para instanciar la clase");
         }
-        pss = p;
+        pss = p.clone();
         loadCipherKeyStore();
     }
 

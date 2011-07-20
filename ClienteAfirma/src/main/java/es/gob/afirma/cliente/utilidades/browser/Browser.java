@@ -56,7 +56,7 @@ public final class Browser {
 
         if (firmar) {
             return new FirmadorWeb().firmar(html,
-                                                        AFirmaWebSignHTMLDocument.files.toArray(new Attachment[AFirmaWebSignHTMLDocument.files.size()]),
+                                                        AFirmaWebSignHTMLDocument.getAttachedFiles().toArray(new Attachment[AFirmaWebSignHTMLDocument.getAttachedFiles().size()]),
                                                         hashAlg);
         }
         return null;

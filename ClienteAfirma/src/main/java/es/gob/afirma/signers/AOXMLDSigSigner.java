@@ -1974,7 +1974,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
         if (sign == null) {
-            throw new NullPointerException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar");
         }
 
         if (!isSign(sign)) {
@@ -2023,7 +2023,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         // Si no hay datos a analizar
         if (sign == null) {
-            throw new NullPointerException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar");
         }
 
         // Si no es una firma valida

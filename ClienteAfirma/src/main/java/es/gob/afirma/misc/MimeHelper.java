@@ -48,7 +48,7 @@ public final class MimeHelper {
     public MimeHelper(final byte[] data) {
 
         if (data == null) {
-            throw new NullPointerException("No se han indicado los datos que se desean analizar");
+            throw new IllegalArgumentException("No se han indicado los datos que se desean analizar");
         }
 
         this.data = data.clone();

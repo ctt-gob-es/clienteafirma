@@ -60,7 +60,7 @@ public final class Platform {
     }
 
     /** Directorio endorsed de la distribuci&oacute;n Java. */
-    static String endorsedDir = null;
+    private static String endorsedDir = null;
 
     /** Sistema operativo. */
     private static OS os;

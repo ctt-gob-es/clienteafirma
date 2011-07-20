@@ -27,7 +27,11 @@ import javax.swing.text.html.StyleSheet;
 final class AFirmaWebSignHTMLDocument extends HTMLDocument {
     private static final long serialVersionUID = 1L;
 
-    static List<Attachment> files = new ArrayList<Attachment>();
+    private static List<Attachment> files = new ArrayList<Attachment>();
+    
+    static List<Attachment> getAttachedFiles() {
+        return files;
+    }
 
     AFirmaWebSignHTMLDocument(final StyleSheet styles) {
         super(styles);
@@ -83,10 +87,6 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             Logger.getLogger("es.gob.afirma").info("Fin: " + t.toString());
             if (t.toString().toLowerCase().equals("afirma")) {
                 Logger.getLogger("es.gob.afirma").info("Fin de afirma");
-                // if(inFile)
-                // {
-                // endFile();
-                // }
             }
             else {
                 super.handleEndTag(t, pos);
@@ -99,10 +99,6 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             if (t.toString().toLowerCase().equals("afirma")) {
                 if (a.isDefined(HTML.Attribute.ENDTAG)) {
                     Logger.getLogger("es.gob.afirma").info("Fin de afirma");
-                    // if(inFile)
-                    // {
-                    // endFile();
-                    // }
                 }
                 else {
                     final String type = (String) a.getAttribute(HTML.Attribute.TYPE);
@@ -136,11 +132,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             super.handleError(errorMsg, pos);
         }
 
-        int tagLevel;
-
-        // private boolean inFile = false;
-        //
-        // private String inFileUri = null;
+        private int tagLevel;
 
         private void startFile(final String uri) {
             try {
@@ -149,15 +141,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             catch (final UnsupportedEncodingException e) {
                 AFirmaWebSignHTMLDocument.files.add(new Attachment(uri));
             }
-
         }
-
-        // public void endFile()
-        // {
-        // // logger.debug("End " + inFileUri);
-        // inFile = false;
-        // inFileUri = null;
-        // }
 
         private class AFirmaTagAction extends HTMLDocument.HTMLReader.TagAction {
 
@@ -174,23 +158,8 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
                 }
             }
 
-            // public void start(HTML.Tag t)
-            // {
-            // Logger.getLogger("es.gob.afirma").warning("TAG SIN ATTR: "+
-            // t.toString());
-            // }
-
-            // public void end(HTML.Tag t, MutableAttributeSet a)
-            // {
-            // Logger.getLogger("es.gob.afirma").warning("fin(" + t.toString() +
-            // ", " + a + ")"+ t.toString());
-            // endFile();
-            // }
-
             @Override
-            public void end(final HTML.Tag t) {
-                // endFile();
-            }
+            public void end(final HTML.Tag t) {}
 
         }
 

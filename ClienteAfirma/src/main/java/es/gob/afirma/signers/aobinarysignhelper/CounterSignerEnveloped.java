@@ -73,8 +73,7 @@ import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
  * Contrafirma. */
 public final class CounterSignerEnveloped {
 
-    int actualIndex = 0;
-    Oid actualOid = null;
+    private int actualIndex = 0;
     ASN1Set signedAttr2;
     private Map<Oid, byte[]> atrib2 = new HashMap<Oid, byte[]>();
     private Map<Oid, byte[]> uatrib2 = new HashMap<Oid, byte[]>();
@@ -126,7 +125,6 @@ public final class CounterSignerEnveloped {
                                          final Map<Oid, byte[]> uatri) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 
         // Inicializamos el Oid
-        actualOid = dataType;
         this.atrib2 = atri;
         this.uatrib2 = uatri;
 

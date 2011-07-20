@@ -1594,7 +1594,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         if (sign == null) {
-            throw new NullPointerException("El objeto de firma no puede ser nulo");
+            throw new IllegalArgumentException("El objeto de firma no puede ser nulo");
         }
 
         if (algorithm.equalsIgnoreCase("RSA")) {
@@ -2312,7 +2312,7 @@ public final class AOXAdESSigner implements AOSigner {
 
     public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
         if (sign == null) {
-            throw new NullPointerException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar");
         }
 
         if (!isSign(sign)) {
@@ -2361,7 +2361,7 @@ public final class AOXAdESSigner implements AOSigner {
 
         // Si no hay datos a analizar
         if (sign == null) {
-            throw new NullPointerException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar");
         }
 
         // Si no es una firma valida

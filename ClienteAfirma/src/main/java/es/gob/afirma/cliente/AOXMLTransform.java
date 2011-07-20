@@ -31,7 +31,7 @@ final class AOXMLTransform {
      *        Cuerpo de la transformaci&oacute;n. */
     AOXMLTransform(final String type, final String subtype, final String body) {
         if (type == null) {
-            throw new NullPointerException("El tipo de una transformacion XML no puede ser nulo");
+            throw new IllegalArgumentException("El tipo de una transformacion XML no puede ser nulo");
         }
         this.type = type;
         this.subtype = subtype;

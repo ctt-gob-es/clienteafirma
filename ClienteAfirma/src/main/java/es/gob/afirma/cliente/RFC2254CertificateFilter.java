@@ -65,7 +65,7 @@ public final class RFC2254CertificateFilter implements CertificateFilter {
      *        </ul> */
     public RFC2254CertificateFilter(final String subjectFilter, final String issuerFilter, final Boolean[] keyUsage) {
         if (subjectFilter == null && issuerFilter == null && keyUsage == null) {
-            throw new NullPointerException("Al menos uno de los criterios de filtrado debe no ser nulo");
+            throw new IllegalArgumentException("Al menos uno de los criterios de filtrado debe no ser nulo");
         }
         keyUsageFilter = keyUsage.clone();
         rfc2254IssuerFilter = issuerFilter;

@@ -18,19 +18,6 @@ import java.util.logging.Logger;
  * @version 0.4. */
 public final class AOInstallParameters {
 
-    /** Preguntar al usuario sobre la acci&oacute;n a realizar. */
-    public final static int ACTION_ASK = 1;
-
-    /** Respetar instalaciones antiguas del cliente. */
-    public final static int ACTION_RESPECT = 2;
-
-    /** Eliminar instalaciones antiguas del cliente. */
-    public final static int ACTION_DELETE = 3;
-
-    /** Acci&oacute;n a realizar con respecto a las versiones antiguas
-     * encontradas del cliente. */
-    public int oldVersionsAction = ACTION_ASK;
-
     /** Directorio de usuario. */
     public static final String USER_HOME;
     static {

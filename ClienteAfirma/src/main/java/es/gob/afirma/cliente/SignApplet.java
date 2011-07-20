@@ -552,10 +552,10 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     private void saveDataToStorage(final byte[] binaryData, final String filename) throws AOException {
         if (binaryData == null) {
-            throw new NullPointerException("Los datos que desea almacenar no pueden ser nulos"); //$NON-NLS-1$
+            throw new IllegalArgumentException("Los datos que desea almacenar no pueden ser nulos"); //$NON-NLS-1$
         }
         if (filename == null) {
-            throw new NullPointerException("El nombre de fichero de salida no puede ser nulo"); //$NON-NLS-1$
+            throw new IllegalArgumentException("El nombre de fichero de salida no puede ser nulo"); //$NON-NLS-1$
         }
 
         OutputStream fos = null;
@@ -3096,7 +3096,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public void removeRecipientToCMS(final String certB64) {
 
         if (certB64 == null || certB64.length() == 0) {
-            throw new NullPointerException("No se ha introducido el certificado que se desea eliminar"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se ha introducido el certificado que se desea eliminar"); //$NON-NLS-1$
         }
 
         try {
@@ -3115,7 +3115,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     public void setLdapConfiguration(final String address, String port, final String root) {
         logger.info("Invocando setLdapConfiguration"); //$NON-NLS-1$
         if (address == null) {
-            throw new NullPointerException("No se ha indicado la URL del directorio LDAP"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se ha indicado la URL del directorio LDAP"); //$NON-NLS-1$
         }
 
         // Si no se indica el puerto se toma el por defecto

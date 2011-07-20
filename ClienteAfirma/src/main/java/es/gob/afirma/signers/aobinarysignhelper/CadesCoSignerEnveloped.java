@@ -457,7 +457,7 @@ public final class CadesCoSignerEnveloped {
             signedAttr = getAttributeSet(new AttributeTable(contextExpecific));
         }
         else {
-            throw new NullPointerException("No se puede crear la firma ya que no se ha encontrado un message digest valido");
+            throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un message digest valido");
         }
 
         ASN1OctetString sign2 = null;

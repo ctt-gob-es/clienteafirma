@@ -106,7 +106,7 @@ public final class AOOOXMLSigner implements AOSigner {
     public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
 
         if (sign == null) {
-            throw new NullPointerException("Los datos de firma introducidos son nulos");
+            throw new IllegalArgumentException("Los datos de firma introducidos son nulos");
         }
 
         final InputStream contentTypesXml;
@@ -130,7 +130,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
     public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
         if (sign == null) {
-            throw new NullPointerException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar");
         }
 
         if (!isSign(sign)) {
@@ -170,7 +170,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
     public TreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
         if (sign == null) {
-            throw new NullPointerException("Los datos de firma introducidos son nulos");
+            throw new IllegalArgumentException("Los datos de firma introducidos son nulos");
         }
 
         if (!isSign(sign)) {

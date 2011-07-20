@@ -58,10 +58,10 @@ public final class MassiveSignatureHelper {
     public MassiveSignatureHelper(final MassiveSignConfiguration configuration) throws AOException {
 
         if (configuration == null) {
-            throw new NullPointerException("La configuracion de firma masiva no puede ser nula");
+            throw new IllegalArgumentException("La configuracion de firma masiva no puede ser nula");
         }
         if (configuration.massiveOperation == null) {
-            throw new NullPointerException("La configuracion indicada no tiene establecida ninguna operacion masiva");
+            throw new IllegalArgumentException("La configuracion indicada no tiene establecida ninguna operacion masiva");
         }
 
         this.massiveConfiguration = configuration;
@@ -112,7 +112,7 @@ public final class MassiveSignatureHelper {
 
         if (!this.isInitialized) {
             Logger.getLogger("es.gob.afirma").severe("El modulo de firma masiva no ha sido inicializado");
-            throw new NullPointerException("El modulo de firma masiva no ha sido inicializado");
+            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado");
         }
 
         if (b64Data == null) {
@@ -175,7 +175,7 @@ public final class MassiveSignatureHelper {
 
         if (!this.isInitialized) {
             Logger.getLogger("es.gob.afirma").severe("El modulo de firma masiva no ha sido inicializado");
-            throw new NullPointerException("El modulo de firma masiva no ha sido inicializado");
+            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado");
         }
 
         if (b64Hash == null) {
@@ -229,7 +229,7 @@ public final class MassiveSignatureHelper {
 
         if (!this.isInitialized) {
             Logger.getLogger("es.gob.afirma").severe("El modulo de firma masiva no ha sido inicializado");
-            throw new NullPointerException("El modulo de firma masiva no ha sido inicializado");
+            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado");
         }
 
         if (fileUri == null) {

@@ -296,12 +296,12 @@ public final class EnveloperManager {
 
         if (contentType == null) {
             Logger.getLogger("es.gob.afirma").severe("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
-            throw new NullPointerException("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
         }
 
         if ((recipients == null || recipients.isEmpty())) {
             Logger.getLogger("es.gob.afirma").severe("No se han indicado los destinatarios del sobre electronico"); //$NON-NLS-1$
-            throw new NullPointerException("No se han indicado los destinatarios del sobre electronico"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se han indicado los destinatarios del sobre electronico"); //$NON-NLS-1$
         }
 
         if (contentType.equals(AOConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {

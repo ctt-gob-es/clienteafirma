@@ -657,7 +657,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         // Comprobamos que el archivo a tratar no sea nulo.
         if (file == null) {
-            throw new NullPointerException("El archivo a tratar no puede ser nulo.");
+            throw new IllegalArgumentException("El archivo a tratar no puede ser nulo.");
         }
 
         byte[] plainData;
@@ -794,7 +794,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         // Comprobamos que el archivo a cifrar no sea nulo.
         if (file == null) {
-            throw new NullPointerException("El archivo a cifrar no puede ser nulo.");
+            throw new IllegalArgumentException("El archivo a cifrar no puede ser nulo.");
         }
 
         // tipos de datos a firmar.
@@ -991,7 +991,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         // Comprobamos que el archivo a tratar no sea nulo.
         if (file == null) {
-            throw new NullPointerException("El archivo a tratar no puede ser nulo.");
+            throw new IllegalArgumentException("El archivo a tratar no puede ser nulo.");
         }
 
         final byte[] plainData;
@@ -1079,7 +1079,7 @@ public final class AOCAdESSigner implements AOSigner {
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
 
         if (signData == null) {
-            throw new NullPointerException("Se han introducido datos nulos para su comprobacion");
+            throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion");
         }
 
         if (!this.isCADESValid(signData)) {
@@ -1095,7 +1095,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
         if (signData == null) {
-            throw new NullPointerException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar");
         }
 
         if (!isSign(signData)) {

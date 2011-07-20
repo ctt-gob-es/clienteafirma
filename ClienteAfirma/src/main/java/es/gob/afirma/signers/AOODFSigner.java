@@ -632,7 +632,7 @@ public final class AOODFSigner implements AOSigner {
 
     public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
         if (signData == null) {
-            throw new NullPointerException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar");
         }
         if (!isSign(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");

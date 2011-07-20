@@ -143,7 +143,7 @@ public final class AOUtil {
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
 
         if (uri == null) {
-            throw new NullPointerException("Se ha pedido el contenido de una URI nula");
+            throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula");
         }
 
         javax.swing.ProgressMonitor pm = null;
@@ -503,7 +503,7 @@ public final class AOUtil {
      * cifrado.
      * @return Ruta absoluta del fichero. */
     public final static String getCipherKeystore() {
-        return AOInstallParameters.getUserHome() + "ciphkeys.jceks";
+        return Platform.getUserHome() + File.separator + "ciphkeys.jceks";
     }
 
     /** Recupera un algoritmo de hash a partir del algoritmo de firma introducido

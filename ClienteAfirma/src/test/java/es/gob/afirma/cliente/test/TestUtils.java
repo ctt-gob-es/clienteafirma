@@ -311,7 +311,7 @@ public class TestUtils {
     public static String verifyBinSignature(final byte[] sign) throws Exception {
 
         if (sign == null) {
-            throw new NullPointerException("Los datos de firma a validar son nulos");
+            throw new IllegalArgumentException("Los datos de firma a validar son nulos");
         }
 
         //final String endpointURL = "https://des-afirma.redinteradministrativa.es:443/afirmaws/services/DSSAfirmaVerify";
