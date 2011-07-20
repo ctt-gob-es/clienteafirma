@@ -1,8 +1,8 @@
 package es.gob.afirma.misc;
 
-import java.util.logging.Logger;
-
 import com.sun.deploy.util.WinRegistry;
+
+import es.gob.afirma.install.AfirmaBootLoader;
 
 /** Clase intermedia para el acceso al registro de Windows mediante las
  * clases de Sun Microsystems. */
@@ -14,7 +14,7 @@ public final class WinRegistryWrapper {
                 AOBootUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll"); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar la libreria de despliegue 'deploy.dll', no se podra acceder al registro de Windows: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                AfirmaBootLoader.LOGGER.warning("No se ha podido cargar la libreria de despliegue 'deploy.dll', no se podra acceder al registro de Windows: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
     }
@@ -37,7 +37,7 @@ public final class WinRegistryWrapper {
             return WinRegistry.getString(hKey, path, name);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
                                                       "No se ha podido obtener la clave de registro con ruta '" + //$NON-NLS-1$
                                                       path
                                                       + "' y nombre '" + name + "', se devolvera null: " + e //$NON-NLS-1$ //$NON-NLS-2$

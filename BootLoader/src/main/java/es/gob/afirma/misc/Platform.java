@@ -11,7 +11,8 @@
 package es.gob.afirma.misc;
 
 import java.io.File;
-import java.util.logging.Logger;
+
+import es.gob.afirma.install.AfirmaBootLoader;
 
 /** Clase para la identificaci&oacute;n de la plataforma Cliente y
  * extracci&oacute;n de datos relativos a la misma. */
@@ -105,7 +106,7 @@ public final class Platform {
             }
             else {
                 os = OS.OTHER;
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido determinar el sistema operativo");
+                AfirmaBootLoader.LOGGER.warning("No se ha podido determinar el sistema operativo");
             }
 
             javaArch = System.getProperty("sun.arch.data.model");
@@ -190,7 +191,7 @@ public final class Platform {
      * actualmente en uso. Si no se puede obtener, se devolver&aacute; {@code null}.
      * Copiado de com.sun.deploy.config.Config.
      * @return Directorio del entorno de ejecuci&oacute;n de Java. */
-    private final static String recoverJavaHome() {
+    private static final String recoverJavaHome() {
         String ret = null;
         try {
             ret = System.getProperty("jnlpx.home");
@@ -204,7 +205,7 @@ public final class Platform {
             return System.getProperty("java.home");
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido identificar el directorio de java");
+            AfirmaBootLoader.LOGGER.warning("No se ha podido identificar el directorio de java");
         }
 
         return null;

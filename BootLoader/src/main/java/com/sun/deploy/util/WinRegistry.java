@@ -30,7 +30,7 @@ public final class WinRegistry {
     static native void initIDs();
 
     /** Los valores del registro se componen de un tipo y de unos datos. */
-    private final static class KeyValue {
+    private static final class KeyValue {
         private final int type;
         private final byte[] data;
 

@@ -17,13 +17,13 @@ import java.awt.GridBagLayout;
 import java.awt.Label;
 import java.io.InputStream;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
+import es.gob.afirma.install.AfirmaBootLoader;
 import es.gob.afirma.install.Messages;
 
 /** Panel con el acuerdo de licencia del cliente de firma @firma versi&oacute;n 3. */
@@ -62,7 +62,7 @@ public final class LicenceDialogPanel {
         }
         catch (final Exception e2) {
             licenseText = Messages.getString("LicenceDialogPanel.2"); //$NON-NLS-1$
-            Logger.getLogger("es.gob.afirma").warning("Error al acceder a las condiciones de la licencia: " + e2); //$NON-NLS-1$ //$NON-NLS-2$
+            AfirmaBootLoader.LOGGER.warning("Error al acceder a las condiciones de la licencia: " + e2); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         try {

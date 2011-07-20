@@ -31,23 +31,20 @@ public final class AfirmaBootLoader extends JApplet {
 
     private static final long serialVersionUID = -2570412953683244702L;
 
-    private final static Logger logger;
+    /** Gestor de registro para todo el proyecto. */
+    public static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     /** Direcci&oacute;n remota del applet. */
     private URL codeBase = null;
 
-    static {
-        logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    }
-
     @Override
     public void init() {
         this.codeBase = this.getCodeBase();
-        logger.info("BootLoader de @firma iniciado"); //$NON-NLS-1$
-        logger.info("Arquitectura del JRE: " + Platform.getJavaArch());
-        logger.info("Arquitectura del sistema operativo: " + Platform.getOsArch());
+        LOGGER.info("BootLoader de @firma iniciado"); //$NON-NLS-1$
+        LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch());
+        LOGGER.info("Arquitectura del sistema operativo: " + Platform.getOsArch());
         if (DEBUG) {
-            logger.warning("Modo de depuracion activado");
+            LOGGER.warning("Modo de depuracion activado");
         }
     }
 
@@ -55,12 +52,12 @@ public final class AfirmaBootLoader extends JApplet {
      * @param url URL desde la cual se bajar&aacute;n los ficheros para instalar
      * @return <code>true</code> si se ha establecido correctamente, <code>false</code> si la URL est&aacute; mal formada */
     public boolean setBaseDownloadURL(final String url) {
-        logger.info("Invocando setBaseDownloadURL(String)"); //$NON-NLS-1$
+        LOGGER.info("Invocando setBaseDownloadURL(String)"); //$NON-NLS-1$
         try {
             this.codeBase = new URL(url);
         }
         catch (final Exception e) {
-            logger.severe("La URL establecida es incorrecta, se usara la original (" + this.codeBase.toString() + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.severe("La URL establecida es incorrecta, se usara la original (" + this.codeBase.toString() + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
             );
             return false;
         }
@@ -91,7 +88,7 @@ public final class AfirmaBootLoader extends JApplet {
      *        instalaci&oacute;n (puede ser nulo)
      * @param jsMethodParams Par&aacute;metros del m&eacute;todo JavaScript */
     public boolean instalar(final String build, final String jsMethodName, final Object jsMethodParams) {
-        logger.info("Invocando instalar(" + build + ", " + jsMethodName + ", " + jsMethodParams + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$  //$NON-NLS-4$
+        LOGGER.info("Invocando instalar(" + build + ", " + jsMethodName + ", " + jsMethodParams + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$  //$NON-NLS-4$
         );
 
         // Realizamos la instalacion
@@ -121,7 +118,7 @@ public final class AfirmaBootLoader extends JApplet {
     /** Desinstala localmente las dependecias de entorno operativo del Cliente de Firma.
      * @return Devuelve <code>true</code> si se desinstalaron correctamente, <code>false</code> en caso contrario */
     public boolean desinstalar() {
-        logger.info("Invocando desinstalar()"); //$NON-NLS-1$
+        LOGGER.info("Invocando desinstalar()"); //$NON-NLS-1$
         return new Installer(AfirmaBootLoader.this, this.codeBase, null).uninstall();
     }
 
@@ -152,7 +149,7 @@ public final class AfirmaBootLoader extends JApplet {
                 netscape.javascript.JSObject.getWindow(AfirmaBootLoader.this).call(jsMethodName, jsPreparedParams);
             }
             catch (final Exception e) {
-                logger.severe("No se ha podido realizar la llamada al metodo JavaScript '" + jsMethodName + "': " + e);
+                LOGGER.severe("No se ha podido realizar la llamada al metodo JavaScript '" + jsMethodName + "': " + e);
                 JOptionPane.showMessageDialog(AfirmaBootLoader.this,
                                               "Por favor, reinicie su navegador Web.",
                                               "Informaci\u00F3n",

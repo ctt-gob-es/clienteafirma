@@ -25,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import es.gob.afirma.callbacks.UIPasswordCallbackLite;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOBootUtil;
 import es.gob.afirma.misc.Platform;
@@ -108,7 +106,7 @@ final class CheckAndInstallMissingParts {
             AOInstallUtils.unpack(Platform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            AfirmaBootLoader.LOGGER.warning( //$NON-NLS-1$
                                                        "No se ha podido instalar el paquete de compatibilidad con Java 5 en formato PACK200, se intentara en formato JAR: " + e //$NON-NLS-1$
             );
             // Borramos el Pack200 si se llego a copiar
@@ -187,7 +185,7 @@ final class CheckAndInstallMissingParts {
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e);
+            AfirmaBootLoader.LOGGER.warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e);
             if (AfirmaBootLoader.DEBUG) {
                 e.printStackTrace();
             }
@@ -211,7 +209,7 @@ final class CheckAndInstallMissingParts {
     /** Configura NSS en Mac OS X para permitir la carga desde directorios fuera de
      * <i>LD_LIBRARY_PATH</i> y <i>PATH</i>.
      * @param parent Componente padre para los di&aacute;logos gr&aacute;ficos */
-    void configureNSS(final Component parent) throws AOCancelledOperationException, AOException {
+    void configureNSS(final Component parent) throws AOException {
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;
         }
@@ -220,7 +218,7 @@ final class CheckAndInstallMissingParts {
             nssLibDir = getSystemNSSLibDirMacOSX();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
                                                       "No se ha encontrado un NSS para configurar: " + e //$NON-NLS-1$
             );
             return;
@@ -284,7 +282,7 @@ final class CheckAndInstallMissingParts {
 
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            AfirmaBootLoader.LOGGER.warning( //$NON-NLS-1$
                                                        "No se ha podido crear un script para configurar las bibliotecas NSS en Mac OS X: " + e //$NON-NLS-1$
             );
             return;
@@ -296,7 +294,7 @@ final class CheckAndInstallMissingParts {
             );
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            AfirmaBootLoader.LOGGER.warning( //$NON-NLS-1$
                                                        "No se ha podido ejecutar el script configuracion de las bibliotecas NSS en Mac OS X: " + e //$NON-NLS-1$
             );
             return;
@@ -477,11 +475,11 @@ final class CheckAndInstallMissingParts {
             localVersion = getNssLocalVersion();
         }
         catch (final FileNotFoundException e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha localizado el NSS instalado");
+            AfirmaBootLoader.LOGGER.warning("No se ha localizado el NSS instalado");
             return false;
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma")
+            AfirmaBootLoader.LOGGER
             .warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e);
             return true;
         }
@@ -491,7 +489,7 @@ final class CheckAndInstallMissingParts {
             remoteVersion = getNssRemoteVersion();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma")
+            AfirmaBootLoader.LOGGER
             .warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e);
             return true;
         }
@@ -614,7 +612,7 @@ final class CheckAndInstallMissingParts {
             return false;
         }
         if (getEndorsedDir() == null) {
-            Logger.getLogger("es.gob.afirma")
+            AfirmaBootLoader.LOGGER
             .severe("No se ha podido determinar el directorio ENDORSED del JRE, por lo que no se considera necesario instalar Apache XALAN");
             return false;
         }

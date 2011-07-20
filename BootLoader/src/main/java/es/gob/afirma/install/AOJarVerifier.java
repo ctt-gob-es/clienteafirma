@@ -36,7 +36,6 @@ import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.logging.Logger;
 
 final class AOJarVerifier {
 
@@ -57,7 +56,7 @@ final class AOJarVerifier {
      *        firmas del fichero
      * @throws SecurityException Si la firma no es v&aacute;lida u ocurre cualquier
      *         problema durante la verificaci&oacute;n */
-    void verifyJar(final String jarName, final X509Certificate caCert, final X509Certificate signerCert) throws SecurityException {
+    void verifyJar(final String jarName, final X509Certificate caCert, final X509Certificate signerCert) {
 
         if (jarName == null || "".equals(jarName)) {
             throw new SecurityException("El fichero proporcionado es nulo o vacio, y por lo tanto no esta firmado");
@@ -158,15 +157,15 @@ final class AOJarVerifier {
             }
 
             if (this.hasExpiringCert) {
-                Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses");
+                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses");
             }
 
             if (this.hasExpiredCert) {
-                Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado");
+                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado");
             }
 
             if (this.notYetValidCert) {
-                Logger.getLogger("es.gob.afirma").warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido");
+                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido");
             }
 
         }
@@ -193,14 +192,14 @@ final class AOJarVerifier {
     private boolean signatureRelated(final String name) {
         final String ucName = name.toUpperCase();
         if (ucName.equals(JarFile.MANIFEST_NAME) || ucName.equals(META_INF)
-                || (ucName.startsWith(SIG_PREFIX) && ucName.indexOf("/") == ucName.lastIndexOf("/"))) {
+                || (ucName.startsWith(SIG_PREFIX) && ucName.indexOf('/') == ucName.lastIndexOf('/'))) {
             return true;
         }
 
         if (ucName.startsWith(META_INF) && isBlockOrSF(ucName)) {
             // .SF/.DSA/.RSA files in META-INF subdirs
             // are not considered signature-related
-            return (ucName.indexOf("/") == ucName.lastIndexOf("/"));
+            return (ucName.indexOf('/') == ucName.lastIndexOf('/'));
         }
 
         return false;
