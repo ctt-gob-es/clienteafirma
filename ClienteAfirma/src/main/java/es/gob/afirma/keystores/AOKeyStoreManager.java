@@ -81,7 +81,7 @@ public class AOKeyStoreManager {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante la
      *         inicializaci&oacute;n */
-    public Vector<KeyStore> init(AOConstants.AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException {
+    Vector<KeyStore> init(AOConstants.AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException {
 
         Logger.getLogger("es.gob.afirma").info("Inicializamos el almacen de tipo: " + type);
 

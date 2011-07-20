@@ -11,10 +11,10 @@
 package es.gob.afirma.signers.ooxmlhelper;
 
 /** Relaci&oacute;n XML seg&uacute;n la normativa OOXML. */
-public final class RelationShip {
+final class RelationShip {
 
-    /** Tipo de la relaci&oacute;n principal del documento. */
-    public final static String DOCUMENT_RELATIONSHIP_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
+//    /** Tipo de la relaci&oacute;n principal del documento. */
+//    public final static String DOCUMENT_RELATIONSHIP_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument";
 
     private String id = null;
     private String type = null;

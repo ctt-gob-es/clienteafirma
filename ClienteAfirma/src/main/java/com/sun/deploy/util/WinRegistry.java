@@ -26,17 +26,17 @@ public final class WinRegistry {
 
     // Funciones de la biblioteca nativa para el acceso al registro de Windows
 
-    static native int sysOpenKey(int hKey, String subKey, int sam);
+    private static native int sysOpenKey(int hKey, String subKey, int sam);
 
-    static native int sysCloseKey(int hKey);
+    private static native int sysCloseKey(int hKey);
 
-    static native KeyValue sysQueryKey(int hKey, String name);
+    private static native KeyValue sysQueryKey(int hKey, String name);
 
-    static native int sysCreateKey(int hKey, String name, int sam);
+    private static native int sysCreateKey(int hKey, String name, int sam);
 
-    static native boolean sysSetStringValue(int hKey, String name, String value);
+    private static native boolean sysSetStringValue(int hKey, String name, String value);
 
-    static native void initIDs();
+    private static native void initIDs();
 
     /** Los valores del registro se componen de un tipo y de unos datos. */
     static class KeyValue {
@@ -46,12 +46,6 @@ public final class WinRegistry {
         KeyValue(final int type, final byte[] data) {
             this.type = type;
             this.data = data.clone();
-        }
-
-        /** Retorna el tipo del valor del par-valor
-         * @return Entero identificador del tipo de clave */
-        public int getType() {
-            return type;
         }
 
         /** Retorna el valor del par-valor

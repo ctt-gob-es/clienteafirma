@@ -103,7 +103,7 @@ public final class OfficeXMLAnalizer {
      * @param zipData
      *        Fichero ODF u OOXML
      * @return MimeType. */
-    public static String getMimeType(final byte[] zipData) {
+    static String getMimeType(final byte[] zipData) {
 
         final ZipFile zipFile;
         try {
@@ -143,7 +143,7 @@ public final class OfficeXMLAnalizer {
      * @param zipData
      *        Fichero ODF u OOXML
      * @return Extensi&oacute;n. */
-    public static String getExtension(final byte[] zipData) {
+    static String getExtension(final byte[] zipData) {
         final String mimetype = getMimeType(zipData);
         if (mimetype == null) {
             return null;

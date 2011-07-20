@@ -217,11 +217,11 @@ final class AuthenticatedDataHelper {
     }
 
     /** Clase Auxiliar para el manejo de las MAC. Es Original de Bouncy Castle */
-    protected static class MacOutputStream extends OutputStream {
+    private static class MacOutputStream extends OutputStream {
         private final OutputStream out;
         private final Mac mac;
 
-        MacOutputStream(final OutputStream out, final Mac mac) {
+        private MacOutputStream(final OutputStream out, final Mac mac) {
             this.out = out;
             this.mac = mac;
         }
@@ -249,7 +249,7 @@ final class AuthenticatedDataHelper {
             out.close();
         }
 
-        byte[] getMac() {
+        private byte[] getMac() {
             return mac.doFinal();
         }
     }

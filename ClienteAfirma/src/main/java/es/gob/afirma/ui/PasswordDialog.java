@@ -56,7 +56,7 @@ public final class PasswordDialog extends JDialog {
      * dialog. Pressing enter in the password field may be the same as 'OK' but
      * closing the dialog and pressing the cancel button are not.
      * @return true if the the user hit OK, false if the user canceled. */
-    public boolean okPressed() {
+    private boolean okPressed() {
         return pressed_OK;
     }
 
@@ -76,19 +76,12 @@ public final class PasswordDialog extends JDialog {
         }
     }
 
-    /** Create this dialog with the given parent and the default title.
-     * @param parent
-     *        window from which this dialog is launched */
-    public PasswordDialog(final Dialog parent) {
-        this(parent, null);
-    }
-
     /** Create this dialog with the given parent and title.
      * @param parent
      *        window from which this dialog is launched
      * @param title
      *        the title for the dialog box window */
-    public PasswordDialog(final Frame parent, final String title) {
+    private PasswordDialog(final Frame parent, final String title) {
         super(parent, title, true);
         setTitle(title);
         if (parent != null) {

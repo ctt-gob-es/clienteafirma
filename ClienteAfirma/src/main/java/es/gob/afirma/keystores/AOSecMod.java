@@ -131,7 +131,7 @@ final class AOSecMod {
         private final String lib;
         private final String description;
 
-        ModuleName(final String l, final String d) {
+        private ModuleName(final String l, final String d) {
             lib = l;
             description = d;
         }

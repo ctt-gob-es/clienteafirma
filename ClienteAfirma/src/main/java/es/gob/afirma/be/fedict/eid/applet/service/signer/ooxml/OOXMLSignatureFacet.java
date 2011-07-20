@@ -81,13 +81,13 @@ import es.gob.afirma.be.fedict.eid.applet.service.signer.SignatureFacet;
 /** Office OpenXML Signature Facet implementation.
  * @author fcorneli
  * @see "http://msdn.microsoft.com/en-us/library/cc313071.aspx" */
-public class OOXMLSignatureFacet implements SignatureFacet {
+class OOXMLSignatureFacet implements SignatureFacet {
 
     private final AbstractOOXMLSignatureService signatureService;
 
     /** Main constructor.
      * @param signatureService */
-    public OOXMLSignatureFacet(final AbstractOOXMLSignatureService signatureService) {
+    OOXMLSignatureFacet(final AbstractOOXMLSignatureService signatureService) {
         this.signatureService = signatureService;
     }
 
@@ -340,7 +340,7 @@ public class OOXMLSignatureFacet implements SignatureFacet {
         throw new RuntimeException("ZIP entry not found: " + zipEntryName);
     }
 
-    protected Document findDocument(final String zipEntryName) throws IOException, ParserConfigurationException, SAXException {
+    private Document findDocument(final String zipEntryName) throws IOException, ParserConfigurationException, SAXException {
         final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()));
         ZipEntry zipEntry;
         while (null != (zipEntry = zipInputStream.getNextEntry())) {

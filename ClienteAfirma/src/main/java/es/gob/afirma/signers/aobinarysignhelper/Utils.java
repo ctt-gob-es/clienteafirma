@@ -437,7 +437,7 @@ final class Utils {
      * @param algorithmConfig
      *        Configuracion de cifrado que debemos parametrizar.
      * @return Par&aacute;metros para operar. */
-    public static AlgorithmParameterSpec getParams(final AOCipherConfig algorithmConfig) {
+    private static AlgorithmParameterSpec getParams(final AOCipherConfig algorithmConfig) {
 
         AlgorithmParameterSpec params = null;
         if (algorithmConfig.getAlgorithm().supportsPassword()) {
@@ -834,7 +834,7 @@ final class Utils {
      * @param datos
      *        informacion de los datos cifrados sin formatear.
      * @return informacion de los datos cifrados. */
-    public static String getEncryptedContentInfo(final EncryptedContentInfo datos) {
+    private static String getEncryptedContentInfo(final EncryptedContentInfo datos) {
         String info = "";
 
         // especificamos el tipo de contenido
@@ -1220,7 +1220,7 @@ final class Utils {
      * @param binarySignType
      *        Identifica el tipo de firma binaria (CMS o CADES)
      * @return lista de atributos concatenados. */
-    public static String getsignedAttributes(final ASN1Set attributes, final String binarySignType) {
+    private static String getsignedAttributes(final ASN1Set attributes, final String binarySignType) {
         String attributos = "";
 
         final Enumeration<?> e = attributes.getObjects();

@@ -92,7 +92,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
 
 public final class GenCadesEPESSignedData {
 
-    ASN1Set signedAttr2;
+    private ASN1Set signedAttr2;
 
     /** M&eacute;odo que genera una firma digital usando el sitema conocido como
      * SignedData y que podr&aacute; ser con el contenido del fichero codificado

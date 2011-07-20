@@ -131,7 +131,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
      * ds:Signature should be the top-level element. Implementations can
      * override this method to provide a custom enveloping document.
      * @return */
-    protected Document getEnvelopingDocument() {
+    private Document getEnvelopingDocument() {
         return null;
     }
 
@@ -391,7 +391,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         throw new RuntimeException("unsupported sign algo: " + digestAlgo);
     }
 
-    protected void writeDocument(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,
+    private void writeDocument(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,
                                                                                                   TransformerFactoryConfigurationError,
                                                                                                   TransformerException,
                                                                                                   IOException {
@@ -399,7 +399,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         documentOutputStream.close();
     }
 
-    protected void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,
+    private  void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,
                                                                                                            TransformerFactoryConfigurationError,
                                                                                                            TransformerException {
         // we need the XML processing initial line for OOXML
@@ -419,7 +419,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         xformer.transform(source, result);
     }
 
-    protected Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
+    private Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         return documentBuilderFactory.newDocumentBuilder().parse(new InputSource(documentInputStream));

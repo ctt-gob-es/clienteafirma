@@ -78,7 +78,7 @@ import es.gob.afirma.misc.AOUtil;
  * peculiaridad de que es una Cofirma. */
 public final class CoSigner {
 
-    ASN1Set signedAttr2;
+    private ASN1Set signedAttr2;
 
     /** Constructor de la clase. Se crea una cofirma a partir de los datos del
      * firmante, el archivo que se firma y del archivo que contiene las firmas.

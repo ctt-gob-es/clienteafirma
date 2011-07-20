@@ -93,7 +93,7 @@ public final class Utils {
          * dereferenciar una hoja de estilo.
          * @param s
          *        Mesaje de excepci&oacute;n */
-        public CannotDereferenceException(final String s) {
+        private CannotDereferenceException(final String s) {
             super(s);
         }
 
@@ -103,7 +103,7 @@ public final class Utils {
          *        Mesaje de excepci&oacute;n
          * @param e
          *        Excepci&oacute;n anterior en la cadena */
-        public CannotDereferenceException(final String s, final Exception e) {
+        private CannotDereferenceException(final String s, final Exception e) {
             super(s, e);
         }
     }
@@ -226,7 +226,7 @@ public final class Utils {
      *        Reeferncia a la hoja de estilo
      * @return XML con la cabecera de declaraci&oacute;n de hoja de estilo
      *         a&ntilde;adida */
-    public static String addStyleSheetHeader(final String xml, String type, final String href) {
+    private static String addStyleSheetHeader(final String xml, String type, final String href) {
         if (href == null) {
             return xml;
         }

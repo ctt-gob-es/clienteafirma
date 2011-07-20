@@ -69,38 +69,30 @@ public final class CadesCounterSigner {
 
     /* Propiedades de la clase */
     private int actualIndex = 0;
-    private Oid actualOid = null;
     private ASN1Set signedAttr2;
 
     private String globalPolicy = "";
     private Oid GlobalOidQualifier = null;
     private boolean GlobalsigningCertificateV2;
 
-    Oid getActualOid() {
-        return actualOid;
-    }
-
-    void setActualOid(final Oid actualOid) {
-        this.actualOid = actualOid;
-    }
 
     /** Obtiene el Oid del qualificador de pol&iacute;tica
      * @return Oid de calificador de pol&iacute;tica */
-    Oid getGlobalOidQualifier() {
+    private Oid getGlobalOidQualifier() {
         return GlobalOidQualifier;
     }
 
     /** Establece el Oid del qualificador de pol&iacute;tica
      * @param globalOidQualifier
      *        Oid de calificador de pol&iacute;tica */
-    void setGlobalOidQualifier(final Oid globalOidQualifier) {
+    private void setGlobalOidQualifier(final Oid globalOidQualifier) {
         GlobalOidQualifier = globalOidQualifier;
     }
 
     /** Obtiene el tipo de atributo firmado signingCertificate o
      * signingCertificateV2
      * @return tipo de atributo firmado. */
-    boolean isGlobalsigningCertificateV2() {
+    private boolean isGlobalsigningCertificateV2() {
         return GlobalsigningCertificateV2;
     }
 
@@ -108,7 +100,7 @@ public final class CadesCounterSigner {
      * signingCertificateV2
      * @param globalsigningCertificateV2
      *        tipo de atributo */
-    void setGlobalsigningCertificateV2(final boolean globalsigningCertificateV2) {
+    private void setGlobalsigningCertificateV2(final boolean globalsigningCertificateV2) {
         GlobalsigningCertificateV2 = globalsigningCertificateV2;
     }
 
@@ -172,9 +164,6 @@ public final class CadesCounterSigner {
                                 final Oid qualifier,
                                 final boolean signingCertificateV2,
                                 final Oid dataType) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
-
-        // Inicializamos el Oid
-        actualOid = dataType;
 
         // Introducimos la pol&iacute;tica en variable global por comodidad.
         // &Eacute;sta no var&iacute;a.

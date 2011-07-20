@@ -44,7 +44,7 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 /** Relationship Transform parameter specification class.
  * @author fcorneli */
-public class RelationshipTransformParameterSpec implements TransformParameterSpec {
+class RelationshipTransformParameterSpec implements TransformParameterSpec {
 
     private final List<String> sourceIds;
 
@@ -55,7 +55,7 @@ public class RelationshipTransformParameterSpec implements TransformParameterSpe
 
     /** Adds a relationship reference for the given source identifier.
      * @param sourceId */
-    public void addRelationshipReference(final String sourceId) {
+    void addRelationshipReference(final String sourceId) {
         this.sourceIds.add(sourceId);
     }
 

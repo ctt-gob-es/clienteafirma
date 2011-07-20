@@ -126,7 +126,7 @@ final class KeyStoreConfigurationManager {
         return AOKeyStore.PKCS12;
     }
 
-    void resetFilters() {
+    private void resetFilters() {
         certFilters.removeAllElements();
     }
 
@@ -476,7 +476,7 @@ final class KeyStoreConfigurationManager {
     /** Indica si se seleccionar&aacute; autom&aacute;ticamente el certificado de
      * firma.
      * @return Devuelve {@code true} si autoselecciona el certificado. */
-    boolean isMandatoryCert() {
+    private boolean isMandatoryCert() {
         return this.mandatoryCert;
     }
 

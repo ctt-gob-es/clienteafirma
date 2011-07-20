@@ -17,12 +17,12 @@ public final class AOCertificateException extends AOException {
     /** SerialID. */
     private static final long serialVersionUID = 3035513480174034743L;
 
-    /** Crea la excepci&oacute;n con un mensaje determinado.
-     * @param msg
-     *        Mensaje descriptivo de la excepci&oacute;n. */
-    public AOCertificateException(final String msg) {
-        super(msg);
-    }
+//    /** Crea la excepci&oacute;n con un mensaje determinado.
+//     * @param msg
+//     *        Mensaje descriptivo de la excepci&oacute;n. */
+//    public AOCertificateException(final String msg) {
+//        super(msg);
+//    }
 
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg

@@ -33,7 +33,7 @@ import es.gob.afirma.misc.AOConstants;
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de
  * Mozilla / Firefox accedidos v&iacute;a NSS en el que se tratan de forma
  * unificada los m&oacute;dulos internos y externos. */
-public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
+final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
     private Hashtable<String, KeyStore> storesByAlias;
 

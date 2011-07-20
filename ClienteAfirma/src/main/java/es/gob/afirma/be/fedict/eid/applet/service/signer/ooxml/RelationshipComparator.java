@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
 
 /** Comparator for Relationship DOM elements.
  * @author Frank Cornelis */
-public class RelationshipComparator implements Comparator<Element> {
+class RelationshipComparator implements Comparator<Element> {
 
     public int compare(final Element element1, final Element element2) {
         final String id1 = element1.getAttribute("Id");

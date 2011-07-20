@@ -48,7 +48,7 @@ public final class OOXMLUtil {
      * @param ooxmlFile
      *        Documento OOXML.
      * @return N&uacute;mero de firma del documento OOXML. */
-    public static RelationShip[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) {
+    private static RelationShip[] getOOXMLSignaturesRelationships(final byte[] ooxmlFile) {
 
         final ZipFile zipFile;
         try {

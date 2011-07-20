@@ -63,7 +63,7 @@ public final class AOCMSEnveloper {
 
     /** Tipo de los datos contenidos en la envoltura. Siempre data por
      * est&aacute;ndar. */
-    static Oid DATA_TYPE_OID;
+    private static Oid DATA_TYPE_OID;
 
     /** Algoritmo de firma. */
     private String signatureAlgorithm = AOConstants.DEFAULT_SIGN_ALGO;

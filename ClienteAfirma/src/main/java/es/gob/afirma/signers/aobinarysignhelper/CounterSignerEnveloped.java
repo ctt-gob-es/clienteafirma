@@ -74,7 +74,7 @@ import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
 public final class CounterSignerEnveloped {
 
     private int actualIndex = 0;
-    ASN1Set signedAttr2;
+    private ASN1Set signedAttr2;
     private Map<Oid, byte[]> atrib2 = new HashMap<Oid, byte[]>();
     private Map<Oid, byte[]> uatrib2 = new HashMap<Oid, byte[]>();
 

@@ -165,7 +165,7 @@ final class BrowserDialog extends JDialog {
         }
     }
 
-    void disableContent(final Container cnt) {
+    private void disableContent(final Container cnt) {
         final int numChildrens = cnt.getComponentCount();
         for (int i = 0; i < numChildrens; i++) {
             final Component children = cnt.getComponent(i);

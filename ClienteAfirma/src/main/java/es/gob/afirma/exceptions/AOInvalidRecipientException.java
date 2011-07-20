@@ -23,13 +23,13 @@ public final class AOInvalidRecipientException extends AOException {
         super(msg);
     }
 
-    /** Crea la excepci&oacute;n con un mensaje determinado.
-     * @param msg
-     *        Mensaje descriptivo de la excepci&oacute;n.
-     * @param e
-     *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    public AOInvalidRecipientException(final String msg, final Exception e) {
-        super(msg, e);
-    }
+//    /** Crea la excepci&oacute;n con un mensaje determinado.
+//     * @param msg
+//     *        Mensaje descriptivo de la excepci&oacute;n.
+//     * @param e
+//     *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
+//    public AOInvalidRecipientException(final String msg, final Exception e) {
+//        super(msg, e);
+//    }
 
 }

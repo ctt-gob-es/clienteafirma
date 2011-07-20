@@ -79,7 +79,7 @@ public final class CMSSignedAndEnvelopedData {
 
     /** Clave de cifrado. La almacenamos internamente. */
     private SecretKey cipherKey;
-    ASN1Set signedAttr2;
+    private ASN1Set signedAttr2;
 
     /** M&eacute;todo que genera la firma de tipo SignedAndEnvelopedData.
      * @param parameters

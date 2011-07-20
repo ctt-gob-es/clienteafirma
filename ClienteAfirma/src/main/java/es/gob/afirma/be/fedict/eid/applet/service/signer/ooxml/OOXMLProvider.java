@@ -46,7 +46,7 @@ public final class OOXMLProvider extends Provider {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String NAME = "OOXMLProvider";
+    private static final String NAME = "OOXMLProvider";
 
     private OOXMLProvider() {
         super(NAME, 1.0, "OOXML Security Provider");

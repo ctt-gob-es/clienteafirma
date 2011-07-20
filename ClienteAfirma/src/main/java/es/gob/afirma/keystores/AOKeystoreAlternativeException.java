@@ -41,7 +41,7 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Almac&eacute;n de claves y certificados alternativo
      * @param desc
      *        Mensaje descriptivo de la excepci&oacute;n. */
-    public AOKeystoreAlternativeException(final AOConstants.AOKeyStore ks, final String desc) {
+    AOKeystoreAlternativeException(final AOConstants.AOKeyStore ks, final String desc) {
         super(desc);
         if (ks == null) {
             throw new IllegalArgumentException("Es necesario proporcionar un AOConstants.AOKeyStore alternativo");

@@ -90,7 +90,7 @@ public final class AOCryptoUtil {
      *        Fichero de firma.
      * @return Manejador de firma especificado.
      * @see es.gob.afirma.misc.AOConstants */
-    public static AOSigner getSigner(final File signFile) {
+    static AOSigner getSigner(final File signFile) {
 
         int nBytes = 0;
         final byte[] buffer = new byte[1024];

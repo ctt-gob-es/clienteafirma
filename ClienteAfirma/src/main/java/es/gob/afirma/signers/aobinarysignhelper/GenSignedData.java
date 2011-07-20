@@ -97,7 +97,7 @@ import es.gob.afirma.misc.AOCryptoUtil;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 public final class GenSignedData {
 
-    ASN1Set signedAttr2;
+    private ASN1Set signedAttr2;
 
     /** M&eacute;odo que genera una firma digital usando el sitema conocido como
      * SignedData y que podr&aacute; ser con el contenido del fichero codificado

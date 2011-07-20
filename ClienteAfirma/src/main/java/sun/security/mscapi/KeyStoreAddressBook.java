@@ -67,17 +67,12 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
 
         /** Gets the alias for the keystore entry. */
-        String getAlias() {
+        private String getAlias() {
             return alias;
         }
 
-        /** Sets the alias for the keystore entry. */
-        void setAlias(final String alias) {
-            this.alias = alias;
-        }
-
         /** Gets the certificate chain for the keystore entry. */
-        X509Certificate[] getCertificateChain() {
+        private X509Certificate[] getCertificateChain() {
             return certChain;
         }
 

@@ -78,7 +78,7 @@ public final class TreeNode {
      *            node
      * @exception IllegalStateException
      *            if this node does not allow children */
-    public void insert(final TreeNode newChild, final int childIndex) {
+    private void insert(final TreeNode newChild, final int childIndex) {
         if (!allowsChildren) {
             throw new IllegalStateException("node does not allow children");
         }
@@ -107,7 +107,7 @@ public final class TreeNode {
      *        the index in this node's child array of the child to remove
      * @exception ArrayIndexOutOfBoundsException
      *            if <code>childIndex</code> is out of bounds */
-    public void remove(final int childIndex) {
+    private void remove(final int childIndex) {
         final TreeNode child = getChildAt(childIndex);
         children.removeElementAt(childIndex);
         child.setParent(null);
@@ -161,7 +161,7 @@ public final class TreeNode {
      * @return an int giving the index of the node in this node's child array,
      *         or <code>-1</code> if the specified node is a not a child of this
      *         node */
-    public int getIndex(final TreeNode aChild) {
+    private int getIndex(final TreeNode aChild) {
         if (aChild == null) {
             throw new IllegalArgumentException("argument is null");
         }
@@ -176,7 +176,7 @@ public final class TreeNode {
      * Modifying this node's child array invalidates any child enumerations
      * created before the modification.
      * @return an Enumeration of this node's children */
-    public Enumeration<TreeNode> children() {
+    private Enumeration<TreeNode> children() {
         if (children == null) {
             return EMPTY_ENUMERATION;
         }
@@ -226,7 +226,7 @@ public final class TreeNode {
      * @exception IllegalArgumentException
      *            if <code>aChild</code> is null or is not a child of this
      *            node */
-    public void remove(final TreeNode aChild) {
+    private void remove(final TreeNode aChild) {
         if (aChild == null) {
             throw new IllegalArgumentException("argument is null");
         }

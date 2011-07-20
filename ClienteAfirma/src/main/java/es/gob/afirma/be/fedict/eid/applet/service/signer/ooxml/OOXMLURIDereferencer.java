@@ -54,13 +54,13 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 
 /** JSR105 URI dereferencer for Office Open XML documents.
  * @author Frank Cornelis */
-public class OOXMLURIDereferencer implements URIDereferencer {
+class OOXMLURIDereferencer implements URIDereferencer {
 
     private final byte[] ooxml;
 
     private final URIDereferencer baseUriDereferencer;
 
-    public OOXMLURIDereferencer(final byte[] ooxml) {
+    OOXMLURIDereferencer(final byte[] ooxml) {
         if (null == ooxml) {
             throw new IllegalArgumentException("ooxml is null");
         }

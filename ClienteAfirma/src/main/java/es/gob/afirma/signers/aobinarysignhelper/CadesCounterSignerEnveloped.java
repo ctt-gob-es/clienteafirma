@@ -92,14 +92,14 @@ public final class CadesCounterSignerEnveloped {
     /** Establece el Oid del qualificador de pol&iacute;tica
      * @param globalOidQualifier
      *        Oid de calificador de pol&iacute;tica */
-    void setGlobalOidQualifier(final Oid globalOidQualifier) {
+    private void setGlobalOidQualifier(final Oid globalOidQualifier) {
         GlobalOidQualifier = globalOidQualifier;
     }
 
     /** Obtiene el tipo de atributo firmado signingCertificate o
      * signingCertificateV2
      * @return tipo de atributo firmado. */
-    boolean isGlobalsigningCertificateV2() {
+    private boolean isGlobalsigningCertificateV2() {
         return GlobalsigningCertificateV2;
     }
 
@@ -107,7 +107,7 @@ public final class CadesCounterSignerEnveloped {
      * signingCertificateV2
      * @param globalsigningCertificateV2
      *        tipo de atributo */
-    void setGlobalsigningCertificateV2(final boolean globalsigningCertificateV2) {
+    private void setGlobalsigningCertificateV2(final boolean globalsigningCertificateV2) {
         GlobalsigningCertificateV2 = globalsigningCertificateV2;
     }
 

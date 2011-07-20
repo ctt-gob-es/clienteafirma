@@ -968,100 +968,100 @@ public final class AOCAdESSigner implements AOSigner {
 
     }
 
-    /** Inserta un nuevo firmante dentro de una firma signedAndEnveloped dada.
-     * @param signFile
-     *        Flujo de entrada de datos que contiene la firma.
-     * @param file
-     *        Fichero de firma, necesario para calcular los datos del nuevo
-     *        firmante.
-     * @param signatureAlgorithm
-     *        Algoritmo de firma.
-     * @param keyEntry
-     *        Clave privada a usar para firmar.
-     * @param extraParams
-     *        Par&aacute;metros adiocionales (variables)
-     * @return Firma original con el nuevo firmante a&ntilde;adido
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    public byte[] addOriginatorInfo(final InputStream signFile,
-                                    final InputStream file,
-                                    final String signatureAlgorithm,
-                                    final PrivateKeyEntry keyEntry,
-                                    final Properties extraParams) throws AOException {
-
-        // Comprobamos que el archivo a tratar no sea nulo.
-        if (file == null) {
-            throw new IllegalArgumentException("El archivo a tratar no puede ser nulo.");
-        }
-
-        final byte[] plainData;
-        try {
-            plainData = AOUtil.getDataFromInputStream(file);
-        }
-        catch (final Exception e1) {
-            throw new AOException("No se han podido leer los datos a firmar", e1);
-        }
-
-        P7ContentSignerParameters csp = null;
-        if (keyEntry != null) {
-
-            X509Certificate[] xCerts = new X509Certificate[0];
-            final Certificate[] certs = keyEntry.getCertificateChain();
-            if (certs != null && (certs instanceof X509Certificate[])) {
-                xCerts = (X509Certificate[]) certs;
-            }
-            else {
-                final Certificate cert = keyEntry.getCertificate();
-                if (cert instanceof X509Certificate) {
-                    xCerts = new X509Certificate[] {
-                                                    (X509Certificate) cert
-                    };
-                }
-            }
-
-            csp = new P7ContentSignerParameters(plainData, signatureAlgorithm, xCerts);
-
-        }
-
-        // Tipos de datos a firmar.
-        if (this.dataType == null) {
-            try {
-                this.dataType = new Oid(PKCSObjectIdentifiers.data.getId());
-            }
-            catch (final Exception ex) {
-                // Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto en el envoltorio CMS: "
-                // + ex);
-                throw new AOException("Error al asignar el OID por defecto en el envoltorio CAdES", ex);
-            }
-        }
-
-        Oid policyQualifier = null;
-        try {
-            policyQualifier = new Oid(extraParams.getProperty("policyQualifier"));
-        }
-        catch (final Exception e) {}
-
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
-
-        // Datos firmados.
-        byte[] dataSigned = null;
-
-        try {
-            dataSigned =
-                    new CADESEPESSignedAndEnvelopedData().addOriginatorInfo(signFile,
-                                                                            csp,
-                                                                            keyEntry,
-                                                                            dataType,
-                                                                            extraParams.getProperty("policyIdentifier"),
-                                                                            policyQualifier,
-                                                                            signingCertificateV2);
-
-        }
-        catch (final Exception e) {
-            throw new AOException("Error generando el enveloped de CAdES", e);
-        }
-        return dataSigned;
-    }
+//    /** Inserta un nuevo firmante dentro de una firma signedAndEnveloped dada.
+//     * @param signFile
+//     *        Flujo de entrada de datos que contiene la firma.
+//     * @param file
+//     *        Fichero de firma, necesario para calcular los datos del nuevo
+//     *        firmante.
+//     * @param signatureAlgorithm
+//     *        Algoritmo de firma.
+//     * @param keyEntry
+//     *        Clave privada a usar para firmar.
+//     * @param extraParams
+//     *        Par&aacute;metros adiocionales (variables)
+//     * @return Firma original con el nuevo firmante a&ntilde;adido
+//     * @throws AOException
+//     *         Cuando ocurre cualquier problema durante el proceso */
+//    public byte[] addOriginatorInfo(final InputStream signFile,
+//                                    final InputStream file,
+//                                    final String signatureAlgorithm,
+//                                    final PrivateKeyEntry keyEntry,
+//                                    final Properties extraParams) throws AOException {
+//
+//        // Comprobamos que el archivo a tratar no sea nulo.
+//        if (file == null) {
+//            throw new IllegalArgumentException("El archivo a tratar no puede ser nulo.");
+//        }
+//
+//        final byte[] plainData;
+//        try {
+//            plainData = AOUtil.getDataFromInputStream(file);
+//        }
+//        catch (final Exception e1) {
+//            throw new AOException("No se han podido leer los datos a firmar", e1);
+//        }
+//
+//        P7ContentSignerParameters csp = null;
+//        if (keyEntry != null) {
+//
+//            X509Certificate[] xCerts = new X509Certificate[0];
+//            final Certificate[] certs = keyEntry.getCertificateChain();
+//            if (certs != null && (certs instanceof X509Certificate[])) {
+//                xCerts = (X509Certificate[]) certs;
+//            }
+//            else {
+//                final Certificate cert = keyEntry.getCertificate();
+//                if (cert instanceof X509Certificate) {
+//                    xCerts = new X509Certificate[] {
+//                                                    (X509Certificate) cert
+//                    };
+//                }
+//            }
+//
+//            csp = new P7ContentSignerParameters(plainData, signatureAlgorithm, xCerts);
+//
+//        }
+//
+//        // Tipos de datos a firmar.
+//        if (this.dataType == null) {
+//            try {
+//                this.dataType = new Oid(PKCSObjectIdentifiers.data.getId());
+//            }
+//            catch (final Exception ex) {
+//                // Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto en el envoltorio CMS: "
+//                // + ex);
+//                throw new AOException("Error al asignar el OID por defecto en el envoltorio CAdES", ex);
+//            }
+//        }
+//
+//        Oid policyQualifier = null;
+//        try {
+//            policyQualifier = new Oid(extraParams.getProperty("policyQualifier"));
+//        }
+//        catch (final Exception e) {}
+//
+//        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
+//
+//        // Datos firmados.
+//        byte[] dataSigned = null;
+//
+//        try {
+//            dataSigned =
+//                    new CADESEPESSignedAndEnvelopedData().addOriginatorInfo(signFile,
+//                                                                            csp,
+//                                                                            keyEntry,
+//                                                                            dataType,
+//                                                                            extraParams.getProperty("policyIdentifier"),
+//                                                                            policyQualifier,
+//                                                                            signingCertificateV2);
+//
+//        }
+//        catch (final Exception e) {
+//            throw new AOException("Error generando el enveloped de CAdES", e);
+//        }
+//        return dataSigned;
+//    }
 
     /** Establece el algoritmo de cifrado.
      * @param alg

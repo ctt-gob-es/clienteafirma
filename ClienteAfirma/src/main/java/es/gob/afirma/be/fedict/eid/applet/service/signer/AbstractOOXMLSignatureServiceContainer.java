@@ -46,10 +46,6 @@ import es.gob.afirma.misc.AOUtil;
 
 public final class AbstractOOXMLSignatureServiceContainer {
 
-    public final static void setUp() {
-        OOXMLProvider.install();
-    }
-
     private static final class OOXMLSignatureService extends AbstractOOXMLSignatureService {
 
         @Override

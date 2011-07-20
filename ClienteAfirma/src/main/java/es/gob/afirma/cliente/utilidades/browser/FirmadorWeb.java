@@ -31,7 +31,7 @@ public final class FirmadorWeb {
 
         public final File tmpWebDataFile;
 
-        FirmaWeb(final byte[] hash, final String hashAlgorithm, final File tmpWebDataFile) {
+        private FirmaWeb(final byte[] hash, final String hashAlgorithm, final File tmpWebDataFile) {
             this.tmpWebDataFile = tmpWebDataFile;
         }
     }

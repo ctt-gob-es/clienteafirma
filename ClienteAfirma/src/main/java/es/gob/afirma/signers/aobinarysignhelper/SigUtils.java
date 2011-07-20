@@ -59,7 +59,7 @@ final class SigUtils {
      *        Lo codificado
      * @return Un objeto formateado de tipo DER
      * @throws java.io.IOException */
-    static DERObject makeObj(final byte[] encoding) throws IOException {
+    private static DERObject makeObj(final byte[] encoding) throws IOException {
         if (encoding == null) {
             Logger.getLogger("es.gob.afirma").warning("La codificacion era nula, se devolvera null");
             return null;

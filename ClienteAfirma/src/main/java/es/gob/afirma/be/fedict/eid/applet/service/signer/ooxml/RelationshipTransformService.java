@@ -87,9 +87,9 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
  * Specs: http://openiso.org/Ecma/376/Part2/12.2.4#26
  * </p>
  * @author Frank Cornelis */
-public class RelationshipTransformService extends TransformService {
+class RelationshipTransformService extends TransformService {
 
-    public static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform";
+    static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform";
 
     private final List<String> sourceIds;
 

@@ -241,7 +241,7 @@ public final class Platform {
 
     /** Recupera la ruta del directorio de instalaci&oacute;n de Java.
      * @return Ruta del directorio de instalaci&oacute;n de Java. */
-    public static String getJavaHome() {
+    static String getJavaHome() {
         return javaHome;
     }
 

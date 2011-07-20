@@ -34,7 +34,7 @@ import es.gob.afirma.misc.mozilla.utils.NSPreferences;
 
 /** Clase con m&eacute;toos de utilidad para la gesti&oacute;n del almac&eacute;n
  * de certificados de Mozilla. */
-public final class MozillaKeyStoreUtilities {
+final class MozillaKeyStoreUtilities {
 
     /** Directorio con las bibliotecas de NSS necesarias para el acceso al
      * almac&eacute;n de Mozilla. */

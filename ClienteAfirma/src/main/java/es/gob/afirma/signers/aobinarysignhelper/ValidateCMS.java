@@ -51,7 +51,7 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSData(final byte[] data) {
+    boolean isCMSData(final byte[] data) {
         boolean isValid = true;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -86,7 +86,7 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSSignedData(final byte[] data) {
+    boolean isCMSSignedData(final byte[] data) {
         boolean isValid = true;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -144,7 +144,7 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSDigestedData(final byte[] data) {
+    boolean isCMSDigestedData(final byte[] data) {
         boolean isValid = true;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -180,7 +180,7 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSEncryptedData(final byte[] data) {
+    boolean isCMSEncryptedData(final byte[] data) {
         boolean isValid = true;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -290,7 +290,7 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSAuthenticatedData(final byte[] data) {
+    boolean isCMSAuthenticatedData(final byte[] data) {
         boolean isValid = true;
         // Leemos el fichero que contiene la firma.
         final ASN1InputStream is = new ASN1InputStream(data);
@@ -358,7 +358,7 @@ public final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
-    public boolean isCMSCompressedData(final byte[] data) {
+    boolean isCMSCompressedData(final byte[] data) {
         boolean isValid = true;
         // Leemos el fichero que contiene la firma.
         final ASN1InputStream is = new ASN1InputStream(data);

@@ -26,7 +26,7 @@ import es.gob.afirma.exceptions.AOException;
 /** Parser de ficheros XML Relationships. Este tipo de fichero se encuentra
  * comunmente dentro de los ficheros OOXML de Microsoft Office con el nombre
  * ".rels". */
-public final class RelationshipsParser {
+final class RelationshipsParser {
 
     /** Esquema del XML Relationships. */
     private static final String RELATIONSHIPS_SCHEMA = "http://schemas.openxmlformats.org/package/2006/relationships";
@@ -40,36 +40,8 @@ public final class RelationshipsParser {
      * @throws AOException
      *         Cuando ocurre un error durante la lectura del XML o si no es
      *         un XML v&aacute;lido. */
-    public RelationshipsParser(final InputStream xmlRelationships) throws AOException {
+    RelationshipsParser(final InputStream xmlRelationships) throws AOException {
         this.relations = getRelationships(xmlRelationships);
-    }
-
-    /** Recupera el identificador de la primera relaci&oacute;n que se encuentra
-     * del tipo indicado. Si no se encuentra ninguna, se devuelve <code>null</code>.
-     * @param type
-     *        Tipo de relaci&oacute;n.
-     * @return Identificador de relaci&oacute;n. */
-    public String getRelationshipId(final String type) {
-        for (final RelationShip relation : relations) {
-            if (relation.getType().equalsIgnoreCase(type)) {
-                return relation.getId();
-            }
-        }
-        return null;
-    }
-
-    /** Recupera la relaci&oacute;n con el identificador indicado. Si no se
-     * encuentra ninguna, se devuelve <code>null</code>.
-     * @param id
-     *        Identificador de la relaci&oacute;n.
-     * @return Relaci&oacute;n. */
-    public RelationShip getRelation(final String id) {
-        for (final RelationShip relation : relations) {
-            if (relation.getId().equalsIgnoreCase(id)) {
-                return relation;
-            }
-        }
-        return null;
     }
 
     /** Recupera el listado de relaciones extraido del XML.

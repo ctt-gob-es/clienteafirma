@@ -26,7 +26,7 @@ import org.bouncycastle.asn1.cms.EncryptedContentInfo;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un SignedAndEnvelopedData desarrollado en BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-public final class SignedAndEnvelopedData extends ASN1Encodable {
+final class SignedAndEnvelopedData extends ASN1Encodable {
 
     private final DERInteger version;
     private final ASN1Set recipientInfos;
@@ -74,19 +74,6 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
 
     }
 
-    /** return an SignedAndEnvelopedData object from a tagged object.
-     * @param obj
-     *        the tagged object holding the object we want.
-     * @param explicit
-     *        true if the object is meant to be explicitly tagged false
-     *        otherwise.
-     * @exception IllegalArgumentException
-     *            if the object held by the tagged object cannot be
-     *            converted. */
-    static SignedAndEnvelopedData getInstance(final ASN1TaggedObject obj, final boolean explicit) {
-        return getInstance(ASN1Sequence.getInstance(obj, explicit));
-    }
-
     /** return an SignedAndEnvelopedData object from the given object.
      * @param obj
      *        the object we want converted.
@@ -122,10 +109,6 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
 
     ASN1Set getCertificates() {
         return certificates;
-    }
-
-    ASN1Set getCrls() {
-        return crls;
     }
 
     ASN1Set getSignerInfos() {

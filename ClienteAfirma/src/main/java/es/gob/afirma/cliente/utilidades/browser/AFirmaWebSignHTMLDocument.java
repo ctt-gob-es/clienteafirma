@@ -43,8 +43,8 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
         return new CustomReader(pos);
     }
 
-    class CustomReader extends HTMLDocument.HTMLReader {
-        public CustomReader(final int pos) {
+    private class CustomReader extends HTMLDocument.HTMLReader {
+        private CustomReader(final int pos) {
             super(pos);
             registerTag(AFirmaTag.INSTANCE, new AFirmaTagAction());
             Logger.getLogger("es.gob.afirma").info("Posicion del lector: " + pos);
