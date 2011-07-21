@@ -11,9 +11,11 @@
 package es.gob.afirma.keystores;
 
 import java.lang.reflect.Field;
+import java.security.AccessController;
 import java.security.KeyStore;
 import java.security.KeyStoreSpi;
 import java.security.PrivateKey;
+import java.security.PrivilegedAction;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -27,6 +29,8 @@ import es.gob.afirma.misc.AOUtil;
 public final class KeyStoreUtilities {
 
     private KeyStoreUtilities() {}
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
 
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
@@ -70,7 +74,7 @@ public final class KeyStoreUtilities {
             buffer.append("slot=").append(slot);
         }
 
-        Logger.getLogger("es.gob.afirma").info("Creada configuracion PKCS#11:\r\n" + buffer.toString());
+        LOGGER.info("Creada configuracion PKCS#11:\r\n" + buffer.toString());
         return buffer.toString();
     }
 
@@ -163,7 +167,7 @@ public final class KeyStoreUtilities {
                         tmpCert = (X509Certificate) tmpKs.getCertificate(al);
                     }
                     catch (final Exception e) {
-                        Logger.getLogger("es.gob.afirma").warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                        LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
                         continue;
                     }
                     if (tmpCert != null) {
@@ -180,7 +184,7 @@ public final class KeyStoreUtilities {
 
                 if (tmpCert == null)
                  {
-                    Logger.getLogger("es.gob.afirma").warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$ //$NON-NLS-2$
+                    LOGGER.warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$
                 }
 
                 if (!showExpiredCertificates && tmpCert != null) {
@@ -188,7 +192,7 @@ public final class KeyStoreUtilities {
                         tmpCert.checkValidity();
                     }
                     catch (final Exception e) {
-                        Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+                        LOGGER.info( //$NON-NLS-1$
                         "Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
                         );
                         aliassesByFriendlyName.remove(al);
@@ -199,21 +203,29 @@ public final class KeyStoreUtilities {
                 if (checkPrivateKeys && tmpCert != null) {
                     try {
                         if ("KeychainStore".equals(ks.getType())) {
-                            final PrivateKey key;
-                            try {
-                                Logger.getLogger("es.gob.afirma").info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas");
-                                key = (PrivateKey) ks.getKey(al, "dummy".toCharArray());
-                            }
-                            catch (final Exception e) {
-                                throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X", e);
-                            }
-                            if (key == null) {
-                                throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X");
-                            }
+                            final KeyStore tmpKs = ks;
+                            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                                public Void run() {
+                                    final PrivateKey key;
+                                    try {
+                                        LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas");
+                                        key = (PrivateKey) tmpKs.getKey(al, "dummy".toCharArray());
+                                    }
+                                    catch (final Exception e) {
+                                        e.printStackTrace();
+                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X", e);
+                                    }
+                                    if (key == null) {
+                                        System.out.println("Recuperada clave privada nula");
+                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X");
+                                    }
+                                    return null;
+                                }
+                            });
                         }
                         else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
                             aliassesByFriendlyName.remove(al);
-                            Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+                            LOGGER.info(
                             "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
                             );
                             continue;
@@ -221,13 +233,13 @@ public final class KeyStoreUtilities {
                     }
                     catch (final UnsupportedOperationException e) {
                         aliassesByFriendlyName.remove(al);
-                        Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+                        LOGGER.info(
                         "El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
                         );
                         continue;
                     }
                     catch (final Exception e) {
-                        Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+                        LOGGER.info(
                         "Se ha incluido un certificado (" + al + ") con clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
                         );
                     }
@@ -260,7 +272,7 @@ public final class KeyStoreUtilities {
                     }
                     else {
                         // Eliminamos aquellos certificados que no hayan encajado
-                        Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
+                        LOGGER.info(
                         "El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
                         );
                         aliassesByFriendlyName.remove(al);
