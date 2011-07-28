@@ -32,6 +32,8 @@ import es.gob.afirma.misc.AOBootUtil;
 final class AOInstallUtils {
 
     private AOInstallUtils() {}
+    
+    private static final int BUFFER_SIZE = 1024;
 
     static final String PACK200_SUFIX = ".pack.gz";
 
@@ -127,7 +129,7 @@ final class AOInstallUtils {
         }
 
         // Descomprimimos los ficheros
-        final byte[] buffer = new byte[1024];
+        final byte[] buffer = new byte[BUFFER_SIZE];
         for (final Enumeration<? extends ZipEntry> zipEntries = zipFile.entries(); zipEntries.hasMoreElements();) {
             final ZipEntry entry = zipEntries.nextElement();
             try {
@@ -215,7 +217,7 @@ final class AOInstallUtils {
         }
 
         int nBytes = 0;
-        final byte[] buffer = new byte[1024];
+        final byte[] buffer = new byte[BUFFER_SIZE];
         final FileOutputStream fos = new FileOutputStream(outFile);
         while ((nBytes = is.read(buffer)) != -1) {
             fos.write(buffer, 0, nBytes);

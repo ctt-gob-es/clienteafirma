@@ -54,7 +54,7 @@ public final class UIPasswordCallbackLite extends PasswordCallback {
      * @param c Componente padre (para la modalidad)
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws AOCancelledOperationException Cuando el usuario cancela o cierra el di&aacute;logo */
-    private static final char[] getPassword(String text, final Component c) {
+    private static char[] getPassword(String text, final Component c) {
         if (text == null) {
             text = "Introduzca la contrase\u00F1a";
         }

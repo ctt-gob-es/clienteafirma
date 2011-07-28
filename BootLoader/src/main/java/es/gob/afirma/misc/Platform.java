@@ -191,7 +191,7 @@ public final class Platform {
      * actualmente en uso. Si no se puede obtener, se devolver&aacute; {@code null}.
      * Copiado de com.sun.deploy.config.Config.
      * @return Directorio del entorno de ejecuci&oacute;n de Java. */
-    private static final String recoverJavaHome() {
+    private static String recoverJavaHome() {
         String ret = null;
         try {
             ret = System.getProperty("jnlpx.home");

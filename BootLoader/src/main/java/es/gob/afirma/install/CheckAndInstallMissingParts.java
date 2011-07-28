@@ -525,7 +525,7 @@ final class CheckAndInstallMissingParts {
      * @throws IOException Cuando no existe el directorio de NSS local o el fichero de versi&oacute;n
      *         (FileNotFoundException) o cuando se produce un error durante la lectura (IOException). */
     private String getNssRemoteVersion() throws IOException {
-        final File versionTempFile = AOInstallUtils.createTempFile();;
+        final File versionTempFile = AOInstallUtils.createTempFile();
         try {
             AOInstallUtils.copyFileFromURL(
                                            AOBootUtil.createURLFile(

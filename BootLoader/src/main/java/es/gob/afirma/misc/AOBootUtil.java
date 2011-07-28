@@ -83,12 +83,10 @@ public final class AOBootUtil {
 
         // Miramos si el esquema es una letra, en cuyo caso seguro que es una
         // unidad de Windows ("C:", "D:", etc.), y le anado el file://
-        if (scheme.length() == 1) {
-            if (Character.isLetter((char) scheme.getBytes()[0])) {
-                return createURI("file://" + filename); //$NON-NLS-1$
-            }
+        if (scheme.length() == 1 && Character.isLetter((char) scheme.getBytes()[0])) {
+            return createURI("file://" + filename); //$NON-NLS-1$
         }
-
+        
         throw new AOException("Formato de URI valido pero no soportado '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
     }

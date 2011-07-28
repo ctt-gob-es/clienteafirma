@@ -129,11 +129,9 @@ final class AOJarVerifier {
                                     this.notYetValidCert = true;
                                 }
                                 ((X509Certificate) cert).verify(pkCA);
-                                if (signerCert != null) {
-                                    // No me fio del .equals directo del PublicKey
-                                    if (!Arrays.equals(signerCert.getPublicKey().getEncoded(), cert.getPublicKey().getEncoded())) {
-                                        throw new SecurityException("El certificado firmante era de una CA valida, pero no se corresponde con el indicado");
-                                    }
+                                // No me fio del .equals directo del PublicKey
+                                if (signerCert != null && (!Arrays.equals(signerCert.getPublicKey().getEncoded(), cert.getPublicKey().getEncoded()))) {
+                                    throw new SecurityException("El certificado firmante era de una CA valida, pero no se corresponde con el indicado");
                                 }
                             }
                             else {
