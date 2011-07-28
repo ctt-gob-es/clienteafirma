@@ -60,7 +60,7 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         nssProvider = Security.getProvider("SunPKCS11-NSSCrypto-AFirma");
         try {
             if (nssProvider == null) {
-                Logger.getLogger("es.gob.afirma").info("Inicializando almacen unificado de Mozilla Firefox (NSS + modulos PKCS#11)");
+                LOGGER.info("Inicializando almacen unificado de Mozilla Firefox (NSS + modulos PKCS#11)");
 
                 final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
                 final String p11NSSConfigFile =
@@ -78,12 +78,11 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                                         .newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 
                 Security.addProvider(nssProvider);
-                Logger.getLogger("es.gob.afirma").info("Proveedor PKCS#11 para Mozilla/Firefox anadido");
+                LOGGER.info("Proveedor PKCS#11 para Mozilla/Firefox anadido");
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma")
-                  .severe("Error inicializando NSS, se continuara con los almacenes externos de Mozilla, pero los certificados del almacen interno no estaran disponibles: " + e);
+            LOGGER.severe("Error inicializando NSS, se continuara con los almacenes externos de Mozilla, pero los certificados del almacen interno no estaran disponibles: " + e);
         }
 
         Enumeration<String> tmpAlias = new Vector<String>(0).elements();
@@ -96,8 +95,7 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                 ks = KeyStore.getInstance(AOConstants.AOKeyStore.MOZILLA.getName(), nssProvider);
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma")
-                      .warning("No se ha podido obtener el KeyStore de nombre '" + AOConstants.AOKeyStore.MOZILLA.getName()
+                LOGGER.warning("No se ha podido obtener el KeyStore de nombre '" + AOConstants.AOKeyStore.MOZILLA.getName()
                                + "' del Provider 'sun.security.pkcs11.SunPKCS11', se continuara con los almacenes externos: "
                                + e);
                 ks = null;
@@ -119,8 +117,7 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                     throw e1;
                 }
                 catch (final Exception e2) {
-                    Logger.getLogger("es.gob.afirma")
-                          .warning("No se ha podido inicializar el KeyStore de nombre '" + AOConstants.AOKeyStore.MOZILLA.getName()
+                    LOGGER.warning("No se ha podido inicializar el KeyStore de nombre '" + AOConstants.AOKeyStore.MOZILLA.getName()
                                    + "' del Provider 'sun.security.pkcs11.SunPKCS11', se continuara con los almacenes externos: "
                                    + e2);
                     ks = null;
@@ -132,8 +129,7 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                     tmpAlias = ks.aliases();
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma")
-                          .warning("El almacen interno de Mozilla no devolvio certificados, se continuara con los externos: " + e);
+                    LOGGER.warning("El almacen interno de Mozilla no devolvio certificados, se continuara con los externos: " + e);
                     ks = null;
                 }
                 while (tmpAlias.hasMoreElements()) {
@@ -156,10 +152,10 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                 logStr.append(externalStores.get(key));
                 logStr.append("' ");
             }
-            Logger.getLogger("es.gob.afirma").info(logStr.toString());
+            LOGGER.info(logStr.toString());
         }
         else {
-            Logger.getLogger("es.gob.afirma").info("No se han encontrado modulos PKCS#11 externos instalados en Mozilla / Firefox");
+            LOGGER.info("No se han encontrado modulos PKCS#11 externos instalados en Mozilla / Firefox");
         }
 
         KeyStore tmpStore = null;
@@ -178,17 +174,17 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                                                .get(0);
             }
             catch (final AOCancelledOperationException ex) {
-                Logger.getLogger("es.gob.afirma").warning("Se cancelo el acceso al almacen externo  '" + descr
+                LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr
                                                           + "', se continuara con el siguiente: "
                                                           + ex);
                 continue;
             }
             catch (final Exception ex) {
-                Logger.getLogger("es.gob.afirma").severe("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex);
+                LOGGER.severe("No se ha podido inicializar el PKCS#11 '" + descr + "': " + ex);
                 continue;
             }
 
-            Logger.getLogger("es.gob.afirma").info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas");
+            LOGGER.info("El almacen externo '" + descr + "' ha podido inicializarse, se anadiran sus entradas");
 
             if (ks == null) {
                 ks = tmpStore;
@@ -199,7 +195,7 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                 tmpAlias = tmpStore.aliases();
             }
             catch (final Exception ex) {
-                Logger.getLogger("es.gob.afirma").warning("Se encontro un error obteniendo los alias del almacen externo '" + descr
+                LOGGER.warning("Se encontro un error obteniendo los alias del almacen externo '" + descr
                                                           + "', se continuara con el siguiente: "
                                                           + ex);
                 continue;
@@ -208,7 +204,7 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
             while (tmpAlias.hasMoreElements()) {
                 alias = tmpAlias.nextElement().toString();
                 storesByAlias.put(alias, tmpStore);
-                Logger.getLogger("es.gob.afirma").info("Anadida la entrada '" + alias + "' del almacen externo '" + descr + "'");
+                LOGGER.info("Anadida la entrada '" + alias + "' del almacen externo '" + descr + "'");
             }
             kss.add(tmpStore);
         }
@@ -231,12 +227,12 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
     @Override
     public String[] getAliases() {
         if (kss == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se han pedido los alias de un almacen sin inicializar, se intentara inicializar primero");
+            LOGGER.warning("Se han pedido los alias de un almacen sin inicializar, se intentara inicializar primero");
             try {
                 init();
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").severe("No se ha podido inicializar el almacen, se devolvera una lista de alias vacia: " + e);
+                LOGGER.severe("No se ha podido inicializar el almacen, se devolvera una lista de alias vacia: " + e);
                 return new String[0];
             }
         }
@@ -269,7 +265,7 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
             throw e;
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("No se ha podido obtener el puntero a la clave privada del certicado " + "con el alias '"
+            LOGGER.severe("No se ha podido obtener el puntero a la clave privada del certicado " + "con el alias '"
                                                      + alias
                                                      + "', se devolvera null: "
                                                      + e);
@@ -295,8 +291,7 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
     @Override
     public X509Certificate getCertificate(final String alias) {
         if (kss == null) {
-            Logger.getLogger("es.gob.afirma")
-                  .warning("El KeyStore actual no esta inicializado, por lo que no se pudo recuperar el certificado para el alias '" + alias + "'");
+            LOGGER.warning("El KeyStore actual no esta inicializado, por lo que no se pudo recuperar el certificado para el alias '" + alias + "'");
             return null;
         }
         for (final KeyStore ks : kss) {
@@ -306,14 +301,14 @@ final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                 }
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").info("El KeyStore '" + ks
+                LOGGER.info("El KeyStore '" + ks
                                                        + "' no contenia o no pudo recuperar el certificado para el alias '"
                                                        + alias
                                                        + "', se probara con el siguiente: "
                                                        + e);
             }
         }
-        Logger.getLogger("es.gob.afirma").warning("Ningun KeyStore de Mozilla/Firefox contenia el certificado para el alias '" + alias
+        LOGGER.warning("Ningun KeyStore de Mozilla/Firefox contenia el certificado para el alias '" + alias
                                                   + "', se devolvera null");
         return null;
     }
