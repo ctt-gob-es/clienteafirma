@@ -41,6 +41,8 @@ import es.gob.afirma.misc.Platform;
  * para cada caso
  * @version 0.3 */
 public class AOKeyStoreManager {
+    
+    protected static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
 
     /** Instancia del provider de NSS. S&oacute;lo se permite una instancia de
      * esta clase, as&iacute; que la cacheamos. */
@@ -83,12 +85,12 @@ public class AOKeyStoreManager {
      *         inicializaci&oacute;n */
     Vector<KeyStore> init(AOConstants.AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException {
 
-        Logger.getLogger("es.gob.afirma").info("Inicializamos el almacen de tipo: " + type);
+        LOGGER.info("Inicializamos el almacen de tipo: " + type);
 
         final Vector<KeyStore> ret = new Vector<KeyStore>(1);
 
         if (type == null) {
-            Logger.getLogger("es.gob.afirma").severe("Se ha solicitado inicializar un AOKeyStore nulo, se intentara inicializar un PKCS#12");
+            LOGGER.severe("Se ha solicitado inicializar un AOKeyStore nulo, se intentara inicializar un PKCS#12");
             type = AOConstants.AOKeyStore.PKCS12;
         }
         ksType = type;
@@ -210,7 +212,7 @@ public class AOKeyStoreManager {
         // Security.addProvider((Provider)Class.forName("com.sun.deploy.security.MSCryptoProvider").newInstance());
         // }
         // catch(final Exception e) {
-        // Logger.getLogger("es.gob.afirma").warning(
+        // LOGGER.warning(
         // "No se ha podido instanciar el proveedor 'com.sun.deploy.security.MSCryptoProvider': "
         // + e
         // );
@@ -254,7 +256,7 @@ public class AOKeyStoreManager {
                     Security.insertProviderAt(sunMSCAPIProvider, 1);
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").warning("No se ha podido instanciar el proveedor 'sun.security.mscapi.SunMSCAPI': " + e);
+                    LOGGER.warning("No se ha podido instanciar el proveedor 'sun.security.mscapi.SunMSCAPI': " + e);
                 }
             }
 
@@ -267,7 +269,7 @@ public class AOKeyStoreManager {
                                                      + "' del Provider 'sun.security.mscapi.SunMSCAPI'", e);
             }
 
-            Logger.getLogger("es.gob.afirma").info("Cargando KeyStore de Windows.");
+            LOGGER.info("Cargando KeyStore de Windows.");
             try {
                 ks.load(store, pssCallBack.getPassword());
             }
@@ -287,7 +289,7 @@ public class AOKeyStoreManager {
                 KeyStoreUtilities.cleanCAPIDuplicateAliases(ks);
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se han podido tratar los alias duplicados: " + e);
+                LOGGER.warning("No se han podido tratar los alias duplicados: " + e);
             }
 
             ret.add(ks);
@@ -411,8 +413,7 @@ public class AOKeyStoreManager {
                 }
             }
             else {
-                Logger.getLogger("es.gob.afirma")
-                      .info("El proveedor PKCS#11 solicitado ya estaba instanciado, se reutilizara esa instancia: " + p11Provider.getName());
+                LOGGER.info("El proveedor PKCS#11 solicitado ya estaba instanciado, se reutilizara esa instancia: " + p11Provider.getName());
             }
 
             try {
@@ -460,7 +461,7 @@ public class AOKeyStoreManager {
             final String mozillaProfileDir = params[0].toString();
             final String nssLibDir = params[1].toString();
 
-            // Logger.getLogger("es.gob.afirma").info("Se usaran las bibliotecas NSS del siguiente directorio: "+NSSLibDir);
+            // LOGGER.info("Se usaran las bibliotecas NSS del siguiente directorio: "+NSSLibDir);
 
             nssProvider = Security.getProvider("SunPKCS11-NSSCrypto-AFirma");
 
@@ -574,10 +575,10 @@ public class AOKeyStoreManager {
         // Esta cadena de texto debe contener unicamente caracteres ASCII.
         if ("KeychainStore".equals(ks.getType())) {
             try {
-                Logger.getLogger("es.gob.afirma").info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas");
+                LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas");
                 Certificate[] certChain = ks.getCertificateChain(alias);
                 if (certChain == null) {
-                    Logger.getLogger("es.gob.afirma").warning("El certificado " + alias
+                    LOGGER.warning("El certificado " + alias
                                                               + " no tiene su cadena completa de confianza "
                                                               + "instalada en el Llavero de Mac OS X, se insertara solo este certificado");
                     certChain = new Certificate[] {
@@ -615,7 +616,7 @@ public class AOKeyStoreManager {
         if (cert instanceof X509Certificate) {
             return (X509Certificate) cert;
         }
-        Logger.getLogger("es.gob.afirma").severe("El certificado solicitado no era de tipo X509Certificate, se devolvera null");
+        LOGGER.severe("El certificado solicitado no era de tipo X509Certificate, se devolvera null");
         return null;
     }
 
@@ -625,12 +626,12 @@ public class AOKeyStoreManager {
      * @return El certificado o {@code null} si no se pudo recuperar. */
     public X509Certificate getCertificate(final String alias) {
         if (alias == null) {
-            Logger.getLogger("es.gob.afirma").warning("El alias del certificado es nulo, se devolvera null");
+            LOGGER.warning("El alias del certificado es nulo, se devolvera null");
             return null;
         }
 
         if (this.ks == null) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido recuperar el certificado con alias '" + alias
+            LOGGER.warning("No se ha podido recuperar el certificado con alias '" + alias
                                                       + "' porque el KeyStore no estaba inicializado, se devolvera null");
             return null;
         }
@@ -640,18 +641,18 @@ public class AOKeyStoreManager {
             cert = ks.getCertificate(alias);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null: " + e);
+            LOGGER.warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null: " + e);
             return null;
         }
         if (cert == null) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null");
+            LOGGER.warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null");
             return null;
         }
         if (cert instanceof X509Certificate) {
             return (X509Certificate) cert;
         }
 
-        Logger.getLogger("es.gob.afirma").warning("El certificado con alias '" + alias + "' no es de tipo X509Certificate, se devolvera null");
+        LOGGER.warning("El certificado con alias '" + alias + "' no es de tipo X509Certificate, se devolvera null");
         return null;
 
     }
@@ -672,7 +673,7 @@ public class AOKeyStoreManager {
                                           (X509Certificate) cert
             };
         }
-        Logger.getLogger("es.gob.afirma").severe("No se ha podido obtener la cadena de certificados, se devolvera una cadena vacia");
+        LOGGER.severe("No se ha podido obtener la cadena de certificados, se devolvera una cadena vacia");
         return new X509Certificate[0];
     }
 
@@ -683,8 +684,7 @@ public class AOKeyStoreManager {
      * @return Certificados de la cadena de certificaci&oacute;n o {@code null} si no se pudo recuperar. */
     public X509Certificate[] getCertificateChain(final String alias) {
         if (ks == null) {
-            Logger.getLogger("es.gob.afirma")
-                  .warning("El KeyStore actual no esta inicializado, por lo que no se pudo recuperar el certificado para el alias '" + alias + "'");
+            LOGGER.warning("El KeyStore actual no esta inicializado, por lo que no se pudo recuperar el certificado para el alias '" + alias + "'");
             return null;
         }
         try {
@@ -700,12 +700,12 @@ public class AOKeyStoreManager {
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al obtener la cadena de certificados para el alias '" + alias
+            LOGGER.severe("Error al obtener la cadena de certificados para el alias '" + alias
                                                      + "', se devolvera una cadena vacia: "
                                                      + e);
             return new X509Certificate[0];
         }
-        Logger.getLogger("es.gob.afirma").severe("No se ha podido obtener la cadena de certificados para el alias '" + alias
+        LOGGER.severe("No se ha podido obtener la cadena de certificados para el alias '" + alias
                                                  + "', se devolvera una cadena vacia");
         return new X509Certificate[0];
     }
@@ -718,22 +718,21 @@ public class AOKeyStoreManager {
             throw new IllegalStateException("Se han pedido los alias de un almacen no inicializado");
         }
 
-        Logger.getLogger("es.gob.afirma").info("Solicitando los alias al KeyStore (" + ks.getProvider() + ")");
+        LOGGER.info("Solicitando los alias al KeyStore (" + ks.getProvider() + ")");
 
         final Enumeration<String> aliases;
         try {
             aliases = ks.aliases();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma")
-                  .severe("Error intentando obtener los alias del almacen de claves, se devolvera " + "una enumeracion vacia: " + e);
+            LOGGER.severe("Error intentando obtener los alias del almacen de claves, se devolvera " + "una enumeracion vacia: " + e);
             return new String[0];
         }
 
         String currAlias;
         final Vector<String> v = new Vector<String>();
 
-        Logger.getLogger("es.gob.afirma").info("Componiendo el vector de alias");
+        LOGGER.info("Componiendo el vector de alias");
 
         for (; aliases.hasMoreElements();) {
             currAlias = aliases.nextElement().toString();
