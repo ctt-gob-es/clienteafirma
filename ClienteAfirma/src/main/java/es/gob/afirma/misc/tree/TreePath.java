@@ -23,7 +23,7 @@ final class TreePath {
         if (path == null || path.length == 0) {
             throw new IllegalArgumentException("path in TreePath must be non null and not empty.");
         }
-        lastPathComponent = path[path.length - 1];
+        lastPathComponent = path.clone()[path.length - 1];
         if (path.length > 1) {
             parentPath = new TreePath(path, path.length - 1);
         }
@@ -31,7 +31,7 @@ final class TreePath {
 
     /** Constructs a new TreePath with the identified path components of length <code>length</code>. */
     private TreePath(final Object[] path, final int length) {
-        lastPathComponent = path[length - 1];
+        lastPathComponent = path.clone()[length - 1];
         if (length > 1) {
             parentPath = new TreePath(path, length - 1);
         }

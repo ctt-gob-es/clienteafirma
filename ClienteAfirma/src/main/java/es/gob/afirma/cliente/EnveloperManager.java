@@ -42,6 +42,8 @@ import es.gob.afirma.ui.AOUIManager;
  * de ensobrado y desensobrado y proporciona las funcionalidades b&aacute;sicas
  * para realizar estas operaciones. */
 public final class EnveloperManager {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
 
     /** Componente padre sobre el que mostrar los di&aacute;logos modales. */
     private Component parent = null;
@@ -295,12 +297,12 @@ public final class EnveloperManager {
                                              AOCancelledOperationException {
 
         if (contentType == null) {
-            Logger.getLogger("es.gob.afirma").severe("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
+            LOGGER.severe("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
             throw new IllegalArgumentException("No se ha indicado el tipo de sobre electronico"); //$NON-NLS-1$
         }
 
         if ((recipients == null || recipients.isEmpty())) {
-            Logger.getLogger("es.gob.afirma").severe("No se han indicado los destinatarios del sobre electronico"); //$NON-NLS-1$
+            LOGGER.severe("No se han indicado los destinatarios del sobre electronico"); //$NON-NLS-1$
             throw new IllegalArgumentException("No se han indicado los destinatarios del sobre electronico"); //$NON-NLS-1$
         }
 
@@ -417,7 +419,7 @@ public final class EnveloperManager {
         if (contentData == null) {
             return recoverDataFromFile();
         }
-        return contentData;
+        return contentData.clone();
     }
 
     /** Obtiene los datos configurados como entrada para la operacion. Si no hay
@@ -430,7 +432,7 @@ public final class EnveloperManager {
         if (this.envelopedData == null) {
             return recoverDataFromFile();
         }
-        return envelopedData;
+        return envelopedData.clone();
     }
 
     /** Recupera el contenido del fichero. Si no hay ning&uacute;n fichero
@@ -603,27 +605,27 @@ public final class EnveloperManager {
      * @param data
      *        Sobre electr&oacute;nico. */
     public void setEnvelopedData(final byte[] data) {
-        this.envelopedData = data;
+        this.envelopedData = data.clone();
     }
 
     /** Recupera el envoltorio CMS.
      * @return Envoltorio CMS. */
     public byte[] getEnvelopedData() {
-        return this.envelopedData;
+        return this.envelopedData.clone();
     }
 
     /** Establece los datos que desean ensobrarse.
      * @param data
      *        Datos del sobre. */
     public void setContentData(final byte[] data) {
-        this.contentData = data;
+        this.contentData = data.clone();
     }
 
     /** Recupera los datos extra&iacute;dos de un envoltorio o preparados para
      * insertarse en el mismo.
      * @return Datos del sobre. */
     public byte[] getContentData() {
-        return this.contentData;
+        return this.contentData.clone();
     }
 
     /** Configura un atributo para agregarlo firmado a un envoltorio.
@@ -654,11 +656,11 @@ public final class EnveloperManager {
             cmsInformation = new CMSInformation().getInformation(cmsEnvelop);
         }
         catch (final AOInvalidFormatException e) {
-            Logger.getLogger("es.gob.afirma").severe("Formato de dato no valido: " + e); //$NON-NLS-1$  //$NON-NLS-2$
+            LOGGER.severe("Formato de dato no valido: " + e); //$NON-NLS-1$  //$NON-NLS-2$
             return ""; //$NON-NLS-1$
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al obtener la informacion del objeto CMS: " + e); //$NON-NLS-1$  //$NON-NLS-2$
+            LOGGER.severe("Error al obtener la informacion del objeto CMS: " + e); //$NON-NLS-1$  //$NON-NLS-2$
             return ""; //$NON-NLS-1$
         }
         return cmsInformation;

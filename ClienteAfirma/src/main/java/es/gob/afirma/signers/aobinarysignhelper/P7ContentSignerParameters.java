@@ -24,6 +24,8 @@ public final class P7ContentSignerParameters {
     private final String sigAlgo;
     private final X509Certificate[] certChain;
     private final byte[] signature;
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
 
     /** M&eacute;todo que asigna los datos pasados por par&aacute;metro a las
      * propiedades de la clase.
@@ -38,18 +40,18 @@ public final class P7ContentSignerParameters {
         data = data2.clone();
 
         if (signatureAlgorithm == null || signatureAlgorithm.length() < 1) {
-            Logger.getLogger("es.gob.afirma")
-                  .warning("No se especifico algoritmo para la firma CADES, se utilizara " + AOConstants.DEFAULT_SIGN_ALGO);
+            LOGGER.warning("No se especifico algoritmo para la firma CADES, se utilizara " + AOConstants.DEFAULT_SIGN_ALGO);
             signatureAlgorithm = AOConstants.DEFAULT_SIGN_ALGO;
         }
         if (cChain == null) {
-            Logger.getLogger("es.gob.afirma")
-                  .warning("No se ha proporcionado una cadena de certificados para la construccion de los " + "parametros de firma CADES, se utilizara una cadena vacia");
-            cChain = new X509Certificate[0];
+            LOGGER.warning("No se ha proporcionado una cadena de certificados para la construccion de los parametros de firma CADES, se utilizara una cadena vacia");
+            certChain = new X509Certificate[0];
+        }
+        else {
+            certChain = cChain.clone();
         }
 
         sigAlgo = signatureAlgorithm;
-        certChain = cChain;
         signature = new byte[0]; // la firma se realizara despues
 
     }
@@ -81,16 +83,14 @@ public final class P7ContentSignerParameters {
     /** Obtiene la URL de la autoridad de sellado de tiempo.
      * @return URL de la autoridad de sellado de tiempo */
     public URI getTimestampingAuthority() {
-        Logger.getLogger("es.gob.afirma")
-              .info("Se ha solicitado la URI de la autoridad de sellado de tiempo, pero como es una caracteristica " + "aun no soportada se devolvio null");
+        LOGGER.info("Se ha solicitado la URI de la autoridad de sellado de tiempo, pero como es una caracteristica aun no soportada se devolvio null");
         return null;
     }
 
     /** Obtiene el certificado de la autoridad de sellado de tiempo.
      * @return Certificado de la autoridad de sellado de tiempo */
     public X509Certificate getTimestampingAuthorityCertificate() {
-        Logger.getLogger("es.gob.afirma")
-              .info("Se ha solicitado el certificado de la autoridad de sellado de tiempo, pero como es una caracteristica " + "aun no soportada se devolvio null");
+        LOGGER.info("Se ha solicitado el certificado de la autoridad de sellado de tiempo, pero como es una caracteristica aun no soportada se devolvio null");
         return null;
     }
 }

@@ -35,13 +35,11 @@ public final class CipherAction extends BasicPrivilegedAction<Boolean, Void> {
      *        Datos que se desean cifrar, {@code null} si se desean tomar
      *        los del manejador. */
     public CipherAction(final CipherManager cipherManager, final byte[] data) {
-
         if (cipherManager == null) {
             throw new IllegalArgumentException("El CipherManager no puede ser nulo");
         }
-
         this.cipherManager = cipherManager;
-        this.data = data;
+        this.data = data.clone();
     }
 
     public Boolean run() {

@@ -29,6 +29,8 @@ import es.gob.afirma.misc.AOUtil;
 /** Utilidades para el manejo de claves de cifrado en el almac&eacute;n privado
  * de AFirma. */
 public final class AOCipherKeyStoreHelper {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
 
     /** Almac&eacute;n de claves de cifrado. */
     private KeyStore ks;
@@ -72,7 +74,7 @@ public final class AOCipherKeyStoreHelper {
             aliases = ks.aliases();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error obteniendo los alias del almacen, se devolvera una lista vacia: " + e);
+            LOGGER.severe("Error obteniendo los alias del almacen, se devolvera una lista vacia: " + e);
             return new String[0];
         }
         final Vector<String> tmpRet = new Vector<String>();
@@ -96,7 +98,7 @@ public final class AOCipherKeyStoreHelper {
             }
         }
         if (new File(AOUtil.getCipherKeystore()).exists()) {
-            Logger.getLogger("es.gob.afirma").warning("Se ha pedido crear un almacen de claves, pero ya existia (" + AOUtil.getCipherKeystore()
+            LOGGER.warning("Se ha pedido crear un almacen de claves, pero ya existia (" + AOUtil.getCipherKeystore()
                                                       + "), se borrara el existente y se creara uno nuevo");
             new File(AOUtil.getCipherKeystore()).delete();
         }
@@ -132,7 +134,7 @@ public final class AOCipherKeyStoreHelper {
             }
         }
         if (!new File(AOUtil.getCipherKeystore()).exists()) {
-            Logger.getLogger("es.gob.afirma").warning("El almacen no existe, se creara uno nuevo");
+            LOGGER.warning("El almacen no existe, se creara uno nuevo");
             createCipherKeyStore();
         }
         final InputStream ksIs;

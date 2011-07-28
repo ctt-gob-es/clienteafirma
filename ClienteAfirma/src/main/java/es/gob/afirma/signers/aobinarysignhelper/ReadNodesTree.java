@@ -45,6 +45,8 @@ import es.gob.afirma.signers.beans.AOSimpleSignInfo;
 /** Clase que genera las listas de nodos o de firmantes que existe en un fichero. */
 public final class ReadNodesTree {
 
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    
     private String StringRetorn = "";
     private TreeNode raiz;
     private TreeNode rama;
@@ -58,7 +60,7 @@ public final class ReadNodesTree {
     }
 
     void setSeleccionados(final int[] seleccionados) {
-        this.seleccionados = seleccionados;
+        this.seleccionados = seleccionados.clone();
     }
 
     // DefaultTreeModel modelo;
@@ -108,13 +110,13 @@ public final class ReadNodesTree {
         }
         catch (final Exception exception) {
             try {
-                Logger.getLogger("es.gob.afirma").info("No es signedData, probamos con SignedAndEnvelopedData.");
+                LOGGER.info("No es signedData, probamos con SignedAndEnvelopedData.");
                 final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
                 signerInfosSd = sd.getSignerInfos();
                 certificates = sd.getCertificates();
             }
             catch (final Exception e2) {
-                Logger.getLogger("es.gob.afirma").severe(e2.toString());
+                LOGGER.severe("Error obteniendo los SignerInfos del SignedData: " + e2);
             }
         }
 
@@ -345,14 +347,13 @@ public final class ReadNodesTree {
                     ret[0] = new X509CertificateObject(new X509CertificateStructure(atrib2));
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma")
-                          .severe("No se pudieron recuperar los certificados de la lista, se devolvera un array vacio: " + e);
+                    LOGGER.severe("No se pudieron recuperar los certificados de la lista, se devolvera un array vacio: " + e);
                     return new X509Certificate[0];
                 }
                 return ret;
             }
         }
-        Logger.getLogger("es.gob.afirma").severe("El certificados pedido no estaba en la lista, se devolvera un array vacio");
+        LOGGER.severe("El certificados pedido no estaba en la lista, se devolvera un array vacio");
         return new X509Certificate[0];
     }
 
@@ -370,7 +371,7 @@ public final class ReadNodesTree {
                         returnDate = d.getDate();
                     }
                     catch (final ParseException ex) {
-                        Logger.getLogger("es.gob.afirma").warning("No es posible convertir la fecha");
+                        LOGGER.warning("No es posible convertir la fecha");
                     }
                 }
             }

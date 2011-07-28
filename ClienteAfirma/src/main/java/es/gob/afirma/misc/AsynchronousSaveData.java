@@ -24,6 +24,8 @@ import es.gob.afirma.ui.AOUIManager;
  * <code>SwingUtilities.invokeLater(new AsynchronousSaveData(data, file, desc, exts, parent, true));</code> */
 public final class AsynchronousSaveData implements Runnable {
 
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    
     private final byte[] dataToSave;
     private String savingTarget;
     private final String[] extensions;
@@ -60,7 +62,7 @@ public final class AsynchronousSaveData implements Runnable {
         if (desc != null && !"".equals(desc)) {
             description = desc;
         }
-        extensions = exts;
+        extensions = exts.clone();
         parent = p;
         showDialogIfError = errorDialog;
     }
@@ -73,11 +75,11 @@ public final class AsynchronousSaveData implements Runnable {
                         savingTarget = AOUIManager.getSaveFileName(extensions, description, parent);
                     }
                     catch (final Exception e) {
-                        Logger.getLogger("es.gob.afirma").severe("El nombre de fichero para guardar los datos no es valido: " + e);
+                        LOGGER.severe("El nombre de fichero para guardar los datos no es valido: " + e);
                         return null;
                     }
                     if (savingTarget == null) {
-                        Logger.getLogger("es.gob.afirma").severe("No se establecio un nombre de fichero de salida");
+                        LOGGER.severe("No se establecio un nombre de fichero de salida");
                         return null;
                     }
                 }
@@ -90,7 +92,7 @@ public final class AsynchronousSaveData implements Runnable {
                     fos.flush();
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").severe("No se pudieron almacenar los datos en disco: " + e);
+                    LOGGER.severe("No se pudieron almacenar los datos en disco: " + e);
                     if (showDialogIfError) {
                         JOptionPane.showMessageDialog(parent,
                                                       "Error al almacenar los datos en disco,\r\nlos datos no se han guardado.",
@@ -104,8 +106,7 @@ public final class AsynchronousSaveData implements Runnable {
                             fos.close();
                         }
                         catch (final Exception e) {
-                            Logger.getLogger("es.gob.afirma")
-                                  .warning("No se ha podido cerrar el fichero de salida, es posible que se no se pueda abrir hasta cerrar la aplicacion");
+                            LOGGER.warning("No se ha podido cerrar el fichero de salida, es posible que se no se pueda abrir hasta cerrar la aplicacion");
                         }
                     }
                 }
