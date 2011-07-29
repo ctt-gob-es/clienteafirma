@@ -169,7 +169,7 @@ public final class SignText {
         final Hashtable<String, String> aliasesByFriendlyName;
         try {
             aliasesByFriendlyName =
-                    KeyStoreUtilities.getAlisasesByFriendlyName(alias, // aliases
+                    KeyStoreUtilities.getAliasesByFriendlyName(alias, // aliases
                                                                 kss.getKeyStores(), // KeyStores
                                                                 true, // checkPrivateKeys
                                                                 true, // checkValidity

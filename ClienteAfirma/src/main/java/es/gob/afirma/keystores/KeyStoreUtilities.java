@@ -135,7 +135,7 @@ public final class KeyStoreUtilities {
      * @param certFilters
      *        Filtros a aplicar sobre los certificados
      * @return Alias seleccionado por el usuario */
-    public final static Hashtable<String, String> getAlisasesByFriendlyName(final String[] alias,
+    public final static Hashtable<String, String> getAliasesByFriendlyName(final String[] alias,
                                                                             final List<KeyStore> kss,
                                                                             final boolean checkPrivateKeys,
                                                                             final boolean checkValidity,

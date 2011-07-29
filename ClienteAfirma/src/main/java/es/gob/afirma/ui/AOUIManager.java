@@ -167,7 +167,7 @@ public final class AOUIManager {
         }
 
         final Hashtable<String, String> aliassesByFriendlyName =
-                KeyStoreUtilities.getAlisasesByFriendlyName(alias, kss, checkPrivateKeys, checkValidity, showExpiredCertificates, certFilters);
+                KeyStoreUtilities.getAliasesByFriendlyName(alias, kss, checkPrivateKeys, checkValidity, showExpiredCertificates, certFilters);
 
         // Miramos si despues de filtrar las entradas queda alguna o se ha
         // quedado la lista vacia
@@ -714,7 +714,7 @@ public final class AOUIManager {
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
-        panel.add(new JLabel("Seleccione los nodos de firma que desee contrafirmar:"), c); //$NON-NLS-1$
+        panel.add(new JLabel(Messages.getString("AOUIManager.60")), c); //$NON-NLS-1$
         c.weighty = 1.0;
         c.gridy = 1;
         panel.add(spArbolNodos, c);
