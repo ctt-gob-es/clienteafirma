@@ -4188,7 +4188,11 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public void changeLanguage(final String locale) {
         if (locale != null) {
-            Locale.setDefault(new Locale(locale));
+            try {
+                Locale.setDefault(new Locale(locale));
+            } catch (Exception e) {
+                Logger.getLogger("es.gob.afirma").warning("No se ha podido actualizar la localizacion de los textos");  //$NON-NLS-1$  //$NON-NLS-2$ 
+            }
         }
     }
 }
