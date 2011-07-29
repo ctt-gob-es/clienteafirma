@@ -4186,7 +4186,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         return signText(stringToSign, caOption, null);
     }
 
-    public void changeLanguage(final String locale) {
+    public void setLocale(final String locale) {
         if (locale != null) {
             try {
                 Locale.setDefault(new Locale(locale));
