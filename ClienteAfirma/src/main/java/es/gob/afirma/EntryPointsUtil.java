@@ -227,13 +227,13 @@ public interface EntryPointsUtil {
      *         Complete route for the selected directory. */
     String selectDirectory();
 
-    /** Cambia el idioma del actual del Cliente. <br>
+    /** Cambia el idioma actual del Cliente. <br>
      * <br>
      * Change the current language.
      * @param locale
-     *        C&oacute;digo de idioma (por ejemplo: en, es, it...). <br>
-     *        Language code (p.e. en, es, it...) */
-    void changeLanguage(String locale);
+     *        C&oacute;digo de idioma (por ejemplo: en, en_GB, es, it...). <br>
+     *        Language code (p.e. en, en_GB, es, it...) */
+    void changeLanguage(String locale); 
 
     // /**
     // * Recupera un fragmento de datos en base 64.
