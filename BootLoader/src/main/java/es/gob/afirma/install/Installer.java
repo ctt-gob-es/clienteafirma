@@ -77,14 +77,14 @@ final class Installer {
                     AfirmaBootLoader.LOGGER.info( //$NON-NLS-1$
                                                             "El directorio de instalacion no existe, se omitira la operacion" //$NON-NLS-1$
                     );
-                    return true;
+                    return Boolean.TRUE;
                 }
                 try {
                     fileDelete(afirmaDir);
                     JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString("Installer.11"), //$NON-NLS-1$
                                                   Messages.getString("Installer.12"), //$NON-NLS-1$
                                                   JOptionPane.INFORMATION_MESSAGE);
-                    return true;
+                    return Boolean.TRUE;
                 }
                 catch (final Exception e) {
                     AfirmaBootLoader.LOGGER.warning( //$NON-NLS-1$
@@ -93,7 +93,7 @@ final class Installer {
                     JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString("Installer.13"), //$NON-NLS-1$
                                                   Messages.getString("Installer.12"), //$NON-NLS-1$
                                                   JOptionPane.ERROR_MESSAGE);
-                    return false;
+                    return Boolean.TRUE;
                 }
             }
 
@@ -108,7 +108,7 @@ final class Installer {
                     srcFile.delete();
                 }
             }
-        });
+        }).booleanValue();
 
     }
 

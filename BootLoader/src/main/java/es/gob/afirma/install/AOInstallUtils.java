@@ -130,30 +130,46 @@ final class AOInstallUtils {
 
         // Descomprimimos los ficheros
         final byte[] buffer = new byte[BUFFER_SIZE];
+        String entryName;
+        File outputFile;
+        InputStream zeis;
+        FileOutputStream fos;
+        int nBytes;
         for (final Enumeration<? extends ZipEntry> zipEntries = zipFile.entries(); zipEntries.hasMoreElements();) {
             final ZipEntry entry = zipEntries.nextElement();
             try {
-                // Creamos el arbol de directorios para el fichero
-                final File outputFile = new File(destDirectory, entry.getName());
-                if (!outputFile.getParentFile().exists()) {
-                    outputFile.getParentFile().mkdirs();
+                entryName = entry.getName();
+                // Por motivos de seguridad nunca descomprimimos los elementos relacionados con
+                // firmas JAR
+                if (AOJarVerifier.signatureRelated(entryName)) {
+                    continue;
                 }
-
-                // Descomprimimos el fichero
-                final InputStream zeis = zipFile.getInputStream(entry);
-                final FileOutputStream fos = new FileOutputStream(outputFile);
-                int nBytes;
-                while ((nBytes = zeis.read(buffer)) != -1) {
-                    fos.write(buffer, 0, nBytes);
+                outputFile = new File(destDirectory, entryName);
+                if (entry.isDirectory()) {
+                    outputFile.mkdir();
                 }
-                try {
-                    fos.flush();
+                else {
+                    System.out.println(entryName);
+                    // Creamos el arbol de directorios para el fichero
+                    if (!outputFile.getParentFile().exists()) {
+                        outputFile.getParentFile().mkdirs();
+                    }
+    
+                    // Descomprimimos el fichero
+                    zeis = zipFile.getInputStream(entry);
+                    fos = new FileOutputStream(outputFile);
+                    while ((nBytes = zeis.read(buffer)) != -1) {
+                        fos.write(buffer, 0, nBytes);
+                    }
+                    try {
+                        fos.flush();
+                    }
+                    catch (final Exception e) {}
+                    try {
+                        fos.close();
+                    }
+                    catch (final Exception e) {}
                 }
-                catch (final Exception e) {}
-                try {
-                    fos.close();
-                }
-                catch (final Exception e) {}
             }
             catch (final Exception e) {
                 throw new AOException("Error durante la instalacion, no se pudo instalar la biblioteca '" //$NON-NLS-1$
@@ -360,7 +376,7 @@ final class AOInstallUtils {
             AfirmaBootLoader.LOGGER.severe("IMPORTANTE: Modo de depuracion, comprobaciones de firma desacivadas");
             return;
         }
-        new AOJarVerifier().verifyJar(jarFile.getAbsolutePath(), ca.getCACertificate(), ca.getSigningCertificate());
+        new AOJarVerifier().verifyJar(jarFile.getAbsolutePath(), ca.getSigningCertificate());
     }
 
     private static void createDirectory(final File dir) {
@@ -396,6 +412,10 @@ final class AOInstallUtils {
                 AfirmaBootLoader.LOGGER.severe("No se ha podido crear el directorio '" + dir.getAbsolutePath() + "'");
             }
         }
+    }
+    
+    public static void main(String args[]) throws Throwable {
+        AOInstallUtils.unzip(new ZipFile(new File("/Users/tomas/plugin.jar")), new File("/var/tmp"));
     }
 
 }

@@ -27,7 +27,6 @@ package es.gob.afirma.install;
 
 import java.io.InputStream;
 import java.security.CodeSigner;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
@@ -42,6 +41,8 @@ final class AOJarVerifier {
     private boolean hasExpiredCert = false;
     private boolean hasExpiringCert = false;
     private boolean notYetValidCert = false;
+    
+    private static int BUFFER_SIZE = 8192;
 
     private static final long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L; // milliseconds
 
@@ -52,21 +53,18 @@ final class AOJarVerifier {
 
     /** Verifica la firma JAR de un fichero JAR o ZIP-
      * @param jarName Nombre (incluida ruta) del fichero cuya firma se desea verificar
-     * @param caCert Certificado de la autoridad de certificaci&oacute;n aceptada para las
-     *        firmas del fichero
+     * @param signerCert Certificado del firmante del fichero
      * @throws SecurityException Si la firma no es v&aacute;lida u ocurre cualquier
      *         problema durante la verificaci&oacute;n */
-    void verifyJar(final String jarName, final X509Certificate caCert, final X509Certificate signerCert) {
+    void verifyJar(final String jarName, final X509Certificate signerCert) {
 
         if (jarName == null || "".equals(jarName)) {
             throw new SecurityException("El fichero proporcionado es nulo o vacio, y por lo tanto no esta firmado");
         }
 
-        if (caCert == null) {
+        if (signerCert == null) {
             throw new SecurityException("Es obligatorio proporcionar un certificado CA para comprobar las firmas");
         }
-
-        final PublicKey pkCA = caCert.getPublicKey();
 
         boolean anySigned = false;
         boolean hasUnsignedEntry = false;
@@ -75,7 +73,7 @@ final class AOJarVerifier {
         try {
             jf = new JarFile(jarName, true);
             final Vector<JarEntry> entriesVec = new Vector<JarEntry>();
-            final byte[] buffer = new byte[8192];
+            final byte[] buffer = new byte[BUFFER_SIZE];
 
             final Enumeration<JarEntry> entries = jf.entries();
             while (entries.hasMoreElements()) {
@@ -128,10 +126,9 @@ final class AOJarVerifier {
                                 else if (((X509Certificate) cert).getNotBefore().getTime() > now) {
                                     this.notYetValidCert = true;
                                 }
-                                ((X509Certificate) cert).verify(pkCA);
                                 // No me fio del .equals directo del PublicKey
-                                if (signerCert != null && (!Arrays.equals(signerCert.getPublicKey().getEncoded(), cert.getPublicKey().getEncoded()))) {
-                                    throw new SecurityException("El certificado firmante era de una CA valida, pero no se corresponde con el indicado");
+                                if (!Arrays.equals(signerCert.getPublicKey().getEncoded(), cert.getPublicKey().getEncoded())) {
+                                    throw new SecurityException("El certificado firmante no se corresponde con el indicado");
                                 }
                             }
                             else {
@@ -187,7 +184,7 @@ final class AOJarVerifier {
      * . META-INF/*.SF
      * . META-INF/*.DSA
      * . META-INF/*.RSA */
-    private boolean signatureRelated(final String name) {
+    static boolean signatureRelated(final String name) {
         final String ucName = name.toUpperCase();
         if (ucName.equals(JarFile.MANIFEST_NAME) || ucName.equals(META_INF)
                 || (ucName.startsWith(SIG_PREFIX) && ucName.indexOf('/') == ucName.lastIndexOf('/'))) {
@@ -208,7 +205,7 @@ final class AOJarVerifier {
      * @param s file name
      * @return true if the input file name is a supported
      *         Signature File or PKCS7 block file name */
-    private boolean isBlockOrSF(final String s) {
+    static private boolean isBlockOrSF(final String s) {
         // we currently only support DSA and RSA PKCS7 blocks
         if (s.endsWith(".SF") || s.endsWith(".DSA") || s.endsWith(".RSA")) {
             return true;
