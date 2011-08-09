@@ -126,8 +126,8 @@ final class AOJarVerifier {
                                 else if (((X509Certificate) cert).getNotBefore().getTime() > now) {
                                     this.notYetValidCert = true;
                                 }
-                                // No me fio del .equals directo del PublicKey
-                                if (!Arrays.equals(signerCert.getPublicKey().getEncoded(), cert.getPublicKey().getEncoded())) {
+
+                                if (!signerCert.equals(cert)) {
                                     throw new SecurityException("El certificado firmante no se corresponde con el indicado");
                                 }
                             }
