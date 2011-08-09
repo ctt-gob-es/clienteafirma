@@ -139,11 +139,18 @@ final class AOInstallUtils {
             final ZipEntry entry = zipEntries.nextElement();
             try {
                 entryName = entry.getName();
+                
+                // No decomprimimos entradas con "..", para evitar problemas de seguridad
+                if (entryName.contains("..")) {
+                    continue;
+                }
+                
                 // Por motivos de seguridad nunca descomprimimos los elementos relacionados con
                 // firmas JAR
                 if (AOJarVerifier.signatureRelated(entryName)) {
                     continue;
                 }
+                
                 outputFile = new File(destDirectory, entryName);
                 if (entry.isDirectory()) {
                     outputFile.mkdir();
