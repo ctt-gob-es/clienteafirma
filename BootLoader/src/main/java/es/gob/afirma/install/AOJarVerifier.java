@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.security.CodeSigner;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
 import java.util.jar.JarEntry;
