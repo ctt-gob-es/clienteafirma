@@ -54,40 +54,48 @@ public final class DigestedData extends ASN1Encodable {
             return new DigestedData((ASN1Sequence) o);
         }
 
-        throw new IllegalArgumentException("unknown object in factory: " + o.getClass().getName());
+        throw new IllegalArgumentException("Objeto desconocido: " + o.getClass().getName()); //$NON-NLS-1$
     }
 
-    public DigestedData(final AlgorithmIdentifier digestAlgorithms, final ContentInfo contentInfo, final ASN1OctetString digest) {
+    /** Crea un objeto CMS DigestedData.
+     * @param digestAlgo ALgoritmo de huella digital
+     * @param contentInfo ContentInfo
+     * @param digest Valor de la huella digital
+     */
+    public DigestedData(final AlgorithmIdentifier digestAlgo, final ContentInfo contentInfo, final ASN1OctetString digest) {
         this.version = new DERInteger(0);
-        this.digestAlgorithm = digestAlgorithms;
+        this.digestAlgorithm = digestAlgo;
         this.contentInfo = contentInfo;
         this.digest = digest;
     }
 
+    /** Crea un object CMS DigestedData a partir de una Secuencia ASN.1.
+     * @param seq Secuencia origen
+     */
     public DigestedData(final ASN1Sequence seq) {
         final Enumeration<?> e = seq.getObjects();
 
-        version = (DERInteger) e.nextElement();
-        digestAlgorithm = new AlgorithmIdentifier((ASN1Sequence) e.nextElement());
-        contentInfo = new ContentInfo((ASN1Sequence) e.nextElement());
-        digest = ((ASN1OctetString) (e.nextElement()));
+        this.version = (DERInteger) e.nextElement();
+        this.digestAlgorithm = new AlgorithmIdentifier((ASN1Sequence) e.nextElement());
+        this.contentInfo = new ContentInfo((ASN1Sequence) e.nextElement());
+        this.digest = ((ASN1OctetString) (e.nextElement()));
 
     }
 
     DERInteger getVersion() {
-        return version;
+        return this.version;
     }
 
     AlgorithmIdentifier getDigestAlgorithm() {
-        return digestAlgorithm;
+        return this.digestAlgorithm;
     }
 
     ASN1OctetString getDigest() {
-        return digest;
+        return this.digest;
     }
 
     ContentInfo getContentInfo() {
-        return contentInfo;
+        return this.contentInfo;
     }
 
     /** Produce an object suitable for an ASN1OutputStream.
@@ -106,10 +114,10 @@ public final class DigestedData extends ASN1Encodable {
     public DERObject toASN1Object() {
         final ASN1EncodableVector v = new ASN1EncodableVector();
 
-        v.add(version);
-        v.add(digestAlgorithm);
-        v.add(contentInfo);
-        v.add(digest);
+        v.add(this.version);
+        v.add(this.digestAlgorithm);
+        v.add(this.contentInfo);
+        v.add(this.digest);
 
         return new BERSequence(v);
     }

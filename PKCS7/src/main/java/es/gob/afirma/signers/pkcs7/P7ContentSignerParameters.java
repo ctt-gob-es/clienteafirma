@@ -26,7 +26,7 @@ public final class P7ContentSignerParameters {
     private final X509Certificate[] certChain;
     private final byte[] signature;
     
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** M&eacute;todo que asigna los datos pasados por par&aacute;metro a las
      * propiedades de la clase.
@@ -38,60 +38,62 @@ public final class P7ContentSignerParameters {
      *        Certificados del firmante */
     public P7ContentSignerParameters(final byte[] data2, String signatureAlgorithm, X509Certificate[] cChain) {
 
-        data = data2.clone();
+        this.data = data2.clone();
 
         if (signatureAlgorithm == null || signatureAlgorithm.length() < 1) {
-            LOGGER.warning("No se especifico algoritmo para la firma CADES, se utilizara " + AOSignConstants.DEFAULT_SIGN_ALGO);
-            signatureAlgorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
-        }
-        if (cChain == null) {
-            LOGGER.warning("No se ha proporcionado una cadena de certificados para la construccion de los parametros de firma CADES, se utilizara una cadena vacia");
-            certChain = new X509Certificate[0];
+            LOGGER.warning("No se especifico algoritmo para la firma CADES, se utilizara " + AOSignConstants.DEFAULT_SIGN_ALGO); //$NON-NLS-1$
+            this.sigAlgo = AOSignConstants.DEFAULT_SIGN_ALGO;
         }
         else {
-            certChain = cChain.clone();
+            this.sigAlgo = signatureAlgorithm;
         }
-
-        sigAlgo = signatureAlgorithm;
-        signature = new byte[0]; // la firma se realizara despues
+        if (cChain == null) {
+            LOGGER.warning("No se ha proporcionado una cadena de certificados para la construccion de los parametros de firma CADES, se utilizara una cadena vacia"); //$NON-NLS-1$
+            this.certChain = new X509Certificate[0];
+        }
+        else {
+            this.certChain = cChain.clone();
+        }
+        
+        this.signature = new byte[0]; // la firma se realizara despues
 
     }
 
     /** M&eacute;todo que devuelve el contenido
      * @return el contenido */
     public byte[] getContent() {
-        return data.clone();
+        return this.data.clone();
     }
 
     /** M&eacute;todo que devuelve la firma.
      * @return la firma. */
     public byte[] getSignature() {
-        return signature.clone();
+        return this.signature.clone();
     }
 
     /** M&eacute;todo que devuelve el tipo
      * @return el tipo */
     public String getSignatureAlgorithm() {
-        return sigAlgo;
+        return this.sigAlgo;
     }
 
     /** M&eacute;todo que devuelve los certificados del firmante
      * @return Array de certificados. */
     public X509Certificate[] getSignerCertificateChain() {
-        return certChain.clone();
+        return this.certChain.clone();
     }
 
     /** Obtiene la URL de la autoridad de sellado de tiempo.
      * @return URL de la autoridad de sellado de tiempo */
     public URI getTimestampingAuthority() {
-        LOGGER.info("Se ha solicitado la URI de la autoridad de sellado de tiempo, pero como es una caracteristica aun no soportada se devolvio null");
+        LOGGER.info("Se ha solicitado la URI de la autoridad de sellado de tiempo, pero como es una caracteristica aun no soportada se devolvio null"); //$NON-NLS-1$
         return null;
     }
 
     /** Obtiene el certificado de la autoridad de sellado de tiempo.
      * @return Certificado de la autoridad de sellado de tiempo */
     public X509Certificate getTimestampingAuthorityCertificate() {
-        LOGGER.info("Se ha solicitado el certificado de la autoridad de sellado de tiempo, pero como es una caracteristica aun no soportada se devolvio null");
+        LOGGER.info("Se ha solicitado el certificado de la autoridad de sellado de tiempo, pero como es una caracteristica aun no soportada se devolvio null"); //$NON-NLS-1$
         return null;
     }
 }

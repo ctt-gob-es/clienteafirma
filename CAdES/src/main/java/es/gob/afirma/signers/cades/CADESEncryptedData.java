@@ -50,6 +50,8 @@ import es.gob.afirma.signers.pkcs7.Utils;
  * para crear un mensaje EncryptedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CADESEncryptedData {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Clave de cifrado. La almacenamos internamente porque no hay forma de
      * mostrarla directamente al usuario. */
@@ -84,10 +86,10 @@ final class CADESEncryptedData {
         EncryptedContentInfo encInfo = null;
         try {
             // 3. ENCRIPTEDCONTENTINFO
-            encInfo = Utils.getEncryptedContentInfo(codeFile, config, cipherKey);
+            encInfo = Utils.getEncryptedContentInfo(codeFile, config, this.cipherKey);
         }
         catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso cifrado: " + ex);
+            LOGGER.severe("Error durante el proceso de cifrado: " + ex); //$NON-NLS-1$
         }
 
         // 4. ATRIBUTOS
@@ -125,7 +127,7 @@ final class CADESEncryptedData {
             return baos.toByteArray();
         }
         catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de lectura del fichero: " + ex);
+            LOGGER.severe("Error durante el proceso de lectura del fichero: " + ex); //$NON-NLS-1$
             return null;
         }
     }

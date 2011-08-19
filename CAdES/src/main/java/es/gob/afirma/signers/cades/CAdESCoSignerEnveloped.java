@@ -199,10 +199,10 @@ final class CAdESCoSignerEnveloped {
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         String digestAlgorithm = null;
         String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
         if (with > 0) {
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
             }
@@ -234,7 +234,7 @@ final class CAdESCoSignerEnveloped {
                                              dataType,
                                              null);
 
-            signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
+            this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         }
         else {
@@ -249,7 +249,7 @@ final class CAdESCoSignerEnveloped {
                                              signingCertificateV2,
                                              dataType,
                                              messageDigest);
-            signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
+            this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         }
 
@@ -278,7 +278,7 @@ final class CAdESCoSignerEnveloped {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma", ex);
+            throw new IOException("Error al realizar la firma", ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del SignedAndEnvelopedData
@@ -382,10 +382,10 @@ final class CAdESCoSignerEnveloped {
         AlgorithmIdentifier digAlgId;
         String digestAlgorithm = null;
         String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
         if (with > 0) {
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
             }
@@ -451,11 +451,11 @@ final class CAdESCoSignerEnveloped {
                                              signingCertificateV2,
                                              dataType,
                                              messageDigest);
-            signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
+            this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         }
         else {
-            throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un message digest valido");
+            throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un message digest valido"); //$NON-NLS-1$
         }
 
         ASN1OctetString sign2 = null;
@@ -463,7 +463,7 @@ final class CAdESCoSignerEnveloped {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma", ex);
+            throw new IOException("Error al realizar la firma", ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del SignedAndEnvelopedData
@@ -498,16 +498,16 @@ final class CAdESCoSignerEnveloped {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
         byte[] tmp = null;
 
         try {
-            tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            throw new AOException("Error al obtener los datos a firmar", ex);
+            throw new AOException("Error al obtener los datos a firmar", ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -515,7 +515,7 @@ final class CAdESCoSignerEnveloped {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
 
         // Actualizamos la configuracion de firma
@@ -523,7 +523,7 @@ final class CAdESCoSignerEnveloped {
             sig.update(tmp);
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e);
+            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
         }
 
         // firmamos.
@@ -532,7 +532,7 @@ final class CAdESCoSignerEnveloped {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
         final ASN1OctetString encDigest = new DEROctetString(realSig);

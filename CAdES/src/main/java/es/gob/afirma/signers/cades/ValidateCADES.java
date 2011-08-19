@@ -47,6 +47,7 @@ final class ValidateCADES {
      * @param data
      *        El envoltorio.
      * @return si es de este tipo. */
+    @SuppressWarnings("unused")
     boolean isCADESData(final byte[] data) {
         boolean isValid = true;
         try {
@@ -144,6 +145,7 @@ final class ValidateCADES {
      * @param data
      *        El envoltorio.
      * @return si es de este tipo. */
+    @SuppressWarnings("unused")
     boolean isCADESDigestedData(final byte[] data) {
         boolean isValid = false;
         try {
@@ -224,6 +226,7 @@ final class ValidateCADES {
      * @param data
      *        El envoltorio.
      * @return si es de este tipo. */
+    @SuppressWarnings("unused")
     boolean isCADESEnvelopedData(final byte[] data) {
         boolean isValid = false;
         try {

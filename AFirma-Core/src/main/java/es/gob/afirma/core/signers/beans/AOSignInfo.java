@@ -53,7 +53,7 @@ public final class AOSignInfo {
         return this.variant;
     }
 
-    /** Establece la variante de formato a la que pertene e objeto de firma.
+    /** Establece la variante de formato a la que pertene el objeto de firma.
      * @param variant Nombre de la variante */
     public void setVariant(final String variant) {
         this.variant = variant;

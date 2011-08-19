@@ -37,6 +37,8 @@ import es.gob.afirma.core.AOException;
 /** Clase que contiene una serie de m&eacute;todos utilizados por GenSignedData,
  * GenCadesSignedData, CoSigner y CounterSigner. */
 public final class SigUtils {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** M&eacute;todo que devuelve el Identificador del algoritmo.
      * @param oid
@@ -61,7 +63,7 @@ public final class SigUtils {
      * @throws java.io.IOException */
     private static DERObject makeObj(final byte[] encoding) throws IOException {
         if (encoding == null) {
-            Logger.getLogger("es.gob.afirma").warning("La codificacion era nula, se devolvera null");
+            LOGGER.warning("La codificacion era nula, se devolvera null"); //$NON-NLS-1$
             return null;
         }
         return new ASN1InputStream(new ByteArrayInputStream(encoding)).readObject();
@@ -91,13 +93,14 @@ public final class SigUtils {
         if (attr != null) {
             return new DERSet(attr.toASN1EncodableVector());
         }
-        Logger.getLogger("es.gob.afirma").warning("Los atributos eran nulos, se devolvera null");
+        LOGGER.warning("Los atributos eran nulos, se devolvera null"); //$NON-NLS-1$
         return null;
     }
 
-    /** Genera un estructura de tipo SET de formato ASN1.
+    /** Genera un estructura de tipo SET de formato ASN1 a partir de una lista de objectos ya existente.
      * @param derObjects
-     *        Una lista con los objetos a obtener el tipo SET
+     *        Una lista con los nuevos objetos a obtener el tipo SET
+     * @param v Vector con los objectos ya existentes
      * @return Un SET de ASN1 con los elementos de la lista introducida. */
     public static ASN1Set fillRestCerts(final List<DEREncodable> derObjects, final ASN1EncodableVector v) {
         for (final DEREncodable d : derObjects) {
@@ -123,13 +126,13 @@ public final class SigUtils {
             sig = Signature.getInstance(algorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + algorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + algorithm, e); //$NON-NLS-1$
         }
         try {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
         final BufferedInputStream bufin = new BufferedInputStream(file);
         final byte[] buffer = new byte[1024];
@@ -144,20 +147,20 @@ public final class SigUtils {
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al leer los datos a firmar: " + e);
+            LOGGER.severe("Error al leer los datos a firmar: " + e); //$NON-NLS-1$
         }
         try {
             bufin.close();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("Error al cerrar el fichero de datos, el proceso de firma continuara: " + e);
+            LOGGER.warning("Error al cerrar el fichero de datos, el proceso de firma continuara: " + e); //$NON-NLS-1$
         }
         byte[] realSig;
         try {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
         return realSig;

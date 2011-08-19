@@ -56,9 +56,9 @@ public final class ExtractMimeType {
             }
         }
         catch (final IOException e1) {
-            Logger.getLogger("es.gob.afirma").warning("Error intentando obtener el MIME-Type, se devolvera una cadena vacia: " + e1);
+            Logger.getLogger("es.gob.afirma").warning("Error intentando obtener el MIME-Type, se devolvera una cadena vacia: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        return "";
+        return ""; //$NON-NLS-1$
 
     }
 

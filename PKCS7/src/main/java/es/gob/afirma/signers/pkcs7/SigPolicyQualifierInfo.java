@@ -41,20 +41,20 @@ final class SigPolicyQualifierInfo extends ASN1Encodable {
      * @param cps
      *        El CPS (certification practice statement) uri como <code>String</code>. */
     public SigPolicyQualifierInfo(final String cps) {
-        SigPolicyQualifierId = PKCSObjectIdentifiers.id_spq_ets_uri;
-        SigQualifier = new DERIA5String(cps);
+        this.SigPolicyQualifierId = PKCSObjectIdentifiers.id_spq_ets_uri;
+        this.SigQualifier = new DERIA5String(cps);
     }
 
     /** Devuelve el identificador de la estancia.
      * @return El identificador. */
     public DERObjectIdentifier getSigPolicyQualifierId() {
-        return SigPolicyQualifierId;
+        return this.SigPolicyQualifierId;
     }
 
     /** Devuelve el Cualificador de la estancia.
      * @return el Cualificador. */
     public DEREncodable getSigQualifier() {
-        return SigQualifier;
+        return this.SigQualifier;
     }
 
     /** Devuelve una representaci&oacute;n DER-encodable the esta estancia.
@@ -62,8 +62,8 @@ final class SigPolicyQualifierInfo extends ASN1Encodable {
     @Override
     public DERObject toASN1Object() {
         final ASN1EncodableVector dev = new ASN1EncodableVector();
-        dev.add(SigPolicyQualifierId);
-        dev.add(SigQualifier);
+        dev.add(this.SigPolicyQualifierId);
+        dev.add(this.SigQualifier);
         return new DERSequence(dev);
     }
 }

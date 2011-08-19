@@ -104,7 +104,7 @@ import sun.security.x509.AlgorithmId;
 
 final class CAdESEPESSignedAndEnvelopedData {
     
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Clave de cifrado. La almacenamos internamente. */
     private SecretKey cipherKey;
@@ -169,13 +169,13 @@ final class CAdESEPESSignedAndEnvelopedData {
             signatureAlgorithm = parameters.getSignatureAlgorithm();
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
             digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-            keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm, digestAlgorithmId);
+            keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm);
 
             final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
             digestAlgs.add(digAlgId);
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
+            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
         }
 
         // LISTA DE CERTIFICADOS: obtenemos la lista de certificados
@@ -185,7 +185,7 @@ final class CAdESEPESSignedAndEnvelopedData {
         certificates = Utils.fetchCertificatesList(signerCertificateChain);
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
 
         // 4. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -212,7 +212,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                          signingCertificateV2,
                                          dataType,
                                          null);
-        signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
+        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 
         // digEncryptionAlgorithm
@@ -223,7 +223,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
+            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
         }
 
         ASN1OctetString sign2 = null;
@@ -262,13 +262,13 @@ final class CAdESEPESSignedAndEnvelopedData {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
         byte[] tmp = null;
 
         try {
-            tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
             Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
@@ -279,7 +279,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
 
         // Actualizamos la configuracion de firma
@@ -287,7 +287,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             sig.update(tmp);
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e);
+            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
         }
 
         // firmamos.
@@ -296,7 +296,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
         final ASN1OctetString encDigest = new DEROctetString(realSig);
@@ -366,13 +366,13 @@ final class CAdESEPESSignedAndEnvelopedData {
                         signatureAlgorithm = parameters.getSignatureAlgorithm();
                         digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
                         digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-                        keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm, digestAlgorithmId);
+                        keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm);
 
                         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
                         digestAlgs.add(digAlgId);
                     }
                     catch (final Exception e2) {
-                        throw new IOException("Error de codificacion: " + e2);
+                        throw new IOException("Error de codificacion: " + e2); //$NON-NLS-1$
                     }
 
                     final TBSCertificateStructure tbs2 =
@@ -399,7 +399,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                      signingCertificateV2,
                                                      dataType,
                                                      null);
-                    signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
+                    this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
                     final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 
                     final ASN1Set unSignedAttr = null;
@@ -414,7 +414,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                   signedAttr,
                                                   unSignedAttr,
                                                   digestAlgorithmIdEnc,
-                                                  signedAttr2);
+                                                  this.signedAttr2);
 
                     // introducimos el nuevo Signer
                     signerInfos.add(nuevoSigner);
@@ -423,7 +423,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                     signCerts = Utils.loadCertificatesList(signEnv, signerCertificateChain);
                 }
                 else {
-                    LOGGER.warning("No se ha podido obtener el certificado del nuevo firmante ");
+                    LOGGER.warning("No se ha podido obtener el certificado del nuevo firmante "); //$NON-NLS-1$
                 }
 
                 final ASN1Set certrevlist = null;
@@ -443,7 +443,7 @@ final class CAdESEPESSignedAndEnvelopedData {
 
         }
         catch (final Exception ex) {
-            LOGGER.severe("Error durante el proceso de insercion: " + ex);
+            LOGGER.severe("Error durante el proceso de insercion: " + ex); //$NON-NLS-1$
 
         }
         return retorno;

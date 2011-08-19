@@ -25,6 +25,8 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 /** Clase que obtiene el contenido de un fichero en formato SignedData. de CMS o
  * CADES. */
 public final class ObtainContentSignedData {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** M&eacute;todo que obtiene el contenido firmado de un tipo Signed Data
      * tanto en CADES como en CMS. Si la firma no contiene los datos, devuelve <code>null</code>.
@@ -55,17 +57,17 @@ public final class ObtainContentSignedData {
                     contenido = os.getOctets();
                 }
                 else {
-                    Logger.getLogger("es.gob.afirma").warning("No existe contenido en esta firma.");
+                    LOGGER.warning("No existe contenido en esta firma."); //$NON-NLS-1$
                 }
             }
             else {
-                Logger.getLogger("es.gob.afirma").warning("No se puede obtener el contenido de esta firma.");
+                LOGGER.warning("No se puede obtener el contenido de esta firma."); //$NON-NLS-1$
             }
 
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("No se pudieron recuperar los datos contenidos en la firma: " + e);
-            contenido = null;
+            LOGGER.severe("No se pudieron recuperar los datos contenidos en la firma, se devolvera null: " + e); //$NON-NLS-1$
+            return null;
         }
 
         return contenido;

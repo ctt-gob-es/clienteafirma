@@ -45,9 +45,28 @@ public interface AOUIManager {
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
     char[] getPassword(String text, final String charSet, final boolean beep, final Object c) throws AOCancelledOperationException;
     
-    
+    /**
+     * JOptionPane.showInputDialog().
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param message Mensaje
+     * @param title Titulo del cuadro de di&aacute;logo
+     * @param messageType Tipo de mensaje
+     * @param icon Icono a mostrar en el di&aacute;logo
+     * @param selectionValues Valores posibles para seleccionar
+     * @param initialSelectionValue Valor seleccionado por defecto
+     * @return Valor seleccionado
+     */    
     Object showInputDialog(Object parentComponent, Object message, String title, int messageType, Object icon, Object[] selectionValues, Object initialSelectionValue);
     
+    /**
+     * JOptionPane.showConfirmDialog().
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param message Mensaje
+     * @param title Titulo del cuadro de di&aacute;logo
+     * @param optionType Tipo de opciones a confirmar
+     * @param messageType Tipo de mensaje
+     * @return Opci&oacute;n seleccionada
+     */
     int showConfirmDialog(Object parentComponent, Object message, String title, int optionType, int messageType);
     
     /** 

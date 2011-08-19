@@ -36,6 +36,14 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
     private ASN1Set crls;
     private final ASN1Set signerInfos;
 
+    /** Crea un objecto CMS SignedAndEnvelopedData.
+     * @param recipientInfos RecipientInfo
+     * @param digestAlgorithms ALgoritmos de huella digital
+     * @param encryptedContentInfo EncryptedContentInfo
+     * @param certificates Certificados
+     * @param crls Listas de revoaci&oacute;n de certificados
+     * @param signerInfos SignerInfo
+     */
     public SignedAndEnvelopedData(final ASN1Set recipientInfos,
                            final ASN1Set digestAlgorithms,
                            final EncryptedContentInfo encryptedContentInfo,
@@ -52,6 +60,9 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
         this.signerInfos = signerInfos;
     }
 
+    /** Crea un objecto CMS SignedAndEnvelopedData a partir de una Secuencia ASN.1.
+     * @param seq Secuencia ASN.1 origen
+     */
     public SignedAndEnvelopedData(final ASN1Sequence seq) {
         int index = 0;
         this.version = (DERInteger) seq.getObjectAt(index++);
@@ -88,31 +99,46 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
             return new SignedAndEnvelopedData((ASN1Sequence) obj);
         }
 
-        throw new IllegalArgumentException("Invalid EnvelopedData: " + obj.getClass().getName());
+        throw new IllegalArgumentException("EnvelopedData invalido: " + obj.getClass().getName()); //$NON-NLS-1$
     }
 
     DERInteger getVersion() {
-        return version;
+        return this.version;
     }
 
+    /** Obtiene los RecipientInfo en forma de Set ASN.1.
+     * @return RecipientInfos
+     */    
     public ASN1Set getRecipientInfos() {
-        return recipientInfos;
+        return this.recipientInfos;
     }
 
+    /** Obtiene los algoritmos de huella digital en forma de Set ASN.1.
+     * @return Algoritmos de huella digital
+     */
     public ASN1Set getDigestAlgorithms() {
-        return digestAlgorithms;
+        return this.digestAlgorithms;
     }
 
+    /** Obtiene el EncryptedContentInfo.
+     * @return EncryptedContentInfo
+     */       
     public EncryptedContentInfo getEncryptedContentInfo() {
-        return encryptedContentInfo;
+        return this.encryptedContentInfo;
     }
 
+    /** Obtiene los Certificados en forma de Set ASN.1.
+     * @return Certificados
+     */
     public ASN1Set getCertificates() {
-        return certificates;
+        return this.certificates;
     }
 
+    /** Obtiene los SignerInfo en forma de Set ASN.1.
+     * @return SignerInfos
+     */
     public ASN1Set getSignerInfos() {
-        return signerInfos;
+        return this.signerInfos;
     }
 
     /** Produce an object suitable for an ASN1OutputStream.
@@ -135,19 +161,19 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
     public DERObject toASN1Object() {
         final ASN1EncodableVector v = new ASN1EncodableVector();
 
-        v.add(version);
-        v.add(recipientInfos);
-        v.add(digestAlgorithms);
-        v.add(encryptedContentInfo);
+        v.add(this.version);
+        v.add(this.recipientInfos);
+        v.add(this.digestAlgorithms);
+        v.add(this.encryptedContentInfo);
 
-        if (certificates != null) {
-            v.add(new DERTaggedObject(false, 1, certificates));
+        if (this.certificates != null) {
+            v.add(new DERTaggedObject(false, 1, this.certificates));
         }
-        if (crls != null) {
-            v.add(new DERTaggedObject(false, 1, crls));
+        if (this.crls != null) {
+            v.add(new DERTaggedObject(false, 1, this.crls));
         }
 
-        v.add(signerInfos);
+        v.add(this.signerInfos);
 
         return new BERSequence(v);
     }

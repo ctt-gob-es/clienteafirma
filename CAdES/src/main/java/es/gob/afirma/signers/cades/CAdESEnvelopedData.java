@@ -100,7 +100,7 @@ final class CAdESEnvelopedData {
         }
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
 
         // 3. ATRIBUTOS
         final ASN1Set unprotectedAttrs =
@@ -145,7 +145,7 @@ final class CAdESEnvelopedData {
         final OriginatorInfo origInfo = null;
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(data, config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(data, config, certDest, this.cipherKey);
 
         // 3. ATRIBUTOS
         final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(Utils.initContexExpecific(digestAlgorithm, data, dataType, null)));

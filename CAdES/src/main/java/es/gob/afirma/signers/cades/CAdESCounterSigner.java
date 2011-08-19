@@ -69,7 +69,7 @@ final class CAdESCounterSigner {
     private int actualIndex = 0;
     private ASN1Set signedAttr2;
 
-    private String globalPolicy = "";
+    private String globalPolicy = ""; //$NON-NLS-1$
     private String GlobalOidQualifier = null;
     private boolean GlobalsigningCertificateV2;
 
@@ -77,21 +77,21 @@ final class CAdESCounterSigner {
     /** Obtiene el Oid del qualificador de pol&iacute;tica
      * @return Oid de calificador de pol&iacute;tica */
     private String getGlobalOidQualifier() {
-        return GlobalOidQualifier;
+        return this.GlobalOidQualifier;
     }
 
     /** Establece el Oid del qualificador de pol&iacute;tica
      * @param globalOidQualifier
      *        Oid de calificador de pol&iacute;tica */
     private void setGlobalOidQualifier(final String globalOidQualifier) {
-        GlobalOidQualifier = globalOidQualifier;
+        this.GlobalOidQualifier = globalOidQualifier;
     }
 
     /** Obtiene el tipo de atributo firmado signingCertificate o
      * signingCertificateV2
      * @return tipo de atributo firmado. */
     private boolean isGlobalsigningCertificateV2() {
-        return GlobalsigningCertificateV2;
+        return this.GlobalsigningCertificateV2;
     }
 
     /** Define si el atributo firmado es signingCertificate o
@@ -99,13 +99,13 @@ final class CAdESCounterSigner {
      * @param globalsigningCertificateV2
      *        tipo de atributo */
     private void setGlobalsigningCertificateV2(final boolean globalsigningCertificateV2) {
-        GlobalsigningCertificateV2 = globalsigningCertificateV2;
+        this.GlobalsigningCertificateV2 = globalsigningCertificateV2;
     }
 
     /** Obtiene la pol&iacute;tica global.
      * @return politica de firma. */
     String getGlobalPolicy() {
-        return globalPolicy;
+        return this.globalPolicy;
     }
 
     /** Establece la pol&iacute;tica de firma.
@@ -377,21 +377,21 @@ final class CAdESCounterSigner {
         ASN1Set auxSignerRaiz;
 
         auxSignerRaiz = signerInfosRaiz;
-        actualIndex = 0;
+        this.actualIndex = 0;
 
         for (int i = 0; i < auxSignerRaiz.size(); i++) {
             final ASN1Sequence atribute = (ASN1Sequence) auxSignerRaiz.getObjectAt(i);
             final SignerInfo si = new SignerInfo(atribute);
             SignerInfo CounterSigner = null;
-            if (actualIndex == nodo) {
+            if (this.actualIndex == nodo) {
                 CounterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
             }
             else {
-                if (actualIndex != nodo) {
+                if (this.actualIndex != nodo) {
                     CounterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, nodo);
                 }
             }
-            actualIndex++;
+            this.actualIndex++;
             CounterSigners.add(CounterSigner);
         }
 
@@ -829,9 +829,9 @@ final class CAdESCounterSigner {
                     while (eAtributesData.hasMoreElements()) {
                         final ASN1Sequence atrib = (ASN1Sequence) eAtributesData.nextElement();
                         final SignerInfo si = new SignerInfo(atrib);
-                        actualIndex++;
-                        if (actualIndex != node) {
-                            if (actualIndex < node) {
+                        this.actualIndex++;
+                        if (this.actualIndex != node) {
+                            if (this.actualIndex < node) {
                                 CounterSigner2 = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, node);
                                 signerInfosU.add(CounterSigner2);
                             }
@@ -953,10 +953,10 @@ final class CAdESCounterSigner {
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         String digestAlgorithm = null;
         String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
         if (with > 0) {
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
             }
@@ -987,7 +987,7 @@ final class CAdESCounterSigner {
                                          signingCertificateV2,
                                          null,
                                          null);
-        signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
+        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
         unsignedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
 
         // 5. SIGNERINFO
@@ -1018,7 +1018,7 @@ final class CAdESCounterSigner {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma", ex);
+            throw new IOException("Error al realizar la firma", ex); //$NON-NLS-1$
         }
 
         final SignerInfo uAtrib = new SignerInfo(identifier, digAlgId, unsignedAttr, encAlgId, sign2, null);
@@ -1041,16 +1041,16 @@ final class CAdESCounterSigner {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
         byte[] tmp = null;
 
         try {
-            tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            throw new AOException("Error al obtener los datos a firmar", ex);
+            throw new AOException("Error al obtener los datos a firmar", ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -1058,7 +1058,7 @@ final class CAdESCounterSigner {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
 
         // Actualizamos la configuracion de firma
@@ -1066,7 +1066,7 @@ final class CAdESCounterSigner {
             sig.update(tmp);
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e);
+            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
         }
 
         // firmamos.
@@ -1075,7 +1075,7 @@ final class CAdESCounterSigner {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
         final ASN1OctetString encDigest = new DEROctetString(realSig);

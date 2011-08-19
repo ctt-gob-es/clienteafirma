@@ -40,24 +40,24 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.TreeNode;
+import es.gob.afirma.core.util.tree.AOTreeNode;
 
 
 /** Clase que genera las listas de nodos o de firmantes que existe en un fichero. */
 public final class ReadNodesTree {
 
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
-    private String StringRetorn = "";
-    private TreeNode raiz;
-    private TreeNode rama;
-    private TreeNode rama2;
+    private String StringRetorn = ""; //$NON-NLS-1$
+    private AOTreeNode raiz;
+    private AOTreeNode rama;
+    private AOTreeNode rama2;
     private int seleccionados[];
     private final List<String> lista = new ArrayList<String>();
     private final List<X509Certificate[]> listaCert = new ArrayList<X509Certificate[]>();
 
     int[] getSeleccionados() {
-        return seleccionados;
+        return this.seleccionados;
     }
 
     void setSeleccionados(final int[] seleccionados) {
@@ -67,7 +67,7 @@ public final class ReadNodesTree {
     // DefaultTreeModel modelo;
 
     String getStringRetorn() {
-        return StringRetorn;
+        return this.StringRetorn;
     }
 
     void setStringRetorn(final String StringRetorn) {
@@ -111,18 +111,18 @@ public final class ReadNodesTree {
         }
         catch (final Exception exception) {
             try {
-                LOGGER.info("No es signedData, probamos con SignedAndEnvelopedData.");
+                LOGGER.info("No es signedData, probamos con SignedAndEnvelopedData."); //$NON-NLS-1$
                 final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
                 signerInfosSd = sd.getSignerInfos();
                 certificates = sd.getCertificates();
             }
             catch (final Exception e2) {
-                LOGGER.severe("Error obteniendo los SignerInfos del SignedData: " + e2);
+                LOGGER.severe("Error obteniendo los SignerInfos del SignedData: " + e2); //$NON-NLS-1$
             }
         }
 
         // Para la creacion del arbol
-        raiz = new TreeNode("Datos");
+        this.raiz = new AOTreeNode("Datos"); //$NON-NLS-1$
 
         // introducimos el nuevo SignerInfo del firmante actual.
 
@@ -135,11 +135,11 @@ public final class ReadNodesTree {
                 final Date signingTime = getSigningTime(si);
                 final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
                 aossi.setPkcs1(si.getEncryptedDigest().getOctets());
-                rama = new TreeNode(aossi);
-                listaCert.add(nameSigner);
-                getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(), rama, certificates);
+                this.rama = new AOTreeNode(aossi);
+                this.listaCert.add(nameSigner);
+                getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(), this.rama, certificates);
 
-                raiz.add(rama);
+                this.raiz.add(this.rama);
             }
         }
         else if (signerInfosSd != null) {
@@ -148,15 +148,15 @@ public final class ReadNodesTree {
                 final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atribute.getObjectAt(1));
                 final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
                 final SignerInfo si = new SignerInfo(atribute);
-                rama = new TreeNode(nameSigner);
-                lista.add(nameSigner);
-                getUnsignedAtributes(si.getUnauthenticatedAttributes(), rama, certificates);
+                this.rama = new AOTreeNode(nameSigner);
+                this.lista.add(nameSigner);
+                getUnsignedAtributes(si.getUnauthenticatedAttributes(), this.rama, certificates);
 
-                raiz.add(rama);
+                this.raiz.add(this.rama);
             }
         }
 
-        return new AOTreeModel(raiz);
+        return new AOTreeModel(this.raiz);
     }
 
     /** M&eacute;todo para obtener las contrafirmas.
@@ -166,7 +166,7 @@ public final class ReadNodesTree {
      *        Rama hija donde buscar los siguientes nodos.
      * @param certificates
      *        Certificados. */
-    private void getUnsignedAtributesWithCertificates(final ASN1Set signerInfouAtrib, final TreeNode ramahija, final ASN1Set certificates) {
+    private void getUnsignedAtributesWithCertificates(final ASN1Set signerInfouAtrib, final AOTreeNode ramahija, final ASN1Set certificates) {
 
         if (signerInfouAtrib != null) {
             final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
@@ -185,10 +185,10 @@ public final class ReadNodesTree {
                             final Date signingTime = getSigningTime(si);
                             final AOSimpleSignInfo aossi = new AOSimpleSignInfo(nameSigner, signingTime);
                             aossi.setPkcs1(si.getEncryptedDigest().getOctets());
-                            rama2 = new TreeNode(aossi);
-                            listaCert.add(nameSigner);
-                            ramahija.add(rama2);
-                            getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(), rama2, certificates);
+                            this.rama2 = new AOTreeNode(aossi);
+                            this.listaCert.add(nameSigner);
+                            ramahija.add(this.rama2);
+                            getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(), this.rama2, certificates);
                         }
                     }
                 }
@@ -204,7 +204,7 @@ public final class ReadNodesTree {
      *        Rama hija donde buscar los siguientes nodos.
      * @param certificates
      *        Certificados. */
-    private void getUnsignedAtributes(final ASN1Set signerInfouAtrib, final TreeNode ramahija, final ASN1Set certificates) {
+    private void getUnsignedAtributes(final ASN1Set signerInfouAtrib, final AOTreeNode ramahija, final ASN1Set certificates) {
 
         if (signerInfouAtrib != null) {
             final Enumeration<?> eAtributes = signerInfouAtrib.getObjects();
@@ -220,10 +220,10 @@ public final class ReadNodesTree {
                             final IssuerAndSerialNumber issuerSerial = new IssuerAndSerialNumber((ASN1Sequence) atrib.getObjectAt(1));
                             final SignerInfo si = new SignerInfo(atrib);
                             final String nameSigner = searchName(certificates, issuerSerial.getSerialNumber());
-                            rama2 = new TreeNode(nameSigner);
-                            lista.add(nameSigner);
-                            ramahija.add(rama2);
-                            getUnsignedAtributes(si.getUnauthenticatedAttributes(), rama2, certificates);
+                            this.rama2 = new AOTreeNode(nameSigner);
+                            this.lista.add(nameSigner);
+                            ramahija.add(this.rama2);
+                            getUnsignedAtributes(si.getUnauthenticatedAttributes(), this.rama2, certificates);
                         }
                     }
                 }
@@ -244,7 +244,7 @@ public final class ReadNodesTree {
         int[] solucion;
 
         readNodesTree(data, false);
-        final List<String> listaComp = lista;
+        final List<String> listaComp = this.lista;
         final int[] nodesToSign = new int[listaComp.size()];
         int cont = 0;
         for (int i = 0; i < listaComp.size(); i++) {
@@ -297,7 +297,7 @@ public final class ReadNodesTree {
      *        N&uacute;mero de serie del certificado a firmar.
      * @return El nombre com&uacute;n. */
     private String searchName(final ASN1Set certificates, final DERInteger serialNumber) {
-        String nombre = "";
+        String nombre = ""; //$NON-NLS-1$
         final Enumeration<?> certSet = certificates.getObjects();
         while (certSet.hasMoreElements()) {
             final ASN1Sequence atrib2 = (ASN1Sequence) certSet.nextElement();
@@ -305,7 +305,7 @@ public final class ReadNodesTree {
             if (serialNumber.toString().equals(atrib.getSerialNumber().toString())) {
                 final X509Name name = atrib.getSubject();
                 nombre = name.getValues(X509ObjectIdentifiers.commonName).toString();
-                if (nombre != null && !nombre.equals("") && !nombre.equals("[]")) {
+                if (nombre != null && !nombre.equals("") && !nombre.equals("[]")) {  //$NON-NLS-1$//$NON-NLS-2$
                     nombre = nombre.substring(1, nombre.length() - 1);
                 }
                 else {
@@ -348,13 +348,13 @@ public final class ReadNodesTree {
                     ret[0] = new X509CertificateObject(new X509CertificateStructure(atrib2));
                 }
                 catch (final Exception e) {
-                    LOGGER.severe("No se pudieron recuperar los certificados de la lista, se devolvera un array vacio: " + e);
+                    LOGGER.severe("No se pudieron recuperar los certificados de la lista, se devolvera un array vacio: " + e); //$NON-NLS-1$
                     return new X509Certificate[0];
                 }
                 return ret;
             }
         }
-        LOGGER.severe("El certificados pedido no estaba en la lista, se devolvera un array vacio");
+        LOGGER.severe("El certificados pedido no estaba en la lista, se devolvera un array vacio"); //$NON-NLS-1$
         return new X509Certificate[0];
     }
 
@@ -372,7 +372,7 @@ public final class ReadNodesTree {
                         returnDate = d.getDate();
                     }
                     catch (final ParseException ex) {
-                        LOGGER.warning("No es posible convertir la fecha");
+                        LOGGER.warning("No es posible convertir la fecha"); //$NON-NLS-1$
                     }
                 }
             }

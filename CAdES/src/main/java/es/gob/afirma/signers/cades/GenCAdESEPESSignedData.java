@@ -140,7 +140,7 @@ public final class GenCAdESEPESSignedData {
                                      final byte[] messageDigest) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
 
         if (parameters == null) {
-            throw new IllegalArgumentException("Los parametros no pueden ser nulos");
+            throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
         }
 
         // 1. VERSION
@@ -155,10 +155,10 @@ public final class GenCAdESEPESSignedData {
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         String digestAlgorithm = null;
         String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
         if (with > 0) {
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
             }
@@ -173,7 +173,7 @@ public final class GenCAdESEPESSignedData {
             digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
+            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
         }
 
         digestAlgs.add(digAlgId);
@@ -192,7 +192,7 @@ public final class GenCAdESEPESSignedData {
                 msg.write(bOut);
             }
             catch (final Exception ex) {
-                throw new IOException("Error en la escritura del procesable CMS: " + ex);
+                throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
             }
             encInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
         }
@@ -241,7 +241,7 @@ public final class GenCAdESEPESSignedData {
                                          signingCertificateV2,
                                          dataType,
                                          messageDigest);
-        signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
+        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
         final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
 
         // // FIN ATRIBUTOS
@@ -253,7 +253,7 @@ public final class GenCAdESEPESSignedData {
             encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
+            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
         }
 
         final ASN1OctetString sign2;
@@ -290,17 +290,17 @@ public final class GenCAdESEPESSignedData {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
         byte[] tmp = null;
 
         try {
-            tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
             Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, ex.toString(), ex);
-            throw new AOException("Error al detectar la codificacion de los datos ASN.1", ex);
+            throw new AOException("Error al detectar la codificacion de los datos ASN.1", ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -308,7 +308,7 @@ public final class GenCAdESEPESSignedData {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
 
         // Actualizamos la configuracion de firma
@@ -316,7 +316,7 @@ public final class GenCAdESEPESSignedData {
             sig.update(tmp);
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e);
+            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
         }
 
         // firmamos.
@@ -325,7 +325,7 @@ public final class GenCAdESEPESSignedData {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
         final ASN1OctetString encDigest = new DEROctetString(realSig);

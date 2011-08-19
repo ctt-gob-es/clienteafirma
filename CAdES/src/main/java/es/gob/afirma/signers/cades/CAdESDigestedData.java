@@ -61,7 +61,7 @@ final class CAdESDigestedData {
      *         datos */
     byte[] genDigestedData(final P7ContentSignerParameters parameters, final String dataType) throws NoSuchAlgorithmException, IOException {
         if (parameters == null) {
-            throw new IllegalArgumentException("Los parametros no pueden ser nulos");
+            throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
         }
         // Obtenemos el algoritmo para "digestear"
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
@@ -71,7 +71,7 @@ final class CAdESDigestedData {
             digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
         }
         catch (final Exception e) {
-            throw new IOException((new StringBuilder()).append("Error de codificacion: ").append(e).toString());
+            throw new IOException((new StringBuilder()).append("Error de codificacion: ").append(e).toString()); //$NON-NLS-1$
         }
         ContentInfo encInfo = null;
 

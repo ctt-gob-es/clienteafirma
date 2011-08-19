@@ -94,7 +94,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 /** Clase que contiene funciones comunes para CADES y CMS */
 public final class Utils {
 
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
     private static final byte[] SALT = {
             (byte) 0xA2, (byte) 0x35, (byte) 0xDC, (byte) 0xA4, (byte) 0x11, (byte) 0x7C, (byte) 0x99, (byte) 0x4B
@@ -140,7 +140,7 @@ public final class Utils {
     public static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest) throws NullPointerException {
         // Comprobamos que el archivo a tratar no sea nulo.
         if (certDest == null || certDest.length == 0) {
-            throw new IllegalArgumentException("No se pueden envolver datos sin certificados destino.");
+            throw new IllegalArgumentException("No se pueden envolver datos sin certificados destino."); //$NON-NLS-1$
         }
 
         // Asignamos la clave de cifrado
@@ -148,7 +148,7 @@ public final class Utils {
             return assignKey(config);
         }
         catch (final Exception ex) {
-            LOGGER.severe("Error durante el proceso de asignado de clave: " + ex);
+            LOGGER.severe("Error durante el proceso de asignado de clave: " + ex); //$NON-NLS-1$
         }
 
         return null;
@@ -188,7 +188,7 @@ public final class Utils {
                                                                                                                    ITERATION_COUNT));
             }
             catch (final Exception ex) {
-                LOGGER.severe("Error durante el proceso de asignacion de la clave (a partir de password): " + ex);
+                LOGGER.severe("Error durante el proceso de asignacion de la clave (a partir de password): " + ex); //$NON-NLS-1$
             }
         }
         else {
@@ -256,7 +256,7 @@ public final class Utils {
                 encryptedKey = cipherKey(pubKey, cipherKey);
             }
             catch (final Exception e) {
-                LOGGER.severe("Error durante el proceso cifrado de la clave: " + e);
+                LOGGER.severe("Error durante el proceso cifrado de la clave: " + e); //$NON-NLS-1$
             }
             // creamos el recipiente con los datos del destinatario.
             final KeyTransRecipientInfo keyTransRecipientInfo = new KeyTransRecipientInfo(rid, keyEncAlg, new DEROctetString(encryptedKey));
@@ -271,7 +271,7 @@ public final class Utils {
             infos.setEncInfo(getEncryptedContentInfo(data, config, cipherKey));
         }
         catch (final Exception e) {
-            LOGGER.severe("Error durante el proceso cifrado de la clave: " + e);
+            LOGGER.severe("Error durante el proceso cifrado de la clave: " + e); //$NON-NLS-1$
         }
 
         infos.setRecipientInfos(recipientInfos);
@@ -333,13 +333,13 @@ public final class Utils {
             ciphered = cipher.doFinal(file);
         }
         catch (final Exception e) {
-            LOGGER.severe("No se ha podido completar el cifrado, se devolvera null: " + e);
+            LOGGER.severe("No se ha podido completar el cifrado, se devolvera null: " + e); //$NON-NLS-1$
             return null;
         }
 
         DEREncodable asn1Params;
         if (params != null) {
-            final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1"));
+            final ASN1InputStream aIn = new ASN1InputStream(cipher.getParameters().getEncoded("ASN.1")); //$NON-NLS-1$
             asn1Params = aIn.readObject();
         }
         else {
@@ -421,7 +421,7 @@ public final class Utils {
      * @param messageDigest
      * @return ASN1EncodableVector
      * @throws NoSuchAlgorithmException */
-    public static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, byte[] messageDigest) throws NoSuchAlgorithmException {
+    public static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest) throws NoSuchAlgorithmException {
         // authenticatedAttributes
         final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
@@ -433,13 +433,8 @@ public final class Utils {
         // fecha de firma
         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
-        // Si el hash nos viene de fuera lo reutilizamos
-        if (messageDigest == null) {
-            messageDigest = MessageDigest.getInstance(digestAlgorithm).digest(datos);
-        }
-
         // MessageDigestç
-        ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(messageDigest))));
+        ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString((messageDigest != null) ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
 
         return ContexExpecific;
     }
@@ -492,7 +487,7 @@ public final class Utils {
             encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
         }
         catch (final Exception e3) {
-            throw new IOException("Error de codificacion", e3);
+            throw new IOException("Error de codificacion", e3); //$NON-NLS-1$
         }
 
         ASN1OctetString sign2 = null;
@@ -500,7 +495,7 @@ public final class Utils {
             sign2 = firma(signatureAlgorithm, keyEntry, signedAttr2);
         }
         catch (final AOException ex) {
-            throw new IOException("Error durante la firma", ex);
+            throw new IOException("Error durante la firma", ex); //$NON-NLS-1$
         }
 
         // EN ESTE PUNTO YA TENEMOS EL NUEVO SIGNER
@@ -527,7 +522,7 @@ public final class Utils {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
         byte[] tmp = null;
@@ -536,7 +531,7 @@ public final class Utils {
             tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            Logger.getLogger("No se han podido codificar en ASN.1 los atributos firmados: " + ex);
+            Logger.getLogger("No se han podido codificar en ASN.1 los atributos firmados: " + ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -544,7 +539,7 @@ public final class Utils {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
 
         // Actualizamos la configuracion de firma
@@ -554,7 +549,7 @@ public final class Utils {
             }
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e);
+            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
         }
 
         // firmamos.
@@ -563,7 +558,7 @@ public final class Utils {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
         final ASN1OctetString encDigest = new DEROctetString(realSig);
@@ -579,9 +574,9 @@ public final class Utils {
     public static String getKeyAlgorithm(final String signatureAlgorithm) throws IOException {
         try {
             String keyAlgorithm = null;
-            final int with = signatureAlgorithm.indexOf("with");
+            final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
             if (with > 0) {
-                final int and = signatureAlgorithm.indexOf("and", with + 4);
+                final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
                 if (and > 0) {
                     keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
                 }
@@ -593,7 +588,7 @@ public final class Utils {
             return keyAlgorithm;
         }
         catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
+            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
         }
     }
 
@@ -679,7 +674,7 @@ public final class Utils {
             if (qualifier != null) {
 
                 final DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
-                if (politica.equals("")) {
+                if (politica.equals("")) { //$NON-NLS-1$
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier)
                     };
@@ -742,7 +737,7 @@ public final class Utils {
             if (qualifier != null) {
 
                 final DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
-                if (politica.equals("")) {
+                if (politica.equals("")) { //$NON-NLS-1$
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier)
                     };

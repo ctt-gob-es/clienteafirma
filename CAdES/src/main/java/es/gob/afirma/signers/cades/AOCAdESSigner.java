@@ -80,7 +80,7 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
  * @version 0.3 */
 public final class AOCAdESSigner implements AOSigner {
     
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /* Propiedades de la clase. */
     private AOCipherAlgorithm cipherAlgorithm = null;
@@ -94,15 +94,15 @@ public final class AOCAdESSigner implements AOSigner {
             extraParams = new Properties();
         }
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
+        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
+        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
+        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
 
         byte[] messageDigest = null;
 
@@ -110,7 +110,7 @@ public final class AOCAdESSigner implements AOSigner {
             messageDigest = data;
         }
 
-        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE);
+        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
 
 //        if (mode.equals(AOSignConstants.SIGN_MODE_IMPLICIT) && "true".equalsIgnoreCase(extraParams.getProperty("useMIMEencoding"))) {
 //
@@ -165,22 +165,24 @@ public final class AOCAdESSigner implements AOSigner {
             // Nos puede venir como URN o como OID
             try {
                 policyQualifier =
-                        extraParams.getProperty("policyQualifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "");
+                        extraParams.getProperty("policyQualifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Se ignora, podemos no tener politica
+            }
 
             return new GenCAdESEPESSignedData().generateSignedData(csp,
                                                                    omitContent,
-                                                                   extraParams.getProperty("policyIdentifier"),
+                                                                   extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                                    policyQualifier,
                                                                    signingCertificateV2,
-                                                                   dataType,
+                                                                   this.dataType,
                                                                    keyEntry,
                                                                    messageDigest);
 
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la firma CAdES", e);
+            throw new AOException("Error generando la firma CAdES", e); //$NON-NLS-1$
         }
     }
 
@@ -190,15 +192,15 @@ public final class AOCAdESSigner implements AOSigner {
             extraParams = new Properties();
         }
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
+        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
+        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
+        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
 
         byte[] messageDigest = null;
 
@@ -228,39 +230,39 @@ public final class AOCAdESSigner implements AOSigner {
         }
 
         try {
-            String policyQualifier = extraParams.getProperty("policyQualifier");
+            String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
 
             // Si la firma que nos introducen es SignedData
             //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
             final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
             if (signedData) {
 
-                final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE);
+                final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
                 final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 
                 return new CAdESCoSigner().coSigner(csp,
                                                     sign,
                                                     omitContent,
-                                                    extraParams.getProperty("policyIdentifier"),
+                                                    extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                     policyQualifier,
                                                     signingCertificateV2,
-                                                    dataType,
+                                                    this.dataType,
                                                     keyEntry,
                                                     messageDigest);
             }
 
             return new CAdESCoSignerEnveloped().coSigner(csp,
                                                          sign,
-                                                         extraParams.getProperty("policyIdentifier"),
+                                                         extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                          policyQualifier,
                                                          signingCertificateV2,
-                                                         dataType,
+                                                         this.dataType,
                                                          keyEntry,
                                                          messageDigest);
 
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma CAdES", e);
+            throw new AOException("Error generando la Cofirma CAdES", e); //$NON-NLS-1$
         }
     }
 
@@ -269,12 +271,12 @@ public final class AOCAdESSigner implements AOSigner {
         if (extraParams == null) {
             extraParams = new Properties();
         }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
+        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
+        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
@@ -299,7 +301,7 @@ public final class AOCAdESSigner implements AOSigner {
             }
         }
 
-        String policyQualifier = extraParams.getProperty("policyQualifier");
+        String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
 
         // Si la firma que nos introducen es SignedData
         //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
@@ -309,10 +311,10 @@ public final class AOCAdESSigner implements AOSigner {
                 return new CAdESCoSigner().coSigner(typeAlgorithm,
                                                     aCertificados,
                                                     new ByteArrayInputStream(sign),
-                                                    extraParams.getProperty("policyIdentifier"),
+                                                    extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                     policyQualifier,
                                                     signingCertificateV2,
-                                                    dataType,
+                                                    this.dataType,
                                                     keyEntry,
                                                     null // null porque no nos pueden dar un hash
                                                          // en este metodo, tendría que ser en el
@@ -320,7 +322,7 @@ public final class AOCAdESSigner implements AOSigner {
                 );
             }
             catch (final Exception e) {
-                throw new AOException("Error generando la Cofirma CADES", e);
+                throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
             }
         }
         // Signed And Enveloped.
@@ -329,17 +331,17 @@ public final class AOCAdESSigner implements AOSigner {
             return new CAdESCoSignerEnveloped().coSigner(typeAlgorithm,
                                                          aCertificados,
                                                          new ByteArrayInputStream(sign),
-                                                         extraParams.getProperty("policyIdentifier"),
+                                                         extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                          policyQualifier,
                                                          signingCertificateV2,
-                                                         dataType,
+                                                         this.dataType,
                                                          keyEntry,
                                                          null // null porque no nos pueden dar un hash en este
                                                               // metodo, tendría que ser en el que incluye datos
             );
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma CADES", e);
+            throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
         }
 
     }
@@ -354,12 +356,12 @@ public final class AOCAdESSigner implements AOSigner {
         if (extraParams == null) {
             extraParams = new Properties();
         }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
+        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
+        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
@@ -387,9 +389,9 @@ public final class AOCAdESSigner implements AOSigner {
         // Recuperamos la polictica de firma si se indico
         String policyQualifier = null;
         String policyIdentifier = null;
-        if (extraParams.containsKey("policyQualifier")) {
-            policyQualifier = extraParams.getProperty("policyQualifier");
-            policyIdentifier = extraParams.getProperty("policyIdentifier");
+        if (extraParams.containsKey("policyQualifier")) { //$NON-NLS-1$
+            policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
+            policyIdentifier = extraParams.getProperty("policyIdentifier"); //$NON-NLS-1$
         }
 
         // Datos firmados.
@@ -415,7 +417,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    policyIdentifier,
                                                                    policyQualifier,
                                                                    signingCertificateV2,
-                                                                   dataType);
+                                                                   this.dataType);
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.Leafs) {
@@ -431,7 +433,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    policyIdentifier,
                                                                    policyQualifier,
                                                                    signingCertificateV2,
-                                                                   dataType);
+                                                                   this.dataType);
                 }
                 // CASO DE FIRMA DE NODOS
                 else if (targetType == CounterSignTarget.Nodes) {
@@ -449,7 +451,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    policyIdentifier,
                                                                    policyQualifier,
                                                                    signingCertificateV2,
-                                                                   dataType);
+                                                                   this.dataType);
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
                 else if (targetType == CounterSignTarget.Signers) {
@@ -470,7 +472,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    policyIdentifier,
                                                                    policyQualifier,
                                                                    signingCertificateV2,
-                                                                   dataType);
+                                                                   this.dataType);
 
                 }
 
@@ -478,7 +480,7 @@ public final class AOCAdESSigner implements AOSigner {
 
             }
             catch (final Exception e) {
-                throw new AOException("Error generando la Contrafirma CAdES", e);
+                throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
             }
         }
         // Signed and enveloped
@@ -499,7 +501,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                         policyIdentifier,
                                                                         policyQualifier,
                                                                         signingCertificateV2,
-                                                                        dataType);
+                                                                        this.dataType);
             }
             // CASO DE FIRMA DE HOJAS
             else if (targetType == CounterSignTarget.Leafs) {
@@ -515,7 +517,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                         policyIdentifier,
                                                                         policyQualifier,
                                                                         signingCertificateV2,
-                                                                        dataType);
+                                                                        this.dataType);
             }
             // CASO DE FIRMA DE NODOS
             else if (targetType == CounterSignTarget.Nodes) {
@@ -533,7 +535,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                         policyIdentifier,
                                                                         policyQualifier,
                                                                         signingCertificateV2,
-                                                                        dataType);
+                                                                        this.dataType);
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
             else if (targetType == CounterSignTarget.Signers) {
@@ -554,7 +556,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                         policyIdentifier,
                                                                         policyQualifier,
                                                                         signingCertificateV2,
-                                                                        dataType);
+                                                                        this.dataType);
 
             }
 
@@ -562,7 +564,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Contrafirma CAdES", e);
+            throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
         }
 
     }
@@ -611,11 +613,11 @@ public final class AOCAdESSigner implements AOSigner {
         if (extraParams == null) {
             extraParams = new Properties();
         }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false"));
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Comprobamos que el archivo a tratar no sea nulo.
         if (file == null) {
-            throw new IllegalArgumentException("El archivo a tratar no puede ser nulo.");
+            throw new IllegalArgumentException("El archivo a tratar no puede ser nulo."); //$NON-NLS-1$
         }
 
         byte[] plainData;
@@ -623,7 +625,7 @@ public final class AOCAdESSigner implements AOSigner {
             plainData = AOUtil.getDataFromInputStream(file);
         }
         catch (final Exception e1) {
-            throw new AOException("No se han podido leer los datos a firmar", e1);
+            throw new AOException("No se han podido leer los datos a firmar", e1); //$NON-NLS-1$
         }
 
         P7ContentSignerParameters csp = null;
@@ -671,7 +673,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         try {
             // Busqueda del tipo que nos han solicitado.
-            if ((type == null) || (type.equals(""))) {
+            if ((type == null) || (type.equals(""))) { //$NON-NLS-1$
                 type = AOSignConstants.DEFAULT_CMS_CONTENTTYPE;
             }
             // Es Data.
@@ -680,34 +682,34 @@ public final class AOCAdESSigner implements AOSigner {
             }
             // Es Digested Data.
             else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA)) {
-                dataSigned = new CAdESDigestedData().genDigestedData(csp, dataType);
+                dataSigned = new CAdESDigestedData().genDigestedData(csp, this.dataType);
             }
             // Es Enveloped Data.
             else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
                 if (keyEntry != null) {
-                    dataSigned = new CAdESEnvelopedData().genEnvelopedData(csp, config, certDest, dataType);
+                    dataSigned = new CAdESEnvelopedData().genEnvelopedData(csp, config, certDest, this.dataType);
                 }
                 else {
-                    dataSigned = new CAdESEnvelopedData().genEnvelopedData(plainData, digestAlgorithm, config, certDest, dataType);
+                    dataSigned = new CAdESEnvelopedData().genEnvelopedData(plainData, digestAlgorithm, config, certDest, this.dataType);
                 }
             }
             // Es Signed and Enveloped Data.
             else {
                 this.dataType = PKCSObjectIdentifiers.signedData.getId();
-                String policyQualifier = extraParams.getProperty("policyQualifier");
+                String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
                 dataSigned =
                         new CAdESEPESSignedAndEnvelopedData().genCADESEPESSignedAndEnvelopedData(csp,
                                                                                                  config,
-                                                                                                 extraParams.getProperty("policyIdentifier"),
+                                                                                                 extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                                                                  policyQualifier,
                                                                                                  signingCertificateV2,
                                                                                                  certDest,
-                                                                                                 dataType,
+                                                                                                 this.dataType,
                                                                                                  keyEntry);
             }
         }
         catch (final Exception e) {
-            throw new AOException("Error generando el enveloped de CADES", e);
+            throw new AOException("Error generando el enveloped de CADES", e); //$NON-NLS-1$
         }
 
         return dataSigned;
@@ -738,7 +740,7 @@ public final class AOCAdESSigner implements AOSigner {
 
         // Comprobamos que el archivo a cifrar no sea nulo.
         if (file == null) {
-            throw new IllegalArgumentException("El archivo a cifrar no puede ser nulo.");
+            throw new IllegalArgumentException("El archivo a cifrar no puede ser nulo."); //$NON-NLS-1$
         }
 
         // tipos de datos a firmar.
@@ -762,10 +764,10 @@ public final class AOCAdESSigner implements AOSigner {
         }
 
         try {
-            return new CADESEncryptedData().genEncryptedData(file, digestAlgorithm, config, key, dataType);
+            return new CADESEncryptedData().genEncryptedData(file, digestAlgorithm, config, key, this.dataType);
         }
         catch (final Exception e) {
-            throw new AOException("Error generando el enveloped de CADES", e);
+            throw new AOException("Error generando el enveloped de CADES", e); //$NON-NLS-1$
         }
 
     }
@@ -776,14 +778,14 @@ public final class AOCAdESSigner implements AOSigner {
             return Rn.readNodesTree(sign, asSimpleSignInfo);
         }
         catch (final Exception ex) {
-            LOGGER.severe("No se ha podido obtener el albol de firmantes de la firma, se devolvera null: " + ex);
+            LOGGER.severe("No se ha podido obtener el albol de firmantes de la firma, se devolvera null: " + ex); //$NON-NLS-1$
         }
         return null;
     }
 
     public boolean isSign(final byte[] data) {
         if (data == null) {
-            LOGGER.warning("Se han introducido datos nulos para su comprobacion");
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
         return new ValidateCADES().isCADESSignedData(data);
@@ -791,7 +793,7 @@ public final class AOCAdESSigner implements AOSigner {
 
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
-            LOGGER.warning("Se han introducido datos nulos para su comprobacion");
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
         return true;
@@ -815,7 +817,7 @@ public final class AOCAdESSigner implements AOSigner {
         // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
         // siempre sera nulo
         if (data == null) {
-            LOGGER.warning("Se han introducido datos nulos para su comprobacion");
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
 
@@ -878,7 +880,7 @@ public final class AOCAdESSigner implements AOSigner {
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
             return new ValidateCADES().isCADESSignedAndEnvelopedData(signData);
         }
-        LOGGER.warning("Tipo de contenido CADES no reconocido");
+        LOGGER.warning("Tipo de contenido CADES no reconocido"); //$NON-NLS-1$
         return false;
     }
 
@@ -899,7 +901,7 @@ public final class AOCAdESSigner implements AOSigner {
             this.isSign(signData);
         }
         catch (final Exception e1) {
-            throw new AOUnsupportedSignFormatException("No es un tipo de firma valido", e1);
+            throw new AOUnsupportedSignFormatException("No es un tipo de firma valido", e1); //$NON-NLS-1$
         }
 
         // Extraemos el mimetype y transformamos el OID a mimeType
@@ -1006,27 +1008,27 @@ public final class AOCAdESSigner implements AOSigner {
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
 
         if (signData == null) {
-            throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion");
+            throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
 
         if (!this.isCADESValid(signData)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
         return new ObtainContentSignedData().obtainData(signData);
     }
 
     public String getSignedName(final String originalName, final String inText) {
-        return originalName + (inText != null ? inText : "") + ".csig";
+        return originalName + (inText != null ? inText : "") + ".csig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
         if (signData == null) {
-            throw new IllegalArgumentException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
         if (!isSign(signData)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_CADES);

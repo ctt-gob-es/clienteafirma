@@ -19,18 +19,30 @@ public final class Info {
     private ASN1EncodableVector recipientInfos = null;
     private EncryptedContentInfo encInfo = null;
 
+    /** Obtiene los RecipientInfo.
+     * @return RecipientInfo
+     */
     public ASN1EncodableVector getRecipientInfos() {
-        return recipientInfos;
+        return this.recipientInfos;
     }
 
+    /** Establece los RecipientInfo.
+     * @param recipientInfos RecipientInfo
+     */
     public void setRecipientInfos(final ASN1EncodableVector recipientInfos) {
         this.recipientInfos = recipientInfos;
     }
 
+    /** Obtiene el EncryptedContentInfo.
+     * @return EncryptedContentInfo
+     */
     public EncryptedContentInfo getEncInfo() {
-        return encInfo;
+        return this.encInfo;
     }
 
+    /** Establece el EncryptedContentInfo.
+     * @param encInfo EncryptedContentInfo
+     */
     public void setEncInfo(final EncryptedContentInfo encInfo) {
         this.encInfo = encInfo;
     }
