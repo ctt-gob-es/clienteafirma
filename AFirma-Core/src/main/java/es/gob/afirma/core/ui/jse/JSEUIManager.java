@@ -66,14 +66,11 @@ public final class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
     public final char[] getPassword(String text, final String charSet, final boolean beep, final Object c) throws AOCancelledOperationException {
-        if (text == null) {
-            text = UIMessages.getString("AOUIManager.24"); //$NON-NLS-1$
-        }
         final JPasswordField pwd = new JPasswordField(10);
         if (charSet != null) {
             pwd.setDocument(new JTextFieldFilter(charSet, beep));
         }
-        final JLabel lbText = new JLabel(text);
+        final JLabel lbText = new JLabel((text != null) ? text : JSEUIMessages.getString("AOUIManager.24"));
         lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
@@ -95,7 +92,7 @@ public final class JSEUIManager implements AOUIManager {
             parent = (Component) c;
         }
         
-        pane.createDialog(parent, UIMessages.getString("AOUIManager.24")).setVisible(true);
+        pane.createDialog(parent, JSEUIMessages.getString("AOUIManager.24")).setVisible(true);
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) {
@@ -279,11 +276,8 @@ public final class JSEUIManager implements AOUIManager {
             if (exts == null || exts.length < 1) {
                 throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
             }
-            if (desc == null || desc.length() < 1) {
-                desc = UIMessages.getString("AOUIManager.0"); //$NON-NLS-1$
-            }
             this.extensions = exts.clone();
-            this.description = desc;
+            this.description = (desc != null) ? desc : JSEUIMessages.getString("AOUIManager.0");
         }
 
         @Override

@@ -50,20 +50,52 @@ public interface AOUIManager {
     
     int showConfirmDialog(Object parentComponent, Object message, String title, int optionType, int messageType);
     
+    /** 
+     * Obtiene el c&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE en la implementaci&oacute;n del entorno operativo actual. 
+     * @return C&oacute;digo equivalente a JOptionPane.PLAIN_MESSAGE
+     */
     int getPlainMessageCode();
     
+    /** 
+     * Obtiene el c&oacute;digo equivalente a JOptionPane.YES_NO_OPTION en la implementaci&oacute;n del entorno operativo actual. 
+     * @return C&oacute;digo equivalente a JOptionPane.YES_NO_OPTION
+     */
     int getYesNoOptionCode();
     
+    /** 
+     * Obtiene el c&oacute;digo equivalente a JOptionPane.WARNING_MESSAGE en la implementaci&oacute;n del entorno operativo actual. 
+     * @return C&oacute;digo equivalente a JOptionPane.WARNING_MESSAGE
+     */
     int getWarningMessageCode();
     
+    /** 
+     * Obtiene el c&oacute;digo equivalente a JOptionPane.YES_OPTION en la implementaci&oacute;n del entorno operativo actual. 
+     * @return C&oacute;digo equivalente a JOptionPane.YES_OPTION
+     */
     int getYesOptionCode();
     
+    /** 
+     * Obtiene el c&oacute;digo equivalente a JOptionPane.NO_OPTION en la implementaci&oacute;n del entorno operativo actual. 
+     * @return C&oacute;digo equivalente a JOptionPane.NO_OPTION
+     */
     int getNoOptionCode();
     
+    /** 
+     * Obtiene el c&oacute;digo equivalente a JOptionPane.OK_CANCEL_OPTION en la implementaci&oacute;n del entorno operativo actual. 
+     * @return C&oacute;digo equivalente a JOptionPane.OK_CANCEL_OPTION
+     */
     int getOkCancelOptionCode();
     
+    /** 
+     * Obtiene el c&oacute;digo equivalente a JOptionPane.OK_OPTION en la implementaci&oacute;n del entorno operativo actual. 
+     * @return C&oacute;digo equivalente a JOptionPane.OK_OPTION
+     */
     int getOkOptionCode();
     
+    /** 
+     * Obtiene el c&oacute;digo equivalente a JOptionPane.INFORMATION_MESSAGE en la implementaci&oacute;n del entorno operativo actual. 
+     * @return C&oacute;digo equivalente a JOptionPane.INFORMATION_MESSAGE
+     */
     int getInformationMessageCode();
     
     /** Pregunta al usuario por un nombre de fichero para su carga.

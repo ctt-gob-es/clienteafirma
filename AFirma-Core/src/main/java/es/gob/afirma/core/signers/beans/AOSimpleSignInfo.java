@@ -59,34 +59,58 @@ public final class AOSimpleSignInfo {
         this.signingTime = signingTime;
     }
 
+    /** Obtiene el algoritmo de firma.
+     * @return Algoritmo de firma
+     */
     public String getSignAlgorithm() {
         return this.signAlgorithm;
     }
 
+    /** Establece el algoritmo de firma 
+     * @param algorithm Algoritmo de firma
+     */
     public void setSignAlgorithm(final String algorithm) {
         this.signAlgorithm = algorithm;
     }
 
+    /** Obtiene el formato de firma.
+     * @return Formato de firma
+     */
     public String getSignFormat() {
         return this.signFormat;
     }
 
+    /** Establece el formato de firma.
+     * @param format Formato de firma
+     */
     public void setSignFormat(final String format) {
         this.signFormat = format;
     }
 
+    /** Obtiene las fechas de los sellos de tiempo de la firma.
+     * @return Fechas de los sellos de tiempo 
+     */
     public Date[] getTimestampingTime() {
         return this.timestampingTime.clone();
     }
 
+    /** Establece las fechas de los sellos de tiempo de la firma.
+     * @param timestampingTime Fechas de los sellos de tiempo 
+     */
     public void setTimestampingTime(final Date[] timestampingTime) {
         this.timestampingTime = timestampingTime.clone();
     }
 
+    /** Obtiene el certificado (con su cadena de confianza) de la firma. 
+     * @return Certificado (con su cadena de confianza) de la firma
+     */
     public X509Certificate[] getCerts() {
         return this.certs.clone();
     }
 
+    /** Obtiene la fecha de la firma.
+     * @return Fecha de la firma
+     */
     public Date getSigningTime() {
         return this.signingTime;
     }

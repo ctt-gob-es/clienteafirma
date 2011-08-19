@@ -40,7 +40,7 @@ public final class AOSignInfo {
     private String b64VerificationCode = null;
 
     /** Construye un objeto de informaci&oacute;n de firma. Si no se especifica
-     * un formato de firma se establece el formato "Desconocido".
+     * un formato de firma se establece el formato "Desconocido"
      * @param signFormat
      *        Formato general de firma. */
     public AOSignInfo(final String signFormat) {
@@ -48,11 +48,13 @@ public final class AOSignInfo {
     }
 
     /** Recupera la variante de formato a la que pertene e objeto de firma.
-     * @return Nombre de la variante. */
+     * @return Nombre de la variante */
     public String getVariant() {
         return this.variant;
     }
 
+    /** Establece la variante de formato a la que pertene e objeto de firma.
+     * @param variant Nombre de la variante */
     public void setVariant(final String variant) {
         this.variant = variant;
     }
@@ -81,6 +83,8 @@ public final class AOSignInfo {
         this.b64VerificationCode = b64VerificationCode;
     }
 
+    /** Obtiene el formato de la firma.
+     * @return Formato de la firma */
     public String getFormat() {
         return this.format;
     }

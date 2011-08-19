@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 /** Clase para la obtencion de los recursos textuales del UI del n&uacute;cleo del
  * cliente Afirma. */
-public final class UIMessages {
+public final class JSEUIMessages {
 
     private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 
@@ -36,7 +36,7 @@ public final class UIMessages {
         }
     }
 
-    private UIMessages() {
+    private JSEUIMessages() {
         // No permitimos la instanciacion
     }
 

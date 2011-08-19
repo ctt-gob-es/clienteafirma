@@ -506,20 +506,13 @@ public final class AOUtil {
             return null;
         }
 
-        if (linePrefx == null) {
-            linePrefx = ""; //$NON-NLS-1$
-        }
-        if (identationString == null) {
-            identationString = "\t"; //$NON-NLS-1$
-        }
-
         final StringBuilder buffer = new StringBuilder();
 
         // Transformamos en cadenas de texto cada rama que surja del nodo raiz
         // del arbol
         final AOTreeNode root = (AOTreeNode) tree.getRoot();
         for (int i = 0; i < root.getChildCount(); i++) {
-            archiveTreeNode(root.getChildAt(i), 0, linePrefx, identationString, buffer);
+            archiveTreeNode(root.getChildAt(i), 0, (linePrefx != null) ? linePrefx : "", (identationString != null) ? identationString : "\t", buffer);  //$NON-NLS-1$//$NON-NLS-2$
         }
 
         return buffer.toString();

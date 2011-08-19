@@ -4,16 +4,35 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 
+/**
+ * Factor&iscute;a de elementos de interfaz gr&aacute;fica.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
 public class AOUIFactory {
     
     // Por defecto los valores sacadas del Fuente de JOptionPane
+    /** JOptionPane.PLAIN_MESSAGE. */
     public static int PLAIN_MESSAGE = -1;
+    
+    /** JOptionPane.YES_NO_OPTION. */
     public static int YES_NO_OPTION = 0;
+    
+    /** JOptionPane.WARNING_MESSAGE. */
     public static int WARNING_MESSAGE = 2;
+    
+    /** JOptionPane.YES_OPTION. */
     public static int YES_OPTION = 0;
-    public static int NO_OPTION = 1; 
+    
+    /** JOptionPane.NO_OPTION. */
+    public static int NO_OPTION = 1;
+    
+    /** JOptionPane.OK_CANCEL_OPTION. */
     public static int OK_CANCEL_OPTION = 2;
+    
+    /** JOptionPane.PK_OPTION. */
     public static int OK_OPTION = 0;
+    
+    /** JOptionPane.INFORMATION_MESSAGE. */
     public static int INFORMATION_MESSAGE = 1;
     
     private static AOUIManager uiManager;
@@ -22,7 +41,7 @@ public class AOUIFactory {
     
     static {
         try {
-            uiManager = (AOUIManager) Class.forName("").newInstance();
+            uiManager = (AOUIManager) Class.forName("es.gob.afirma.core.ui.jse.JSEUIManager").newInstance(); //$NON-NLS-1$
             PLAIN_MESSAGE = uiManager.getPlainMessageCode();
             YES_NO_OPTION = uiManager.getYesNoOptionCode();
             WARNING_MESSAGE = uiManager.getWarningMessageCode();
@@ -51,10 +70,30 @@ public class AOUIFactory {
         return uiManager.getPassword(text, c);
     }
     
+    /**
+     * JOptionPane.showConfirmDialog().
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param message Mensaje
+     * @param title Titulo del cuadro de di&aacute;logo
+     * @param optionType Tipo de opciones a confirmar
+     * @param messageType Tipo de mensaje
+     * @return Opci&oacute;n seleccionada
+     */
     public static int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
         return uiManager.showConfirmDialog(parentComponent, message, title, optionType, messageType);
     }
     
+    /**
+     * JOptionPane.showInputDialog().
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param message Mensaje
+     * @param title Titulo del cuadro de di&aacute;logo
+     * @param messageType Tipo de mensaje
+     * @param icon Icono a mostrar en el di&aacute;logo
+     * @param selectionValues Valores posibles para seleccionar
+     * @param initialSelectionValue Valor seleccionado por defecto
+     * @return Valor seleccionado
+     */
     public static Object showInputDialog(final Object parentComponent, final Object message, final String title, final int messageType, final Object icon, final Object[] selectionValues, final Object initialSelectionValue) {
         return uiManager.showInputDialog(parentComponent, message, title, messageType, icon, selectionValues, initialSelectionValue);
     }
