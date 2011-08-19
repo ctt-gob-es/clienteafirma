@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  * cliente Afirma. */
 public final class JSEUIMessages {
 
-    private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "uimessages"; //$NON-NLS-1$
 
     private static ResourceBundle RESOURCE_BUNDLE;
 

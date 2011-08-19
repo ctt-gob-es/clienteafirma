@@ -70,7 +70,7 @@ public final class JSEUIManager implements AOUIManager {
         if (charSet != null) {
             pwd.setDocument(new JTextFieldFilter(charSet, beep));
         }
-        final JLabel lbText = new JLabel((text != null) ? text : JSEUIMessages.getString("AOUIManager.24"));
+        final JLabel lbText = new JLabel((text != null) ? text : JSEUIMessages.getString("JSEUIManager.24")); //$NON-NLS-1$
         lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
@@ -92,7 +92,7 @@ public final class JSEUIManager implements AOUIManager {
             parent = (Component) c;
         }
         
-        pane.createDialog(parent, JSEUIMessages.getString("AOUIManager.24")).setVisible(true);
+        pane.createDialog(parent, JSEUIMessages.getString("JSEUIManager.24")).setVisible(true); //$NON-NLS-1$
 
         final Object selectedValue = pane.getValue();
         if (selectedValue == null) {
@@ -277,7 +277,7 @@ public final class JSEUIManager implements AOUIManager {
                 throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
             }
             this.extensions = exts.clone();
-            this.description = (desc != null) ? desc : JSEUIMessages.getString("AOUIManager.0");
+            this.description = (desc != null) ? desc : JSEUIMessages.getString("JSEUIManager.0"); //$NON-NLS-1$
         }
 
         @Override
