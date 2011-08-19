@@ -102,9 +102,9 @@ public final class AOCipherConfig {
 
     @Override
     public String toString() {
-        final StringBuilder config = new StringBuilder(algo.getName());
-        if (mode != null && padding != null) {
-            config.append("/").append(mode.getName()).append("/").append(padding.getName());
+        final StringBuilder config = new StringBuilder(this.algo.getName());
+        if (this.mode != null && this.padding != null) {
+            config.append("/").append(this.mode.getName()).append("/").append(this.padding.getName()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return config.toString();
     }
@@ -114,7 +114,7 @@ public final class AOCipherConfig {
         if (!(obj instanceof AOCipherConfig)) {
             return false;
         }
-        return ((AOCipherConfig) obj).algo.equals(algo) && ((AOCipherConfig) obj).mode.equals(mode) && ((AOCipherConfig) obj).padding.equals(padding);
+        return ((AOCipherConfig) obj).algo.equals(this.algo) && ((AOCipherConfig) obj).mode.equals(this.mode) && ((AOCipherConfig) obj).padding.equals(this.padding);
     }
 
     @Override
@@ -125,19 +125,19 @@ public final class AOCipherConfig {
     /** Obtiene el algoritmo de cifrado.
      * @return Algoritmo de cifrado */
     public AOCipherAlgorithm getAlgorithm() {
-        return algo;
+        return this.algo;
     }
 
     /** Obtiene el modo de bloque (<i>block mode</i>) de cifrado.
      * @return Modo de bloque de cifrado */
     public AOCipherBlockMode getBlockMode() {
-        return mode;
+        return this.mode;
     }
 
     /** Obtiene el relleno (<i>padding</i>) del cifrado.
      * @return Relleno del cifrado */
     public AOCipherPadding getPadding() {
-        return padding;
+        return this.padding;
     }
 
     /** Establece el algoritmo de cifrado.

@@ -147,8 +147,8 @@ public final class JSEUIManager implements AOUIManager {
          *        cuando el usuario introduce un caracter no v&aacute;lido,
          *        false en caso contrario */
         JTextFieldFilter(final String acceptedchars, final boolean beepOnError) {
-            beep = beepOnError;
-            acceptedChars = acceptedchars;
+            this.beep = beepOnError;
+            this.acceptedChars = acceptedchars;
         }
 
         private boolean beep = false;
@@ -159,8 +159,8 @@ public final class JSEUIManager implements AOUIManager {
                 return;
             }
             for (int i = 0; i < str.length(); i++) {
-                if (acceptedChars.indexOf(String.valueOf(str.charAt(i))) == -1) {
-                    if (beep) {
+                if (this.acceptedChars.indexOf(String.valueOf(str.charAt(i))) == -1) {
+                    if (this.beep) {
                         Toolkit.getDefaultToolkit().beep();
                     }
                     return;
@@ -282,8 +282,8 @@ public final class JSEUIManager implements AOUIManager {
             if (desc == null || desc.length() < 1) {
                 desc = UIMessages.getString("AOUIManager.0"); //$NON-NLS-1$
             }
-            extensions = exts.clone();
-            description = desc;
+            this.extensions = exts.clone();
+            this.description = desc;
         }
 
         @Override
@@ -294,7 +294,7 @@ public final class JSEUIManager implements AOUIManager {
             // getExtension() pasa la extension a minusculas, no hace falta
             // el "ignoreCase"
             final String extension = getExtension(f);
-            for (final String extension2 : extensions) {
+            for (final String extension2 : this.extensions) {
                 if (extension2.equalsIgnoreCase(extension)) {
                     return true;
                 }
@@ -308,7 +308,7 @@ public final class JSEUIManager implements AOUIManager {
 
         @Override
         public String getDescription() {
-            return description;
+            return this.description;
         }
 
         /** Devuelve la extensi&oacute;n de un fichero.

@@ -1,12 +1,12 @@
 package es.gob.afirma.core.util.tree;
 
-final class TreePath {
+final class AOTreePath {
 
     private static final long serialVersionUID = 1L;
 
     /** Path representing the parent, null if lastPathComponent represents the
      * root. */
-    private TreePath parentPath;
+    private AOTreePath parentPath;
 
     /** Last path component. */
     transient private Object lastPathComponent;
@@ -19,21 +19,21 @@ final class TreePath {
      * The first TreeNode in the path is the root of the tree, the last TreeNode is the node identified by the path.
      * @param path
      *        an array of Objects representing the path to a node */
-    TreePath(final Object[] path) {
+    AOTreePath(final Object[] path) {
         if (path == null || path.length == 0) {
-            throw new IllegalArgumentException("path in TreePath must be non null and not empty.");
+            throw new IllegalArgumentException("La ruta en el TreePath no puede ser ni nula ni vacia"); //$NON-NLS-1$
         }
-        lastPathComponent = path.clone()[path.length - 1];
+        this.lastPathComponent = path.clone()[path.length - 1];
         if (path.length > 1) {
-            parentPath = new TreePath(path, path.length - 1);
+            this.parentPath = new AOTreePath(path, path.length - 1);
         }
     }
 
     /** Constructs a new TreePath with the identified path components of length <code>length</code>. */
-    private TreePath(final Object[] path, final int length) {
-        lastPathComponent = path.clone()[length - 1];
+    private AOTreePath(final Object[] path, final int length) {
+        this.lastPathComponent = path.clone()[length - 1];
         if (length > 1) {
-            parentPath = new TreePath(path, length - 1);
+            this.parentPath = new AOTreePath(path, length - 1);
         }
     }
 
@@ -41,7 +41,7 @@ final class TreePath {
      * @return an int giving a count of items the path */
     private int getPathCount() {
         int result = 0;
-        for (TreePath path = this; path != null; path = path.parentPath) {
+        for (AOTreePath path = this; path != null; path = path.parentPath) {
             result++;
         }
         return result;
@@ -59,10 +59,10 @@ final class TreePath {
         final int pathLength = getPathCount();
 
         if (element < 0 || element >= pathLength) {
-            throw new IllegalArgumentException("Index " + element + " is out of the specified range");
+            throw new IllegalArgumentException("El indice " + element + " esta fuera del rango especificado"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        TreePath path = this;
+        AOTreePath path = this;
 
         for (int i = pathLength - 1; i != element; i--) {
             path = path.parentPath;
@@ -101,15 +101,15 @@ final class TreePath {
      * @return a String representation of this object */
     @Override
     public String toString() {
-        final StringBuffer tempSpot = new StringBuffer("[");
+        final StringBuffer tempSpot = new StringBuffer("["); //$NON-NLS-1$
 
         for (int counter = 0, maxCounter = getPathCount(); counter < maxCounter; counter++) {
             if (counter > 0) {
-                tempSpot.append(", ");
+                tempSpot.append(", "); //$NON-NLS-1$
             }
             tempSpot.append(getPathComponent(counter));
         }
-        tempSpot.append("]");
+        tempSpot.append("]"); //$NON-NLS-1$
         return tempSpot.toString();
     }
 

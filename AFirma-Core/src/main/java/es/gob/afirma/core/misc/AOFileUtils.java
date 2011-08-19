@@ -31,7 +31,7 @@ public final class AOFileUtils {
     public static ZipFile createTempZipFile(final byte[] zipFileData) throws ZipException, IOException {
 
         // Creamos un fichero temporal
-        final File tempFile = File.createTempFile("afirmazip", null);
+        final File tempFile = File.createTempFile("afirmazip", null); //$NON-NLS-1$
         final FileOutputStream fos = new FileOutputStream(tempFile);
         fos.write(zipFileData);
         fos.flush();
@@ -40,7 +40,9 @@ public final class AOFileUtils {
         try {
             tempFile.deleteOnExit();
         }
-        catch (final Exception e) {}
+        catch (final Exception e) {
+            // Ignoramos los errores, el usuario debe limpiar los temporales regularmente
+        }
 
         return new ZipFile(tempFile);
     }

@@ -30,9 +30,9 @@ import org.w3c.dom.NodeList;
 /** Clase para el an&aacute;lisis de ficheros OOXML. */
 public final class OfficeXMLAnalizer {
 
-    private static final String ZIP_MIMETYPE = "application/zip";
+    private static final String ZIP_MIMETYPE = "application/zip"; //$NON-NLS-1$
     
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** MimeTypes reconocidos del formato OOXML. */
     private static final Set<String> OOXML_MIMETYPES = new HashSet<String>(17);
@@ -45,57 +45,57 @@ public final class OfficeXMLAnalizer {
 
     static {
         // MimeTypes reconocidos del formato OOXML
-        OOXML_MIMETYPES.add("application/vnd.ms-word.document.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-        OOXML_MIMETYPES.add("application/vnd.ms-word.template.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.wordprocessingml.template");
-        OOXML_MIMETYPES.add("application/vnd.ms-powerpoint.template.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.presentationml.template");
-        OOXML_MIMETYPES.add("application/vnd.ms-powerpoint.addin.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.ms-powerpoint.slideshow.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.presentationml.slideshow");
-        OOXML_MIMETYPES.add("application/vnd.ms-powerpoint.presentation.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.presentationml.presentation");
-        OOXML_MIMETYPES.add("application/vnd.ms-excel.addin.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.ms-excel.sheet.binary.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.ms-excel.sheet.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        OOXML_MIMETYPES.add("application/vnd.ms-excel.template.macroEnabled.12");
-        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.spreadsheetml.template");
+        OOXML_MIMETYPES.add("application/vnd.ms-word.document.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.wordprocessingml.document"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-word.template.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.wordprocessingml.template"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-powerpoint.template.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.presentationml.template"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-powerpoint.addin.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-powerpoint.slideshow.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.presentationml.slideshow"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-powerpoint.presentation.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.presentationml.presentation"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-excel.addin.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-excel.sheet.binary.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-excel.sheet.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.ms-excel.template.macroEnabled.12"); //$NON-NLS-1$
+        OOXML_MIMETYPES.add("application/vnd.openxmlformats-officedocument.spreadsheetml.template"); //$NON-NLS-1$
 
         // MimeTypes reconocidos del formato ODF
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.text");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.text-template");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.text-web");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.text-master");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.graphics");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.graphics-template");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.presentation");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.presentation-template");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.spreadsheet");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.spreadsheet-template");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.chart");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.formula");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.database");
-        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.image");
-        ODF_MIMETYPES.add("application/vnd.openofficeorg.extension");
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.text"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.text-template"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.text-web"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.text-master"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.graphics"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.graphics-template"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.presentation"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.presentation-template"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.spreadsheet"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.spreadsheet-template"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.chart"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.formula"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.database"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.oasis.opendocument.image"); //$NON-NLS-1$
+        ODF_MIMETYPES.add("application/vnd.openofficeorg.extension"); //$NON-NLS-1$
 
         // Extensiones de fichero
-        FILE_EXTENSIONS.put("application/zip", "zip");
+        FILE_EXTENSIONS.put("application/zip", "zip"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
-        FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.spreadsheet", "xslx");
+        FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.spreadsheet", "xslx"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text", "odt");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.presentation", "odp");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.spreadsheet", "ods");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.graphics", "odg");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.chart", "odc");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.formula", "odf");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.database", "odb");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.image", "odi");
-        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text-master", "odm");
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text", "odt"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.presentation", "odp"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.spreadsheet", "ods"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.graphics", "odg"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.chart", "odc"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.formula", "odf"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.database", "odb"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.image", "odi"); //$NON-NLS-1$ //$NON-NLS-2$
+        FILE_EXTENSIONS.put("application/vnd.oasis.opendocument.text-master", "odm"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /** Devuelve el MimeType correspondiente al documento ofim&aacute;tico
@@ -112,11 +112,11 @@ public final class OfficeXMLAnalizer {
             zipFile = AOFileUtils.createTempZipFile(zipData);
         }
         catch (final ZipException e1) {
-            LOGGER.warning("El fichero indicado no es un ZIP");
+            LOGGER.warning("El fichero indicado no es un ZIP"); //$NON-NLS-1$
             return null;
         }
         catch (final Exception e1) {
-            LOGGER.warning("No se pudo leer el fichero, se considerara que es un zip");
+            LOGGER.warning("No se pudo leer el fichero, se considerara que es un zip"); //$NON-NLS-1$
             return ZIP_MIMETYPE;
         }
 
@@ -124,16 +124,18 @@ public final class OfficeXMLAnalizer {
         try {
             String tempMimetype = null;
             if (isODFFile(zipFile)) {
-                tempMimetype = getODFMimeType(zipFile.getInputStream(zipFile.getEntry("mimetype")));
+                tempMimetype = getODFMimeType(zipFile.getInputStream(zipFile.getEntry("mimetype"))); //$NON-NLS-1$
             }
             else if (isOOXMLFile(zipFile)) {
-                tempMimetype = getOOXMLMimeType(zipFile.getInputStream(zipFile.getEntry("[Content_Types].xml")));
+                tempMimetype = getOOXMLMimeType(zipFile.getInputStream(zipFile.getEntry("[Content_Types].xml"))); //$NON-NLS-1$
             }
             if (tempMimetype != null) {
                 mimetype = tempMimetype;
             }
         }
-        catch (final Exception e) {}
+        catch (final Exception e) {
+            // Se ignora, es porque no es ni ODF ni OOXML
+        }
 
         return mimetype;
     }
@@ -164,7 +166,7 @@ public final class OfficeXMLAnalizer {
             zipFile = AOFileUtils.createTempZipFile(document);
         }
         catch (final Exception e1) {
-            LOGGER.warning("No se pudo leer el fichero, se considerara que no es un documento OOXML");
+            LOGGER.warning("No se pudo leer el fichero, se considerara que no es un documento OOXML"); //$NON-NLS-1$
             return false;
         }
         return isOOXMLFile(zipFile);
@@ -177,9 +179,9 @@ public final class OfficeXMLAnalizer {
      * @return Devuelve <code>true</code> si el fichero era un OOXML soportado, <code>false</code> en caso contrario. */
     private static boolean isOOXMLFile(final ZipFile zipFile) {
         // Comprobamos si estan todos los ficheros principales del documento
-        return zipFile.getEntry("[Content_Types].xml") != null && zipFile.getEntry("_rels/.rels") != null
-               && zipFile.getEntry("docProps/app.xml") != null
-               && zipFile.getEntry("docProps/core.xml") != null;
+        return zipFile.getEntry("[Content_Types].xml") != null && zipFile.getEntry("_rels/.rels") != null //$NON-NLS-1$ //$NON-NLS-2$
+               && zipFile.getEntry("docProps/app.xml") != null //$NON-NLS-1$
+               && zipFile.getEntry("docProps/core.xml") != null; //$NON-NLS-1$
     }
 
     /** Recupera el MimeType del XML "[Content_Type].xml" de un OOXML. Si el
@@ -200,7 +202,7 @@ public final class OfficeXMLAnalizer {
 
         // Obtenemos la raiz
         final Element root = doc.getDocumentElement();
-        if (!root.getNodeName().equalsIgnoreCase("Types")) {
+        if (!root.getNodeName().equalsIgnoreCase("Types")) { //$NON-NLS-1$
             return null;
         }
 
@@ -208,11 +210,11 @@ public final class OfficeXMLAnalizer {
         final NodeList nodes = root.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             node = nodes.item(i);
-            if (node.getNodeName().equalsIgnoreCase("Override")) {
+            if (node.getNodeName().equalsIgnoreCase("Override")) { //$NON-NLS-1$
                 final NamedNodeMap nodeAttributes = node.getAttributes();
                 Node nodeAttribute = null;
                 for (int j = 0; j < nodeAttributes.getLength(); j++) {
-                    if (nodeAttributes.item(j).getNodeName().equalsIgnoreCase("ContentType")) {
+                    if (nodeAttributes.item(j).getNodeName().equalsIgnoreCase("ContentType")) { //$NON-NLS-1$
                         nodeAttribute = nodeAttributes.item(j);
                         break;
                     }
@@ -242,7 +244,7 @@ public final class OfficeXMLAnalizer {
             zipFile = AOFileUtils.createTempZipFile(document);
         }
         catch (final Exception e1) {
-            LOGGER.warning("No se pudo leer el fichero, se considerara que no es un documento ODF");
+            LOGGER.warning("No se pudo leer el fichero, se considerara que no es un documento ODF"); //$NON-NLS-1$
             return false;
         }
         return isODFFile(zipFile);
@@ -256,11 +258,11 @@ public final class OfficeXMLAnalizer {
     private static boolean isODFFile(final ZipFile zipFile) {
 
         // Comprobamos si estan todos los ficheros principales del documento
-        return zipFile.getEntry("mimetype") != null && zipFile.getEntry("content.xml") != null
-               && zipFile.getEntry("meta.xml") != null
-               && zipFile.getEntry("settings.xml") != null
-               && zipFile.getEntry("styles.xml") != null
-               && zipFile.getEntry("META-INF/manifest.xml") != null;
+        return zipFile.getEntry("mimetype") != null && zipFile.getEntry("content.xml") != null //$NON-NLS-1$ //$NON-NLS-2$
+               && zipFile.getEntry("meta.xml") != null //$NON-NLS-1$
+               && zipFile.getEntry("settings.xml") != null //$NON-NLS-1$
+               && zipFile.getEntry("styles.xml") != null //$NON-NLS-1$
+               && zipFile.getEntry("META-INF/manifest.xml") != null; //$NON-NLS-1$
     }
 
     /** Recupera la extensi&oacute;n apropiada para un documento ODF. Si el

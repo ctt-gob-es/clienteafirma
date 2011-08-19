@@ -25,7 +25,7 @@ import net.sf.jmimemagic.MagicMatchNotFoundException;
  * identificadores de tipo de contenidos. */
 public final class MimeHelper {
 
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
     /** Tabla que asocia Oids y Mimetypes. */
     private static Properties oidMimetypeProp = null;
@@ -50,7 +50,7 @@ public final class MimeHelper {
     public MimeHelper(final byte[] data) {
 
         if (data == null) {
-            throw new IllegalArgumentException("No se han indicado los datos que se desean analizar");
+            throw new IllegalArgumentException("No se han indicado los datos que se desean analizar"); //$NON-NLS-1$
         }
 
         this.data = data.clone();
@@ -60,10 +60,10 @@ public final class MimeHelper {
             this.match = Magic.getMagicMatch(data);
         }
         catch (final MagicMatchNotFoundException e) {
-            LOGGER.warning("No se pudo detectar el formato de los datos");
+            LOGGER.warning("No se pudo detectar el formato de los datos"); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            LOGGER.warning("Error durante el analisis de la cabecera de los datos: " + e);
+            LOGGER.warning("Error durante el analisis de la cabecera de los datos: " + e); //$NON-NLS-1$
         }
     }
 
@@ -96,17 +96,19 @@ public final class MimeHelper {
     private static void loadOidMimetypeProperties() {
         oidMimetypeProp = new Properties();
 
-        final InputStream isProp = MimeHelper.class.getResourceAsStream("/resources/oids_mimetypes.properties");
+        final InputStream isProp = MimeHelper.class.getResourceAsStream("/resources/oids_mimetypes.properties"); //$NON-NLS-1$
         try {
             oidMimetypeProp.load(isProp);
         }
         catch (final Exception e) {
-            LOGGER.warning("No se ha podido cargar la tabla de relaciones Oid-Mimetype: " + e);
+            LOGGER.warning("No se ha podido cargar la tabla de relaciones Oid-Mimetype: " + e); //$NON-NLS-1$
         }
         try {
             isProp.close();
         }
-        catch (final Exception e) {}
+        catch (final Exception e) {
+            // Ignoramos errores en el cierre
+        }
     }
 
     /** Carga la tabla de relacion de MimeTypes y Oids. */
@@ -126,19 +128,21 @@ public final class MimeHelper {
     public String getMimeType() {
 
         // Comprobamos si ya se calculo previamente el tipo de datos
-        if (mimeType == null) {
+        if (this.mimeType == null) {
 
             // Probamos a pasear los datos como si fuesen un XML, si no lanzan
             // una excepcion, entonces son
             // datos XML.
             try {
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
-                mimeType = "text/xml";
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
+                this.mimeType = "text/xml"; //$NON-NLS-1$
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Ignoramos, es porque no es XML
+            }
 
-            if (mimeType == null && match != null) {
-                mimeType = match.getMimeType();
+            if (this.mimeType == null && this.match != null) {
+                this.mimeType = this.match.getMimeType();
             }
 
             // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
@@ -146,12 +150,12 @@ public final class MimeHelper {
             // alguno de los ficheros ofimaticos soportados (que son ZIP con una
             // estructura concreta)
             // Comprobaciones especiales para los ficheros ZIP
-            if (mimeType != null && mimeType.equals("application/zip")) {
-                mimeType = OfficeXMLAnalizer.getMimeType(data);
+            if (this.mimeType != null && this.mimeType.equals("application/zip")) { //$NON-NLS-1$
+                this.mimeType = OfficeXMLAnalizer.getMimeType(this.data);
             }
         }
 
-        return mimeType;
+        return this.mimeType;
     }
 
     /** Recupera la extensi&oacute;n com&uacute;n para un fichero con los datos analizados, {@code null} si no se conoce. La extensi&oacute;n se
@@ -164,20 +168,22 @@ public final class MimeHelper {
         // Probamos a pasear los datos como si fuesen un XML, si no lanzan
         // una excepcion, entonces son datos XML.
         try {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
-            extension = "xml";
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(this.data));
+            extension = "xml"; //$NON-NLS-1$
         }
-        catch (final Exception e) {}
+        catch (final Exception e) {
+         // Ignoramos, es porque no es XML
+        }
 
-        if (extension == null && match != null) {
-            extension = match.getExtension();
+        if (extension == null && this.match != null) {
+            extension = this.match.getExtension();
         }
 
         // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
         // realidad alguno de los ficheros ofimaticos soportados (que son ZIP con una
         // estructura concreta)
-        if (extension != null && extension.equals("zip")) {
-            extension = OfficeXMLAnalizer.getExtension(data);
+        if (extension != null && extension.equals("zip")) { //$NON-NLS-1$
+            extension = OfficeXMLAnalizer.getExtension(this.data);
         }
 
         return extension;
@@ -187,8 +193,8 @@ public final class MimeHelper {
      * se pudo detectar.
      * @return Descripci&oacute;n del tipo de dato. */
     public String getDescription() {
-        if (match != null) {
-            return match.getDescription();
+        if (this.match != null) {
+            return this.match.getDescription();
         }
         return null;
     }

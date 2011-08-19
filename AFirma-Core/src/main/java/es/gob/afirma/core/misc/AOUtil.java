@@ -32,19 +32,21 @@ import javax.naming.ldap.Rdn;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.TreeNode;
+import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3 */
 public final class AOUtil {
 
-    private AOUtil() {}
+    private AOUtil() {
+        // No permitimos la instanciacion
+    }
     
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String[] SUPPORTED_URI_SCHEMES = new String[] {
-            "http", "https", "file", "urn"
+            "http", "https", "file", "urn" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     };
 
     /** Crea una URI a partir de un nombre de fichero local o una URL.
@@ -56,13 +58,13 @@ public final class AOUtil {
     public final static URI createURI(String filename) throws AOException {
 
         if (filename == null) {
-            throw new AOException("No se puede crear una URI a partir de un nulo");
+            throw new AOException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
         }
 
         filename = filename.trim();
 
-        if ("".equals(filename)) {
-            throw new AOException("La URI no puede ser una cadena vacia");
+        if ("".equals(filename)) { //$NON-NLS-1$
+            throw new AOException("La URI no puede ser una cadena vacia"); //$NON-NLS-1$
         }
 
         // Cambiamos los caracteres Windows
@@ -72,24 +74,24 @@ public final class AOUtil {
         // seguros
         // de la URL
         filename =
-                filename.replace(" ", "%20")
-                        .replace("<", "%3C")
-                        .replace(">", "%3E")
-                        .replace("\"", "%22")
-                        .replace("{", "%7B")
-                        .replace("}", "%7D")
-                        .replace("|", "%7C")
-                        .replace("^", "%5E")
-                        .replace("[", "%5B")
-                        .replace("]", "%5D")
-                        .replace("`", "%60");
+                filename.replace(" ", "%20") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("<", "%3C") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace(">", "%3E") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("\"", "%22") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("{", "%7B") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("}", "%7D") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("|", "%7C") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("^", "%5E") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("[", "%5B") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("]", "%5D") //$NON-NLS-1$ //$NON-NLS-2$
+                        .replace("`", "%60"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final URI uri;
         try {
             uri = new URI(filename);
         }
         catch (final Exception e) {
-            throw new AOException("Formato de URI (" + filename + ") incorrecto", e);
+            throw new AOException("Formato de URI (" + filename + ") incorrecto", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Comprobamos si es un esquema soportado
@@ -103,19 +105,19 @@ public final class AOUtil {
         // Si el esquema es nulo, aun puede ser un nombre de fichero valido
         // El caracter '#' debe protegerse en rutas locales
         if (scheme == null) {
-            filename = filename.replace("#", "%23");
-            return createURI("file://" + filename);
+            filename = filename.replace("#", "%23"); //$NON-NLS-1$ //$NON-NLS-2$
+            return createURI("file://" + filename); //$NON-NLS-1$
         }
 
         // Miramos si el esquema es una letra, en cuyo caso seguro que es una
         // unidad de Windows ("C:", "D:", etc.), y le anado el file://
         // El caracter '#' debe protegerse en rutas locales
         if (scheme.length() == 1 && Character.isLetter((char) scheme.getBytes()[0])) {
-            filename = filename.replace("#", "%23");
-            return createURI("file://" + filename);
+            filename = filename.replace("#", "%23"); //$NON-NLS-1$ //$NON-NLS-2$
+            return createURI("file://" + filename); //$NON-NLS-1$
         }
 
-        throw new AOException("Formato de URI valido pero no soportado '" + filename + "'");
+        throw new AOException("Formato de URI valido pero no soportado '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
     }
 
@@ -131,16 +133,16 @@ public final class AOUtil {
     public final static InputStream loadFile(final URI uri) throws FileNotFoundException, AOException {
 
         if (uri == null) {
-            throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula");
+            throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
         }
 
-        if (uri.getScheme().equals("file")) {
+        if (uri.getScheme().equals("file")) { //$NON-NLS-1$
             // Es un fichero en disco. Las URL de Java no soportan file://, con
             // lo que hay que diferenciarlo a mano
             try {
                 // Retiramos el "file://" de la uri
                 String path = uri.getSchemeSpecificPart();
-                if (path.startsWith("//")) {
+                if (path.startsWith("//")) { //$NON-NLS-1$
                     path = path.substring(2);
                 }
                 return new FileInputStream(new File(path));
@@ -152,7 +154,7 @@ public final class AOUtil {
                 throw e;
             }
             catch (final Exception e) {
-                throw new AOException("Error intentando abrir un archivo en almacenamiento local", e);
+                throw new AOException("Error intentando abrir un archivo en almacenamiento local", e); //$NON-NLS-1$
             }
         }
 
@@ -162,7 +164,7 @@ public final class AOUtil {
             tmpStream = new BufferedInputStream(uri.toURL().openStream());
         }
         catch (final Exception e) {
-            throw new AOException("Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL", e);
+            throw new AOException("Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         // Las firmas via URL fallan en la descarga por temas de Sun, asi que
         // descargamos primero
@@ -172,7 +174,7 @@ public final class AOUtil {
             tmpBuffer = getDataFromInputStream(tmpStream);
         }
         catch (final Exception e) {
-            throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "'", e);
+            throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // LOGGER.info(
@@ -211,27 +213,27 @@ public final class AOUtil {
             return File.separator;
         }
         String systemRoot = null;
-        final String defaultSystemRoot = "C:\\WINDOWS";
+        final String defaultSystemRoot = "C:\\WINDOWS"; //$NON-NLS-1$
         try {
             systemRoot =
                     WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE,
-                                                 "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-                                                 "SystemRoot");
+                                                 "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", //$NON-NLS-1$
+                                                 "SystemRoot"); //$NON-NLS-1$
         }
         catch (final Exception e) {
             LOGGER
-                  .severe("No se ha podido obtener el directorio principal de Windows accediendo al registro, " + "se probara con 'C:\\WINDOWS': "
+                  .severe("No se ha podido obtener el directorio principal de Windows accediendo al registro, " + "se probara con 'C:\\WINDOWS': " //$NON-NLS-1$ //$NON-NLS-2$
                           + e);
         }
         if (systemRoot == null) {
-            final File winSys32 = new File(defaultSystemRoot + "\\SYSTEM32");
+            final File winSys32 = new File(defaultSystemRoot + "\\SYSTEM32"); //$NON-NLS-1$
             if (winSys32.exists() && winSys32.isDirectory()) {
                 return defaultSystemRoot;
             }
         }
         if (systemRoot == null) {
             LOGGER
-                  .warning("No se ha encontrado el directorio ra&iacute;z del sistema, se devolver&aacute;: " + File.separator);
+                  .warning("No se ha encontrado el directorio ra&iacute;z del sistema, se devolver&aacute;: " + File.separator); //$NON-NLS-1$
             systemRoot = File.separator;
         }
         return systemRoot;
@@ -245,15 +247,15 @@ public final class AOUtil {
             String systemRoot = AOUtil.getSystemRoot();
             if (systemRoot == null) {
                 LOGGER
-                      .warning("No se ha podido determinar el directorio de Windows accediendo al registro, " + "se establecera 'C:\\WINDOWS\\' por defecto");
-                systemRoot = "c:\\windows\\";
+                      .warning("No se ha podido determinar el directorio de Windows accediendo al registro, " + "se establecera 'C:\\WINDOWS\\' por defecto"); //$NON-NLS-1$ //$NON-NLS-2$
+                systemRoot = "c:\\windows\\"; //$NON-NLS-1$
             }
-            if (!systemRoot.endsWith("\\")) {
-                systemRoot += "\\";
+            if (!systemRoot.endsWith("\\")) { //$NON-NLS-1$
+                systemRoot += "\\"; //$NON-NLS-1$
             }
-            return systemRoot + "System32";
+            return systemRoot + "System32"; //$NON-NLS-1$
         }
-        return "/usr/lib";
+        return "/usr/lib"; //$NON-NLS-1$
     }
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) del titular de un
@@ -286,16 +288,16 @@ public final class AOUtil {
             rdns = new LdapName(principal).getRdns();
         }
         catch (final Exception e) {
-            LOGGER.warning("No se ha podido obtener el Common Name, se devolvera la cadena de entrada: " + e);
+            LOGGER.warning("No se ha podido obtener el Common Name, se devolvera la cadena de entrada: " + e); //$NON-NLS-1$
             return principal;
         }
         if (rdns != null && (!rdns.isEmpty())) {
             String ou = null;
             for (int j = 0; j < rdns.size(); j++) {
-                if (rdns.get(j).toString().startsWith("cn=") || rdns.get(j).toString().startsWith("CN=")) {
+                if (rdns.get(j).toString().startsWith("cn=") || rdns.get(j).toString().startsWith("CN=")) { //$NON-NLS-1$ //$NON-NLS-2$
                     return rdns.get(j).toString().substring(3);
                 }
-                else if (rdns.get(j).toString().startsWith("ou=") || rdns.get(j).toString().startsWith("OU=")) {
+                else if (rdns.get(j).toString().startsWith("ou=") || rdns.get(j).toString().startsWith("OU=")) { //$NON-NLS-1$ //$NON-NLS-2$
                     ou = rdns.get(j).toString().substring(3);
                 }
             }
@@ -308,10 +310,10 @@ public final class AOUtil {
             }
 
             LOGGER
-                  .warning("No se ha podido obtener el Common Name ni la Organizational Unit, se devolvera el fragmento mas significativo");
+                  .warning("No se ha podido obtener el Common Name ni la Organizational Unit, se devolvera el fragmento mas significativo"); //$NON-NLS-1$
             return rdns.get(rdns.size() - 1).toString().substring(3);
         }
-        LOGGER.warning("Principal no valido, se devolvera la entrada");
+        LOGGER.warning("Principal no valido, se devolvera la entrada"); //$NON-NLS-1$
         return principal;
     }
 
@@ -320,7 +322,7 @@ public final class AOUtil {
      * A&ntilde;adimos el car&aacute;cter &tilde; porque en ciertas
      * codificaciones de Base64 est&aacute; aceptado, aunque no es nada
      * recomendable */
-    private static final String BASE_64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\n+/0123456789\r~";
+    private static final String BASE_64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=_-\n+/0123456789\r~"; //$NON-NLS-1$
 
     /** @param data
      *        Datos a comprobar si podr6iacute;an o no ser Base64
@@ -332,7 +334,7 @@ public final class AOUtil {
 
         // Comprobamos que la cadena tenga una longitud multiplo de 4 caracteres
         final String b64String = new String(data).trim();
-        if (b64String.replace("\r\n", "").replace("\n", "").length() % 4 != 0) {
+        if (b64String.replace("\r\n", "").replace("\n", "").length() % 4 != 0) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             return false;
         }
 
@@ -365,7 +367,7 @@ public final class AOUtil {
      * @return Representaci&oacute;n textual del vector de octetos de entrada */
     public final static String hexify(final byte abyte0[], final boolean separator) {
         if (abyte0 == null) {
-            return "null";
+            return "null"; //$NON-NLS-1$
         }
 
         final StringBuffer stringbuffer = new StringBuffer(256);
@@ -398,7 +400,7 @@ public final class AOUtil {
      * @return Representaci&oacute;n textual del vector de octetos de entrada */
     public static final String hexify(final byte abyte0[], final String separator) {
         if (abyte0 == null) {
-            return "null";
+            return "null"; //$NON-NLS-1$
         }
 
         final StringBuffer stringbuffer = new StringBuffer(256);
@@ -416,7 +418,7 @@ public final class AOUtil {
      * cifrado.
      * @return Ruta absoluta del fichero. */
     public final static String getCipherKeystore() {
-        return Platform.getUserHome() + File.separator + "ciphkeys.jceks";
+        return Platform.getUserHome() + File.separator + "ciphkeys.jceks"; //$NON-NLS-1$
     }
 
     /** Recupera un algoritmo de hash a partir del algoritmo de firma introducido
@@ -428,14 +430,14 @@ public final class AOUtil {
      * @return Algoritmo de hash. */
     public final static String getDigestAlgorithm(final String signatureAlgorithm) {
 
-        final int withPos = signatureAlgorithm.indexOf("with");
+        final int withPos = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
         if (withPos == -1) {
             return null;
         }
 
         String digestAlg = signatureAlgorithm.substring(0, withPos);
-        if (digestAlg.startsWith("SHA")) {
-            digestAlg = "SHA-" + digestAlg.substring(3);
+        if (digestAlg.startsWith("SHA")) { //$NON-NLS-1$
+            digestAlg = "SHA-" + digestAlg.substring(3); //$NON-NLS-1$
         }
         return digestAlg;
     }
@@ -465,18 +467,18 @@ public final class AOUtil {
             p.load(is);
         }
         catch (final Exception e) {
-            LOGGER.warning("No se han podido obtener los datos de version del cliente de firma");
+            LOGGER.warning("No se han podido obtener los datos de version del cliente de firma"); //$NON-NLS-1$
         }
         final StringBuilder version = new StringBuilder();
-        version.append(p.getProperty("version.mayor", "0"))
-               .append(".")
-               .append(p.getProperty("version.minor", "0"))
-               .append(".")
-               .append(p.getProperty("version.build", "0"));
+        version.append(p.getProperty("version.mayor", "0")) //$NON-NLS-1$ //$NON-NLS-2$
+               .append(".") //$NON-NLS-1$
+               .append(p.getProperty("version.minor", "0")) //$NON-NLS-1$ //$NON-NLS-2$
+               .append(".") //$NON-NLS-1$
+               .append(p.getProperty("version.build", "0")); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final String desc = p.getProperty("version.description");
-        if (desc != null && !desc.trim().equals("")) {
-            version.append(" ").append(desc);
+        final String desc = p.getProperty("version.description"); //$NON-NLS-1$
+        if (desc != null && !desc.trim().equals("")) { //$NON-NLS-1$
+            version.append(" ").append(desc); //$NON-NLS-1$
         }
         return version.toString();
 
@@ -499,23 +501,23 @@ public final class AOUtil {
             return null;
         }
 
-        if (!(tree.getRoot() instanceof TreeNode)) {
+        if (!(tree.getRoot() instanceof AOTreeNode)) {
             LOGGER.severe("La raiz del arbol de firmas no es de tipo DafaultMutableTreeNode"); //$NON-NLS-1$
             return null;
         }
 
         if (linePrefx == null) {
-            linePrefx = "";
+            linePrefx = ""; //$NON-NLS-1$
         }
         if (identationString == null) {
-            identationString = "\t";
+            identationString = "\t"; //$NON-NLS-1$
         }
 
         final StringBuilder buffer = new StringBuilder();
 
         // Transformamos en cadenas de texto cada rama que surja del nodo raiz
         // del arbol
-        final TreeNode root = (TreeNode) tree.getRoot();
+        final AOTreeNode root = (AOTreeNode) tree.getRoot();
         for (int i = 0; i < root.getChildCount(); i++) {
             archiveTreeNode(root.getChildAt(i), 0, linePrefx, identationString, buffer);
         }
@@ -539,7 +541,7 @@ public final class AOUtil {
      *        defecto, tabulador).
      * @param buffer
      *        Buffer en donde se genera la cadena de texto. */
-    private final static void archiveTreeNode(final TreeNode node,
+    private final static void archiveTreeNode(final AOTreeNode node,
                                               final int depth,
                                               final String linePrefx,
                                               final String identationString,
@@ -559,7 +561,7 @@ public final class AOUtil {
      *        Ruta a la libreria de sistema. */
     public static void loadNativeLibrary(final String path) {
         if (path == null) {
-            LOGGER.warning("No se puede cargar una biblioteca nula");
+            LOGGER.warning("No se puede cargar una biblioteca nula"); //$NON-NLS-1$
             return;
         }
         boolean copyOK = false;
@@ -575,7 +577,7 @@ public final class AOUtil {
             copyOK = copyFile(file, tempLibrary);
         }
         catch (final Exception e) {
-            LOGGER.warning("Error al generar una nueva instancia de la libreria " + path + " para su carga: " + e);
+            LOGGER.warning("Error al generar una nueva instancia de la libreria " + path + " para su carga: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Pedimos borrar los temporales cuando se cierre la JVM
@@ -583,10 +585,12 @@ public final class AOUtil {
             try {
                 tempLibrary.deleteOnExit();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Ignoramos los errores, el usuario debe limpiar los temporales regularmente
+            }
         }
 
-        LOGGER.info("Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath()));
+        LOGGER.info("Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath())); //$NON-NLS-1$
         System.load((copyOK && tempLibrary != null) ? tempLibrary.getAbsolutePath() : path);
 
     }
@@ -615,26 +619,34 @@ public final class AOUtil {
             try {
                 in.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Ignoramos los errores de cierre
+            }
             try {
                 out.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+             // Ignoramos los errores de cierre
+            }
             try {
                 is.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+             // Ignoramos los errores de cierre
+            }
             try {
                 os.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+             // Ignoramos los errores de cierre
+            }
 
         }
         catch (final Exception e) {
-            LOGGER.severe("No se ha podido copiar el fichero origen '" + source.getName()
-                                                     + "' al destino '"
+            LOGGER.severe("No se ha podido copiar el fichero origen '" + source.getName() //$NON-NLS-1$
+                                                     + "' al destino '" //$NON-NLS-1$
                                                      + dest.getName()
-                                                     + "': "
+                                                     + "': " //$NON-NLS-1$
                                                      + e);
             return false;
         }
@@ -663,7 +675,7 @@ public final class AOUtil {
         int j = 0;
         while (i != text.length() && (j = text.indexOf(sp, i)) != -1) {
             if (i == j) {
-                parts.add("");
+                parts.add(""); //$NON-NLS-1$
             }
             else {
                 parts.add(text.substring(i, j));
@@ -671,7 +683,7 @@ public final class AOUtil {
             i = j + sp.length();
         }
         if (i == text.length()) {
-            parts.add("");
+            parts.add(""); //$NON-NLS-1$
         }
         else {
             parts.add(text.substring(i));

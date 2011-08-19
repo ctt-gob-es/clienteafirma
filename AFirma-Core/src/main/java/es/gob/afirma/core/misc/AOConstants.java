@@ -14,47 +14,49 @@ package es.gob.afirma.core.misc;
  * @version 0.3 */
 public final class AOConstants {
 
-    private AOConstants() {}
+    private AOConstants() {
+        // No permitimos la instanciacion
+    }
 
     // ************************************************************
     // ************* ALGORITMOS DE CIFRADO***** *******************
     // ************************************************************
 
     /** Caracteres ASCII validos para la contrase&ntilde;a de cifrado. */
-    public final static String ACCEPTED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+    public final static String ACCEPTED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; //$NON-NLS-1$
 
     /** Algoritmos de cifrado soportados. */
     public enum AOCipherAlgorithm {
 
         /** Advanced Encryption Standard (AES). */
-        AES("AES", "Advanced Encryption Standard (AES)", false, true, "2.16.840.1.101.3.4.1"),
+        AES("AES", "Advanced Encryption Standard (AES)", false, true, "2.16.840.1.101.3.4.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** Alleged RC4. */
-        ARCFOUR("ARCFOUR", "Alleged RC4", false, true, "1.2.840.113549.3.4"),
+        ARCFOUR("ARCFOUR", "Alleged RC4", false, true, "1.2.840.113549.3.4"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** Blowfish. */
-        BLOWFISH("Blowfish", "Blowfish", false, true, "1.3.6.1.4.1.3029.1.1.1"),
+        BLOWFISH("Blowfish", "Blowfish", false, true, "1.3.6.1.4.1.3029.1.1.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** Data Encryption Standard (DES). */
-        DES("DES", "Data Encryption Standard (DES)", false, true, "1.2.840.113549.3.6"),
+        DES("DES", "Data Encryption Standard (DES)", false, true, "1.2.840.113549.3.6"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** Triple DES (3DES). */
-        TRIPLEDES("DESede", "Triple DES (3DES)", false, true, "1.2.840.113549.3.7"),
+        TRIPLEDES("DESede", "Triple DES (3DES)", false, true, "1.2.840.113549.3.7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** RC2. */
-        RC2("RC2", "RC2", false, true, "1.2.840.113549.3.3"),
+        RC2("RC2", "RC2", false, true, "1.2.840.113549.3.3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** Contrase&ntilde;a con MD5 y DES. */
-        PBEWITHMD5ANDDES("PBEWithMD5AndDES", "Contrase\u00F1a con MD5 y DES", true, false, "1.2.840.113549.1.5.3"),
+        PBEWITHMD5ANDDES("PBEWithMD5AndDES", "Contrase\u00F1a con MD5 y DES", true, false, "1.2.840.113549.1.5.3"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** Contrase&ntilde;a con SHA1 y 3DES. */
-        PBEWITHSHA1ANDDESEDE("PBEWithSHA1AndDESede", "Contrase\u00F1a con SHA1 y 3DES", true, false, "1.2.840.113549.1.5.10"),
+        PBEWITHSHA1ANDDESEDE("PBEWithSHA1AndDESede", "Contrase\u00F1a con SHA1 y 3DES", true, false, "1.2.840.113549.1.5.10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** Contrase&ntilde;a con SHA1 y RC2. */
-        PBEWITHSHA1ANDRC2_40("PBEWithSHA1AndRC2_40", "Contrase\u00F1a con SHA1 y RC2", true, false, "1.2.840.113549.1.5.11"),
+        PBEWITHSHA1ANDRC2_40("PBEWithSHA1AndRC2_40", "Contrase\u00F1a con SHA1 y RC2", true, false, "1.2.840.113549.1.5.11"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         /** MAC HMACMD5 **/
-        HMACMD5("HmacMD5", "HmacMD5", false, true, "1.3.6.1.5.5.8.1.1"),
+        HMACMD5("HmacMD5", "HmacMD5", false, true, "1.3.6.1.5.5.8.1.1"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** MAC HMACSHA1 **/
-        HMACSHA1("HmacSHA1", "HmacSHA1", false, true, "1.2.840.113549.2.7"),
+        HMACSHA1("HmacSHA1", "HmacSHA1", false, true, "1.2.840.113549.2.7"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** MAC HMACSHA256 **/
-        HMACSHA256("HmacSHA256", "HmacSHA256", false, true, "1.2.840.113549.2.9"),
+        HMACSHA256("HmacSHA256", "HmacSHA256", false, true, "1.2.840.113549.2.9"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** MAC HMACSHA384 **/
-        HMACSHA384("HmacSHA384", "HmacSHA384", false, true, "1.2.840.113549.2.10"),
+        HMACSHA384("HmacSHA384", "HmacSHA384", false, true, "1.2.840.113549.2.10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         /** MAC HMACSHA512 **/
-        HMACSHA512("HmacSHA512", "HmacSHA512", false, true, "1.2.840.113549.2.11");
+        HMACSHA512("HmacSHA512", "HmacSHA512", false, true, "1.2.840.113549.2.11"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         /** Algoritmo de cifrado por defecto. */
         private static final AOCipherAlgorithm DEFAULT_CIPHER_ALGO = AES;
@@ -66,11 +68,11 @@ public final class AOConstants {
         }
 
         private AOCipherAlgorithm(final String n, final String d, final boolean p, final boolean k, final String oi) {
-            name = n;
-            description = d;
-            password = p;
-            key = k;
-            oid = oi;
+            this.name = n;
+            this.description = d;
+            this.password = p;
+            this.key = k;
+            this.oid = oi;
         }
 
         private String name;
@@ -83,31 +85,31 @@ public final class AOConstants {
          * @return <code>true</code> si el algoritmo soporta contrase&ntilde;as
          *         (en vez de claves), <code>false</code> en caso contrario */
         public boolean supportsPassword() {
-            return password;
+            return this.password;
         }
 
         /** Indica si el algoritmo de cifrado soporta claves.
          * @return <code>true</code> si el algoritmo soporta claves (en vez de
          *         contrase&ntilde;as), <code>false</code> en caso contrario */
         public boolean supportsKey() {
-            return key;
+            return this.key;
         }
 
         /** Obtiene el nombre del algoritmo.
          * @return Nombre del algoritmo */
         public String getName() {
-            return name;
+            return this.name;
         }
 
         @Override
         public String toString() {
-            return description;
+            return this.description;
         }
 
         /** Obtiene el OID (<i>Object IDentifier</i>) ASN.1 del algoritmo.
          * @return OID del algoritmo */
         public String getOid() {
-            return oid;
+            return this.oid;
         }
 
         /** Recupera el algoritmo soportado cuyo nombre se indique. Si el
@@ -128,30 +130,30 @@ public final class AOConstants {
     /** Relleno (padding) para algorimos de cifrado. */
     public enum AOCipherPadding {
         /** Relleno PKCS#5. */
-        PKCS5PADDING("PKCS5PADDING", "Relleno PKCS#5"),
+        PKCS5PADDING("PKCS5PADDING", "Relleno PKCS#5"), //$NON-NLS-1$ //$NON-NLS-2$
         /** Relleno ISO 10126. */
-        ISO10126PADDING("ISO10126PADDING", "Relleno ISO-10126"),
+        ISO10126PADDING("ISO10126PADDING", "Relleno ISO-10126"), //$NON-NLS-1$ //$NON-NLS-2$
         /** Sin relleno. */
-        NOPADDING("NOPADDING", "Sin Relleno");
+        NOPADDING("NOPADDING", "Sin Relleno"); //$NON-NLS-1$ //$NON-NLS-2$
 
         private String name;
 
         private String description;
 
         private AOCipherPadding(final String n, final String d) {
-            name = n;
-            description = d;
+            this.name = n;
+            this.description = d;
         }
 
         /** Obtiene el nombre del tipo de relleno.
          * @return Nombre del tipo de relleno (padding) */
         public String getName() {
-            return name;
+            return this.name;
         }
 
         @Override
         public String toString() {
-            return description;
+            return this.description;
         }
 
         /** Recupera el relleno soportado cuyo nombre se indique. Si el relleno
@@ -172,35 +174,35 @@ public final class AOConstants {
     /** Modo de bloque para algoritmos de cifrado. */
     public enum AOCipherBlockMode {
         /** Electronic CodeBook (ECB). */
-        ECB("ECB", "Electronic CodeBook (ECB)"),
+        ECB("ECB", "Electronic CodeBook (ECB)"), //$NON-NLS-1$ //$NON-NLS-2$
         /** Cipher-Block Chaining (CBC). */
-        CBC("CBC", "Cipher-Block Chaining (CBC)"),
+        CBC("CBC", "Cipher-Block Chaining (CBC)"), //$NON-NLS-1$ //$NON-NLS-2$
         /** Propagating Cipher-Block Chaining (PCBC). */
-        PCBC("PCBC", "Propagating Cipher-Block Chaining (PCBC)"),
+        PCBC("PCBC", "Propagating Cipher-Block Chaining (PCBC)"), //$NON-NLS-1$ //$NON-NLS-2$
         /** Counter (CTR). */
-        CTR("CTR", "Counter (CTR)"),
+        CTR("CTR", "Counter (CTR)"), //$NON-NLS-1$ //$NON-NLS-2$
         /** Cipher FeedBack (CFB). */
-        CFB("CFB", "Cipher FeedBack (CFB)"),
+        CFB("CFB", "Cipher FeedBack (CFB)"), //$NON-NLS-1$ //$NON-NLS-2$
         /** Output FeedBack (OFB). */
-        OFB("OFB", "Output FeedBack (OFB)");
+        OFB("OFB", "Output FeedBack (OFB)"); //$NON-NLS-1$ //$NON-NLS-2$
 
         private String name;
         private String description;
 
         private AOCipherBlockMode(final String n, final String d) {
-            name = n;
-            description = d;
+            this.name = n;
+            this.description = d;
         }
 
         /** Obtiene el nombre del modo de bloque.
          * @return Nombre del modo de bloque */
         public String getName() {
-            return name;
+            return this.name;
         }
 
         @Override
         public String toString() {
-            return description;
+            return this.description;
         }
 
         /** Recupera el modo de bloque soportado cuyo nombre se indique. Si el
@@ -220,9 +222,9 @@ public final class AOConstants {
     }
 
     /** Configuraci&oacute;n de cifrado por defecto. */
-    public static final String DEFAULT_CIPHER_CONFIG = AOCipherAlgorithm.AES.name() + "/"
+    public static final String DEFAULT_CIPHER_CONFIG = AOCipherAlgorithm.AES.name() + "/" //$NON-NLS-1$
                                                        + AOCipherBlockMode.CBC.name()
-                                                       + "/"
+                                                       + "/" //$NON-NLS-1$
                                                        + AOCipherPadding.PKCS5PADDING.name();
 
     // ************************************************************
@@ -231,19 +233,19 @@ public final class AOConstants {
 
     /** Modo de generaci&oacute;n autom&aacute;tica de clave sim&eacute;trica
      * aleatoria. */
-    public static final String KEY_MODE_GENERATEKEY = "GENERATEKEY";
+    public static final String KEY_MODE_GENERATEKEY = "GENERATEKEY"; //$NON-NLS-1$
 
     /** Modo de inserci&oacute;n directa de clave por parte del usuario. */
-    public static final String KEY_MODE_USERINPUT = "USERINPUT";
+    public static final String KEY_MODE_USERINPUT = "USERINPUT"; //$NON-NLS-1$
 
     /** Modo de generaci&oacute;n de clave a partir de una password. */
-    public static final String KEY_MODE_PASSWORD = "PASSWORD";
+    public static final String KEY_MODE_PASSWORD = "PASSWORD"; //$NON-NLS-1$
 
     /** Algoritmo de cifrado que se usa por defecto. */
     public static final String DEFAULT_KEY_MODE = KEY_MODE_GENERATEKEY;
     
     /** Algoritmo Hash por defecto. */
-    public static final String DEFAULT_DIGEST_ALGORITHM = "SHA-1";
+    public static final String DEFAULT_DIGEST_ALGORITHM = "SHA-1"; //$NON-NLS-1$
 
     // ************************************************************
     // ************* ALMACENES DE CLAVES **************************

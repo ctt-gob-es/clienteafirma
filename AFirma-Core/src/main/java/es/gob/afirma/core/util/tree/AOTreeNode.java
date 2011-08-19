@@ -6,27 +6,27 @@ import java.util.Stack;
 import java.util.Vector;
 
 /** Adaptaci&oacute;n de las clases TreeNode de Swing para su uso sin interfaz gr6aacute;fico. */
-public final class TreeNode {
+public final class AOTreeNode {
 
     private static final long serialVersionUID = 1L;
 
     /** An enumeration that is always empty. This is used when an enumeration of
      * a leaf node's children is requested. */
-    static private final Enumeration<TreeNode> EMPTY_ENUMERATION = new Enumeration<TreeNode>() {
+    static private final Enumeration<AOTreeNode> EMPTY_ENUMERATION = new Enumeration<AOTreeNode>() {
         public boolean hasMoreElements() {
             return false;
         }
 
-        public TreeNode nextElement() {
-            throw new NoSuchElementException("No more elements");
+        public AOTreeNode nextElement() {
+            throw new NoSuchElementException("No hay mas elementos"); //$NON-NLS-1$
         }
     };
 
     /** this node's parent, or null if this node has no parent */
-    private TreeNode parent;
+    private AOTreeNode parent;
 
     /** array of children, may be null if this node has no children */
-    private Vector<TreeNode> children;
+    private Vector<AOTreeNode> children;
 
     /** optional user object */
     transient protected Object userObject;
@@ -39,7 +39,7 @@ public final class TreeNode {
      * @param userObject
      *        an Object provided by the user that constitutes the node's
      *        data */
-    public TreeNode(final Object userObject) {
+    public AOTreeNode(final Object userObject) {
         this(userObject, true);
     }
 
@@ -51,9 +51,9 @@ public final class TreeNode {
      * @param allowsChildren
      *        if true, the node is allowed to have child nodes -- otherwise,
      *        it is always a leaf node */
-    private TreeNode(final Object userObject, final boolean allowsChildren) {
+    private AOTreeNode(final Object userObject, final boolean allowsChildren) {
         super();
-        parent = null;
+        this.parent = null;
         this.allowsChildren = allowsChildren;
         this.userObject = userObject;
     }
@@ -78,27 +78,27 @@ public final class TreeNode {
      *            node
      * @exception IllegalStateException
      *            if this node does not allow children */
-    private void insert(final TreeNode newChild, final int childIndex) {
-        if (!allowsChildren) {
-            throw new IllegalStateException("node does not allow children");
+    private void insert(final AOTreeNode newChild, final int childIndex) {
+        if (!this.allowsChildren) {
+            throw new IllegalStateException("El nodo no permite hijos"); //$NON-NLS-1$
         }
         else if (newChild == null) {
-            throw new IllegalArgumentException("new child is null");
+            throw new IllegalArgumentException("EL nuevo hijo es nulo"); //$NON-NLS-1$
         }
         else if (isNodeAncestor(newChild)) {
-            throw new IllegalArgumentException("new child is an ancestor");
+            throw new IllegalArgumentException("El nuevo hijo es ya un ancestro"); //$NON-NLS-1$
         }
 
-        final TreeNode oldParent = newChild.getParent();
+        final AOTreeNode oldParent = newChild.getParent();
 
         if (oldParent != null) {
             oldParent.remove(newChild);
         }
         newChild.setParent(this);
-        if (children == null) {
-            children = new Vector<TreeNode>();
+        if (this.children == null) {
+            this.children = new Vector<AOTreeNode>();
         }
-        children.insertElementAt(newChild, childIndex);
+        this.children.insertElementAt(newChild, childIndex);
     }
 
     /** Removes the child at the specified index from this node's children and
@@ -108,8 +108,8 @@ public final class TreeNode {
      * @exception ArrayIndexOutOfBoundsException
      *            if <code>childIndex</code> is out of bounds */
     private void remove(final int childIndex) {
-        final TreeNode child = getChildAt(childIndex);
-        children.removeElementAt(childIndex);
+        final AOTreeNode child = getChildAt(childIndex);
+        this.children.removeElementAt(childIndex);
         child.setParent(null);
     }
 
@@ -118,14 +118,14 @@ public final class TreeNode {
      * messaged from anywhere else.
      * @param newParent
      *        this node's new parent */
-    public void setParent(final TreeNode newParent) {
-        parent = newParent;
+    public void setParent(final AOTreeNode newParent) {
+        this.parent = newParent;
     }
 
     /** Returns this node's parent or null if this node has no parent.
      * @return this node's parent TreeNode, or null if this node has no parent */
-    public TreeNode getParent() {
-        return parent;
+    public AOTreeNode getParent() {
+        return this.parent;
     }
 
     /** Returns the child at the specified index in this node's child array.
@@ -134,20 +134,20 @@ public final class TreeNode {
      * @exception ArrayIndexOutOfBoundsException
      *            if <code>index</code> is out of bounds
      * @return the TreeNode in this node's child array at the specified index */
-    public TreeNode getChildAt(final int index) {
-        if (children == null) {
-            throw new ArrayIndexOutOfBoundsException("node has no children");
+    public AOTreeNode getChildAt(final int index) {
+        if (this.children == null) {
+            throw new ArrayIndexOutOfBoundsException("El nodo no tiene hijos"); //$NON-NLS-1$
         }
-        return children.elementAt(index);
+        return this.children.elementAt(index);
     }
 
     /** Returns the number of children of this node.
      * @return an int giving the number of children of this node */
     public int getChildCount() {
-        if (children == null) {
+        if (this.children == null) {
             return 0;
         }
-        return children.size();
+        return this.children.size();
     }
 
     /** Returns the index of the specified child in this node's child array. If
@@ -161,32 +161,32 @@ public final class TreeNode {
      * @return an int giving the index of the node in this node's child array,
      *         or <code>-1</code> if the specified node is a not a child of this
      *         node */
-    private int getIndex(final TreeNode aChild) {
+    private int getIndex(final AOTreeNode aChild) {
         if (aChild == null) {
-            throw new IllegalArgumentException("argument is null");
+            throw new IllegalArgumentException("Argumento nulo"); //$NON-NLS-1$
         }
 
         if (!isNodeChild(aChild)) {
             return -1;
         }
-        return children.indexOf(aChild); // linear search
+        return this.children.indexOf(aChild); // linear search
     }
 
     /** Creates and returns a forward-order enumeration of this node's children.
      * Modifying this node's child array invalidates any child enumerations
      * created before the modification.
      * @return an Enumeration of this node's children */
-    Enumeration<TreeNode> children() {
-        if (children == null) {
+    Enumeration<AOTreeNode> children() {
+        if (this.children == null) {
             return EMPTY_ENUMERATION;
         }
-        return children.elements();
+        return this.children.elements();
     }
 
     /** Returns true if this node is allowed to have children.
      * @return true if this node allows children, else false */
     public boolean getAllowsChildren() {
-        return allowsChildren;
+        return this.allowsChildren;
     }
 
     /** Sets the user object for this node to <code>userObject</code>.
@@ -203,7 +203,7 @@ public final class TreeNode {
      * @see #setUserObject
      * @see #toString */
     public Object getUserObject() {
-        return userObject;
+        return this.userObject;
     }
 
     //
@@ -213,7 +213,7 @@ public final class TreeNode {
     /** Removes the subtree rooted at this node from the tree, giving this node a
      * null parent. Does nothing if this node is the root of its tree. */
     public void removeFromParent() {
-        final TreeNode part = getParent();
+        final AOTreeNode part = getParent();
         if (part != null) {
             part.remove(this);
         }
@@ -226,13 +226,13 @@ public final class TreeNode {
      * @exception IllegalArgumentException
      *            if <code>aChild</code> is null or is not a child of this
      *            node */
-    private void remove(final TreeNode aChild) {
+    private void remove(final AOTreeNode aChild) {
         if (aChild == null) {
-            throw new IllegalArgumentException("argument is null");
+            throw new IllegalArgumentException("Argumento nulo"); //$NON-NLS-1$
         }
 
         if (!isNodeChild(aChild)) {
-            throw new IllegalArgumentException("argument is not a child");
+            throw new IllegalArgumentException("El argumento no es un hijo"); //$NON-NLS-1$
         }
         remove(getIndex(aChild)); // linear search
     }
@@ -246,7 +246,7 @@ public final class TreeNode {
      *            if <code>newChild</code> is null
      * @exception IllegalStateException
      *            if this node does not allow children */
-    public void add(final TreeNode newChild) {
+    public void add(final AOTreeNode newChild) {
         if (newChild != null && newChild.getParent() == this) {
             insert(newChild, getChildCount() - 1);
         }
@@ -269,12 +269,12 @@ public final class TreeNode {
      * @param anotherNode
      *        node to test as an ancestor of this node
      * @return true if this node is a descendant of <code>anotherNode</code> */
-    private boolean isNodeAncestor(final TreeNode anotherNode) {
+    private boolean isNodeAncestor(final AOTreeNode anotherNode) {
         if (anotherNode == null) {
             return false;
         }
 
-        TreeNode ancestor = this;
+        AOTreeNode ancestor = this;
 
         do {
             if (ancestor == anotherNode) {
@@ -290,7 +290,7 @@ public final class TreeNode {
      * <P>
      * Modifying the tree by inserting, removing, or moving a node invalidates any enumerations created before the modification.
      * @return an enumeration for traversing the tree in preorder */
-    public Enumeration<TreeNode> preorderEnumeration() {
+    public Enumeration<AOTreeNode> preorderEnumeration() {
         return new PreorderEnumeration(this);
     }
 
@@ -300,7 +300,7 @@ public final class TreeNode {
 
     /** Returns true if <code>aNode</code> is a child of this node. If <code>aNode</code> is null, this method returns false.
      * @return true if <code>aNode</code> is a child of this node; false if <code>aNode</code> is null */
-    private boolean isNodeChild(final TreeNode aNode) {
+    private boolean isNodeChild(final AOTreeNode aNode) {
         boolean retval;
 
         if (aNode == null) {
@@ -341,37 +341,37 @@ public final class TreeNode {
      * @see #getUserObject */
     @Override
     public String toString() {
-        if (userObject == null) {
-            return "null";
+        if (this.userObject == null) {
+            return "null"; //$NON-NLS-1$
         }
-        return userObject.toString();
+        return this.userObject.toString();
     }
 
-    private static final class PreorderEnumeration implements Enumeration<TreeNode> {
-        private final Stack<Enumeration<TreeNode>> stack;
+    private static final class PreorderEnumeration implements Enumeration<AOTreeNode> {
+        private final Stack<Enumeration<AOTreeNode>> stack;
 
-        PreorderEnumeration(final TreeNode rootNode) {
+        PreorderEnumeration(final AOTreeNode rootNode) {
             super();
-            final Vector<TreeNode> v = new Vector<TreeNode>(1);
+            final Vector<AOTreeNode> v = new Vector<AOTreeNode>(1);
             v.addElement(rootNode); // PENDING: don't really need a vector
-            stack = new Stack<Enumeration<TreeNode>>();
-            stack.push(v.elements());
+            this.stack = new Stack<Enumeration<AOTreeNode>>();
+            this.stack.push(v.elements());
         }
 
         public boolean hasMoreElements() {
-            return (!stack.empty() && (stack.peek()).hasMoreElements());
+            return (!this.stack.empty() && (this.stack.peek()).hasMoreElements());
         }
 
-        public TreeNode nextElement() {
-            final Enumeration<TreeNode> enumer = stack.peek();
-            final TreeNode node = enumer.nextElement();
-            final Enumeration<TreeNode> child = node.children();
+        public AOTreeNode nextElement() {
+            final Enumeration<AOTreeNode> enumer = this.stack.peek();
+            final AOTreeNode node = enumer.nextElement();
+            final Enumeration<AOTreeNode> child = node.children();
 
             if (!enumer.hasMoreElements()) {
-                stack.pop();
+                this.stack.pop();
             }
             if (child.hasMoreElements()) {
-                stack.push(child);
+                this.stack.push(child);
             }
             return node;
         }

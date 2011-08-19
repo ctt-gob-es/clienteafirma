@@ -51,24 +51,24 @@ public final class WinRegistry {
         /** Retorna el valor del par-valor
          * @return Valor de la clave */
         public byte[] getData() {
-            return data.clone();
+            return this.data.clone();
         }
 
         /** Retorna el valor tras realizar el casting al objeto java adecuado, ya
          * sea este un entero, una cadena o en su defecto un array de bytes.
          * @return Valor del objeto */
         public Object getValue() {
-            switch (type) {
+            switch (this.type) {
                 case REG_SZ:
-                    if (data.length <= 0) {
+                    if (this.data.length <= 0) {
                         return null;
                     }
-                    return new String(data, 0, data.length - 1);
+                    return new String(this.data, 0, this.data.length - 1);
 
                 case REG_DWORD: {
                     int n = 0;
-                    for (int i = 0; (i < 4) && (i < data.length); i++) {
-                        n += data[i] << (i * 8);
+                    for (int i = 0; (i < 4) && (i < this.data.length); i++) {
+                        n += this.data[i] << (i * 8);
                     }
                     return Integer.valueOf(n);
                 }

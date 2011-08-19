@@ -34,11 +34,15 @@ public final class WinRegistryWrapper {
         }
     }
 
-    /** Carga la DLL <i>deploy.dll</i>, o la original de Java o la propia del
-     * Cliente @firma. */
-    public static void loadDeployDll() {}
+//    /** Carga la DLL <i>deploy.dll</i>, o la original de Java o la propia del
+//     * Cliente @firma. */
+//    public static void loadDeployDll() {
+//        // Cuerpo vacio, unicamente para cargar la DLL de forma estatica
+//    }
 
-    private WinRegistryWrapper() {}
+    private WinRegistryWrapper() {
+        // No permitimos la instanciacion
+    }
 
     /** Clave <i>HKEY_LOCAL_MACHINE</i> del registro de Windows. */
     public static final int HKEY_LOCAL_MACHINE = 0x80000002;

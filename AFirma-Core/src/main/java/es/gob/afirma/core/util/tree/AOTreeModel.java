@@ -6,7 +6,7 @@ public final class AOTreeModel {
     private static final long serialVersionUID = 1L;
 
     /** Root of the tree. */
-    private final TreeNode root;
+    private final AOTreeNode root;
 
     /** Children count. Always 1 starting with the root */
     private int count = 1;
@@ -14,7 +14,7 @@ public final class AOTreeModel {
     /** Obtiene el n&uacute;mero de elementos del &aacute;rbol.
      * @return N&uacute;mero de elementos del &aacute;rbol */
     public Integer getCount() {
-        return new Integer(count);
+        return new Integer(this.count);
     }
 
     /** Determines how the <code>isLeaf</code> method figures out if a node is a
@@ -24,7 +24,7 @@ public final class AOTreeModel {
      * <i>file</i> nodes in a file system, for example.
      * <p>
      * If this value is false, then any node which has no children is a leaf node, and any node may acquire children.
-     * @see TreeNode#getAllowsChildren
+     * @see AOTreeNode#getAllowsChildren
      * @see AOTreeModel#isLeaf
      * @see #setAsksAllowsChildren */
     private final boolean asksAllowsChildren;
@@ -32,8 +32,8 @@ public final class AOTreeModel {
     /** Creates a tree in which any node can have children.
      * @param root
      *        a TreeNode object that is the root of the tree
-     * @see #AOTreeModel(TreeNode, boolean) */
-    public AOTreeModel(final TreeNode root) {
+     * @see #AOTreeModel(AOTreeNode, boolean) */
+    public AOTreeModel(final AOTreeNode root) {
         this(root, false);
     }
 
@@ -45,7 +45,7 @@ public final class AOTreeModel {
      *        a boolean, false if any node can have children, true if each
      *        node is asked to see if it can have children
      * @see #asksAllowsChildren */
-    private AOTreeModel(final TreeNode root, final boolean asksAllowsChildren) {
+    private AOTreeModel(final AOTreeNode root, final boolean asksAllowsChildren) {
         super();
         this.root = root;
         this.asksAllowsChildren = asksAllowsChildren;
@@ -54,7 +54,7 @@ public final class AOTreeModel {
     /** Construye un nuevo &aacute;rbol.
      * @param treeRoot Ra&iacute;z del &aacute;rbol
      * @param count N&uacute;mero de elementos iniciales del nuevo &aacute;rbol */
-    public AOTreeModel(final TreeNode treeRoot, final int count) {
+    public AOTreeModel(final AOTreeNode treeRoot, final int count) {
         this(treeRoot, false);
         this.count = count;
     }
@@ -65,13 +65,13 @@ public final class AOTreeModel {
      *         nodes
      * @see #asksAllowsChildren */
     public boolean asksAllowsChildren() {
-        return asksAllowsChildren;
+        return this.asksAllowsChildren;
     }
 
     /** Returns the root of the tree. Returns null only if the tree has no nodes.
      * @return the root of the tree */
     public Object getRoot() {
-        return root;
+        return this.root;
     }
 
     /** Returns the child of <I>parent</I> at index <I>index</I> in the parent's
@@ -85,7 +85,7 @@ public final class AOTreeModel {
      *        a node in the tree, obtained from this data source
      * @return the child of <I>parent</I> at index <I>index</I> */
     public Object getChild(final Object parent, final int index) {
-        return ((TreeNode) parent).getChildAt(index);
+        return ((AOTreeNode) parent).getChildAt(index);
     }
 
     /** Returns the number of children of <I>parent</I>. Returns 0 if the node is
@@ -95,7 +95,7 @@ public final class AOTreeModel {
      *        a node in the tree, obtained from this data source
      * @return the number of children of the node <I>parent</I> */
     public int getChildCount(final Object parent) {
-        return ((TreeNode) parent).getChildCount();
+        return ((AOTreeNode) parent).getChildCount();
     }
 
 }

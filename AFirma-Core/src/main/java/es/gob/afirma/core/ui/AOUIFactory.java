@@ -18,7 +18,7 @@ public class AOUIFactory {
     
     private static AOUIManager uiManager;
     
-    private final static Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
     static {
         try {
@@ -33,7 +33,7 @@ public class AOUIFactory {
             INFORMATION_MESSAGE = uiManager.getInformationMessageCode();
         }
         catch(final Exception e) {
-            LOGGER.severe("No se ha podido instanciar el gestor de interfaces graficas: " + e);
+            LOGGER.severe("No se ha podido instanciar el gestor de interfaces graficas: " + e); //$NON-NLS-1$
         }
     }
     

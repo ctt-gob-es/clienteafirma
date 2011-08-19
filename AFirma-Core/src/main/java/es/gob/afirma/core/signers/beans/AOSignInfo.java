@@ -44,13 +44,13 @@ public final class AOSignInfo {
      * @param signFormat
      *        Formato general de firma. */
     public AOSignInfo(final String signFormat) {
-        this.format = (signFormat != null ? signFormat : "Desconocido");
+        this.format = (signFormat != null ? signFormat : "Desconocido"); //$NON-NLS-1$
     }
 
     /** Recupera la variante de formato a la que pertene e objeto de firma.
      * @return Nombre de la variante. */
     public String getVariant() {
-        return variant;
+        return this.variant;
     }
 
     public void setVariant(final String variant) {
@@ -58,7 +58,7 @@ public final class AOSignInfo {
     }
 
     public String getUrlSignObject() {
-        return urlSignObject;
+        return this.urlSignObject;
     }
 
     public void setUrlSignObject(final String urlSignObject) {
@@ -66,7 +66,7 @@ public final class AOSignInfo {
     }
 
     public String getUrlSignedData() {
-        return urlSignedData;
+        return this.urlSignedData;
     }
 
     public void setUrlSignedData(final String urlSignedData) {
@@ -74,7 +74,7 @@ public final class AOSignInfo {
     }
 
     public String getB64VerificationCode() {
-        return b64VerificationCode;
+        return this.b64VerificationCode;
     }
 
     public void setB64VerificationCode(final String b64VerificationCode) {
@@ -82,6 +82,6 @@ public final class AOSignInfo {
     }
 
     public String getFormat() {
-        return format;
+        return this.format;
     }
 }

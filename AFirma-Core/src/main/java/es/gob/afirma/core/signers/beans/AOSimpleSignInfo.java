@@ -52,7 +52,7 @@ public final class AOSimpleSignInfo {
     public AOSimpleSignInfo(final X509Certificate[] chainCert, final Date signingTime) {
 
         if (chainCert == null || chainCert.length == 0 || chainCert[0] == null) {
-            throw new IllegalArgumentException("No se ha introducido la cadena de certificacion.");
+            throw new IllegalArgumentException("No se ha introducido la cadena de certificacion"); //$NON-NLS-1$
         }
 
         this.certs = chainCert.clone();
@@ -60,7 +60,7 @@ public final class AOSimpleSignInfo {
     }
 
     public String getSignAlgorithm() {
-        return signAlgorithm;
+        return this.signAlgorithm;
     }
 
     public void setSignAlgorithm(final String algorithm) {
@@ -68,7 +68,7 @@ public final class AOSimpleSignInfo {
     }
 
     public String getSignFormat() {
-        return signFormat;
+        return this.signFormat;
     }
 
     public void setSignFormat(final String format) {
@@ -76,7 +76,7 @@ public final class AOSimpleSignInfo {
     }
 
     public Date[] getTimestampingTime() {
-        return timestampingTime.clone();
+        return this.timestampingTime.clone();
     }
 
     public void setTimestampingTime(final Date[] timestampingTime) {
@@ -84,11 +84,11 @@ public final class AOSimpleSignInfo {
     }
 
     public X509Certificate[] getCerts() {
-        return certs.clone();
+        return this.certs.clone();
     }
 
     public Date getSigningTime() {
-        return signingTime;
+        return this.signingTime;
     }
 
     /** Indica si la firma dispone de un sello de tiempo.
@@ -100,7 +100,7 @@ public final class AOSimpleSignInfo {
     /** Recupera el PKCS#1 de la firma en cuesti&oacute;n. Devuelve {@code null} si no se preestablecio.
      * @return PKCS#1 de la firma. */
     public byte[] getPkcs1() {
-        return pkcs1.clone();
+        return this.pkcs1.clone();
     }
 
     /** Establece el PKCS#1 de la firma.
@@ -112,12 +112,12 @@ public final class AOSimpleSignInfo {
 
     @Override
     public String toString() {
-        String desc = AOUtil.getCN(certs[0]);
-        if (timestampingTime != null && timestampingTime.length > 0 && timestampingTime[0] != null) {
-            desc += " (TimeStamp: " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(signingTime) + ")";
+        String desc = AOUtil.getCN(this.certs[0]);
+        if (this.timestampingTime != null && this.timestampingTime.length > 0 && this.timestampingTime[0] != null) {
+            desc += " (TimeStamp: " + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(this.signingTime) + ")";  //$NON-NLS-1$//$NON-NLS-2$
         }
-        else if (signingTime != null) {
-            desc += " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(signingTime) + ")";
+        else if (this.signingTime != null) {
+            desc += " (" + DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT).format(this.signingTime) + ")";  //$NON-NLS-1$//$NON-NLS-2$
         }
 
         return desc;
