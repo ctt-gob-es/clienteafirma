@@ -487,7 +487,7 @@ public final class Utils {
             encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
         }
         catch (final Exception e3) {
-            throw new IOException("Error de codificacion", e3); //$NON-NLS-1$
+            throw new IOException("Error de codificacion: " + e3); //$NON-NLS-1$
         }
 
         ASN1OctetString sign2 = null;
@@ -495,7 +495,7 @@ public final class Utils {
             sign2 = firma(signatureAlgorithm, keyEntry, signedAttr2);
         }
         catch (final AOException ex) {
-            throw new IOException("Error durante la firma", ex); //$NON-NLS-1$
+            throw new IOException("Error durante la firma: " + ex); //$NON-NLS-1$
         }
 
         // EN ESTE PUNTO YA TENEMOS EL NUEVO SIGNER
