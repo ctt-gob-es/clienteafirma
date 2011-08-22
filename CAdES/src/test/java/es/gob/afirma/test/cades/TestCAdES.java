@@ -89,8 +89,10 @@ public final class TestCAdES {
                         e);
                 }
                 Assert.assertNotNull(prueba, result);
+                Assert.assertTrue(signer.isSign(result));
+                Assert.assertTrue(AOCAdESSigner.isCADESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
                 
-                System.out.println(prueba + ": OK"); //$NON-NLS-1$
+                //System.out.println(prueba + ": OK"); //$NON-NLS-1$
             }
         }
         

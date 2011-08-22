@@ -50,7 +50,9 @@ import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.GenSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
@@ -168,9 +170,10 @@ public final class GenCAdESEPESSignedData {
         }
 
         final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
+        System.out.println(AOUtil.hexify(digestAlgorithmId.getEncodedParams(), true));
 
         try {
-            digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+            digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm), digestAlgorithmId.getEncodedParams());
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
@@ -248,9 +251,12 @@ public final class GenCAdESEPESSignedData {
 
         // digEncryptionAlgorithm
         final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
+        System.out.println(AOUtil.hexify(digestAlgorithmIdEnc.getEncodedParams(), true));
+        
+        
         final AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm), digestAlgorithmIdEnc.getEncodedParams());
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
