@@ -171,7 +171,7 @@ public final class TestCAdES {
                 // Cofirma indicando los datos
                 byte[] sign3 = cosign(signer, DATA, sign2, algo, pke3, extraParams);
                 
-                checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pfísica De la Seña Pruebasdit", "Certificado Pruebas Software Válido"}, prueba);
+                checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke3, pke2}, new String[] {"ANF Usuario Activo", "Certificado Pruebas Software Válido", "CPISR-1 Pfísica De la Seña Pruebasdit"}, prueba);
                 
                 //System.out.println(prueba + ": OK"); //$NON-NLS-1$
             }
@@ -283,6 +283,8 @@ public final class TestCAdES {
         AOTreeNode root = (AOTreeNode) tree.getRoot();
         Assert.assertEquals("Datos", root.getUserObject());
         for (int i = 0; i < signsAlias.length; i++) {
+            System.out.println(" = Alias esperado: " + signsAlias[i]);
+            System.out.println(" = Alias encontrado: " + root.getChildAt(i).getUserObject());
             Assert.assertEquals(signsAlias[i], root.getChildAt(i).getUserObject());
         }
         
