@@ -20,8 +20,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -50,15 +48,11 @@ import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
-import es.gob.afirma.signers.pkcs7.GenSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.Utils;
-
-import sun.security.x509.AlgorithmId;
 
 /** Clase que implementa firma digital CMS Advanced Electronic Signatures
  * (CAdES).
@@ -169,11 +163,8 @@ public final class GenCAdESEPESSignedData {
             }
         }
 
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        System.out.println(AOUtil.hexify(digestAlgorithmId.getEncodedParams(), true));
-
         try {
-            digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm), digestAlgorithmId.getEncodedParams());
+            digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
@@ -229,13 +220,12 @@ public final class GenCAdESEPESSignedData {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
-        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
         // // ATRIBUTOS
 
         final ASN1EncodableVector contextExcepcific =
                 Utils.generateSignerInfo(signerCertificateChain[0],
-                                         digestAlgorithmId,
                                          digestAlgorithm,
                                          digAlgId,
                                          parameters.getContent(),
@@ -250,13 +240,9 @@ public final class GenCAdESEPESSignedData {
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        System.out.println(AOUtil.hexify(digestAlgorithmIdEnc.getEncodedParams(), true));
-        
-        
         final AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm), digestAlgorithmIdEnc.getEncodedParams());
+            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
@@ -305,7 +291,6 @@ public final class GenCAdESEPESSignedData {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, ex.toString(), ex);
             throw new AOException("Error al detectar la codificacion de los datos ASN.1", ex); //$NON-NLS-1$
         }
 

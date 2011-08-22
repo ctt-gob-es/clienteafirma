@@ -52,11 +52,10 @@ import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.Utils;
-
-import sun.security.x509.AlgorithmId;
 
 /** Clase que implementa la contrafirma digital CADES SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
@@ -172,8 +171,7 @@ final class CAdESCounterSigner {
         final ASN1InputStream is = new ASN1InputStream(data);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        ASN1Sequence dsq = null;
-        dsq = (ASN1Sequence) is.readObject();
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -184,8 +182,7 @@ final class CAdESCounterSigner {
         final SignedData sd = new SignedData(contentSignedData);
 
         // Obtenemos los signerInfos del SignedData
-        ASN1Set signerInfosSd = null;
-        signerInfosSd = sd.getSignerInfos();
+        final ASN1Set signerInfosSd = sd.getSignerInfos();
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
@@ -964,8 +961,8 @@ final class CAdESCounterSigner {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4);
             }
         }
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+
+        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // ATRIBUTOS FINALES
         // recuperamos las variables globales
@@ -978,7 +975,6 @@ final class CAdESCounterSigner {
         // authenticatedAttributes
         final ASN1EncodableVector contextExcepcific =
                 Utils.generateSignerInfo(cert,
-                                         digestAlgorithmId,
                                          digestAlgorithm,
                                          digAlgId,
                                          si.getEncryptedDigest().getOctets(),
@@ -997,15 +993,12 @@ final class CAdESCounterSigner {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
-        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
-
-        encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+        AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
 
         // Firma del SignerInfo
         // ByteArrayInputStream signerToDigest = new
@@ -1013,7 +1006,7 @@ final class CAdESCounterSigner {
         // byte[] signedInfo = signData(signerToDigest, signatureAlgorithm,
         // keyEntry);
 
-        ASN1OctetString sign2 = null;
+        final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }

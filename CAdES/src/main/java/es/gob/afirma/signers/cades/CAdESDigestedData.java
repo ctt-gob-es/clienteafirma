@@ -18,9 +18,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
-import sun.security.x509.AlgorithmId;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.DigestedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
@@ -65,10 +66,9 @@ final class CAdESDigestedData {
         }
         // Obtenemos el algoritmo para "digestear"
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        org.bouncycastle.asn1.x509.AlgorithmIdentifier digAlgId;
+        AlgorithmIdentifier digAlgId;
         try {
-            digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+            digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
         }
         catch (final Exception e) {
             throw new IOException((new StringBuilder()).append("Error de codificacion: ").append(e).toString()); //$NON-NLS-1$

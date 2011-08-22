@@ -168,7 +168,7 @@ public final class GenSignedData {
 
         final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
         try {
-            digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+            digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString());
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
@@ -255,7 +255,7 @@ public final class GenSignedData {
         final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
         final AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString());
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$

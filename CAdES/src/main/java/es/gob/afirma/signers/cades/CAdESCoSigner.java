@@ -56,11 +56,10 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.Utils;
-
-import sun.security.x509.AlgorithmId;
 
 /** Clase que implementa la cofirma digital CADES SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
@@ -171,8 +170,7 @@ final class CAdESCoSigner {
         final ASN1InputStream is = new ASN1InputStream(sign);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        ASN1Sequence dsq = null;
-        dsq = (ASN1Sequence) is.readObject();
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -243,8 +241,8 @@ final class CAdESCoSigner {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4);
             }
         }
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+
+        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
         final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
@@ -257,7 +255,6 @@ final class CAdESCoSigner {
         if (messageDigest == null) {
             final ASN1EncodableVector contextExpecific =
                     Utils.generateSignerInfo(signerCertificateChain[0],
-                                             digestAlgorithmId,
                                              digestAlgorithm,
                                              digAlgId,
                                              parameters.getContent(),
@@ -272,7 +269,6 @@ final class CAdESCoSigner {
         else {
             final ASN1EncodableVector contextExpecific =
                     Utils.generateSignerInfo(signerCertificateChain[0],
-                                             digestAlgorithmId,
                                              digestAlgorithm,
                                              digAlgId,
                                              null,
@@ -286,15 +282,12 @@ final class CAdESCoSigner {
         }
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
-        encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
         // Obtenemos los signerInfos del SignedData
-        ASN1Set signerInfosSd = null;
-        signerInfosSd = sd.getSignerInfos();
+        final ASN1Set signerInfosSd = sd.getSignerInfos();
 
         // introducimos los SignerInfos Existentes
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
@@ -305,7 +298,7 @@ final class CAdESCoSigner {
             signerInfos.add(si);
         }
 
-        ASN1OctetString sign2 = null;
+        final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
@@ -377,8 +370,7 @@ final class CAdESCoSigner {
         final ASN1InputStream is = new ASN1InputStream(data);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        ASN1Sequence dsq = null;
-        dsq = (ASN1Sequence) is.readObject();
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -392,11 +384,7 @@ final class CAdESCoSigner {
 
         // 3. CONTENTINFO
         // si se introduce el contenido o no
-        ContentInfo encInfo = null;
-        // DERObjectIdentifier contentTypeOID = new
-        // DERObjectIdentifier(dataType.toString());
-
-        encInfo = sd.getEncapContentInfo();
+        final ContentInfo encInfo = sd.getEncapContentInfo();
 
         final DEROctetString contenido = (DEROctetString) encInfo.getContent();
         byte[] contenidoDatos = null;
@@ -439,8 +427,8 @@ final class CAdESCoSigner {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4);
             }
         }
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+        
+        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
         final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
@@ -448,15 +436,12 @@ final class CAdESCoSigner {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
-        encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
         // Obtenemos los signerInfos del SignedData
-        ASN1Set signerInfosSd = null;
-        signerInfosSd = sd.getSignerInfos();
+        final ASN1Set signerInfosSd = sd.getSignerInfos();
 
         // introducimos los SignerInfos Existentes
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
@@ -465,7 +450,7 @@ final class CAdESCoSigner {
         for (int i = 0; i < signerInfosSd.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
             final AlgorithmIdentifier algHash = si.getDigestAlgorithm();
-            if (algHash.getAlgorithm().toString().equals(digestAlgorithmId.getOID().toString())) {
+            if (algHash.getAlgorithm().toString().equals(AOAlgorithmID.getOID(digestAlgorithm))) {
                 final ASN1Set signedAttrib = si.getAuthenticatedAttributes();
                 for (int s = 0; s < signedAttrib.size(); s++) {
                     final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
@@ -483,12 +468,11 @@ final class CAdESCoSigner {
 
         // // ATRIBUTOS
 
-        ASN1Set signedAttr = null;
+        ASN1Set signedAttr;
         // atributos firmados
         if (contenidoDatos != null) {
             final ASN1EncodableVector contextExpecific =
                     Utils.generateSignerInfo(signerCertificateChain[0],
-                                             digestAlgorithmId,
                                              digestAlgorithm,
                                              digAlgId,
                                              contenidoDatos,
@@ -503,7 +487,6 @@ final class CAdESCoSigner {
         else if (messageDigest != null) {
             final ASN1EncodableVector contextExpecific =
                     Utils.generateSignerInfo(signerCertificateChain[0],
-                                             digestAlgorithmId,
                                              digestAlgorithm,
                                              digAlgId,
                                              null,
@@ -519,7 +502,7 @@ final class CAdESCoSigner {
             throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un message digest valido"); //$NON-NLS-1$
         }
 
-        ASN1OctetString sign2 = null;
+        final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
@@ -531,14 +514,11 @@ final class CAdESCoSigner {
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, null // unsignedAttr
         ));
 
-        // CRLS no usado
-        final ASN1Set certrevlist = null;
-
         // construimos el Signed Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
                                                                                 encInfo,
                                                                                 certificates,
-                                                                                certrevlist,
+                                                                                null,
                                                                                 new DERSet(signerInfos)// unsignedAttr
                                )).getDEREncoded();
 
@@ -553,7 +533,7 @@ final class CAdESCoSigner {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
-        Signature sig = null;
+        final Signature sig;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
@@ -561,7 +541,7 @@ final class CAdESCoSigner {
             throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
-        byte[] tmp = null;
+        final byte[] tmp;
 
         try {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
@@ -587,7 +567,7 @@ final class CAdESCoSigner {
         }
 
         // firmamos.
-        byte[] realSig = null;
+        final byte[] realSig;
         try {
             realSig = sig.sign();
         }
@@ -595,8 +575,7 @@ final class CAdESCoSigner {
             throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
-        final ASN1OctetString encDigest = new DEROctetString(realSig);
+        return new DEROctetString(realSig);
 
-        return encDigest;
     }
 }

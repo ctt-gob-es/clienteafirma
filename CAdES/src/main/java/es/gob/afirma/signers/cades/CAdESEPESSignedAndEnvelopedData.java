@@ -19,7 +19,6 @@ import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
@@ -46,17 +45,15 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
+import sun.security.x509.AlgorithmId;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.pkcs7.GenSignedData;
 import es.gob.afirma.signers.pkcs7.Info;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 import es.gob.afirma.signers.pkcs7.Utils;
-
-import sun.security.x509.AlgorithmId;
 
 /** Clase que implementa firma digital CADES-EPES SignedAndEnvelopedData. basado
  * en las especificaciones de RFC-5126.
@@ -171,7 +168,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
             keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm);
 
-            final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+            final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString());
             digestAlgs.add(digAlgId);
         }
         catch (final Exception e) {
@@ -203,7 +200,6 @@ final class CAdESEPESSignedAndEnvelopedData {
         // // ATRIBUTOS
         final ASN1EncodableVector contextExpecific =
                 Utils.generateSignerInfo(signerCertificateChain[0],
-                                         digestAlgorithmId,
                                          digestAlgorithm,
                                          digAlgId,
                                          parameters.getContent(),
@@ -220,18 +216,18 @@ final class CAdESEPESSignedAndEnvelopedData {
         AlgorithmIdentifier encAlgId;
 
         try {
-            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString());
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
         }
 
-        ASN1OctetString sign2 = null;
+        final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IOException("Error en la firma electronica: " + ex); //$NON-NLS-1$
         }
 
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, null // unsignedAttr
@@ -271,7 +267,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
+            throw new AOException("Error obteniendo los atributos firmados", ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -368,7 +364,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                         digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
                         keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm);
 
-                        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+                        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString());
                         digestAlgs.add(digAlgId);
                     }
                     catch (final Exception e2) {
@@ -390,7 +386,6 @@ final class CAdESEPESSignedAndEnvelopedData {
                     // // ATRIBUTOS
                     final ASN1EncodableVector contextExpecific =
                             Utils.generateSignerInfo(signerCertificateChain[0],
-                                                     digestAlgorithmId,
                                                      digestAlgorithm,
                                                      digAlgId,
                                                      parameters.getContent(),

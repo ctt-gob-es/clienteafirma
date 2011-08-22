@@ -48,10 +48,7 @@ public final class SigUtils {
      * @return El identificador del algoritmo formateado y listo para introducir
      *         en el cms.
      * @throws java.io.IOException */
-    public static AlgorithmIdentifier makeAlgId(final String oid, final byte[] params) throws IOException {
-        if (params != null) {
-            return new AlgorithmIdentifier(new DERObjectIdentifier(oid), makeObj(params));
-        }
+    public static AlgorithmIdentifier makeAlgId(final String oid) throws IOException {
         return new AlgorithmIdentifier(new DERObjectIdentifier(oid), new DERNull());
     }
 

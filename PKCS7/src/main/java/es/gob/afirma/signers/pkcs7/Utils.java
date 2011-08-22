@@ -84,12 +84,10 @@ import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.util.encoders.Base64;
 
 import sun.security.x509.AlgorithmId;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.misc.AOConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.misc.AOConstants.AOCipherBlockMode;
-import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Clase que contiene funciones comunes para CADES y CMS */
 public final class Utils {
@@ -484,7 +482,7 @@ public final class Utils {
                                              final ASN1Set signedAttr2) throws IOException {
         AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString());
         }
         catch (final Exception e3) {
             throw new IOException("Error de codificacion: " + e3); //$NON-NLS-1$
@@ -596,8 +594,6 @@ public final class Utils {
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
      * @param cert
      *        Certificado de firma.
-     * @param digestAlgorithmId
-     *        Identificador del algoritmo de firma.
      * @param digestAlgorithm
      *        Algoritmo Firmado.
      * @param digAlgId
@@ -615,7 +611,6 @@ public final class Utils {
      * @throws java.io.IOException
      * @throws CertificateEncodingException */
     public static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
-                                                         final AlgorithmId digestAlgorithmId,
                                                          final String digestAlgorithm,
                                                          final AlgorithmIdentifier digAlgId,
                                                          final byte[] datos,
@@ -626,6 +621,7 @@ public final class Utils {
                                                          final byte[] messageDigest) throws NoSuchAlgorithmException,
                                                                               IOException,
                                                                               CertificateEncodingException {
+        
         // // ATRIBUTOS
 
         // authenticatedAttributes
@@ -656,7 +652,7 @@ public final class Utils {
              * IssuerSerial OPTIONAL }
              * Hash ::= OCTET STRING */
 
-            final MessageDigest md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestAlgorithmId.getName()));
+            final MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
             final byte[] certHash = md.digest(cert.getEncoded());
             final ESSCertIDv2[] essCertIDv2 = {
                 new ESSCertIDv2(digAlgId, certHash, isuerSerial)
@@ -718,10 +714,7 @@ public final class Utils {
             /** ESSCertID ::= SEQUENCE { certHash Hash, issuerSerial IssuerSerial
              * OPTIONAL }
              * Hash ::= OCTET STRING -- SHA1 hash of entire certificate */
-            // MessageDigest
-            // Los DigestAlgorithms con SHA-2 tienen un guion:
-            final String digestAlgorithmName = AOSignConstants.getDigestAlgorithmName(digestAlgorithmId.getName());
-            final MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
+            final MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
             final byte[] certHash = md.digest(cert.getEncoded());
             final ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
 

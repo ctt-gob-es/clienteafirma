@@ -20,8 +20,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -52,12 +50,11 @@ import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 import es.gob.afirma.signers.pkcs7.Utils;
-
-import sun.security.x509.AlgorithmId;
 
 /** Clase que implementa la contrafirma digital CADES SignedAndEnvelopedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
@@ -964,8 +961,7 @@ final class CAdESCounterSignerEnveloped {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4);
             }
         }
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // ATRIBUTOS FINALES
         final String politica = getGlobalPolicy();
@@ -974,7 +970,6 @@ final class CAdESCounterSignerEnveloped {
 
         final ASN1EncodableVector contextExcepcific =
                 Utils.generateSignerInfo(cert,
-                                         digestAlgorithmId,
                                          digestAlgorithm,
                                          digAlgId,
                                          si.getEncryptedDigest().getOctets(),
@@ -993,15 +988,12 @@ final class CAdESCounterSignerEnveloped {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
-        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
-
-        encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+        AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
 
         // Firma del SignerInfo
         // ByteArrayInputStream signerToDigest = new
@@ -1009,17 +1001,15 @@ final class CAdESCounterSignerEnveloped {
         // byte[] signedInfo = signData(signerToDigest, signatureAlgorithm,
         // keyEntry);
 
-        ASN1OctetString sign2 = null;
+        final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            Logger.getLogger(CAdESCounterSignerEnveloped.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IOException("Error al realizar la firma electronica: " + ex); //$NON-NLS-1$
         }
 
-        final SignerInfo uAtrib = new SignerInfo(identifier, digAlgId, unsignedAttr, encAlgId, sign2, null);
-
-        return uAtrib;
+        return  new SignerInfo(identifier, digAlgId, unsignedAttr, encAlgId, sign2, null);
 
     }
 
@@ -1040,13 +1030,13 @@ final class CAdESCounterSignerEnveloped {
             throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
-        byte[] tmp = null;
+        final byte[] tmp;
 
         try {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            Logger.getLogger(CAdESCounterSignerEnveloped.class.getName()).log(Level.SEVERE, null, ex);
+            throw new AOException("Error obteniendo los atributos firmados: " + ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -1074,8 +1064,6 @@ final class CAdESCounterSignerEnveloped {
             throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
-        final ASN1OctetString encDigest = new DEROctetString(realSig);
-
-        return encDigest;
+        return new DEROctetString(realSig);
     }
 }
