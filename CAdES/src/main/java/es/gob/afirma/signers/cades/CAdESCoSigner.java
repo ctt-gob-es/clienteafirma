@@ -310,7 +310,7 @@ final class CAdESCoSigner {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma", ex); //$NON-NLS-1$
+            throw new IOException("Error al realizar la firma: " + ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del SignedData
@@ -524,7 +524,7 @@ final class CAdESCoSigner {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma", ex); //$NON-NLS-1$
+            throw new IOException("Error al realizar la firma: " + ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del SignedData

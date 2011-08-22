@@ -1018,7 +1018,7 @@ final class CAdESCounterSigner {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            throw new IOException("Error al realizar la firma", ex); //$NON-NLS-1$
+            throw new IOException("Error al realizar la firma: " + ex); //$NON-NLS-1$
         }
 
         final SignerInfo uAtrib = new SignerInfo(identifier, digAlgId, unsignedAttr, encAlgId, sign2, null);
