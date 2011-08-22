@@ -34,10 +34,8 @@ import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -297,24 +295,22 @@ public final class ReadNodesTree {
      *        N&uacute;mero de serie del certificado a firmar.
      * @return El nombre com&uacute;n. */
     private String searchName(final ASN1Set certificates, final DERInteger serialNumber) {
-        String nombre = ""; //$NON-NLS-1$
         final Enumeration<?> certSet = certificates.getObjects();
         while (certSet.hasMoreElements()) {
-            final ASN1Sequence atrib2 = (ASN1Sequence) certSet.nextElement();
-            final TBSCertificateStructure atrib = TBSCertificateStructure.getInstance(atrib2.getObjectAt(0));
-            if (serialNumber.toString().equals(atrib.getSerialNumber().toString())) {
-                final X509Name name = atrib.getSubject();
-                nombre = name.getValues(X509ObjectIdentifiers.commonName).toString();
-                if (nombre != null && !nombre.equals("") && !nombre.equals("[]")) {  //$NON-NLS-1$//$NON-NLS-2$
-                    nombre = nombre.substring(1, nombre.length() - 1);
-                }
-                else {
-                    nombre = name.getValues(X509ObjectIdentifiers.organizationalUnitName).toString();
-                    nombre = nombre.substring(1, nombre.length() - 1);
-                }
+            final X509Certificate c;
+            try {
+                c = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(((ASN1Sequence) certSet.nextElement()).getEncoded())); //$NON-NLS-1$
+            }
+            catch(final Exception e) {
+                LOGGER.severe("Error extrayendo los certificados del Set ASN.1, puede que se haya omitido un elemento valido" + e); //$NON-NLS-1$
+                continue;
+            }
+            if (c.getSerialNumber().equals(serialNumber.getValue())) {
+                return AOUtil.getCN(c);
             }
         }
-        return nombre;
+        LOGGER.info("No se ha encontrado el certificado indicado, se devolvera una cadena vacia"); //$NON-NLS-1$
+        return ""; //$NON-NLS-1$
     }
 
     /** A partir de un numero de serie de un certificado, devuelve un array con
