@@ -2,6 +2,7 @@ package es.gob.afirma.test.cades;
 
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +13,9 @@ import org.junit.Test;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
+import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 
@@ -57,10 +61,12 @@ public final class TestCAdES {
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
+        final X509Certificate cert;
         try {
             KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
             ks.load(ClassLoader.getSystemResourceAsStream("ANF_PF_Activo.pfx"), "12341234".toCharArray()); //$NON-NLS-1$ //$NON-NLS-2$
             pke = (PrivateKeyEntry) ks.getEntry("anf usuario activo", new KeyStore.PasswordProtection("12341234".toCharArray())); //$NON-NLS-1$ //$NON-NLS-2$
+            cert = (X509Certificate) ks.getCertificate("anf usuario activo");
         }
         catch(Exception e) {
             Assert.fail("No se ha podido obtener las claves de firma: " + e); //$NON-NLS-1$
@@ -91,6 +97,20 @@ public final class TestCAdES {
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));
                 Assert.assertTrue(AOCAdESSigner.isCADESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+                
+                AOTreeModel tree = signer.getSignersStructure(result, false);
+                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject());
+                Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject());
+                
+                tree = signer.getSignersStructure(result, true);
+                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject());
+                AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
+                
+                //Assert.assertEquals("CAdES", simpleSignInfo.getSignFormat());
+                Assert.assertEquals(algo, simpleSignInfo.getSignAlgorithm());
+                Assert.assertNotNull(simpleSignInfo.getSigningTime());
+                Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);    
+                
                 
                 //System.out.println(prueba + ": OK"); //$NON-NLS-1$
             }
