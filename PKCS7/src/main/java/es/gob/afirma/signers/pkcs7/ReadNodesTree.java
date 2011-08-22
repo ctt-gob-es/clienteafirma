@@ -10,7 +10,9 @@
 
 package es.gob.afirma.signers.pkcs7;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -33,10 +35,8 @@ import org.bouncycastle.asn1.cms.SignedData;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
@@ -327,31 +327,17 @@ public final class ReadNodesTree {
      *         en orden). */
     private X509Certificate[] searchCert(final ASN1Set certificates, final DERInteger serialNumber) {
         final Enumeration<?> certSet = certificates.getObjects();
-        ASN1Sequence atrib2;
         while (certSet.hasMoreElements()) {
-            atrib2 = (ASN1Sequence) certSet.nextElement();
-            // atrib2 es ya en sí un único certificado.
-            // se compone de 3 elementos:
-            // tbsCert =
-            // TBSCertificateStructure.getInstance(seq.getObjectAt(0));
-            // sigAlgId = AlgorithmIdentifier.getInstance(seq.getObjectAt(1));
-            // sig = DERBitString.getInstance(seq.getObjectAt(2));
-            if (atrib2.size() < 1) {
+            final X509Certificate c;
+            try {
+                c = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(((ASN1Sequence) certSet.nextElement()).getEncoded())); //$NON-NLS-1$
+            }
+            catch(final Exception e) {
+                LOGGER.severe("Error extrayendo los certificados del Set ASN.1, puede que se haya omitido un elemento valido" + e); //$NON-NLS-1$
                 continue;
             }
-            final TBSCertificateStructure atrib = TBSCertificateStructure.getInstance(atrib2.getObjectAt(0));
-            if (serialNumber.toString().equals(atrib.getSerialNumber().toString())) {
-                // Es el certificado bueno, creamos el array con un único
-                // elemento y lo devolvemos
-                final X509Certificate[] ret = new X509Certificate[1];
-                try {
-                    ret[0] = new X509CertificateObject(new X509CertificateStructure(atrib2));
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("No se pudieron recuperar los certificados de la lista, se devolvera un array vacio: " + e); //$NON-NLS-1$
-                    return new X509Certificate[0];
-                }
-                return ret;
+            if (c.getSerialNumber().equals(serialNumber.getValue())) {
+                return new X509Certificate[] { c };
             }
         }
         LOGGER.severe("El certificados pedido no estaba en la lista, se devolvera un array vacio"); //$NON-NLS-1$
