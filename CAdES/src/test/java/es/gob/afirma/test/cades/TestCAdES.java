@@ -154,7 +154,7 @@ public final class TestCAdES {
         for (final Properties extraParams : CADES_MODES) {
             for (final String algo : ALGOS) {
                 
-                prueba = "Firma CAdES en modo '" +  //$NON-NLS-1$
+                prueba = "Cofirma CAdES en modo '" +  //$NON-NLS-1$
                 extraParams.getProperty("mode") +  //$NON-NLS-1$
                 "' con el algoritmo ': " + //$NON-NLS-1$
                 algo +
@@ -166,49 +166,12 @@ public final class TestCAdES {
                 // Cofirma sin indicar los datos
                 byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
                 
-                Assert.assertNotNull(prueba, sign2);
-                Assert.assertTrue(signer.isSign(sign2));
-                Assert.assertTrue(AOCAdESSigner.isCADESValid(sign2, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
-                
-                AOTreeModel tree = signer.getSignersStructure(sign2, false);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject());
-                Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject());
-                
-                tree = signer.getSignersStructure(sign2, true);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject());
-                AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
-                
-//                Assert.assertEquals("CAdES", simpleSignInfo.getSignFormat());
-//                Assert.assertEquals(algo, simpleSignInfo.getSignAlgorithm());
-                Assert.assertNotNull(simpleSignInfo.getSigningTime());
-                
-//                System.out.println("Certificado firmante:\n" + pke2.getCertificate());
-//                System.out.println("-------------");
-//                System.out.println("Certificado extraido:\n" + simpleSignInfo.getCerts()[0]);
-                
-                //Assert.assertEquals(pke2.getCertificate(), simpleSignInfo.getCerts()[0]);    
-                
-                
+                checkSign(signer, sign2, new PrivateKeyEntry[] {pke1, pke2}, new String[] {"ANF Usuario Activo", "CPISR-1 Pfísica De la Seña Pruebasdit"}, prueba);
+                                
                 // Cofirma indicando los datos
                 byte[] sign3 = cosign(signer, DATA, sign2, algo, pke3, extraParams);
                 
-                
-                Assert.assertNotNull(prueba, sign3);
-                Assert.assertTrue(signer.isSign(sign3));
-                Assert.assertTrue(AOCAdESSigner.isCADESValid(sign3, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
-                
-                tree = signer.getSignersStructure(sign3, false);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject());
-                Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject());
-                
-                tree = signer.getSignersStructure(sign3, true);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject());
-                simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
-                
-//                Assert.assertEquals("CAdES", simpleSignInfo.getSignFormat());
-//                Assert.assertEquals(algo, simpleSignInfo.getSignAlgorithm());
-                Assert.assertNotNull(simpleSignInfo.getSigningTime());
-                //Assert.assertEquals(pke3.getCertificate(), simpleSignInfo.getCerts()[0]);    
+                checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pfísica De la Seña Pruebasdit", "Certificado Pruebas Software Válido"}, prueba);
                 
                 //System.out.println(prueba + ": OK"); //$NON-NLS-1$
             }
@@ -222,6 +185,13 @@ public final class TestCAdES {
         }
     }
 
+    /**
+     * Carga la clave privada un certificado de un almac&eacute;n en disco.
+     * @param pkcs12File Fichero P12/PFX.
+     * @param alias Alias del certificado.
+     * @param password Contrase&ntilde;a.
+     * @return Clave privada del certificado.
+     */
     private PrivateKeyEntry loadKeyEntry(String pkcs12File, String alias, String password) {
         final PrivateKeyEntry pke;
         try {
@@ -237,6 +207,15 @@ public final class TestCAdES {
         return pke;
     }
     
+    /**
+     * Firma.
+     * @param signer
+     * @param data
+     * @param algorithm
+     * @param pke
+     * @param params
+     * @return
+     */
     private byte[] sign(AOSigner signer, byte[] data, String algorithm, PrivateKeyEntry pke, Properties params) {
         try {
             return signer.sign(data, algorithm, pke, params);
@@ -247,6 +226,15 @@ public final class TestCAdES {
         }
     }
     
+    /**
+     * Cofirma sin necesidad de los datos originales.
+     * @param signer
+     * @param sign
+     * @param algorithm
+     * @param pke
+     * @param params
+     * @return
+     */
     private byte[] cosign(AOSigner signer, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) {
         try {
             return signer.cosign(sign, algorithm, pke, params);
@@ -257,6 +245,16 @@ public final class TestCAdES {
         }
     }
     
+    /**
+     * Cofirma utilizando los datos originales.
+     * @param signer
+     * @param data
+     * @param sign
+     * @param algorithm
+     * @param pke
+     * @param params
+     * @return
+     */
     private byte[] cosign(AOSigner signer, byte[] data, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) {
         try {
             return signer.cosign(data, sign, algorithm, pke, params);
@@ -264,6 +262,40 @@ public final class TestCAdES {
         catch(final Exception e) {
             Assert.fail("Error al cofirmar con datos:" + e);
             return null;
+        }
+    }
+    
+    /**
+     * Hace las comprobaciones b&aacute;sicas de una firma.
+     * @param signer
+     * @param sign
+     * @param pke
+     * @param signsAlias
+     * @param prueba
+     */
+    private void checkSign(AOSigner signer, byte[] sign, PrivateKeyEntry[] pke, String[] signsAlias, String prueba) {
+        Assert.assertNotNull(prueba, sign);
+        Assert.assertTrue(signer.isSign(sign));
+        Assert.assertTrue(AOCAdESSigner.isCADESValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+        
+        // Arbol de alias
+        AOTreeModel tree = signer.getSignersStructure(sign, false);
+        AOTreeNode root = (AOTreeNode) tree.getRoot();
+        Assert.assertEquals("Datos", root.getUserObject());
+        for (int i = 0; i < signsAlias.length; i++) {
+            Assert.assertEquals(signsAlias[i], root.getChildAt(i).getUserObject());
+        }
+        
+        // Arbol de AOSimpleSignersInfo
+        tree = signer.getSignersStructure(sign, true);
+        root = (AOTreeNode) tree.getRoot();
+        Assert.assertEquals("Datos", root.getUserObject());
+        for (int i = 0; i < signsAlias.length; i++) {
+            AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) root.getChildAt(i).getUserObject();
+//          Assert.assertEquals("CAdES", simpleSignInfo.getSignFormat());
+//          Assert.assertEquals(algo, simpleSignInfo.getSignAlgorithm());
+            Assert.assertNotNull(simpleSignInfo.getSigningTime());
+            Assert.assertEquals(pke[i].getCertificate(), simpleSignInfo.getCerts()[0]);
         }
     }
 }
