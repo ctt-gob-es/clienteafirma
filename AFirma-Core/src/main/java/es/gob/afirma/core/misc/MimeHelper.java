@@ -345,16 +345,4 @@ public final class MimeHelper {
     // ************************************************************
     // *** FIN SOPORTE DE ADJUNTOS MIME ***************************
     // ************************************************************
-
-    public static void main(String[] args) throws Exception {
-        java.io.FileInputStream fis = new java.io.FileInputStream("C:/pruebas/Entrada.jpg");
-        
-        MimeHelper helper = new MimeHelper(AOUtil.getDataFromInputStream(fis));
-        System.out.println("Mimetype: " + helper.getMimeType());
-        System.out.println("Description: " + helper.getDescription());
-        System.out.println("Extension: " + helper.getExtension());
-        System.out.println("---");
-        
-        try {fis.close(); } catch (Exception e) {}
-    }
 }
