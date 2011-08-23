@@ -45,7 +45,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
-import sun.security.x509.AlgorithmId;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -401,7 +400,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                   identifier,
                                                   signedAttr,
                                                   unSignedAttr,
-                                                  AlgorithmId.get(keyAlgorithm),
+                                                  sun.security.x509.AlgorithmId.get(keyAlgorithm),
                                                   this.signedAttr2);
 
                     // introducimos el nuevo Signer

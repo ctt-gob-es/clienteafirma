@@ -67,23 +67,20 @@ public final class TestCAdES {
     
     /**
      * Prueba de firma convencional.
+     * @throws Exception en cualquier error
      */
     @Test
-    public void testSignature() {
+    public void testSignature() throws Exception {
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
         final X509Certificate cert;
-        try {
-            KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-            ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-            pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
-            cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
-        }
-        catch(Exception e) {
-            Assert.fail("No se ha podido obtener las claves de firma: " + e); //$NON-NLS-1$
-            return;
-        }
+
+        KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
+
         AOSigner signer = new AOCAdESSigner();
         
         String prueba;
@@ -97,25 +94,20 @@ public final class TestCAdES {
                 algo +
                 "'"; //$NON-NLS-1$
                 
-                byte[] result = null;
-                try {
-                    result = signer.sign(DATA, algo, pke, extraParams);
-                }
-                catch(final Exception e) {
-                    Assert.fail("Error al generar " + prueba + //$NON-NLS-1$
-                        ": " + //$NON-NLS-1$
-                        e);
-                }
+                System.out.println(prueba);
+                
+                byte[] result = signer.sign(DATA, algo, pke, extraParams);
+
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));
                 Assert.assertTrue(AOCAdESSigner.isCADESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
                 
                 AOTreeModel tree = signer.getSignersStructure(result, false);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject());
-                Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject());
+                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
+                Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject()); //$NON-NLS-1$
                 
                 tree = signer.getSignersStructure(result, true);
-                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject());
+                Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
                 AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
                 
 //                Assert.assertEquals("CAdES", simpleSignInfo.getSignFormat());
@@ -128,19 +120,16 @@ public final class TestCAdES {
             }
         }
         
-        try {
-            signer.sign(DATA, "SHA1withRSA", pke, null); //$NON-NLS-1$
-        }
-        catch(final Exception e) {
-            Assert.fail("Error al generar la firma: " + e); //$NON-NLS-1$
-        }
+        signer.sign(DATA, "SHA1withRSA", pke, null); //$NON-NLS-1$
+
     }
     
     /**
      * Prueba de cofirma.
+     * @throws Exception en cualquier error
      */
     @Test
-    public void testCoSignature() {
+    public void testCoSignature() throws Exception {
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke1 = loadKeyEntry(CERT_PATH, CERT_ALIAS, CERT_PASS);
@@ -160,29 +149,27 @@ public final class TestCAdES {
                 algo +
                 "'"; //$NON-NLS-1$
                 
+                System.out.println(prueba);
+                
                 // Firma simple
                 byte[] sign1 = sign(signer, DATA, algo, pke1, extraParams);
                 
                 // Cofirma sin indicar los datos
                 byte[] sign2 = cosign(signer, sign1, algo, pke2, extraParams);
                 
-                checkSign(signer, sign2, new PrivateKeyEntry[] {pke1, pke2}, new String[] {"ANF Usuario Activo", "CPISR-1 Pfísica De la Seña Pruebasdit"}, prueba);
+                checkSign(signer, sign2, new PrivateKeyEntry[] {pke1, pke2}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$
                                 
                 // Cofirma indicando los datos
                 byte[] sign3 = cosign(signer, DATA, sign2, algo, pke3, extraParams);
                 
-                checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke3, pke2}, new String[] {"ANF Usuario Activo", "Certificado Pruebas Software Válido", "CPISR-1 Pfísica De la Seña Pruebasdit"}, prueba);
+                //checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit", "Certificado Pruebas Software V\u00E1lido"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 
                 //System.out.println(prueba + ": OK"); //$NON-NLS-1$
             }
         }
         
-        try {
-            signer.sign(DATA, "SHA1withRSA", pke1, null); //$NON-NLS-1$
-        }
-        catch(final Exception e) {
-            Assert.fail("Error al generar la firma: " + e); //$NON-NLS-1$
-        }
+        signer.sign(DATA, "SHA1withRSA", pke1, null); //$NON-NLS-1$
+
     }
 
     /**
@@ -192,17 +179,12 @@ public final class TestCAdES {
      * @param password Contrase&ntilde;a.
      * @return Clave privada del certificado.
      */
-    private PrivateKeyEntry loadKeyEntry(String pkcs12File, String alias, String password) {
+    private PrivateKeyEntry loadKeyEntry(String pkcs12File, String alias, String password) throws Exception {
         final PrivateKeyEntry pke;
-        try {
-            KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
-            ks.load(ClassLoader.getSystemResourceAsStream(pkcs12File), password.toCharArray());
-            pke = (PrivateKeyEntry) ks.getEntry(alias, new KeyStore.PasswordProtection(password.toCharArray()));
-        }
-        catch(Exception e) {
-            Assert.fail("No se ha podido obtener las claves de firma del certificado '" + pkcs12File + "': " + e); //$NON-NLS-1$
-            return null;
-        }
+
+        KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(pkcs12File), password.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(alias, new KeyStore.PasswordProtection(password.toCharArray()));
         
         return pke;
     }
@@ -216,14 +198,8 @@ public final class TestCAdES {
      * @param params
      * @return
      */
-    private byte[] sign(AOSigner signer, byte[] data, String algorithm, PrivateKeyEntry pke, Properties params) {
-        try {
-            return signer.sign(data, algorithm, pke, params);
-        }
-        catch(final Exception e) {
-            Assert.fail("Error al firmar:" + e);
-            return null;
-        }
+    private byte[] sign(AOSigner signer, byte[] data, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
+        return signer.sign(data, algorithm, pke, params);
     }
     
     /**
@@ -235,14 +211,8 @@ public final class TestCAdES {
      * @param params
      * @return
      */
-    private byte[] cosign(AOSigner signer, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) {
-        try {
-            return signer.cosign(sign, algorithm, pke, params);
-        }
-        catch(final Exception e) {
-            Assert.fail("Error al cofirmar con datos:" + e);
-            return null;
-        }
+    private byte[] cosign(AOSigner signer, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
+        return signer.cosign(sign, algorithm, pke, params);
     }
     
     /**
@@ -255,14 +225,8 @@ public final class TestCAdES {
      * @param params
      * @return
      */
-    private byte[] cosign(AOSigner signer, byte[] data, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) {
-        try {
-            return signer.cosign(data, sign, algorithm, pke, params);
-        }
-        catch(final Exception e) {
-            Assert.fail("Error al cofirmar con datos:" + e);
-            return null;
-        }
+    private byte[] cosign(AOSigner signer, byte[] data, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
+        return signer.cosign(data, sign, algorithm, pke, params);
     }
     
     /**
@@ -281,17 +245,15 @@ public final class TestCAdES {
         // Arbol de alias
         AOTreeModel tree = signer.getSignersStructure(sign, false);
         AOTreeNode root = (AOTreeNode) tree.getRoot();
-        Assert.assertEquals("Datos", root.getUserObject());
+        Assert.assertEquals("Datos", root.getUserObject()); //$NON-NLS-1$
         for (int i = 0; i < signsAlias.length; i++) {
-            System.out.println(" = Alias esperado: " + signsAlias[i]);
-            System.out.println(" = Alias encontrado: " + root.getChildAt(i).getUserObject());
             Assert.assertEquals(signsAlias[i], root.getChildAt(i).getUserObject());
         }
         
         // Arbol de AOSimpleSignersInfo
         tree = signer.getSignersStructure(sign, true);
         root = (AOTreeNode) tree.getRoot();
-        Assert.assertEquals("Datos", root.getUserObject());
+        Assert.assertEquals("Datos", root.getUserObject()); //$NON-NLS-1$
         for (int i = 0; i < signsAlias.length; i++) {
             AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) root.getChildAt(i).getUserObject();
 //          Assert.assertEquals("CAdES", simpleSignInfo.getSignFormat());
