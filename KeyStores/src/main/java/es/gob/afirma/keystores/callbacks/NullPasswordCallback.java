@@ -20,7 +20,7 @@ public final class NullPasswordCallback extends PasswordCallback {
 
     /** Contruye el la forma b&aacute;sica de la clase. */
     public NullPasswordCallback() {
-        super(">", false);
+        super(">", false); //$NON-NLS-1$
     }
 
     @Override

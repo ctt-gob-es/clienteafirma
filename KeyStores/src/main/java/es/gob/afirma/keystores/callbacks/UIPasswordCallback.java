@@ -38,6 +38,6 @@ public final class UIPasswordCallback extends PasswordCallback {
 
     @Override
     public char[] getPassword() {
-        return AOUIFactory.getPassword(this.getPrompt(), parent);
+        return AOUIFactory.getPassword(this.getPrompt(), this.parent);
     }
 }

@@ -36,9 +36,11 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 /** Utilidades para le manejo de almacenes de claves y certificados. */
 public final class KeyStoreUtilities {
 
-    private KeyStoreUtilities() {}
+    private KeyStoreUtilities() {
+        // No permitimos la instanciacion
+    }
     
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
@@ -50,10 +52,8 @@ public final class KeyStoreUtilities {
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
     static final String createPKCS11ConfigFile(final String lib, String name, final Integer slot) {
-        if (name == null) {
-            name = "AFIRMA-PKCS11";
-        }
-        final StringBuilder buffer = new StringBuilder("library=");
+
+        final StringBuilder buffer = new StringBuilder("library="); //$NON-NLS-1$
 
         // TODO: Ir uno a uno en el ApplicationPath de Java hasta que
         // encontremos la biblioteca, en vez de mirar directamente en
@@ -69,50 +69,50 @@ public final class KeyStoreUtilities {
             buffer.append(sysLibDir);
         }
 
-        buffer.append(lib).append("\r\n")
+        buffer.append(lib).append("\r\n") //$NON-NLS-1$
         // Ignoramos la descripcion que se nos proporciona, ya que el
         // proveedor PKCS#11 de Sun
         // falla si llegan espacios o caracteres raros
-              .append("name=")
-              .append(name)
-              .append("\r\n")
-              .append("showInfo=true\r\n");
+              .append("name=") //$NON-NLS-1$
+              .append((name != null) ? name : "AFIRMA-PKCS11") //$NON-NLS-1$
+              .append("\r\n") //$NON-NLS-1$
+              .append("showInfo=true\r\n"); //$NON-NLS-1$
 
         if (slot != null) {
-            buffer.append("slot=").append(slot);
+            buffer.append("slot=").append(slot); //$NON-NLS-1$
         }
 
-        LOGGER.info("Creada configuracion PKCS#11:\r\n" + buffer.toString());
+        LOGGER.info("Creada configuracion PKCS#11:\r\n" + buffer.toString()); //$NON-NLS-1$
         return buffer.toString();
     }
 
     static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws Exception {
 
-        Field field = keyStore.getClass().getDeclaredField("keyStoreSpi");
+        Field field = keyStore.getClass().getDeclaredField("keyStoreSpi"); //$NON-NLS-1$
         field.setAccessible(true);
         final KeyStoreSpi keyStoreVeritable = (KeyStoreSpi) field.get(keyStore);
 
-        if ("sun.security.mscapi.KeyStore$MY".equals(keyStoreVeritable.getClass().getName())) {
+        if ("sun.security.mscapi.KeyStore$MY".equals(keyStoreVeritable.getClass().getName())) { //$NON-NLS-1$
             String alias, hashCode;
             X509Certificate[] certificates;
 
-            field = keyStoreVeritable.getClass().getEnclosingClass().getDeclaredField("entries");
+            field = keyStoreVeritable.getClass().getEnclosingClass().getDeclaredField("entries"); //$NON-NLS-1$
             field.setAccessible(true);
             final Collection<?> entries = (Collection<?>) field.get(keyStoreVeritable);
 
             for (final Object entry : entries) {
-                field = entry.getClass().getDeclaredField("certChain");
+                field = entry.getClass().getDeclaredField("certChain"); //$NON-NLS-1$
                 field.setAccessible(true);
                 certificates = (X509Certificate[]) field.get(entry);
 
                 hashCode = Integer.toString(certificates[0].hashCode());
 
-                field = entry.getClass().getDeclaredField("alias");
+                field = entry.getClass().getDeclaredField("alias"); //$NON-NLS-1$
                 field.setAccessible(true);
                 alias = (String) field.get(entry);
 
                 if (!alias.equals(hashCode)) {
-                    field.set(entry, alias.concat(" - ").concat(hashCode));
+                    field.set(entry, alias.concat(" - ").concat(hashCode)); //$NON-NLS-1$
                 }
             } // for
         } // if
@@ -200,8 +200,8 @@ public final class KeyStoreUtilities {
                         tmpCert.checkValidity();
                     }
                     catch (final Exception e) {
-                        LOGGER.info( //$NON-NLS-1$
-                        "Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
+                        LOGGER.info(
+                                    "Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
                         );
                         aliassesByFriendlyName.remove(al);
                         continue;
@@ -210,22 +210,20 @@ public final class KeyStoreUtilities {
 
                 if (checkPrivateKeys && tmpCert != null) {
                     try {
-                        if ("KeychainStore".equals(ks.getType())) {
+                        if ("KeychainStore".equals(ks.getType())) { //$NON-NLS-1$
                             final KeyStore tmpKs = ks;
                             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                                 public Void run() {
                                     final PrivateKey key;
                                     try {
-                                        Logger.getLogger("es.gob.afirma").info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas");
-                                        key = (PrivateKey) tmpKs.getKey(al, "dummy".toCharArray());
+                                        LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
+                                        key = (PrivateKey) tmpKs.getKey(al, "dummy".toCharArray()); //$NON-NLS-1$
                                     }
                                     catch (final Exception e) {
-                                        e.printStackTrace();
-                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X", e);
+                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X", e); //$NON-NLS-1$
                                     }
                                     if (key == null) {
-                                        System.out.println("Recuperada clave privada nula");
-                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X");
+                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X"); //$NON-NLS-1$
                                     }
                                     return null;
                                 }
@@ -266,7 +264,7 @@ public final class KeyStoreUtilities {
                         issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
 
                         if (tmpCN != null && issuerTmpCN != null) {
-                            aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+                            aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         }
 
                         else if (tmpCN != null /* && isValidString(tmpCN) */) {
@@ -463,7 +461,6 @@ public final class KeyStoreUtilities {
             certName = o.toString();
         }
         else {
-            Logger.getLogger("es.gob.afirma").warning("Operacion de seleccion de certificado cancelada"); //$NON-NLS-1$ //$NON-NLS-2$
             throw new AOCancelledOperationException("Operacion de seleccion de certificado cancelada"); //$NON-NLS-1$
         }
 
@@ -487,11 +484,11 @@ public final class KeyStoreUtilities {
                         }
                         catch (final CertificateExpiredException e) {
                             errorMessage = "Puede que el certificado haya caducado. " + KeyStoreMessages.getString("AOUIManager.8") //$NON-NLS-1$
-                                           + "\r\n" + KeyStoreMessages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                                           + "\r\n" + KeyStoreMessages.getString("AOUIManager.9"); //$NON-NLS-1$
                         }
                         catch (final CertificateNotYetValidException e) {
                             errorMessage = "Puede que el certificado aun no sea v\u00E1lido. " + KeyStoreMessages.getString("AOUIManager.8") //$NON-NLS-1$
-                                           + "\r\n" + KeyStoreMessages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                                           + "\r\n" + KeyStoreMessages.getString("AOUIManager.9"); //$NON-NLS-1$
                         }
                         catch (final KeyStoreException e) {
                             errorMessage = "No se ha podido validar el certificado. " + KeyStoreMessages.getString("AOUIManager.8") //$NON-NLS-1$
@@ -499,7 +496,7 @@ public final class KeyStoreUtilities {
                         }
 
                         if (errorMessage != null) {
-                            Logger.getLogger("es.gob.afirma").warning("Error durante la validacion: " + errorMessage);
+                            LOGGER.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
                             if (AOUIFactory.showConfirmDialog(parentComponent, errorMessage + KeyStoreMessages.getString("AOUIManager.8"), //$NON-NLS-1$
                                                               KeyStoreMessages.getString("AOUIManager.5"), //$NON-NLS-1$
                                                               AOUIFactory.YES_NO_OPTION,

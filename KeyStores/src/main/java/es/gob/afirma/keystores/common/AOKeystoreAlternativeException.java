@@ -29,9 +29,9 @@ public final class AOKeystoreAlternativeException extends Exception {
     public AOKeystoreAlternativeException(final AOKeyStore ks, final String desc, final Exception e) {
         super(desc, e);
         if (ks == null) {
-            throw new IllegalArgumentException("Es necesario proporcionar un AOKeyStore alternativo");
+            throw new IllegalArgumentException("Es necesario proporcionar un AOKeyStore alternativo"); //$NON-NLS-1$
         }
-        alternativeKs = ks;
+        this.alternativeKs = ks;
     }
 
     /** Crea la excepci&oacute;n con un mensaje determinado y un almac&eacute;n
@@ -43,16 +43,16 @@ public final class AOKeystoreAlternativeException extends Exception {
     AOKeystoreAlternativeException(final AOKeyStore ks, final String desc) {
         super(desc);
         if (ks == null) {
-            throw new IllegalArgumentException("Es necesario proporcionar un AOKeyStore alternativo");
+            throw new IllegalArgumentException("Es necesario proporcionar un AOKeyStore alternativo"); //$NON-NLS-1$
         }
-        alternativeKs = ks;
+        this.alternativeKs = ks;
     }
 
     /** Obtiene el almac&eacute;n alternativo que podr&iacute;a usarse como
      * sustituto.
      * @return Almac&eacute;n de claves y certificados alternativo */
     public AOKeyStore getAlternativeKsm() {
-        return alternativeKs;
+        return this.alternativeKs;
     }
 
 }

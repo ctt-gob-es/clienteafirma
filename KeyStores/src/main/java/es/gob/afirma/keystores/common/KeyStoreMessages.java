@@ -31,12 +31,14 @@ public final class KeyStoreMessages {
                 RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
             }
             catch (final Exception e1) {
-                Logger.getLogger("es.gob.afirma").severe("No ha podido cargarse el fichero de mensajes localizados: " + e1);
+                Logger.getLogger("es.gob.afirma").severe("No ha podido cargarse el fichero de mensajes localizados: " + e1);  //$NON-NLS-1$//$NON-NLS-2$
             }
         }
     }
 
-    private KeyStoreMessages() {}
+    private KeyStoreMessages() {
+        // No permitimos la instanciacion
+    }
 
     /** Recupera el texto identificado con la clave proporcionada.
      * @param key
@@ -60,7 +62,7 @@ public final class KeyStoreMessages {
      * @return Recuerso textual con la subcadena sustituida. */
     public static String getString(final String key, final String text) {
         try {
-            return RESOURCE_BUNDLE.getString(key).replace("%0", text);
+            return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return '!' + key + '!';
@@ -87,7 +89,7 @@ public final class KeyStoreMessages {
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                text = text.replace("%" + i, params[i]);
+                text = text.replace("%" + i, params[i]); //$NON-NLS-1$
             }
         }
 
