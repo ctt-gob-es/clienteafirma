@@ -24,8 +24,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import sun.security.x509.AlgorithmId;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
@@ -166,9 +164,8 @@ public final class GenSignedData {
             }
         }
 
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
         try {
-            digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString());
+            digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
@@ -231,7 +228,7 @@ public final class GenSignedData {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
-        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
         // // ATRIBUTOS
 
@@ -252,10 +249,9 @@ public final class GenSignedData {
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
         final AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString());
+            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$

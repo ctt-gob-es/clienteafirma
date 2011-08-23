@@ -49,6 +49,7 @@ import sun.security.x509.AlgorithmId;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.Info;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
@@ -158,17 +159,15 @@ final class CAdESEPESSignedAndEnvelopedData {
 
         final String signatureAlgorithm;
         final String digestAlgorithm;
-        final AlgorithmId digestAlgorithmId;
         final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
         final String keyAlgorithm;
 
         try {
             signatureAlgorithm = parameters.getSignatureAlgorithm();
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
             keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm);
 
-            final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString());
+            final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
             digestAlgs.add(digAlgId);
         }
         catch (final Exception e) {
@@ -195,7 +194,7 @@ final class CAdESEPESSignedAndEnvelopedData {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
-        final AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+        final AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
         // // ATRIBUTOS
         final ASN1EncodableVector contextExpecific =
@@ -212,11 +211,9 @@ final class CAdESEPESSignedAndEnvelopedData {
         final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
-
+        final AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString());
+            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
@@ -353,17 +350,15 @@ final class CAdESEPESSignedAndEnvelopedData {
                     // algoritmo
                     final String signatureAlgorithm;
                     final String digestAlgorithm;
-                    final AlgorithmId digestAlgorithmId;
                     final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
                     final String keyAlgorithm;
 
                     try {
                         signatureAlgorithm = parameters.getSignatureAlgorithm();
                         digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-                        digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
                         keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm);
 
-                        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString());
+                        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
                         digestAlgs.add(digAlgId);
                     }
                     catch (final Exception e2) {
@@ -380,7 +375,7 @@ final class CAdESEPESSignedAndEnvelopedData {
 
                     // AlgorithmIdentifier
                     final AlgorithmIdentifier digAlgId =
-                            new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+                            new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
                     // // ATRIBUTOS
                     final ASN1EncodableVector contextExpecific =
@@ -399,7 +394,6 @@ final class CAdESEPESSignedAndEnvelopedData {
                     final ASN1Set unSignedAttr = null;
 
                     // digEncryptionAlgorithm
-                    final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
                     final SignerInfo nuevoSigner =
                             Utils.signAndEnvelope(keyEntry,
                                                   signatureAlgorithm,
@@ -407,7 +401,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                   identifier,
                                                   signedAttr,
                                                   unSignedAttr,
-                                                  digestAlgorithmIdEnc,
+                                                  AlgorithmId.get(keyAlgorithm),
                                                   this.signedAttr2);
 
                     // introducimos el nuevo Signer
