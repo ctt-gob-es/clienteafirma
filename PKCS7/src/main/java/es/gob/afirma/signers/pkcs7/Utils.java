@@ -83,7 +83,6 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.util.encoders.Base64;
 
-import sun.security.x509.AlgorithmId;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.misc.AOConstants.AOCipherAlgorithm;
@@ -478,7 +477,7 @@ public final class Utils {
                                              final SignerIdentifier identifier,
                                              final ASN1Set signedAttr,
                                              final ASN1Set unSignedAttr,
-                                             final AlgorithmId digestAlgorithmIdEnc,
+                                             final sun.security.x509.AlgorithmId digestAlgorithmIdEnc,
                                              final ASN1Set signedAttr2) throws IOException {
         AlgorithmIdentifier encAlgId;
         try {
