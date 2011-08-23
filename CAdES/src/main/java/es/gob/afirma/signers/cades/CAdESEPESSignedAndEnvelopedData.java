@@ -156,11 +156,11 @@ final class CAdESEPESSignedAndEnvelopedData {
         // 2. DIGESTALGORITM
         // buscamos que timo de algoritmo es y lo codificamos con su OID
 
-        String signatureAlgorithm = null;
-        String digestAlgorithm = null;
-        AlgorithmId digestAlgorithmId = null;
+        final String signatureAlgorithm;
+        final String digestAlgorithm;
+        final AlgorithmId digestAlgorithmId;
         final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
-        String keyAlgorithm = null;
+        final String keyAlgorithm;
 
         try {
             signatureAlgorithm = parameters.getSignatureAlgorithm();
@@ -253,7 +253,7 @@ final class CAdESEPESSignedAndEnvelopedData {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
-        Signature sig = null;
+        final Signature sig;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
@@ -261,8 +261,7 @@ final class CAdESEPESSignedAndEnvelopedData {
             throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
-        byte[] tmp = null;
-
+        final byte[] tmp;
         try {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
@@ -287,7 +286,7 @@ final class CAdESEPESSignedAndEnvelopedData {
         }
 
         // firmamos.
-        byte[] realSig = null;
+        final byte[] realSig;
         try {
             realSig = sig.sign();
         }
@@ -352,11 +351,11 @@ final class CAdESEPESSignedAndEnvelopedData {
                 if (signerCertificateChain.length != 0) {
 
                     // algoritmo
-                    String signatureAlgorithm = null;
-                    String digestAlgorithm = null;
-                    AlgorithmId digestAlgorithmId = null;
+                    final String signatureAlgorithm;
+                    final String digestAlgorithm;
+                    final AlgorithmId digestAlgorithmId;
                     final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
-                    String keyAlgorithm = null;
+                    final String keyAlgorithm;
 
                     try {
                         signatureAlgorithm = parameters.getSignatureAlgorithm();

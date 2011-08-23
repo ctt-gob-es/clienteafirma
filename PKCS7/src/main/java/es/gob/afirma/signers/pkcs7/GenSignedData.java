@@ -402,7 +402,7 @@ public final class GenSignedData {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
-        Signature sig = null;
+        final Signature sig;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
@@ -427,7 +427,7 @@ public final class GenSignedData {
         }
 
         // firmamos.
-        byte[] realSig = null;
+        final byte[] realSig;
         try {
             realSig = sig.sign();
         }
@@ -435,9 +435,7 @@ public final class GenSignedData {
             throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
-        final ASN1OctetString encDigest = new DEROctetString(realSig);
-
-        return encDigest;
+        return new DEROctetString(realSig);
 
     }
 

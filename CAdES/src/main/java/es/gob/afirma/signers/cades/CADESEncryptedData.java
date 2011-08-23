@@ -24,6 +24,7 @@ import org.bouncycastle.asn1.cms.EncryptedContentInfo;
 import org.bouncycastle.asn1.cms.EncryptedData;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.SigUtils;
@@ -72,7 +73,7 @@ final class CADESEncryptedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    byte[] genEncryptedData(final InputStream file, final String digAlg, final AOCipherConfig config, final String pass, final String dataType) throws NoSuchAlgorithmException {
+    byte[] genEncryptedData(final InputStream file, final String digAlg, final AOCipherConfig config, final String pass, final String dataType) throws NoSuchAlgorithmException, AOException {
 
         final byte[] codeFile = createArrayFromFile(file);
 
@@ -83,19 +84,18 @@ final class CADESEncryptedData {
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digAlg);
 
         // generamos el contenedor de cifrado
-        EncryptedContentInfo encInfo = null;
+        final EncryptedContentInfo encInfo;
         try {
             // 3. ENCRIPTEDCONTENTINFO
             encInfo = Utils.getEncryptedContentInfo(codeFile, config, this.cipherKey);
         }
         catch (final Exception ex) {
-            LOGGER.severe("Error durante el proceso de cifrado: " + ex); //$NON-NLS-1$
+            throw new AOException("Error durante el proceso de cifrado", ex); //$NON-NLS-1$
         }
 
         // 4. ATRIBUTOS
         // obtenemos la lista de certificados
-        ASN1Set unprotectedAttrs = null;
-        unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(Utils.initContexExpecific(digestAlgorithm, codeFile, dataType, null)));
+        final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(Utils.initContexExpecific(digestAlgorithm, codeFile, dataType, null)));
 
         // construimos el Enveloped Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.encryptedData, new EncryptedData(encInfo, unprotectedAttrs)).getDEREncoded();

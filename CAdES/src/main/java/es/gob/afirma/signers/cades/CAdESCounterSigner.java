@@ -1029,7 +1029,7 @@ final class CAdESCounterSigner {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
-        Signature sig = null;
+        final Signature sig;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
@@ -1037,8 +1037,7 @@ final class CAdESCounterSigner {
             throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
-        byte[] tmp = null;
-
+        final byte[] tmp;
         try {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
@@ -1063,7 +1062,7 @@ final class CAdESCounterSigner {
         }
 
         // firmamos.
-        byte[] realSig = null;
+        final byte[] realSig;
         try {
             realSig = sig.sign();
         }
@@ -1071,8 +1070,7 @@ final class CAdESCounterSigner {
             throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
-        final ASN1OctetString encDigest = new DEROctetString(realSig);
+        return new DEROctetString(realSig);
 
-        return encDigest;
     }
 }

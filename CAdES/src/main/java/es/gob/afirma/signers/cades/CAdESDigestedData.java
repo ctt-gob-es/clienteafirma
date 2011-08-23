@@ -73,16 +73,12 @@ final class CAdESDigestedData {
         catch (final Exception e) {
             throw new IOException((new StringBuilder()).append("Error de codificacion: ").append(e).toString()); //$NON-NLS-1$
         }
-        ContentInfo encInfo = null;
 
         // indicamos el tipo de contenido
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
-        encInfo = new ContentInfo(contentTypeOID, null);
-
-        final byte data[] = parameters.getContent();
+        final ContentInfo encInfo = new ContentInfo(new ASN1ObjectIdentifier(dataType.toString()), null);
 
         // digest
-        final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm.toString()).digest(data));
+        final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm.toString()).digest(parameters.getContent()));
 
         // construimos el digestedData.
         return (new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest))).getDEREncoded();

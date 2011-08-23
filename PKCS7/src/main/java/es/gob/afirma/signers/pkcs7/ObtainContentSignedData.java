@@ -38,8 +38,7 @@ public final class ObtainContentSignedData {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = null;
-            dsq = (ASN1Sequence) is.readObject();
+            final ASN1Sequence dsq  = (ASN1Sequence) is.readObject();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();

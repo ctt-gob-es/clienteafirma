@@ -181,8 +181,7 @@ final class CAdESCounterSignerEnveloped {
         final ASN1InputStream is = new ASN1InputStream(data);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        ASN1Sequence dsq = null;
-        dsq = (ASN1Sequence) is.readObject();
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedAndEnvelopedData
         e.nextElement();
@@ -193,8 +192,7 @@ final class CAdESCounterSignerEnveloped {
         final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
 
         // Obtenemos los signerInfos del SignedAndEnvelopedData
-        ASN1Set signerInfosSd = null;
-        signerInfosSd = sd.getSignerInfos();
+        final ASN1Set signerInfosSd = sd.getSignerInfos();
 
         // 4. CERTIFICADOS
         // obtenemos la lista de certificados
@@ -1022,7 +1020,7 @@ final class CAdESCounterSignerEnveloped {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
-        Signature sig = null;
+        final Signature sig;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
@@ -1031,7 +1029,6 @@ final class CAdESCounterSignerEnveloped {
         }
 
         final byte[] tmp;
-
         try {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
@@ -1056,7 +1053,7 @@ final class CAdESCounterSignerEnveloped {
         }
 
         // firmamos.
-        byte[] realSig = null;
+        final byte[] realSig;
         try {
             realSig = sig.sign();
         }

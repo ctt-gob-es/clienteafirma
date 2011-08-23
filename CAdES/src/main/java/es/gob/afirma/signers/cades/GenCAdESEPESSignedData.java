@@ -277,7 +277,7 @@ public final class GenCAdESEPESSignedData {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
-        Signature sig = null;
+        final Signature sig;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
@@ -285,8 +285,7 @@ public final class GenCAdESEPESSignedData {
             throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
-        byte[] tmp = null;
-
+        final byte[] tmp;
         try {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
@@ -311,7 +310,7 @@ public final class GenCAdESEPESSignedData {
         }
 
         // firmamos.
-        byte[] realSig = null;
+        final byte[] realSig;
         try {
             realSig = sig.sign();
         }

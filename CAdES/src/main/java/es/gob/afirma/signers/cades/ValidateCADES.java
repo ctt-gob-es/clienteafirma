@@ -87,8 +87,7 @@ final class ValidateCADES {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = null;
-            dsq = (ASN1Sequence) is.readObject();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -100,8 +99,7 @@ final class ValidateCADES {
             final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
             final SignedData sd = new SignedData(datos);
 
-            ASN1Set signerInfosSd = null;
-            signerInfosSd = sd.getSignerInfos();
+            final ASN1Set signerInfosSd = sd.getSignerInfos();
 
             for (int i = 0; i < signerInfosSd.size(); i++) {
                 final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
@@ -151,8 +149,7 @@ final class ValidateCADES {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = null;
-            dsq = (ASN1Sequence) is.readObject();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -188,8 +185,7 @@ final class ValidateCADES {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = null;
-            dsq = (ASN1Sequence) is.readObject();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -232,8 +228,7 @@ final class ValidateCADES {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = null;
-            dsq = (ASN1Sequence) is.readObject();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -270,8 +265,7 @@ final class ValidateCADES {
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-            ASN1Sequence dsq = null;
-            dsq = (ASN1Sequence) is.readObject();
+            final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
             final Enumeration<?> e = dsq.getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
@@ -283,8 +277,7 @@ final class ValidateCADES {
             final ASN1Sequence datos = (ASN1Sequence) doj.getObject();
             final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(datos);
 
-            ASN1Set signerInfosSd = null;
-            signerInfosSd = sd.getSignerInfos();
+            final ASN1Set signerInfosSd = sd.getSignerInfos();
 
             for (int i = 0; i < signerInfosSd.size(); i++) {
                 final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
