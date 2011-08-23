@@ -51,6 +51,8 @@ public final class AOCMSSigner implements AOSigner {
     private String dataType = null;
     private final Map<String, byte[]> atrib = new HashMap<String, byte[]>();
     private final Map<String, byte[]> uatrib = new HashMap<String, byte[]>();
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     public byte[] sign(final byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
@@ -58,14 +60,14 @@ public final class AOCMSSigner implements AOSigner {
             extraParams = new Properties();
         }
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
+        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
+        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
+        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
 
         byte[] messageDigest = null;
         if (precalculatedDigest != null) {
@@ -93,21 +95,21 @@ public final class AOCMSSigner implements AOSigner {
             this.dataType = PKCSObjectIdentifiers.data.getId();
         }
 
-        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE);
+        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
 
         try {
             final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
             return new GenSignedData().generateSignedData(csp,
                                                           omitContent,
-                                                          Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")),
-                                                          dataType,
+                                                          Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")), //$NON-NLS-1$ //$NON-NLS-2$
+                                                          this.dataType,
                                                           keyEntry,
-                                                          atrib,
-                                                          uatrib,
+                                                          this.atrib,
+                                                          this.uatrib,
                                                           messageDigest);
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la firma PKCS#7", e);
+            throw new AOException("Error generando la firma PKCS#7", e); //$NON-NLS-1$
         }
     }
 
@@ -117,14 +119,14 @@ public final class AOCMSSigner implements AOSigner {
             extraParams = new Properties();
         }
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
+        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
+        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
+        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
 
         byte[] messageDigest = null;
         if (precalculatedDigest != null) {
@@ -152,7 +154,7 @@ public final class AOCMSSigner implements AOSigner {
             this.dataType = PKCSObjectIdentifiers.data.getId();
         }
 
-        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE);
+        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
 
         final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 
@@ -160,29 +162,29 @@ public final class AOCMSSigner implements AOSigner {
         final boolean signedData = CMSHelper.isCMSValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA);
         if (signedData) {
             try {
-                return new CoSigner().coSigner(csp, sign, omitContent, dataType, keyEntry, atrib, uatrib, messageDigest);
+                return new CoSigner().coSigner(csp, sign, omitContent, this.dataType, keyEntry, this.atrib, this.uatrib, messageDigest);
             }
             catch (final Exception e) {
-                throw new AOException("Error generando la Cofirma PKCS#7", e);
+                throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
             }
         }
         // Si la firma que nos introducen es SignedAndEnvelopedData
         try {
             // El parametro omitContent no tiene sentido en un signed and
             // envelopedData.
-            return new CoSignerEnveloped().coSigner(csp, sign, dataType, keyEntry, atrib, uatrib, messageDigest);
+            return new CoSignerEnveloped().coSigner(csp, sign, this.dataType, keyEntry, this.atrib, this.uatrib, messageDigest);
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma PKCS#7", e);
+            throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
         }
     }
 
     public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
+        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
+        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
@@ -213,7 +215,7 @@ public final class AOCMSSigner implements AOSigner {
         if (CMSHelper.isCMSValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA)) {
             // Cofirma de la firma usando unicamente el fichero de firmas.
             try {
-                return new CoSigner().coSigner(typeAlgorithm, aCertificados, sign, dataType, keyEntry, atrib, uatrib, null // null
+                return new CoSigner().coSigner(typeAlgorithm, aCertificados, sign, this.dataType, keyEntry, this.atrib, this.uatrib, null // null
                                                                                                                            // porque
                                                                                                                            // no
                                                                                                                            // nos
@@ -234,14 +236,14 @@ public final class AOCMSSigner implements AOSigner {
                 );
             }
             catch (final Exception e) {
-                throw new AOException("Error generando la Cofirma PKCS#7", e);
+                throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
             }
         }
         // Si la firma que nos introducen es SignedAndEnvelopedData
 
         // Cofirma de la firma usando unicamente el fichero de firmas.
         try {
-            return new CoSignerEnveloped().coSigner(typeAlgorithm, aCertificados, sign, dataType, keyEntry, atrib, uatrib, null // null porque no nos
+            return new CoSignerEnveloped().coSigner(typeAlgorithm, aCertificados, sign, this.dataType, keyEntry, this.atrib, this.uatrib, null // null porque no nos
                                                                                                                                 // pueden dar un hash
                                                                                                                                 // en este
                                                                                                                                 // metodo, tendría que
@@ -250,7 +252,7 @@ public final class AOCMSSigner implements AOSigner {
             );
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma PKCS#7", e);
+            throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
         }
     }
 
@@ -261,10 +263,10 @@ public final class AOCMSSigner implements AOSigner {
                               final PrivateKeyEntry keyEntry,
                               final Properties extraParams) throws AOException {
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
+        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
+        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
@@ -301,14 +303,14 @@ public final class AOCMSSigner implements AOSigner {
                     final int[] nodes = {
                         0
                     };
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Tree, nodes, keyEntry, dataType, atrib, uatrib);
+                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Tree, nodes, keyEntry, this.dataType, this.atrib, this.uatrib);
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.Leafs) {
                     final int[] nodes = {
                         0
                     };
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Leafs, nodes, keyEntry, dataType, atrib, uatrib);
+                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Leafs, nodes, keyEntry, this.dataType, this.atrib, this.uatrib);
                 }
                 // CASO DE FIRMA DE NODOS
                 else if (targetType == CounterSignTarget.Nodes) {
@@ -317,7 +319,7 @@ public final class AOCMSSigner implements AOSigner {
                         nodesID[i] = ((Integer) targets[i]).intValue();
                     }
                     nodesID = new ReadNodesTree().simplyArray(nodesID);
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Nodes, nodesID, keyEntry, dataType, atrib, uatrib);
+                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Nodes, nodesID, keyEntry, this.dataType, this.atrib, this.uatrib);
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
                 else if (targetType == CounterSignTarget.Signers) {
@@ -329,12 +331,12 @@ public final class AOCMSSigner implements AOSigner {
                     }
                     final ReadNodesTree rn2 = new ReadNodesTree();
                     final int[] nodes2 = rn2.readNodesFromSigners(signers, sign);
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Signers, nodes2, keyEntry, dataType, atrib, uatrib);
+                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Signers, nodes2, keyEntry, this.dataType, this.atrib, this.uatrib);
 
                 }
             }
             catch (final Exception e) {
-                throw new AOException("Error generando la Contrafirma PKCS#7", e);
+                throw new AOException("Error generando la Contrafirma PKCS#7", e); //$NON-NLS-1$
             }
         }
         // Si la firma es SignedAndEnveloped
@@ -352,9 +354,9 @@ public final class AOCMSSigner implements AOSigner {
                                                                                 CounterSignTarget.Tree,
                                                                                 nodes,
                                                                                 keyEntry,
-                                                                                dataType,
-                                                                                atrib,
-                                                                                uatrib);
+                                                                                this.dataType,
+                                                                                this.atrib,
+                                                                                this.uatrib);
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.Leafs) {
@@ -367,9 +369,9 @@ public final class AOCMSSigner implements AOSigner {
                                                                                 CounterSignTarget.Leafs,
                                                                                 nodes,
                                                                                 keyEntry,
-                                                                                dataType,
-                                                                                atrib,
-                                                                                uatrib);
+                                                                                this.dataType,
+                                                                                this.atrib,
+                                                                                this.uatrib);
                 }
                 // CASO DE FIRMA DE NODOS
                 else if (targetType == CounterSignTarget.Nodes) {
@@ -384,9 +386,9 @@ public final class AOCMSSigner implements AOSigner {
                                                                                 CounterSignTarget.Nodes,
                                                                                 nodesID,
                                                                                 keyEntry,
-                                                                                dataType,
-                                                                                atrib,
-                                                                                uatrib);
+                                                                                this.dataType,
+                                                                                this.atrib,
+                                                                                this.uatrib);
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
                 else if (targetType == CounterSignTarget.Signers) {
@@ -402,14 +404,14 @@ public final class AOCMSSigner implements AOSigner {
                                                                                 CounterSignTarget.Signers,
                                                                                 new ReadNodesTree().readNodesFromSigners(signers, sign),
                                                                                 keyEntry,
-                                                                                dataType,
-                                                                                atrib,
-                                                                                uatrib);
+                                                                                this.dataType,
+                                                                                this.atrib,
+                                                                                this.uatrib);
 
                 }
             }
             catch (final Exception e) {
-                throw new AOException("Error generando la Contrafirma PKCS#7", e);
+                throw new AOException("Error generando la Contrafirma PKCS#7", e); //$NON-NLS-1$
             }
 
         }
@@ -423,14 +425,14 @@ public final class AOCMSSigner implements AOSigner {
             return Rn.readNodesTree(sign, asSimpleSignInfo);
         }
         catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe(ex.toString());
+            LOGGER.severe(ex.toString());
         }
         return null;
     }
 
     public boolean isSign(final byte[] signData) {
         if (signData == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
 
@@ -445,7 +447,7 @@ public final class AOCMSSigner implements AOSigner {
 
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
         return true;
@@ -453,15 +455,15 @@ public final class AOCMSSigner implements AOSigner {
 
     public String getDataMimeType(final byte[] signData) throws AOUnsupportedSignFormatException {
 
-        String numOid = "";
-        String oid = "";
+        String numOid = ""; //$NON-NLS-1$
+        String oid = ""; //$NON-NLS-1$
 
         // Comprobamos que sea una firma valida
         try {
             this.isSign(signData);
         }
         catch (final Exception e1) {
-            throw new AOUnsupportedSignFormatException("No es un tipo de firma valido.");
+            throw new AOUnsupportedSignFormatException("No es un tipo de firma valido"); //$NON-NLS-1$
         }
 
         // Extraemos el mimetype
@@ -482,7 +484,7 @@ public final class AOCMSSigner implements AOSigner {
      * @param value
      *        Valor asignado */
     public void addSignedAttribute(final String oid, final byte[] value) {
-        atrib.put(oid, value);
+        this.atrib.put(oid, value);
     }
 
     /** A&ntilde;ade un atributo no firmado al formato de firma seleccionado.
@@ -491,7 +493,7 @@ public final class AOCMSSigner implements AOSigner {
      * @param value
      *        Valor asignado */
     public void addUnsignedAttribute(final String oid, final byte[] value) {
-        uatrib.put(oid, value);
+        this.uatrib.put(oid, value);
     }
 
     public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
@@ -506,28 +508,28 @@ public final class AOCMSSigner implements AOSigner {
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException, AOException {
 
         if (signData == null) {
-            throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion");
+            throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
 
         if (!CMSHelper.isCMSValid(signData)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
         return new ObtainContentSignedData().obtainData(signData);
     }
 
     public String getSignedName(final String originalName, final String inText) {
-        return originalName + (inText != null ? inText : "") + ".csig";
+        return originalName + (inText != null ? inText : "") + ".csig";  //$NON-NLS-1$//$NON-NLS-2$
     }
 
     public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
 
         if (signData == null) {
-            throw new IllegalArgumentException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
         if (!isSign(signData)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma");
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
         final AOSignInfo signInfo = new AOSignInfo(AOSignConstants.SIGN_FORMAT_CMS);

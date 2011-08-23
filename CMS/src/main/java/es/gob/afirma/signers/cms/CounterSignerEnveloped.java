@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -61,11 +59,10 @@ import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
-
-import sun.security.x509.AlgorithmId;
 
 /** Clase que implementa la contrafirma digital PKCS#7/CMS signedAndEnvelopedData
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
@@ -346,20 +343,20 @@ final class CounterSignerEnveloped {
 
         final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         final ASN1Set auxSignerRaiz = signerInfosRaiz;
-        actualIndex = 0;
+        this.actualIndex = 0;
 
         for (int i = 0; i < auxSignerRaiz.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) auxSignerRaiz.getObjectAt(i));
             SignerInfo counterSigner = null;
-            if (actualIndex == nodo) {
+            if (this.actualIndex == nodo) {
                 counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
             }
             else {
-                if (actualIndex != nodo) {
+                if (this.actualIndex != nodo) {
                     counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, nodo);
                 }
             }
-            actualIndex++;
+            this.actualIndex++;
             counterSigners.add(counterSigner);
         }
 
@@ -816,9 +813,9 @@ final class CounterSignerEnveloped {
                         if (obj instanceof ASN1Sequence) {
                             final ASN1Sequence atrib = (ASN1Sequence) obj;
                             final SignerInfo si = new SignerInfo(atrib);
-                            actualIndex++;
-                            if (actualIndex != node) {
-                                if (actualIndex < node) {
+                            this.actualIndex++;
+                            if (this.actualIndex != node) {
+                                if (this.actualIndex < node) {
                                     counterSigner2 = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, node);
                                     signerInfosU.add(counterSigner2);
                                 }
@@ -931,14 +928,14 @@ final class CounterSignerEnveloped {
         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
         // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equals("SHA512")) {
-            digestAlgorithm = "SHA-512";
+        if (digestAlgorithm.equalsIgnoreCase("SHA512")) { //$NON-NLS-1$
+            digestAlgorithm = "SHA-512"; //$NON-NLS-1$
         }
-        else if (digestAlgorithm.equals("SHA384")) {
-            digestAlgorithm = "SHA-384";
+        else if (digestAlgorithm.equalsIgnoreCase("SHA384")) { //$NON-NLS-1$
+            digestAlgorithm = "SHA-384"; //$NON-NLS-1$
         }
-        else if (digestAlgorithm.equals("SHA256")) {
-            digestAlgorithm = "SHA-256";
+        else if (digestAlgorithm.equalsIgnoreCase("SHA256")) { //$NON-NLS-1$
+            digestAlgorithm = "SHA-256"; //$NON-NLS-1$
         }
 
         // MessageDigest
@@ -949,8 +946,8 @@ final class CounterSignerEnveloped {
         ContexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
 
         // agregamos la lista de atributos a mayores.
-        if (atrib2.size() != 0) {
-            final Iterator<Map.Entry<String, byte[]>> it = atrib2.entrySet().iterator();
+        if (this.atrib2.size() != 0) {
+            final Iterator<Map.Entry<String, byte[]>> it = this.atrib2.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
@@ -961,7 +958,7 @@ final class CounterSignerEnveloped {
             }
         }
 
-        signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
 
         return SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
 
@@ -978,8 +975,8 @@ final class CounterSignerEnveloped {
         final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // agregamos la lista de atributos a mayores.
-        if (uatrib2.size() != 0) {
-            final Iterator<Map.Entry<String, byte[]>> it = uatrib2.entrySet().iterator();
+        if (this.uatrib2.size() != 0) {
+            final Iterator<Map.Entry<String, byte[]>> it = this.uatrib2.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
@@ -1011,8 +1008,8 @@ final class CounterSignerEnveloped {
         final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
         // agregamos la lista de atributos a mayores.
-        if (uatrib2.size() != 0) {
-            final Iterator<Map.Entry<String, byte[]>> it = uatrib2.entrySet().iterator();
+        if (this.uatrib2.size() != 0) {
+            final Iterator<Map.Entry<String, byte[]>> it = this.uatrib2.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
@@ -1058,10 +1055,10 @@ final class CounterSignerEnveloped {
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         String digestAlgorithm = null;
         String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
         if (with > 0) {
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
             }
@@ -1070,8 +1067,7 @@ final class CounterSignerEnveloped {
             }
         }
 
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // ATRIBUTOS FINALES
         // ByteArrayInputStream signerToDigest = new
@@ -1086,13 +1082,12 @@ final class CounterSignerEnveloped {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // AlgorithmIdentifier
-        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
 
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
 
         // Firma del SignerInfo
 
@@ -1102,18 +1097,15 @@ final class CounterSignerEnveloped {
         // byte[] signedInfo = signData(signerToDigest, signatureAlgorithm,
         // keyEntry);
 
-        ASN1OctetString sign2 = null;
+        final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final AOException ex) {
-            Logger.getLogger(CounterSignerEnveloped.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IOException("Error en la firma electronica: " + ex); //$NON-NLS-1$
         }
 
-        final SignerInfo uAtrib = new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unsignedAttr// null
-                );
-
-        return uAtrib;
+        return new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unsignedAttr);
 
     }
 
@@ -1131,16 +1123,15 @@ final class CounterSignerEnveloped {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
-        byte[] tmp = null;
-
+        byte[] tmp;
         try {
-            tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            Logger.getLogger(CounterSignerEnveloped.class.getName()).log(Level.SEVERE, null, ex);
+            throw new AOException("Error obteniendo los atributos firmados", ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -1148,7 +1139,7 @@ final class CounterSignerEnveloped {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
 
         // Actualizamos la configuracion de firma
@@ -1156,7 +1147,7 @@ final class CounterSignerEnveloped {
             sig.update(tmp);
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e);
+            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
         }
 
         // firmamos.
@@ -1165,7 +1156,7 @@ final class CounterSignerEnveloped {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
         return new DEROctetString(realSig);

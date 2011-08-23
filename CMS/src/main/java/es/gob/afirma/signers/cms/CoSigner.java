@@ -25,8 +25,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -64,11 +62,9 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.pkcs7.GenSignedData;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
-
-import sun.security.x509.AlgorithmId;
 
 /** Clase que implementa la cofirma digital PKCS#7/CMS SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
@@ -121,8 +117,7 @@ final class CoSigner {
         final ASN1InputStream is = new ASN1InputStream(sign);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        ASN1Sequence dsq = null;
-        dsq = (ASN1Sequence) is.readObject();
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -147,7 +142,7 @@ final class CoSigner {
                 msg.write(bOut);
             }
             catch (final Exception ex) {
-                throw new IOException("Error en la escritura del procesable CMS: " + ex);
+                throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
             }
             encInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
         }
@@ -188,10 +183,10 @@ final class CoSigner {
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
         String digestAlgorithm = null;
         String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
         if (with > 0) {
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
             }
@@ -199,14 +194,12 @@ final class CoSigner {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4);
             }
         }
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+
+        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
         final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
-        System.out.println(" ** OK2 ** ");
-        System.out.println(" --------- ");
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // // ATRIBUTOS
@@ -222,21 +215,17 @@ final class CoSigner {
         }
 
         // atributos no firmados.
-        ASN1Set unSignedAttr = null;
-        unSignedAttr = generateUnsignerInfo(uatrib);
+        final ASN1Set unSignedAttr = generateUnsignerInfo(uatrib);
 
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
-        encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
         // Obtenemos los signerInfos del SignedData
-        ASN1Set signerInfosSd = null;
-        signerInfosSd = sd.getSignerInfos();
+        final ASN1Set signerInfosSd = sd.getSignerInfos();
 
         // introducimos los SignerInfos Existentes
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
@@ -247,26 +236,24 @@ final class CoSigner {
             signerInfos.add(si);
         }
 
-        ASN1OctetString sign2 = null;
+        final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final Exception ex) {
-            throw new IOException("Error al generar la firma: " + ex);
+            throw new IOException("Error al generar la firma: " + ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del SignedData
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
         ));
 
-        // CRLS no usado
-        final ASN1Set certrevlist = null;
 
         // construimos el Signed Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
                                                                                 encInfo,
                                                                                 certificates,
-                                                                                certrevlist,
+                                                                                null,
                                                                                 new DERSet(signerInfos)// unsignedAttr
                                )).getDEREncoded();
 
@@ -313,8 +300,7 @@ final class CoSigner {
         final ASN1InputStream is = new ASN1InputStream(sign);
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
-        ASN1Sequence dsq = null;
-        dsq = (ASN1Sequence) is.readObject();
+        final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
         final Enumeration<?> e = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
         e.nextElement();
@@ -328,11 +314,7 @@ final class CoSigner {
 
         // 3. CONTENTINFO
         // si se introduce el contenido o no
-        ContentInfo encInfo = null;
-        // DERObjectIdentifier contentTypeOID = new
-        // DERObjectIdentifier(dataType.toString());
-
-        encInfo = sd.getEncapContentInfo();
+        final ContentInfo encInfo = sd.getEncapContentInfo();
 
         final DEROctetString contenido = (DEROctetString) encInfo.getContent();
         byte[] contenidoDatos = null;
@@ -374,10 +356,10 @@ final class CoSigner {
         // String signatureAlgorithm = parameters.getSignatureAlgorithm();
         String digestAlgorithm = null;
         String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with");
+        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
         if (with > 0) {
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4);
+            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
             }
@@ -385,8 +367,7 @@ final class CoSigner {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4);
             }
         }
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
         final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
@@ -399,21 +380,17 @@ final class CoSigner {
         ASN1Set signedAttr = null;
 
         // atributos no firmados.
-        ASN1Set unSignedAttr = null;
-        unSignedAttr = generateUnsignerInfo(uatrib);
+        final ASN1Set unSignedAttr = generateUnsignerInfo(uatrib);
 
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
-        encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
         // Obtenemos los signerInfos del SignedData
-        ASN1Set signerInfosSd = null;
-        signerInfosSd = sd.getSignerInfos();
+        final ASN1Set signerInfosSd = sd.getSignerInfos();
 
         // introducimos los SignerInfos Existentes
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
@@ -435,7 +412,7 @@ final class CoSigner {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
             final AlgorithmIdentifier algHash = si.getDigestAlgorithm();
             // Solo si coninciden los algos puedo sacar el hash de dentro
-            if (algHash.getAlgorithm().toString().equals(digestAlgorithmId.getOID().toString())) {
+            if (algHash.getAlgorithm().toString().equals(AOAlgorithmID.getOID(digestAlgorithm))) {
                 final ASN1Set signedAttrib = si.getAuthenticatedAttributes();
                 for (int s = 0; s < signedAttrib.size(); s++) {
                     final ASN1Sequence elemento = (ASN1Sequence) signedAttrib.getObjectAt(s);
@@ -462,29 +439,26 @@ final class CoSigner {
             // En este caso no puedo usar un hash de fuera, ya que no me han
             // pasado datos ni
             // huellas digitales, solo un fichero de firma
-            throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un hash valido.");
+            throw new IllegalStateException("No se puede crear la firma ya que no se ha encontrado un hash valido"); //$NON-NLS-1$
         }
 
-        ASN1OctetString sign2 = null;
+        final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);
         }
         catch (final Exception ex) {
-            throw new IOException("Error al generar la firma: " + ex);
+            throw new IOException("Error al generar la firma: " + ex); //$NON-NLS-1$
         }
 
         // Creamos los signerInfos del SignedData
         signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
         ));
 
-        // CRLS no usado
-        final ASN1Set certrevlist = null;
-
         // construimos el Signed Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(sd.getDigestAlgorithms(),
                                                                                 encInfo,
                                                                                 certificates,
-                                                                                certrevlist,
+                                                                                null,
                                                                                 new DERSet(signerInfos)// unsignedAttr
                                )).getDEREncoded();
 
@@ -519,14 +493,14 @@ final class CoSigner {
         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
         // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equals("SHA512")) {
-            digestAlgorithm = "SHA-512";
+        if (digestAlgorithm.equalsIgnoreCase("SHA512")) { //$NON-NLS-1$
+            digestAlgorithm = "SHA-512"; //$NON-NLS-1$
         }
-        else if (digestAlgorithm.equals("SHA384")) {
-            digestAlgorithm = "SHA-384";
+        else if (digestAlgorithm.equalsIgnoreCase("SHA384")) { //$NON-NLS-1$
+            digestAlgorithm = "SHA-384"; //$NON-NLS-1$
         }
-        else if (digestAlgorithm.equals("SHA256")) {
-            digestAlgorithm = "SHA-256";
+        else if (digestAlgorithm.equalsIgnoreCase("SHA256")) { //$NON-NLS-1$
+            digestAlgorithm = "SHA-256"; //$NON-NLS-1$
         }
 
         // Si nos viene el hash de fuera no lo calculamos
@@ -548,7 +522,7 @@ final class CoSigner {
             }
         }
 
-        signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
 
         return SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
 
@@ -601,7 +575,7 @@ final class CoSigner {
             }
         }
 
-        signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
 
         return SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
 
@@ -649,21 +623,20 @@ final class CoSigner {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
-        Signature sig = null;
+        final Signature sig;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
         }
 
-        byte[] tmp = null;
-
+        final byte[] tmp;
         try {
-            tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
+            tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
+            throw new AOException("Error obteniendo los atributos firmados", ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -671,7 +644,7 @@ final class CoSigner {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
 
         // Actualizamos la configuracion de firma
@@ -679,21 +652,19 @@ final class CoSigner {
             sig.update(tmp);
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e);
+            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
         }
 
         // firmamos.
-        byte[] realSig = null;
+        final byte[] realSig;
         try {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
-        final ASN1OctetString encDigest = new DEROctetString(realSig);
-
-        return encDigest;
+        return new DEROctetString(realSig);
 
     }
 }

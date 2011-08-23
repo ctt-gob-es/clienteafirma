@@ -54,6 +54,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
+    @SuppressWarnings("unused")
     boolean isCMSData(final byte[] data) {
         boolean isValid = true;
         try {
@@ -137,7 +138,7 @@ final class ValidateCMS {
             // si tiene la pol&iacute;tica es CADES.
             if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId)) {
                 isSignerValid = false;
-                Logger.getLogger("es.gob.afirma").warning("El signerInfo no es del tipo CMS, es del tipo CADES.");
+                Logger.getLogger("es.gob.afirma").warning("El signerInfo no es del tipo CMS, es del tipo CADES"); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
         return isSignerValid;
@@ -147,6 +148,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
+    @SuppressWarnings("unused")
     boolean isCMSDigestedData(final byte[] data) {
         boolean isValid = true;
         try {
@@ -220,6 +222,7 @@ final class ValidateCMS {
      * @param data
      *        Datos CMS.
      * @return si es de este tipo. */
+    @SuppressWarnings("unused")
     boolean isCMSEnvelopedData(final byte[] data) {
         boolean isValid = true;
         try {

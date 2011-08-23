@@ -15,6 +15,8 @@ import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Utilidades para la firma CMS. */
 final class CMSHelper {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
      * Se realiza la verificaci&ocute;n sobre los los siguientes tipos de PKCS#7
@@ -36,7 +38,7 @@ final class CMSHelper {
         // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
         // siempre sera nulo
         if (data == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
 
@@ -119,7 +121,7 @@ final class CMSHelper {
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_COMPRESSEDDATA)) {
             return new ValidateCMS().isCMSCompressedData(data);
         }
-        Logger.getLogger("es.gob.afirma").warning("Tipo de contenido CMS no reconocido");
+        LOGGER.warning("Tipo de contenido CMS no reconocido"); //$NON-NLS-1$
         return false;
     }
 }
