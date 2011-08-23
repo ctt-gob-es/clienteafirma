@@ -94,7 +94,7 @@ final class CheckAndInstallMissingParts {
                                                                SigningCert.INTEGRATOR);
         }
         catch (final Exception e) {
-            throw new AOException("No se puede copiar NSS al directorio por defecto, compruebe que no existe previamente y que se cuenta con los permisos adecuados", e //$NON-NLS-1$
+            throw new AOException("No se puede copiar NSS al directorio por defecto, compruebe que no existe previamente y que se cuenta con los permisos adecuados: " + e, e //$NON-NLS-1$
             );
         }
     }
@@ -490,7 +490,11 @@ final class CheckAndInstallMissingParts {
                 System.load(nssDir + File.separator + nssLib);
                 return false;
             }
-            catch (final Throwable e) {}
+            catch (final Throwable e) {
+                if (AfirmaBootLoader.DEBUG) {
+                    AfirmaBootLoader.LOGGER.info("No se ha podido cargar NSS: " + e);
+                }
+            }
         }
 
         // Consideramos que si esta instalado el NSS de dentro funciona

@@ -116,7 +116,6 @@ final class AOJarVerifier {
                     if (isSigned && signers != null) {
                         for (final CodeSigner cs : signers) {
                             final Certificate cert = cs.getSignerCertPath().getCertificates().get(0);
-                            AfirmaBootLoader.LOGGER.info("Certificado usado para firmar la entrada '" + je.getName() + "': " + ((X509Certificate) cert).getSubjectX500Principal());
                             if (cert instanceof X509Certificate) {
                                 final long notAfter = ((X509Certificate) cert).getNotAfter().getTime();
                                 if (notAfter < now) {
