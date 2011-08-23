@@ -49,6 +49,12 @@ final class CheckAndInstallMissingParts {
     /** Archivo zip con las librerias Xalan en formato JAR necesarias para la firma XML en JDK 5. */
     private static final String XALAN_JARLIBRARY_ZIP = "xalanjar.zip";
 
+    /** Archivo zip con las librerias Apache XMLSec en formato PACK200 necesarias para la firma XML en JDK 7. */
+    private static final String XMLSEC_LIBRARY_ZIP = "xmlsec.zip";
+
+    /** Archivo zip con las librerias Apache XMLSec en formato JAR necesarias para la firma XML en JDK 7. */
+    private static final String XMLSEC_JARLIBRARY_ZIP = "xmlsecjar.zip";
+
     private final String build;
 
     private final OS os;
@@ -85,7 +91,7 @@ final class CheckAndInstallMissingParts {
                                                                + Platform.getJavaArch()
                                                                + ".zip"),
                                                                nssDir,
-                                                               SigningCA.INTEGRATOR);
+                                                               SigningCert.INTEGRATOR);
         }
         catch (final Exception e) {
             throw new AOException("No se puede copiar NSS al directorio por defecto, compruebe que no existe previamente y que se cuenta con los permisos adecuados", e //$NON-NLS-1$
@@ -122,6 +128,47 @@ final class CheckAndInstallMissingParts {
         }
     }
 
+/** Instala las bibliotecas Apache XMLSec para la generaci&oacute;n de firmas XML desde Java 7.
+     * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar. */
+    void installEndorsedApacheXMLSec() throws Exception {
+        File tempDir = null;
+        try {
+            tempDir = AOInstallUtils.createTempFile(true);
+            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_LIBRARY_ZIP), tempDir, SigningCert.INTEGRATOR);
+
+            String filename;
+            for (final File file : tempDir.listFiles()) {
+                filename = file.getName();
+                if (filename.endsWith(".pack.gz")) { //$NON-NLS-1$
+                    AOInstallUtils.unpack(file.getAbsolutePath(),
+                                          Platform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz")));
+                }
+            }
+
+        }
+        catch (final Exception e) {
+            AfirmaBootLoader.LOGGER
+                  .warning("No se ha podido instalar la version PACK200 de Apache XMLSec, se intentara la version JAR: " + e);
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
+            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_JARLIBRARY_ZIP),
+                                      new File(getEndorsedDir()),
+                                      SigningCert.INTEGRATOR);
+        }
+        finally {
+            if (tempDir != null) {
+                try {
+                    for (File file : tempDir.listFiles())
+                        file.delete();
+                    AOInstallUtils.deleteDir(tempDir);
+                }
+                catch (final Exception e) {}
+            }
+        }
+
+    }
+
     /** Instala el proveedor de seguridad SunMSCAPI.
      * @param installFilesCodeBase Localizaci&oacute;n de los ficheros necesarios para la instalaci&oacute;n
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
@@ -132,13 +179,13 @@ final class CheckAndInstallMissingParts {
         AOInstallUtils.installFile(AOBootUtil.createURLFile(this.installFilesCodeBase, "sunmscapi.jar"), //$NON-NLS-1$
                                    new File(Platform.getJavaHome() + File.separator
                                             + "lib" + File.separator + "ext" + File.separator + "sunmscapi.jar"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                            SigningCA.SUN);
+                                            SigningCert.SUN);
 
         // Descomprimimos las DLL de SunMSCAPI en el directorio de binarios del JRE
         AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase,
                                                            "mscapi_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$
         ), new File(Platform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
-        SigningCA.INTEGRATOR);
+        SigningCert.INTEGRATOR);
     }
 
     /** Instala el proveedor de seguridad SunPKCS11.
@@ -151,14 +198,14 @@ final class CheckAndInstallMissingParts {
         AOInstallUtils.installFile(AOBootUtil.createURLFile(this.installFilesCodeBase, "sunpkcs11.jar"), //$NON-NLS-1$
                                    new File(Platform.getJavaHome() + File.separator
                                             + "lib" + File.separator + "ext" + File.separator + "sunpkcs11.jar"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                            SigningCA.SUN);
+                                            SigningCert.SUN);
 
         // Descomprimimos las DLL de SunPKCS11 en el directorio de binarios del JRE
         AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase,
                                                            this.os.toString() + "_pkcs11lib_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$
         ),
         new File(Platform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
-        SigningCA.INTEGRATOR);
+        SigningCert.INTEGRATOR);
     }
 
     /** Instala las bibliotecas Xalan para la generaci&oacute;n de firmas XML desde Java 5.
@@ -171,7 +218,7 @@ final class CheckAndInstallMissingParts {
         File tempDir = null;
         try {
             tempDir = AOInstallUtils.createTempFile(true);
-            AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, XALAN_LIBRARY_ZIP), tempDir, SigningCA.INTEGRATOR);
+            AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, XALAN_LIBRARY_ZIP), tempDir, SigningCert.INTEGRATOR);
 
             // Desempaquetamos los ficheros Pack200 del directorio temporal en el
             // directorio Endorsed de Java
@@ -191,7 +238,7 @@ final class CheckAndInstallMissingParts {
             }
             AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, XALAN_JARLIBRARY_ZIP),
                                       new File(getEndorsedDir()),
-                                      SigningCA.INTEGRATOR);
+                                      SigningCert.INTEGRATOR);
         }
         finally {
             if (tempDir != null) {
@@ -312,7 +359,7 @@ final class CheckAndInstallMissingParts {
         try {
             System.load(nssLibDir + "libsoftokn3.dylib");
         }
-        catch (final Exception e) {
+        catch (final Throwable e) {
             if (AfirmaBootLoader.DEBUG) {
                 e.printStackTrace();
             }
@@ -443,7 +490,7 @@ final class CheckAndInstallMissingParts {
                 System.load(nssDir + File.separator + nssLib);
                 return false;
             }
-            catch (final Exception e) {}
+            catch (final Throwable e) {}
         }
 
         // Consideramos que si esta instalado el NSS de dentro funciona
@@ -596,6 +643,12 @@ final class CheckAndInstallMissingParts {
             }
             return true;
         }
+        catch (final Throwable e) {
+            if (AfirmaBootLoader.DEBUG) {
+                e.printStackTrace();
+            }
+            return true;
+        }
 
         return false;
 
@@ -624,6 +677,17 @@ final class CheckAndInstallMissingParts {
                                                                                                                                                                                                                                                                                    + "xercesImpl-2.9.1.jar").exists()) && (new File(getEndorsedDir() + File.separator
                                                                                                                                                                                                                                                                                                                                     + "xml-apis.jar").exists() || new File(getEndorsedDir() + File.separator
                                                                                                                                                                                                                                                                                                                                                                            + "xml-apis-1.3.03.jar").exists()));
+    }
+
+	/** Comprueba si los paquetes Apache XMLSec son necesarios en el directorio endorsed del JRE
+     * configurado.
+     * @return Devuelve <code>true</code> si se necesita Apache XMLSec, <code>false</code> en caso contrario. */
+    boolean isEndorsedApacheXMLSecNeeded() {
+        if (!Platform.JREVER.J7.equals(jreVersion)) {
+            return false;
+        }
+        return !(new File(getEndorsedDir() + File.separator + "xmlsec-1.4.4.jar").exists() && new File(getEndorsedDir() + File.separator
+                                                                                                       + "commons-logging-api-1.1.jar").exists());
     }
 
     /** Comprueba si se necesitan las dependencias para la compatibilidad del Cliente AFirma con Java 5.
@@ -684,7 +748,7 @@ final class CheckAndInstallMissingParts {
                 System.load("/Applications/Firefox.app/Contents/MacOS/libnspr4.dylib");
                 nssLibDir = "/Applications/Firefox.app/Contents/MacOS";
             }
-            catch (final Exception e) {
+            catch (final Throwable e) {
                 nssLibDir = null;
             }
         }
@@ -693,7 +757,7 @@ final class CheckAndInstallMissingParts {
                 System.load("/lib/libnspr4.dylib");
                 nssLibDir = "/lib";
             }
-            catch (final Exception e) {
+            catch (final Throwable e) {
                 nssLibDir = null;
             }
         }
@@ -702,7 +766,7 @@ final class CheckAndInstallMissingParts {
                 System.load("/usr/lib/libnspr4.dylib");
                 nssLibDir = "/usr/lib";
             }
-            catch (final Exception e) {
+            catch (final Throwable e) {
                 nssLibDir = null;
             }
         }
@@ -711,7 +775,7 @@ final class CheckAndInstallMissingParts {
                 System.load("/usr/lib/nss/libnspr4.dylib");
                 nssLibDir = "/usr/lib/nss";
             }
-            catch (final Exception e) {
+            catch (final Throwable e) {
                 nssLibDir = null;
             }
         }
@@ -721,7 +785,7 @@ final class CheckAndInstallMissingParts {
                 System.load("/Applications/Minefield.app/Contents/MacOS/libnspr4.dylib");
                 nssLibDir = "/Applications/Minefield.app/Contents/MacOS";
             }
-            catch (final Exception e) {
+            catch (final Throwable e) {
                 nssLibDir = null;
             }
         }
@@ -749,7 +813,7 @@ final class CheckAndInstallMissingParts {
                             + "libnspr4.dylib");
                 nssLibDir = Platform.getUserHome() + File.separator + Installer.INSTALL_DIR + File.separator + "nss" + Platform.getJavaArch();
             }
-            catch (final Exception e) {
+            catch (final Throwable e) {
                 nssLibDir = null;
             }
         }

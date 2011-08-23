@@ -334,7 +334,7 @@ final class AOInstallUtils {
      * @throws AOException Si ocurre cualquier otro error durante la copia
      * @throws IOException Si ocurre un error de entrada/salida
      * @throws SecurityException Cuando ocurre un error al validar la firma del fichero */
-    static void installFile(final URL remoteFile, final File installationFile, final SigningCA signingCa) throws IOException, AOException, URISyntaxException {
+    static void installFile(final URL remoteFile, final File installationFile, final SigningCert signingCa) throws IOException, AOException, URISyntaxException {
 
         if (signingCa == null) {
             copyFileFromURL(remoteFile, installationFile);
@@ -363,7 +363,7 @@ final class AOInstallUtils {
      * @throws AOException Si ocurre cualquier otro error durante la copia
      * @throws IOException Si ocurre un error de entrada/salida
      * @throws SecurityException Cuando ocurre un error al validar la firma del fichero */
-    static void installZip(final URL remoteFile, final File installationDir, final SigningCA signingCa) throws IOException, AOException, URISyntaxException {
+    static void installZip(final URL remoteFile, final File installationDir, final SigningCert signingCa) throws IOException, AOException, URISyntaxException {
         final File tempFile = createTempFile();
         copyFileFromURL(remoteFile, tempFile);
         if (signingCa != null) {
@@ -378,9 +378,9 @@ final class AOInstallUtils {
      * @param jarFile Fichero JAR/ZIP.
      * @param ca Certificado de la CA.
      * @throws SecurityException Cuando se produce cualquier error durante el proceso. */
-    private static void checkSign(final File jarFile, final SigningCA ca) {
+    private static void checkSign(final File jarFile, final SigningCert ca) {
         if (AfirmaBootLoader.DEBUG) {
-            AfirmaBootLoader.LOGGER.severe("IMPORTANTE: Modo de depuracion, comprobaciones de firma desacivadas");
+            AfirmaBootLoader.LOGGER.severe("IMPORTANTE: Modo de depuracion, comprobaciones de firma desactivadas");
             return;
         }
         new AOJarVerifier().verifyJar(jarFile.getAbsolutePath(), ca.getSigningCertificate());
@@ -415,7 +415,10 @@ final class AOInstallUtils {
         }
         // Si no existe
         else {
-            if (!dir.mkdirs()) {
+            if (!dir.getParentFile().canWrite()) {
+                AfirmaBootLoader.LOGGER.severe("El directorio '" + dir.getParent() + "' no tiene permisos de escritura, se intentara de todas formas");
+            }
+            if (!dir.mkdir()) {
                 AfirmaBootLoader.LOGGER.severe("No se ha podido crear el directorio '" + dir.getAbsolutePath() + "'");
             }
         }
