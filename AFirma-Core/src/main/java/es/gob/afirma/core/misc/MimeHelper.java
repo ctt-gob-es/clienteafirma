@@ -12,14 +12,12 @@ package es.gob.afirma.core.misc;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jmimemagic.Magic;
-import net.sf.jmimemagic.MagicMatch;
-import net.sf.jmimemagic.MagicMatchNotFoundException;
 
 /** M&eacute;todos de utilidad para la gesti&oacute;n de MimeType y OID
  * identificadores de tipo de contenidos. */
@@ -27,14 +25,17 @@ public final class MimeHelper {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
+    /** MimeType por defecto. */
+    public static final String DEFAULT_MIMETYPE = "application/octet-stream";
+    
     /** Tabla que asocia Oids y Mimetypes. */
     private static Properties oidMimetypeProp = null;
 
     /** Tabla que asocia Mimetypes y Oids. */
     private static Properties mimetypeOidProp = null;
 
-    /** Objeto de an&aacute;lisis de datos . */
-    private MagicMatch match = null;
+    /** Objeto para el almac&eacute;n de la informaci&oacute;n de los datos. */
+    private MimeInfo mimeInfo = null;
 
     /** Datos analizados. */
     private final byte[] data;
@@ -54,16 +55,34 @@ public final class MimeHelper {
         }
 
         this.data = data.clone();
-        this.match = null;
+        this.mimeInfo = new MimeInfo();
+
+        
 
         try {
-            this.match = Magic.getMagicMatch(data);
+            Method getMagicMatchMethod = Class.forName("net.sf.jmimemagic.Magic")
+                .getMethod("getMagicMatch", new Class[] { byte[].class });
+            Object magicMatchObject = getMagicMatchMethod.invoke(null, this.data);
+        
+            Class<?> magicMatchClass = Class.forName("net.sf.jmimemagic.MagicMatch");
+            this.mimeInfo.mimeType = (String) magicMatchClass.getMethod("getMimeType", (Class[]) null).invoke(magicMatchObject, (Object[]) null);
+            this.mimeInfo.extension = (String) magicMatchClass.getMethod("getExtension", (Class[]) null).invoke(magicMatchObject, (Object[]) null);
+            this.mimeInfo.description = (String) magicMatchClass.getMethod("getDescription", (Class[]) null).invoke(magicMatchObject, (Object[]) null);
         }
-        catch (final MagicMatchNotFoundException e) {
-            LOGGER.warning("No se pudo detectar el formato de los datos"); //$NON-NLS-1$
+        catch (final ClassNotFoundException e) {
+            LOGGER.warning("No se encontro la biblioteca JMimeMagic para la deteccion del tipo de dato"); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            LOGGER.warning("Error durante el analisis de la cabecera de los datos: " + e); //$NON-NLS-1$
+            try {
+                Class<?> magicMatchNotFoundException = Class.forName("net.sf.jmimemagic.MagicMatchNotFoundException");
+                if (magicMatchNotFoundException.isInstance(e)) {
+                    LOGGER.warning("No se pudo detectar el formato de los datos"); //$NON-NLS-1$
+                } else {
+                    LOGGER.warning("Error durante el analisis de la cabecera de los datos: " + e); //$NON-NLS-1$
+                }
+            } catch (final Exception e2) {
+                LOGGER.warning("Error al evaluar el tipo de dato mediante JMimeMagic: " + e2); //$NON-NLS-1$
+            }
         }
     }
 
@@ -141,8 +160,8 @@ public final class MimeHelper {
                 // Ignoramos, es porque no es XML
             }
 
-            if (this.mimeType == null && this.match != null) {
-                this.mimeType = this.match.getMimeType();
+            if (this.mimeType == null && this.mimeInfo != null) {
+                this.mimeType = this.mimeInfo.mimeType;
             }
 
             // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
@@ -175,8 +194,8 @@ public final class MimeHelper {
          // Ignoramos, es porque no es XML
         }
 
-        if (extension == null && this.match != null) {
-            extension = this.match.getExtension();
+        if (extension == null && this.mimeInfo != null) {
+            extension = this.mimeInfo.extension;
         }
 
         // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
@@ -193,12 +212,18 @@ public final class MimeHelper {
      * se pudo detectar.
      * @return Descripci&oacute;n del tipo de dato. */
     public String getDescription() {
-        if (this.match != null) {
-            return this.match.getDescription();
+        if (this.mimeInfo != null) {
+            return this.mimeInfo.description;
         }
         return null;
     }
 
+    private class MimeInfo {
+        String mimeType = null;
+        String extension = null;
+        String description = null;
+    }
+    
     // ************************************************************
     // ***************** SOPORTE DE ADJUNTOS MIME *****************
     // ************************************************************
@@ -321,4 +346,15 @@ public final class MimeHelper {
     // *** FIN SOPORTE DE ADJUNTOS MIME ***************************
     // ************************************************************
 
+    public static void main(String[] args) throws Exception {
+        java.io.FileInputStream fis = new java.io.FileInputStream("C:/pruebas/Entrada.jpg");
+        
+        MimeHelper helper = new MimeHelper(AOUtil.getDataFromInputStream(fis));
+        System.out.println("Mimetype: " + helper.getMimeType());
+        System.out.println("Description: " + helper.getDescription());
+        System.out.println("Extension: " + helper.getExtension());
+        System.out.println("---");
+        
+        try {fis.close(); } catch (Exception e) {}
+    }
 }
