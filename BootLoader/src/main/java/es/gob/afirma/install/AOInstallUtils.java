@@ -376,14 +376,14 @@ final class AOInstallUtils {
     /** Comprueba que la firma de un JAR haya sido realizada con un certificado de la entidad
      * indicada.
      * @param jarFile Fichero JAR/ZIP.
-     * @param ca Certificado de la CA.
+     * @param sCert Certificado que debe haberse usado para firmar el JAR.
      * @throws SecurityException Cuando se produce cualquier error durante el proceso. */
-    private static void checkSign(final File jarFile, final SigningCert ca) {
+    private static void checkSign(final File jarFile, final SigningCert sCert) {
         if (AfirmaBootLoader.DEBUG) {
             AfirmaBootLoader.LOGGER.severe("IMPORTANTE: Modo de depuracion, comprobaciones de firma desactivadas");
             return;
         }
-        new AOJarVerifier().verifyJar(jarFile.getAbsolutePath(), ca.getSigningCertificate());
+        new AOJarVerifier().verifyJar(jarFile.getAbsolutePath(), sCert.getSigningCertificate());
     }
 
     private static void createDirectory(final File dir) {

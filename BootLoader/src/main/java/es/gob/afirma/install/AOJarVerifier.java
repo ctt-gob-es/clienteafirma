@@ -35,6 +35,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import es.gob.afirma.misc.AOBootUtil;
+
 final class AOJarVerifier {
 
     private boolean hasExpiredCert = false;
@@ -52,7 +54,7 @@ final class AOJarVerifier {
 
     /** Verifica la firma JAR de un fichero JAR o ZIP-
      * @param jarName Nombre (incluida ruta) del fichero cuya firma se desea verificar
-     * @param signerCert Certificado del firmante del fichero
+     * @param signerCert Certificado que debe ser el firmante del fichero
      * @throws SecurityException Si la firma no es v&aacute;lida u ocurre cualquier
      *         problema durante la verificaci&oacute;n */
     void verifyJar(final String jarName, final X509Certificate signerCert) {
@@ -62,7 +64,7 @@ final class AOJarVerifier {
         }
 
         if (signerCert == null) {
-            throw new SecurityException("Es obligatorio proporcionar un certificado CA para comprobar las firmas");
+            throw new SecurityException("Es obligatorio proporcionar un certificado para comprobar las firmas");
         }
 
         boolean anySigned = false;
@@ -114,6 +116,7 @@ final class AOJarVerifier {
                     if (isSigned && signers != null) {
                         for (final CodeSigner cs : signers) {
                             final Certificate cert = cs.getSignerCertPath().getCertificates().get(0);
+                            AfirmaBootLoader.LOGGER.info("Certificado usado para firmar la entrada '" + je.getName() + "': " + ((X509Certificate) cert).getSubjectX500Principal());
                             if (cert instanceof X509Certificate) {
                                 final long notAfter = ((X509Certificate) cert).getNotAfter().getTime();
                                 if (notAfter < now) {
