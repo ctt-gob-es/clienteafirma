@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.cms.CMSSignedGenerator;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Jpeg;
@@ -55,7 +54,7 @@ import es.gob.afirma.core.signers.beans.AOSignInfo;
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.TreeNode;
+import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -98,6 +97,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </dl>
  * </p> */
 public final class AOPDFSigner implements AOSigner {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -666;
@@ -114,7 +115,7 @@ public final class AOPDFSigner implements AOSigner {
             && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA)
             && !algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA)) {
 
-            Logger.getLogger("es.gob.afirma").warning("El algoritmo '" + algorithm + "' no esta soportado por PDF, se usara SHA-1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            LOGGER.warning("El algoritmo '" + algorithm + "' no esta soportado por PDF, se usara SHA-1"); //$NON-NLS-1$ //$NON-NLS-2$
             signAlgorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
@@ -122,7 +123,7 @@ public final class AOPDFSigner implements AOSigner {
             extraParams = new Properties();
         }
         try {
-            return signPDF(this.getLowagieDigestOid(signAlgorithm), keyEntry, data, extraParams, signAlgorithm);
+            return signPDF(keyEntry, data, extraParams, signAlgorithm);
         }
         catch (final InvalidPdfException e) {
             throw new AOFormatFileException("El documento no era un PDF valido"); //$NON-NLS-1$
@@ -156,21 +157,21 @@ public final class AOPDFSigner implements AOSigner {
 
         final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
 
-        if (originalName == null)
-         {
+        if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
-        if (originalName.toLowerCase().endsWith(".pdf"))
-         {
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".pdf"; //$NON-NLS-1$ //$NON-NLS-2$
+        if (originalName.toLowerCase().endsWith(".pdf")) { //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".pdf"; //$NON-NLS-1$
         }
         return originalName + inTextInt + ".pdf"; //$NON-NLS-1$
     }
 
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {}
+    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
+        // Ignoramos, el tipo siempre es PDF
+    }
 
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
-        final TreeNode root = new TreeNode("Datos"); //$NON-NLS-1$
+        final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
         final AcroFields af;
 
         PdfReader pdfReader;
@@ -185,21 +186,21 @@ public final class AOPDFSigner implements AOSigner {
                         );
             }
             catch (final BadPasswordException e2) {
-                Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-                "La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2 //$NON-NLS-1$
+                LOGGER.severe(
+                              "La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2 //$NON-NLS-1$
                 );
                 return new AOTreeModel(root, root.getChildCount());
             }
             catch (final Exception e3) {
-                Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-                "No se ha podido leer el PDF, se devolvera un arbol vacio: " + e3 //$NON-NLS-1$
+                LOGGER.severe(
+                              "No se ha podido leer el PDF, se devolvera un arbol vacio: " + e3 //$NON-NLS-1$
                 );
                 return new AOTreeModel(root, root.getChildCount());
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "No se ha podido leer el PDF, se devolvera un arbol vacio: " + e //$NON-NLS-1$
+            LOGGER.severe(
+                          "No se ha podido leer el PDF, se devolvera un arbol vacio: " + e //$NON-NLS-1$
             );
             return new AOTreeModel(root, root.getChildCount());
         }
@@ -208,8 +209,8 @@ public final class AOPDFSigner implements AOSigner {
             af = pdfReader.getAcroFields();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e //$NON-NLS-1$
+            LOGGER.severe(
+                          "No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e //$NON-NLS-1$
             );
             return new AOTreeModel(root, root.getChildCount());
         }
@@ -232,18 +233,18 @@ public final class AOPDFSigner implements AOSigner {
                     pkcs1Object = digestField.get(pcks7);
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-                    "No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
+                    LOGGER.severe(
+                                  "No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
                     );
                     continue;
                 }
                 if (pkcs1Object != null && pkcs1Object instanceof byte[]) {
                     ssi.setPkcs1((byte[]) pkcs1Object);
                 }
-                root.add(new TreeNode(ssi));
+                root.add(new AOTreeNode(ssi));
             }
             else {
-                root.add(new TreeNode((AOUtil.getCN(pcks7.getSigningCertificate()))));
+                root.add(new AOTreeNode((AOUtil.getCN(pcks7.getSigningCertificate()))));
             }
         }
 
@@ -252,14 +253,15 @@ public final class AOPDFSigner implements AOSigner {
 
     public boolean isSign(final byte[] data) {
         if (data == null) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-            "Se han introducido datos nulos para su comprobacion" //$NON-NLS-1$
+            LOGGER.warning(
+                           "Se han introducido datos nulos para su comprobacion" //$NON-NLS-1$
             );
             return false;
         }
         return isPdfFile(data);
     }
 
+    @SuppressWarnings("unused")
     private boolean isPdfFile(final byte[] data) {
 
         byte[] buffer = new byte[5];
@@ -271,7 +273,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         // Comprobamos que cuente con una cabecera PDF
-        if (buffer != null && !"%PDF-".equals(new String(buffer))) {
+        if (buffer != null && !"%PDF-".equals(new String(buffer))) { //$NON-NLS-1$
             return false;
         }
 
@@ -281,8 +283,8 @@ public final class AOPDFSigner implements AOSigner {
             new PdfReader(data);
         }
         catch (final BadPasswordException e) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-            "El PDF esta protegido con contrasena por lo que no se toma como PDF valido" //$NON-NLS-1$
+            LOGGER.warning(
+                           "El PDF esta protegido con contrasena por lo que no se toma como PDF valido" //$NON-NLS-1$
             );
             return false;
         }
@@ -295,39 +297,12 @@ public final class AOPDFSigner implements AOSigner {
 
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-            "Se han introducido datos nulos para su comprobacion" //$NON-NLS-1$
+            LOGGER.warning(
+                           "Se han introducido datos nulos para su comprobacion" //$NON-NLS-1$
             );
             return false;
         }
         return isPdfFile(data);
-    }
-
-    private String getLowagieDigestOid(final String algorithm) {
-
-        String digestOid = CMSSignedGenerator.DIGEST_SHA1; // SHA1 es el
-                                                           // algoritmo por
-                                                           // defecto
-        if (algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA)) {
-            digestOid = CMSSignedGenerator.DIGEST_SHA1;
-        }
-        else if (algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA)) {
-            digestOid = CMSSignedGenerator.DIGEST_SHA256;
-        }
-        else if (algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA)) {
-            digestOid = CMSSignedGenerator.DIGEST_SHA384;
-        }
-        else if (algorithm.equals(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA)) {
-            digestOid = CMSSignedGenerator.DIGEST_SHA512;
-        }
-        else if (algorithm.equals(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA)) {
-            digestOid = CMSSignedGenerator.DIGEST_MD5;
-        }
-        else {
-            Logger.getLogger("es.gob.afirma").warning("El algoritmo '" + algorithm + "' no esta soportado por PDF, se usara SHA-1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
-
-        return digestOid;
     }
 
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
@@ -335,7 +310,6 @@ public final class AOPDFSigner implements AOSigner {
      * el eje horizontal de izquierda a derecha y en el vertical de abajo a
      * arriba. */
     private Rectangle getSignaturePositionOnPage(final Properties extraParams) {
-
         try {
             return new Rectangle(Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftX")), //$NON-NLS-1$
                                  Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftY")), //$NON-NLS-1$
@@ -346,10 +320,9 @@ public final class AOPDFSigner implements AOSigner {
         catch (final Exception e) {
             return null;
         }
-
     }
 
-    private byte[] signPDF(final String lowagieDigestOid, final PrivateKeyEntry ke, final byte[] inPDF, Properties extraParams, final String algorithm) throws Exception {
+    private byte[] signPDF(final PrivateKeyEntry ke, final byte[] inPDF, Properties extraParams, final String algorithm) throws Exception {
 
         if (extraParams == null) {
             extraParams = new Properties();
@@ -365,7 +338,8 @@ public final class AOPDFSigner implements AOSigner {
         try {
             page = Integer.parseInt(extraParams.getProperty("signaturePage")); //$NON-NLS-1$
         }
-        catch (final Exception e) { /* Se deja la pagina tal y como esta */
+        catch (final Exception e) { 
+            /* Se deja la pagina tal y como esta */
         }
 
         /*
@@ -374,8 +348,8 @@ public final class AOPDFSigner implements AOSigner {
          */
         if (extraParams.containsKey("mode") //$NON-NLS-1$
             && extraParams.getProperty("mode").equals(AOSignConstants.SIGN_MODE_EXPLICIT)) { //$NON-NLS-1$
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-            "El formato de firma PDF no soporta el modo de firma explicita, " + //$NON-NLS-1$
+            LOGGER.warning(
+                "El formato de firma PDF no soporta el modo de firma explicita, " + //$NON-NLS-1$
                     "se ignorara esta configuracion"); //$NON-NLS-1$
         }
 
@@ -394,9 +368,8 @@ public final class AOPDFSigner implements AOSigner {
             // esta no pedimos contrasena por
             // dialogo, principalmente para no interrumpir un firmado por lotes
             // desatendido
-            if ("true".equalsIgnoreCase(extraParams.getProperty("headLess")))
-             {
-                throw new AOException("La contrasena proporcionada no es valida para el PDF actual"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                throw new AOException("La contrasena proporcionada no es valida para el PDF actual"); //$NON-NLS-1$
             }
             // La contrasena que nos han proporcionada no es buena o no nos
             // proporcionaron ninguna
@@ -411,7 +384,7 @@ public final class AOPDFSigner implements AOSigner {
 
         if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED) {
             if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                if (!"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) {
+                if (!"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
                     throw new UnsupportedOperationException("No se permite la firma o cofirma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a true)" //$NON-NLS-1$
                     );
                 }
@@ -450,8 +423,9 @@ public final class AOPDFSigner implements AOSigner {
                         if (refs != null) {
                             for (final Object name : refs.getKeys()) {
                                 if (name instanceof PdfName) {
-                                    Logger.getLogger("es.gob.afirma").warning("Se ha encontrado un adjunto (" + fs.getAsString((PdfName) name)
-                                                                              + ") en el PDF, pero no se firmara de forma independiente");
+                                    LOGGER.warning(
+                                       "Se ha encontrado un adjunto (" + fs.getAsString((PdfName) name) //$NON-NLS-1$
+                                          + ") en el PDF, pero no se firmara de forma independiente"); //$NON-NLS-1$
                                 }
                                 // System.out.println(fs.getAsString(name).toString());
                                 // System.out.println(new
@@ -478,9 +452,8 @@ public final class AOPDFSigner implements AOSigner {
                         refs = filespec.getAsDict(PdfName.EF);
                         for (final Object key : refs.getKeys()) {
                             if (key instanceof PdfName) {
-                                Logger.getLogger("es.gob.afirma")
-                                      .warning("Se ha encontrado un fichero empotrado (" + filespec.getAsString((PdfName) key)
-                                               + ") en el PDF, pero no se firmara de forma independiente");
+                                LOGGER.warning("Se ha encontrado un fichero empotrado (" + filespec.getAsString((PdfName) key) //$NON-NLS-1$
+                                               + ") en el PDF, pero no se firmara de forma independiente"); //$NON-NLS-1$
 
                                 // System.out.println(filespec.getAsString(key).toString());
                                 // System.out.println(new
@@ -500,36 +473,24 @@ public final class AOPDFSigner implements AOSigner {
         // ******************************************************************************
 
         // Los derechos van firmados por Adobe, y como desde iText se invalidan
-        // es mejor
-        // quitarlos
+        // es mejor quitarlos
         pdfReader.removeUsageRights();
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         // Activar el atributo de "agregar firma" (cuarto parametro del metodo
         // "PdfStamper.createSignature") hace que se cree una nueva revision del
-        // documento
-        // y evita que las firmas previas queden invalidadas. Sin embargo, este
-        // exige que
-        // el PDF no incorpore ningun error, asi que lo mantendremos desactivado
-        // para la
-        // primera firma y activado para las subsiguientes. Un error incorporado
-        // en un PDF
-        // erroneo puede quedar subsanado en su version firmada, haciendo
-        // posible incorporar
-        // nuevas firmas agregando revisiones del documento.
-        final PdfStamper stp = PdfStamper.createSignature(pdfReader, // PDF de
-                                                                     // entrada
-                                                          baos, // Salida
-                                                          '\0', // Mantener version
-                                                          null, // No crear temporal
-                                                          pdfReader.getAcroFields().getSignatureNames().size() > 0 // Si
-                                                                                                                   // hay
-                                                                                                                   // mas
-                                                                                                                   // firmas,
-                                                                                                                   // creo
-                                                                                                                   // una
-                                                                                                                   // revision
+        // documento y evita que las firmas previas queden invalidadas. Sin embargo, este
+        // exige que el PDF no incorpore ningun error, asi que lo mantendremos desactivado
+        // para la primera firma y activado para las subsiguientes. Un error incorporado
+        // en un PDF erroneo puede quedar subsanado en su version firmada, haciendo
+        // posible incorporar nuevas firmas agregando revisiones del documento.
+        final PdfStamper stp = PdfStamper.createSignature(
+              pdfReader, // PDF de entrada
+              baos, // Salida
+              '\0', // Mantener version
+              null, // No crear temporal
+              pdfReader.getAcroFields().getSignatureNames().size() > 0 // Si hay mas firmas, creo una revision
         );
 
         final PdfSignatureAppearance sap = stp.getSignatureAppearance();
@@ -551,20 +512,20 @@ public final class AOPDFSigner implements AOSigner {
 
         if (pdfReader.isEncrypted() && ownerPassword != null) {
             if ("true".equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                "Aunque el PDF original estaba encriptado no se encriptara el PDF firmado (se establecio el indicativo 'avoidEncryptingSignedPdfs')" //$NON-NLS-1$
+                LOGGER.info(
+                    "Aunque el PDF original estaba encriptado no se encriptara el PDF firmado (se establecio el indicativo 'avoidEncryptingSignedPdfs')" //$NON-NLS-1$
                 );
             }
             else {
-                Logger.getLogger("es.gob.afirma").info( //$NON-NLS-1$
-                "El PDF original estaba encriptado, se intentara encriptar tambien el PDF firmado" //$NON-NLS-1$
+                LOGGER.info(
+                    "El PDF original estaba encriptado, se intentara encriptar tambien el PDF firmado" //$NON-NLS-1$
                 );
                 try {
                     stp.setEncryption(ownerPassword.getBytes(), ownerPassword.getBytes(), pdfReader.getPermissions(), pdfReader.getCryptoMode());
                 }
                 catch (final DocumentException de) {
-                    Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                    "No se ha podido cifrar el PDF destino, se escribira sin contrasena: " + de //$NON-NLS-1$
+                    LOGGER.warning(
+                       "No se ha podido cifrar el PDF destino, se escribira sin contrasena: " + de //$NON-NLS-1$
                     );
                 }
             }
@@ -595,12 +556,12 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         // Rubrica de la firma
-        if (rubric != null) {
+        if (this.rubric != null) {
             try {
-                sap.setImage(new Jpeg(rubric));
+                sap.setImage(new Jpeg(this.rubric));
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+                LOGGER.severe(
                   "No se pudo establecer la imagen de firma para el documento PDF, no se usara imagen: " + e //$NON-NLS-1$
                 );
             }
@@ -664,7 +625,7 @@ public final class AOPDFSigner implements AOSigner {
 
         final byte[] pk;
 
-        String policyQualifier2 = policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "");
+        String policyQualifier2 = policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = ke.getCertificateChain();
@@ -681,15 +642,15 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         pk =
-                new GenCAdESEPESSignedData().generateSignedData(new P7ContentSignerParameters(inPDF, algorithm, xCerts), true, // omitContent
-                                                                policyIdentifier,
-                                                                policyQualifier2,
-                                                                true, // true -> isSigningCertificateV2, false ->
-                                                                      // isSigningCertificateV1
-                                                                dataType,
-                                                                ke,
-                                                                MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm))
-                                                                             .digest(AOUtil.getDataFromInputStream(sap.getRangeStream())));
+                new GenCAdESEPESSignedData().generateSignedData(
+                    new P7ContentSignerParameters(inPDF, algorithm, xCerts), 
+                    true, // omitContent
+                    policyIdentifier,
+                    policyQualifier2,
+                    true, // true -> isSigningCertificateV2, false -> isSigningCertificateV1
+                    dataType,
+                    ke,
+                    MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())));
 
 
         // ********************************************************************************
@@ -735,13 +696,13 @@ public final class AOPDFSigner implements AOSigner {
          {
             return "signed.pdf"; //$NON-NLS-1$
         }
-        if (originalName.endsWith(".pdf"))
+        if (originalName.endsWith(".pdf")) //$NON-NLS-1$
          {
-            return originalName.replace(".pdf", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            return originalName.replace(".pdf", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        if (originalName.endsWith(".PDF"))
+        if (originalName.endsWith(".PDF")) //$NON-NLS-1$
          {
-            return originalName.replace(".PDF", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            return originalName.replace(".PDF", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return originalName + ".signed.pdf"; //$NON-NLS-1$
     }

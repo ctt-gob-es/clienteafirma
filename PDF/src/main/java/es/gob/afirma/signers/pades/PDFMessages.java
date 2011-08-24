@@ -16,9 +16,9 @@ import java.util.logging.Logger;
 
 /** Clase para la obtencion de los recursos textuales del n&uacute;cleo del
  * cliente de firma. */
-public final class PDFMessages {
+final class PDFMessages {
 
-    private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "pdfmessages"; //$NON-NLS-1$
 
     private static ResourceBundle RESOURCE_BUNDLE;
 
@@ -31,18 +31,20 @@ public final class PDFMessages {
                 RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
             }
             catch (final Exception e1) {
-                Logger.getLogger("es.gob.afirma").severe("No ha podido cargarse el fichero de mensajes localizados: " + e1);
+                Logger.getLogger("es.gob.afirma").severe("No ha podido cargarse el fichero de mensajes localizados: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
     }
 
-    private PDFMessages() {}
+    private PDFMessages() {
+        // No se permite la instanciacion
+    }
 
     /** Recupera el texto identificado con la clave proporcionada.
      * @param key
      *        Clave del texto.
      * @return Recuerso textual. */
-    public static String getString(final String key) {
+    static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
@@ -58,9 +60,9 @@ public final class PDFMessages {
      * @param text
      *        Texto que se desea insertar.
      * @return Recuerso textual con la subcadena sustituida. */
-    public static String getString(final String key, final String text) {
+    static String getString(final String key, final String text) {
         try {
-            return RESOURCE_BUNDLE.getString(key).replace("%0", text);
+            return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return '!' + key + '!';
@@ -87,7 +89,7 @@ public final class PDFMessages {
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                text = text.replace("%" + i, params[i]);
+                text = text.replace("%" + i, params[i]); //$NON-NLS-1$
             }
         }
 
