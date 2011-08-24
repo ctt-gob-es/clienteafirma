@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 /** Clase para la obtencion de los recursos textuales del n&uacute;cleo del
  * cliente de firma. */
-public final class XMLMessages {
+final class XMLMessages {
 
     private static final String BUNDLE_NAME = "xmlmessages"; //$NON-NLS-1$
 
@@ -31,18 +31,20 @@ public final class XMLMessages {
                 RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
             }
             catch (final Exception e1) {
-                Logger.getLogger("es.gob.afirma").severe("No ha podido cargarse el fichero de mensajes localizados: " + e1);
+                Logger.getLogger("es.gob.afirma").severe("No ha podido cargarse el fichero de mensajes localizados: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
     }
 
-    private XMLMessages() {}
+    private XMLMessages() {
+        // No permitimos la instanciacion
+    }
 
     /** Recupera el texto identificado con la clave proporcionada.
      * @param key
      *        Clave del texto.
      * @return Recuerso textual. */
-    public static String getString(final String key) {
+    static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
@@ -58,9 +60,9 @@ public final class XMLMessages {
      * @param text
      *        Texto que se desea insertar.
      * @return Recuerso textual con la subcadena sustituida. */
-    public static String getString(final String key, final String text) {
+    static String getString(final String key, final String text) {
         try {
-            return RESOURCE_BUNDLE.getString(key).replace("%0", text);
+            return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return '!' + key + '!';
@@ -75,7 +77,7 @@ public final class XMLMessages {
      * @param params
      *        Par&aacute;metros que se desean insertar.
      * @return Recuerso textual con las subcadenas sustituidas. */
-    public static String getString(final String key, final String[] params) {
+    static String getString(final String key, final String[] params) {
 
         String text;
         try {
@@ -87,7 +89,7 @@ public final class XMLMessages {
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                text = text.replace("%" + i, params[i]);
+                text = text.replace("%" + i, params[i]); //$NON-NLS-1$
             }
         }
 

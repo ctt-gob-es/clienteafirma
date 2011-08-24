@@ -67,7 +67,10 @@ import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Utilidades para las firmas XML. */
+@SuppressWarnings("restriction")
 public final class Utils {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Hoja de estilo local (rutal local no dereferenciable) a un XML */
     public final static class IsInnerlException extends Exception {
@@ -83,7 +86,7 @@ public final class Utils {
          * dereferenciar una hoja de estilo.
          * @param s
          *        Mesaje de excepci&oacute;n */
-        private CannotDereferenceException(final String s) {
+        CannotDereferenceException(final String s) {
             super(s);
         }
 
@@ -93,7 +96,7 @@ public final class Utils {
          *        Mesaje de excepci&oacute;n
          * @param e
          *        Excepci&oacute;n anterior en la cadena */
-        private CannotDereferenceException(final String s, final Exception e) {
+        CannotDereferenceException(final String s, final Exception e) {
             super(s, e);
         }
     }
@@ -121,7 +124,7 @@ public final class Utils {
     public static Document dereferenceStyleSheet(final String id, final boolean headLess) throws CannotDereferenceException,
                                                                                          IsInnerlException,
                                                                                          ReferenceIsNotXMLException {
-        if (id == null || "".equals(id)) {
+        if (id == null || "".equals(id)) { //$NON-NLS-1$
             throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$ 
         }
 
@@ -131,8 +134,8 @@ public final class Utils {
         // http://, https:// y file://
         try {
             final URI styleURI = AOUtil.createURI(id);
-            if (styleURI.getScheme().equals("file")) {
-                throw new UnsupportedOperationException("No se aceptan dereferenciaciones directas con file://");
+            if (styleURI.getScheme().equals("file")) { //$NON-NLS-1$
+                throw new UnsupportedOperationException("No se aceptan dereferenciaciones directas con file://"); //$NON-NLS-1$
             }
             xml = AOUtil.getDataFromInputStream(AOUtil.loadFile(styleURI));
         }
@@ -147,7 +150,7 @@ public final class Utils {
             final String[] idParts = id.replace(File.separator, "/").split("/"); //$NON-NLS-1$ //$NON-NLS-2$
             final String fileName = idParts[idParts.length - 1];
 
-            if (fileName.startsWith("#")) {
+            if (fileName.startsWith("#")) { //$NON-NLS-1$
                 throw new IsInnerlException(); 
             }
             else if (id.startsWith("file://")) { //$NON-NLS-1$
@@ -156,35 +159,26 @@ public final class Utils {
                                                   XMLMessages.getString("Utils.6"), //$NON-NLS-1$
                                                   AOUIFactory.OK_CANCEL_OPTION,
                                                   AOUIFactory.INFORMATION_MESSAGE) == AOUIFactory.OK_OPTION) {
-                    final JFileChooser fc = new JFileChooser();
-                    fc.setDialogTitle(XMLMessages.getString("Utils.7")); //$NON-NLS-1$
-                    fc.setFileFilter(new FileFilter() {
-                        @Override
-                        public boolean accept(final File f) {
-                            if (f == null) {
-                                return false;
-                            }
-                            if (f.getName().equalsIgnoreCase(fileName)) {
-                                return true;
-                            }
-                            return false;
-                        }
-
-                        @Override
-                        public String getDescription() {
-                            return XMLMessages.getString("Utils.8") + fileName + XMLMessages.getString("Utils.9"); //$NON-NLS-1$ //$NON-NLS-2$
-                        }
-                    });
-                    if (fc.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+                    
+                    final File xmlStyleFile = AOUIFactory.getLoadFile(
+                       XMLMessages.getString("Utils.7"), //$NON-NLS-1$
+                       fileName,
+                       XMLMessages.getString("Utils.8", fileName), //$NON-NLS-1$
+                       null
+                    );
+                    
+                    if (xmlStyleFile == null) {
                         throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo"); //$NON-NLS-1$
                     }
                     try {
-                        final InputStream is = new FileInputStream(fc.getSelectedFile());
+                        final InputStream is = new FileInputStream(xmlStyleFile);
                         xml = AOUtil.getDataFromInputStream(is);
                         try {
                             is.close();
                         }
-                        catch (final Exception ex) {}
+                        catch (final Exception ex) {
+                            // Ignoramos los errores en el cierre
+                        }
                     }
                     catch (final Exception ex) {
                         throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", ex); //$NON-NLS-1$
@@ -263,8 +257,8 @@ public final class Utils {
             ret.load(new ByteArrayInputStream(xml.getBytes()));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
-            "No se ha podido analizar correctamente la cabecera de definicion de la hora de estilo del XML: " + e //$NON-NLS-1$
+            LOGGER.severe(
+              "No se ha podido analizar correctamente la cabecera de definicion de la hora de estilo del XML: " + e //$NON-NLS-1$
             );
         }
         return ret;
@@ -306,15 +300,15 @@ public final class Utils {
                     transformParam = new XPathFilterParameterSpec(transformBody, Collections.singletonMap(xmlSignaturePrefix, XMLSignature.XMLNS));
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                    "No se han podido crear los parametros para una transformacion XPATH, se omitira: " + e //$NON-NLS-1$
+                    LOGGER.warning(
+                       "No se han podido crear los parametros para una transformacion XPATH, se omitira: " + e //$NON-NLS-1$
                     );
                     continue;
                 }
             }
             else if (Transform.XPATH2.equals(transformType) && transformBody != null) {
                 transformSubtype = extraParams.getProperty("xmlTransform" + Integer.toString(i) + "Subtype"); //$NON-NLS-1$ //$NON-NLS-2$
-                if ("subtract".equals(transformSubtype)) {
+                if ("subtract".equals(transformSubtype)) { //$NON-NLS-1$
                     xPath2TransformFilter = Filter.SUBTRACT; 
                 }
                 else if ("intersect".equals(transformSubtype)) { //$NON-NLS-1$
@@ -324,8 +318,8 @@ public final class Utils {
                     xPath2TransformFilter = Filter.UNION;
                 }
                 else {
-                    Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                    "Se ha solicitado aplicar una transformacion XPATH2 de un tipo no soportado: " + transformSubtype //$NON-NLS-1$
+                    LOGGER.warning(
+                       "Se ha solicitado aplicar una transformacion XPATH2 de un tipo no soportado: " + transformSubtype //$NON-NLS-1$
                     );
                     continue;
                 }
@@ -333,8 +327,8 @@ public final class Utils {
                     transformParam = new XPathFilter2ParameterSpec(Collections.singletonList(new XPathType(transformBody, xPath2TransformFilter)));
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                    "No se han podido crear los parametros para una transformacion XPATH2, se omitira: " + e //$NON-NLS-1$
+                    LOGGER.warning(
+                       "No se han podido crear los parametros para una transformacion XPATH2, se omitira: " + e //$NON-NLS-1$
                     );
                     continue;
                 }
@@ -348,8 +342,8 @@ public final class Utils {
                                                                                                   .getDocumentElement()));
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
-                    "No se han podido crear los parametros para una transformacion XSLT, se omitira: " + e //$NON-NLS-1$
+                    LOGGER.warning(
+                       "No se han podido crear los parametros para una transformacion XSLT, se omitira: " + e //$NON-NLS-1$
                     );
                     continue;
                 }
@@ -363,7 +357,7 @@ public final class Utils {
                 transformParam = null;
             }
             else {
-                Logger.getLogger("es.gob.afirma").warning("Tipo de transformacion no soportada: " + transformType); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.warning("Tipo de transformacion no soportada: " + transformType); //$NON-NLS-1$
                 continue;
             }
 
@@ -373,7 +367,7 @@ public final class Utils {
                 transformList.add(fac.newTransform(transformType, transformParam));
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido aplicar la transformacion '" + transformType + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                LOGGER.warning("No se ha podido aplicar la transformacion '" + transformType + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
         }
@@ -397,7 +391,7 @@ public final class Utils {
                                                                                                                         InvalidAlgorithmParameterException {
 
         final Vector<Transform> transformList = new Vector<Transform>();
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 
         // El nodo de referencia puede contener un nodo "Transforms" que a su
         // vez contiene
@@ -407,7 +401,7 @@ public final class Utils {
         for (int i = 0; i < tmpNodeList.getLength(); i++) {
 
             // Buscamos el nodo Transforms a secas o precedido por el namespace
-            if ("Transforms".equals(tmpNodeList.item(i).getNodeName()) || (namespacePrefix + ":Transforms").equals(tmpNodeList.item(i).getNodeName())) {
+            if ("Transforms".equals(tmpNodeList.item(i).getNodeName()) || (namespacePrefix + ":Transforms").equals(tmpNodeList.item(i).getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$
 
                 final NodeList transformsNodeList = tmpNodeList.item(i).getChildNodes();
 
@@ -433,7 +427,7 @@ public final class Utils {
         if (transformNode == null) {
             return null;
         }
-        final Node algorithmNode = transformNode.getAttributes().getNamedItem("Algorithm");
+        final Node algorithmNode = transformNode.getAttributes().getNamedItem("Algorithm"); //$NON-NLS-1$
         if (algorithmNode != null) {
             return algorithmNode.getNodeValue();
         }
@@ -471,9 +465,9 @@ public final class Utils {
 
                     // Probamos a encontrar un nodo XPath sin namespace y con el
                     // namespace indicado
-                    if ("XPath".equals(xpathTransformNode.getNodeName()) || (namespacePrefix + ":XPath").equals(xpathTransformNode.getNodeName())) {
+                    if ("XPath".equals(xpathTransformNode.getNodeName()) || (namespacePrefix + ":XPath").equals(xpathTransformNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$
 
-                        if (namespacePrefix == null || "".equals(namespacePrefix)) {
+                        if (namespacePrefix == null || "".equals(namespacePrefix)) { //$NON-NLS-1$
                             params = new XPathFilterParameterSpec(xpathTransformNode.getTextContent());
                         }
                         else {
@@ -487,7 +481,7 @@ public final class Utils {
                 }
 
                 if (params == null) {
-                    throw new InvalidAlgorithmParameterException("No se ha indicado un cuerpo para una transformacion XPATH declarada");
+                    throw new InvalidAlgorithmParameterException("No se ha indicado un cuerpo para una transformacion XPATH declarada"); //$NON-NLS-1$
                 }
 
             }
@@ -498,27 +492,27 @@ public final class Utils {
                 final NodeList xpathTransforms = transformNode.getChildNodes();
                 for (int i = 0; i < xpathTransforms.getLength(); i++) {
                     final Node xpathTransformNode = xpathTransforms.item(i);
-                    if ("XPath".equals(xpathTransformNode.getNodeName()) || (namespacePrefix + ":XPath").equals(xpathTransformNode.getNodeName())) {
+                    if ("XPath".equals(xpathTransformNode.getNodeName()) || (namespacePrefix + ":XPath").equals(xpathTransformNode.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$
 
                         Filter filter;
-                        final Node filterNode = xpathTransformNode.getAttributes().getNamedItem("Filter");
+                        final Node filterNode = xpathTransformNode.getAttributes().getNamedItem("Filter"); //$NON-NLS-1$
                         if (filterNode != null) {
                             final String filterName = filterNode.getNodeValue();
-                            if (filterName.equals("subtract")) {
+                            if (filterName.equals("subtract")) { //$NON-NLS-1$
                                 filter = Filter.SUBTRACT;
                             }
-                            else if (filterName.equals("intersect")) {
+                            else if (filterName.equals("intersect")) { //$NON-NLS-1$
                                 filter = Filter.INTERSECT;
                             }
-                            else if (filterName.equals("union")) {
+                            else if (filterName.equals("union")) { //$NON-NLS-1$
                                 filter = Filter.UNION;
                             }
                             else {
-                                throw new InvalidAlgorithmParameterException("El subtipo '" + filterName + "' de la transformacion XPATH2 no es valido");
+                                throw new InvalidAlgorithmParameterException("El subtipo '" + filterName + "' de la transformacion XPATH2 no es valido"); //$NON-NLS-1$ //$NON-NLS-2$
                             }
                         }
                         else {
-                            throw new InvalidAlgorithmParameterException("No se ha declarado un subtipo para la transformacion XPATH2");
+                            throw new InvalidAlgorithmParameterException("No se ha declarado un subtipo para la transformacion XPATH2"); //$NON-NLS-1$
                         }
 
                         params = new XPathFilter2ParameterSpec(Collections.singletonList(new XPathType(xpathTransformNode.getTextContent(), filter)));
@@ -527,7 +521,7 @@ public final class Utils {
                 }
 
                 if (params == null) {
-                    throw new InvalidAlgorithmParameterException("No se ha indicado un cuerpo para una transformacion XPATH2 declarada");
+                    throw new InvalidAlgorithmParameterException("No se ha indicado un cuerpo para una transformacion XPATH2 declarada"); //$NON-NLS-1$
                 }
             }
 
@@ -622,16 +616,16 @@ public final class Utils {
 
         // Prioridad: xades132 > latest > xades141
         if (numXades132 >= numLatest && numXades132 >= numXades141) {
-            return xades132.replace("\"", "");
+            return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (numLatest >= numXades132 && numLatest >= numXades141) {
-            return latest.replace("\"", "");
+            return latest.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
         if (numXades141 >= numLatest && numXades141 >= numXades132) {
-            return xades141.replace("\"", "");
+            return xades141.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        return xades132.replace("\"", "");
+        return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /** Intenta determinar la URL de declaraci&oacute;n de espacio de nombres de
@@ -645,10 +639,10 @@ public final class Utils {
 
         // Por defecto "http://www.w3.org/2000/09/xmldsig#"
 
-        final int numXmlDsig = countSubstring(signatureText, "http://www.w3.org/2000/09/xmldsig#");
-        final int numXmlDsig11 = countSubstring(signatureText, "http://www.w3.org/2009/xmldsig11#");
+        final int numXmlDsig = countSubstring(signatureText, "http://www.w3.org/2000/09/xmldsig#"); //$NON-NLS-1$
+        final int numXmlDsig11 = countSubstring(signatureText, "http://www.w3.org/2009/xmldsig11#"); //$NON-NLS-1$
 
-        return numXmlDsig >= numXmlDsig11 ? "http://www.w3.org/2000/09/xmldsig#" : "http://www.w3.org/2009/xmldsig11#";
+        return numXmlDsig >= numXmlDsig11 ? "http://www.w3.org/2000/09/xmldsig#" : "http://www.w3.org/2009/xmldsig11#"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /** Intenta determinar el prefijo del espacio de nombres de la firma.
@@ -659,25 +653,25 @@ public final class Utils {
 
         final String signatureText = new String(writeXML(el, null, null, null));
 
-        final int numEmpty = countSubstring(signatureText, "<Signature");
-        final int numDs = countSubstring(signatureText, "<ds:Signature");
-        final int numDsig = countSubstring(signatureText, "<dsig:Signature");
-        final int numDsig11 = countSubstring(signatureText, "<dsig11:Signature");
+        final int numEmpty = countSubstring(signatureText, "<Signature"); //$NON-NLS-1$
+        final int numDs = countSubstring(signatureText, "<ds:Signature"); //$NON-NLS-1$
+        final int numDsig = countSubstring(signatureText, "<dsig:Signature"); //$NON-NLS-1$
+        final int numDsig11 = countSubstring(signatureText, "<dsig11:Signature"); //$NON-NLS-1$
 
         // Prioridad: ds > "" > dsig > dsig11
         if (numDs >= numEmpty && numDs >= numDsig && numDs >= numDsig11) {
-            return "ds";
+            return "ds"; //$NON-NLS-1$
         }
         if (numEmpty >= numDs && numEmpty >= numDsig && numEmpty >= numDsig11) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
         if (numDsig >= numEmpty && numDsig >= numDs && numDsig >= numDsig11) {
-            return "dsig";
+            return "dsig"; //$NON-NLS-1$
         }
         if (numDsig11 >= numEmpty && numDsig11 >= numDsig && numDsig11 >= numDs) {
-            return "dsig11";
+            return "dsig11"; //$NON-NLS-1$
         }
-        return "ds";
+        return "ds"; //$NON-NLS-1$
     }
 
     /** Cuenta las repeticiones de una subcadena dentro de una cadena. Las
@@ -712,7 +706,7 @@ public final class Utils {
             return newList;
         }
         List<Transform> trans;
-        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+        final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
         boolean needsReconReference;
 
         for (final Reference r : referenceList) {
@@ -724,7 +718,7 @@ public final class Utils {
                 needsReconReference = false;
                 for (final Object t : r.getTransforms()) {
                     if (t instanceof Transform) {
-                        if (!"http://www.w3.org/2000/09/xmldsig#base64".equals(((Transform) t).getAlgorithm())) {
+                        if (!"http://www.w3.org/2000/09/xmldsig#base64".equals(((Transform) t).getAlgorithm())) { //$NON-NLS-1$
                             // Si el ID es nulo y hay una transformacion Base64
                             // reconstruimos la referencia
                             // pero quitando esa transformacion Base64
@@ -775,7 +769,7 @@ public final class Utils {
         }
 
         // La codificacion por defecto sera UTF-8
-        final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ? xmlProps.get(OutputKeys.ENCODING) : "UTF-8";
+        final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ? xmlProps.get(OutputKeys.ENCODING) : "UTF-8"; //$NON-NLS-1$
 
         // Primero creamos un writer
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -784,7 +778,7 @@ public final class Utils {
             writer = new OutputStreamWriter(baos, xmlEncoding);
         }
         catch (final UnsupportedEncodingException e) {
-            Logger.getLogger("es.gob.afirma").warning("La codificacion '" + xmlEncoding + "' no es valida, se usara la por defecto: " + e);
+            LOGGER.warning("La codificacion '" + xmlEncoding + "' no es valida, se usara la por defecto: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             writer = new OutputStreamWriter(baos);
         }
 
@@ -806,8 +800,7 @@ public final class Utils {
             docum = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma")
-                  .severe("No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e);
+            LOGGER.severe("No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e); //$NON-NLS-1$
             return baos.toByteArray();
         }
 
@@ -817,7 +810,7 @@ public final class Utils {
             writer = new OutputStreamWriter(baos, xmlEncoding);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("La codificacion '" + xmlEncoding + "' no es valida, se usara la por defecto: " + e);
+            LOGGER.warning("La codificacion '" + xmlEncoding + "' no es valida, se usara la por defecto: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             writer = new OutputStreamWriter(baos);
         }
 
@@ -829,15 +822,14 @@ public final class Utils {
             return Utils.addStyleSheetHeader(new String(baos.toByteArray(), xmlEncoding), styleType, styleHref).getBytes(xmlEncoding);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma")
-                  .warning("La codificacion '" + xmlEncoding + "' no es valida, se usara la por defecto del sistema: " + e);
+            LOGGER.warning("La codificacion '" + xmlEncoding + "' no es valida, se usara la por defecto del sistema: " + e); //$NON-NLS-1$ //$NON-NLS-2$
             return Utils.addStyleSheetHeader(new String(baos.toByteArray()), styleType, styleHref).getBytes();
         }
     }
 
     private final static void writeXMLwithXALAN(final Writer writer, final Node node, final String xmlEncoding) {
         final LSSerializer serializer = ((DOMImplementationLS) node.getOwnerDocument().getImplementation()).createLSSerializer();
-        serializer.getDomConfig().setParameter("namespaces", false);
+        serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
         final DOMOutputImpl output = new DOMOutputImpl();
         output.setCharacterStream(writer);
         if (xmlEncoding != null) {
@@ -858,19 +850,19 @@ public final class Utils {
             }
             // Por defecto, si no hay eclarada una codificacion, se utiliza
             // UTF-8
-            if (!properties.containsKey(OutputKeys.ENCODING) || "".equals(properties.get(OutputKeys.ENCODING))) {
-                properties.put(OutputKeys.ENCODING, "UTF-8");
+            if (!properties.containsKey(OutputKeys.ENCODING) || "".equals(properties.get(OutputKeys.ENCODING))) { //$NON-NLS-1$
+                properties.put(OutputKeys.ENCODING, "UTF-8"); //$NON-NLS-1$
             }
             for (final String key : properties.keySet()) {
                 serializer.setOutputProperty(key, properties.get(key));
             }
             if (indent) {
-                serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+                serializer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
             }
             serializer.transform(domSource, streamResult);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error escribiendo el XML: " + e);
+            LOGGER.severe("Error escribiendo el XML: " + e); //$NON-NLS-1$
         }
     }
 
@@ -888,25 +880,25 @@ public final class Utils {
         if (namespace != null) {
             try {
                 signingTime =
-                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(((Element) signature.getElementsByTagNameNS(namespace, "SigningTime")
+                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(((Element) signature.getElementsByTagNameNS(namespace, "SigningTime") //$NON-NLS-1$ //$NON-NLS-2$
                                                                                                 .item(0)).getTextContent());
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido recuperar la fecha de firma: " + e);
+                LOGGER.warning("No se ha podido recuperar la fecha de firma: " + e); //$NON-NLS-1$
             }
         }
 
         final AOSimpleSignInfo ssi = new AOSimpleSignInfo(new X509Certificate[] {
-            Utils.getCertificate(signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate").item(0))
+            Utils.getCertificate(signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate").item(0)) //$NON-NLS-1$
         }, signingTime);
-        ssi.setSignAlgorithm(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureMethod").item(0)).getAttribute("Algorithm"));
+        ssi.setSignAlgorithm(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureMethod").item(0)).getAttribute("Algorithm")); //$NON-NLS-1$ //$NON-NLS-2$
 
         byte[] pkcs1;
         try {
-            pkcs1 = Base64.decode(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0)).getTextContent());
+            pkcs1 = Base64.decode(((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0)).getTextContent()); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se pudo extraer el PKCS#1 de una firma");
+            LOGGER.warning("No se pudo extraer el PKCS#1 de una firma"); //$NON-NLS-1$
             pkcs1 = null;
         }
         ssi.setPkcs1(pkcs1);
@@ -919,7 +911,7 @@ public final class Utils {
      *        Nodo de firma.
      * @return CN del certificado de firma. */
     public static String getStringInfoNode(final Element signature) {
-        return AOUtil.getCN(Utils.getCertificate(signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate").item(0)));
+        return AOUtil.getCN(Utils.getCertificate(signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "X509Certificate").item(0))); //$NON-NLS-1$
     }
 
     /** Genera un certificado X.509 a partir de un nodo de certificado de firma.
@@ -927,7 +919,7 @@ public final class Utils {
      *        Nodo "X509Certificate" de la firma.
      * @return Certificado de firma. */
     public static X509Certificate getCertificate(final Node certificateNode) {
-        return createCert(certificateNode.getTextContent().trim().replace("\r", "").replace("\n", "").replace(" ", "").replace("\t", ""));
+        return createCert(certificateNode.getTextContent().trim().replace("\r", "").replace("\n", "").replace(" ", "").replace("\t", "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
     }
 
     /** Recupera el identificador (id) de la firma sobre la que se ha realizado
@@ -941,12 +933,12 @@ public final class Utils {
     public static String getCounterSignerReferenceId(final Element signature, final NodeList signatureValues) {
         // Tomamos la URI de la primera referencia (la del objeto firmado),
         // evitando el primer caracter de la URI que sera la almohadilla (#)
-        final String uri = ((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference").item(0)).getAttribute("URI").substring(1);
-        String signatureId = "";
+        final String uri = ((Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference").item(0)).getAttribute("URI").substring(1); //$NON-NLS-1$ //$NON-NLS-2$
+        String signatureId = ""; //$NON-NLS-1$
         for (int j = 0; j < signatureValues.getLength(); j++) {
             final Element signatureValue = (Element) signatureValues.item(j);
-            if (signatureValue.getAttribute("Id").equals(uri)) {
-                signatureId = ((Element) signatureValue.getParentNode()).getAttribute("Id");
+            if (signatureValue.getAttribute("Id").equals(uri)) { //$NON-NLS-1$
+                signatureId = ((Element) signatureValue.getParentNode()).getAttribute("Id"); //$NON-NLS-1$
                 break;
             }
         }
@@ -958,21 +950,23 @@ public final class Utils {
      *        Certificado en Base64. No debe incluir <i>Bag Attributes</i>
      * @return Certificado X509 o <code>null</code> si no se pudo crear */
     public static X509Certificate createCert(final String b64Cert) {
-        if (b64Cert == null || "".equals(b64Cert)) {
-            Logger.getLogger("es.gob.afirma").severe("Se ha proporcionado una cadena nula o vacia, se devolvera null");
+        if (b64Cert == null || "".equals(b64Cert)) { //$NON-NLS-1$
+            LOGGER.severe("Se ha proporcionado una cadena nula o vacia, se devolvera null"); //$NON-NLS-1$
             return null;
         }
         final X509Certificate cert;
         try {
             final InputStream isCert = new ByteArrayInputStream(Base64.decode(b64Cert));
-            cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(isCert);
+            cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(isCert); //$NON-NLS-1$
             try {
                 isCert.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Ignoramos los errores en el cierre
+            }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("No se pudo decodificar el certificado en Base64, se devolvera null: " + e);
+            LOGGER.severe("No se pudo decodificar el certificado en Base64, se devolvera null: " + e); //$NON-NLS-1$
             return null;
         }
         return cert;
