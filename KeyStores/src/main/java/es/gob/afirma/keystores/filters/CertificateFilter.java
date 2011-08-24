@@ -17,5 +17,10 @@ import java.security.cert.X509Certificate;
  * del interfaz y debe ser espec&iacute;fico para cada implementaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public interface CertificateFilter {
+    
+    /** Comprueba si un certificado se adec&uacute;a al filtro
+     * @param cert Certificado a comprobar
+     * @return <code>true</code> si el certificado se adec&uacute;a al filtro, <code>false</code> en caso contrario
+     */
     boolean matches(final X509Certificate cert);
 }
