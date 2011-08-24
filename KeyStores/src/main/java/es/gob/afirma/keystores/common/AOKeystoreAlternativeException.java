@@ -26,7 +26,7 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Mensaje descriptivo de la excepci&oacute;n.
      * @param e
      *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    public AOKeystoreAlternativeException(final AOKeyStore ks, final String desc, final Exception e) {
+    AOKeystoreAlternativeException(final AOKeyStore ks, final String desc, final Exception e) {
         super(desc, e);
         if (ks == null) {
             throw new IllegalArgumentException("Es necesario proporcionar un AOKeyStore alternativo"); //$NON-NLS-1$

@@ -21,7 +21,7 @@ public final class AOCertificatesNotFoundException extends AOException {
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n. */
-    public AOCertificatesNotFoundException(final String msg) {
+    AOCertificatesNotFoundException(final String msg) {
         super(msg);
     }
 

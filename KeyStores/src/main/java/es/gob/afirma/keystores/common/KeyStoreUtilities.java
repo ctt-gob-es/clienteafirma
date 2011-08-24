@@ -449,12 +449,14 @@ public final class KeyStoreUtilities {
             }
         });
 
-        final Object o = AOUIFactory.showInputDialog(parentComponent, KeyStoreMessages.getString("AOUIManager.13"), //$NON-NLS-1$
-                                               KeyStoreMessages.getString("AOUIManager.14"), //$NON-NLS-1$
-                                               AOUIFactory.PLAIN_MESSAGE,
-                                               null,
-                                               finalOrderedAliases,
-                                               null);
+        final Object o = AOUIFactory.showInputDialog(
+             parentComponent, KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
+             KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
+             AOUIFactory.PLAIN_MESSAGE,
+             null,
+             finalOrderedAliases,
+             null
+        );
 
         final String certName;
         if (o != null) {
@@ -483,24 +485,24 @@ public final class KeyStoreUtilities {
                             ((X509Certificate)ks.getCertificate(al)).checkValidity();
                         }
                         catch (final CertificateExpiredException e) {
-                            errorMessage = "Puede que el certificado haya caducado. " + KeyStoreMessages.getString("AOUIManager.8") //$NON-NLS-1$
-                                           + "\r\n" + KeyStoreMessages.getString("AOUIManager.9"); //$NON-NLS-1$
+                            errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.2"); //$NON-NLS-1$
                         }
                         catch (final CertificateNotYetValidException e) {
-                            errorMessage = "Puede que el certificado aun no sea v\u00E1lido. " + KeyStoreMessages.getString("AOUIManager.8") //$NON-NLS-1$
-                                           + "\r\n" + KeyStoreMessages.getString("AOUIManager.9"); //$NON-NLS-1$
+                            errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.3"); //$NON-NLS-1$
                         }
                         catch (final KeyStoreException e) {
-                            errorMessage = "No se ha podido validar el certificado. " + KeyStoreMessages.getString("AOUIManager.8") //$NON-NLS-1$
-                            + "\r\n" + KeyStoreMessages.getString("AOUIManager.9"); //$NON-NLS-1$ //$NON-NLS-2$
+                            errorMessage = KeyStoreMessages.getString("KeyStoreUtilities.4"); //$NON-NLS-1$
                         }
 
                         if (errorMessage != null) {
                             LOGGER.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
-                            if (AOUIFactory.showConfirmDialog(parentComponent, errorMessage + KeyStoreMessages.getString("AOUIManager.8"), //$NON-NLS-1$
-                                                              KeyStoreMessages.getString("AOUIManager.5"), //$NON-NLS-1$
-                                                              AOUIFactory.YES_NO_OPTION,
-                                                              AOUIFactory.WARNING_MESSAGE) == AOUIFactory.YES_OPTION) {
+                            if (AOUIFactory.showConfirmDialog(
+                                  parentComponent, 
+                                  errorMessage,
+                                  KeyStoreMessages.getString("KeyStoreUtilities.5"), //$NON-NLS-1$
+                                  AOUIFactory.YES_NO_OPTION,
+                                  AOUIFactory.WARNING_MESSAGE
+                            ) == AOUIFactory.YES_OPTION) {
                                 return al;
                             }
                             rejected = true;

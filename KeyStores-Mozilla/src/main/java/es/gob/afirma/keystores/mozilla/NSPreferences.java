@@ -19,35 +19,7 @@ import java.util.Vector;
 /** M&eacute;todos de utilidad para Mozilla Firefox y Nestcape.
  * Inspirada en la clase com.sun.deploy.net.proxy.NSPreferences de Sun
  * Microsystems. */
-public final class NSPreferences {
-
-    /** Return the location of the user profile directory in the netscape
-     * registry or null if we can't figure that out. This method should work
-     * with versions 6 of Navigator.
-     * @param registryFile
-     *        Netscape / Mozilla registry file
-     * @return Location of the Netscape / Mozilla user profile directory
-     * @throws IOException
-     *         When there's an error opening or reading the registry file */
-    public static String getNS6UserProfileDirectory(final File registryFile) throws IOException {
-        final NSRegistry reg = new NSRegistry().open(registryFile);
-        String path = null;
-        String currProfileName = null;
-
-        // Get current user profile directory
-        if (reg != null) {
-            currProfileName = reg.get("Common/Profiles/CurrentProfile");
-            if (currProfileName != null) {
-                path = reg.get("Common/Profiles/" + currProfileName + "/directory");
-            }
-            reg.close();
-        }
-
-        if (path == null) {
-            throw new IOException();
-        }
-        return path;
-    }
+final class NSPreferences {
 
     /** Devuelve el directorio del perfil activo de Firefox. Si no hubiese perfil
      * activo, devolver&iacute;a el directorio del perfil por defecto y si
@@ -61,11 +33,11 @@ public final class NSPreferences {
     public static String getFireFoxUserProfileDirectory(final File iniFile) throws IOException {
 
         if (iniFile == null) {
-            throw new IllegalArgumentException("El fichero INI es nulo y no se podra determinar el directorio del usuario de firefox");
+            throw new IllegalArgumentException("El fichero INI es nulo y no se podra determinar el directorio del usuario de firefox"); //$NON-NLS-1$
         }
 
         if (!iniFile.exists() || !iniFile.isFile()) {
-            throw new IOException("No se ha encontrado el fichero con los perfiles de firefox");
+            throw new IOException("No se ha encontrado el fichero con los perfiles de firefox"); //$NON-NLS-1$
         }
 
         String currentProfilePath = null;
@@ -110,10 +82,10 @@ public final class NSPreferences {
      *         configuraci&oacute;n. */
     private static FirefoxProfile[] readProfiles(final File iniFile) throws IOException {
 
-        final String NAME_ATR = "name=";
-        final String IS_RELATIVE_ATR = "isrelative=";
-        final String PATH_PROFILES_ATR = "path=";
-        final String IS_DEFAULT_ATR = "default=";
+        final String NAME_ATR = "name="; //$NON-NLS-1$
+        final String IS_RELATIVE_ATR = "isrelative="; //$NON-NLS-1$
+        final String PATH_PROFILES_ATR = "path="; //$NON-NLS-1$
+        final String IS_DEFAULT_ATR = "default="; //$NON-NLS-1$
 
         String line = null;
         final Vector<FirefoxProfile> profiles = new Vector<FirefoxProfile>();
@@ -122,18 +94,18 @@ public final class NSPreferences {
             while ((line = in.readLine()) != null) {
 
                 // Buscamos un nuevo bloque de perfil
-                if (!line.trim().toLowerCase().startsWith("[profile")) {
+                if (!line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
                     continue;
                 }
 
                 final FirefoxProfile profile = new FirefoxProfile();
-                while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) {
+                while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
                     if (line.trim().toLowerCase().startsWith(NAME_ATR)) {
                         profile.name = line.trim().substring(NAME_ATR.length());
                     }
                     else if (line.trim().toLowerCase().startsWith(IS_RELATIVE_ATR)) {
                         profile.isRelative =
-                                line.trim().substring(IS_RELATIVE_ATR.length()).equals("1");
+                                line.trim().substring(IS_RELATIVE_ATR.length()).equals("1"); //$NON-NLS-1$
                     }
                     else if (line.trim().toLowerCase().startsWith(PATH_PROFILES_ATR)) {
                         profile.path =
@@ -141,7 +113,7 @@ public final class NSPreferences {
                     }
                     else if (line.trim().toLowerCase().startsWith(IS_DEFAULT_ATR)) {
                         profile.isDefault =
-                                line.trim().substring(IS_DEFAULT_ATR.length()).equals("1");
+                                line.trim().substring(IS_DEFAULT_ATR.length()).equals("1"); //$NON-NLS-1$
                     }
                     else {
                         break;
@@ -157,13 +129,15 @@ public final class NSPreferences {
             }
         }
         catch (final Exception e) {
-            throw new IOException("Error al leer la configuracion de los perfiles de Firefox: " + e);
+            throw new IOException("Error al leer la configuracion de los perfiles de Firefox: " + e); //$NON-NLS-1$
         }
         finally {
             try {
                 in.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+             // Ignoramos los errores en el cierre
+            }
         }
 
         return profiles.toArray(new FirefoxProfile[profiles.size()]);
@@ -175,9 +149,9 @@ public final class NSPreferences {
      *        Informaci&oacute;n del perfil de Firefox.
      * @return Devuelve {@code true} si el perfil esta bloqueado, {@code false} en caso contrario. */
     private static boolean isProfileLocked(final FirefoxProfile profile) {
-        return new File(profile.absolutePath, "parent.lock").exists() || // En
+        return new File(profile.absolutePath, "parent.lock").exists() || // En //$NON-NLS-1$
                                                                          // Windows
-               new File(profile.absolutePath, "lock").exists(); // En UNIX
+               new File(profile.absolutePath, "lock").exists(); // En UNIX //$NON-NLS-1$
     }
 
     /** Clase que almacena la configuraci&oacute;n para la identificacion de un

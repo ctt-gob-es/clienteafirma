@@ -11,9 +11,7 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,9 +29,9 @@ import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 
 /** Clase con m&eacute;toos de utilidad para la gesti&oacute;n del almac&eacute;n
  * de certificados de Mozilla. */
-public final class MozillaKeyStoreUtilities {
+final class MozillaKeyStoreUtilities {
     
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Directorio con las bibliotecas de NSS necesarias para el acceso al
      * almac&eacute;n de Mozilla. */
@@ -53,37 +51,37 @@ public final class MozillaKeyStoreUtilities {
      *         NSS. */
     public static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
 
-        String softoknLib = "libsoftokn3.so";
+        String softoknLib = "libsoftokn3.so"; //$NON-NLS-1$
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-            softoknLib = "softokn3.dll";
+            softoknLib = "softokn3.dll"; //$NON-NLS-1$
         }
         else if (Platform.getOS().equals(Platform.OS.MACOSX)) {
-            softoknLib = "libsoftokn3.dylib";
+            softoknLib = "libsoftokn3.dylib"; //$NON-NLS-1$
         }
 
-        final StringBuilder buffer = new StringBuilder("name=NSSCrypto-AFirma\r\n");
+        final StringBuilder buffer = new StringBuilder("name=NSSCrypto-AFirma\r\n"); //$NON-NLS-1$
 
         // Java 1.5 tenia un metodo indocumentado para acceder a NSS,
         // http://docs.sun.com/app/docs/doc/819-3671/gcsoc?a=view
 
         // if (System.getProperty("java.version").startsWith("1.5")) {
-        buffer.append("library=")
+        buffer.append("library=") //$NON-NLS-1$
               .append(libDir)
               .append(java.io.File.separator)
               .append(softoknLib)
-              .append("\r\n")
-              .append("attributes=compatibility\r\n")
-              .append("slot=2\r\n")
-              .append("showInfo=false\r\n")
-              .append("nssArgs=\"")
-              .append("configdir='")
+              .append("\r\n") //$NON-NLS-1$
+              .append("attributes=compatibility\r\n") //$NON-NLS-1$
+              .append("slot=2\r\n") //$NON-NLS-1$
+              .append("showInfo=false\r\n") //$NON-NLS-1$
+              .append("nssArgs=\"") //$NON-NLS-1$
+              .append("configdir='") //$NON-NLS-1$
               .append(userProfileDirectory)
-              .append("' ")
-              .append("certPrefix='' ")
-              .append("keyPrefix='' ")
-              .append("secmod='secmod.db' ")
-              .append("flags=readOnly")
-              .append("\"\n");
+              .append("' ") //$NON-NLS-1$
+              .append("certPrefix='' ") //$NON-NLS-1$
+              .append("keyPrefix='' ") //$NON-NLS-1$
+              .append("secmod='secmod.db' ") //$NON-NLS-1$
+              .append("flags=readOnly") //$NON-NLS-1$
+              .append("\"\n"); //$NON-NLS-1$
         // //.append("omitInitialize=true");
         // }
         // else {
@@ -114,19 +112,19 @@ public final class MozillaKeyStoreUtilities {
     private static String getSystemNSSLibDirWindows() throws FileNotFoundException, AOInvalidFormatException {
 
         // Intentamos extraer la ruta de instalacion de Firefox del registro
-        String dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_CURRENT_USER, "Software\\Classes\\FirefoxURL\\shell\\open\\command", "");
+        String dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_CURRENT_USER, "Software\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
         if (dir == null) {
-            dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxURL\\shell\\open\\command", "");
+            dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
             if (dir == null) {
-                throw new FileNotFoundException("No se ha podido localizar el directorio de Firefox a traves del registro de Windows");
+                throw new FileNotFoundException("No se ha podido localizar el directorio de Firefox a traves del registro de Windows"); //$NON-NLS-1$
             }
         }
 
         final String regKeyLowCase = dir.toLowerCase();
-        final int pos = regKeyLowCase.indexOf("firefox.exe");
+        final int pos = regKeyLowCase.indexOf("firefox.exe"); //$NON-NLS-1$
         if (pos != -1) {
             dir = dir.substring(0, pos);
-            if (dir.startsWith("\"")) {
+            if (dir.startsWith("\"")) { //$NON-NLS-1$
                 dir = dir.substring(1);
             }
             if (dir.endsWith(File.separator)) {
@@ -135,25 +133,14 @@ public final class MozillaKeyStoreUtilities {
 
             File tmpFile = new File(dir);
             if (tmpFile.exists() && tmpFile.isDirectory()) {
-                tmpFile = new File(dir + File.separator + "softokn3.dll");
+                tmpFile = new File(dir + File.separator + "softokn3.dll"); //$NON-NLS-1$
                 if (tmpFile.exists()) {
-                    try {
-                        LOGGER.info("Informacion sobre el modulo PKCS#11 de NSS");
-                        final InputStream is = new FileInputStream(tmpFile);
-                        try {
-                            is.close();
-                        }
-                        catch (final Exception e) {}
-                    }
-                    catch (final Exception e) {
-                        LOGGER.warning("No se ha podido obtener informacion sobre el modulo PKCS#11 de NSS" + e);
-                    }
                     try {
                         dir = tmpFile.getParentFile().getCanonicalPath();
                     }
                     catch (final Exception e) {
-                        if (dir.contains("\u007E")) {
-                            throw new FileNotFoundException("No se ha podido obtener el nombre del directorio del modulo PKCS#11, parece estar establecido como un nombre corto (8+3): " + e);
+                        if (dir.contains("\u007E")) { //$NON-NLS-1$
+                            throw new FileNotFoundException("No se ha podido obtener el nombre del directorio del modulo PKCS#11, parece estar establecido como un nombre corto (8+3): " + e); //$NON-NLS-1$
                         }
                     }
 
@@ -166,30 +153,30 @@ public final class MozillaKeyStoreUtilities {
                         }
                     }
                     catch (final Exception e) {
-                        final File localNSS = new File(Platform.getUserHome() + "\\" + NSS_INSTALL_DIR + "\\nss" + Platform.getJavaArch());
+                        final File localNSS = new File(Platform.getUserHome() + "\\" + NSS_INSTALL_DIR + "\\nss" + Platform.getJavaArch()); //$NON-NLS-1$ //$NON-NLS-2$
                         if (localNSS.exists() && localNSS.isDirectory() && localNSS.canRead()) {
-                            LOGGER.info("Existe una copia local de NSS");
+                            LOGGER.info("Existe una copia local de NSS"); //$NON-NLS-1$
                             // Existe un NSS local
                             try {
                                 dir = localNSS.getCanonicalPath();
                             }
                             catch (final Exception t) {
                                 dir = localNSS.getAbsolutePath();
-                                throw new FileNotFoundException("No se ha encontrado un NSS compatible en el sistema: " + t);
+                                throw new FileNotFoundException("No se ha encontrado un NSS compatible en el sistema: " + t); //$NON-NLS-1$
                             }
                         }
-                        throw new AOInvalidFormatException("El NSS del sistema (" + dir
-                                                           + ") es de una arquitectura incompatible "
-                                                           + "y no existe una version alternativa en "
+                        throw new AOInvalidFormatException("El NSS del sistema (" + dir //$NON-NLS-1$
+                                                           + ") es de una arquitectura incompatible " //$NON-NLS-1$
+                                                           + "y no existe una version alternativa en " //$NON-NLS-1$
                                                            + localNSS.getAbsolutePath()
-                                                           + ": "
+                                                           + ": " //$NON-NLS-1$
                                                            + e);
                     }
 
                     // Tenemos la ruta del NSS, comprobamos adecuacion por bugs
                     // de Java
 
-                    if (dir.contains(")") || dir.contains("(") || dir.contains("\u007E")) {
+                    if (dir.contains(")") || dir.contains("(") || dir.contains("\u007E")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         // Tenemos una ruta con caracteres ilegales para la
                         // configuracion de SunPKCS#11 por el bug 6581254:
                         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6581254
@@ -197,63 +184,61 @@ public final class MozillaKeyStoreUtilities {
 
                             // Copiamos las DLL necesarias a un temporal y
                             // devolvemos el temporal
-                            final File tmp = File.createTempFile("nss", null);
+                            final File tmp = File.createTempFile("nss", null); //$NON-NLS-1$
                             tmp.delete();
                             if (!tmp.mkdir()) {
-                                throw new AOException("No se ha creado el directorio temporal");
+                                throw new AOException("No se ha creado el directorio temporal"); //$NON-NLS-1$
                             }
                             final String dest = tmp.getCanonicalPath() + File.separator;
 
                             // Las cuatro primeras bibliotecas son comunes para
                             // Firefox 2, 3 y 4
-                            AOUtil.copyFile(new File(dir + File.separator + "softokn3.dll"), new File(dest + "softokn3.dll"));
-
-                            AOUtil.copyFile(new File(dir + File.separator + "plc4.dll"), new File(dest + "plc4.dll"));
-                            AOUtil.copyFile(new File(dir + File.separator + "plds4.dll"), new File(dest + "plds4.dll"));
-                            AOUtil.copyFile(new File(dir + File.separator + "nspr4.dll"), new File(dest + "nspr4.dll"));
+                            AOUtil.copyFile(new File(dir + File.separator + "softokn3.dll"), new File(dest + "softokn3.dll")); //$NON-NLS-1$ //$NON-NLS-2$
+                            AOUtil.copyFile(new File(dir + File.separator + "plc4.dll"), new File(dest + "plc4.dll")); //$NON-NLS-1$ //$NON-NLS-2$
+                            AOUtil.copyFile(new File(dir + File.separator + "plds4.dll"), new File(dest + "plds4.dll")); //$NON-NLS-1$ //$NON-NLS-2$
+                            AOUtil.copyFile(new File(dir + File.separator + "nspr4.dll"), new File(dest + "nspr4.dll")); //$NON-NLS-1$ //$NON-NLS-2$
 
                             // A partir de aqui comprobamos exsitencia antes,
                             // porque no estan en Mozilla 2
 
                             // Cuidado, en Firefox 4 sqlite3.dll pasa a llamarse
                             // mozsqlite3.dll
-                            File tmpFile2 = new File(dir + File.separator + "mozsqlite3.dll");
+                            File tmpFile2 = new File(dir + File.separator + "mozsqlite3.dll"); //$NON-NLS-1$
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "mozsqlite3.dll"));
+                                AOUtil.copyFile(tmpFile2, new File(dest + "mozsqlite3.dll")); //$NON-NLS-1$
                             }
                             else {
-                                tmpFile2 = new File(dir + File.separator + "sqlite3.dll");
+                                tmpFile2 = new File(dir + File.separator + "sqlite3.dll"); //$NON-NLS-1$
                                 if (tmpFile2.exists()) {
-                                    AOUtil.copyFile(tmpFile2, new File(dest + "sqlite3.dll"));
+                                    AOUtil.copyFile(tmpFile2, new File(dest + "sqlite3.dll")); //$NON-NLS-1$
                                 }
                             }
 
-                            tmpFile2 = new File(dir + File.separator + "mozcrt19.dll");
+                            tmpFile2 = new File(dir + File.separator + "mozcrt19.dll"); //$NON-NLS-1$
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "mozcrt19.dll"));
+                                AOUtil.copyFile(tmpFile2, new File(dest + "mozcrt19.dll")); //$NON-NLS-1$
                             }
 
-                            tmpFile2 = new File(dir + File.separator + "nssutil3.dll");
+                            tmpFile2 = new File(dir + File.separator + "nssutil3.dll"); //$NON-NLS-1$
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "nssutil3.dll"));
+                                AOUtil.copyFile(tmpFile2, new File(dest + "nssutil3.dll")); //$NON-NLS-1$
                             }
 
-                            tmpFile2 = new File(dir + File.separator + "freebl3.dll");
+                            tmpFile2 = new File(dir + File.separator + "freebl3.dll"); //$NON-NLS-1$
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "freebl3.dll"));
+                                AOUtil.copyFile(tmpFile2, new File(dest + "freebl3.dll")); //$NON-NLS-1$
                             }
 
-                            tmpFile2 = new File(dir + File.separator + "nssdbm3.dll");
+                            tmpFile2 = new File(dir + File.separator + "nssdbm3.dll"); //$NON-NLS-1$
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "nssdbm3.dll"));
+                                AOUtil.copyFile(tmpFile2, new File(dest + "nssdbm3.dll")); //$NON-NLS-1$
                             }
 
                             return tmp.getCanonicalPath();
 
                         }
                         catch (final Exception e) {
-                            LOGGER
-                                  .warning("No se ha podido duplicar NSS en un directorio temporal, si esta version de JRE esta afectada por el error 6581254 es posible que no pueda cargarse: " + e);
+                            LOGGER.warning("No se ha podido duplicar NSS en un directorio temporal, si esta version de JRE esta afectada por el error 6581254 es posible que no pueda cargarse: " + e); //$NON-NLS-1$
                         }
                     }
                     return dir;
@@ -262,18 +247,18 @@ public final class MozillaKeyStoreUtilities {
         }
         else {
             // No hay NSS en el sistema, buscamos uno local
-            final File localNSS = new File(Platform.getUserHome() + "\\" + NSS_INSTALL_DIR + "\\nss" + Platform.getJavaArch());
+            final File localNSS = new File(Platform.getUserHome() + "\\" + NSS_INSTALL_DIR + "\\nss" + Platform.getJavaArch()); //$NON-NLS-1$ //$NON-NLS-2$
             if (localNSS.exists() && localNSS.isDirectory() && localNSS.canRead()) {
                 try {
                     return localNSS.getCanonicalPath();
                 }
                 catch (final Exception e) {
-                    throw new FileNotFoundException("No se ha encontrado un NSS compatible en Windows: " + e);
+                    throw new FileNotFoundException("No se ha encontrado un NSS compatible en Windows: " + e); //$NON-NLS-1$
                 }
             }
         }
 
-        throw new FileNotFoundException("No se ha encontrado un NSS compatible en Windows");
+        throw new FileNotFoundException("No se ha encontrado un NSS compatible en Windows"); //$NON-NLS-1$
 
     }
 
@@ -281,31 +266,31 @@ public final class MozillaKeyStoreUtilities {
 
         final String[] paths =
                 new String[] {
-                        "/Applications/Firefox.app/Contents/MacOS",
-                        "/lib",
-                        "/usr/lib",
-                        "/usr/lib/nss",
-                        "/Applications/Minefield.app/Contents/MacOS",
-                        Platform.getUserHome() + "/" + NSS_INSTALL_DIR + "/nss" + Platform.getJavaArch()
+                        "/Applications/Firefox.app/Contents/MacOS", //$NON-NLS-1$
+                        "/lib", //$NON-NLS-1$
+                        "/usr/lib", //$NON-NLS-1$
+                        "/usr/lib/nss", //$NON-NLS-1$
+                        "/Applications/Minefield.app/Contents/MacOS", //$NON-NLS-1$
+                        Platform.getUserHome() + "/" + NSS_INSTALL_DIR + "/nss" + Platform.getJavaArch() //$NON-NLS-1$ //$NON-NLS-2$
                 };
 
         for (final String path : paths) {
-            if (new File(path + "/libsoftokn3.dylib").exists() && new File(path + "/libnspr4.dylib").exists()) {
+            if (new File(path + "/libsoftokn3.dylib").exists() && new File(path + "/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
                 try {
-                    System.load(path + "/libnspr4.dylib");
+                    System.load(path + "/libnspr4.dylib"); //$NON-NLS-1$
                     nssLibDir = path;
                 }
                 catch (final Exception e) {
                     nssLibDir = null;
-                    LOGGER.warning("Descartamos el NSS situado en '" + path
-                                                              + "' porque no puede cargarse adecuadamente: "
+                    LOGGER.warning("Descartamos el NSS situado en '" + path //$NON-NLS-1$
+                                                              + "' porque no puede cargarse adecuadamente: " //$NON-NLS-1$
                                                               + e);
                 }
             }
         }
 
         if (nssLibDir == null) {
-            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X");
+            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X"); //$NON-NLS-1$
         }
 
         return nssLibDir;
@@ -313,7 +298,7 @@ public final class MozillaKeyStoreUtilities {
 
     private static String getSystemNSSLibDirUNIX() throws FileNotFoundException {
 
-        if (nssLibDir != null && (!"".equals(nssLibDir))) {
+        if (nssLibDir != null && (!"".equals(nssLibDir))) { //$NON-NLS-1$
             return nssLibDir;
         }
 
@@ -321,15 +306,15 @@ public final class MozillaKeyStoreUtilities {
         // *********************************************************************
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
-        if (new File("/usr/lib/libsoftokn3.so").exists() && new File("/lib/libnspr4.so").exists()) {
+        if (new File("/usr/lib/libsoftokn3.so").exists() && new File("/lib/libnspr4.so").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
             try {
-                System.load("/lib/libnspr4.so");
-                nssLibDir = "/usr/lib";
+                System.load("/lib/libnspr4.so"); //$NON-NLS-1$
+                nssLibDir = "/usr/lib"; //$NON-NLS-1$
             }
             catch (final Exception e) {
                 nssLibDir = null;
                 LOGGER
-                      .warning("Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e);
+                      .warning("Descartamos el NSS situado entre /lib y /usr/lib porque no puede cargarse adecuadamente: " + e); //$NON-NLS-1$
             }
             if (nssLibDir != null) {
                 return nssLibDir;
@@ -340,27 +325,27 @@ public final class MozillaKeyStoreUtilities {
 
         final String[] paths =
                 new String[] {
-                        "/usr/lib/firefox-" + searchLastFirefoxVersion("/usr/lib/"),
-                        "/usr/lib/firefox",
-                        "/opt/firefox",
-                        "/opt/firefox-" + searchLastFirefoxVersion("/opt/"),
-                        "/lib",
-                        "/usr/lib",
-                        "/usr/lib/nss",
-                        "/opt/fedora-ds/clients/lib",
-                        Platform.getUserHome() + "/" + NSS_INSTALL_DIR + "/nss" + Platform.getJavaArch()
+                        "/usr/lib/firefox-" + searchLastFirefoxVersion("/usr/lib/"), //$NON-NLS-1$ //$NON-NLS-2$
+                        "/usr/lib/firefox", //$NON-NLS-1$
+                        "/opt/firefox", //$NON-NLS-1$
+                        "/opt/firefox-" + searchLastFirefoxVersion("/opt/"), //$NON-NLS-1$ //$NON-NLS-2$
+                        "/lib", //$NON-NLS-1$
+                        "/usr/lib", //$NON-NLS-1$
+                        "/usr/lib/nss", //$NON-NLS-1$
+                        "/opt/fedora-ds/clients/lib", //$NON-NLS-1$
+                        Platform.getUserHome() + "/" + NSS_INSTALL_DIR + "/nss" + Platform.getJavaArch() //$NON-NLS-1$ //$NON-NLS-2$
                 };
 
         for (final String path : paths) {
-            if (new File(path + "/libsoftokn3.so").exists() && new File(path + "/libnspr4.so").exists()) {
+            if (new File(path + "/libsoftokn3.so").exists() && new File(path + "/libnspr4.so").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
                 try {
-                    System.load(path + "/libnspr4.so");
+                    System.load(path + "/libnspr4.so"); //$NON-NLS-1$
                     nssLibDir = path;
                 }
                 catch (final Exception e) {
                     nssLibDir = null;
-                    LOGGER.warning("Descartamos el NSS situado en '" + path
-                                                              + "' porque no puede cargarse adecuadamente: "
+                    LOGGER.warning("Descartamos el NSS situado en '" + path //$NON-NLS-1$
+                                                              + "' porque no puede cargarse adecuadamente: " //$NON-NLS-1$
                                                               + e);
                 }
                 if (nssLibDir != null) {
@@ -370,7 +355,7 @@ public final class MozillaKeyStoreUtilities {
         }
 
         if (nssLibDir == null) {
-            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX");
+            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en UNIX"); //$NON-NLS-1$
         }
 
         return nssLibDir;
@@ -403,7 +388,7 @@ public final class MozillaKeyStoreUtilities {
             return getSystemNSSLibDirMacOSX();
         }
 
-        throw new FileNotFoundException("No se han encontrado bibliotecas NSS instaladas en su sistema operativo");
+        throw new FileNotFoundException("No se han encontrado bibliotecas NSS instaladas en su sistema operativo"); //$NON-NLS-1$
     }
 
     /** Busca la &uacute;ltima versi&oacute;n de firefox instalada en un sistema
@@ -415,12 +400,12 @@ public final class MozillaKeyStoreUtilities {
             final String filenames[] = directoryLib.list();
             final List<String> firefoxDirectories = new ArrayList<String>();
             for (final String filename : filenames) {
-                if (filename.startsWith("firefox-")) {
-                    firefoxDirectories.add(filename.replace("firefox-", ""));
+                if (filename.startsWith("firefox-")) { //$NON-NLS-1$
+                    firefoxDirectories.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
             if (firefoxDirectories.isEmpty()) {
-                return "";
+                return ""; //$NON-NLS-1$
             }
             for (int i = 0; i < firefoxDirectories.size(); i++) {
                 try {
@@ -440,7 +425,7 @@ public final class MozillaKeyStoreUtilities {
             });
             return firefoxDirectories.get(0);
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     /** Obtiene las rutas completas hacia las bibliotecas (.dll o .so) de los
@@ -459,8 +444,7 @@ public final class MozillaKeyStoreUtilities {
                                                  // usen la misma biblioteca
         }
         catch (final Exception t) {
-            LOGGER
-                  .severe("No se han podido obtener los modulos externos de Mozilla, se devolvera una lista vacia o unicamente con el DNIe: " + t);
+            LOGGER.severe("No se han podido obtener los modulos externos de Mozilla, se devolvera una lista vacia o unicamente con el DNIe: " + t); //$NON-NLS-1$
             return new Hashtable<String, String>(0);
         }
     }
@@ -506,17 +490,17 @@ public final class MozillaKeyStoreUtilities {
         String tmpLib;
         for (final String key : table.keySet()) {
             tmpLib = table.get(key);
-            if (tmpLib.toLowerCase().endsWith(".dll")) {
+            if (tmpLib.toLowerCase().endsWith(".dll")) { //$NON-NLS-1$
                 tmpLib = tmpLib.toLowerCase();
             }
 
-            if (!revisedLibs.contains(tmpLib) && (!tmpLib.toLowerCase().contains("nssckbi"))) {
+            if (!revisedLibs.contains(tmpLib) && (!tmpLib.toLowerCase().contains("nssckbi"))) { //$NON-NLS-1$
                 purgedTable.put(key, table.get(key));
                 revisedLibs.add(tmpLib);
             }
             else {
-                LOGGER.warning("Se eliminara el modulo '" + key
-                                                          + "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: "
+                LOGGER.warning("Se eliminara el modulo '" + key //$NON-NLS-1$
+                                                          + "' porque ya existe uno con la misma biblioteca o es un modulo de certificados raiz: " //$NON-NLS-1$
                                                           + table.get(key));
             }
         }
@@ -535,49 +519,49 @@ public final class MozillaKeyStoreUtilities {
         // *********************************************************************
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
-        if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File("/lib/libnspr4.so").exists()) {
+        if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File("/lib/libnspr4.so").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
             try {
-                System.load("/lib/libnspr4.so");
-                if (new File("/lib/libplds4.so").exists()) {
-                    System.load("/lib/libplds4.so");
+                System.load("/lib/libnspr4.so"); //$NON-NLS-1$
+                if (new File("/lib/libplds4.so").exists()) { //$NON-NLS-1$
+                    System.load("/lib/libplds4.so"); //$NON-NLS-1$
                 }
-                if (new File("/usr/lib/libplds4.so").exists()) {
-                    System.load("/usr/lib/libplds4.so");
+                if (new File("/usr/lib/libplds4.so").exists()) { //$NON-NLS-1$
+                    System.load("/usr/lib/libplds4.so"); //$NON-NLS-1$
                 }
-                if (new File("/lib/libplc4.so").exists()) {
-                    System.load("/lib/libplc4.so");
+                if (new File("/lib/libplc4.so").exists()) { //$NON-NLS-1$
+                    System.load("/lib/libplc4.so"); //$NON-NLS-1$
                 }
-                if (new File("/usr/lib/libplc4.so").exists()) {
-                    System.load("/usr/lib/libplc4.so");
+                if (new File("/usr/lib/libplc4.so").exists()) { //$NON-NLS-1$
+                    System.load("/usr/lib/libplc4.so"); //$NON-NLS-1$
                 }
-                if (new File("/lib/libnssutil3.so").exists()) {
-                    System.load("/lib/libnssutil3.so");
+                if (new File("/lib/libnssutil3.so").exists()) { //$NON-NLS-1$
+                    System.load("/lib/libnssutil3.so"); //$NON-NLS-1$
                 }
-                if (new File("/usr/lib/libnssutil3.so").exists()) {
-                    System.load("/usr/lib/libnssutil3.so");
+                if (new File("/usr/lib/libnssutil3.so").exists()) { //$NON-NLS-1$
+                    System.load("/usr/lib/libnssutil3.so"); //$NON-NLS-1$
                 }
-                if (new File("/lib/libsqlite3.so").exists()) {
-                    System.load("/lib/libsqlite3.so");
+                if (new File("/lib/libsqlite3.so").exists()) { //$NON-NLS-1$
+                    System.load("/lib/libsqlite3.so"); //$NON-NLS-1$
                 }
-                if (new File("/usr/lib/libsqlite3.so").exists()) {
-                    System.load("/usr/lib/libsqlite3.so");
+                if (new File("/usr/lib/libsqlite3.so").exists()) { //$NON-NLS-1$
+                    System.load("/usr/lib/libsqlite3.so"); //$NON-NLS-1$
                 }
-                if (new File("/lib/libmozsqlite3.so").exists()) {
-                    System.load("/lib/libmozsqlite3.so");
+                if (new File("/lib/libmozsqlite3.so").exists()) { //$NON-NLS-1$
+                    System.load("/lib/libmozsqlite3.so"); //$NON-NLS-1$
                 }
-                if (new File("/usr/lib/libmozsqlite3.so").exists()) {
-                    System.load("/usr/lib/libmozsqlite3.so");
+                if (new File("/usr/lib/libmozsqlite3.so").exists()) { //$NON-NLS-1$
+                    System.load("/usr/lib/libmozsqlite3.so"); //$NON-NLS-1$
                 }
             }
             catch (final Exception e) {
-                LOGGER.warning("Error cargando NSS en una instalacion partida entre /lib y /usr/lib: " + e);
+                LOGGER.warning("Error cargando NSS en una instalacion partida entre /lib y /usr/lib: " + e); //$NON-NLS-1$
             }
             return;
         }
         // *********************************************************************
         // *********************************************************************
 
-        final String path = nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator);
+        final String path = nssDirectory + (nssDirectory.endsWith(File.separator) ? "" : File.separator); //$NON-NLS-1$
         for (final String libPath : getSoftkn3Dependencies(path)) {
             try {
                 if (new File(libPath).exists()) {
@@ -585,8 +569,8 @@ public final class MozillaKeyStoreUtilities {
                 }
             }
             catch (final Exception e) {
-                LOGGER.warning("Error al cargar la biblioteca " + libPath
-                                                          + " para el acceso al almacen de claves de Mozilla: "
+                LOGGER.warning("Error al cargar la biblioteca " + libPath //$NON-NLS-1$
+                                                          + " para el acceso al almacen de claves de Mozilla: " //$NON-NLS-1$
                                                           + e);
             }
         }
@@ -615,65 +599,65 @@ public final class MozillaKeyStoreUtilities {
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             // Mozilla Firefox 4.0
-            if (new File(nssPath + "mozsqlite3.dll").exists()) {
-                LOGGER.info("Detectado NSS de Firefox 4 en Windows");
+            if (new File(nssPath + "mozsqlite3.dll").exists()) { //$NON-NLS-1$
+                LOGGER.info("Detectado NSS de Firefox 4 en Windows"); //$NON-NLS-1$
                 return new String[] {
-                        nssPath + "mozcrt19.dll",
-                        nssPath + "nspr4.dll",
-                        nssPath + "plds4.dll",
-                        nssPath + "plc4.dll",
-                        nssPath + "nssutil3.dll",
-                        nssPath + "mozsqlite3.dll",
-                        nssPath + "nssdbm3.dll",
-                        nssPath + "freebl3.dll"
+                        nssPath + "mozcrt19.dll", //$NON-NLS-1$
+                        nssPath + "nspr4.dll", //$NON-NLS-1$
+                        nssPath + "plds4.dll", //$NON-NLS-1$
+                        nssPath + "plc4.dll", //$NON-NLS-1$
+                        nssPath + "nssutil3.dll", //$NON-NLS-1$
+                        nssPath + "mozsqlite3.dll", //$NON-NLS-1$
+                        nssPath + "nssdbm3.dll", //$NON-NLS-1$
+                        nssPath + "freebl3.dll" //$NON-NLS-1$
                 };
             }
             // Mozilla Firefox 3.0
-            else if (new File(nssPath + "mozcrt19.dll").exists()) {
+            else if (new File(nssPath + "mozcrt19.dll").exists()) { //$NON-NLS-1$
                 // LOGGER.info("Detectado NSS de Firefox 3");
                 return new String[] {
-                        nssPath + "mozcrt19.dll",
-                        nssPath + "nspr4.dll",
-                        nssPath + "plds4.dll",
-                        nssPath + "plc4.dll",
-                        nssPath + "nssutil3.dll",
-                        nssPath + "sqlite3.dll",
-                        nssPath + "nssdbm3.dll",
-                        nssPath + "freebl3.dll"
+                        nssPath + "mozcrt19.dll", //$NON-NLS-1$
+                        nssPath + "nspr4.dll", //$NON-NLS-1$
+                        nssPath + "plds4.dll", //$NON-NLS-1$
+                        nssPath + "plc4.dll", //$NON-NLS-1$
+                        nssPath + "nssutil3.dll", //$NON-NLS-1$
+                        nssPath + "sqlite3.dll", //$NON-NLS-1$
+                        nssPath + "nssdbm3.dll", //$NON-NLS-1$
+                        nssPath + "freebl3.dll" //$NON-NLS-1$
                 };
             }
             // Mozilla Firefox 2.0
-            else if (new File(nssPath + "nspr4.dll").exists()) {
+            else if (new File(nssPath + "nspr4.dll").exists()) { //$NON-NLS-1$
                 // LOGGER.info("Detectado NSS de Firefox 2");
                 return new String[] {
-                        nssPath + "nspr4.dll", nssPath + "plds4.dll", nssPath + "plc4.dll"
+                        nssPath + "nspr4.dll", nssPath + "plds4.dll", nssPath + "plc4.dll" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 };
             }
         }
         else if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.SOLARIS)) {
-            if (new File(nssPath + "libmozsqlite.so").exists()) {
-                LOGGER.info("Detectado NSS de Firefox 4 en UNIX");
+            if (new File(nssPath + "libmozsqlite.so").exists()) { //$NON-NLS-1$
+                LOGGER.info("Detectado NSS de Firefox 4 en UNIX"); //$NON-NLS-1$
                 return new String[] {
-                        nssPath + "libnspr4.so",
-                        nssPath + "libplds4.so",
-                        nssPath + "libplc4.so",
-                        nssPath + "libnssutil3.so",
-                        nssPath + "libsqlite3.so"
+                        nssPath + "libnspr4.so", //$NON-NLS-1$
+                        nssPath + "libplds4.so", //$NON-NLS-1$
+                        nssPath + "libplc4.so", //$NON-NLS-1$
+                        nssPath + "libnssutil3.so", //$NON-NLS-1$
+                        nssPath + "libsqlite3.so" //$NON-NLS-1$
                 };
             }
             return new String[] {
-                    nssPath + "libnspr4.so",
-                    nssPath + "libplds4.so",
-                    nssPath + "libplc4.so",
-                    nssPath + "libnssutil3.so",
-                    nssPath + "libmozsqlite3.so"
+                    nssPath + "libnspr4.so", //$NON-NLS-1$
+                    nssPath + "libplds4.so", //$NON-NLS-1$
+                    nssPath + "libplc4.so", //$NON-NLS-1$
+                    nssPath + "libnssutil3.so", //$NON-NLS-1$
+                    nssPath + "libmozsqlite3.so" //$NON-NLS-1$
             };
         }
 
-        LOGGER.warning("Plataforma no soportada para la precarga de las bibliotecas NSS: " + Platform.getOS()
-                                                  + " + Java "
+        LOGGER.warning("Plataforma no soportada para la precarga de las bibliotecas NSS: " + Platform.getOS() //$NON-NLS-1$
+                                                  + " + Java " //$NON-NLS-1$
                                                   + Platform.getJavaArch()
-                                                  + "-bits");
+                                                  + "-bits"); //$NON-NLS-1$
         return new String[0];
     }
 
@@ -686,12 +670,12 @@ public final class MozillaKeyStoreUtilities {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final String appDataDir =
                     WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_CURRENT_USER,
-                                                 "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",
-                                                 "AppData");
+                                                 "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", //$NON-NLS-1$
+                                                 "AppData"); //$NON-NLS-1$
             if (appDataDir != null) {
                 String finalDir = null;
                 // En Firefox usamos preferentemente el profiles.ini
-                regFile = new File(appDataDir + "\\Mozilla\\Firefox\\profiles.ini");
+                regFile = new File(appDataDir + "\\Mozilla\\Firefox\\profiles.ini"); //$NON-NLS-1$
                 try {
                     if (regFile.exists()) {
                         finalDir = NSPreferences.getFireFoxUserProfileDirectory(regFile);
@@ -699,22 +683,7 @@ public final class MozillaKeyStoreUtilities {
                 }
                 catch (final Exception e) {
                     LOGGER
-                          .severe("Error obteniendo el directorio de perfil de usuario de Firefox, " + "se devolvera null: " + e);
-                    return null;
-                }
-                if (finalDir != null) {
-                    return finalDir.replace('\\', '/');
-                }
-                // Hemos probado el de Firefox, vamos ahora con el de Mozilla
-                regFile = new File(appDataDir + "\\Mozilla\\registry.dat");
-                try {
-                    if (regFile.exists()) {
-                        finalDir = NSPreferences.getNS6UserProfileDirectory(regFile);
-                    }
-                }
-                catch (final Exception e) {
-                    LOGGER
-                          .severe("Error obteniendo el directorio de perfil de usuario de Mozilla, " + "se devolvera null: " + e);
+                          .severe("Error obteniendo el directorio de perfil de usuario de Firefox, " + "se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$
                     return null;
                 }
                 if (finalDir != null) {
@@ -722,13 +691,13 @@ public final class MozillaKeyStoreUtilities {
                 }
             }
             LOGGER
-                  .severe("Error obteniendo el directorio de perfil de usuario de Mozilla/Firefox (Windows), " + "se devolvera null");
+                  .severe("Error obteniendo el directorio de perfil de usuario de Mozilla/Firefox (Windows), " + "se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
             return null;
         }
 
         else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
             // Si es un Mac OS X, profiles.ini esta en una ruta distinta...
-            regFile = new File(Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini");
+            regFile = new File(Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini"); //$NON-NLS-1$
             try {
                 if (regFile.exists()) {
                     return NSPreferences.getFireFoxUserProfileDirectory(regFile);
@@ -736,8 +705,8 @@ public final class MozillaKeyStoreUtilities {
             }
             catch (final Exception e) {
                 LOGGER
-                      .severe("Error obteniendo el directorio de perfil de usuario de Firefox (" + regFile.getAbsolutePath()
-                              + "), se devolvera null: "
+                      .severe("Error obteniendo el directorio de perfil de usuario de Firefox (" + regFile.getAbsolutePath() //$NON-NLS-1$
+                              + "), se devolvera null: " //$NON-NLS-1$
                               + e);
                 return null;
             }
@@ -746,34 +715,22 @@ public final class MozillaKeyStoreUtilities {
 
             // No es Windows ni Mac OS X, entonces es UNIX (Linux / Solaris)
 
-            // Probamos primero con "profiles.ini" de Firefox
-            regFile = new File(Platform.getUserHome() + "/.mozilla/firefox/profiles.ini");
+            // Probamos con "profiles.ini" de Firefox
+            regFile = new File(Platform.getUserHome() + "/.mozilla/firefox/profiles.ini"); //$NON-NLS-1$
             try {
                 if (regFile.exists()) {
                     return NSPreferences.getFireFoxUserProfileDirectory(regFile);
                 }
             }
             catch (final Exception e) {
-                LOGGER.severe("Error obteniendo el directorio de perfil de usuario de Firefox, " + "se devolvera null: "
+                LOGGER.severe("Error obteniendo el directorio de perfil de usuario de Firefox, " + "se devolvera null: " //$NON-NLS-1$ //$NON-NLS-2$
                                                          + e);
                 return null;
             }
 
-            // Y luego con el registro clasico de Mozilla
-            regFile = new File(Platform.getUserHome() + "/.mozilla/appreg");
-            try {
-                if (regFile.exists()) {
-                    return NSPreferences.getNS6UserProfileDirectory(regFile);
-                }
-            }
-            catch (final Exception e) {
-                LOGGER.severe("Error obteniendo el directorio de perfil de usuario de Firefox, " + "se devolvera null: "
-                                                         + e);
-                return null;
-            }
         }
 
-        LOGGER.severe("Error obteniendo el directorio de perfil de usuario de Mozilla/Firefox (UNIX), " + "se devolvera null");
+        LOGGER.severe("Error obteniendo el directorio de perfil de usuario de Mozilla/Firefox (UNIX), " + "se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
 
         return null;
     }

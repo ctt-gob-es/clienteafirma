@@ -77,28 +77,28 @@ public final class AOKeyStoreManagerFactory {
                     exts = new String[] {
                             "pfx", "p12" //$NON-NLS-1$ //$NON-NLS-2$
                     };
-                    desc = "Almacenes PKCS#12 (*.p12, *.pfx)";
+                    desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.0"); //$NON-NLS-1$
                 }
                 if (store == AOKeyStore.JAVA) {
                     exts = new String[] {
                         "jks" //$NON-NLS-1$
                     };
-                    desc = "Java KeyStore (*.jks)";
+                    desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.1"); //$NON-NLS-1$
                 }
                 if (store == AOKeyStore.SINGLE) {
                     exts = new String[] {
                             "cer", "p7b" //$NON-NLS-1$ //$NON-NLS-2$
                     };
-                    desc = "Certificados PKCS#7 / X.509 (*.cer, *.p7b)";
+                    desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.2"); //$NON-NLS-1$
                 }
                 if (store == AOKeyStore.JCEKS) {
                     exts = new String[] {
                             "jceks", "jks" //$NON-NLS-1$ //$NON-NLS-2$
                     };
-                    desc = "Java Cryptography Extension KeyStore (*.jceks, *.jks)";
+                    desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.3"); //$NON-NLS-1$
                 }
 
-                storeFilename = AOUIFactory.getLoadFileName("Abrir repositorio " + store.getDescription(), exts, desc, parentComponent);
+                storeFilename = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + store.getDescription(), exts, desc, parentComponent); //$NON-NLS-1$ //$NON-NLS-2$
                 if (storeFilename == null) {
                     throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
                 }
@@ -123,7 +123,7 @@ public final class AOKeyStoreManagerFactory {
             }
             if (p11Lib == null) {
                 final String[] exts;
-                String extsDesc = "Bibliotecas PKCS#11";
+                String extsDesc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.6"); //$NON-NLS-1$
                 if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
                     exts = new String[] { "dll" }; //$NON-NLS-1$
                     extsDesc = extsDesc + " (*.dll)"; //$NON-NLS-1$
@@ -136,7 +136,7 @@ public final class AOKeyStoreManagerFactory {
                     exts = new String[] { "so" }; //$NON-NLS-1$
                     extsDesc = extsDesc + " (*.so)"; //$NON-NLS-1$
                 }
-                p11Lib = AOUIFactory.getLoadFileName("Seleccionar biblioteca PKCS#11", exts, extsDesc, parentComponent);
+                p11Lib = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.7"), exts, extsDesc, parentComponent); //$NON-NLS-1$
             }
             if (p11Lib == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11"); //$NON-NLS-1$

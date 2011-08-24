@@ -14,9 +14,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-/** Clase para la obtencion de los recursos textuales del UI del n&uacute;cleo del
- * cliente Afirma. */
-public final class KeyStoreMessages {
+/** Clase para la obtencion de los recursos textuales del UI. */
+final class KeyStoreMessages {
 
     private static final String BUNDLE_NAME = "keystoremessages"; //$NON-NLS-1$
 
@@ -44,7 +43,7 @@ public final class KeyStoreMessages {
      * @param key
      *        Clave del texto.
      * @return Recuerso textual. */
-    public static String getString(final String key) {
+    static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
@@ -60,7 +59,7 @@ public final class KeyStoreMessages {
      * @param text
      *        Texto que se desea insertar.
      * @return Recuerso textual con la subcadena sustituida. */
-    public static String getString(final String key, final String text) {
+    static String getString(final String key, final String text) {
         try {
             return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
@@ -77,7 +76,7 @@ public final class KeyStoreMessages {
      * @param params
      *        Par&aacute;metros que se desean insertar.
      * @return Recuerso textual con las subcadenas sustituidas. */
-    public static String getString(final String key, final String[] params) {
+    static String getString(final String key, final String[] params) {
 
         String text;
         try {

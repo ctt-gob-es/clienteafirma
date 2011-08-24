@@ -28,7 +28,9 @@ final class AOSecMod {
     /** Listado de m&oacute;dulos almacenados en el fichero "Secmod.db". */
     private static Vector<ModuleName> modules = null;
 
-    private AOSecMod() {}
+    private AOSecMod() {
+        // No permitimos la instanciacion
+    }
 
     /** <pre>
      * struct {
@@ -53,7 +55,7 @@ final class AOSecMod {
         len = getShort(secmoddb, namesRunningOffset);
         final String libName = new String(secmoddb, namesRunningOffset + 2, len);
 
-        if (libName.endsWith(".DLL") || libName.endsWith(".dll") || libName.endsWith(".so") || libName.endsWith(".dylib")) {
+        if (libName.endsWith(".DLL") || libName.endsWith(".dll") || libName.endsWith(".so") || libName.endsWith(".dylib")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
             // namesRunningOffset += len + 2;
 
@@ -66,7 +68,7 @@ final class AOSecMod {
             }
         }
 
-        throw new UnsupportedOperationException("Intento fallido: " + libName);
+        throw new UnsupportedOperationException("Intento fallido: " + libName); //$NON-NLS-1$
 
     }
 
@@ -80,26 +82,26 @@ final class AOSecMod {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
     static Vector<ModuleName> getModules(String profileDir) throws AOException {
-        if (profileDir == null || "".equals(profileDir)) {
-            throw new AOException("El directorio del perfil de Mozilla era nulo");
+        if (profileDir == null || "".equals(profileDir)) { //$NON-NLS-1$
+            throw new AOException("El directorio del perfil de Mozilla era nulo"); //$NON-NLS-1$
         }
 
         if (modules == null) {
 
-            profileDir = profileDir.replace("\\ ", " ");
-            if (!profileDir.endsWith("/")) {
-                profileDir = profileDir + "/";
+            profileDir = profileDir.replace("\\ ", " "); //$NON-NLS-1$ //$NON-NLS-2$
+            if (!profileDir.endsWith("/")) { //$NON-NLS-1$
+                profileDir = profileDir + "/"; //$NON-NLS-1$
             }
-            final File secmod = new File(profileDir + "secmod.db");
+            final File secmod = new File(profileDir + "secmod.db"); //$NON-NLS-1$
             if (!secmod.exists()) {
-                throw new AOException("El directorio del perfil de Mozilla proporcionado no contiene una base de datos de modulos (secmod.db)");
+                throw new AOException("El directorio del perfil de Mozilla proporcionado no contiene una base de datos de modulos (secmod.db)"); //$NON-NLS-1$
             }
             final byte[] secMod;
             try {
                 secMod = AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(secmod.getAbsolutePath())));
             }
             catch (final Exception e) {
-                throw new AOException("Error leyendo la base de datos de modulos (secmod.db)");
+                throw new AOException("Error leyendo la base de datos de modulos (secmod.db)"); //$NON-NLS-1$
             }
 
             // Obtenemos los modulos PKCS#11 asegurandonos de que no aparecen
@@ -132,29 +134,29 @@ final class AOSecMod {
         private final String description;
 
         ModuleName(final String l, final String d) {
-            lib = l;
-            description = d;
+            this.lib = l;
+            this.description = d;
         }
 
         /** Obtiene el nombre de la biblioteca PKCS#11 del m&oacute;dulo.
          * @return Nombre de la biblioteca (con la ruta absoluta ioncluida) del
          *         m&oacute;dulo */
         String getLib() {
-            return lib;
+            return this.lib;
         }
 
         /** Obtiene la descripci&oacute;n (nombre com&uacute;n) del
          * m&oacute;dulo.
          * @return Descripci&oacute;n del m&oacute;dulo */
         String getDescription() {
-            return description;
+            return this.description;
         }
 
         @Override
         public String toString() {
             // commonName + " (" + type + ", " + libraryName + ", slot " + slot
             // + ")";
-            return description + " (EXTERNAL, " + lib + ", slot 0)";
+            return this.description + " (EXTERNAL, " + this.lib + ", slot 0)"; //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
