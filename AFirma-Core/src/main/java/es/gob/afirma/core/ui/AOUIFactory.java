@@ -1,5 +1,6 @@
 package es.gob.afirma.core.ui;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -124,6 +125,21 @@ public class AOUIFactory {
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     public static String getLoadFileName(final String dialogTitle,final String[] extensions, final String description, final Object parentComponent) {
         return uiManager.getLoadFileName(dialogTitle, extensions, description, parentComponent);
+    }
+    
+    /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
+     * @param dialogTitle
+     *        T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param fileName
+     *        Nombre del fichero a localizar
+     * @param description
+     *        Descripci&oacute;n del tipo de fichero correspondiente con las
+     *        extensiones
+     * @param parent
+     *        Componente padre (para la modalidad)
+     * @return Fichero seleccionado por el usuario */
+    public static File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
+        return uiManager.getLoadFile(dialogTitle, fileName, description, parent);
     }
 
 }

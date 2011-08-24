@@ -296,10 +296,6 @@ public final class JSEUIManager implements AOUIManager {
             return false;
         }
 
-        // public String[] getExtensions() {
-        // return extensions;
-        // }
-
         @Override
         public String getDescription() {
             return this.description;
@@ -321,5 +317,47 @@ public final class JSEUIManager implements AOUIManager {
 
     }
 
+    /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
+     * @param dialogTitle
+     *        T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param fileName
+     *        Nombre del fichero a localizar
+     * @param description
+     *        Descripci&oacute;n del tipo de fichero correspondiente con las
+     *        extensiones
+     * @param parentComponent
+     *        Componente padre (para la modalidad, debe ser de tipo <code>java.awt.Component</code>)
+     * @return Fichero seleccionado por el usuario */
+    public File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
+        
+        Component parentComponent = null;
+        if (parent instanceof Component) {
+            parentComponent = (Component) parent;
+        }
+        
+        final JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle(dialogTitle);
+        fc.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(final File f) {
+                if (f == null) {
+                    return false;
+                }
+                if (f.getName().equalsIgnoreCase(fileName)) {
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+                return description;
+            }
+        });
+        if (fc.showOpenDialog(parentComponent) != JFileChooser.APPROVE_OPTION) {
+            return null;
+        }
+        return fc.getSelectedFile();
+    }
 
 }

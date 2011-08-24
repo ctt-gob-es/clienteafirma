@@ -10,6 +10,8 @@
 
 package es.gob.afirma.core.ui;
 
+import java.io.File;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 
 /** Gestor de componentes de interfaz gr&aacute;fico
@@ -140,6 +142,18 @@ public interface AOUIManager {
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     String getLoadFileName(String dialogTitle, String[] extensions, String description, Object parentComponent);
-
+    
+    /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
+     * @param dialogTitle
+     *        T&iacute;tulo de la ventana de di&aacute;logo.
+     * @param fileName
+     *        Nombre del fichero a localizar
+     * @param description
+     *        Descripci&oacute;n del tipo de fichero correspondiente con las
+     *        extensiones
+     * @param parentComponent
+     *        Componente padre (para la modalidad)
+     * @return Nombre de fichero (con ruta) seleccionado por el usuario */
+    File getLoadFile(String dialogTitle, String fileName, String description, Object parentComponent);
 
 }
