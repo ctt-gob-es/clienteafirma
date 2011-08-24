@@ -20,11 +20,11 @@ final class SingleCertKeyStoreProvider extends Provider {
     private static final long serialVersionUID = 3525417804439532445L;
 
     protected SingleCertKeyStoreProvider() {
-        super("PKCS7", 0.1d, "KeyStore for a PKCS7 or X.509 certificate");
+        super("PKCS7", 0.1d, "KeyStore for a PKCS7 or X.509 certificate"); //$NON-NLS-1$ //$NON-NLS-2$
 
         AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
             public Object run() {
-                put("KeyStore.PKCS7", "es.gob.afirma.keystores.single.SingleCertKeyStore");
+                put("KeyStore.PKCS7", "es.gob.afirma.keystores.single.SingleCertKeyStore"); //$NON-NLS-1$ //$NON-NLS-2$
                 return null;
             }
         });
