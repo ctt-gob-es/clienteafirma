@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 /** Clase para la obtencion de los recursos textuales del UI del n&uacute;cleo del
  * cliente Afirma. */
-public final class JSEUIMessages {
+final class JSEUIMessages {
 
     private static final String BUNDLE_NAME = "uimessages"; //$NON-NLS-1$
 
@@ -44,7 +44,7 @@ public final class JSEUIMessages {
      * @param key
      *        Clave del texto.
      * @return Recuerso textual. */
-    public static String getString(final String key) {
+    static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
@@ -60,7 +60,7 @@ public final class JSEUIMessages {
      * @param text
      *        Texto que se desea insertar.
      * @return Recuerso textual con la subcadena sustituida. */
-    public static String getString(final String key, final String text) {
+    static String getString(final String key, final String text) {
         try {
             return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
@@ -77,7 +77,7 @@ public final class JSEUIMessages {
      * @param params
      *        Par&aacute;metros que se desean insertar.
      * @return Recuerso textual con las subcadenas sustituidas. */
-    public static String getString(final String key, final String[] params) {
+    static String getString(final String key, final String[] params) {
 
         String text;
         try {
