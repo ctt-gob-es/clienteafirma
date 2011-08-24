@@ -43,14 +43,14 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     final static class KeyEntry {
         // private Key privateKey;
-        private final X509Certificate certChain[];
+        final X509Certificate certChain[];
         private String alias;
 
-        KeyEntry(final Key key, final X509Certificate[] chain) {
-            this(null, key, chain);
+        KeyEntry(final X509Certificate[] chain) {
+            this((String)null, chain);
         }
 
-        KeyEntry(final String alias, final Key key, final X509Certificate[] chain) {
+        KeyEntry(final String alias, final X509Certificate[] chain) {
 
             // this.privateKey = key;
             this.certChain = chain.clone();
@@ -67,16 +67,16 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
 
         /** Gets the alias for the keystore entry. */
-        private String getAlias() {
-            return alias;
+        String getAlias() {
+            return this.alias;
         }
 
         /** Gets the certificate chain for the keystore entry. */
-        private X509Certificate[] getCertificateChain() {
-            return certChain;
+        X509Certificate[] getCertificateChain() {
+            return this.certChain;
         }
 
-    };
+    }
 
     /* The keystore entries. */
     private final Collection<KeyEntry> entries = new ArrayList<KeyEntry>();
@@ -91,17 +91,17 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     KeyStoreAddressBook(final String storeName) {
 
-        nativeWrapper = new KeyStore.MY();
+        this.nativeWrapper = new KeyStore.MY();
 
         try {
-            nativeWrapper.getClass();
-            for (final java.lang.reflect.Method m : nativeWrapper.getClass().getDeclaredMethods()) {
+            this.nativeWrapper.getClass();
+            for (final java.lang.reflect.Method m : this.nativeWrapper.getClass().getDeclaredMethods()) {
                 m.setAccessible(true);
             }
-            for (final java.lang.reflect.Method m : nativeWrapper.getClass().getSuperclass().getDeclaredMethods()) {
+            for (final java.lang.reflect.Method m : this.nativeWrapper.getClass().getSuperclass().getDeclaredMethods()) {
                 m.setAccessible(true);
                 if (m.getName().equals("loadKeysOrCertificateChains")) { //$NON-NLS-1$
-                    loadKeysOrCertificateChains = m;
+                    this.loadKeysOrCertificateChains = m;
                 }
             }
         }
@@ -147,7 +147,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
             return null;
         }
 
-        for (final KeyEntry entry : entries) {
+        for (final KeyEntry entry : this.entries) {
             if (alias.equals(entry.getAlias())) {
                 final X509Certificate[] certChain = entry.getCertificateChain();
                 return certChain.clone();
@@ -173,7 +173,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
         java.lang.reflect.Method getAlias = null;
         java.lang.reflect.Method getCertificateChain = null;
-        for (final Object o : entries) {
+        for (final Object o : this.entries) {
             for (final java.lang.reflect.Method m : o.getClass().getDeclaredMethods()) {
                 if (m.getName().equals("getAlias")) { //$NON-NLS-1$
                     m.setAccessible(true);
@@ -192,7 +192,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
                             }
                         }
                     }
-                    catch (final Exception e) {}
+                    catch (final Exception e) {
+                        Logger.getLogger("es.gob.afirma").warning("Error obteniendo el certificado para el alias '" + alias + "', se devolvera null: " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    }
                 }
             }
         }
@@ -296,7 +298,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     @Override
     public final Enumeration<String> engineAliases() {
 
-        final Iterator<KeyEntry> iter = entries.iterator();
+        final Iterator<KeyEntry> iter = this.entries.iterator();
 
         return new Enumeration<String>() {
             public boolean hasMoreElements() {
@@ -341,7 +343,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      * @return the number of entries in this keystore */
     @Override
     public final int engineSize() {
-        return entries.size();
+        return this.entries.size();
     }
 
     /** Returns true if the entry identified by the given alias is a <i>key
@@ -374,7 +376,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *         null if no such entry exists in this keystore. */
     @Override
     public final String engineGetCertificateAlias(final Certificate cert) {
-        for (final KeyEntry entry : entries) {
+        for (final KeyEntry entry : this.entries) {
             if (entry.certChain != null && entry.certChain[0].equals(cert)) {
                 return entry.getAlias();
             }
@@ -384,11 +386,6 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     /** engineStore is currently a no-op. Entries are stored during
      * engineSetEntry.
-     * A compatibility mode is supported for applications that assume keystores
-     * are stream-based. It permits (but ignores) a non-null <code>stream</code> or <code>password</code>. The mode is enabled by default. Set the
-     * <code>sun.security.mscapi.keyStoreCompatibilityMode</code> system
-     * property to <code>false</code> to disable compatibility mode and reject a
-     * non-null <code>stream</code> or <code>password</code>.
      * @param stream
      *        the output stream, which should be <code>null</code>
      * @param password
@@ -397,7 +394,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *            if compatibility mode is disabled and either parameter is
      *            non-null. */
     @Override
-    public final void engineStore(final OutputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {}
+    public final void engineStore(final OutputStream stream, final char[] password) throws IOException, NoSuchAlgorithmException, CertificateException {
+        // No es necesario hacer nada, se almacena en engineSetEntry()
+    }
 
     /** Loads the keystore.
      * A compatibility mode is supported for applications that assume keystores
@@ -435,11 +434,11 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
 
         // Clear all key entries
-        entries.clear();
+        this.entries.clear();
 
         try {
             // Load keys and/or certificate chains
-            loadKeysOrCertificateChains(getName(), entries);
+            loadKeysOrCertificateChains(getName(), this.entries);
         }
         catch (final KeyStoreException kse) {
             // Wrap the JNI exception in an IOException
@@ -449,7 +448,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     /** Returns the name of the keystore. */
     private String getName() {
-        return storeName;
+        return this.storeName;
     }
 
     /** Load keys and/or certificates from keystore into Collection.
@@ -459,7 +458,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
      *        Collection of key/certificate. */
     private void loadKeysOrCertificateChains(final String name, final Collection<KeyEntry> ntries) throws KeyStoreException {
         try {
-            loadKeysOrCertificateChains.invoke(nativeWrapper, name, ntries);
+            this.loadKeysOrCertificateChains.invoke(this.nativeWrapper, name, ntries);
         }
         catch (final Exception e) {
             throw new KeyStoreException(e);
