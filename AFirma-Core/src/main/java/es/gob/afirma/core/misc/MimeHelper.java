@@ -57,8 +57,6 @@ public final class MimeHelper {
         this.data = data.clone();
         this.mimeInfo = new MimeInfo();
 
-        
-
         try {
             Method getMagicMatchMethod = Class.forName("net.sf.jmimemagic.Magic")
                 .getMethod("getMagicMatch", new Class[] { byte[].class });
@@ -165,12 +163,14 @@ public final class MimeHelper {
             }
 
             // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
-            // realidad
-            // alguno de los ficheros ofimaticos soportados (que son ZIP con una
-            // estructura concreta)
-            // Comprobaciones especiales para los ficheros ZIP
+            // realidad alguno de los ficheros ofimaticos soportados (que son ZIP
+            // con una estructura concreta)
             if (this.mimeType != null && this.mimeType.equals("application/zip")) { //$NON-NLS-1$
                 this.mimeType = OfficeXMLAnalizer.getMimeType(this.data);
+            }
+            
+            if (this.mimeType == null) {
+                this.mimeType = MimeHelper.DEFAULT_MIMETYPE;
             }
         }
 
@@ -218,9 +218,15 @@ public final class MimeHelper {
         return null;
     }
 
+    /**
+     * Almacena la informaci&oacute;n identificada del tipo de datos.
+     */
     private class MimeInfo {
+        /** MimeType de los datos. */
         String mimeType = null;
+        /** Extensi&oacute;n com&uacute;n para el tipo de fichero. */
         String extension = null;
+        /** Descripci&oacute;n del tipo de datos. */
         String description = null;
     }
     
@@ -346,3 +352,4 @@ public final class MimeHelper {
     // *** FIN SOPORTE DE ADJUNTOS MIME ***************************
     // ************************************************************
 }
+ 
