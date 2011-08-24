@@ -202,9 +202,12 @@ public interface AOSigner {
      * <ul>
      * <li>Formato de firma: Formato general de la firma (p.e. CAdES, XAdES,...)</li>
      * <li>Variante: Variante del formato de firma (p.e. Enveloped, Detached,...)</li>
-     * <li>URL de firma: URL desde donde descargar el fichero de firma</li>
-     * <li>URL de datos: URL desde donde descargar el fichero de datos</li>
-     * <li>Codigo de verificacion: Codigo en base64 con la informacion de la firma</li>
+     * <li>URL de firma: URL desde donde descargar el fichero de firma.  Esta
+     * informaci&oacute;n puede haberse insertado en alg&uacute;n campo no estandarizado.</li>
+     * <li>URL de datos: URL desde donde descargar el fichero de datos. Esta
+     * informaci&oacute;n puede haberse insertado en alg&uacute;n campo no estandarizado.</li>
+     * <li>C&oacute;digo de verificaci&oacute;n: C&oacute;digo en base64 para la
+     * verificaci&oacute;n de la firma.</li>
      * </ul>
      * Todos los campos, salvo el "Formato de firma" son opcionales.<br/>
      * <br/>
