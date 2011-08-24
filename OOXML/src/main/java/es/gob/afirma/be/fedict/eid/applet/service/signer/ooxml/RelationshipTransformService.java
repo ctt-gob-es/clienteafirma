@@ -87,13 +87,16 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
  * Specs: http://openiso.org/Ecma/376/Part2/12.2.4#26
  * </p>
  * @author Frank Cornelis */
+@SuppressWarnings("restriction")
 public class RelationshipTransformService extends TransformService {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform";
+    static final String TRANSFORM_URI = "http://schemas.openxmlformats.org/package/2006/RelationshipTransform"; //$NON-NLS-1$
 
     private final List<String> sourceIds;
 
-    public RelationshipTransformService() {
+    private RelationshipTransformService() {
         super();
         this.sourceIds = new LinkedList<String>();
     }
@@ -120,19 +123,19 @@ public class RelationshipTransformService extends TransformService {
         catch (final TransformerException e) {
             throw new InvalidAlgorithmParameterException();
         }
-        final Element nsElement = parentNode.getOwnerDocument().createElement("ns");
-        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS);
-        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature");
+        final Element nsElement = parentNode.getOwnerDocument().createElement("ns"); //$NON-NLS-1$
+        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS); //$NON-NLS-1$
+        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature"); //$NON-NLS-1$ //$NON-NLS-2$
         NodeList nodeList;
         try {
-            nodeList = XPathAPI.selectNodeList(parentNode, "mdssi:RelationshipReference/@SourceId", nsElement);
+            nodeList = XPathAPI.selectNodeList(parentNode, "mdssi:RelationshipReference/@SourceId", nsElement); //$NON-NLS-1$
         }
         catch (final TransformerException e) {
-            Logger.getLogger("es.gob.afirma").severe("transformer exception: " + e.getMessage());
+            LOGGER.severe("transformer exception: " + e.getMessage()); //$NON-NLS-1$
             throw new InvalidAlgorithmParameterException();
         }
         if (0 == nodeList.getLength()) {
-            Logger.getLogger("es.gob.afirma").warning("no RelationshipReference/@SourceId parameters present");
+            LOGGER.warning("no RelationshipReference/@SourceId parameters present"); //$NON-NLS-1$
         }
         for (int nodeIdx = 0; nodeIdx < nodeList.getLength(); nodeIdx++) {
             final Node node = nodeList.item(nodeIdx);
@@ -146,12 +149,12 @@ public class RelationshipTransformService extends TransformService {
         final DOMStructure domParent = (DOMStructure) parent;
         final Node parentNode = domParent.getNode();
         final Element parentElement = (Element) parentNode;
-        parentElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature");
+        parentElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:mdssi", "http://schemas.openxmlformats.org/package/2006/digital-signature"); //$NON-NLS-1$ //$NON-NLS-2$
         final Document document = parentNode.getOwnerDocument();
         for (final String sourceId : this.sourceIds) {
             final Element relationshipReferenceElement =
-                    document.createElementNS("http://schemas.openxmlformats.org/package/2006/digital-signature", "mdssi:RelationshipReference");
-            relationshipReferenceElement.setAttribute("SourceId", sourceId);
+                    document.createElementNS("http://schemas.openxmlformats.org/package/2006/digital-signature", "mdssi:RelationshipReference"); //$NON-NLS-1$ //$NON-NLS-2$
+            relationshipReferenceElement.setAttribute("SourceId", sourceId); //$NON-NLS-1$
             parentElement.appendChild(relationshipReferenceElement);
         }
     }
@@ -180,8 +183,8 @@ public class RelationshipTransformService extends TransformService {
         catch (final TransformerException e) {
             throw new TransformException(e.getMessage(), e);
         }
-        final Element nsElement = relationshipsDocument.createElement("ns");
-        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/relationships");
+        final Element nsElement = relationshipsDocument.createElement("ns"); //$NON-NLS-1$
+        nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:tns", "http://schemas.openxmlformats.org/package/2006/relationships");  //$NON-NLS-1$//$NON-NLS-2$
         final Element relationshipsElement = relationshipsDocument.getDocumentElement();
         final NodeList childNodes = relationshipsElement.getChildNodes();
         for (int nodeIdx = 0; nodeIdx < childNodes.getLength(); nodeIdx++) {
@@ -193,7 +196,7 @@ public class RelationshipTransformService extends TransformService {
                 continue;
             }
             final Element childElement = (Element) childNode;
-            final String idAttribute = childElement.getAttribute("Id");
+            final String idAttribute = childElement.getAttribute("Id"); //$NON-NLS-1$
             if (false == this.sourceIds.contains(idAttribute)) {
                 relationshipsElement.removeChild(childNode);
                 nodeIdx--;
@@ -202,8 +205,8 @@ public class RelationshipTransformService extends TransformService {
              * See: ISO/IEC 29500-2:2008(E) - 13.2.4.24 Relationships Transform
              * Algorithm.
              */
-            if (null == childElement.getAttributeNode("TargetMode")) {
-                childElement.setAttribute("TargetMode", "Internal");
+            if (null == childElement.getAttributeNode("TargetMode")) { //$NON-NLS-1$
+                childElement.setAttribute("TargetMode", "Internal"); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
 
@@ -218,7 +221,7 @@ public class RelationshipTransformService extends TransformService {
 
     private void sortRelationshipElements(final Element relationshipsElement) {
         final List<Element> relationshipElements = new LinkedList<Element>();
-        final NodeList relationshipNodes = relationshipsElement.getElementsByTagName("*");
+        final NodeList relationshipNodes = relationshipsElement.getElementsByTagName("*"); //$NON-NLS-1$
         final int nodeCount = relationshipNodes.getLength();
         for (int nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
             final Node relationshipNode = relationshipNodes.item(0);
@@ -246,7 +249,7 @@ public class RelationshipTransformService extends TransformService {
          * We have to omit the ?xml declaration if we want to embed the
          * document.
          */
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
         transformer.transform(source, result);
         return stringWriter.getBuffer().toString();
     }
@@ -257,7 +260,7 @@ public class RelationshipTransformService extends TransformService {
         final Result result = new StreamResult(outputStream);
         final TransformerFactory transformerFactory = TransformerFactory.newInstance();
         final Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
         transformer.transform(source, result);
         // System.out.println("result: " + new
         // String(outputStream.toByteArray()));

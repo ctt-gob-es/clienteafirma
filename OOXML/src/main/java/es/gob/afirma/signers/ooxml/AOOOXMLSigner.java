@@ -37,12 +37,15 @@ import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.beans.AOSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.core.util.tree.TreeNode;
+import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner;
 
 /** Firmas OOXML basadas en una versi&oacute;n fuertemente modificada de las
  * clases <code>es.gob.afirma.be.fedict.eid.applet.service</code>. */
+@SuppressWarnings("restriction")
 public final class AOOOXMLSigner implements AOSigner {
+    
+    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     // En Java 5 es necesario disponer del proveedor XMLDSigRI para generar
     // firmas XMLdSig
@@ -54,8 +57,7 @@ public final class AOOOXMLSigner implements AOSigner {
                         Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
                     }
                     catch (final Exception e) {
-                        Logger.getLogger("es.gob.afirma")
-                              .warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e);
+                        LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
                     }
                 }
                 return null;
@@ -67,7 +69,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
         // Si no es una firma OOXML valida, lanzamos una excepcion
         if (!isSign(sign)) {
-            throw new AOInvalidFormatException("El documento introducido no contiene una firma valida");
+            throw new AOInvalidFormatException("El documento introducido no contiene una firma valida"); //$NON-NLS-1$
         }
 
         // TODO: Por ahora, devolveremos el propio OOXML firmado.
@@ -90,36 +92,36 @@ public final class AOOOXMLSigner implements AOSigner {
             return false;
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al cargar el fichero OOXML: " + e);
+            LOGGER.severe("Error al cargar el fichero OOXML: " + e); //$NON-NLS-1$
             return false;
         }
 
         // Comprobamos si estan todos los ficheros principales del documento
-        return zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null)
-               && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null)
-               && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null);
+        return zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
+               && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
 
         if (sign == null) {
-            throw new IllegalArgumentException("Los datos de firma introducidos son nulos");
+            throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
         }
 
         final InputStream contentTypesXml;
         final ZipEntry zipEntry;
         try {
             final ZipFile zipFile = AOFileUtils.createTempZipFile(sign);
-            zipEntry = zipFile.getEntry("[Content_Types].xml");
+            zipEntry = zipFile.getEntry("[Content_Types].xml"); //$NON-NLS-1$
             contentTypesXml = zipFile.getInputStream(zipEntry);
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al analizar el fichero de firma: " + e);
+            LOGGER.severe("Error al analizar el fichero de firma: " + e); //$NON-NLS-1$
             return null;
         }
 
         if (zipEntry == null || contentTypesXml == null || isOOXMLFile(sign)) {
-            throw new AOUnsupportedSignFormatException("La firma introducida no es un documento OOXML");
+            throw new AOUnsupportedSignFormatException("La firma introducida no es un documento OOXML"); //$NON-NLS-1$
         }
 
         return OfficeXMLAnalizer.getOOXMLMimeType(contentTypesXml);
@@ -127,11 +129,11 @@ public final class AOOOXMLSigner implements AOSigner {
 
     public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
         if (sign == null) {
-            throw new IllegalArgumentException("No se han introducido datos para analizar");
+            throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
         if (!isSign(sign)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con documento OOXML");
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con documento OOXML"); //$NON-NLS-1$
         }
 
         // Aqui vendria el analisis de la firma buscando alguno de los otros
@@ -142,36 +144,36 @@ public final class AOOOXMLSigner implements AOSigner {
     }
 
     public String getSignedName(final String originalName, final String inText) {
-        final String inTextInt = (inText != null ? inText : "");
+        final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
         if (originalName == null) {
-            return inTextInt + ".ooxml";
+            return inTextInt + ".ooxml"; //$NON-NLS-1$
         }
         final String originalNameLC = originalName.toLowerCase();
         if (originalNameLC.length() <= 4) {
-            return originalName + inTextInt + ".ooxml";
+            return originalName + inTextInt + ".ooxml"; //$NON-NLS-1$
         }
-        if (originalNameLC.endsWith(".docx")) {
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".docx";
+        if (originalNameLC.endsWith(".docx")) { //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".docx"; //$NON-NLS-1$
         }
-        if (originalNameLC.endsWith(".xlsx")) {
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".xlsx";
+        if (originalNameLC.endsWith(".xlsx")) { //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".xlsx"; //$NON-NLS-1$
         }
-        if (originalNameLC.endsWith(".pptx")) {
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".pptx";
+        if (originalNameLC.endsWith(".pptx")) { //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".pptx"; //$NON-NLS-1$
         }
-        if (originalNameLC.endsWith(".ppsx")) {
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".ppsx";
+        if (originalNameLC.endsWith(".ppsx")) { //$NON-NLS-1$
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".ppsx"; //$NON-NLS-1$
         }
-        return originalName + inTextInt + ".ooxml";
+        return originalName + inTextInt + ".ooxml"; //$NON-NLS-1$
     }
 
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
         if (sign == null) {
-            throw new IllegalArgumentException("Los datos de firma introducidos son nulos");
+            throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
         }
 
         if (!isSign(sign)) {
-            Logger.getLogger("es.gob.afirma").severe("La firma indicada no es de tipo OOXML");
+            LOGGER.severe("La firma indicada no es de tipo OOXML"); //$NON-NLS-1$
             return null;
         }
 
@@ -181,7 +183,7 @@ public final class AOOOXMLSigner implements AOSigner {
         final AOSigner xmldsigSigner = new AOXMLDSigSigner();
 
         // Recuperamos las firmas individuales del documento y creamos el arbol
-        final TreeNode tree = new TreeNode("Datos");
+        final AOTreeNode tree = new AOTreeNode("Datos"); //$NON-NLS-1$
         try {
             for (final byte[] elementSign : OOXMLUtil.getOOXMLSignatures(sign)) {
 
@@ -192,11 +194,11 @@ public final class AOOOXMLSigner implements AOSigner {
                 // el ejemplo representativo de los datos firmados y no de la
                 // propia firma.
                 final AOTreeModel signTree = xmldsigSigner.getSignersStructure(elementSign, asSimpleSignInfo);
-                tree.add(((TreeNode) signTree.getRoot()).getChildAt(0));
+                tree.add(((AOTreeNode) signTree.getRoot()).getChildAt(0));
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("La estructura de una de las firmas elementales no es valida: " + e);
+            LOGGER.severe("La estructura de una de las firmas elementales no es valida: " + e); //$NON-NLS-1$
             return null;
         }
 
@@ -205,7 +207,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
     public boolean isSign(final byte[] sign) {
         if (sign == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se ha introducido una firma nula para su comprobacion");
+            LOGGER.warning("Se ha introducido una firma nula para su comprobacion"); //$NON-NLS-1$
             return false;
         }
         return isOOXMLFile(sign);
@@ -213,13 +215,15 @@ public final class AOOOXMLSigner implements AOSigner {
 
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se han introducido datos nulos para su comprobacion");
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
         return isOOXMLFile(data);
     }
 
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {}
+    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
+        // No soportado, se ignora la llamada
+    }
 
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
         return addNewSign(data, algorithm, keyEntry, extraParams);
@@ -241,7 +245,7 @@ public final class AOOOXMLSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
                               final Properties extraParams) throws AOException {
-        throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros OOXML");
+        throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros OOXML"); //$NON-NLS-1$
     }
 
     /** Agrega una nueva firma a un documento OOXML.
@@ -274,46 +278,45 @@ public final class AOOOXMLSigner implements AOSigner {
         // Cogemos el algoritmo de digest
         String digestAlgo;
         if (algorithm == null) {
-            digestAlgo = "SHA1";
+            digestAlgo = "SHA1"; //$NON-NLS-1$
         }
-        else if (algorithm.startsWith("SHA-1") || algorithm.startsWith("SHA1") || algorithm.startsWith("SHAwith")) {
-            digestAlgo = "SHA1";
+        else if (algorithm.startsWith("SHA-1") || algorithm.startsWith("SHA1") || algorithm.startsWith("SHAwith")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            digestAlgo = "SHA1"; //$NON-NLS-1$
         }
-        else if (algorithm.startsWith("SHA-512") || algorithm.startsWith("SHA512")) {
-            digestAlgo = "SHA512";
+        else if (algorithm.startsWith("SHA-512") || algorithm.startsWith("SHA512")) { //$NON-NLS-1$ //$NON-NLS-2$
+            digestAlgo = "SHA512"; //$NON-NLS-1$
         }
-        else if (algorithm.startsWith("SHA-384") || algorithm.startsWith("SHA384")) {
-            digestAlgo = "SHA384";
+        else if (algorithm.startsWith("SHA-384") || algorithm.startsWith("SHA384")) { //$NON-NLS-1$ //$NON-NLS-2$
+            digestAlgo = "SHA384"; //$NON-NLS-1$
         }
-        else if (algorithm.startsWith("SHA-256") || algorithm.startsWith("SHA256")) {
-            digestAlgo = "SHA256";
+        else if (algorithm.startsWith("SHA-256") || algorithm.startsWith("SHA256")) { //$NON-NLS-1$ //$NON-NLS-2$
+            digestAlgo = "SHA256"; //$NON-NLS-1$
         }
-        else if (algorithm.startsWith("RIPEND-160") || algorithm.startsWith("RIPEND160")) {
-            digestAlgo = "RIPEND160";
+        else if (algorithm.startsWith("RIPEND-160") || algorithm.startsWith("RIPEND160")) { //$NON-NLS-1$ //$NON-NLS-2$
+            digestAlgo = "RIPEND160"; //$NON-NLS-1$
         }
         else {
-            Logger.getLogger("es.gob.afirma").warning("El algoritmo de firma '" + algorithm
-                                                      + "' no esta soportado en OOXML, se utilizara SHA1 con RSA");
-            digestAlgo = "SHA1";
+            LOGGER.warning("El algoritmo de firma '" + algorithm //$NON-NLS-1$
+                                                      + "' no esta soportado en OOXML, se utilizara SHA1 con RSA"); //$NON-NLS-1$
+            digestAlgo = "SHA1"; //$NON-NLS-1$
         }
 
         /*
          * Si se solicito una firma explicita, advertimos no son compatibles con
          * OOXML y se ignorara esta configuracion
          */
-        if (extraParams != null && extraParams.containsKey("mode") && extraParams.getProperty("mode").equals(AOSignConstants.SIGN_MODE_EXPLICIT)) {
-            Logger.getLogger("es.gob.afirma")
-                  .warning("El formato de firma OOXML no soporta el modo de firma explicita, " + "se ignorara esta configuracion");
+        if (extraParams != null && extraParams.containsKey("mode") && extraParams.getProperty("mode").equals(AOSignConstants.SIGN_MODE_EXPLICIT)) { //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warning("El formato de firma OOXML no soporta el modo de firma explicita, " + "se ignorara esta configuracion"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Comprobamos si es un documento OOXML valido.
         if (!OfficeXMLAnalizer.isOOXMLDocument(ooxmlDocument)) {
-            throw new AOFormatFileException("El fichero introducido no es un documento OOXML");
+            throw new AOFormatFileException("El fichero introducido no es un documento OOXML"); //$NON-NLS-1$
         }
 
         // Pasamos la cadena de certificacion a un vector
         if (keyEntry == null) {
-            throw new AOException("No se ha proporcionado una clave valida");
+            throw new AOException("No se ha proporcionado una clave valida"); //$NON-NLS-1$
         }
 
         X509Certificate[] xCerts = new X509Certificate[0];
@@ -343,7 +346,7 @@ public final class AOOOXMLSigner implements AOSigner {
                                                                      signNum);
         }
         catch (final Exception e) {
-            throw new AOException("Error durante la firma OOXML", e);
+            throw new AOException("Error durante la firma OOXML", e); //$NON-NLS-1$
         }
     }
 }

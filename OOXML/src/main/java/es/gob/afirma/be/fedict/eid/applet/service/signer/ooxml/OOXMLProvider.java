@@ -46,12 +46,12 @@ public final class OOXMLProvider extends Provider {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String NAME = "OOXMLProvider";
+    private static final String NAME = "OOXMLProvider"; //$NON-NLS-1$
 
     private OOXMLProvider() {
-        super(NAME, 1.0, "OOXML Security Provider");
-        put("TransformService." + RelationshipTransformService.TRANSFORM_URI, RelationshipTransformService.class.getName());
-        put("TransformService." + RelationshipTransformService.TRANSFORM_URI + " MechanismType", "DOM");
+        super(NAME, 1.0, "OOXML Security Provider"); //$NON-NLS-1$
+        put("TransformService." + RelationshipTransformService.TRANSFORM_URI, RelationshipTransformService.class.getName()); //$NON-NLS-1$
+        put("TransformService." + RelationshipTransformService.TRANSFORM_URI + " MechanismType", "DOM"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
     /** Installs this security provider. */

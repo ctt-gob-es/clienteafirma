@@ -54,6 +54,7 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 
 /** JSR105 URI dereferencer for Office Open XML documents.
  * @author Frank Cornelis */
+@SuppressWarnings("restriction")
 class OOXMLURIDereferencer implements URIDereferencer {
 
     private final byte[] ooxml;
@@ -62,7 +63,7 @@ class OOXMLURIDereferencer implements URIDereferencer {
 
     OOXMLURIDereferencer(final byte[] ooxml) {
         if (null == ooxml) {
-            throw new IllegalArgumentException("ooxml is null");
+            throw new IllegalArgumentException("El OOXML es nulo"); //$NON-NLS-1$
         }
         this.baseUriDereferencer = XMLSignatureFactory.getInstance().getURIDereferencer();
         this.ooxml = ooxml.clone();
@@ -71,18 +72,18 @@ class OOXMLURIDereferencer implements URIDereferencer {
     public Data dereference(final URIReference uriReference, final XMLCryptoContext context) throws URIReferenceException {
 
         if (null == uriReference) {
-            throw new IllegalArgumentException("URIReference cannot be null");
+            throw new IllegalArgumentException("La URIReference no puede ser nula"); //$NON-NLS-1$
         }
         if (null == context) {
-            throw new IllegalArgumentException("XMLCrytoContext cannot be null");
+            throw new IllegalArgumentException("El XMLCrytoContext no puede ser nulo"); //$NON-NLS-1$
         }
 
         String uri = uriReference.getURI();
         try {
-            uri = URLDecoder.decode(uri, "UTF-8");
+            uri = URLDecoder.decode(uri, "UTF-8"); //$NON-NLS-1$
         }
         catch (final UnsupportedEncodingException e) {
-            Logger.getLogger("es.gob.afirma").warning("could not URL decode the uri: " + uri);
+            Logger.getLogger("es.gob.afirma").warning("No se puede decodificar la URI '" + uri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
         try {
@@ -93,20 +94,20 @@ class OOXMLURIDereferencer implements URIDereferencer {
             return new OctetStreamData(dataInputStream, uri, null);
         }
         catch (final IOException e) {
-            throw new URIReferenceException("I/O error: " + e.getMessage(), e);
+            throw new URIReferenceException("Error de I/O: " + e.getMessage(), e); //$NON-NLS-1$
         }
     }
 
     private InputStream findDataInputStream(final String uri) throws IOException {
         String entryName;
-        if (uri.startsWith("/")) {
+        if (uri.startsWith("/")) { //$NON-NLS-1$
             entryName = uri.substring(1); // remove '/'
         }
         else {
             entryName = uri.toString();
         }
-        if (-1 != entryName.indexOf("?")) {
-            entryName = entryName.substring(0, entryName.indexOf("?"));
+        if (-1 != entryName.indexOf("?")) { //$NON-NLS-1$
+            entryName = entryName.substring(0, entryName.indexOf("?")); //$NON-NLS-1$
         }
 
         final ZipInputStream ooxmlZipInputStream = new ZipInputStream(new ByteArrayInputStream(this.ooxml));

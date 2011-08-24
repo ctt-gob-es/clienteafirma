@@ -44,8 +44,8 @@ import org.w3c.dom.Element;
 class RelationshipComparator implements Comparator<Element> {
 
     public int compare(final Element element1, final Element element2) {
-        final String id1 = element1.getAttribute("Id");
-        final String id2 = element2.getAttribute("Id");
+        final String id1 = element1.getAttribute("Id"); //$NON-NLS-1$
+        final String id2 = element2.getAttribute("Id"); //$NON-NLS-1$
         return id1.compareTo(id2);
     }
 }

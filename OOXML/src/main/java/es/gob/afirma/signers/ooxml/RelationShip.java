@@ -53,6 +53,6 @@ final class RelationShip {
 
     @Override
     public String toString() {
-        return "<Relationship Id=\"" + this.id + "\" Type=\"" + this.type + "\" Target=\"" + this.target + "\"/>";
+        return "<Relationship Id=\"" + this.id + "\" Type=\"" + this.type + "\" Target=\"" + this.target + "\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     }
 }

@@ -29,7 +29,7 @@ import es.gob.afirma.core.AOException;
 final class RelationshipsParser {
 
     /** Esquema del XML Relationships. */
-    private static final String RELATIONSHIPS_SCHEMA = "http://schemas.openxmlformats.org/package/2006/relationships";
+    private static final String RELATIONSHIPS_SCHEMA = "http://schemas.openxmlformats.org/package/2006/relationships"; //$NON-NLS-1$
 
     /** Listado de relaciones obtenido. */
     private RelationShip[] relations = null;
@@ -64,16 +64,16 @@ final class RelationshipsParser {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlRelationships);
         }
         catch (final Exception e) {
-            throw new AOException("El flujo de datos proporcionado no era un XML valido");
+            throw new AOException("El flujo de datos proporcionado no era un XML valido"); //$NON-NLS-1$
         }
 
         // Obtenemos la raiz
         final Element root = doc.getDocumentElement();
 
         // Si no se ajusta a la estructura de las Relationships, devolvemos null
-        if (!root.getNodeName().equals("Relationships") || root.getAttributeNode("xmlns") == null
-            || !root.getAttribute("xmlns").equals(RELATIONSHIPS_SCHEMA)) {
-            throw new AOException("El nodo principal no es una etiqueta Relationships");
+        if (!root.getNodeName().equals("Relationships") || root.getAttributeNode("xmlns") == null //$NON-NLS-1$ //$NON-NLS-2$
+            || !root.getAttribute("xmlns").equals(RELATIONSHIPS_SCHEMA)) { //$NON-NLS-1$
+            throw new AOException("El nodo principal no es una etiqueta Relationships"); //$NON-NLS-1$
         }
 
         final NodeList relationsList = root.getChildNodes();
@@ -99,21 +99,21 @@ final class RelationshipsParser {
     private RelationShip getRelationship(final Node node) throws AOException {
 
         // Comprobamos que sea un nodo de relacion
-        if (!node.getNodeName().equals("Relationship")) {
-            throw new AOException("Se ha encontrado un nodo que es de relacion: " + node.getNodeName());
+        if (!node.getNodeName().equals("Relationship")) { //$NON-NLS-1$
+            throw new AOException("Se ha encontrado un nodo que es de relacion: " + node.getNodeName()); //$NON-NLS-1$
         }
 
         // Comprobamos que tenga todos sus atributos
         final NamedNodeMap attributes = node.getAttributes();
 
-        if (attributes.getNamedItem("Id") == null || attributes.getNamedItem("Type") == null || attributes.getNamedItem("Target") == null) {
-            throw new AOException("Se ha encontrado un nodo de relacion que no disponia de todos sus atributos");
+        if (attributes.getNamedItem("Id") == null || attributes.getNamedItem("Type") == null || attributes.getNamedItem("Target") == null) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            throw new AOException("Se ha encontrado un nodo de relacion que no disponia de todos sus atributos"); //$NON-NLS-1$
         }
 
         // Creamos la relacion
-        return new RelationShip(attributes.getNamedItem("Id").getNodeValue(),
-                                attributes.getNamedItem("Type").getNodeValue(),
-                                attributes.getNamedItem("Target").getNodeValue());
+        return new RelationShip(attributes.getNamedItem("Id").getNodeValue(), //$NON-NLS-1$
+                                attributes.getNamedItem("Type").getNodeValue(), //$NON-NLS-1$
+                                attributes.getNamedItem("Target").getNodeValue()); //$NON-NLS-1$
     }
 
 }

@@ -37,7 +37,6 @@ package es.gob.afirma.be.fedict.eid.applet.service.signer;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.logging.Logger;
 
 import org.apache.commons.io.output.ProxyOutputStream;
 
@@ -53,7 +52,6 @@ class NoCloseOutputStream extends ProxyOutputStream {
 
     @Override
     public void close() throws IOException {
-        Logger.getLogger("es.gob.afirma").info("close");
         // empty
     }
 }

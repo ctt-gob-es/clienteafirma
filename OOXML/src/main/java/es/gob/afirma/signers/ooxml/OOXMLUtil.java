@@ -22,14 +22,16 @@ import es.gob.afirma.core.misc.AOUtil;
 
 /** Clase con m&eacute;todos de utilidad para las firmas OOXML. */
 public final class OOXMLUtil {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Tipo de relaci&oacute;n correspondiente a una firma OOXML. */
     private final static String OOXML_SIGNATURE_RELATIONSHIP_TYPE =
-            "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature";
+            "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"; //$NON-NLS-1$
 
     /** Tipo de relaci&oacute;n correspondiente a la relaci&oacute;n de firmas OOXML. */
     private final static String OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE =
-            "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
+            "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"; //$NON-NLS-1$
 
     /** Cuenta el n&uacute;mero de firmas del documento OOXML. Si se produce
      * alg&uacute;n error durante el an&aacute;lisis del fichero, se
@@ -55,11 +57,11 @@ public final class OOXMLUtil {
             zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
         }
         catch (final ZipException e) {
-            Logger.getLogger("es.gob.afirma").severe("El documento indicado no es un documento OOXML: " + e);
+            LOGGER.severe("El documento indicado no es un documento OOXML: " + e); //$NON-NLS-1$ 
             return new RelationShip[0];
         }
         catch (final IOException e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al abrir el documento OOXML: " + e);
+            LOGGER.severe("Error al abrir el documento OOXML: " + e); //$NON-NLS-1$ 
             return new RelationShip[0];
         }
 
@@ -79,7 +81,7 @@ public final class OOXMLUtil {
             parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error en la lectura del OOXML: " + e);
+            LOGGER.severe("Error en la lectura del OOXML: " + e); //$NON-NLS-1$ 
             return new RelationShip[0];
         }
 
@@ -88,7 +90,7 @@ public final class OOXMLUtil {
             zipFile.close();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido cerrar el documento OOXML: " + e);
+            LOGGER.warning("No se ha podido cerrar el documento OOXML: " + e); //$NON-NLS-1$ 
         }
 
         // Contamos las relaciones de firma
@@ -113,11 +115,11 @@ public final class OOXMLUtil {
             zipFile = AOFileUtils.createTempZipFile(ooxmlFile);
         }
         catch (final ZipException e) {
-            Logger.getLogger("es.gob.afirma").severe("El documento indicado no es un documento OOXML: " + e);
+            LOGGER.severe("El documento indicado no es un documento OOXML: " + e); //$NON-NLS-1$ 
             return new byte[0][];
         }
         catch (final IOException e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al abrir el documento OOXML: " + e);
+            LOGGER.severe("Error al abrir el documento OOXML: " + e); //$NON-NLS-1$ 
             return new byte[0][];
         }
 
@@ -137,7 +139,7 @@ public final class OOXMLUtil {
             parser = new RelationshipsParser(zipFile.getInputStream(relsEntry));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error en la lectura del OOXML: " + e);
+            LOGGER.severe("Error en la lectura del OOXML: " + e); //$NON-NLS-1$ 
             return new byte[0][];
         }
 
@@ -148,12 +150,12 @@ public final class OOXMLUtil {
 
                 // Comprobamos que exista el firma referenciada
                 final String target = rel.getTarget();
-                ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target);
+                ZipEntry signEntry = zipFile.getEntry("_xmlsignatures/" + target); //$NON-NLS-1$
                 if (signEntry == null) {
-                    signEntry = zipFile.getEntry("_xmlsignatures\\" + target);
+                    signEntry = zipFile.getEntry("_xmlsignatures\\" + target); //$NON-NLS-1$
                 }
                 if (signEntry == null) {
-                    Logger.getLogger("es.gob.afirma").severe("El documento OOXML no contiene las firmas declaradas");
+                    LOGGER.severe("El documento OOXML no contiene las firmas declaradas"); //$NON-NLS-1$ 
                     return new byte[0][];
                 }
 
@@ -162,7 +164,7 @@ public final class OOXMLUtil {
                     relations.add(AOUtil.getDataFromInputStream(zipFile.getInputStream(signEntry)));
                 }
                 catch (final Exception e) {
-                    Logger.getLogger("es.gob.afirma").severe("No se pudo leer una de las firmas del documento OOXML: " + e);
+                    LOGGER.severe("No se pudo leer una de las firmas del documento OOXML: " + e); //$NON-NLS-1$ 
                     return new byte[0][];
                 }
             }
@@ -173,7 +175,7 @@ public final class OOXMLUtil {
             zipFile.close();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha podido cerrar el documento OOXML: " + e);
+            LOGGER.warning("No se ha podido cerrar el documento OOXML: " + e); //$NON-NLS-1$ 
         }
 
         return relations.toArray(new byte[0][]);
@@ -183,9 +185,9 @@ public final class OOXMLUtil {
      * @param ooxmlZipFile Fichero OOXML.
      * @return Entrada con la relaci&oacute;n de firmas. */
     private static ZipEntry getSignaturesRelsEntry(final ZipFile ooxmlZipFile) {
-        ZipEntry relsEntry = ooxmlZipFile.getEntry("_rels/.rels");
+        ZipEntry relsEntry = ooxmlZipFile.getEntry("_rels/.rels"); //$NON-NLS-1$
         if (relsEntry == null) {
-            relsEntry = ooxmlZipFile.getEntry("_rels\\.rels");
+            relsEntry = ooxmlZipFile.getEntry("_rels\\.rels"); //$NON-NLS-1$
         }
 
         // Analizamos el fichero de relaciones
@@ -194,7 +196,7 @@ public final class OOXMLUtil {
             parser = new RelationshipsParser(ooxmlZipFile.getInputStream(relsEntry));
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error en la lectura del OOXML: " + e);
+            LOGGER.severe("Error en la lectura del OOXML: " + e); //$NON-NLS-1$ 
             return null;
         }
 
@@ -204,11 +206,11 @@ public final class OOXMLUtil {
             //String r = rel.getType();
 
             if (OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE.equals(rel.getType())) {
-                final String middleTarget = rel.getTarget().substring(0, "_xmlsignatures".length() + 1);
-                final String target = rel.getTarget().substring("_xmlsignatures".length() + 1);
-                signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels/" + target + ".rels");
+                final String middleTarget = rel.getTarget().substring(0, "_xmlsignatures".length() + 1); //$NON-NLS-1$
+                final String target = rel.getTarget().substring("_xmlsignatures".length() + 1); //$NON-NLS-1$
+                signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels/" + target + ".rels"); //$NON-NLS-1$ //$NON-NLS-2$
                 if (signsEntry == null) {
-                    signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels\\" + target + ".rels");
+                    signsEntry = ooxmlZipFile.getEntry(middleTarget + "_rels\\" + target + ".rels"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 break;
             }

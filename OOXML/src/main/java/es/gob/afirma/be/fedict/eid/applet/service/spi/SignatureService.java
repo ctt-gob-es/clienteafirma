@@ -29,7 +29,8 @@ public interface SignatureService {
 
     /** Gives back the digest algorithm to be used for construction of the digest
      * infos of the preSign method. Return a digest algorithm here if you want
-     * to let the client sign some locally stored files. Return <code>null</code> if no pre-sign digest infos are required. */
+     * to let the client sign some locally stored files. Return <code>null</code> if no pre-sign digest infos are required. 
+     * @return Algoritmo de huella digital */
     String getFilesDigestAlgorithm();
 
     /** Pre-sign callback method. Depending on the configuration some parameters
@@ -41,6 +42,7 @@ public interface SignatureService {
      *        the optional list of digest infos.
      * @param signingCertificateChain
      *        the optional list of certificates.
+     * @param signingKey 
      * @return the digest to be signed.
      * @throws NoSuchAlgorithmException */
     byte[] preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain, PrivateKey signingKey) throws NoSuchAlgorithmException;
@@ -50,8 +52,11 @@ public interface SignatureService {
      * <p>
      * TODO: service must be able to throw some exception on failure.
      * </p>
+     * @param signedXML 
      * @param signatureValue
      * @param signingCertificateChain
-     *        the optional chain of signing certificates. */
+     *        the optional chain of signing certificates. 
+     * @param signatureId 
+     * @return Resultado de la tercera fase de firma */
     byte[] postSign(byte[] signedXML, List<X509Certificate> signingCertificateChain, String signatureId, byte[] signatureValue);
 }

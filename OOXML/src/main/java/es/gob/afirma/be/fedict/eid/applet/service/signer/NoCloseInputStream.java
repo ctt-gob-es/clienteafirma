@@ -51,5 +51,7 @@ public class NoCloseInputStream extends ProxyInputStream {
     }
 
     @Override
-    public void close() throws IOException {}
+    public void close() throws IOException {
+        // Se ignoran los errores al cerrar
+    }
 }

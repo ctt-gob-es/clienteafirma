@@ -44,6 +44,7 @@ import es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml.AbstractOOXMLSign
 import es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
 import es.gob.afirma.core.misc.AOUtil;
 
+/** Contenedor para la implementaci&oacute;n abstracta del servicio de firma OOXML. */
 public final class AbstractOOXMLSignatureServiceContainer {
 
     private static final class OOXMLSignatureService extends AbstractOOXMLSignatureService {
@@ -62,10 +63,10 @@ public final class AbstractOOXMLSignatureServiceContainer {
                 this.ooxml = AOUtil.getDataFromInputStream(ooxmlis);
             }
             catch (final Exception e) {
-                throw new IllegalArgumentException("No se ha podido leer el OOXML desde el InputStream de entrada");
+                throw new IllegalArgumentException("No se ha podido leer el OOXML desde el flujo de entrada"); //$NON-NLS-1$
             }
             if (digestAlgo == null) {
-                this.digestAlgorithm = "SHA1";
+                this.digestAlgorithm = "SHA1"; //$NON-NLS-1$
             }
             else {
                 this.digestAlgorithm = digestAlgo;
