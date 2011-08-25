@@ -12,9 +12,9 @@ package es.gob.afirma.core.ciphers;
 
 import java.security.NoSuchAlgorithmException;
 
-import es.gob.afirma.core.misc.AOConstants.AOCipherAlgorithm;
-import es.gob.afirma.core.misc.AOConstants.AOCipherBlockMode;
-import es.gob.afirma.core.misc.AOConstants.AOCipherPadding;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 
 /** Confuiguraciones de algoritmo / modo de bloque / relleno para cifrado. */
 public final class AOCipherConfig {

@@ -155,5 +155,5 @@ public interface AOUIManager {
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     File getLoadFile(String dialogTitle, String fileName, String description, Object parentComponent);
-
+    
 }
