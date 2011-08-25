@@ -48,7 +48,8 @@ import org.w3c.dom.Element;
  * <li>Se puede establecer la URL del espacio de nombres de XAdES</li>
  * <li>Se puede a&ntilde;adir una hoja de estilo en modo <i>enveloping</i> dentro de la firma
  * </ul> */
-public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
+@SuppressWarnings("restriction")
+final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
     private AOXMLAdvancedSignature(final XAdES_BES xades) {
         super(xades);
@@ -56,7 +57,7 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
     private String canonicalizationMethod = CanonicalizationMethod.INCLUSIVE;
     private Element styleElement = null;
-    private String styleType = "text/xsl";
+    private String styleType = "text/xsl"; //$NON-NLS-1$
     private String styleEncoding = null;
     private String styleId = null;
 
@@ -73,7 +74,7 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
      * @param sId
      *        Identificador de la hoja de estilo (si se proporciona un nulo
      *        no se a&ntilde;ade la hoja de estilo) */
-    public void addStyleSheetEnvelopingOntoSignature(final Element s, final String sType, final String sEncoding, final String sId) {
+    void addStyleSheetEnvelopingOntoSignature(final Element s, final String sType, final String sEncoding, final String sId) {
         this.styleElement = s;
         if (sType != null) {
             this.styleType = sType;
@@ -86,9 +87,9 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
      * @param canMethod
      *        URL del algoritmo de canonicalizaci&oacute;n. Debe estar
      *        soportado en XMLDSig 1.0 &oacute; 1.1 */
-    public void setCanonicalizationMethod(final String canMethod) {
+    void setCanonicalizationMethod(final String canMethod) {
         if (canMethod != null) {
-            canonicalizationMethod = canMethod;
+            this.canonicalizationMethod = canMethod;
         }
     }
 
@@ -105,6 +106,7 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         return keyInfoFactory.newKeyInfo(newList, keyInfoId);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void sign(final X509Certificate certificate,
                      final PrivateKey privateKey,
@@ -116,23 +118,23 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         final List<?> referencesIdList = new ArrayList(refsIdList);
 
         if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace())) {
-            xades.setSigningCertificate(certificate);
+            this.xades.setSigningCertificate(certificate);
         }
 
-        addXMLObject(marshalXMLSignature(xadesNamespace, signatureIdPrefix, referencesIdList, tsaURL));
+        addXMLObject(marshalXMLSignature(this.xadesNamespace, signatureIdPrefix, referencesIdList, tsaURL));
 
         final XMLSignatureFactory fac = getXMLSignatureFactory();
 
-        if (styleElement != null && styleId != null) {
-            addXMLObject(fac.newXMLObject(Collections.singletonList(new DOMStructure(styleElement)), styleId, styleType, styleEncoding));
+        if (this.styleElement != null && this.styleId != null) {
+            addXMLObject(fac.newXMLObject(Collections.singletonList(new DOMStructure(this.styleElement)), this.styleId, this.styleType, this.styleEncoding));
         }
 
         final List<Reference> documentReferences = getReferences(referencesIdList);
         final String keyInfoId = getKeyInfoId(signatureIdPrefix);
-        documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod()));
+        documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod())); //$NON-NLS-1$
 
         this.signature =
-                fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(canonicalizationMethod, (C14NMethodParameterSpec) null),
+                fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(this.canonicalizationMethod, (C14NMethodParameterSpec) null),
                                                       fac.newSignatureMethod(signatureMethod, null),
                                                       documentReferences),
                                     newKeyInfo(certificate, keyInfoId),
@@ -140,11 +142,11 @@ public final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                                     getSignatureId(signatureIdPrefix),
                                     getSignatureValueId(signatureIdPrefix));
 
-        this.signContext = new DOMSignContext(privateKey, baseElement);
-        this.signContext.putNamespacePrefix(XMLSignature.XMLNS, xades.getXmlSignaturePrefix());
-        this.signContext.putNamespacePrefix(xadesNamespace, xades.getXadesPrefix());
+        this.signContext = new DOMSignContext(privateKey, this.baseElement);
+        this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
+        this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
 
-        this.signature.sign(signContext);
+        this.signature.sign(this.signContext);
     }
 
     public static AOXMLAdvancedSignature newInstance(final XAdES_BES xades) throws GeneralSecurityException {
