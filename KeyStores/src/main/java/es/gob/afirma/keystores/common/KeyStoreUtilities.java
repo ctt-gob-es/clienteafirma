@@ -10,6 +10,7 @@
 
 package es.gob.afirma.keystores.common;
 
+import java.awt.Component;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.KeyStore;
@@ -28,9 +29,13 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.security.auth.callback.PasswordCallback;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
@@ -517,6 +522,33 @@ public final class KeyStoreUtilities {
             }
         }
         return null;
+    }
+    
+    /** Recupera el PasswordCallback que com&uacute;nmente se requiere para el
+     * acceso a un almac&eacute;n de claves.
+     * @param kStore
+     *        Almac&eacuten de claves
+     * @param parent
+     *        Componente sobre el que se deben visualizar los
+     *        di&aacute;logos modales.
+     * @return Manejador para la solicitud de la clave. */
+    public static PasswordCallback getPreferredPCB(final AOKeyStore kStore, final Component parent) {
+
+        if (kStore == null) {
+            throw new IllegalArgumentException("No se ha indicado el KeyStore del que desea " + //$NON-NLS-1$
+                                                               "obtener la PasswordCallBack"); //$NON-NLS-1$
+        }
+
+        PasswordCallback pssCallback;
+        if (kStore == AOKeyStore.WINDOWS || kStore == AOKeyStore.WINROOT
+            || kStore == AOKeyStore.PKCS11
+            || kStore == AOKeyStore.APPLE) {
+            pssCallback = new NullPasswordCallback();
+        }
+        else {
+            pssCallback = new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getDescription()), parent); //$NON-NLS-1$
+        }
+        return pssCallback;
     }
 
 }

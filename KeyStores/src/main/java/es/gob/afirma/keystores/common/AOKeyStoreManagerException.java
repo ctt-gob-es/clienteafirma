@@ -21,7 +21,7 @@ public final class AOKeyStoreManagerException extends AOException {
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n. */
-    AOKeyStoreManagerException(final String msg) {
+    public AOKeyStoreManagerException(final String msg) {
         super(msg);
     }
 
@@ -30,7 +30,7 @@ public final class AOKeyStoreManagerException extends AOException {
      *        Mensaje descriptivo de la excepci&oacute;n.
      * @param e
      *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    AOKeyStoreManagerException(final String msg, final Exception e) {
+    public AOKeyStoreManagerException(final String msg, final Exception e) {
         super(msg, e);
     }
 }
