@@ -85,8 +85,8 @@ import org.bouncycastle.util.encoders.Base64;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
-import es.gob.afirma.core.misc.AOConstants.AOCipherAlgorithm;
-import es.gob.afirma.core.misc.AOConstants.AOCipherBlockMode;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 
 /** Clase que contiene funciones comunes para CADES y CMS */
 public final class Utils {
