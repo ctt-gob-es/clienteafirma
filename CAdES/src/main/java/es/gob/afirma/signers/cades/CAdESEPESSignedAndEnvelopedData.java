@@ -49,11 +49,9 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
-import es.gob.afirma.signers.pkcs7.Info;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
-import es.gob.afirma.signers.pkcs7.Utils;
 
 /** Clase que implementa firma digital CADES-EPES SignedAndEnvelopedData. basado
  * en las especificaciones de RFC-5126.
@@ -147,7 +145,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                                               CertificateEncodingException,
                                                                               NoSuchAlgorithmException {
 
-        this.cipherKey = Utils.initEnvelopedData(config, certDest);
+        this.cipherKey = CAdESUtils.initEnvelopedData(config, certDest);
 
         // 1. VERSION
         // la version se mete en el constructor del signedAndEnvelopedData y es
@@ -164,7 +162,7 @@ final class CAdESEPESSignedAndEnvelopedData {
         try {
             signatureAlgorithm = parameters.getSignatureAlgorithm();
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm);
+            keyAlgorithm = CAdESUtils.getKeyAlgorithm(signatureAlgorithm);
 
             final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
             digestAlgs.add(digAlgId);
@@ -177,10 +175,10 @@ final class CAdESEPESSignedAndEnvelopedData {
         ASN1Set certificates = null;
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
 
-        certificates = Utils.fetchCertificatesList(signerCertificateChain);
+        certificates = CAdESUtils.fetchCertificatesList(signerCertificateChain);
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
+        final Info infos = CAdESUtils.getEnvelopeInfo(parameters.getContent(), config, certDest, this.cipherKey);
 
         // 4. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -197,7 +195,7 @@ final class CAdESEPESSignedAndEnvelopedData {
 
         // // ATRIBUTOS
         final ASN1EncodableVector contextExpecific =
-                Utils.generateSignerInfo(signerCertificateChain[0],
+            CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                          digestAlgorithm,
                                          digAlgId,
                                          parameters.getContent(),
@@ -355,7 +353,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                     try {
                         signatureAlgorithm = parameters.getSignatureAlgorithm();
                         digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-                        keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm);
+                        keyAlgorithm = CAdESUtils.getKeyAlgorithm(signatureAlgorithm);
 
                         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
                         digestAlgs.add(digAlgId);
@@ -378,7 +376,7 @@ final class CAdESEPESSignedAndEnvelopedData {
 
                     // // ATRIBUTOS
                     final ASN1EncodableVector contextExpecific =
-                            Utils.generateSignerInfo(signerCertificateChain[0],
+                        CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                                      digestAlgorithm,
                                                      digAlgId,
                                                      parameters.getContent(),
@@ -394,7 +392,7 @@ final class CAdESEPESSignedAndEnvelopedData {
 
                     // digEncryptionAlgorithm
                     final SignerInfo nuevoSigner =
-                            Utils.signAndEnvelope(keyEntry,
+                            CAdESUtils.signAndEnvelope(keyEntry,
                                                   signatureAlgorithm,
                                                   digAlgId,
                                                   identifier,
@@ -407,7 +405,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                     signerInfos.add(nuevoSigner);
 
                     // LISTA DE CERTIFICADOS: obtenemos la lista de certificados
-                    signCerts = Utils.loadCertificatesList(signEnv, signerCertificateChain);
+                    signCerts = CAdESUtils.loadCertificatesList(signEnv, signerCertificateChain);
                 }
                 else {
                     LOGGER.warning("No se ha podido obtener el certificado del nuevo firmante "); //$NON-NLS-1$
@@ -435,4 +433,5 @@ final class CAdESEPESSignedAndEnvelopedData {
         }
         return retorno;
     }
+    
 }

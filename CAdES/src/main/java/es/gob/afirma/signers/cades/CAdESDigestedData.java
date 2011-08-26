@@ -66,7 +66,7 @@ final class CAdESDigestedData {
         }
         // Obtenemos el algoritmo para "digestear"
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
-        AlgorithmIdentifier digAlgId;
+        final AlgorithmIdentifier digAlgId;
         try {
             digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
         }

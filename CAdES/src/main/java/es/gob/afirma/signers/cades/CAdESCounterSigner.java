@@ -55,7 +55,6 @@ import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
-import es.gob.afirma.signers.pkcs7.Utils;
 
 /** Clase que implementa la contrafirma digital CADES SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
@@ -974,7 +973,7 @@ final class CAdESCounterSigner {
 
         // authenticatedAttributes
         final ASN1EncodableVector contextExcepcific =
-                Utils.generateSignerInfo(cert,
+                CAdESUtils.generateSignerInfo(cert,
                                          digestAlgorithm,
                                          digAlgId,
                                          si.getEncryptedDigest().getOctets(),

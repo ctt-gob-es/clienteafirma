@@ -27,10 +27,8 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.pkcs7.Info;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
-import es.gob.afirma.signers.pkcs7.Utils;
 
 /** Clase que implementa firma digital EnvelopedData en CADES basada en
  * PKCS#7/CMS EnvelopedData. La Estructura del mensaje es la siguiente:<br>
@@ -83,7 +81,7 @@ final class CAdESEnvelopedData {
                                                                                                                                          CertificateEncodingException,
                                                                                                                                          NoSuchAlgorithmException {
 
-        this.cipherKey = Utils.initEnvelopedData(config, certDest);
+        this.cipherKey = CAdESUtils.initEnvelopedData(config, certDest);
 
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
@@ -91,7 +89,7 @@ final class CAdESEnvelopedData {
         // 1. ORIGINATORINFO
         // obtenemos la lista de certificados
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
-        final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
+        final ASN1Set certificates = CAdESUtils.fetchCertificatesList(signerCertificateChain);
         final ASN1Set certrevlist = null;
 
         OriginatorInfo origInfo = null;
@@ -100,11 +98,11 @@ final class CAdESEnvelopedData {
         }
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
+        final Info infos = CAdESUtils.getEnvelopeInfo(parameters.getContent(), config, certDest, this.cipherKey);
 
         // 3. ATRIBUTOS
         final ASN1Set unprotectedAttrs =
-            SigUtils.getAttributeSet(new AttributeTable(Utils.initContexExpecific(digestAlgorithm, parameters.getContent(), dataType, null)));
+            SigUtils.getAttributeSet(new AttributeTable(CAdESUtils.initContexExpecific(digestAlgorithm, parameters.getContent(), dataType, null)));
 
         // construimos el Enveloped Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.envelopedData, new EnvelopedData(origInfo,
@@ -136,7 +134,7 @@ final class CAdESEnvelopedData {
     byte[] genEnvelopedData(final byte[] data, final String digestAlg, final AOCipherConfig config, final X509Certificate[] certDest, final String dataType) throws IOException,
                                                                                                                                   CertificateEncodingException,
                                                                                                                                   NoSuchAlgorithmException {
-        this.cipherKey = Utils.initEnvelopedData(config, certDest);
+        this.cipherKey = CAdESUtils.initEnvelopedData(config, certDest);
 
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digestAlg);
@@ -145,10 +143,10 @@ final class CAdESEnvelopedData {
         final OriginatorInfo origInfo = null;
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(data, config, certDest, this.cipherKey);
+        final Info infos = CAdESUtils.getEnvelopeInfo(data, config, certDest, this.cipherKey);
 
         // 3. ATRIBUTOS
-        final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(Utils.initContexExpecific(digestAlgorithm, data, dataType, null)));
+        final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(CAdESUtils.initContexExpecific(digestAlgorithm, data, dataType, null)));
 
         // construimos el Enveloped Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.envelopedData, new EnvelopedData(origInfo,

@@ -10,10 +10,8 @@
 
 package es.gob.afirma.signers.cades;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
@@ -26,9 +24,9 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.SigUtils;
-import es.gob.afirma.signers.pkcs7.Utils;
 
 /** Clase que implementa firma digital CADES EncryptedData basado en PKCS#7/CMS
  * EncryptedData. La Estructura del mensaje es la siguiente:<br>
@@ -51,8 +49,6 @@ import es.gob.afirma.signers.pkcs7.Utils;
  * para crear un mensaje EncryptedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CADESEncryptedData {
-    
-    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Clave de cifrado. La almacenamos internamente porque no hay forma de
      * mostrarla directamente al usuario. */
@@ -75,10 +71,16 @@ final class CADESEncryptedData {
      *         digital */
     byte[] genEncryptedData(final InputStream file, final String digAlg, final AOCipherConfig config, final String pass, final String dataType) throws NoSuchAlgorithmException, AOException {
 
-        final byte[] codeFile = createArrayFromFile(file);
+        final byte[] codeFile;
+        try {
+            codeFile = AOUtil.getDataFromInputStream(file);
+        }
+        catch(final Exception e) {
+            throw new AOException("No se ha podido leer el fujo de entrada", e); //$NON-NLS-1$
+        }
 
         // Asignamos la clave de cifrado
-        this.cipherKey = Utils.assignKey(config, pass);
+        this.cipherKey = CAdESUtils.assignKey(config, pass);
 
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digAlg);
@@ -87,7 +89,7 @@ final class CADESEncryptedData {
         final EncryptedContentInfo encInfo;
         try {
             // 3. ENCRIPTEDCONTENTINFO
-            encInfo = Utils.getEncryptedContentInfo(codeFile, config, this.cipherKey);
+            encInfo = CAdESUtils.getEncryptedContentInfo(codeFile, config, this.cipherKey);
         }
         catch (final Exception ex) {
             throw new AOException("Error durante el proceso de cifrado", ex); //$NON-NLS-1$
@@ -95,40 +97,11 @@ final class CADESEncryptedData {
 
         // 4. ATRIBUTOS
         // obtenemos la lista de certificados
-        final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(Utils.initContexExpecific(digestAlgorithm, codeFile, dataType, null)));
+        final ASN1Set unprotectedAttrs = SigUtils.getAttributeSet(new AttributeTable(CAdESUtils.initContexExpecific(digestAlgorithm, codeFile, dataType, null)));
 
         // construimos el Enveloped Data y lo devolvemos
         return new ContentInfo(PKCSObjectIdentifiers.encryptedData, new EncryptedData(encInfo, unprotectedAttrs)).getDEREncoded();
 
     }
 
-    /*************************************************************************/
-    /**************** Metodos auxiliares de cifrado **************************/
-    /*************************************************************************/
-
-    /** M&eacute;todo que transforma un Inputstream en un array de bytes.
-     * @param file
-     *        InputStream a ser transformado.
-     * @return fichero en formato array de bytes. */
-    private byte[] createArrayFromFile(final InputStream file) {
-        ByteArrayOutputStream baos = null;
-        try {
-            final InputStream dataReader = file;
-
-            final byte[] buffer = new byte[1024];
-            int len;
-            baos = new ByteArrayOutputStream();
-
-            while (dataReader.available() != 0) {
-                len = dataReader.read(buffer);
-                baos.write(buffer, 0, len);
-            }
-
-            return baos.toByteArray();
-        }
-        catch (final Exception ex) {
-            LOGGER.severe("Error durante el proceso de lectura del fichero: " + ex); //$NON-NLS-1$
-            return null;
-        }
-    }
 }

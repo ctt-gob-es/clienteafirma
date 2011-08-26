@@ -59,7 +59,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
-import es.gob.afirma.signers.pkcs7.Utils;
 
 /** Clase que implementa la cofirma digital CADES SignedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
@@ -254,7 +253,7 @@ final class CAdESCoSigner {
         ASN1Set signedAttr = null;
         if (messageDigest == null) {
             final ASN1EncodableVector contextExpecific =
-                    Utils.generateSignerInfo(signerCertificateChain[0],
+                CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                              digestAlgorithm,
                                              digAlgId,
                                              parameters.getContent(),
@@ -268,7 +267,7 @@ final class CAdESCoSigner {
         }
         else {
             final ASN1EncodableVector contextExpecific =
-                    Utils.generateSignerInfo(signerCertificateChain[0],
+                CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                              digestAlgorithm,
                                              digAlgId,
                                              null,
@@ -472,7 +471,7 @@ final class CAdESCoSigner {
         // atributos firmados
         if (contenidoDatos != null) {
             final ASN1EncodableVector contextExpecific =
-                    Utils.generateSignerInfo(signerCertificateChain[0],
+                CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                              digestAlgorithm,
                                              digAlgId,
                                              contenidoDatos,
@@ -486,7 +485,7 @@ final class CAdESCoSigner {
         }
         else if (messageDigest != null) {
             final ASN1EncodableVector contextExpecific =
-                    Utils.generateSignerInfo(signerCertificateChain[0],
+                CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                              digestAlgorithm,
                                              digAlgId,
                                              null,

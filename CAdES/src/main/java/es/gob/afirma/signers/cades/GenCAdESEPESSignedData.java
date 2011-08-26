@@ -52,7 +52,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
-import es.gob.afirma.signers.pkcs7.Utils;
 
 /** Clase que implementa firma digital CMS Advanced Electronic Signatures
  * (CAdES).
@@ -225,7 +224,7 @@ public final class GenCAdESEPESSignedData {
         // // ATRIBUTOS
 
         final ASN1EncodableVector contextExcepcific =
-                Utils.generateSignerInfo(signerCertificateChain[0],
+            CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                          digestAlgorithm,
                                          digAlgId,
                                          parameters.getContent(),

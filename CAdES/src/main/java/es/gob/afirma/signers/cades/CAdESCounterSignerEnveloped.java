@@ -54,7 +54,6 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
-import es.gob.afirma.signers.pkcs7.Utils;
 
 /** Clase que implementa la contrafirma digital CADES SignedAndEnvelopedData La
  * implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios para
@@ -967,7 +966,7 @@ final class CAdESCounterSignerEnveloped {
         final String qualifier = getGlobalOidQualifier();
 
         final ASN1EncodableVector contextExcepcific =
-                Utils.generateSignerInfo(cert,
+            CAdESUtils.generateSignerInfo(cert,
                                          digestAlgorithm,
                                          digAlgId,
                                          si.getEncryptedDigest().getOctets(),
