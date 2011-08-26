@@ -328,9 +328,6 @@ public final class AOPDFSigner implements AOSigner {
 
     private byte[] signPDF(final PrivateKeyEntry ke, final byte[] inPDF, Properties extraParams, final String algorithm) throws Exception {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
         final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")); //$NON-NLS-1$ //$NON-NLS-2$
         final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
         final String signField = extraParams.getProperty("signField"); //$NON-NLS-1$

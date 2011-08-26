@@ -29,14 +29,6 @@ public class TestPAdES {
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
-
-    private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
-    
-    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
-    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
     
     private static final Properties[] PADES_MODES;
     
@@ -46,6 +38,12 @@ public class TestPAdES {
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_PDF); //$NON-NLS-1$
         p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+        p1.setProperty("signReason", "test"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("signatureProductionCity", "madrid"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("signerContact", "sink@usa.net"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("policyQualifier", "2.16.724.1.3.1.1.2"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("policyIdentifier", "http://google.com/"); //$NON-NLS-1$ //$NON-NLS-2$
+        
 
         final Properties p2 = new Properties();
         p2.setProperty("format", AOSignConstants.SIGN_FORMAT_PDF); //$NON-NLS-1$
@@ -61,7 +59,7 @@ public class TestPAdES {
             AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, 
             AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
+            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA,
     };
     
     /**
@@ -70,6 +68,8 @@ public class TestPAdES {
      */
     @Test
     public void testSignature() throws Exception {
+        
+        Assert.assertEquals("file.signed.pdf", AOPDFSigner.getSignedName("file.pdf")); //$NON-NLS-1$ //$NON-NLS-2$
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
@@ -117,6 +117,8 @@ public class TestPAdES {
                     
                     Assert.assertNotNull(simpleSignInfo.getSigningTime());
                     Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);    
+                    
+                    Assert.assertEquals("application/pdf", signer.getDataMimeType(result)); //$NON-NLS-1$
                     
                 }
                 
