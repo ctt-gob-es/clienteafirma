@@ -27,7 +27,7 @@ final class RelationShip {
      *        Typo de la relaci&oacute;n
      * @param target
      *        Destino de la relaci&oacute;n (objeto relacionado) */
-    public RelationShip(final String id, final String type, final String target) {
+    RelationShip(final String id, final String type, final String target) {
         this.id = id;
         this.type = type;
         this.target = target;
@@ -35,19 +35,19 @@ final class RelationShip {
 
     /** Obtiene el identificador de la relaci&oacute;n.
      * @return Identificador de la relaci&oacute;n */
-    public String getId() {
+    String getId() {
         return this.id;
     }
 
     /** Obtiene el tipo de la relaci&oacute;n.
      * @return Tipo de la relaci&oacute;n */
-    public String getType() {
+    String getType() {
         return this.type;
     }
 
     /** Obtiene el destino de la relaci&oacute;n (el objeto relacionado)
      * @return Destino de la relaci&oacute;n (objeto relacionado) */
-    public String getTarget() {
+    String getTarget() {
         return this.target;
     }
 

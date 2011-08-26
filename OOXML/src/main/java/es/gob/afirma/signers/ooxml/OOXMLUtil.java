@@ -21,7 +21,7 @@ import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.AOUtil;
 
 /** Clase con m&eacute;todos de utilidad para las firmas OOXML. */
-public final class OOXMLUtil {
+final class OOXMLUtil {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -39,7 +39,7 @@ public final class OOXMLUtil {
      * @param ooxmlFile
      *        Documento OOXML.
      * @return N&uacute;mero de firma del documento OOXML. */
-    public static int countOOXMLSignatures(final byte[] ooxmlFile) {
+    static int countOOXMLSignatures(final byte[] ooxmlFile) {
         final RelationShip[] rels = getOOXMLSignaturesRelationships(ooxmlFile);
         return (rels == null ? 0 : rels.length);
     }
@@ -108,7 +108,7 @@ public final class OOXMLUtil {
      * @param ooxmlFile
      *        Documento OOXML.
      * @return Firmas empotradas en el documento. */
-    public static byte[][] getOOXMLSignatures(final byte[] ooxmlFile) {
+    static byte[][] getOOXMLSignatures(final byte[] ooxmlFile) {
 
         final ZipFile zipFile;
         try {

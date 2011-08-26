@@ -46,7 +46,7 @@ final class RelationshipsParser {
 
     /** Recupera el listado de relaciones extraido del XML.
      * @return Listado de relaciones. */
-    public RelationShip[] getRelationships() {
+    RelationShip[] getRelationships() {
         return this.relations;
     }
 
