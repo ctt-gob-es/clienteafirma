@@ -305,7 +305,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 // Obtenemos la hoja de estilo del XML
                 try {
-                    Properties p;
+                    final Properties p;
                     if (!ignoreStyleSheets) {
                         p = Utils.getStyleSheetHeader(new String(data));
                     }
