@@ -49,7 +49,7 @@ final class MozillaKeyStoreUtilities {
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de Mozilla v&iacute;a
      *         NSS. */
-    public static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
+    static String createPKCS11NSSConfigFile(final String userProfileDirectory, final String libDir) {
 
         String softoknLib = "libsoftokn3.so"; //$NON-NLS-1$
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
@@ -372,7 +372,7 @@ final class MozillaKeyStoreUtilities {
      * @throws AOException
      *         Cuando no se ha podido encontrar y cargar una versi&oacute;n
      *         v&aacute;lidad de NSS. */
-    public static String getSystemNSSLibDir() throws FileNotFoundException, AOInvalidFormatException {
+    static String getSystemNSSLibDir() throws FileNotFoundException, AOInvalidFormatException {
 
         if (nssLibDir != null) {
             return nssLibDir;
@@ -514,7 +514,7 @@ final class MozillaKeyStoreUtilities {
      * estuviesen en el PATH del sistema.
      * @param nssDirectory
      *        Directorio en donde se encuentran las bibliotecas de NSS. */
-    public static void loadNSSDependencies(final String nssDirectory) {
+    static void loadNSSDependencies(final String nssDirectory) {
         // *********************************************************************
         // *********************************************************************
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y

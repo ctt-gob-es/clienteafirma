@@ -30,7 +30,7 @@ final class NSPreferences {
      * @return Directorio con la informaci&oacute;n del perfil.
      * @throws IOException
      *         Cuando ocurre un error abriendo o leyendo el fichero. */
-    public static String getFireFoxUserProfileDirectory(final File iniFile) throws IOException {
+    static String getFireFoxUserProfileDirectory(final File iniFile) throws IOException {
 
         if (iniFile == null) {
             throw new IllegalArgumentException("El fichero INI es nulo y no se podra determinar el directorio del usuario de firefox"); //$NON-NLS-1$
