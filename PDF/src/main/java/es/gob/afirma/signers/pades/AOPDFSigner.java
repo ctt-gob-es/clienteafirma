@@ -47,6 +47,7 @@ import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.SHA2AltNamesProvider;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
@@ -132,7 +133,7 @@ public final class AOPDFSigner implements AOSigner {
             throw e;
         }
         catch (final Exception e) {
-            throw new AOException("Error firmando el PDF", e); //$NON-NLS-1$
+            throw new AOException("Error firmando el PDF: " + e, e); //$NON-NLS-1$
         }
     }
 
@@ -171,6 +172,9 @@ public final class AOPDFSigner implements AOSigner {
     }
 
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
+        
+        SHA2AltNamesProvider.install();
+        
         final AOTreeNode root = new AOTreeNode("Datos"); //$NON-NLS-1$
         final AcroFields af;
 
@@ -625,7 +629,8 @@ public final class AOPDFSigner implements AOSigner {
 
         final byte[] pk;
 
-        String policyQualifier2 = policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+        
+        String policyQualifier2 = (policyQualifier != null) ? policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "") : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = ke.getCertificateChain();
