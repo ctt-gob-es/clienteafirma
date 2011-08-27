@@ -14,7 +14,6 @@
  *  <ul>
  *   <li>N&uacute;cleo Afirma.</li>
  *   <li>Paquete PKCS7 de Afirma.</li>
- *   <li>JMIMEMagic.</li>
  *   <li>BouncyCastle (Provider + Mail + TSP).</li>
  *  </ul>
  */
