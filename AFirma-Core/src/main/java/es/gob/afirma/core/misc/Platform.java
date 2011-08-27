@@ -29,6 +29,8 @@ public final class Platform {
         SOLARIS,
         /** Apple Mac OS X. */
         MACOSX,
+        /** Google Android. */
+        ANDROID,
         /** Sistema operativo no identificado. */
         OTHER
     }
@@ -124,7 +126,12 @@ public final class Platform {
                 os = OS.WINDOWS;
             }
             else if (osName.contains("inux")) { //$NON-NLS-1$
-                os = OS.LINUX;
+                if ("Dalvik".equals(System.getProperty("java.vm.name"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                    os = OS.ANDROID;
+                }
+                else {
+                    os = OS.LINUX;
+                }
             }
             else if (osName.contains("SunOS") || osName.contains("olaris")) { //$NON-NLS-1$ //$NON-NLS-2$
                 os = OS.SOLARIS;
