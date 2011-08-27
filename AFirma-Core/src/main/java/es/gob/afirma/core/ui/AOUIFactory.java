@@ -1,7 +1,6 @@
 package es.gob.afirma.core.ui;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
@@ -12,34 +11,31 @@ import es.gob.afirma.core.misc.Platform;
  */
 public class AOUIFactory {
     
-    // Por defecto los valores sacadas del Fuente de JOptionPane
     /** JOptionPane.PLAIN_MESSAGE. */
-    public static int PLAIN_MESSAGE = -1;
+    public static final int PLAIN_MESSAGE;
     
     /** JOptionPane.YES_NO_OPTION. */
-    public static int YES_NO_OPTION = 0;
+    public static final int YES_NO_OPTION;
     
     /** JOptionPane.WARNING_MESSAGE. */
-    public static int WARNING_MESSAGE = 2;
+    public static final int WARNING_MESSAGE;
     
     /** JOptionPane.YES_OPTION. */
-    public static int YES_OPTION = 0;
+    public static final int YES_OPTION;
     
     /** JOptionPane.NO_OPTION. */
-    public static int NO_OPTION = 1;
+    public static final int NO_OPTION;
     
     /** JOptionPane.OK_CANCEL_OPTION. */
-    public static int OK_CANCEL_OPTION = 2;
+    public static final int OK_CANCEL_OPTION;
     
     /** JOptionPane.PK_OPTION. */
-    public static int OK_OPTION = 0;
+    public static final int OK_OPTION;
     
     /** JOptionPane.INFORMATION_MESSAGE. */
-    public static int INFORMATION_MESSAGE = 1;
+    public static final int INFORMATION_MESSAGE;
     
-    private static AOUIManager uiManager;
-    
-    private final static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    private static final AOUIManager uiManager;
     
     static {
         try {
@@ -57,7 +53,7 @@ public class AOUIFactory {
             INFORMATION_MESSAGE = uiManager.getInformationMessageCode();
         }
         catch(final Exception e) {
-            LOGGER.severe("No se ha podido instanciar el gestor de interfaces graficas: " + e); //$NON-NLS-1$
+            throw new UnsupportedOperationException("No se ha podido instanciar el gestor de interfaces graficas: " + e, e); //$NON-NLS-1$
         }
     }
     
