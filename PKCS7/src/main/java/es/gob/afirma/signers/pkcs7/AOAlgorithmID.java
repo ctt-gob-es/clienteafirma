@@ -2,7 +2,6 @@ package es.gob.afirma.signers.pkcs7;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.logging.Logger;
 
 /** Identificadores (OID) comunes de algoritmos usados en CMS/CAdES
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
@@ -45,7 +44,7 @@ public final class AOAlgorithmID {
         }
         final String res = oids.get(name.toUpperCase());
         if (res == null) {
-            Logger.getLogger("es.gob.afirma").warning("Se deconoce el algoritmo '" + name + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            throw new IllegalArgumentException("Se deconoce el algoritmo '" + name + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return res;
     }
