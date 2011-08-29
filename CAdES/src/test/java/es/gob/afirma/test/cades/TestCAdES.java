@@ -98,6 +98,10 @@ public final class TestCAdES {
                 
                 byte[] result = signer.sign(DATA, algo, pke, extraParams);
 
+//                java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/cades"+algo+extraParams.getProperty("mode")+".csig");
+//                fos.write(result);
+//                try { fos.close(); } catch (Exception e) { }
+
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));
                 Assert.assertTrue(AOCAdESSigner.isCADESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
