@@ -23,6 +23,11 @@ final class KeyStoreMessages {
 
     static {
         try {
+            
+            ClassLoader classLoader = KeyStoreMessages.class.getClassLoader();
+            System.out.println("Tipo de classloader para los mensajes de almacenes: " + classLoader.getClass().toString());
+            
+            
             RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
         }
         catch (final Exception e) {
