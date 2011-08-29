@@ -102,7 +102,7 @@ public final class GenCAdESEPESSignedData {
         }
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
 
-        final byte[] content= parameters.getContent();
+        final byte[] content = (omitContent) ? null : parameters.getContent();
         
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         
