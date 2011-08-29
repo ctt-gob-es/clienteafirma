@@ -153,7 +153,7 @@ class CAdESTriPhaseSigner {
         
         // ContentInfo
         final ContentInfo contentInfo;
-        if (content == null) {
+        if (content != null) {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             final CMSProcessable msg = new CMSProcessableByteArray(content);
             try {
