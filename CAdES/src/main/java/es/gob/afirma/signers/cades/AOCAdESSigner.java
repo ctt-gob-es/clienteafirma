@@ -17,8 +17,6 @@ import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
@@ -48,37 +46,12 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
  * <dt>signingCertificateV2</dt>
  * <dd>Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo <i>Signing Certificate</i> de CAdES. Si no se establece
  * o se hace a <code>false</code> se utilizara la versi&oacute;n 1</dd>
- * <!-- <dt>useMIMEencoding</dt>
- * <dd>Debe establecerse a <code>true</code> si se desea usar codificaci&oacute;n MIME para empotrar el binario en la firma (seg&uacute;n
- * recomendaciones de la CE). Este par&aacute;metro solo tiene efecto si el par&aacute;metro <code>mode</code> se estableci&oacute; a
- * <code>implicit</code></dd>
- * <dt>MIMEContentID</dt>
- * <dd>Identificador MIME del contenido a firmar. S&oacute;lo se tiene en cuenta si el par&aacute;metro <code>MIMEContentID</code> est&aacute;
- * establecido a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd>
- * <dt>MIMEContentType</dt>
- * <dd>Tipo MIME (MIME-Type) del contenido a firmar. S&oacute;lo se tiene en cuenta si el par&aacute;metro <code>MIMEContentID</code> est&aacute;
- * establecido a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd>
- * <dt>MIMEFileName</dt>
- * <dd>Nombre original del fichero a firmar. S&oacute;lo se tiene en cuenta si el par&aacute;metro <code>MIMEContentID</code> est&aacute; establecido
- * a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd>
- * <dt>MIMEModificationDate</dt>
- * <dd>Fecha de la &uacute;ltima modificaci&oacute;n (por defecto en formato "<i>yyyy/MM/dd HH:mm:ss</i>") del contenido a firmar. S&oacute;lo se
- * tiene en cuenta si el par&aacute;metro <code>MIMEContentID</code> est&aacute; establecido a <code>true</code> y el par&aacute;metro
- * <code>mode</code> a <code>implicit</code></dd>
- * <dt>MIMEModificationDateFormat</dt>
- * <dd>Formato en el que se ha proporcionado el valor del par&aacute;metro <code></code> (fecha de la &uacute;ltima modificaci&oacute;n del contenido
- * a firmar) si este difiere de "<i>yyyy/MM/dd HH:mm:ss</i>". Misma sintaxis de formato que <code>java.text.SimpleDateFormat</code>. S&oacute;lo se
- * tiene en cuenta si se ha establecido un valor para el par&aacute;metro <code>MIMEModificationDate</code>, <code>MIMEContentID</code> est&aacute;
- * establecido a <code>true</code> y el par&aacute;metro <code>mode</code> a <code>implicit</code></dd> -->
  * </dl>
  * @version 0.3 */
 public final class AOCAdESSigner implements AOSigner {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private String dataType = null;
-
-    //private static final String DEFAULT_MIME_MODIFICATION_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
     public byte[] sign(byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
@@ -89,12 +62,9 @@ public final class AOCAdESSigner implements AOSigner {
         if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
         }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "true")); //$NON-NLS-1$ //$NON-NLS-2$
 
         byte[] messageDigest = null;
 
@@ -103,29 +73,6 @@ public final class AOCAdESSigner implements AOSigner {
         }
 
         final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
-
-//        if (mode.equals(AOSignConstants.SIGN_MODE_IMPLICIT) && "true".equalsIgnoreCase(extraParams.getProperty("useMIMEencoding"))) {
-//
-//            Date modDateObject = null;
-//            final String modDate = extraParams.getProperty("MIMEModificationDate");
-//            if (modDate != null) {
-//                try {
-//                    modDateObject =
-//                            new SimpleDateFormat(extraParams.getProperty("useMIMEencoding", DEFAULT_MIME_MODIFICATION_DATE_FORMAT)).parse(modDate);
-//                }
-//                catch (final Exception e) {
-//                    LOGGER.warning("La fecha MIME de ultima modificacion del contenido a firmar proporcionada (" + modDate
-//                                                              + ") no corresponde al formato establecido, se omitira este dato: "
-//                                                              + e);
-//                }
-//            }
-//            data =
-//                    MimeHelper.getMimeEncodedAsAttachment(data,
-//                                                          extraParams.getProperty("MIMEContentID"),
-//                                                          extraParams.getProperty("MIMEContentType"),
-//                                                          extraParams.getProperty("MIMEFileName"),
-//                                                          modDateObject).getBytes();
-//        }
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();
@@ -142,11 +89,6 @@ public final class AOCAdESSigner implements AOSigner {
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
-
-        // tipos de datos a firmar.
-        if (this.dataType == null) {
-            this.dataType = PKCSObjectIdentifiers.data.getId();
-        }
 
         try {
             boolean omitContent = false;
@@ -168,7 +110,6 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                                    policyQualifier,
                                                                    signingCertificateV2,
-                                                                   this.dataType,
                                                                    keyEntry,
                                                                    messageDigest);
 
@@ -216,11 +157,6 @@ public final class AOCAdESSigner implements AOSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
 
-        // tipos de datos a firmar.
-        if (this.dataType == null) {
-            this.dataType = PKCSObjectIdentifiers.data.getId();
-        }
-
         try {
             String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
 
@@ -238,7 +174,6 @@ public final class AOCAdESSigner implements AOSigner {
                                                     extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                     policyQualifier,
                                                     signingCertificateV2,
-                                                    this.dataType,
                                                     keyEntry,
                                                     messageDigest);
             }
@@ -248,7 +183,6 @@ public final class AOCAdESSigner implements AOSigner {
                                                          extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                          policyQualifier,
                                                          signingCertificateV2,
-                                                         this.dataType,
                                                          keyEntry,
                                                          messageDigest);
 
@@ -272,10 +206,6 @@ public final class AOCAdESSigner implements AOSigner {
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
-        // tipos de datos a firmar.
-        if (this.dataType == null) {
-            this.dataType = PKCSObjectIdentifiers.data.getId();
-        }
         // algoritmo de firma.
         final String typeAlgorithm = algorithm;
         // Array de certificados
@@ -306,7 +236,6 @@ public final class AOCAdESSigner implements AOSigner {
                                                     extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                     policyQualifier,
                                                     signingCertificateV2,
-                                                    this.dataType,
                                                     keyEntry,
                                                     null // null porque no nos pueden dar un hash
                                                          // en este metodo, tendría que ser en el
@@ -326,7 +255,6 @@ public final class AOCAdESSigner implements AOSigner {
                                                          extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
                                                          policyQualifier,
                                                          signingCertificateV2,
-                                                         this.dataType,
                                                          keyEntry,
                                                          null // null porque no nos pueden dar un hash en este
                                                               // metodo, tendría que ser en el que incluye datos
@@ -373,11 +301,6 @@ public final class AOCAdESSigner implements AOSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, xCerts);
 
-        // tipos de datos a firmar.
-        if (this.dataType == null) {
-            this.dataType = PKCSObjectIdentifiers.data.getId();
-        }
-
         // Recuperamos la polictica de firma si se indico
         String policyQualifier = null;
         String policyIdentifier = null;
@@ -408,8 +331,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    keyEntry,
                                                                    policyIdentifier,
                                                                    policyQualifier,
-                                                                   signingCertificateV2,
-                                                                   this.dataType);
+                                                                   signingCertificateV2);
                 }
                 // CASO DE FIRMA DE HOJAS
                 else if (targetType == CounterSignTarget.Leafs) {
@@ -424,8 +346,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    keyEntry,
                                                                    policyIdentifier,
                                                                    policyQualifier,
-                                                                   signingCertificateV2,
-                                                                   this.dataType);
+                                                                   signingCertificateV2);
                 }
                 // CASO DE FIRMA DE NODOS
                 else if (targetType == CounterSignTarget.Nodes) {
@@ -442,8 +363,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    keyEntry,
                                                                    policyIdentifier,
                                                                    policyQualifier,
-                                                                   signingCertificateV2,
-                                                                   this.dataType);
+                                                                   signingCertificateV2);
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
                 else if (targetType == CounterSignTarget.Signers) {
@@ -463,8 +383,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                    keyEntry,
                                                                    policyIdentifier,
                                                                    policyQualifier,
-                                                                   signingCertificateV2,
-                                                                   this.dataType);
+                                                                   signingCertificateV2);
 
                 }
 
@@ -492,8 +411,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                         keyEntry,
                                                                         policyIdentifier,
                                                                         policyQualifier,
-                                                                        signingCertificateV2,
-                                                                        this.dataType);
+                                                                        signingCertificateV2);
             }
             // CASO DE FIRMA DE HOJAS
             else if (targetType == CounterSignTarget.Leafs) {
@@ -508,8 +426,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                         keyEntry,
                                                                         policyIdentifier,
                                                                         policyQualifier,
-                                                                        signingCertificateV2,
-                                                                        this.dataType);
+                                                                        signingCertificateV2);
             }
             // CASO DE FIRMA DE NODOS
             else if (targetType == CounterSignTarget.Nodes) {
@@ -526,8 +443,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                         keyEntry,
                                                                         policyIdentifier,
                                                                         policyQualifier,
-                                                                        signingCertificateV2,
-                                                                        this.dataType);
+                                                                        signingCertificateV2);
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
             else if (targetType == CounterSignTarget.Signers) {
@@ -547,8 +463,7 @@ public final class AOCAdESSigner implements AOSigner {
                                                                         keyEntry,
                                                                         policyIdentifier,
                                                                         policyQualifier,
-                                                                        signingCertificateV2,
-                                                                        this.dataType);
+                                                                        signingCertificateV2);
 
             }
 

@@ -32,19 +32,22 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
+import es.gob.afirma.signers.pkcs7.SigUtils;
+
 class CAdESUtils {
     
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
      * @param cert
      *        Certificado de firma.
-     * @param digestAlgorithm
+     * @param digestAlgorithmName
      *        Algoritmo Firmado.
-     * @param digAlgId
+     * @param digestAlgorithmOID
      * @param datos
      *        Datos firmados.
-     * @param politica
-     * @param qualifier
+     * @param policyIdentifier
+     * @param policyQualifier
      * @param signingCertificateV2
      * @param dataType
      *        Identifica el tipo del contenido a firmar.
@@ -55,21 +58,29 @@ class CAdESUtils {
      * @throws java.io.IOException
      * @throws CertificateEncodingException */
     static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
-                                                         final String digestAlgorithm,
-                                                         final AlgorithmIdentifier digAlgId,
-                                                         final byte[] datos,
-                                                         final String politica,
-                                                         final String qualifier,
-                                                         final boolean signingCertificateV2,
-                                                         final String dataType,
-                                                         final byte[] messageDigest) throws NoSuchAlgorithmException,
-                                                                              IOException,
-                                                                              CertificateEncodingException {
+                                                  final String digestAlgorithmName,
+                                                  final byte[] datos,
+                                                  final String policyIdentifier,
+                                                  final String policyQualifier,
+                                                  final boolean signingCertificateV2,
+                                                  final byte[] messageDigest) throws NoSuchAlgorithmException,
+                                                                                     IOException,
+                                                                                     CertificateEncodingException {
+        
+        // ALGORITMO DE HUELLA DIGITAL
+        final AlgorithmIdentifier digestAlgorithmOID;
+        try {
+            digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
+        }
+        catch (final Exception e) {
+            throw new IOException("Error obteniendo el OID en ASN.1 del algoritmo de huella digital: " + e); //$NON-NLS-1$
+        }
+
         
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        final ASN1EncodableVector ContexExpecific = initContexExpecific(digestAlgorithm, datos, dataType, messageDigest);
+        final ASN1EncodableVector ContexExpecific = initContexExpecific(digestAlgorithmName, datos, PKCSObjectIdentifiers.data.getId(), messageDigest);
 
         // Serial Number
         // comentar lo de abajo para version del rfc 3852
@@ -96,10 +107,10 @@ class CAdESUtils {
              * IssuerSerial OPTIONAL }
              * Hash ::= OCTET STRING */
 
-            final MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
+            final MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
             final byte[] certHash = md.digest(cert.getEncoded());
             final ESSCertIDv2[] essCertIDv2 = {
-                new ESSCertIDv2(digAlgId, certHash, isuerSerial)
+                new ESSCertIDv2(digestAlgorithmOID, certHash, isuerSerial)
             };
 
             /** PolicyInformation ::= SEQUENCE { policyIdentifier CertPolicyId,
@@ -111,16 +122,16 @@ class CAdESUtils {
 
             PolicyInformation[] pI;
             SigningCertificateV2 scv2 = null;
-            if (qualifier != null) {
+            if (policyQualifier != null) {
 
-                final DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
-                if (politica.equals("")) { //$NON-NLS-1$
+                final DERObjectIdentifier oidQualifier = new DERObjectIdentifier(policyQualifier.toString());
+                if (policyIdentifier.equals("")) { //$NON-NLS-1$
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier)
                     };
                 }
                 else {
-                    final PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
+                    final PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(policyIdentifier);
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier, new DERSequence(pqInfo))
                     };
@@ -158,7 +169,7 @@ class CAdESUtils {
             /** ESSCertID ::= SEQUENCE { certHash Hash, issuerSerial IssuerSerial
              * OPTIONAL }
              * Hash ::= OCTET STRING -- SHA1 hash of entire certificate */
-            final MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
+            final MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
             final byte[] certHash = md.digest(cert.getEncoded());
             final ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
 
@@ -171,16 +182,16 @@ class CAdESUtils {
 
             PolicyInformation[] pI;
             SigningCertificate scv = null;
-            if (qualifier != null) {
+            if (policyQualifier != null) {
 
-                final DERObjectIdentifier oidQualifier = new DERObjectIdentifier(qualifier.toString());
-                if (politica.equals("")) { //$NON-NLS-1$
+                final DERObjectIdentifier oidQualifier = new DERObjectIdentifier(policyQualifier.toString());
+                if (policyIdentifier.equals("")) { //$NON-NLS-1$
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier)
                     };
                 }
                 else {
-                    final PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(politica);
+                    final PolicyQualifierInfo pqInfo = new PolicyQualifierInfo(policyIdentifier);
                     pI = new PolicyInformation[] {
                         new PolicyInformation(oidQualifier, new DERSequence(pqInfo))
                     };
@@ -212,19 +223,19 @@ class CAdESUtils {
 
         // INICIO SIGPOLICYID ATTRIBUTE
 
-        if (qualifier != null) {
+        if (policyQualifier != null) {
             /*
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
-            final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(qualifier.toString());
+            final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(policyQualifier.toString());
 
             /*
              * OtherHashAlgAndValue ::= SEQUENCE { hashAlgorithm
              * AlgorithmIdentifier, hashValue OCTET STRING }
              */
-            final MessageDigest mdgest = MessageDigest.getInstance(digestAlgorithm);
-            final byte[] hashed = mdgest.digest(politica.getBytes());
-            final DigestInfo OtherHashAlgAndValue = new DigestInfo(digAlgId, hashed);
+            final MessageDigest mdgest = MessageDigest.getInstance(digestAlgorithmName);
+            final byte[] hashed = mdgest.digest(policyIdentifier.getBytes());
+            final DigestInfo OtherHashAlgAndValue = new DigestInfo(digestAlgorithmOID, hashed);
 
             /*
              * SigPolicyQualifierInfo ::= SEQUENCE { SigPolicyQualifierId
@@ -232,7 +243,7 @@ class CAdESUtils {
              * policyQualifierId }
              */
 
-            final SigPolicyQualifierInfo spqInfo = new SigPolicyQualifierInfo(politica);
+            final SigPolicyQualifierInfo spqInfo = new SigPolicyQualifierInfo(policyIdentifier);
 
             /*
              * SignaturePolicyId ::= SEQUENCE { sigPolicyId SigPolicyId,
@@ -276,7 +287,7 @@ class CAdESUtils {
         // fecha de firma
         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
-        // MessageDigestç
+        // MessageDigest
         ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString((messageDigest != null) ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
 
         return ContexExpecific;

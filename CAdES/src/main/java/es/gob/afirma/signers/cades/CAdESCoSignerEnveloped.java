@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
-import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -150,7 +148,6 @@ final class CAdESCoSignerEnveloped {
                            final String policy,
                            final String qualifier,
                            final boolean signingCertificateV2,
-                           final String dataType,
                            final PrivateKeyEntry keyEntry,
                            final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
@@ -222,12 +219,10 @@ final class CAdESCoSignerEnveloped {
             final ASN1EncodableVector contextExpecific =
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                              digestAlgorithm,
-                                             digAlgId,
                                              parameters.getContent(),
                                              policy,
                                              qualifier,
                                              signingCertificateV2,
-                                             dataType,
                                              null);
 
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -237,12 +232,10 @@ final class CAdESCoSignerEnveloped {
             final ASN1EncodableVector contextExpecific =
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                              digestAlgorithm,
-                                             digAlgId,
                                              null,
                                              policy,
                                              qualifier,
                                              signingCertificateV2,
-                                             dataType,
                                              messageDigest);
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -327,7 +320,6 @@ final class CAdESCoSignerEnveloped {
                            final String policy,
                            final String qualifier,
                            final boolean signingCertificateV2,
-                           final String dataType,
                            final PrivateKeyEntry keyEntry,
                            byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
 
@@ -427,12 +419,10 @@ final class CAdESCoSignerEnveloped {
             final ASN1EncodableVector contextExpecific =
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                              digestAlgorithm,
-                                             digAlgId,
                                              null,
                                              policy,
                                              qualifier,
                                              signingCertificateV2,
-                                             dataType,
                                              messageDigest);
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -473,14 +463,6 @@ final class CAdESCoSignerEnveloped {
      * @throws es.map.es.map.afirma.exceptions.AOException */
     private ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
-        final Signature sig;
-        try {
-            sig = Signature.getInstance(signatureAlgorithm);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e); //$NON-NLS-1$
-        }
-
         final byte[] tmp;
         try {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
@@ -489,32 +471,7 @@ final class CAdESCoSignerEnveloped {
             throw new AOException("Error al obtener los datos a firmar", ex); //$NON-NLS-1$
         }
 
-        // Indicar clave privada para la firma
-        try {
-            sig.initSign(keyEntry.getPrivateKey());
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
-        }
-
-        // Actualizamos la configuracion de firma
-        try {
-            sig.update(tmp);
-        }
-        catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
-        }
-
-        // firmamos.
-        final byte[] realSig;
-        try {
-            realSig = sig.sign();
-        }
-        catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
-        }
-
-        return new DEROctetString(realSig);
+        return new DEROctetString(PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry, tmp));
 
     }
 }
