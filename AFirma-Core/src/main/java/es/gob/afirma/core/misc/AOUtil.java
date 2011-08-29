@@ -22,13 +22,9 @@ import java.net.URI;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
-
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
@@ -259,7 +255,8 @@ public final class AOUtil {
     }
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) del titular de un
-     * certificado X.509.
+     * certificado X.509. Si no se encuentra el CN, se devuelve la unidad organizativa
+     * (Organization Unit, OU).
      * @param c
      *        Certificado X.509 del cual queremos obtener el nombre
      *        com&uacute;n
@@ -273,7 +270,8 @@ public final class AOUtil {
     }
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) de un <i>Principal</i>
-     * X.400.
+     * X.400. Si no se encuentra el CN, se devuelve la unidad organizativa
+     * (Organization Unit, OU).
      * @param principal
      *        <i>Principal</i> del cual queremos obtener el nombre
      *        com&uacute;n
@@ -283,40 +281,98 @@ public final class AOUtil {
         if (principal == null) {
             return null;
         }
-        final List<Rdn> rdns;
-        try {
-            rdns = new LdapName(principal).getRdns();
+        
+        String rdn = getRDNvalue("cn", principal);
+        if (rdn == null) {
+            rdn = getRDNvalue("ou", principal);
         }
-        catch (final Exception e) {
-            LOGGER.warning("No se ha podido obtener el Common Name, se devolvera la cadena de entrada: " + e); //$NON-NLS-1$
-            return principal;
+        
+        if (rdn != null) {
+            return rdn;
         }
-        if (rdns != null && (!rdns.isEmpty())) {
-            String ou = null;
-            for (int j = 0; j < rdns.size(); j++) {
-                if (rdns.get(j).toString().startsWith("cn=") || rdns.get(j).toString().startsWith("CN=")) { //$NON-NLS-1$ //$NON-NLS-2$
-                    return rdns.get(j).toString().substring(3);
-                }
-                else if (rdns.get(j).toString().startsWith("ou=") || rdns.get(j).toString().startsWith("OU=")) { //$NON-NLS-1$ //$NON-NLS-2$
-                    ou = rdns.get(j).toString().substring(3);
-                }
-            }
-
-            // En caso de no haber encontrado el Common Name y si la
-            // Organizational Unit,
-            // devolvemos esta ultima
-            if (ou != null) {
-                return ou;
-            }
-
+        
+        int i = principal.indexOf('=');
+        if (i != -1) {
             LOGGER
-                  .warning("No se ha podido obtener el Common Name ni la Organizational Unit, se devolvera el fragmento mas significativo"); //$NON-NLS-1$
-            return rdns.get(rdns.size() - 1).toString().substring(3);
+            .warning("No se ha podido obtener el Common Name ni la Organizational Unit, se devolvera el fragmento mas significativo"); //$NON-NLS-1$
+            return getRDNvalue(principal.substring(0, i), principal);
         }
+        
         LOGGER.warning("Principal no valido, se devolvera la entrada"); //$NON-NLS-1$
         return principal;
     }
+    
+    /**
+     * Recupera el valor de un RDN de un principal. El valor de retorno no incluye
+     * el nombre del RDN, el igual, ni las posibles comillas que envuelvan el valor.
+     * La funci&oacute;n no es sensible a la capitalizaci&oacute;n del RDN. Si no se
+     * encuentra, se devuelve {@code null}.
+     * @param rdn RDN que deseamos encontrar.
+     * @param principal Principal del que extraer el RDN
+     * @return Valor del RDN indicado o {@code null} si no se encuentra.
+     */
+    private final static String getRDNvalue(final String rdn, final String principal) {
+        
+        int offset1 = 0;
+        while ((offset1 = principal.toLowerCase().indexOf(rdn.toLowerCase(), offset1)) != -1) {
 
+            if (offset1 > 0 && principal.charAt(offset1-1) != ',' && principal.charAt(offset1-1) != ' ') {
+                offset1++;
+                continue;
+            }
+            
+            offset1 += rdn.length();
+            while (offset1 < principal.length() && principal.charAt(offset1) == ' ') {
+                offset1++;
+            }
+            
+            if (offset1 >= principal.length()) {
+                return null;
+            }
+            
+            if (principal.charAt(offset1) != '=') {
+                continue;
+            }
+            
+            offset1++;
+            while (offset1 < principal.length() && principal.charAt(offset1) == ' ') {
+                offset1++;
+            }
+            
+            if (offset1 >= principal.length()) {
+                return "";
+            }
+            
+            int offset2;
+            if (principal.charAt(offset1) == ',') {
+                return "";
+            } else if (principal.charAt(offset1) == '"') {
+                offset1++;
+                if (offset1 >= principal.length()) {
+                    return "";
+                }
+                
+                offset2 = principal.indexOf("\"", offset1);
+                if (offset2 == offset1) {
+                    return "";
+                } else if (offset2 != -1) {
+                    return principal.substring(offset1, offset2);
+                } else {
+                    return principal.substring(offset1);
+                }
+            } else {
+                offset2 = principal.indexOf(",", offset1);
+                if (offset2 != -1) {
+                    return principal.substring(offset1, offset2).trim();
+                } else {
+                    return principal.substring(offset1).trim();
+                }
+            }
+        }
+
+        return null;
+    }
+    
     /** Caracterres aceptados en una codificaci&oacute;n Base64 seg&uacute;n la
      * <a href="http://www.faqs.org/rfcs/rfc3548.html">RFC 3548</a>. Importante:
      * A&ntilde;adimos el car&aacute;cter &tilde; porque en ciertas
@@ -685,3 +741,4 @@ public final class AOUtil {
         return parts.toArray(new String[0]);
     }
 }
+
