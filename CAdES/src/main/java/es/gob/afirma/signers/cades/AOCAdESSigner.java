@@ -223,7 +223,7 @@ public final class AOCAdESSigner implements AOSigner {
             }
         }
 
-        String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
+        final String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
 
         // Si la firma que nos introducen es SignedData
         //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
