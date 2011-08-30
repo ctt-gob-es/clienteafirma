@@ -14,27 +14,28 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 /** Clase para la obtencion de los recursos textuales del UI. */
 final class KeyStoreMessages {
 
     private static final String BUNDLE_NAME = "keystoremessages"; //$NON-NLS-1$
-
     private static ResourceBundle RESOURCE_BUNDLE;
 
     static {
-        try {
-            
+        try {            
             ClassLoader classLoader = KeyStoreMessages.class.getClassLoader();
             if (classLoader instanceof URLClassLoader) {
+                Vector<URL> urls = new Vector<URL>();
                 for (URL url : ((URLClassLoader)classLoader).getURLs()) {
-                    System.out.println("URL del ClassLoader: " + url.toString());
+                    if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+                        urls.add(url);
+                    }
+                    classLoader = new URLClassLoader(urls.toArray(new URL[0]));
                 }
             }
-            
-            
-            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), classLoader);
         }
         catch (final Exception e) {
             try {
@@ -79,30 +80,30 @@ final class KeyStoreMessages {
         }
     }
 
-    /** Recupera el texto identificado con la clave proporcionada y sustituye las
-     * subcadenas de tipo "%i" por el texto en la posici&oacute;n 'i' del array
-     * proporcionado.
-     * @param key
-     *        Clave del texto.
-     * @param params
-     *        Par&aacute;metros que se desean insertar.
-     * @return Recuerso textual con las subcadenas sustituidas. */
-    static String getString(final String key, final String[] params) {
-
-        String text;
-        try {
-            text = RESOURCE_BUNDLE.getString(key);
-        }
-        catch (final Exception e) {
-            return '!' + key + '!';
-        }
-
-        if (params != null) {
-            for (int i = 0; i < params.length; i++) {
-                text = text.replace("%" + i, params[i]); //$NON-NLS-1$
-            }
-        }
-
-        return text;
-    }
+//    /** Recupera el texto identificado con la clave proporcionada y sustituye las
+//     * subcadenas de tipo "%i" por el texto en la posici&oacute;n 'i' del array
+//     * proporcionado.
+//     * @param key
+//     *        Clave del texto.
+//     * @param params
+//     *        Par&aacute;metros que se desean insertar.
+//     * @return Recuerso textual con las subcadenas sustituidas. */
+//    static String getString(final String key, final String[] params) {
+//
+//        String text;
+//        try {
+//            text = RESOURCE_BUNDLE.getString(key);
+//        }
+//        catch (final Exception e) {
+//            return '!' + key + '!';
+//        }
+//
+//        if (params != null) {
+//            for (int i = 0; i < params.length; i++) {
+//                text = text.replace("%" + i, params[i]); //$NON-NLS-1$
+//            }
+//        }
+//
+//        return text;
+//    }
 }

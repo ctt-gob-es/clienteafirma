@@ -234,7 +234,7 @@ public class AOKeyStoreManager {
 
             LOGGER.info("Cargando KeyStore de Windows"); //$NON-NLS-1$
             try {
-                this.ks.load(store, null);
+                this.ks.load(null, null);
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
