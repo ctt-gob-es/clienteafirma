@@ -10,6 +10,8 @@
 
 package es.gob.afirma.keystores.common;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -25,7 +27,11 @@ final class KeyStoreMessages {
         try {
             
             ClassLoader classLoader = KeyStoreMessages.class.getClassLoader();
-            System.out.println("Tipo de classloader para los mensajes de almacenes: " + classLoader.getClass().toString());
+            if (classLoader instanceof URLClassLoader) {
+                for (URL url : ((URLClassLoader)classLoader).getURLs()) {
+                    System.out.println("URL del ClassLoader: " + url.toString());
+                }
+            }
             
             
             RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());

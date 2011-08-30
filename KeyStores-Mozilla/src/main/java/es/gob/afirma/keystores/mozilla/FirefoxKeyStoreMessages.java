@@ -1,4 +1,6 @@
 package es.gob.afirma.keystores.mozilla;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -9,7 +11,11 @@ class FirefoxKeyStoreMessages {
 
     static {
         ClassLoader classLoader = FirefoxKeyStoreMessages.class.getClassLoader();
-        System.out.println("Tipo de classloader para los mensajes de almacenes Firefox: " + classLoader.getClass().toString());
+        if (classLoader instanceof URLClassLoader) {
+            for (URL url : ((URLClassLoader)classLoader).getURLs()) {
+                System.out.println("URL del ClassLoader: " + url.toString());
+            }
+        }
     }
     
     private FirefoxKeyStoreMessages() {
