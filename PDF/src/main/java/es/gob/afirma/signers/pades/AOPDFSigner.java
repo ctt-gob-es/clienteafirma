@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
@@ -620,15 +618,6 @@ public final class AOPDFSigner implements AOSigner {
         // ***************************************
         // ********************************************************************************
 
-        // tipos de datos a firmar. es el tipo de datos. Para este tipo de firma
-        // siempre es "data".
-        String dataType = PKCSObjectIdentifiers.data.getId();
-
-        final byte[] pk;
-
-        
-        String policyQualifier2 = (policyQualifier != null) ? policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "") : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = ke.getCertificateChain();
         if (certs != null && (certs instanceof X509Certificate[])) {
@@ -643,14 +632,13 @@ public final class AOPDFSigner implements AOSigner {
             }
         }
 
-        pk =
+        final byte[] pk =
                 new GenCAdESEPESSignedData().generateSignedData(
                     new P7ContentSignerParameters(inPDF, algorithm, xCerts), 
                     true, // omitContent
                     policyIdentifier,
-                    policyQualifier2,
+                    (policyQualifier != null) ? policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "") : null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
                     true, // true -> isSigningCertificateV2, false -> isSigningCertificateV1
-                    dataType,
                     ke,
                     MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())));
 
