@@ -27,19 +27,19 @@ public final class KeyStoreConfiguration {
      * @param l
      *        Biblioteca PKCS#11 correspondiente al almac&eacute;n de claves
      *        (&uacute;nicamente en almacenes tipo PKCS#11) */
-    public KeyStoreConfiguration(final AOKeyStore t, String d, final String l) {
-        type = t;
-        if (d == null) {
-            d = t.getDescription();
+    public KeyStoreConfiguration(final AOKeyStore t, final String d, final String l) {
+        this.type = t;
+        if (t == null) {
+            throw new IllegalArgumentException("Es necesario indicar el tipo de almacen"); //$NON-NLS-1$
         }
-        description = d;
-        lib = l;
+        this.description = (d != null) ? d : t.getDescription();
+        this.lib = l;
     }
 
     /** Obtiene el tipo de almac&eacute;n de claves.
      * @return Tipo de almac&eacute;n de claves */
     public AOKeyStore getType() {
-        return type;
+        return this.type;
     }
 
     /** Obtiene la biblioteca PKCS#11 correspondiente al almac&eacute;n de
@@ -47,11 +47,11 @@ public final class KeyStoreConfiguration {
      * PKCS#11
      * @return Biblioteca PKCS#11 correspondiente al almac&eacute;n de claves */
     public String getLib() {
-        return lib;
+        return this.lib;
     }
 
     @Override
     public String toString() {
-        return description;
+        return this.description;
     }
 }
