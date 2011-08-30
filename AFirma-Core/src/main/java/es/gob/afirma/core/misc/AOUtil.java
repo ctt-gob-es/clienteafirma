@@ -282,9 +282,9 @@ public final class AOUtil {
             return null;
         }
         
-        String rdn = getRDNvalue("cn", principal);
+        String rdn = getRDNvalue("cn", principal); //$NON-NLS-1$
         if (rdn == null) {
-            rdn = getRDNvalue("ou", principal);
+            rdn = getRDNvalue("ou", principal); //$NON-NLS-1$
         }
         
         if (rdn != null) {
@@ -293,8 +293,7 @@ public final class AOUtil {
         
         int i = principal.indexOf('=');
         if (i != -1) {
-            LOGGER
-            .warning("No se ha podido obtener el Common Name ni la Organizational Unit, se devolvera el fragmento mas significativo"); //$NON-NLS-1$
+            LOGGER .warning("No se ha podido obtener el Common Name ni la Organizational Unit, se devolvera el fragmento mas significativo"); //$NON-NLS-1$
             return getRDNvalue(principal.substring(0, i), principal);
         }
         
@@ -340,33 +339,33 @@ public final class AOUtil {
             }
             
             if (offset1 >= principal.length()) {
-                return "";
+                return ""; //$NON-NLS-1$
             }
             
             int offset2;
             if (principal.charAt(offset1) == ',') {
-                return "";
+                return ""; //$NON-NLS-1$
             } else if (principal.charAt(offset1) == '"') {
                 offset1++;
                 if (offset1 >= principal.length()) {
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 
-                offset2 = principal.indexOf("\"", offset1);
+                offset2 = principal.indexOf("\"", offset1); //$NON-NLS-1$
                 if (offset2 == offset1) {
-                    return "";
+                    return ""; //$NON-NLS-1$
                 } else if (offset2 != -1) {
                     return principal.substring(offset1, offset2);
                 } else {
                     return principal.substring(offset1);
                 }
-            } else {
-                offset2 = principal.indexOf(",", offset1);
+            } 
+            else {
+                offset2 = principal.indexOf(",", offset1); //$NON-NLS-1$
                 if (offset2 != -1) {
                     return principal.substring(offset1, offset2).trim();
-                } else {
-                    return principal.substring(offset1).trim();
-                }
+                } 
+                return principal.substring(offset1).trim();
             }
         }
 
