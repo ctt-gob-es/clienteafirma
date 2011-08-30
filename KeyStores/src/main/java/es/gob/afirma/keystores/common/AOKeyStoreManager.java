@@ -151,7 +151,7 @@ public class AOKeyStoreManager {
 
             // TODO: Revisar si el KeyStore de Java requiere contrasena
             try {
-                this.ks.load(store, pssCallBack.getPassword());
+                this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -186,7 +186,7 @@ public class AOKeyStoreManager {
                 throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#12 / PFX", e); //$NON-NLS-1$
             }
             try {
-                this.ks.load(store, pssCallBack.getPassword());
+                this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -234,7 +234,7 @@ public class AOKeyStoreManager {
 
             LOGGER.info("Cargando KeyStore de Windows"); //$NON-NLS-1$
             try {
-                this.ks.load(store, pssCallBack.getPassword());
+                this.ks.load(store, null);
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -378,7 +378,7 @@ public class AOKeyStoreManager {
             }
 
             try {
-                this.ks.load(store, pssCallBack.getPassword());
+                this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -411,7 +411,7 @@ public class AOKeyStoreManager {
             }
 
             try {
-                this.ks.load(store, pssCallBack.getPassword());
+                this.ks.load(store, null);
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
