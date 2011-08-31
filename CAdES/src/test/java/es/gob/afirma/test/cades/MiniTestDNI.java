@@ -1,13 +1,15 @@
 package es.gob.afirma.test.cades;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.Provider;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 
 import org.junit.Test;
 
+import sun.security.pkcs11.SunPKCS11;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -18,10 +20,9 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  */
 public class MiniTestDNI {
     
-    private static final String DNIE_DRIVER_PATH = "c:\\windows\\system32\\UsrPkcs11.dll"; //$NON-NLS-1$
-    //private static final String DNIE_DRIVER_PATH = "c:\\windows\\sysWOW64\\UsrPkcs11.dll";
+    private static final String DNIE_DRIVER_PATH = "name=testdni\r\nlibrary=c:/windows/system32/UsrPkcs11.dll\r\nshowInfo=true"; //$NON-NLS-1$
     
-    private static final char[] DNI_PIN = "pin0".toCharArray();  //$NON-NLS-1$
+    private static final char[] DNI_PIN = "rock2048".toCharArray();  //$NON-NLS-1$
     
     private static final String DNI_SIGN_ALIAS = "CertFirmaDigital"; //$NON-NLS-1$
     
@@ -34,8 +35,10 @@ public class MiniTestDNI {
     @Test
     public void testCAdESDNIe() throws Exception {
         
-        KeyStore ks = KeyStore.getInstance("PKCS11"); //$NON-NLS-1$
-        ks.load(new FileInputStream(new File(DNIE_DRIVER_PATH)), DNI_PIN);
+        Provider p = new SunPKCS11(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
+        Security.addProvider(p);
+        KeyStore ks = KeyStore.getInstance("PKCS11", p); //$NON-NLS-1$
+        ks.load(null, DNI_PIN);
         
         final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(DNI_SIGN_ALIAS, new KeyStore.PasswordProtection(DNI_PIN));
         
