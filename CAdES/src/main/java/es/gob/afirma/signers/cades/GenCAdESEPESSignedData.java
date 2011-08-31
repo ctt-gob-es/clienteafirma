@@ -102,13 +102,13 @@ public final class GenCAdESEPESSignedData {
         }
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
 
-        final byte[] content = (omitContent) ? null : parameters.getContent();
-        
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         
-        if (omitContent && messageDigest == null && content != null) {
+        final byte[] content = (omitContent) ? null : parameters.getContent();
+        
+        if (omitContent && messageDigest == null && parameters.getContent() != null) {
             final MessageDigest md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm));
-            md.update(content);
+            md.update(parameters.getContent());
             messageDigest = md.digest();
         }
         
