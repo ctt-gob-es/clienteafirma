@@ -143,21 +143,18 @@ public final class GenCadesEPESSignedData {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos");
         }
 
-        // 1. VERSION
-        // la version se mete en el constructor del signedData y es 1
 
-        // 2. DIGESTALGORITM
-        // buscamos que timo de algoritmo es y lo codificamos con su OID
+        
+        // ALGORITMO DE HUELLA DIGITAL
 
-        final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
-        AlgorithmIdentifier digAlgId;
+        AlgorithmIdentifier digestAlgorithmOID;
 
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
-        String digestAlgorithm = null;
+        String digestAlgorithmName = null;
         String keyAlgorithm = null;
         final int with = signatureAlgorithm.indexOf("with");
         if (with > 0) {
-            digestAlgorithm = AOCryptoUtil.getDigestAlgorithmName(signatureAlgorithm);
+            digestAlgorithmName = AOCryptoUtil.getDigestAlgorithmName(signatureAlgorithm);
             final int and = signatureAlgorithm.indexOf("and", with + 4);
             if (and > 0) {
                 keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
@@ -167,45 +164,93 @@ public final class GenCadesEPESSignedData {
             }
         }
 
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
+        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithmName);
 
         try {
-            digAlgId = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
+            digestAlgorithmOID = makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e);
         }
 
-        digestAlgs.add(digAlgId);
+        // // ATRIBUTOS
 
-        // 3. CONTENTINFO
-        // si se introduce el contenido o no
+        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
+        final ASN1EncodableVector contextExcepcific =
+                Utils.generateSignerInfo(signerCertificateChain[0],
+                                         digestAlgorithmId,
+                                         digestAlgorithmName,
+                                         digestAlgorithmOID,
+                                         parameters.getContent(),
+                                         policy,
+                                         qualifier,
+                                         signingCertificateV2,
+                                         dataType,
+                                         messageDigest);
+        
+        signedAttr2                    = getAttributeSet(new AttributeTable(contextExcepcific));
+        final ASN1Set signedAttributes = getAttributeSet(new AttributeTable(contextExcepcific));
 
-        ContentInfo encInfo = null;
+        // Firma PKCS#1
+        
+        final ASN1OctetString encodedPKCS1Signature;
+        try {
+            encodedPKCS1Signature = firma(signatureAlgorithm, keyEntry);
+        }
+        catch (final AOException ex) {
+            throw ex;
+        }
+
+        
+        
+        
+        // ContentInfo
+        ContentInfo contentInfo = null;
         final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
 
         if (omitContent == false) {
             final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            final byte[] content2 = parameters.getContent();
-            final CMSProcessable msg = new CMSProcessableByteArray(content2);
+            final byte[] content = parameters.getContent();
+            final CMSProcessable msg = new CMSProcessableByteArray(content);
             try {
                 msg.write(bOut);
             }
             catch (final Exception ex) {
                 throw new IOException("Error en la escritura del procesable CMS: " + ex);
             }
-            encInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
+            contentInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
         }
         else {
-            encInfo = new ContentInfo(contentTypeOID, null);
+            contentInfo = new ContentInfo(contentTypeOID, null);
         }
 
-        // 4. CERTIFICADOS
-        // obtenemos la lista de certificados
+        final TBSCertificateStructure tbsCertificateStructure = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
+        final IssuerAndSerialNumber issuerAndSerialNumber = new IssuerAndSerialNumber(X500Name.getInstance(tbsCertificateStructure.getIssuer()), tbsCertificateStructure.getSerialNumber().getValue());
 
+        final SignerIdentifier signerIdentifier = new SignerIdentifier(issuerAndSerialNumber);
+
+        // AlgorithmIdentifier
+        digestAlgorithmOID = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
+
+        // digEncryptionAlgorithm
+        final AlgorithmId keyAlgorithmId = AlgorithmId.get(keyAlgorithm);
+        final AlgorithmIdentifier keyAlgorithmIdentifier;
+        try {
+            keyAlgorithmIdentifier = makeAlgId(keyAlgorithmId.getOID().toString(), keyAlgorithmId.getEncodedParams());
+        }
+        catch (final Exception e) {
+            throw new IOException("Error de codificacion: " + e);
+        }
+
+        // SignerInfo
+        final ASN1EncodableVector signerInfo = new ASN1EncodableVector();
+        signerInfo.add(new SignerInfo(signerIdentifier, digestAlgorithmOID, signedAttributes, keyAlgorithmIdentifier, encodedPKCS1Signature, null // unsignedAttr
+        ));
+
+        final ASN1EncodableVector digestAlgorithms = new ASN1EncodableVector();
+        digestAlgorithms.add(digestAlgorithmOID);
+        
         ASN1Set certificates = null;
-        final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
-
         if (signerCertificateChain.length != 0) {
             final List<DEREncodable> ce = new ArrayList<DEREncodable>();
             for (final X509Certificate element : signerCertificateChain) {
@@ -214,65 +259,13 @@ public final class GenCadesEPESSignedData {
             certificates = createBerSetFromList(ce);
         }
 
-        final ASN1Set certrevlist = null;
-
-        // 5. SIGNERINFO
-        // raiz de la secuencia de SignerInfo
-        final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
-
-        final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
-        final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
-
-        final SignerIdentifier identifier = new SignerIdentifier(encSid);
-
-        // AlgorithmIdentifier
-        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
-
-        // // ATRIBUTOS
-
-        final ASN1EncodableVector contextExcepcific =
-                Utils.generateSignerInfo(signerCertificateChain[0],
-                                         digestAlgorithmId,
-                                         digestAlgorithm,
-                                         digAlgId,
-                                         parameters.getContent(),
-                                         policy,
-                                         qualifier,
-                                         signingCertificateV2,
-                                         dataType,
-                                         messageDigest);
-        signedAttr2 = getAttributeSet(new AttributeTable(contextExcepcific));
-        final ASN1Set signedAttr = getAttributeSet(new AttributeTable(contextExcepcific));
-
-        // // FIN ATRIBUTOS
-
-        // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        final AlgorithmIdentifier encAlgId;
-        try {
-            encAlgId = makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
-        }
-
-        final ASN1OctetString sign2;
-        try {
-            sign2 = firma(signatureAlgorithm, keyEntry);
-        }
-        catch (final AOException ex) {
-            throw ex;
-        }
-
-        signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, null // unsignedAttr
-        ));
 
         // construimos el Signed Data y lo devolvemos
-        return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(new DERSet(digestAlgs),
-                                                                                encInfo,
+        return new ContentInfo(PKCSObjectIdentifiers.signedData, new SignedData(new DERSet(digestAlgorithms),
+                                                                                contentInfo,
                                                                                 certificates,
-                                                                                certrevlist,
-                                                                                new DERSet(signerInfos))).getDEREncoded();
+                                                                                null,
+                                                                                new DERSet(signerInfo))).getDEREncoded();
 
     }
 
