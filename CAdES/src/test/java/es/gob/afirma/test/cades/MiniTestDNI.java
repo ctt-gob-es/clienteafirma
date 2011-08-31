@@ -10,6 +10,7 @@ import java.security.cert.X509Certificate;
 import org.junit.Test;
 
 import sun.security.pkcs11.SunPKCS11;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -20,7 +21,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  */
 public class MiniTestDNI {
     
-    private static final String DNIE_DRIVER_PATH = "name=testdni\r\nlibrary=c:/windows/system32/UsrPkcs11.dll\r\nshowInfo=true"; //$NON-NLS-1$
+    private static final String DNIE_DRIVER_PATH = "name=testdni\r\nlibrary=c:/windows/system32/UsrPkcs11.dll\r\nshowInfo=false"; //$NON-NLS-1$
     
     private static final char[] DNI_PIN = "rock2048".toCharArray();  //$NON-NLS-1$
     
@@ -55,9 +56,11 @@ public class MiniTestDNI {
         
         byte[] firma = genCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, /* policy*/ null, /* qualifier */ null, signingCertificateV2, pke, messageDigest);  
 
-        java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/MiniTestCadesNuevo"+ (omitContent ? "Expl" : "Impl") + ".csig");
-        fos.write(firma);
-        try { fos.close(); } catch (Exception e) { }
+        //System.out.println(AOUtil.hexify(firma, true));
+        
+//        java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/MiniTestCadesNuevo"+ (omitContent ? "Expl" : "Impl") + ".csig");
+//        fos.write(firma);
+//        try { fos.close(); } catch (Exception e) { }
     }
 
 }
