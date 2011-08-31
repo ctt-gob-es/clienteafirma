@@ -52,6 +52,8 @@ public final class AOCAdESSigner implements AOSigner {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    /** Indica si por defecto se debe insertar el atributo SigningCertificateV2 en la firma. */
+    private static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = false;
 
     public byte[] sign(byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
@@ -64,7 +66,7 @@ public final class AOCAdESSigner implements AOSigner {
         }
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "true")); //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
         byte[] messageDigest = null;
 
@@ -133,7 +135,7 @@ public final class AOCAdESSigner implements AOSigner {
         }
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
         byte[] messageDigest = null;
 
@@ -197,7 +199,7 @@ public final class AOCAdESSigner implements AOSigner {
         if (extraParams == null) {
             extraParams = new Properties();
         }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
         if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
@@ -276,7 +278,7 @@ public final class AOCAdESSigner implements AOSigner {
         if (extraParams == null) {
             extraParams = new Properties();
         }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
         if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
