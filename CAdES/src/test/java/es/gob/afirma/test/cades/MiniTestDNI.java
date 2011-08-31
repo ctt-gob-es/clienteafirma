@@ -44,8 +44,8 @@ public class MiniTestDNI {
         
         P7ContentSignerParameters p7ContentSignerParameters = new P7ContentSignerParameters(TEXTO_FIRMAR.getBytes("UTF-8"), "SHA1withRSA", (X509Certificate[]) pke.getCertificateChain());  //$NON-NLS-1$ //$NON-NLS-2$
         
-        String policy = "http://www.boe.es/boe/dias/2011/07/30/pdfs/BOE-A-2011-13171.pdf"; //$NON-NLS-1$
-        String qualifier = "2.16.724.1.3.1.1.2.1.8"; //$NON-NLS-1$
+//        String policy = "http://www.boe.es/boe/dias/2011/07/30/pdfs/BOE-A-2011-13171.pdf"; //$NON-NLS-1$
+//        String qualifier = "2.16.724.1.3.1.1.2.1.8"; //$NON-NLS-1$
         
         GenCAdESEPESSignedData  genCAdESEPESSignedData = new GenCAdESEPESSignedData();                                         
 
@@ -53,8 +53,11 @@ public class MiniTestDNI {
         boolean signingCertificateV2 = true; 
         byte[] messageDigest = null; // Se calcula internamente el digest de los datos a firmar. 
         
-        byte[] firma = genCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, policy, qualifier, signingCertificateV2, pke, messageDigest);  
+        byte[] firma = genCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, /* policy*/ null, /* qualifier */ null, signingCertificateV2, pke, messageDigest);  
 
+        java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/MiniTestCadesNuevo"+ (omitContent ? "Expl" : "Impl") + ".csig");
+        fos.write(firma);
+        try { fos.close(); } catch (Exception e) { }
     }
 
 }
