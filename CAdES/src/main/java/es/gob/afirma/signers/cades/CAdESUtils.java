@@ -80,11 +80,11 @@ class CAdESUtils {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        final ASN1EncodableVector ContexExpecific = initContexExpecific(digestAlgorithmName, datos, PKCSObjectIdentifiers.data.getId(), messageDigest);
+        final ASN1EncodableVector contexExpecific = initContexExpecific(digestAlgorithmName, datos, PKCSObjectIdentifiers.data.getId(), messageDigest);
 
         // Serial Number
         // comentar lo de abajo para version del rfc 3852
-        ContexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
+        contexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
 
         if (signingCertificateV2) {
 
@@ -148,7 +148,7 @@ class CAdESUtils {
             }
 
             // Secuencia con singningCertificate
-            ContexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_signingCertificateV2, new DERSet(scv2)));
+            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_signingCertificateV2, new DERSet(scv2)));
 
             // FIN SINGING CERTIFICATE-V2
 
@@ -218,7 +218,7 @@ class CAdESUtils {
              * member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs9(9) smime(16)
              * id-aa(2) 12 } */
             // Secuencia con singningCertificate
-            ContexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_signingCertificate, new DERSet(scv)));
+            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_signingCertificate, new DERSet(scv)));
         }
 
         // INICIO SIGPOLICYID ATTRIBUTE
@@ -261,11 +261,11 @@ class CAdESUtils {
             final DERSequence ds = new DERSequence(v);
 
             // Secuencia con singningCertificate
-            ContexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Object())));
+            contexExpecific.add(new Attribute(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId, new DERSet(ds.toASN1Object())));
             // FIN SIGPOLICYID ATTRIBUTE
         }
 
-        return ContexExpecific;
+        return contexExpecific;
     }
     
     /** Inicializa el context

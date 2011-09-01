@@ -1,6 +1,7 @@
 package es.gob.afirma.signers.cades;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,11 +83,8 @@ class CAdESTriPhaseSigner {
     static byte[] postSign(final String digestAlgorithmName,
                            final byte[] content,
                            final X509Certificate[] signerCertificateChain,
-                           final String policyIdentifier,
-                           final String policyQualifier,
-                           final boolean signingCertificateV2,
-                           final byte[] messageDigest,
-                           final byte[] signature
+                           final byte[] signature,
+                           final byte[] signedAttributes
                ) throws AOException {
         
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
@@ -125,31 +123,19 @@ class CAdESTriPhaseSigner {
         
         // Firma PKCS#1 codificada
         final ASN1OctetString encodedPKCS1Signature = new DEROctetString(signature);
-                
+
         // Atributos firmados
-        final ASN1Set signedAttributes;
+        final ASN1Set asn1SignedAttributes;
         try {
-            signedAttributes = SigUtils.getAttributeSet(
-               new AttributeTable(
-                  CAdESUtils.generateSignerInfo(
-                     signerCertificateChain[0],
-                     digestAlgorithmName,
-                     content,
-                     policyIdentifier,
-                     policyQualifier,
-                     signingCertificateV2,
-                     messageDigest
-                  )
-               )
-            );
-        }
-        catch(Exception e) {
-            throw new AOException("Error obteniendo los atributos a firmar", e); //$NON-NLS-1$
+            asn1SignedAttributes = (ASN1Set) ASN1Object.fromByteArray(signedAttributes);
+        } catch (IOException e) {
+            throw new AOException("Error en la inclusion de la recuperacion de los SignedAttibutes", e); //$NON-NLS-1$
         }
         
         // SignerInfo
         final ASN1EncodableVector signerInfo = new ASN1EncodableVector();
-        signerInfo.add(new SignerInfo(signerIdentifier, digestAlgorithmOID, signedAttributes, keyAlgorithmIdentifier, encodedPKCS1Signature, null));
+        signerInfo.add(new SignerInfo(signerIdentifier, digestAlgorithmOID, asn1SignedAttributes, keyAlgorithmIdentifier, encodedPKCS1Signature, null));
+        
         
         // ContentInfo
         final ContentInfo contentInfo;

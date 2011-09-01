@@ -106,7 +106,7 @@ public final class GenCAdESEPESSignedData {
         
         final byte[] content = (omitContent) ? null : parameters.getContent();
         
-        if (omitContent && messageDigest == null && parameters.getContent() != null) {
+        if (messageDigest == null && parameters.getContent() != null) {
             final MessageDigest md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm));
             md.update(parameters.getContent());
             messageDigest = md.digest();
@@ -128,11 +128,8 @@ public final class GenCAdESEPESSignedData {
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
             content, 
             signerCertificateChain,  
-            policyIdentifier, 
-            policyQualifier, 
-            signingCertificateV2, 
-            messageDigest, 
-            signature
+            signature,
+            preSignature
         );
 
     }
