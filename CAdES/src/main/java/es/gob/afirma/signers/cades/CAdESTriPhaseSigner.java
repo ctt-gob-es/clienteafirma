@@ -69,7 +69,7 @@ class CAdESTriPhaseSigner {
         catch(Exception e) {
             throw new AOException("Error obteniendo los atributos a firmar", e); //$NON-NLS-1$
         }
-                
+        
         try {
             return signedAttributes.getEncoded(ASN1Encodable.DER);
         }
