@@ -7,10 +7,11 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import sun.security.pkcs11.SunPKCS11;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -19,11 +20,12 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  *
  */
+@SuppressWarnings("restriction")
 public class MiniTestDNI {
     
     private static final String DNIE_DRIVER_PATH = "name=testdni\r\nlibrary=c:/windows/system32/UsrPkcs11.dll\r\nshowInfo=false"; //$NON-NLS-1$
     
-    private static final char[] DNI_PIN = "rock2048".toCharArray();  //$NON-NLS-1$
+    private static final char[] DNI_PIN = "pin".toCharArray();  //$NON-NLS-1$
     
     private static final String DNI_SIGN_ALIAS = "CertFirmaDigital"; //$NON-NLS-1$
     
@@ -54,7 +56,9 @@ public class MiniTestDNI {
         boolean signingCertificateV2 = true; 
         byte[] messageDigest = null; // Se calcula internamente el digest de los datos a firmar. 
         
-        byte[] firma = genCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, /* policy*/ null, /* qualifier */ null, signingCertificateV2, pke, messageDigest);  
+        byte[] firma = genCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, /* policy*/ null, /* qualifier */ null, signingCertificateV2, pke, messageDigest);
+        
+        Assert.assertNotNull(firma);
 
         //System.out.println(AOUtil.hexify(firma, true));
         

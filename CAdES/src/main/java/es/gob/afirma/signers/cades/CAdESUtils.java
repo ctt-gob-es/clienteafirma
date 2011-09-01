@@ -35,7 +35,8 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-class CAdESUtils {
+/** Utilidades varias para las firmas CAdES. */
+public class CAdESUtils {
     
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
@@ -57,7 +58,7 @@ class CAdESUtils {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws CertificateEncodingException */
-    static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
+    public static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
                                                   final String digestAlgorithmName,
                                                   final byte[] datos,
                                                   final String policyIdentifier,

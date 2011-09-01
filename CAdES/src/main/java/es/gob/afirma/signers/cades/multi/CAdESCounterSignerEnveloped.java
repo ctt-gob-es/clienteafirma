@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
-package es.gob.afirma.signers.cades;
+package es.gob.afirma.signers.cades.multi;
 
 import java.io.IOException;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -48,6 +48,8 @@ import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.signers.cades.CAdESUtils;
+import es.gob.afirma.signers.cades.PKCS1ExternalizableSigner;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;

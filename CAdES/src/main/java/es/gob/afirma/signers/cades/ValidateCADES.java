@@ -41,7 +41,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * <li>Signed and Enveloped Data</li>
  * </ul> */
 
-final class ValidateCADES {
+public final class ValidateCADES {
     
     /** M&eacute;todo que verifica que es una firma de tipo "data"
      * @param data
@@ -82,7 +82,7 @@ final class ValidateCADES {
      * @param data
      *        El envoltorio.
      * @return si es de este tipo. */
-    boolean isCADESSignedData(final byte[] data) {
+    public boolean isCADESSignedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);

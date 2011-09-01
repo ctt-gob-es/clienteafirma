@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.cades;
 
-import java.io.ByteArrayInputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -26,6 +25,8 @@ import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.beans.AOSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.signers.cades.multi.AOCAdESCoSigner;
+import es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner;
 import es.gob.afirma.signers.pkcs7.ExtractMimeType;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -53,7 +54,7 @@ public final class AOCAdESSigner implements AOSigner {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Indica si por defecto se debe insertar el atributo SigningCertificateV2 en la firma. */
-    private static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = false;
+    public static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
 
     public byte[] sign(byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
@@ -122,150 +123,11 @@ public final class AOCAdESSigner implements AOSigner {
     }
 
     public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
-
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
-
-        byte[] messageDigest = null;
-
-        if (precalculatedDigest != null) {
-            messageDigest = data;
-        }
-
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                                                (X509Certificate) cert
-                };
-            }
-        }
-
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
-
-        try {
-            String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
-
-            // Si la firma que nos introducen es SignedData
-            //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
-            final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
-            if (signedData) {
-
-                final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
-                final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
-
-                return new CAdESCoSigner().coSigner(csp,
-                                                    sign,
-                                                    omitContent,
-                                                    extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                    policyQualifier,
-                                                    signingCertificateV2,
-                                                    keyEntry,
-                                                    messageDigest);
-            }
-
-            return new CAdESCoSignerEnveloped().coSigner(csp,
-                                                         sign,
-                                                         extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                         policyQualifier,
-                                                         signingCertificateV2,
-                                                         keyEntry,
-                                                         messageDigest);
-
-        }
-        catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma CAdES", e); //$NON-NLS-1$
-        }
+        return new AOCAdESCoSigner().cosign(data, sign, algorithm, keyEntry, extraParams);
     }
 
     public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
-
-        // algoritmo de firma.
-        final String typeAlgorithm = algorithm;
-        // Array de certificados
-        X509Certificate[] aCertificados = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            aCertificados = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                aCertificados = new X509Certificate[] {
-                                                       (X509Certificate) cert
-                };
-            }
-        }
-
-        final String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
-
-        // Si la firma que nos introducen es SignedData
-        //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
-        final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
-        if (signedData) {
-            try {
-                return new CAdESCoSigner().coSigner(typeAlgorithm,
-                                                    aCertificados,
-                                                    new ByteArrayInputStream(sign),
-                                                    extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                    policyQualifier,
-                                                    signingCertificateV2,
-                                                    keyEntry,
-                                                    null // null porque no nos pueden dar un hash
-                                                         // en este metodo, tendría que ser en el
-                                                         // que incluye datos
-                );
-            }
-            catch (final Exception e) {
-                throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
-            }
-        }
-        // Signed And Enveloped.
-
-        try {
-            return new CAdESCoSignerEnveloped().coSigner(typeAlgorithm,
-                                                         aCertificados,
-                                                         new ByteArrayInputStream(sign),
-                                                         extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                         policyQualifier,
-                                                         signingCertificateV2,
-                                                         keyEntry,
-                                                         null // null porque no nos pueden dar un hash en este
-                                                              // metodo, tendría que ser en el que incluye datos
-            );
-        }
-        catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma CADES", e); //$NON-NLS-1$
-        }
-
+        return new AOCAdESCoSigner().cosign(sign, algorithm, keyEntry, extraParams);
     }
 
     public byte[] countersign(final byte[] sign,
@@ -274,208 +136,7 @@ public final class AOCAdESSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
                               Properties extraParams) throws AOException {
-
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
-
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                                                (X509Certificate) cert
-                };
-            }
-        }
-
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, xCerts);
-
-        // Recuperamos la polictica de firma si se indico
-        String policyQualifier = null;
-        String policyIdentifier = null;
-        if (extraParams.containsKey("policyQualifier")) { //$NON-NLS-1$
-            policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
-            policyIdentifier = extraParams.getProperty("policyIdentifier"); //$NON-NLS-1$
-        }
-
-        // Datos firmados.
-        byte[] dataSigned = null;
-
-        // Si la firma que nos introducen es SignedData
-        //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
-        final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
-        if (signedData) {
-            try {
-                // CASO DE FIRMA DE ARBOL
-                if (targetType == CounterSignTarget.Tree) {
-                    final int[] nodes = {
-                        0
-                    };
-
-                    dataSigned =
-                            new CAdESCounterSigner().counterSigner(csp,
-                                                                   sign,
-                                                                   CounterSignTarget.Tree,
-                                                                   nodes,
-                                                                   keyEntry,
-                                                                   policyIdentifier,
-                                                                   policyQualifier,
-                                                                   signingCertificateV2);
-                }
-                // CASO DE FIRMA DE HOJAS
-                else if (targetType == CounterSignTarget.Leafs) {
-                    final int[] nodes = {
-                        0
-                    };
-                    dataSigned =
-                            new CAdESCounterSigner().counterSigner(csp,
-                                                                   sign,
-                                                                   CounterSignTarget.Leafs,
-                                                                   nodes,
-                                                                   keyEntry,
-                                                                   policyIdentifier,
-                                                                   policyQualifier,
-                                                                   signingCertificateV2);
-                }
-                // CASO DE FIRMA DE NODOS
-                else if (targetType == CounterSignTarget.Nodes) {
-                    int[] nodesID = new int[targets.length];
-                    for (int i = 0; i < targets.length; i++) {
-                        nodesID[i] = ((Integer) targets[i]).intValue();
-                    }
-                    nodesID = new ReadNodesTree().simplyArray(nodesID);
-                    dataSigned =
-                            new CAdESCounterSigner().counterSigner(csp,
-                                                                   sign,
-                                                                   CounterSignTarget.Nodes,
-                                                                   nodesID,
-                                                                   keyEntry,
-                                                                   policyIdentifier,
-                                                                   policyQualifier,
-                                                                   signingCertificateV2);
-                }
-                // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
-                else if (targetType == CounterSignTarget.Signers) {
-
-                    // clase que lee los nodos de un fichero firmado (p7s, csig,
-                    // sig)
-                    final String[] signers = new String[targets.length];
-                    for (int i = 0; i < targets.length; i++) {
-                        signers[i] = (String) targets[i];
-                    }
-                    final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
-                    dataSigned =
-                            new CAdESCounterSigner().counterSigner(csp,
-                                                                   sign,
-                                                                   CounterSignTarget.Signers,
-                                                                   nodes2,
-                                                                   keyEntry,
-                                                                   policyIdentifier,
-                                                                   policyQualifier,
-                                                                   signingCertificateV2);
-
-                }
-
-                return dataSigned;
-
-            }
-            catch (final Exception e) {
-                throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
-            }
-        }
-        // Signed and enveloped
-
-        try {
-            // CASO DE FIRMA DE ARBOL
-            if (targetType == CounterSignTarget.Tree) {
-                final int[] nodes = {
-                    0
-                };
-
-                dataSigned =
-                        new CAdESCounterSignerEnveloped().counterSigner(csp,
-                                                                        sign,
-                                                                        CounterSignTarget.Tree,
-                                                                        nodes,
-                                                                        keyEntry,
-                                                                        policyIdentifier,
-                                                                        policyQualifier,
-                                                                        signingCertificateV2);
-            }
-            // CASO DE FIRMA DE HOJAS
-            else if (targetType == CounterSignTarget.Leafs) {
-                final int[] nodes = {
-                    0
-                };
-                dataSigned =
-                        new CAdESCounterSignerEnveloped().counterSigner(csp,
-                                                                        sign,
-                                                                        CounterSignTarget.Leafs,
-                                                                        nodes,
-                                                                        keyEntry,
-                                                                        policyIdentifier,
-                                                                        policyQualifier,
-                                                                        signingCertificateV2);
-            }
-            // CASO DE FIRMA DE NODOS
-            else if (targetType == CounterSignTarget.Nodes) {
-                int[] nodesID = new int[targets.length];
-                for (int i = 0; i < targets.length; i++) {
-                    nodesID[i] = ((Integer) targets[i]).intValue();
-                }
-                nodesID = new ReadNodesTree().simplyArray(nodesID);
-                dataSigned =
-                        new CAdESCounterSignerEnveloped().counterSigner(csp,
-                                                                        sign,
-                                                                        CounterSignTarget.Nodes,
-                                                                        nodesID,
-                                                                        keyEntry,
-                                                                        policyIdentifier,
-                                                                        policyQualifier,
-                                                                        signingCertificateV2);
-            }
-            // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
-            else if (targetType == CounterSignTarget.Signers) {
-
-                // clase que lee los nodos de un fichero firmado (p7s, csig,
-                // sig)
-                final String[] signers = new String[targets.length];
-                for (int i = 0; i < targets.length; i++) {
-                    signers[i] = (String) targets[i];
-                }
-                final int[] nodes2 = new ReadNodesTree().readNodesFromSigners(signers, sign);
-                dataSigned =
-                        new CAdESCounterSignerEnveloped().counterSigner(csp,
-                                                                        sign,
-                                                                        CounterSignTarget.Signers,
-                                                                        nodes2,
-                                                                        keyEntry,
-                                                                        policyIdentifier,
-                                                                        policyQualifier,
-                                                                        signingCertificateV2);
-
-            }
-
-            return dataSigned;
-
-        }
-        catch (final Exception e) {
-            throw new AOException("Error generando la Contrafirma CAdES", e); //$NON-NLS-1$
-        }
-
+        return new AOCAdESCounterSigner().countersign(sign, algorithm, targetType, targets, keyEntry, extraParams);
     }
 
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
@@ -621,15 +282,12 @@ public final class AOCAdESSigner implements AOSigner {
     }
 
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
-
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
-
         if (!this.isCADESValid(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
-
         return new ObtainContentSignedData().obtainData(signData);
     }
 

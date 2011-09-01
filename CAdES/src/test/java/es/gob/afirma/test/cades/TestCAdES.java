@@ -165,6 +165,7 @@ public final class TestCAdES {
                                 
                 // Cofirma indicando los datos
                 byte[] sign3 = cosign(signer, DATA, sign2, algo, pke3, extraParams);
+                Assert.assertNotNull(sign3);
                 
                 //checkSign(signer, sign3, new PrivateKeyEntry[] {pke1, pke2, pke3}, new String[] {"ANF Usuario Activo", "CPISR-1 Pf\u00EDsica De la Se\u00F1a Pruebasdit", "Certificado Pruebas Software V\u00E1lido"}, prueba); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 
