@@ -13,7 +13,6 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -52,7 +51,7 @@ public class Descifrado extends JPanel {
     final static List<String> mecanismos = new ArrayList<String>(Arrays.asList("PASSWORD","USERINPUT"));
 
     // Algoritmos para mecanismo contrasena de cifrado
-    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("Contraseña con SHA1 y 3DES","Contraseña con SHA1 y RC2","Contraseña con MD5 y DES"));
+    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("ContraseÃ±a con SHA1 y 3DES","Contraseï¿½a con SHA1 y RC2","Contraseï¿½a con MD5 y DES"));
     final static List<String> algoritmoVc = new ArrayList<String>(Arrays.asList("PBEWithSHA1AndDESede","PBEWithSHA1AndRC2_40","PBEWithMD5AndDES"));
 
     // Algoritmos para mecanismo clave de cifrado
@@ -95,13 +94,18 @@ public class Descifrado extends JPanel {
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.buscar.caja.description")); // NOI18N
 		add(campoFichero, c);
 		
+		//Relación entre etiqueta y campo de texto
+		etiquetaFichero.setLabelFor(campoFichero);
+		//Asignación de mnemónico
+		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_E);
+		
 		c.insets = new Insets(0, 10, 0, 13);
 		c.weightx = 0.0;
 		c.gridx = 1;
 
         // Boton examinar
         JButton examinar = new JButton();
-        examinar.setMnemonic(KeyEvent.VK_E);
+        examinar.setMnemonic(KeyEvent.VK_X);
         examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
         examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
         examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description")));
@@ -128,6 +132,8 @@ public class Descifrado extends JPanel {
 
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 3;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
         
         // Combo mecanismos de cifrado
         final JComboBox comboMecanismo = new JComboBox();
@@ -144,10 +150,23 @@ public class Descifrado extends JPanel {
         });
         comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Descifrado.origenL.0"),Messages.getString("Descifrado.origenL.1")}));
         add(comboMecanismo, c);
+        
+        // En la vista simple, no se permitirá configurar el origen de la clave
+ 		if(!GeneralConfig.isAvanzados()) {
+ 			comboMecanismo.setEnabled(false); //Se deshabilita la opción
+ 		} else {
+ 			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
+ 			//Relación entre etiqueta y combo
+ 			etiquetaMecanismo.setLabelFor(comboMecanismo);
+ 			//Asignación de mnemónico
+ 			etiquetaMecanismo.setDisplayedMnemonic(KeyEvent.VK_A);
+ 		}
 		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.weightx = 1.0;
 		c.gridy = 4;
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
         
         // Etiqueta algoritmos de descifrado
         JLabel etiquetaAlgoritmo = new JLabel();
@@ -156,6 +175,8 @@ public class Descifrado extends JPanel {
 		
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
         
         // Combo con los algoritmos de descifrado
         comboAlgoritmo.setModel(new DefaultComboBoxModel(new String[] { "Triple Data Encryption Standard (3DES)", "Item 2", "Item 3", "Item 4" }));
@@ -166,22 +187,28 @@ public class Descifrado extends JPanel {
         comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N
         comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
 		add(comboAlgoritmo, c);
-        
-        // En la vista simple, no se permitira configurar el origen de la clave ni el algoritmo de cifrado
-        if(!GeneralConfig.isAvanzados()) {
-        	comboMecanismo.setEnabled(false);
-        	comboAlgoritmo.setEnabled(false);
-        }
+		
+		// En la vista simple, no se permitirá configurar el algoritmo de descifrado
+		if(!GeneralConfig.isAvanzados()) {
+			comboAlgoritmo.setEnabled(false); //Se deshabilita la opción
+		} else {
+			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
+			//Relación entre etiqueta y combo
+			etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
+			//Asignación de mnemónico
+			etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_G);
+		}
         
 		c.weighty = 1.0;
 		c.gridy = 6;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
 		JPanel emptyPanel = new JPanel();
 		add(emptyPanel, c);
 		
 		// Panel con los botones
-		Panel panelBotones = new Panel(new GridBagLayout());
+		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
@@ -194,7 +221,7 @@ public class Descifrado extends JPanel {
         
         // Boton descifrar
         JButton descifrar = new JButton();
-        descifrar.setMnemonic(KeyEvent.VK_C);
+        descifrar.setMnemonic(KeyEvent.VK_R);
         descifrar.setText(Messages.getString("Descifrado.btndescifrar")); // NOI18N
         descifrar.setToolTipText(Messages.getString("Descifrado.btndescifrar.description")); // NOI18N
         descifrar.setMaximumSize(null);
@@ -220,7 +247,7 @@ public class Descifrado extends JPanel {
 		panelBotones.add(buttonPanel, cons);
         
         // Boton ayuda
-        JLabel botonAyuda = HelpUtils.fechButton("descifrado");
+		JButton botonAyuda = HelpUtils.helpButton("descifrado");
         
 		cons.ipadx = 15;
 		cons.weightx = 0.0;

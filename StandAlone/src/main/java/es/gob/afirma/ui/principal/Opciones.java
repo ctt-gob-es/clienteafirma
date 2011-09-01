@@ -15,12 +15,14 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Panel;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.Properties;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -29,12 +31,13 @@ import javax.swing.WindowConstants;
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialog;
 import es.gob.afirma.ui.utils.Messages;
 
 /**
  * Clase que muestra el panel de opciones.
  */
-public class Opciones extends JDialog {
+public class Opciones extends JAccessibilityDialog {
 
 	private static final long serialVersionUID = 1L;
 
@@ -52,15 +55,41 @@ public class Opciones extends JDialog {
         initComponents();
     }
   
+    @Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		// Dimensiones de la ventana en Windows y Linux
+        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+                
+        if (Platform.getOS().equals(Platform.OS.MACOSX)){
+        	return (screenSize.height - 485) / 2;
+        } else {
+        	return (screenSize.height - 456) / 2;
+        }
+	}
+	@Override
+	public int getInitialWidth() {
+		// Dimensiones de la ventana para Windows y Linux
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		return (screenSize.width - 426) / 2 ;
+	}
+	
     /**
      * Inicializacion de componentes
      */
     private void initComponents() {
+    	// Dimensiones de la ventana en Windows y Linux
+    	setBounds(this.getInitialWidth(), this.getInitialHeight(), 446, 476);
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(Messages.getString("Opciones.opciones")); // NOI18N
-        setResizable(false);
+        setResizable(true);
         getContentPane().setLayout(new GridBagLayout());
+        setMinimumSize(new Dimension(getSize().width + 20, getSize().height));
         
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -68,14 +97,7 @@ public class Opciones extends JDialog {
         c.weighty = 1.0;
 //        c.insets = new Insets(13, 13, 0, 13);
         c.gridy = 0;
-        
-        // Dimensiones de la ventana en Windows y Linux
-        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width - 426) / 2, (screenSize.height - 456) / 2, 426, 456);
-        
-        if (Platform.getOS().equals(Platform.OS.MACOSX))
-        	setBounds((screenSize.width - 426) / 2, (screenSize.height - 485) / 2, 426, 485);
-        
+                
         // Panel superior con las opciones de configuracion
         JTabbedPane mainPanel = new JTabbedPane();
         
@@ -88,13 +110,21 @@ public class Opciones extends JDialog {
         mainOptions.loadConfig(GeneralConfig.getConfig());
         
         contextOptions =  new ContextOptionsPane();
-        mainPanel.addTab("Contexto de firma",
+        
+        mainPanel.addTab(Messages.getString("Opciones.contextoFirma"),
         		null,
         		contextOptions.getConfigurationPanel(),
-        		"Pesta\u00F1a para la configuraci\u00F3n del contexto de firma");
+        		Messages.getString("Opciones.contexto"));
         
         contextOptions.loadConfig(GeneralConfig.getConfig());
         
+        // Definicion de mnem�nicos.
+        int tabNum = 0;
+        mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pesta�a
+        mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pesta�a
+
+        c.weighty = 0.1;
+        c.fill = GridBagConstraints.BOTH;
         getContentPane().add(mainPanel, c);
         
         c.weighty = 0.0;
@@ -116,9 +146,25 @@ public class Opciones extends JDialog {
 		JLabel label = new JLabel();
 		bottomPanel.add(label, cons);
         
+		//Boton maximizar ventana
+		JButton maximizar = new JButton();
+		maximizar.setText(Messages.getString("Wizard.maximizar"));
+	    maximizar.setName("maximizar");
+	    maximizar.setMnemonic(KeyEvent.VK_M);
+	    maximizar.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		maximizarActionPerformed();
+			}
+		});
+		
+	    //Espacio entre botones
+		Panel panelVacio = new Panel();
+		panelVacio.setPreferredSize(new Dimension(70, 10));
+	    
 		// Boton aceptar
         JButton aceptar = new JButton();
         aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
+        aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al bot�n aceptar
         aceptar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	
@@ -138,6 +184,7 @@ public class Opciones extends JDialog {
         // Boton cancelar
         JButton	cancelar = new JButton();
         cancelar.setText(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
+        cancelar.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al bot�n cancelar
         cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 cancelarActionPerformed();
@@ -146,8 +193,10 @@ public class Opciones extends JDialog {
         cancelar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
         
         
-        // Panel en donde se insertan los botones aceptar y cancelar
+        // Panel en donde se insertan los botones maximizar, aceptar y cancelar
         JPanel buttonPanel = new JPanel();
+        buttonPanel.add(maximizar, BorderLayout.CENTER);
+        buttonPanel.add(panelVacio, BorderLayout.CENTER);
 		buttonPanel.add(aceptar, BorderLayout.CENTER);
 		buttonPanel.add(cancelar, BorderLayout.CENTER);
 		
@@ -158,10 +207,10 @@ public class Opciones extends JDialog {
 		bottomPanel.add(buttonPanel, cons);
         
         // Boton ayuda
-        JLabel botonAyuda = HelpUtils.fechButton("opciones.configuracion");
+		JButton botonAyuda = HelpUtils.helpButton("opciones.configuracion");
 		
         cons.ipadx = 15;
-		cons.weightx = 0.0;
+		cons.weightx = 0.02;
 		cons.gridx = 2;
         
         bottomPanel.add(botonAyuda, cons);
@@ -201,7 +250,7 @@ public class Opciones extends JDialog {
 //
 //        c.gridy = 1;
 //        
-//        // Panel criptograf�a
+//        // Panel criptograf�a
 //        JPanel criptografiaPanel = new JPanel(new GridBagLayout());
 //        criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
 //
@@ -347,4 +396,34 @@ public class Opciones extends JDialog {
     private void cancelarActionPerformed() {
     	dispose();
     }
+    
+    /**
+	 * Cambia el tamaño de la ventana al tamaño máximo de pantalla menos el tamaño de la barra de tareas de windows
+	 */
+	public void maximizarActionPerformed(){
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		JAccessibilityDialog j = getJAccessibilityDialog(this);
+		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		
+	}
+	
+	/**
+	 * Busca el JAccessibilityDialog padre de un componente.
+	 * @param component El componente.
+	 * @return El JAccessibilityDialog buscado.
+	 */
+	public static JAccessibilityDialog getJAccessibilityDialog(Component component)
+	{
+		JAccessibilityDialog  resultingJAccessibilityDialog = null;
+		while (component != null && resultingJAccessibilityDialog == null)
+		{
+	        if (component instanceof JAccessibilityDialog){
+	        	resultingJAccessibilityDialog = (JAccessibilityDialog)component;
+	        }
+	        else{
+	        	component = component.getParent();
+	        }
+		 }
+		 return resultingJAccessibilityDialog;
+	 }
 }

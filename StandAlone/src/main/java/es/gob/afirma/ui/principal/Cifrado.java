@@ -13,7 +13,6 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -115,6 +114,11 @@ public class Cifrado extends JPanel {
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
 		add(campoFichero, c);
 		
+		//Relación entre etiqueta y campo de texto
+		etiquetaFichero.setLabelFor(campoFichero);
+		//Asignación de mnemónico
+		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_T);
+
 		c.insets = new Insets(0, 10, 0, 13);
 		c.weightx = 0.0;
 		c.gridx = 1;
@@ -147,6 +151,8 @@ public class Cifrado extends JPanel {
 
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 3;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Combo mecanismos de cifrado
 		final JComboBox comboMecanismo = new JComboBox();
@@ -164,9 +170,23 @@ public class Cifrado extends JPanel {
 		comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Cifrado.origenL.0"),Messages.getString("Cifrado.origenL.1")}));
 		add(comboMecanismo, c);
 		
+		// En la vista simple, no se permitirá configurar el origen de la clave
+		if(!GeneralConfig.isAvanzados()) {
+			comboMecanismo.setEnabled(false); //Se deshabilita la opción
+		} else {
+			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
+			//Relación entre etiqueta y combo
+			etiquetaMecanismo.setLabelFor(comboMecanismo);
+			//Asignación de mnemónico
+			etiquetaMecanismo.setDisplayedMnemonic(KeyEvent.VK_A);
+		}
+
+		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.weightx = 1.0;
 		c.gridy = 4;
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Etiqueta algoritmos de cifrado
 		JLabel etiquetaAlgoritmo = new JLabel();
@@ -176,6 +196,8 @@ public class Cifrado extends JPanel {
 		
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Combo algoritmos de cifrado
 		comboAlgoritmo.setToolTipText(Messages.getString("Cifrado.formato.combo.description")); // NOI18N
@@ -186,21 +208,28 @@ public class Cifrado extends JPanel {
 		comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
 		add(comboAlgoritmo, c);
 		
-		// En la vista simple, no se permitira configurar el origen de la clave ni el algoritmo de cifrado
+		// En la vista simple, no se permitirá configurar el algoritmo de cifrado
 		if(!GeneralConfig.isAvanzados()) {
-			comboMecanismo.setEnabled(false);
-			comboAlgoritmo.setEnabled(false);
+			comboAlgoritmo.setEnabled(false); //Se deshabilita la opción
+		} else {
+			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
+			//Relación entre etiqueta y combo
+			etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
+			//Asignación de mnemónico
+			etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_G);
 		}
+
 		
 		c.weighty = 1.0;
 		c.gridy = 6;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
 		JPanel emptyPanel = new JPanel();
 		add(emptyPanel, c);
 		
 		// Panel con los botones
-		Panel panelBotones = new Panel(new GridBagLayout());
+		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
@@ -213,7 +242,7 @@ public class Cifrado extends JPanel {
 		
 		// Boton cifrar
 		JButton cifrar = new JButton();
-		cifrar.setMnemonic(KeyEvent.VK_I);
+		cifrar.setMnemonic(KeyEvent.VK_R);
 		cifrar.setText(Messages.getString("Cifrado.btncifrar")); // NOI18N
 		cifrar.setToolTipText(Messages.getString("Cifrado.btncifrar.description")); // NOI18N
 		cifrar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.btncifrar.description.status")));
@@ -236,7 +265,7 @@ public class Cifrado extends JPanel {
 		panelBotones.add(buttonPanel, cons);
 
 		// Boton ayuda
-		JLabel botonAyuda = HelpUtils.fechButton("cifrado");
+		JButton botonAyuda = HelpUtils.helpButton("cifrado");
 		
 		cons.ipadx = 15;
 		cons.weightx = 0.0;

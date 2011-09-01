@@ -47,6 +47,7 @@ import es.gob.afirma.signers.AOSigner;
 import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -57,11 +58,25 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 /**
  * Panel de entrada del archivo
  */
-public class PanelEntrada extends JDialogWizard {
+public class PanelEntrada extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelEntrada.class.getName());
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Configuracion del KeyStore
@@ -123,6 +138,11 @@ public class PanelEntrada extends JDialogWizard {
         campoFirma.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero.description")); // NOI18N
         campoFirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero.description")); // NOI18N
         panelCentral.add(campoFirma, c);
+        
+        //Relación entre etiqueta y campo de texto
+        etiquetaFirma.setLabelFor(campoFirma);
+  		//Asignación de mnemónico
+        etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_F);
         
         c.insets = new Insets(0, 10, 0, 20);
         c.gridwidth = 1;
@@ -217,7 +237,7 @@ public class PanelEntrada extends JDialogWizard {
 	 * @return	True o false si se ha podido leer bien el fichero
 	 */
 	public boolean checkFicheroEntrada(String ficheroFirma) {
-		// Comprobación de la ruta de fichero de entrada.
+		// Comprobaciï¿½n de la ruta de fichero de entrada.
 		if (ficheroFirma == null || ficheroFirma.equals("") || !new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){
 			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;

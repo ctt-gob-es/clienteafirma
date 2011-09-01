@@ -17,6 +17,7 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -42,6 +43,7 @@ import es.gob.afirma.keystores.KeyStoreConfiguration;
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.misc.AOConstants.AOKeyStore;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
@@ -55,13 +57,27 @@ import es.gob.afirma.ui.wizardUtils.PanelesTexto;
  * Clase que contiene los elementos necesarios para crear un grupo de destinatarios
  * a partir de una seleccion de certificados de destinatarios.
  */
-public class PanelDestinatarios extends JDialogWizard {
+public class PanelDestinatarios extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelDestinatarios.class.getName());
 	
 	private List<CertificateDestiny> listaCertificados = new ArrayList<CertificateDestiny>();
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Guarda todas las ventanas del asistente para poder controlar la botonera
@@ -119,6 +135,8 @@ public class PanelDestinatarios extends JDialogWizard {
 		c.gridwidth = 1;
 		c.gridy = 2;
 		c.weightx = 1.0;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Combo con las listas de destinatarios
 		final JComboBox comboDestinatarios = new JComboBox();
@@ -126,9 +144,16 @@ public class PanelDestinatarios extends JDialogWizard {
 		cargarCombo(comboDestinatarios);
 		panelCentral.add(comboDestinatarios, c);
 		
+		//Relación entre etiqueta y combo
+		etiquetaAnadir.setLabelFor(comboDestinatarios);
+		//Asignación de mnemónico
+		etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
+		
 		c.insets = new Insets(0, 10, 0, 20);
 		c.gridx = 1;
 		c.weightx = 0.0;
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Boton anadir destinatarios
 		JButton anadir = new JButton();
@@ -136,6 +161,7 @@ public class PanelDestinatarios extends JDialogWizard {
 		anadir.setToolTipText(Messages.getString("wizard.aniadir.description"));
 		anadir.setText(Messages.getString("wizard.aniadir"));
 		anadir.setAutoscrolls(true);
+		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón
 		anadir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboDestinatarios, (DefaultListModel) listaDestinatarios.getModel(), 
@@ -145,12 +171,23 @@ public class PanelDestinatarios extends JDialogWizard {
 		panelCentral.add(anadir, c);
 		
 		c.insets = new Insets(10, 20, 0, 20);
+		c.gridx = 0;
+		c.gridy = 3;
+		c.weightx =0.0;
+		
+		 // Etiqueta con el texto "Destinatarios"
+        JLabel destLabel = new JLabel();
+        destLabel.setText(Messages.getString("wizard.sobres.listaDestinatarios"));
+		panelCentral.add(destLabel, c);
+		
+		c.insets = new Insets(0, 20, 0, 20);
 		c.ipady = 80;
 		c.gridwidth = 2;
-		c.gridy = 3;
+		c.gridy = 4;
 		c.gridx = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Panel que contiene a la lista de destintatarios
 		JScrollPane panelLista = new JScrollPane();
@@ -159,18 +196,25 @@ public class PanelDestinatarios extends JDialogWizard {
 		// Lista con los destinatarios
 		listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description"));
 		listaDestinatarios.setModel(new DefaultListModel());
+
 		panelLista.setViewportView(listaDestinatarios);
+		
+		//Relación entre etiqueta y lista
+		destLabel.setLabelFor(listaDestinatarios);
+		//Asignación de mnemónico
+		destLabel.setDisplayedMnemonic(KeyEvent.VK_T);
 
 		c.ipady = 0;
 		c.gridwidth = 1;
-		c.gridy = 4;
+		c.gridy = 5;
 		c.weightx = 1.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Espacio izdo del boton
 		Panel panelVacio = new Panel();
 		panelCentral.add(panelVacio, c);
 		
-		c.insets = new Insets(10, 0, 20, 20);
+		c.insets = new Insets(10, 0, 10, 20);
 		c.weightx = 0.0;
 		c.gridx = 1;
 		
@@ -235,6 +279,7 @@ public class PanelDestinatarios extends JDialogWizard {
 				listaModel.addElement(certDest.getAlias());
 				listaCertificados.add(certDest);
 				eliminar.setEnabled(true);
+				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else 
 				JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario.existe"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
@@ -256,6 +301,7 @@ public class PanelDestinatarios extends JDialogWizard {
 
 		if (listaModel.isEmpty()) {
 			eliminar.setEnabled(false);
+			eliminar.setMnemonic(0); //Se asigna un atajo vacío al botón ya que ha sido deshabilitado
 		}
 	}
 

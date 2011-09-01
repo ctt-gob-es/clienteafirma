@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -47,6 +48,7 @@ import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.PasswordDialog;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -56,11 +58,25 @@ import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 /**
  * Dialogo con la pagina 2: Clave de cifrado
  */
-public class PanelClaveCifrado extends JDialogWizard {
+public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelClaveCifrado.class.getName());
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Cifrador configurado para un algoritmo dado
@@ -123,13 +139,23 @@ public class PanelClaveCifrado extends JDialogWizard {
         // Panel que contiene el texto "Introduzca una clave de..."
     	panelCentral.add(PanelesTexto.generarPanelTexto(
         		"WizardCifrado.contenido.texto1", false), c);
+    	
+    	c.insets = new Insets(20, 20, 0, 0);
+    	c.gridwidth = 1;
+    	c.weightx = 0.0;
+    	c.gridx = 0;
+    	c.gridy = 1;
+    	
+    	//Etiqueta con el texto Clave de cifrado
+    	JLabel encodeKeyLabel = new JLabel (Messages.getString("WizardCifrado.claveCifrado"));
+    	panelCentral.add(encodeKeyLabel, c);
         
     	c.fill = GridBagConstraints.HORIZONTAL;
-    	c.insets = new Insets(20, 20, 0, 0);
+    	c.insets = new Insets(0, 20, 0, 0);
     	c.gridwidth = 1;
     	c.weightx = 1.0;
     	c.gridx = 0;
-    	c.gridy = 1;
+    	c.gridy = 2;
     	
         // Caja de texto donde se escribe la clave
         campoClave.setToolTipText(Messages.getString("WizardCifrado.campoClave.description")); // NOI18N
@@ -140,13 +166,18 @@ public class PanelClaveCifrado extends JDialogWizard {
 		});
         panelCentral.add(campoClave, c);
         
+        //Relación entre etiqueta y campo de texto
+        encodeKeyLabel.setLabelFor(campoClave);
+      	//Asignación de mnemónico
+        encodeKeyLabel.setDisplayedMnemonic(KeyEvent.VK_V);
+        
         c.weightx = 0.0;
-        c.insets = new Insets(20, 10, 0, 0);
+        c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 1;
         
         // Boton autogenerar
         JButton autogenerar = new JButton();
-        autogenerar.setMnemonic(KeyEvent.VK_A);
+        autogenerar.setMnemonic(KeyEvent.VK_U);
         autogenerar.setToolTipText(Messages.getString("WizardCifrado.autogenerar.description")); // NOI18N
         autogenerar.setText(Messages.getString("WizardCifrado.autogenerar")); // NOI18N
         autogenerar.addActionListener(new ActionListener() {
@@ -157,13 +188,13 @@ public class PanelClaveCifrado extends JDialogWizard {
         autogenerar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.autogenerar")); // NOI18N
         panelCentral.add(autogenerar, c);
         
-        c.insets = new Insets(20, 10, 0, 20);
+        c.insets = new Insets(0, 10, 0, 20);
         c.weightx = 0.0;
         c.gridx = 2;
         
         // Boton cargar clave del almacen
         JButton almacen = new JButton();
-        almacen.setMnemonic(KeyEvent.VK_A);
+        almacen.setMnemonic(KeyEvent.VK_L);
         almacen.setToolTipText(Messages.getString("WizardCifrado.almacen.description")); // NOI18N
         almacen.setText(Messages.getString("WizardCifrado.almacen")); // NOI18N
         almacen.addActionListener(new ActionListener() {
@@ -178,17 +209,18 @@ public class PanelClaveCifrado extends JDialogWizard {
 		c.weightx = 1.0;
 		c.gridwidth = 3;
 		c.gridx = 0;
-		c.gridy = 2;
+		c.gridy = 3;
 		
 		// Checkbox para guardar en el almacen
         checkGuardar.setText(Messages.getString("WizardCifrado.check")); // NOI18N
         checkGuardar.setToolTipText(Messages.getString("WizardCifrado.check.description")); // NOI18N
         checkGuardar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.check")); // NOI18N
+        checkGuardar.setMnemonic(KeyEvent.VK_G);
         panelCentral.add(checkGuardar, c);
 
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(20, 20, 0, 20);
-		c.gridy = 3;
+		c.gridy = 4;
 		c.weighty = 1.0;
         
 		// Panel que contiene el texto "Adicionalmente, puede almacenar..."

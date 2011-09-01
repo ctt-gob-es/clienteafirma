@@ -14,7 +14,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -65,6 +64,8 @@ public class MultifirmaSimple extends JPanel {
 
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 1;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Combo con los almacenes / repositorios disponibles
 		final JComboBox comboAlmacen = new JComboBox();
@@ -74,8 +75,15 @@ public class MultifirmaSimple extends JPanel {
 		cargarComboAlmacen(comboAlmacen);
 		add(comboAlmacen, c);
 		
+		//Relación entre etiqueta y combo
+		etiquetaAlmacen.setLabelFor(comboAlmacen);
+		//Asignación de mnemónico
+		etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
+		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.gridy = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weighty = 0.0;
 		
 		// Panel que engloba los tipos de multifirma
 		JPanel panelTipos = new JPanel(new GridLayout(0, 1));
@@ -92,6 +100,12 @@ public class MultifirmaSimple extends JPanel {
 		cofirma.getAccessibleContext().setAccessibleName(Messages.getString("Multifirma.opcion.cofirma.sp")); // NOI18N
 		cofirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Multifirma.opcion.cofirma.description")); // NOI18N
 		cofirma.setToolTipText(Messages.getString("Multifirma.opcion.cofirma.description.status"));
+		//Se comprueba si el modo es el avanzado o no
+		if (GeneralConfig.isAvanzados()){
+			cofirma.setMnemonic(KeyEvent.VK_O); //Se asigna el atajo para el modo avanzado
+		} else {
+			cofirma.setMnemonic(KeyEvent.VK_G); //Se asigna el atajo para el modo simple
+		}
 		panelTipos.add(cofirma);
 
 		// Radiobutton contrafirma
@@ -104,6 +118,13 @@ public class MultifirmaSimple extends JPanel {
 		contrafirma.getAccessibleContext().setAccessibleName(Messages.getString("Multifirma.opcion.contrafirma.av")); // NOI18N
 		contrafirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Multifirma.opcion.contrafirma.description")); // NOI18N
 		contrafirma.setToolTipText(Messages.getString("Multifirma.opcion.contrafirma.description.status"));
+		//Se comprueba si el modo es el avanzado o no
+		if (GeneralConfig.isAvanzados()){
+			contrafirma.setMnemonic(KeyEvent.VK_T); //Se asigna el atajo para el modo avanzado
+		} else {
+			contrafirma.setMnemonic(KeyEvent.VK_E); //Se asigna el atajo para el modo simple
+		}
+
 		panelTipos.add(contrafirma);
 		
 		add(panelTipos, c);
@@ -121,7 +142,7 @@ public class MultifirmaSimple extends JPanel {
 		add(emptyPanel, c);
 		
 		// Panel con los botones
-		Panel panelBotones = new Panel(new GridBagLayout());
+		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
@@ -158,7 +179,7 @@ public class MultifirmaSimple extends JPanel {
 		cons.gridx = 2;
 		
 		// Boton ayuda
-		JLabel botonAyuda = HelpUtils.fechButton("multifirma");
+		JButton botonAyuda = HelpUtils.helpButton("multifirma");
 		panelBotones.add(botonAyuda, cons);
 
 		c.fill = GridBagConstraints.HORIZONTAL;

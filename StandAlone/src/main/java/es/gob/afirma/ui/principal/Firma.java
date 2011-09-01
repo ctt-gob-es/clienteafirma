@@ -126,6 +126,11 @@ public class Firma extends JPanel {
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N
 		add(campoFichero, c);
 		
+		//Relación entre etiqueta y campo de texto
+		etiquetaFichero.setLabelFor(campoFichero);
+		//Asignación de mnemónico
+		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_G);
+		
 		c.insets = new Insets(0, 10, 0, 13);
 		c.weightx = 0.0;
 		c.gridx = 1;
@@ -159,6 +164,8 @@ public class Firma extends JPanel {
 		c.insets = new Insets(0, 13, 0, 13);
 		c.weightx = 1.0;
 		c.gridy = 3;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Combo con las opciones del almacen o repositorio
 		final JComboBox comboAlmacen = new JComboBox();
@@ -170,9 +177,16 @@ public class Firma extends JPanel {
 		cargarComboAlmacen(comboAlmacen);
 		add(comboAlmacen, c);
 		
+		//Relación entre etiqueta y combo
+		etiquetaAlmacen.setLabelFor(comboAlmacen);
+		//Asignación de mnemónico
+		etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
+		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.weightx = 1.0;
 		c.gridy = 4;
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Etiqueta formato / formato
 		JLabel etiquetaFormato = new JLabel();
@@ -182,6 +196,8 @@ public class Firma extends JPanel {
 		c.insets = new Insets(0, 13, 0, 13);
 		c.weightx = 1.0;
 		c.gridy = 5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Combo con los diferentes formatos de firma
 		final JComboBox comboFormato = new JComboBox();
@@ -207,8 +223,14 @@ public class Firma extends JPanel {
 		comboFormato.setModel(new DefaultComboBoxModel(formatosL.toArray()));
 		add(comboFormato, c);
 		
+		//Relación entre etiqueta y combo
+		etiquetaFormato.setLabelFor(comboFormato);
+		//Asignación de mnemónico
+		etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_O);
+		
 		c.weighty = 1.0;
 		c.gridy = 6;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
 		JPanel emptyPanel = new JPanel();
@@ -253,7 +275,7 @@ public class Firma extends JPanel {
 		cons.gridx = 2;
 		
 		// Boton ayuda
-		JLabel botonAyuda = HelpUtils.fechButton("firma");
+		JButton botonAyuda = HelpUtils.helpButton("firma");
 		panelBotones.add(botonAyuda, cons);
 		
 		c.gridwidth	= 2;
@@ -395,7 +417,7 @@ public class Firma extends JPanel {
 				}
 
 				// En el caso de firma CAdES, preguntamos al usuario si desea incluir el documento que
-				// se firma en la propia firma. El documento se incluirá en la firma, salvo que se indique
+				// se firma en la propia firma. El documento se incluirï¿½ en la firma, salvo que se indique
 				// los contrario
 				String modoFirma = AOConstants.SIGN_MODE_IMPLICIT;
 				if (formato.equals(AOConstants.SIGN_FORMAT_CADES)){ 

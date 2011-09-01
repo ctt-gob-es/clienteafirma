@@ -13,7 +13,6 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -85,6 +84,11 @@ public class Ensobrado extends JPanel {
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N
 		add(campoFichero, c);
 		
+		//Relación entre etiqueta y campo de texto
+		etiquetaFichero.setLabelFor(campoFichero);
+		//Asignación de mnemónico
+		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_O);
+		
 		c.insets = new Insets(0, 10, 0, 13);
 		c.weightx = 0.0;
 		c.gridx = 1;
@@ -140,6 +144,8 @@ public class Ensobrado extends JPanel {
 
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 4;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
         
         // Combo con el almacen o repositorio de certificados
         comboTipos.setToolTipText(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
@@ -150,15 +156,21 @@ public class Ensobrado extends JPanel {
         cargarComboTipos();
         add(comboTipos, c);
         
+      //Relación entre etiqueta y combo
+        etiquetaOpciones.setLabelFor(comboTipos);
+		//Asignación de mnemónico
+        etiquetaOpciones.setDisplayedMnemonic(KeyEvent.VK_T);
+        
         c.weighty = 1.0;
 		c.gridy = 5;
+		c.fill = GridBagConstraints.HORIZONTAL;
         
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
 		JPanel emptyPanel = new JPanel();
 		add(emptyPanel, c);
 		
 		// Panel con los botones
-		Panel panelBotones = new Panel(new GridBagLayout());
+		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
@@ -196,7 +208,7 @@ public class Ensobrado extends JPanel {
 
         
         // Boton ayuda
-        JLabel botonAyuda = HelpUtils.fechButton("ensobrado");
+		JButton botonAyuda = HelpUtils.helpButton("ensobrado");
         
         cons.ipadx = 15;
 		cons.weightx = 0.0;

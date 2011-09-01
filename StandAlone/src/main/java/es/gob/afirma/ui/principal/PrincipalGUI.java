@@ -10,11 +10,14 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
@@ -32,7 +35,6 @@ import java.util.Locale;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -49,8 +51,11 @@ import javax.swing.event.ChangeListener;
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityFrame;
 import es.gob.afirma.ui.utils.JStatusBar;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
+import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 
 
 /**
@@ -60,7 +65,7 @@ import es.gob.afirma.ui.utils.Messages;
  * ensobrado y desensobrado.
  * 
  */
-public class PrincipalGUI extends JFrame {
+public class PrincipalGUI extends JAccessibilityFrame {
 
 	private static final long serialVersionUID = 1L;
 
@@ -68,28 +73,52 @@ public class PrincipalGUI extends JFrame {
 	
 	public static JStatusBar bar = new JStatusBar();
 	private JTabbedPane panelPest = null;
-
+	
+	@Override
+	public int getMinimumRelation(){
+		return 7;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		// Dimensiones de la ventana
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		if (Platform.getOS().equals(Platform.OS.MACOSX)){
+			return (screenSize.height - 340) / 2;
+		}else{
+			return (screenSize.height - 320) / 2;
+		}
+	}
+	@Override
+	public int getInitialWidth() {
+		// Dimensiones de la ventana
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		return (screenSize.width - 500) / 2 ;
+	}
+	
 	public PrincipalGUI() {
 		initComponents();
 		iniciarProveedores();
+		this.addComponentListener(new ComponentAdapter() {
+		    public void componentResized(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		});
 	}
 
 	/**
 	 * Inicializacion de los componentes
 	 */
 	private void initComponents() {
-		// Dimensiones de la ventana para Windows y Linux
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		setBounds((screenSize.width - 500) / 2, (screenSize.height - 320) / 2, 500, 320);
-		
-		if (Platform.getOS().equals(Platform.OS.MACOSX))
-			setBounds((screenSize.width - 500) / 2, (screenSize.height - 340) / 2, 500, 340);
+		// Dimensiones de la ventana
+		setBounds(this.getInitialWidth(), this.getInitialHeight(), 550, 370);
 		
 		// Parametros ventana
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
 		setTitle("Firma"); // NOI18N
-		setResizable(false);
 		getContentPane().setLayout(new BorderLayout(11, 7));
+		setMinimumSize(getSize());
 
 		// Icono de @firma
 		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
@@ -134,7 +163,7 @@ public class PrincipalGUI extends JFrame {
 		getContentPane().add(izquierda, BorderLayout.LINE_START);
 
 		// Barra de estado
-		bar.setLabelWidth(570);
+		bar.setLabelWidth((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth());
 		bar.setStatus("");
 		bar.setLeftMargin(3);
 		getContentPane().add(bar, BorderLayout.SOUTH);
@@ -149,13 +178,14 @@ public class PrincipalGUI extends JFrame {
 	private JMenu generarMenuHerramientas() {
 		// Opcion del menu principal - Herramientas
 		JMenu herramientas = new JMenu();
-		herramientas.setMnemonic(KeyEvent.VK_H);
+		herramientas.setMnemonic(KeyEvent.VK_S);
 		herramientas.setText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
 		herramientas.setToolTipText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
 
 		// Subopcion menu Herramientas - Opciones
 		JMenuItem opciones = new JMenuItem();
 		opciones.setText(Messages.getString("Opciones.opciones")); // NOI18N
+		opciones.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al menú
 		opciones.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				opcionesActionPerformed();
@@ -166,8 +196,9 @@ public class PrincipalGUI extends JFrame {
 		// Subopcion menu Herramientas - Idiomas
 		JMenu menuIdioma = new JMenu();
 		menuIdioma.setText(Messages.getString("Opciones.general.idioma")); // NOI18N
-
-		// Obtenemos ruta donde se encuentra la aplicación
+		menuIdioma.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al menú
+		
+		// Obtenemos ruta donde se encuentra la aplicaciï¿½n
 		URL baseDirectory = getClass().getProtectionDomain().getCodeSource().getLocation();
 		File languagesDirectory = null;
 
@@ -198,6 +229,9 @@ public class PrincipalGUI extends JFrame {
 			}
 		}
 		
+		//Lista de mnemónicos usados para los radio buttons de lenguajes
+		List<Character> mnemonicList = new ArrayList<Character>();
+		
 		// Generamos las opciones del menu idiomas
 		ButtonGroup grupo = new ButtonGroup();
 		for (String language : languages)
@@ -205,7 +239,10 @@ public class PrincipalGUI extends JFrame {
 				final Locale locale = new Locale(language.substring(0, 2), language.substring(3));
 				String languageName = locale.getDisplayLanguage(locale);
 				JRadioButtonMenuItem opcionIdioma = new JRadioButtonMenuItem(languageName.substring(0, 1).toUpperCase() + languageName.substring(1));
-
+				
+				//Se asigna un mnemónico que no haya sido utilizado
+				opcionIdioma.setMnemonic(Utils.getLanguageMnemonic(mnemonicList, languageName.toLowerCase()));
+				
 				menuIdioma.add(opcionIdioma);
 				grupo.add(opcionIdioma);
 
@@ -222,6 +259,7 @@ public class PrincipalGUI extends JFrame {
 			}
 
 		herramientas.add(menuIdioma);
+
 		
 		// Separador
 		JSeparator separador = new JSeparator();
@@ -230,6 +268,7 @@ public class PrincipalGUI extends JFrame {
 		// Subopcion menu Herramientas - Salir
 		JMenuItem salir = new JMenuItem();
 		salir.setText(Messages.getString("PrincipalGUI.salir")); // NOI18N
+		salir.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo al menú
 		salir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				salirActionPerformed();
@@ -254,6 +293,7 @@ public class PrincipalGUI extends JFrame {
 		// Subopcion menu Ayuda - Ayuda
 		JMenuItem ayudaHTML = new JMenuItem();
 		ayudaHTML.setText(Messages.getString("ayudaHTML.contenido")); // NOI18N
+		ayudaHTML.setMnemonic(KeyEvent.VK_U); //Se asigna un atajo al menu
 		ayudaHTML.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				ayudaHTMLActionPerformed();
@@ -264,6 +304,7 @@ public class PrincipalGUI extends JFrame {
 		// Subopcion menu Ayuda - Acerca de
 		JMenuItem acerca = new JMenuItem();
 		acerca.setText(Messages.getString("ayuda.contenido")); // NOI18N
+		acerca.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al menu
 		acerca.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				acercaActionPerformed();
@@ -292,7 +333,7 @@ public class PrincipalGUI extends JFrame {
 	}
 
 	/**
-	 * Seleccion idiomas: Cambia el idioma de la aplicación
+	 * Seleccion idiomas: Cambia el idioma de la aplicaciï¿½n
 	 * @param locale	Nuevo Locale
 	 */
 	private void cambiarIdioma(Locale locale) {
@@ -307,7 +348,7 @@ public class PrincipalGUI extends JFrame {
 	}
 	
 	/**
-	 * Seleccion menu salir: Cierra la aplicación
+	 * Seleccion menu salir: Cierra la aplicaciï¿½n
 	 */
 	private void salirActionPerformed() {
 		System.exit(0);
@@ -363,7 +404,7 @@ public class PrincipalGUI extends JFrame {
 					Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description"));
 		}
 
-		// Insertar la pestana de validación
+		// Insertar la pestana de validaciï¿½n
 		JPanel panelValidacion = new Validacion();
 		panelValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
 		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion"),
@@ -424,7 +465,7 @@ public class PrincipalGUI extends JFrame {
 		panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_M);
 		// Multifirma masiva
 		if (GeneralConfig.isAvanzados()) 
-			panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_L);
+			panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_I);
 		// Validacion
 		panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_V);
 		// Cifrado
@@ -500,6 +541,9 @@ public class PrincipalGUI extends JFrame {
 				}
 			}
 		});
+		//Al repintar la pantalla principal para quitar o poner las opciones avanzadas hay que ajustar 
+		//la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
+		this.callResize();
 	}
 
 	private void panelPestMouseMoved(MouseEvent evt){
@@ -537,7 +581,7 @@ public class PrincipalGUI extends JFrame {
 	}
 
 	/**
-	 * Muestra la ventana de la aplicación
+	 * Muestra la ventana de la aplicaciï¿½n
 	 */
 	public void main() {	
 		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) {
@@ -556,5 +600,15 @@ public class PrincipalGUI extends JFrame {
 				setVisible(true);
 			}
 		});
+	}
+	
+	/**
+	 * Evento de redimensionado. Redimensiona el tamaÃ±o de la barra de estado y de su contenido
+	 * 
+	 */
+	public void resized(ComponentEvent e) {
+		Dimension screenSize = this.getSize();
+	    bar.setPreferredSize(new Dimension((int) screenSize.getWidth()*10/100,(int) screenSize.getHeight()*5/100));
+	    bar.setLabelSize((int) screenSize.getWidth(),(int) screenSize.getHeight()*4/100);
 	}
 }

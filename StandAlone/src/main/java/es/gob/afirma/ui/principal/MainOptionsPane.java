@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -100,12 +101,13 @@ public class MainOptionsPane {
         checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         checkHabilitar.setSelected(GeneralConfig.isAvanzados()); 
         checkHabilitar.setBounds(12, 20, 340, 23);
+        checkHabilitar.setMnemonic(KeyEvent.VK_H); // Asignación de mnemónico al checkbox
         generalPanel.add(checkHabilitar, c2);
         
         panel.add(generalPanel, c);
         c.gridy = c.gridy + 1;
         
-        // Panel criptografía
+        // Panel criptografï¿½a
         JPanel criptografiaPanel = new JPanel(new GridBagLayout());
         criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
 
@@ -120,6 +122,8 @@ public class MainOptionsPane {
         
         c2.insets = new Insets(5, 13, 0, 13);
         c2.gridy = 1;
+        c2.weighty = 0.1;
+        c2.fill = GridBagConstraints.BOTH;
         
         // Combo con los algoritmos de huella digital
         comboAlgoritmo = new JComboBox();
@@ -129,17 +133,28 @@ public class MainOptionsPane {
         comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoK.toArray()));
         criptografiaPanel.add(comboAlgoritmo, c2);
         
+        //Relación entre etiqueta y combo
+        etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
+  		//Asignación de mnemónico
+        etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_R);
+        
         c2.insets = new Insets(5, 13, 0, 13);
         c2.gridy = 2;
+        c2.weighty = 0.0;
+        c2.fill = GridBagConstraints.HORIZONTAL;
         
         // Checkbox para utilizar XML
         checkXML = new JCheckBox();
         checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
         checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
+        checkXML.setMnemonic(KeyEvent.VK_U);  // Asignación de mnemónico al checkbox
         criptografiaPanel.add(checkXML, c2);
-        
+        c.weighty = 0.3;
+        c.fill = GridBagConstraints.BOTH;
         panel.add(criptografiaPanel, c);
         c.gridy = c.gridy + 1;
+        c.weighty = 0.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
         
      // Panel Politica de firma
     	JPanel policyPanel = new JPanel(new GridBagLayout());
@@ -153,7 +168,8 @@ public class MainOptionsPane {
         // Checkbox para habilitar las opciones de configuracion avanzada
         checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
         checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
-
+        checkAddPolicy.setMnemonic(KeyEvent.VK_O); // Asignación de mnemónico al checkbox
+        
         policyPanel.add(checkAddPolicy, c2);
         c2.gridy = c2.gridy + 1; 
         
@@ -164,6 +180,10 @@ public class MainOptionsPane {
         
         textPolicyOid = new JTextField();
         textPolicyOid.setEnabled(false);
+        
+        //Relación entre etiqueta y campo de texto
+        policyOidLabel.setLabelFor(textPolicyOid);
+        
         policyPanel.add(textPolicyOid, c2);
         c2.gridy = c2.gridy + 1;
         
@@ -174,6 +194,10 @@ public class MainOptionsPane {
         
         textPolicyUrl = new JTextField();
         textPolicyUrl.setEnabled(false);
+        
+        //Relación entre etiqueta y campo de texto
+        policyUrlLabel.setLabelFor(textPolicyUrl);
+        
         policyPanel.add(textPolicyUrl, c2);
         
         panel.add(policyPanel, c);
@@ -190,6 +214,15 @@ public class MainOptionsPane {
 				textPolicyOid.setEnabled(state);
 				policyUrlLabel.setEnabled(state);
 				textPolicyUrl.setEnabled(state);
+				//Asignación de mnemónicos según el estado
+				if (state) {
+					policyOidLabel.setDisplayedMnemonic(KeyEvent.VK_I);
+					policyUrlLabel.setDisplayedMnemonic(KeyEvent.VK_T);
+				} else {
+					//Se eliminan los atajos porque los cuadros de texto están deshabilitados
+					policyOidLabel.setDisplayedMnemonic(0);
+					policyUrlLabel.setDisplayedMnemonic(0);
+				}
 			}
 		});
         

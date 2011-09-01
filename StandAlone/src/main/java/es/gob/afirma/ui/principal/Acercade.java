@@ -15,6 +15,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -83,6 +84,7 @@ public class Acercade extends JFrame {
 		versionInterfaz.setOpaque(false);
 		versionInterfaz.setText(Messages.getString("version.interfaz") + "  " + Main.VERSION); // NOI18N
 		versionInterfaz.setBorder(null);
+		versionInterfaz.setEditable(false); //Para que no sea editable
 		getContentPane().add(versionInterfaz, c);
 		
 		c.insets = new Insets(5, 20, 0, 20);
@@ -92,6 +94,7 @@ public class Acercade extends JFrame {
 		version.setOpaque(false);
 		version.setText(Messages.getString("version") + "  " + getVersion()); // NOI18N
 		version.setBorder(null);
+		version.setEditable(false); //Para que no sea editable
 		getContentPane().add(version, c);
 
 		c.insets = new Insets(15, 20, 0, 20);
@@ -112,6 +115,7 @@ public class Acercade extends JFrame {
 		// Boton aceptar
 		JButton aceptar = new JButton();
 		aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
+		aceptar.setMnemonic(KeyEvent.VK_A); //Se asijna un atajo al boton aceptar
 		aceptar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				aceptarActionPerformed();

@@ -11,8 +11,13 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dialog.ModalExclusionType;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.URL;
@@ -24,6 +29,7 @@ import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.WindowPresentation;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -57,6 +63,8 @@ public class HelpUtils {
 				helpBroker.initPresentation();
 				WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
 				JFrame helpwindow = (JFrame) wp.getHelpWindow();
+				//La ventana de ayuda no debe ser bloqueada por ninguna ventana de la aplicaciï¿½n
+				helpwindow.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 				
 				// Introducimos el icono en la ventana
 				Image icon = Toolkit.getDefaultToolkit().createImage(HelpUtils.class.getClassLoader().getResource("resources/images/afirma_ico.png"));
@@ -108,7 +116,8 @@ public class HelpUtils {
 		getHelp().setDisplayed(true);
 		getHelp().setCurrentID("introduccion");
 	}
-	
+
+	//TODO: el siguiente mï¿½todo se podrï¿½a borrar
 	/**
 	 * Genera una etiqueta con el icono de ayuda y que apunta a la p&aacute;gina dada.
 	 * @param pagina	P&aacute;gina a mostrar cuando se pulse el bot&oacute;n
@@ -133,4 +142,40 @@ public class HelpUtils {
 		
 		return botonAyuda;
 	}
+
+	/**
+	 * Genera el botï¿½n de ayuda que apuntarï¿½ a la pï¿½gina dada.
+	 * @param pagina Pï¿½gina a mostrar cuando se puelse el botï¿½n de ayuda.
+	 * @return botï¿½n de ayuda
+	 */
+	/**
+	 * @param pagina
+	 * @return
+	 */
+	public static JButton helpButton(final String pagina) {
+
+		JButton botonAyuda = new JButton(new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")));
+		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
+		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		botonAyuda.setMnemonic(KeyEvent.VK_H); //Se le asigna un mnemónico al botón de ayuda
+		//Se asigna una dimensiï¿½n al botï¿½n segï¿½n su icono
+		Dimension dimension = new Dimension(12,27);
+		botonAyuda.setPreferredSize(dimension);
+		
+		botonAyuda.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el botï¿½n
+		botonAyuda.setContentAreaFilled(false); //ï¿½rea del botï¿½n invisible
+		
+		//Acción para desplegar la pantalla de ayuda
+		botonAyuda.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				getHelp().setDisplayed(true);
+				getHelp().setCurrentID(pagina);
+			}
+		});
+		
+		return botonAyuda;
+	}
+
 }
+
+

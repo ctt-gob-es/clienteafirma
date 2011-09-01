@@ -3,6 +3,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -78,6 +79,12 @@ public class ContextOptionsPane {
         campoMotivo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.motivo")); // NOI18N
         contextPanel.add(campoMotivo, c2);
         
+        //Relación entre etiqueta y campo de texto
+        etiquetaMotivo.setLabelFor(campoMotivo);
+  		//Asignación de mnemónico
+        etiquetaMotivo.setDisplayedMnemonic(KeyEvent.VK_O);
+        
+        
         c2.insets = new Insets(13, 13, 0, 13);
         c2.gridy = 2;
         
@@ -95,6 +102,11 @@ public class ContextOptionsPane {
         campoLugar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.lugar")); // NOI18N
         contextPanel.add(campoLugar, c2);
         
+        //Relación entre etiqueta y campo de texto
+        etiquetaLugar.setLabelFor(campoLugar);
+  		//Asignación de mnemónico
+        etiquetaLugar.setDisplayedMnemonic(KeyEvent.VK_L);
+        
         c2.insets = new Insets(13, 13, 0, 13);
         c2.gridy = 4;
         
@@ -111,6 +123,11 @@ public class ContextOptionsPane {
         campoDatos.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.datos")); // NOI18N
         campoDatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.datos")); // NOI18N
         contextPanel.add(campoDatos, c2);
+        
+        //Relación entre etiqueta y campo de texto
+        etiquetaDatos.setLabelFor(campoDatos);
+  		//Asignación de mnemónico
+        etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_D);
 
         panel.add(contextPanel, c);
         

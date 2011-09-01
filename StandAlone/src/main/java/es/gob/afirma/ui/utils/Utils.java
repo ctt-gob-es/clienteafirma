@@ -49,4 +49,27 @@ public class Utils {
 			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide"));
 		}
 	}
+
+	/**
+	 * Método que devuelve un mnemónico válido para el lenguaje que recibe como parámetro.
+	 * @param listMnemonic lista de mnemónicos que ya han sido utilizados para otros lenguajes.
+	 * @param actualLanguage lenguaje para el que se está buscando un mnemónico
+	 * @return mnemónico seleccionado o 0 en el caso de que no se haya encontrado ninguno disponible
+	 */
+	public static char getLanguageMnemonic(List<Character> mnemonicList, String actualLanguage){
+		//Se recorren las letras del lenguaje actual
+		for (int i=0; i< actualLanguage.length(); i++) {
+			//Se lee el caracter correspondiente al índice i
+			char caracter = actualLanguage.charAt(i);
+			//Se comprueba si se ha utilizado
+			if (!mnemonicList.contains(caracter)) {
+				//se añade a la lista de caracteres utilizados
+				mnemonicList.add(caracter);
+				//Se devuelve
+				return caracter;
+			}
+		}
+		//TODO: mejorar para que en el caso de que no encuentre mnemónico pueda cambiar alguno de los anteriores
+		return 0;
+	}
 }

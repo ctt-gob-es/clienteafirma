@@ -56,6 +56,7 @@ import es.gob.afirma.signers.aobinarysignhelper.CMSEnvelopedData;
 import es.gob.afirma.signers.aobinarysignhelper.CMSHelper;
 import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
@@ -69,11 +70,25 @@ import es.gob.afirma.ui.wizardUtils.PanelesTexto;
  * Clase que contiene los elementos necesarios para crear un grupo de Remitentes
  * a partir de una seleccion de certificados de remitentes.
  */
-public class PanelRemitentes extends JDialogWizard {
+public class PanelRemitentes extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelRemitentes.class.getName());
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Ruta donde se encuentra el fichero a ensobrar
@@ -239,7 +254,7 @@ public class PanelRemitentes extends JDialogWizard {
 	}
 
 	/**
-	 * Añade un nuevo remitente desde el repositorio indicado
+	 * Aï¿½ade un nuevo remitente desde el repositorio indicado
 	 * @param comboRepositorios	combo con el listado de repositorios / almacenes
 	 * @param listModel  		Modelo de la lista de remitentes
 	 * @param eliminar			Boton para eliminar un remitente del listado de repositorios
@@ -393,7 +408,7 @@ public class PanelRemitentes extends JDialogWizard {
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	} catch(Exception e){
-    		logger.warning("Ocurrio un error durante el proceso de añadir un nuevo remitente: "+e);
+    		logger.warning("Ocurrio un error durante el proceso de aï¿½adir un nuevo remitente: "+e);
     		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
@@ -425,7 +440,7 @@ public class PanelRemitentes extends JDialogWizard {
 						privateKey,
 						null);
 			} catch (AOException e) {
-				logger.warning("Ocurrio un error durante el proceso de añadir un nuevo remitente: "+e);
+				logger.warning("Ocurrio un error durante el proceso de aï¿½adir un nuevo remitente: "+e);
 	    		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), 
 	    				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	    		return null;

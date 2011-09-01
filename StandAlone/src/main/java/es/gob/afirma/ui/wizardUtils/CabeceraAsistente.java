@@ -32,7 +32,7 @@ public class CabeceraAsistente extends JPanel {
 	
 	private String MessagesTitulo;
 	private String MessagesDescripcion;
-	private Dimension dimensiones = new Dimension(607, 70);
+	private Dimension dimensiones = new Dimension(607, 110);
 	private Boolean bloqueTexto = false;
 
 	/**
@@ -94,9 +94,10 @@ public class CabeceraAsistente extends JPanel {
 
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(10, 10, 0, 10);
+		c.insets = new Insets(1, 10, 0, 10);
 		c.weightx = 1.0;
 		c.gridx = 0;
+		c.weighty = 1.0;
         
     	// Etiqueta con el titulo de la ventana
     	JLabel etiquetaTitulo = new JLabel();
@@ -104,7 +105,7 @@ public class CabeceraAsistente extends JPanel {
     	etiquetaTitulo.setText(Messages.getString(MessagesTitulo)); // NOI18N
     	add(etiquetaTitulo, c);
     	
-    	c.insets = new Insets(0, 15, 10, 10);
+    	c.insets = new Insets(0, 15, 0, 10);
     	c.weighty = 1.0;
 		
     	if (bloqueTexto == false) {

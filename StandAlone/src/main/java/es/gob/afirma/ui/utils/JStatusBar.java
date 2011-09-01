@@ -47,6 +47,16 @@ import javax.swing.JLabel;
 		 etiqueta.setPreferredSize(new Dimension(width, getPreferredSize().height));
 		 add(etiqueta);
 	 }
+	 	 
+	 /**
+	  * Define el tamaño de la etiqueta
+	  * @param width	Ancho de la etiqueta
+	  * @param height	Alto de la etiqueta
+	  */
+	 public void setLabelSize(int width, int height) {
+		 JLabel etiqueta = (JLabel) getComponent(0);
+		 etiqueta.setPreferredSize(new Dimension(width, height));
+	 }
 
 	 /**
 	  * Modifica el texto de la barra de estado

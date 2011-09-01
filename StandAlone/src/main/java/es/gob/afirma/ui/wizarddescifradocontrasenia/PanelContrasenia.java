@@ -33,6 +33,7 @@ import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.AOUIManager.JTextFieldASCIIFilter;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -42,11 +43,25 @@ import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 /**
  * Clase que muestra el contenido principal del descifrado de una contrasenia.
  */
-public class PanelContrasenia extends JDialogWizard {
+public class PanelContrasenia extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Cifrador configurado para un algoritmo dado

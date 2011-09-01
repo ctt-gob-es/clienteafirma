@@ -15,6 +15,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Panel;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -26,15 +27,30 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextPane;
 
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
-class PanelConfiguracion extends JDialogWizard {
+class PanelConfiguracion extends JAccessibilityDialogWizard {
 	
 	private static final long serialVersionUID = 1L;
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Muestra/oculta el panel de los radio buttons y su explicacion
@@ -100,7 +116,8 @@ class PanelConfiguracion extends JDialogWizard {
     	// Checkbox con texto "Respetar el formato..."
     	checkRespectar.setText(Messages.getString("Wizard.multifirma.ventana2.check.respetar"));
         checkRespectar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana2.check.respetar")); 
-        checkRespectar.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.check.respetar.description")); 
+        checkRespectar.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.check.respetar.description"));
+        checkRespectar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al checkbox
         panelCentral.add(checkRespectar, c);
         
         c.gridy = 2;
@@ -123,7 +140,8 @@ class PanelConfiguracion extends JDialogWizard {
     	JRadioButton radioTodos = new JRadioButton();
     	radioTodos.setText(Messages.getString("Wizard.multifirma.ventana2.panel.radio1")); 
         radioTodos.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana2.panel.radio1")); 
-        radioTodos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description")); 
+        radioTodos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description"));
+        radioTodos.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al botón de radio
         radioTodos.setSelected(true);
         panelRadios.add(radioTodos, cons);
         
@@ -132,7 +150,8 @@ class PanelConfiguracion extends JDialogWizard {
         // Radio buton "Contrafirmar unicamente"
         radioUltimos.setText(Messages.getString("Wizard.multifirma.ventana2.panel.radio2")); 
         radioUltimos.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana2.panel.radio2")); 
-        radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description")); 
+        radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description"));
+        radioUltimos.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botón de radio
         panelRadios.add(radioUltimos, cons);
         
         // Grupo de radiobuttons

@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,6 +36,7 @@ import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.AOUIManager.JTextFieldASCIIFilter;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -44,7 +46,7 @@ import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 /**
  * Dialogo con la pagina 2: Clave de cifrado
  */
-public class PanelContrasenia extends JDialogWizard {
+public class PanelContrasenia extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -59,6 +61,20 @@ public class PanelContrasenia extends JDialogWizard {
 	 * Clave de cifrado
 	 */
 	private Key cipherKey;
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
     
     /**
      * Guarda todas las ventanas del asistente para poder controlar la botonera
@@ -91,7 +107,7 @@ public class PanelContrasenia extends JDialogWizard {
     private void initComponents() {    	
     	// Titulo de la ventana
     	setTitulo(Messages.getString("WizardCifrado.titulo"));
-    	    	
+    	
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null, true);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -128,6 +144,11 @@ public class PanelContrasenia extends JDialogWizard {
         campoContrasenia.setDocument(new JTextFieldASCIIFilter(true));
         panelCentral.add(campoContrasenia, c);
         
+        //Relación entre etiqueta y campo de contraseña
+        etiquetaContrasenia.setLabelFor(campoContrasenia);
+  		//Asignación de mnemónico
+        etiquetaContrasenia.setDisplayedMnemonic(KeyEvent.VK_I);
+        
         c.gridy = 3;
         c.insets = new Insets(20, 20, 0, 20);
         
@@ -143,6 +164,11 @@ public class PanelContrasenia extends JDialogWizard {
         campoContraseniaRep.setToolTipText(Messages.getString("WizardCifrado.recontrasenia.description")); // NOI18N
         campoContraseniaRep.setDocument(new JTextFieldASCIIFilter(true));
         panelCentral.add(campoContraseniaRep, c);
+        
+        //Relación entre etiqueta y campo de contraseña
+        etiquetaContraseniaRep.setLabelFor(campoContraseniaRep);
+  		//Asignación de mnemónico
+        etiquetaContraseniaRep.setDisplayedMnemonic(KeyEvent.VK_N);
         
         c.fill = GridBagConstraints.BOTH;
         c.gridy = 5;

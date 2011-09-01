@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
@@ -27,13 +28,27 @@ import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 /**
  * Panel explicativo de presentacion
  */
-public class PanelPresentacion extends JDialogWizard {
+public class PanelPresentacion extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
     public PanelPresentacion() {
         initComponents();
     }
+    
+    @Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
     
     /**
      * Guarda todas las ventanas del asistente para poder controlar la botonera

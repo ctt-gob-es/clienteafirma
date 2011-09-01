@@ -38,6 +38,7 @@ import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -48,11 +49,25 @@ import es.gob.afirma.ui.wizardUtils.PanelesTexto;
  *
  * Clase que muestra el contenido principal del descifrado de una clave.
  */
-public class PanelClave extends JDialogWizard {
+public class PanelClave extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelClave.class.getName());
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Cifrador configurado para un algoritmo dado

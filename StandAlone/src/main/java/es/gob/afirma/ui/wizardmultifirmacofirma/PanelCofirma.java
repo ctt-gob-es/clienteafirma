@@ -43,6 +43,7 @@ import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -53,12 +54,26 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 /**
  * Clase que muestra el contenido principal de multifirmas - cofirma.
  */
-public class PanelCofirma extends JDialogWizard {
+public class PanelCofirma extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelCofirma.class.getName());
 
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
+	
 	/**
 	 * Configuracion del KeyStore
 	 */
@@ -119,6 +134,11 @@ public class PanelCofirma extends JDialogWizard {
 		// Caja de texto donde se guarda el nombre del archivo de datos
 		campoDatos.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description"));
 		panelCentral.add(campoDatos, c);
+		
+		//Relación entre etiqueta y campo de texto
+		etiquetaDatos.setLabelFor(campoDatos);
+		//Asignación de mnemónico
+		etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_F);
 
 		c.insets = new Insets(0, 10, 0, 20);
 		c.weightx = 0.0;
@@ -153,13 +173,18 @@ public class PanelCofirma extends JDialogWizard {
 		// Caja de texto donde se guarda el nombre del archivo de la firma
 		campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma.description")); // NOI18N
 		panelCentral.add(campoFirma, c);
+		
+		//Relación entre etiqueta y campo de texto
+		etiquetaFirma.setLabelFor(campoFirma);
+		//Asignación de mnemónico
+		etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_I);
 
 		c.insets = new Insets(0, 10, 0, 20);
 		c.gridx = 1;
 		
 		// Boton examinar (fichero firma)
 		JButton examinarFirma = new JButton();
-		examinarFirma.setMnemonic(KeyEvent.VK_E);
+		examinarFirma.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico diferente al botï¿½n "Examinar" anterior
 		examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar"));
 		examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
 		examinarFirma.addActionListener(new ActionListener() {
@@ -236,7 +261,7 @@ public class PanelCofirma extends JDialogWizard {
 	 * @return	true o false indicando si se ha cofirmado correctamente
 	 */
 	public Boolean cofirmaFichero() {
-		//comprobación de la ruta de fichero de entrada.
+		//comprobaciï¿½n de la ruta de fichero de entrada.
 		String ficheroDatos = campoDatos.getText();
 		String ficheroFirma = campoFirma.getText();
 

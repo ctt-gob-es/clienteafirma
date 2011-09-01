@@ -17,6 +17,7 @@ import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,6 +58,7 @@ import es.gob.afirma.misc.AOUtil;
 import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
@@ -70,7 +72,7 @@ import es.gob.afirma.ui.wizardUtils.PanelesTexto;
  * Clase que contiene los elementos necesarios para crear un grupo de Remitenres
  * a partir de una seleccion de certificados de remitentes.
  */
-public class PanelRemitentes extends JDialogWizard {
+public class PanelRemitentes extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
@@ -79,6 +81,20 @@ public class PanelRemitentes extends JDialogWizard {
 	public static int SOBRE_AUTENTICADO = 0; 
     public static int SOBRE_FIRMADO = 1;
     public static int SOBRE_SIMPLE = 2;
+    
+    @Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
     
     /**
      * Tipo de ensobrado
@@ -136,6 +152,8 @@ public class PanelRemitentes extends JDialogWizard {
 
 	// Lista de remitentes
 	private JList listaRemitentes = new JList();
+	 // Etiqueta con el texto "Anadir remitente desde..."
+	private JLabel etiquetaAnadir = new JLabel();
 	
 	/**
 	 * Inicializacion de componentes
@@ -169,7 +187,7 @@ public class PanelRemitentes extends JDialogWizard {
 		c.gridwidth = 1;
         
         // Etiqueta con el texto "Anadir remitente desde..."
-        JLabel etiquetaAnadir = new JLabel();
+        etiquetaAnadir = new JLabel();
         etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante"));
 		panelCentral.add(etiquetaAnadir, c);
 		
@@ -177,6 +195,8 @@ public class PanelRemitentes extends JDialogWizard {
 		c.gridwidth = 1;
 		c.gridy = 2;
 		c.weightx = 1.0;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Combo con los repositorios / almacenes
 		final JComboBox comboRepositorios = new JComboBox();
@@ -184,9 +204,16 @@ public class PanelRemitentes extends JDialogWizard {
 		cargarCombo(comboRepositorios);
 		panelCentral.add(comboRepositorios, c);
 		
+		//Relación entre etiqueta y combo
+		etiquetaAnadir.setLabelFor(comboRepositorios);
+		//Asignación de mnemónico
+		etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
+		
 		c.insets = new Insets(0, 10, 0, 20);
 		c.gridx = 1;
 		c.weightx = 0.0;
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Boton Anadir
 		final JButton anadir = new JButton();
@@ -194,6 +221,7 @@ public class PanelRemitentes extends JDialogWizard {
 		anadir.setToolTipText(Messages.getString("Wizard.sobres.aniadir.originante.description"));
 		anadir.setText(Messages.getString("wizard.aniadir")); 
 		anadir.setAutoscrolls(true);
+		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón
 		anadir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboRepositorios, eliminar, anadir);
@@ -202,12 +230,23 @@ public class PanelRemitentes extends JDialogWizard {
 		panelCentral.add(anadir, c);
 		
 		c.insets = new Insets(10, 20, 0, 20);
+		c.gridx = 0;
+		c.gridy = 3;
+		c.weightx =0.0;
+		
+		 // Etiqueta con el texto "Remitentes"
+        JLabel senderLabel = new JLabel();
+        senderLabel.setText(Messages.getString("wizard.sobres.listaRemitentes"));
+		panelCentral.add(senderLabel, c);
+		
+		c.insets = new Insets(0, 20, 0, 20);
 		c.ipady = 80;
 		c.gridwidth = 2;
-		c.gridy = 3;
+		c.gridy = 4;
 		c.gridx = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Panel que contiene la lista de remitentes
 		JScrollPane panelLista = new JScrollPane();
@@ -218,16 +257,22 @@ public class PanelRemitentes extends JDialogWizard {
 		listaRemitentes.setModel(new DefaultListModel());
 		panelLista.setViewportView(listaRemitentes);
 		
+		//Relación entre etiqueta y lista
+		senderLabel.setLabelFor(listaRemitentes);
+		//Asignación de mnemónico
+		senderLabel.setDisplayedMnemonic(KeyEvent.VK_T);
+		
 		c.ipady = 0;
 		c.gridwidth = 1;
-		c.gridy = 4;
+		c.gridy = 5;
 		c.weightx = 1.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Espacio izdo del boton
 		Panel panelVacio = new Panel();
 		panelCentral.add(panelVacio, c);
 		
-		c.insets = new Insets(10, 0, 20, 20);
+		c.insets = new Insets(10, 0, 10, 20);
 		c.weightx = 0.0;
 		c.gridx = 1;
 		
@@ -259,7 +304,7 @@ public class PanelRemitentes extends JDialogWizard {
 	}
 
 	/**
-	 * Añade un nuevo remitente desde el repositorio indicado
+	 * Aï¿½ade un nuevo remitente desde el repositorio indicado
 	 * @param comboRepositorios	combo con el listado de repositorios / almacenes
 	 * @param listModel  		Modelo de la lista de remitentes
 	 * @param eliminar			Boton para eliminar un remitente del listado de repositorios
@@ -298,14 +343,17 @@ public class PanelRemitentes extends JDialogWizard {
 				listModel.addElement(certDest.getAlias());
 				listaCertificadosRe.add(certDest);
 				anadir.setEnabled(false);
+				anadir.setMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el botón
 				comboRepositorios.setEnabled(false);
+				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
 				eliminar.setEnabled(true);
+				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else
 				JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
 		}
 		
-		// Preguntamos por la contraseña del certificado
+		// Preguntamos por la contraseï¿½a del certificado
 		if (!listaCertificadosRe.isEmpty())
 			try {
 				privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(),kconf);
@@ -335,8 +383,11 @@ public class PanelRemitentes extends JDialogWizard {
 
 		if (listaCertificadosRe.isEmpty()) {
 			anadir.setEnabled(true);
-			comboRepositorios.setEnabled(true);
+			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón puesto que se ha habilitado
+			comboRepositorios.setEnabled(true); 
+			etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
 			eliminar.setEnabled(false);
+			eliminar.setMnemonic(0); //Se asigna un atajo vacio al botón ya que ha sido deshabilitado
 		}
 	}
 
@@ -356,8 +407,11 @@ public class PanelRemitentes extends JDialogWizard {
 		
 		if (listaCertificadosRe.isEmpty()) {
 			anadir.setEnabled(true);
+			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón puesto que se ha habilitado
 			comboRepositorios.setEnabled(true);
+			etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
 			eliminar.setEnabled(false);
+			eliminar.setMnemonic(0); //Se asigna un atajo vacio al botón ya que ha sido deshabilitado
 		}
 		
 		// Borramos las posibles claves del certificado

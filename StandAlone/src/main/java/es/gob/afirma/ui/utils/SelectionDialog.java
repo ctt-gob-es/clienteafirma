@@ -50,8 +50,8 @@ public class SelectionDialog {
 	 */
 	private File showOpenDialog(Component parent, String title, int selectionMode) {
 		File filePath = null;
-
-		JFileChooser fc = new JFileChooser(currentDir);
+		//Instancia del componente FileChooser accesible
+		JAccessibilityFileChooser fc = new JAccessibilityFileChooser(currentDir);
 		fc.setDialogTitle(title);
 		fc.setFileSelectionMode(selectionMode);
 		if(fc.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {

@@ -13,7 +13,6 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -101,6 +100,11 @@ public class Desensobrado extends JPanel {
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.buscar.caja.description")); // NOI18N
 		add(campoFichero, c);
 		
+		//Relación entre etiqueta y campo de texto
+		etiquetaFichero.setLabelFor(campoFichero);
+		//Asignación de mnemónico
+		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_O);
+		
 		c.insets = new Insets(0, 10, 0, 13);
 		c.weightx = 0.0;
 		c.gridx = 1;
@@ -134,6 +138,8 @@ public class Desensobrado extends JPanel {
 
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 3;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
         // Combo con el almacen o repositorio de certificados
         final JComboBox comboAlmacen = new JComboBox();
@@ -145,9 +151,16 @@ public class Desensobrado extends JPanel {
         cargarComboAlmacen(comboAlmacen);
         add(comboAlmacen, c);
         
+        //Relación entre etiqueta y combo
+        etiquetaAlmacen.setLabelFor(comboAlmacen);
+		//Asignación de mnemónico
+        etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
+        
 		c.insets = new Insets(13, 13, 0, 13);
 		c.weightx = 1.0;
 		c.gridy = 4;
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
         
         // Etiqueta con las opciones de apertura
         JLabel etiquetaOpciones = new JLabel();
@@ -165,6 +178,7 @@ public class Desensobrado extends JPanel {
         checkInicar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.check.check.description.status")));
         checkInicar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check")); // NOI18N
         checkInicar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.check.check.description")); // NOI18N
+        checkInicar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo
         add(checkInicar, c);
 		
 		c.weighty = 1.0;
@@ -175,7 +189,7 @@ public class Desensobrado extends JPanel {
 		add(emptyPanel, c);
 		
 		// Panel con los botones
-		Panel panelBotones = new Panel(new GridBagLayout());
+		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
@@ -186,9 +200,9 @@ public class Desensobrado extends JPanel {
 		JLabel label = new JLabel();
 		panelBotones.add(label, cons);
 		
-        // Boton descifrar
+        // Boton extraer
         JButton extraer = new JButton();
-        extraer.setMnemonic(KeyEvent.VK_C);
+        extraer.setMnemonic(KeyEvent.VK_X);
         extraer.setText(Messages.getString("Desensobrado.btnDescifrar")); // NOI18N
         extraer.setToolTipText(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
         extraer.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.btnDescifrar.description.status")));
@@ -211,7 +225,7 @@ public class Desensobrado extends JPanel {
 		panelBotones.add(buttonPanel, cons);
 		
         // Boton de ayuda
-        JLabel botonAyuda = HelpUtils.fechButton("desensobrado");
+		JButton botonAyuda = HelpUtils.helpButton("desensobrado");
 		
         cons.ipadx = 15;
 		cons.weightx = 0.0;
@@ -236,7 +250,7 @@ public class Desensobrado extends JPanel {
     
     /**
      * Carga el combo almacen respecto al sistema operativo en el que se encuentra 
-     * la aplicación
+     * la aplicaciï¿½n
      * @param comboAlmacen	Combo donde se cargan los tipos de almacen
      * @return	comboAlmacen cargado
      */

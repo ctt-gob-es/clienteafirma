@@ -155,7 +155,7 @@ public class Validacion extends JPanel {
 		
 		
 		// Boton de ayuda
-		JLabel botonAyuda = HelpUtils.fechButton("validacion");
+		JButton botonAyuda = HelpUtils.helpButton("validacion");
 		panelBotones.add(botonAyuda, cons);
 		
 		c.fill = GridBagConstraints.HORIZONTAL;

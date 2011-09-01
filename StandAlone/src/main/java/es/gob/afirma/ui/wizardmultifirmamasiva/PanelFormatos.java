@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,13 +36,14 @@ import javax.swing.JRadioButton;
 
 import es.gob.afirma.misc.AOConstants;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
-class PanelFormatos extends JDialogWizard implements ItemListener {
+class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -57,6 +59,20 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 			AOConstants.SIGN_FORMAT_ODF,
 			AOConstants.SIGN_FORMAT_OOXML));
 	
+	@Override
+	public int getMinimumRelation(){
+		return 8;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
+	
 	/**
 	 * Guarda todas las ventanas del asistente para poder controlar la botonera
 	 * @param ventanas	Listado con todas las paginas del asistente
@@ -70,6 +86,8 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 		initComponents();
 	}
 
+	//Etiqueta para los formatos
+	private JLabel etiquetaFormato = new JLabel();
 	// Combo con los formatos
 	private JComboBox comboFormatos = new JComboBox();
 	// Radio button firma
@@ -128,6 +146,7 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 		radioFirma.addItemListener(this);
 		radioFirma.setName("radioFirma");
 		radioFirma.setSelected(true);
+		radioFirma.setMnemonic(KeyEvent.VK_F); //Se asigna un atajo al botón de radio
 		panelOperaciones.add(radioFirma, cons);
 		
 		cons.insets = new Insets(0, 0, 0, 0);
@@ -140,6 +159,7 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 		radioCofirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.cofirma.description"));
 		radioCofirma.addItemListener(this);
 		radioCofirma.setName("radioCofirma");
+		radioCofirma.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al botón de radio
 		panelOperaciones.add(radioCofirma, cons);
 		
 		cons.insets = new Insets(0, 0, 0, 0);
@@ -152,6 +172,7 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 		radioContrafirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma.description"));
 		radioContrafirma.addItemListener(this);
 		radioContrafirma.setName("radioContrafirma");
+		radioContrafirma.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botón de radio
 		panelOperaciones.add(radioContrafirma, cons);
 		
 		// Agrupamos los radiobutton para que solo se pueda marcar uno
@@ -167,12 +188,14 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 		c.gridy = 2;
 		
 		// Etiqueta con el texto formato
-		JLabel etiquetaFormato = new JLabel(Messages.getString("Firma.formato"));
+		etiquetaFormato.setText(Messages.getString("Firma.formato"));
 		panelCentral.add(etiquetaFormato, c);
 		
 		c.insets = new Insets(0, 20, 0, 20);
 		c.weightx = 1.0;
 		c.gridy = 3;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		// Combo con los formatos
 		comboFormatos.setToolTipText(Messages.getString("Firma.formato.description"));
@@ -186,6 +209,11 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 		cargarCombo();
 		panelCentral.add(comboFormatos, c);
 		
+		//Relación entre etiqueta y combo
+		etiquetaFormato.setLabelFor(comboFormatos);
+		//Asignación de mnemónico
+		etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R);
+		
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(10, 20, 15, 20);
 		c.weightx = 1.0;
@@ -198,6 +226,7 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 		checkFormato.setToolTipText(Messages.getString("Firma.modo.formato.description")); // NOI18N
 		checkFormato.getAccessibleContext().setAccessibleName(Messages.getString("Firma.modo.formato")); // NOI18N
 		checkFormato.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.modo.formato.description")); // NOI18N
+		checkFormato.setMnemonic(0); //Se quita el atajo al deshabilitar el checkbox
 		checkFormato.setEnabled(false);
 		panelCentral.add(checkFormato, c);
 		
@@ -218,10 +247,12 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 	private void checkFormatoModo() {
 		if (formatosV.get(comboFormatos.getSelectedIndex()).equals(AOConstants.SIGN_FORMAT_CADES)) {
 			if (radioFirma.isSelected())
-				checkFormato.setEnabled(true);
+				checkFormato.setEnabled(true); //Se habilita el checkbox
+				checkFormato.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
 		}
 		else {
 			checkFormato.setEnabled(false);
+			checkFormato.setMnemonic(0); //Se quita el atajo al deshabilitar el checkbox
 		}	
 	}
 
@@ -248,19 +279,25 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 		// El listado de seleccion de formato solo se mantiene activo para la firma y la cofirma
 		if (radio.getName().equals("radioFirma")) {
 			comboFormatos.setEnabled(true);
+			etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R); //Se asigna un atajo a la etiqueta
 			if (comboFormatos.getItemCount() != 0 && formatosV.get(comboFormatos.getSelectedIndex()).equals(AOConstants.SIGN_FORMAT_CADES)) {
 				checkFormato.setSelected(true);
+				checkFormato.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
 				checkFormato.setEnabled(true);
 			}
 		}
 		else if (radio.getName().equals("radioCofirma")) {
 			comboFormatos.setEnabled(true);
+			etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R); //Se asigna un atajo a la etiqueta
 			checkFormato.setSelected(true);
+			checkFormato.setMnemonic(0); //Se quita el atajo al deshabilitar el checkbox
 			checkFormato.setEnabled(false);
 		}
 		else if (radio.getName().equals("radioContrafirma")) {
 			comboFormatos.setEnabled(false);
+			etiquetaFormato.setDisplayedMnemonic(0); //Se quita el atajo al deshabilitar el combo
 			checkFormato.setSelected(true);
+			checkFormato.setMnemonic(0); //Se quita el atajo al deshabilitar el checkbox
 			checkFormato.setEnabled(false);
 		}
 	}
@@ -294,8 +331,12 @@ class PanelFormatos extends JDialogWizard implements ItemListener {
 				// Registramos en la pagina 3 que hemos saltado la 2
 				((PanelEntrada) getVentanas().get(3)).setSalto(true);
 				
-				// Nos saltamos la pagina 2
 				Integer indice = 3;
+				
+				//mantenemos el tamaÃ±o y posiciÃ³n de la ventana acutual en la ventana siguiente
+				getVentanas().get(indice).setBounds(getVentanas().get(1).getX(), getVentanas().get(1).getY(), getVentanas().get(1).getWidth(), getVentanas().get(1).getHeight());
+				
+				// Nos saltamos la pagina 2
 				getVentanas().get(indice).setVisibleAndHide(true, getVentanas().get(1));
 			} else if (radioCofirma.isSelected()) {
 				// Carga Cofirma

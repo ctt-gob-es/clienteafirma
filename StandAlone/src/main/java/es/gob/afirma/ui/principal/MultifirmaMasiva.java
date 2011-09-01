@@ -14,7 +14,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -65,6 +64,8 @@ public class MultifirmaMasiva extends JPanel {
 
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 1;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 
 		// Combo con los almacenes / repositorios disponibles
 		final JComboBox comboAlmacen = new JComboBox();
@@ -74,9 +75,15 @@ public class MultifirmaMasiva extends JPanel {
 		cargarComboAlmacen(comboAlmacen);
 		add(comboAlmacen, c);
 		
+		//Relación entre etiqueta y combo
+		etiquetaAlmacen.setLabelFor(comboAlmacen);
+		//Asignación de mnemónico
+		etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
+		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.gridy = 2;
-
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		// Panel que engloba los tipos de multifirma
 		JPanel panelTipos = new JPanel(new GridLayout());
 		panelTipos.setBorder(BorderFactory.createTitledBorder(Messages.getString("PrincipalGUI.multifirma.panel.opciones"))); // NOI18N
@@ -90,6 +97,7 @@ public class MultifirmaMasiva extends JPanel {
 		alerta.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status")));
 		alerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre")); // NOI18N
 		alerta.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
+		alerta.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo
 		panelTipos.add(alerta);
 		
 		add(panelTipos, c);
@@ -102,7 +110,7 @@ public class MultifirmaMasiva extends JPanel {
 		add(emptyPanel, c);
 		
 		// Panel con los botones
-		Panel panelBotones = new Panel(new GridBagLayout());
+		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
@@ -140,7 +148,7 @@ public class MultifirmaMasiva extends JPanel {
 		cons.gridx = 2;
 				
 		// Boton ayuda
-		JLabel botonAyuda = HelpUtils.fechButton("firma.masiva");
+		JButton botonAyuda = HelpUtils.helpButton("firma.masiva");
 		panelBotones.add(botonAyuda, cons);
 
 		c.gridwidth	= 2;

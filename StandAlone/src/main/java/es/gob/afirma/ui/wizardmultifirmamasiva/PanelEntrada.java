@@ -29,18 +29,33 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
-class PanelEntrada extends JDialogWizard {
+class PanelEntrada extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	// Indica si el asistente se ha saltado la pagina anterior
 	private Boolean salto = false;
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Registra un salto dentro del asistente de la pagina 2 a la 3.
@@ -110,6 +125,11 @@ class PanelEntrada extends JDialogWizard {
         campoDirectorio.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.directorio.description"));
         panelCentral.add(campoDirectorio, c);
         
+        //Relación entre etiqueta y campo de texto
+        etiquetaFirma.setLabelFor(campoDirectorio);
+  		//Asignación de mnemónico
+        etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_D);
+        
         c.insets = new Insets(0, 10, 0, 20);
         c.gridwidth = 1;
 		c.weightx = 0.0;
@@ -137,6 +157,7 @@ class PanelEntrada extends JDialogWizard {
         checkIncluir.setText(Messages.getString("Wizard.multifirma.ventana3.check.incluir"));
         checkIncluir.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.check.incluir"));
         checkIncluir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description"));
+        checkIncluir.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
         panelCentral.add(checkIncluir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
@@ -155,6 +176,11 @@ class PanelEntrada extends JDialogWizard {
         campoExtensiones.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.aplicar"));
         campoExtensiones.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.aplicar.description"));
         panelCentral.add(campoExtensiones, c);
+        
+        //Relación entre etiqueta y campo de texto
+        etiquetaAplicar.setLabelFor(campoExtensiones);
+  		//Asignación de mnemónico
+        etiquetaAplicar.setDisplayedMnemonic(KeyEvent.VK_P);
     
         c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(20, 20, 0, 20);
@@ -237,7 +263,7 @@ class PanelEntrada extends JDialogWizard {
 	 * @return	True o false segun la verificacion
 	 */
 	Boolean verificarFicheros() {
-		//comprobación de la ruta de fichero de entrada.
+		//comprobaciï¿½n de la ruta de fichero de entrada.
 		String directorio = campoDirectorio.getText();
 		if (directorio == null || directorio.equals("")) {
 			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.directorio.origen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);

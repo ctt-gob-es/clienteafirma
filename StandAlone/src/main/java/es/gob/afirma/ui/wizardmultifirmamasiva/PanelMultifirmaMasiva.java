@@ -51,6 +51,7 @@ import es.gob.afirma.ui.AOUIManager.ExtFilter;
 import es.gob.afirma.ui.utils.DirectorySignatureHelperAdv;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.OpenFileMessageDialog;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -58,11 +59,25 @@ import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
-class PanelMultifirmaMasiva extends JDialogWizard {
+class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelMultifirmaMasiva.class.getName());
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
 	
 	/**
 	 * Configuracion del KeyStore
@@ -169,6 +184,8 @@ class PanelMultifirmaMasiva extends JDialogWizard {
     
     // Caja de texto donde se guarda el nombre del directorio de firmas
     private JTextField campoDirectorio = new JTextField();
+    // Etiqueta con el texto "Fichero de log"
+    private JLabel etiquetaFichero = new JLabel();
     // Caja de texto donde se guarda el nombre del fichero log
     private JTextField campoFicheroLog = new JTextField();
     // Checkbox con el texto "Sobreescribir ficheros"
@@ -215,6 +232,11 @@ class PanelMultifirmaMasiva extends JDialogWizard {
         campoDirectorio.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.directorio.description"));
         panelCentral.add(campoDirectorio, c);
         
+        //Relaciï¿½n entre etiqueta y campo de texto
+        etiquetaFirma.setLabelFor(campoDirectorio);
+      	//Asignaciï¿½n de mnemï¿½nico
+        etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_D);
+      		
         c.insets = new Insets(0, 10, 0, 20);
         c.weightx = 0.0;
 		c.gridx = 1;
@@ -240,13 +262,13 @@ class PanelMultifirmaMasiva extends JDialogWizard {
         checkSobreescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
         checkSobreescribir.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
         checkSobreescribir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
+        checkSobreescribir.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al checkbox
         panelCentral.add(checkSobreescribir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
 		c.gridy = 3;
         
         // Etiqueta con el texto "Fichero de log"
-        JLabel etiquetaFichero = new JLabel();
         etiquetaFichero.setText(Messages.getString("Wizard.multifirma.ventana4.log"));
         panelCentral.add(etiquetaFichero, c);
         
@@ -261,6 +283,9 @@ class PanelMultifirmaMasiva extends JDialogWizard {
         campoFicheroLog.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.log.description"));
         panelCentral.add(campoFicheroLog, c);
         
+        //Relaciï¿½n entre etiqueta y campo de texto
+        etiquetaFichero.setLabelFor(campoFicheroLog);
+        
         c.insets = new Insets(0, 10, 0, 20);
         c.weightx = 0.0;
         c.gridx = 1;
@@ -268,7 +293,7 @@ class PanelMultifirmaMasiva extends JDialogWizard {
         // Boton examinar fichero log
         examinarFichero = new JButton();
         examinarFichero.setEnabled(false);
-        examinarFichero.setMnemonic(KeyEvent.VK_E);
+        examinarFichero.setMnemonic(0); //mnemï¿½nico vacï¿½o puesto que por defecto estï¿½ deshabilitado
         examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar"));
         examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
         examinarFichero.addActionListener(new ActionListener() {
@@ -308,9 +333,12 @@ class PanelMultifirmaMasiva extends JDialogWizard {
     		campoDirectorio.setText(selectedFile.getAbsolutePath());
     		campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath());
     	}
-    	
+
+      	//Asignaciï¿½n de mnemï¿½nico
+        etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_F);
     	// Activamos el boton de examinar el directorio del log y el campo para introducirlo
     	examinarFichero.setEnabled(true);
+    	examinarFichero.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico asignado puesto que se habilita el botï¿½n
     	campoFicheroLog.setEnabled(true);
     }
 
@@ -504,7 +532,7 @@ class PanelMultifirmaMasiva extends JDialogWizard {
 	}
     
     /**
-     * Obtiene el tipo de multifirma que se está realizando
+     * Obtiene el tipo de multifirma que se estï¿½ realizando
      * @param tipo  tipo de firma
      * @param hojas si se han de firmar las hojas
      * @return tipo de firma a realizar.

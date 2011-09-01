@@ -17,6 +17,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -59,6 +60,7 @@ import es.gob.afirma.signers.AOSignerFactory;
 import es.gob.afirma.ui.AOUIManager;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
@@ -66,12 +68,26 @@ import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 
-public class PanelMultifirma extends JDialogWizard {
+public class PanelMultifirma extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelMultifirma.class.getName());
 
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+	
+	@Override
+	public int getInitialHeight() {
+		return 440;
+	}
+	@Override
+	public int getInitialWidth() {
+		return 630;
+	}
+	
 	/**
 	 * Modelo de la lista
 	 */
@@ -232,6 +248,8 @@ public class PanelMultifirma extends JDialogWizard {
         c.insets = new Insets(0, 20, 0, 20);
 		c.weightx = 1.0;
 		c.gridy	= 1;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.BOTH;
 		
 		comboFirmas.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent evt) {
@@ -246,6 +264,11 @@ public class PanelMultifirma extends JDialogWizard {
 		));
 		comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N
 		panelCentral.add(comboFirmas, c);
+		
+		 //Relación entre etiqueta y combo
+		etiquetaFirmas.setLabelFor(comboFirmas);
+  		//Asignación de mnemónico
+		etiquetaFirmas.setDisplayedMnemonic(KeyEvent.VK_F);
 
 		c.insets = new Insets(20, 20, 0, 20);
 		c.weightx = 1.0;
@@ -281,6 +304,7 @@ public class PanelMultifirma extends JDialogWizard {
 		renderer.setOpenIcon(leafIcon);
 		renderer.setClosedIcon(leafIcon);
 		
+		arbolFirmas.setRowHeight(25);
 		arbolFirmas.setCellRenderer(renderer);
 		arbolFirmas.addTreeExpansionListener(new TreeExpansionListener() {
 			public void treeCollapsed(TreeExpansionEvent event) {
@@ -295,6 +319,11 @@ public class PanelMultifirma extends JDialogWizard {
 		// Panel del arbol (firmantes seleccionados)
 		panelArbol.setViewportView(arbolFirmas);
 		panelCentral.add(panelArbol, c);
+		
+		//Relación entre etiqueta y arbol
+		etiqueta.setLabelFor(arbolFirmas);
+  		//Asignación de mnemónico
+		etiqueta.setDisplayedMnemonic(KeyEvent.VK_R);
 
 		/*
 		 * Para las opciones del combo:
@@ -308,6 +337,11 @@ public class PanelMultifirma extends JDialogWizard {
 		// Panel de la lista
 		panelLista.setViewportView(listaFirmantes);
 		panelCentral.add(panelLista, c);
+		
+		//Relación entre etiqueta y lista
+		etiqueta.setLabelFor(listaFirmantes);
+  		//Asignación de mnemónico
+		etiqueta.setDisplayedMnemonic(KeyEvent.VK_R);
 
 		getContentPane().add(panelCentral, BorderLayout.CENTER);
 
@@ -319,7 +353,7 @@ public class PanelMultifirma extends JDialogWizard {
 
 	/**
 	 * Modifica el interfaz cambiando el arbol por un listado dependiendo
-	 * de la opción seleccionada
+	 * de la opciï¿½n seleccionada
 	 * @param etiqueta 		Etiqueta superior al arbol/listado
 	 * @param panelArbol 	Panel del arbol
 	 * @param panelLista	Panel de la lista	
