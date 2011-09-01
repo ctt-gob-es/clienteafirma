@@ -21,7 +21,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Define los requerimientos de las clases capaces de efectuar firmas digitales.
  * @version 1.0 */
-public interface AOSigner {
+public interface AOSigner extends AOCoSigner, AOCounterSigner {
 
     /** Firma un contenido (t&iacute;picamente un fichero).<br/>
      * Los algoritmos y modos de firma disponibles se declaran en {@link es.gob.afirma.misc.AOConstants}.
@@ -37,79 +37,6 @@ public interface AOSigner {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
     byte[] sign(byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
-
-    /** Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
-     * cofirma se necesitan los datos originales (que este m&eacute;todo
-     * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
-     * (a los que se agregar&aacute; el resultado de la nueva firma).<br/>
-     * Los algoritmos y modos de firma disponibles se declaran en {@link es.gob.afirma.misc.AOConstants}.
-     * @param data
-     *        Datos que deseamos a cofirmar.
-     * @param sign
-     *        Flujo de lectura de la firma de los datos que se quiere
-     *        cofirmar.
-     * @param algorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
-     * @param keyEntry
-     *        Clave privada a usar para firmar
-     * @param extraParams
-     *        Par&aacute;metros adicionales para la cofirma
-     * @return Contenido firmado
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    byte[] cosign(byte[] data, byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
-
-    /** Cofirma un contenido (t&iacute;picamente un fichero). Para realizar la
-     * cofirma se necesita el documento en el que se encuentra la firma sobre la
-     * que se realiza la cofirma (a los que se agregar&aacute; el resultado de
-     * la nueva firma).<br/>
-     * Los algoritmos y modos de firma disponibles se declaran en {@link AOConstants}.
-     * @param sign
-     *        Firma de los datos que se quiere cofirmar.
-     * @param algorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
-     * @param keyEntry
-     *        Clave privada a usar para firmar
-     * @param extraParams
-     *        Par&aacute;metros adicionales para la cofirma
-     * @return Contenido firmado
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    byte[] cosign(byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
-
-    /** Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br/>
-     * Los nodos que se deben firmar se indican en <code>targetType</code> y
-     * pueden ser:
-     * <ul>
-     * <li>Todos los nodos del &aacute;rbol de firma</li>
-     * <li>Los nodos hoja del &aacute;rbol de firma</li>
-     * <li>Los nodos de firma cuyas posiciones se especifican en <code>target</code></li>
-     * <li>Los nodos de firma realizados por los firmantes cuyo <i>Common Name</i> se indica en <code>target</code></li>
-     * </ul>
-     * Los algoritmos y tipos de objetivo de la contrafirma disponibles se
-     * declaran en {@link es.gob.afirma.misc.AOConstants}.
-     * @param sign
-     *        Flujo de lectura de los datos a firmar
-     * @param algorithm
-     *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
-     * @param targetType
-     *        Tipo de objetivo de la contrafirma
-     * @param targets
-     *        Informaci&oacute;n complementario seg&uacute;n el tipo de
-     *        objetivo de la contrafirma
-     * @param keyEntry
-     *        Clave privada a usar para firmar
-     * @param extraParams
-     *        Par&aacute;metros adicionales para la contrafirma
-     * @return Contenido firmado
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
-    byte[] countersign(byte[] sign,
-                              String algorithm,
-                              AOSignConstants.CounterSignTarget targetType,
-                              Object[] targets,
-                              PrivateKeyEntry keyEntry,
-                              Properties extraParams) throws AOException;
 
     /** Recupera el &aacute;rbol de nodos de firma de una firma
      * electr&oacute;nica. Cada uno de los nodos de firma est&aacute;
