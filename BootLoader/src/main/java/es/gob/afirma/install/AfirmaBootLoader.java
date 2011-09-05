@@ -18,6 +18,7 @@ import javax.swing.JApplet;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.BootLoaderMessages;
 import es.gob.afirma.misc.AOBootUtil;
 import es.gob.afirma.misc.Platform;
 
@@ -41,10 +42,10 @@ public final class AfirmaBootLoader extends JApplet {
     public void init() {
         this.codeBase = this.getCodeBase();
         LOGGER.info("BootLoader de @firma iniciado"); //$NON-NLS-1$
-        LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch());
-        LOGGER.info("Arquitectura del sistema operativo: " + Platform.getOsArch());
+        LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch()); //$NON-NLS-1$
+        LOGGER.info("Arquitectura del sistema operativo: " + Platform.getOsArch()); //$NON-NLS-1$
         if (DEBUG) {
-            LOGGER.warning("Modo de depuracion activado");
+            LOGGER.warning("Modo de depuracion activado"); //$NON-NLS-1$
         }
     }
 
@@ -142,17 +143,17 @@ public final class AfirmaBootLoader extends JApplet {
     private void invoqueAsynchronousJSOperation(final String jsMethodName, final Object jsMethodParams) {
 
         // Si se ha definido una accion posterior, la ejecutamos
-        if (jsMethodName != null && !"".equals(jsMethodName)) {
+        if (jsMethodName != null && !"".equals(jsMethodName)) { //$NON-NLS-1$
 
             final Object[] jsPreparedParams = AOBootUtil.prepareJSParams(jsMethodParams);
             try {
                 netscape.javascript.JSObject.getWindow(AfirmaBootLoader.this).call(jsMethodName, jsPreparedParams);
             }
             catch (final Exception e) {
-                LOGGER.severe("No se ha podido realizar la llamada al metodo JavaScript '" + jsMethodName + "': " + e);
+                LOGGER.severe("No se ha podido realizar la llamada al metodo JavaScript '" + jsMethodName + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
                 JOptionPane.showMessageDialog(AfirmaBootLoader.this,
-                                              "Por favor, reinicie su navegador Web.",
-                                              "Informaci\u00F3n",
+                                              BootLoaderMessages.getString("AfirmaBootLoader.6"), //$NON-NLS-1$
+                                              BootLoaderMessages.getString("AfirmaBootLoader.7"), //$NON-NLS-1$
                                               JOptionPane.WARNING_MESSAGE);
             }
         }
