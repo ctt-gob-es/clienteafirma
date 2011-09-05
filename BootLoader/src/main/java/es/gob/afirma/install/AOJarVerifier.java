@@ -101,13 +101,12 @@ final class AOJarVerifier {
             if (man != null) {
                 final long now = System.currentTimeMillis();
                 for (final JarEntry je : entriesVec) {
-                    final String name = je.getName();
                     final CodeSigner[] signers = je.getCodeSigners();
                     final boolean isSigned = (signers != null);
                     anySigned |= isSigned;
-                    hasUnsignedEntry |= !je.isDirectory() && !isSigned && !signatureRelated(name);
+                    hasUnsignedEntry |= !je.isDirectory() && !isSigned && !signatureRelated(je.getName());
 
-                    if (isSigned && signers != null) {
+                    if (isSigned && (signers != null)) {
                         for (final CodeSigner cs : signers) {
                             final Certificate cert = cs.getSignerCertPath().getCertificates().get(0);
                             if (cert instanceof X509Certificate) {

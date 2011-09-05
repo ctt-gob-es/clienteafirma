@@ -279,7 +279,7 @@ final class CheckAndInstallMissingParts {
         }
 
         // Preguntamos la contrasena de usuario privilegiado (para el sudo) de Mac OS X
-        final String sudoPassword = new String(new UIPasswordCallbackLite(Messages.getString("CheckAndInstallMissingParts.30"), //$NON-NLS-1$
+        final String sudoPassword = new String(new UIPasswordCallbackLite(BootLoaderMessages.getString("CheckAndInstallMissingParts.30"), //$NON-NLS-1$
                                                                           parent).getPassword());
 
         if (!nssLibDir.endsWith("/")) {

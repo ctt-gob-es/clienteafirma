@@ -79,15 +79,15 @@ final class Installer {
                 }
                 try {
                     fileDelete(afirmaDir);
-                    JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString("Installer.11"), //$NON-NLS-1$
-                                                  Messages.getString("Installer.12"), //$NON-NLS-1$
+                    JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString("Installer.11"), //$NON-NLS-1$
+                                                  BootLoaderMessages.getString("Installer.12"), //$NON-NLS-1$
                                                   JOptionPane.INFORMATION_MESSAGE);
                     return Boolean.TRUE;
                 }
                 catch (final Exception e) {
                     AfirmaBootLoader.LOGGER.warning("No se ha podido eliminar el directorio de instalacion: " + e); //$NON-NLS-1$
-                    JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString("Installer.13"), //$NON-NLS-1$
-                                                  Messages.getString("Installer.12"), //$NON-NLS-1$
+                    JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString("Installer.13"), //$NON-NLS-1$
+                                                  BootLoaderMessages.getString("Installer.12"), //$NON-NLS-1$
                                                   JOptionPane.ERROR_MESSAGE);
                     return Boolean.TRUE;
                 }
@@ -116,7 +116,7 @@ final class Installer {
      * @return Indica si se ha aceptado o no el acuerdo de licencia. */
     private boolean prepareInstall() {
         JOptionPane.showMessageDialog(this.parentComponent,
-                                      Messages.getString("Installer.0"), Messages.getString("Installer.1"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                                      BootLoaderMessages.getString("Installer.0"), BootLoaderMessages.getString("Installer.1"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
         final boolean accepted = new LicenceDialogPanel(this.parentComponent).showDisclaimer();
         if (accepted) {
             AfirmaBootLoader.LOGGER.info("Se ha aceptado el acuerdo de licencia"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -134,7 +134,9 @@ final class Installer {
 
 		try {
             if (enviromentInstaller.isEndorsedApacheXMLSecNeeded()) {
-                if (!prepareInstall()) return;
+                if (!prepareInstall()) {
+                    return;
+                }
                 licenciaMostrada = true;
                 AfirmaBootLoader.LOGGER.info("Instalando Apache XML Security..."); //$NON-NLS-1$
                 enviromentInstaller.installEndorsedApacheXMLSec();
@@ -158,9 +160,7 @@ final class Installer {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
-                                                      "Error instalando las dependencias para Java 5, la ejecucion sobre Java 5 puede fallar: " + e //$NON-NLS-1$
-            );
+            AfirmaBootLoader.LOGGER.severe("Error instalando las dependencias para Java 5, la ejecucion sobre Java 5 puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
@@ -180,9 +180,7 @@ final class Installer {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
-                                                      "Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e//$NON-NLS-1$
-            );
+            AfirmaBootLoader.LOGGER.severe("Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
@@ -202,9 +200,7 @@ final class Installer {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
-                                                      "Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
-            );
+            AfirmaBootLoader.LOGGER.severe("Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
@@ -223,16 +219,14 @@ final class Installer {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
-                                                      "Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
-            );
+            AfirmaBootLoader.LOGGER.severe("Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
                 AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
-            JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString(Messages.getString("Installer.18")), //$NON-NLS-1$
-                                          Messages.getString("Installer.26"), //$NON-NLS-1$
+            JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString(BootLoaderMessages.getString("Installer.18")), //$NON-NLS-1$
+                                          BootLoaderMessages.getString("Installer.26"), //$NON-NLS-1$
                                           JOptionPane.WARNING_MESSAGE);
             allOK = false;
         }
@@ -248,9 +242,7 @@ final class Installer {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
-                                                      "Error instalando SunMSCAPI, la ejecucion sobre Java 64 bits o Java 5 puede fallar: " + e //$NON-NLS-1$
-            );
+            AfirmaBootLoader.LOGGER.severe("Error instalando SunMSCAPI, la ejecucion sobre Java 64 bits o Java 5 puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
@@ -270,9 +262,7 @@ final class Installer {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
-                                                      "Error instalando SunPKCS11, la ejecucion sobre Java 64 bits puede fallar: " + e //$NON-NLS-1$
-            );
+            AfirmaBootLoader.LOGGER.severe("Error instalando SunPKCS11, la ejecucion sobre Java 64 bits puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
@@ -282,13 +272,13 @@ final class Installer {
         }
 
         if (licenciaMostrada && allOK) {
-            JOptionPane.showMessageDialog(this.parentComponent, Messages.getString("Installer.23"), //$NON-NLS-1$
-                                          Messages.getString("Installer.24"), //$NON-NLS-1$
+            JOptionPane.showMessageDialog(this.parentComponent, BootLoaderMessages.getString("Installer.23"), //$NON-NLS-1$
+                                          BootLoaderMessages.getString("Installer.24"), //$NON-NLS-1$
                                           JOptionPane.INFORMATION_MESSAGE);
         }
         else if (licenciaMostrada) {
-            JOptionPane.showMessageDialog(this.parentComponent, Messages.getString("Installer.25"), //$NON-NLS-1$
-                                          Messages.getString("Installer.26"), //$NON-NLS-1$
+            JOptionPane.showMessageDialog(this.parentComponent, BootLoaderMessages.getString("Installer.25"), //$NON-NLS-1$
+                                          BootLoaderMessages.getString("Installer.26"), //$NON-NLS-1$
                                           JOptionPane.ERROR_MESSAGE);
         }
 

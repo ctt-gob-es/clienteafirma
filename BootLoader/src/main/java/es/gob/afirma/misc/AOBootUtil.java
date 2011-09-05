@@ -29,7 +29,7 @@ import javax.swing.ProgressMonitorInputStream;
 
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.install.AfirmaBootLoader;
-import es.gob.afirma.install.Messages;
+import es.gob.afirma.install.BootLoaderMessages;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3 */
@@ -123,7 +123,7 @@ public final class AOBootUtil {
                 // Cuidado, el ProgressMonitor no se entera del tamano de los ficheros grandes:
                 // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6445283
                 if (waitDialog) {
-                    return new BufferedInputStream(new ProgressMonitorInputStream(c, Messages.getString("AOBootUtil.0") + " " + path, //$NON-NLS-1$ //$NON-NLS-2$
+                    return new BufferedInputStream(new ProgressMonitorInputStream(c, BootLoaderMessages.getString("AOBootUtil.0") + " " + path, //$NON-NLS-1$ //$NON-NLS-2$
                                                                                   new FileInputStream(new File(path))));
                 }
                 return new BufferedInputStream(new FileInputStream(new File(path)));
@@ -136,7 +136,7 @@ public final class AOBootUtil {
         final InputStream tmpStream;
         try {
             if (waitDialog) {
-                final ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(c, Messages.getString("AOBootUtil.0") + uri.toURL().toString(), //$NON-NLS-1$
+                final ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(c, BootLoaderMessages.getString("AOBootUtil.0") + uri.toURL().toString(), //$NON-NLS-1$
                                                                                        uri.toURL().openStream());
                 pm = pmis.getProgressMonitor();
                 // pm.setMillisToDecideToPopup(0);

@@ -13,13 +13,13 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /** Gestor de mensajes del BootLoader. */
-public final class Messages {
+public final class BootLoaderMessages {
 
     private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
-    private Messages() {}
+    private BootLoaderMessages() {}
 
     /** Obtiene un mensaje de usuario.
      * @param key Clave del mensaje a obtener

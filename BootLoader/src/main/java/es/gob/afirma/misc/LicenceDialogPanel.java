@@ -24,7 +24,7 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.install.AfirmaBootLoader;
-import es.gob.afirma.install.Messages;
+import es.gob.afirma.install.BootLoaderMessages;
 
 /** Panel con el acuerdo de licencia del cliente de firma @firma versi&oacute;n 3. */
 public final class LicenceDialogPanel {
@@ -43,7 +43,7 @@ public final class LicenceDialogPanel {
     public boolean showDisclaimer() {
 
         // Texto del dialogo
-        final Label textLabel = new Label(Messages.getString("LicenceDialogPanel.0")); //$NON-NLS-1$
+        final Label textLabel = new Label(BootLoaderMessages.getString("LicenceDialogPanel.0")); //$NON-NLS-1$
 
         // Leemos el acuerdo de licencia desde un fichero
         String licenseText;
@@ -61,7 +61,7 @@ public final class LicenceDialogPanel {
             licenseText = new String(AOBootUtil.getDataFromInputStream(licenseIs), "UTF-8"); //$NON-NLS-1$
         }
         catch (final Exception e2) {
-            licenseText = Messages.getString("LicenceDialogPanel.2"); //$NON-NLS-1$
+            licenseText = BootLoaderMessages.getString("LicenceDialogPanel.2"); //$NON-NLS-1$
             AfirmaBootLoader.LOGGER.warning("Error al acceder a las condiciones de la licencia: " + e2); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
@@ -101,7 +101,7 @@ public final class LicenceDialogPanel {
         licencePanel.add(scrollPane, c);
 
         // Mostramos el dialogo e indicamos si se acepto
-        return JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this.parentComponent, licencePanel, Messages.getString("LicenceDialogPanel.1"), //$NON-NLS-1$
+        return JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(this.parentComponent, licencePanel, BootLoaderMessages.getString("LicenceDialogPanel.1"), //$NON-NLS-1$
                                                                       JOptionPane.OK_CANCEL_OPTION,
                                                                       JOptionPane.PLAIN_MESSAGE);
     }
