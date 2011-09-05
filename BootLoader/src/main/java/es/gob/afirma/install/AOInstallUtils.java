@@ -156,7 +156,6 @@ final class AOInstallUtils {
                     outputFile.mkdir();
                 }
                 else {
-                    System.out.println(entryName);
                     // Creamos el arbol de directorios para el fichero
                     if (!outputFile.getParentFile().exists()) {
                         outputFile.getParentFile().mkdirs();
@@ -422,10 +421,6 @@ final class AOInstallUtils {
                 AfirmaBootLoader.LOGGER.severe("No se ha podido crear el directorio '" + dir.getAbsolutePath() + "'");
             }
         }
-    }
-    
-    public static void main(String args[]) throws Throwable {
-        AOInstallUtils.unzip(new ZipFile(new File("/Users/tomas/plugin.jar")), new File("/var/tmp"));
     }
 
 }

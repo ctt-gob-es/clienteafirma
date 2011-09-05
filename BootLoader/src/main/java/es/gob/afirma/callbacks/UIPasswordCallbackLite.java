@@ -54,13 +54,10 @@ public final class UIPasswordCallbackLite extends PasswordCallback {
      * @param c Componente padre (para la modalidad)
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws AOCancelledOperationException Cuando el usuario cancela o cierra el di&aacute;logo */
-    private static char[] getPassword(String text, final Component c) {
-        if (text == null) {
-            text = "Introduzca la contrase\u00F1a";
-        }
+    private static char[] getPassword(final String text, final Component c) {
         final JPasswordField pwd = new JPasswordField(10);
-        final JLabel lbText = new JLabel(text);
-        lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth(text), lbText.getSize().height));
+        final JLabel lbText = new JLabel((text != null) ? text : "Introduzca la contrase\u00F1a");
+        lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth((text != null) ? text : "Introduzca la contrase\u00F1a"), lbText.getSize().height));
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

@@ -109,9 +109,9 @@ public final class AfirmaBootLoader extends JApplet {
                         invoqueAsynchronousJSOperation(jsMethodName, jsMethodParams);
                     }
                 });
-                return true;
+                return Boolean.TRUE;
             }
-        });
+        }).booleanValue();
 
     }
 

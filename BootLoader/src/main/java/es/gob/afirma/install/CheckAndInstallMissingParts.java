@@ -130,7 +130,7 @@ final class CheckAndInstallMissingParts {
 
 /** Instala las bibliotecas Apache XMLSec para la generaci&oacute;n de firmas XML desde Java 7.
      * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar. */
-    void installEndorsedApacheXMLSec() throws Exception {
+    void installEndorsedApacheXMLSec() throws AOException, IOException, URISyntaxException {
         File tempDir = null;
         try {
             tempDir = AOInstallUtils.createTempFile(true);
@@ -159,11 +159,14 @@ final class CheckAndInstallMissingParts {
         finally {
             if (tempDir != null) {
                 try {
-                    for (File file : tempDir.listFiles())
+                    for (final File file : tempDir.listFiles()) {
                         file.delete();
+                    }
                     AOInstallUtils.deleteDir(tempDir);
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) {
+                    // Ignoramos los errores en el borrado
+                }
             }
         }
 

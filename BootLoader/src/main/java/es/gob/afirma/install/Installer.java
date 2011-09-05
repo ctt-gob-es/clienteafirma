@@ -74,9 +74,7 @@ final class Installer {
             /** {@inheritDoc} */
             public Boolean run() {
                 if (!afirmaDir.exists()) {
-                    AfirmaBootLoader.LOGGER.info( //$NON-NLS-1$
-                                                            "El directorio de instalacion no existe, se omitira la operacion" //$NON-NLS-1$
-                    );
+                    AfirmaBootLoader.LOGGER.info("El directorio de instalacion no existe, se omitira la operacion"); //$NON-NLS-1$
                     return Boolean.TRUE;
                 }
                 try {
@@ -87,9 +85,7 @@ final class Installer {
                     return Boolean.TRUE;
                 }
                 catch (final Exception e) {
-                    AfirmaBootLoader.LOGGER.warning( //$NON-NLS-1$
-                                                               "No se ha podido eliminar el directorio de instalacion: " + e //$NON-NLS-1$
-                    );
+                    AfirmaBootLoader.LOGGER.warning("No se ha podido eliminar el directorio de instalacion: " + e); //$NON-NLS-1$
                     JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString("Installer.13"), //$NON-NLS-1$
                                                   Messages.getString("Installer.12"), //$NON-NLS-1$
                                                   JOptionPane.ERROR_MESSAGE);

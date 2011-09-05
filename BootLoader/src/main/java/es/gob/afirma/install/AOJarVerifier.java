@@ -29,13 +29,11 @@ import java.io.InputStream;
 import java.security.CodeSigner;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-
-import es.gob.afirma.misc.AOBootUtil;
 
 final class AOJarVerifier {
 
@@ -43,7 +41,7 @@ final class AOJarVerifier {
     private boolean hasExpiringCert = false;
     private boolean notYetValidCert = false;
     
-    private static int BUFFER_SIZE = 8192;
+    private static final int BUFFER_SIZE = 8192;
 
     private static final long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L; // milliseconds
 
@@ -73,13 +71,13 @@ final class AOJarVerifier {
 
         try {
             jf = new JarFile(jarName, true);
-            final Vector<JarEntry> entriesVec = new Vector<JarEntry>();
+            final ArrayList<JarEntry> entriesVec = new ArrayList<JarEntry>();
             final byte[] buffer = new byte[BUFFER_SIZE];
 
             final Enumeration<JarEntry> entries = jf.entries();
             while (entries.hasMoreElements()) {
                 final JarEntry je = entries.nextElement();
-                entriesVec.addElement(je);
+                entriesVec.add(je);
                 InputStream is = null;
                 try {
                     is = jf.getInputStream(je);
@@ -101,12 +99,8 @@ final class AOJarVerifier {
             final Manifest man = jf.getManifest();
 
             if (man != null) {
-                final Enumeration<JarEntry> e = entriesVec.elements();
-
                 final long now = System.currentTimeMillis();
-
-                while (e.hasMoreElements()) {
-                    final JarEntry je = e.nextElement();
+                for (final JarEntry je : entriesVec) {
                     final String name = je.getName();
                     final CodeSigner[] signers = je.getCodeSigners();
                     final boolean isSigned = (signers != null);
@@ -206,7 +200,7 @@ final class AOJarVerifier {
      * @param s file name
      * @return true if the input file name is a supported
      *         Signature File or PKCS7 block file name */
-    static private boolean isBlockOrSF(final String s) {
+    private static boolean isBlockOrSF(final String s) {
         // we currently only support DSA and RSA PKCS7 blocks
         if (s.endsWith(".SF") || s.endsWith(".DSA") || s.endsWith(".RSA")) {
             return true;
