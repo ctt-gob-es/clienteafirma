@@ -162,7 +162,9 @@ final class Installer {
                                                       "Error instalando las dependencias para Java 5, la ejecucion sobre Java 5 puede fallar: " + e //$NON-NLS-1$
             );
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }
@@ -182,7 +184,9 @@ final class Installer {
                                                       "Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e//$NON-NLS-1$
             );
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }
@@ -202,7 +206,9 @@ final class Installer {
                                                       "Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
             );
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }
@@ -221,7 +227,9 @@ final class Installer {
                                                       "Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e //$NON-NLS-1$
             );
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             JOptionPane.showMessageDialog(Installer.this.parentComponent, Messages.getString(Messages.getString("Installer.18")), //$NON-NLS-1$
                                           Messages.getString("Installer.26"), //$NON-NLS-1$
@@ -244,7 +252,9 @@ final class Installer {
                                                       "Error instalando SunMSCAPI, la ejecucion sobre Java 64 bits o Java 5 puede fallar: " + e //$NON-NLS-1$
             );
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }
@@ -264,7 +274,9 @@ final class Installer {
                                                       "Error instalando SunPKCS11, la ejecucion sobre Java 64 bits puede fallar: " + e //$NON-NLS-1$
             );
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }

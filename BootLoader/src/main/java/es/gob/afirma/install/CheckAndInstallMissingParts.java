@@ -150,7 +150,9 @@ final class CheckAndInstallMissingParts {
             AfirmaBootLoader.LOGGER
                   .warning("No se ha podido instalar la version PACK200 de Apache XMLSec, se intentara la version JAR: " + e);
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_JARLIBRARY_ZIP),
                                       new File(getEndorsedDir()),
@@ -237,7 +239,9 @@ final class CheckAndInstallMissingParts {
         catch (final Exception e) {
             AfirmaBootLoader.LOGGER.warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e);
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, XALAN_JARLIBRARY_ZIP),
                                       new File(getEndorsedDir()),
@@ -364,7 +368,9 @@ final class CheckAndInstallMissingParts {
         }
         catch (final Throwable e) {
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             throw new AOException("La configuracion de NSS para Mac OS X ha fallado", e);
         }
@@ -646,13 +652,17 @@ final class CheckAndInstallMissingParts {
         }
         catch (final Exception e) {
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             return true;
         }
         catch (final Throwable e) {
             if (AfirmaBootLoader.DEBUG) {
-                e.printStackTrace();
+                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                e.printStackTrace(new java.io.PrintStream(baos));
+                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
             }
             return true;
         }
