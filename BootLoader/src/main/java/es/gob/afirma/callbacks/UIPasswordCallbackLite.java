@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
+import es.gob.afirma.BootLoaderMessages;
 import es.gob.afirma.exceptions.AOCancelledOperationException;
 
 /** <i>PasswordCallbak</i> que muestra un di&aacute;logo Swing para solicitar una contrase&ntilde;a. */
@@ -56,14 +57,14 @@ public final class UIPasswordCallbackLite extends PasswordCallback {
      * @throws AOCancelledOperationException Cuando el usuario cancela o cierra el di&aacute;logo */
     private static char[] getPassword(final String text, final Component c) {
         final JPasswordField pwd = new JPasswordField(10);
-        final JLabel lbText = new JLabel((text != null) ? text : "Introduzca la contrase\u00F1a");
-        lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth((text != null) ? text : "Introduzca la contrase\u00F1a"), lbText.getSize().height));
+        final JLabel lbText = new JLabel((text != null) ? text : BootLoaderMessages.getString("UIPasswordCallbackLite.0")); //$NON-NLS-1$
+        lbText.setMinimumSize(new Dimension(lbText.getFontMetrics(lbText.getFont()).stringWidth((text != null) ? text : BootLoaderMessages.getString("UIPasswordCallbackLite.0")), lbText.getSize().height)); //$NON-NLS-1$
         lbText.setLabelFor(pwd);
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(lbText);
         panel.add(pwd);
-        final int action = JOptionPane.showConfirmDialog(c, panel, "Contrase\u00F1a", JOptionPane.OK_CANCEL_OPTION);
+        final int action = JOptionPane.showConfirmDialog(c, panel, BootLoaderMessages.getString("UIPasswordCallbackLite.2"), JOptionPane.OK_CANCEL_OPTION); //$NON-NLS-1$
         if (!(action == JOptionPane.OK_OPTION)) {
             throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario"); //$NON-NLS-1$
         }

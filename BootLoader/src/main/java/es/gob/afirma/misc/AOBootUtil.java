@@ -27,9 +27,9 @@ import java.util.zip.ZipFile;
 
 import javax.swing.ProgressMonitorInputStream;
 
+import es.gob.afirma.BootLoaderMessages;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.install.AfirmaBootLoader;
-import es.gob.afirma.install.BootLoaderMessages;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3 */

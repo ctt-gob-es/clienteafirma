@@ -7,7 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
-package es.gob.afirma.install;
+package es.gob.afirma;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
