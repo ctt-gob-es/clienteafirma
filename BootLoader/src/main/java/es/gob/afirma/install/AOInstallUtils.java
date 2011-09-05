@@ -70,7 +70,7 @@ final class AOInstallUtils {
         }
         createDirectory(new File(targetJarFilename).getParentFile());
         try {
-            unpack200gunzip(AOBootUtil.loadFile(AOBootUtil.createURI(pack200Filename), null, false),
+            unpack200gunzip(AOBootUtil.loadFile(AOBootUtil.createURI(pack200Filename)),
                             new FileOutputStream(new File(targetJarFilename)));
         }
         catch (final Exception e) {
@@ -224,7 +224,7 @@ final class AOInstallUtils {
             throw new IOException("No se ha podido crear el arbol de directorios necesario"); //$NON-NLS-1$
         }
 
-        InputStream is = AOBootUtil.loadFile(new URI(urlFile.toString()), null, false);
+        InputStream is = AOBootUtil.loadFile(new URI(urlFile.toString()));
         final URI uri = AOBootUtil.createURI(urlFile.toString());
         if (uri.getScheme().equalsIgnoreCase("file")) { //$NON-NLS-1$
             try {

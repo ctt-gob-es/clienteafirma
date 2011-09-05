@@ -9,7 +9,6 @@
  */
 package es.gob.afirma.misc;
 
-import java.awt.Component;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -25,9 +24,6 @@ import java.nio.channels.FileChannel;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
-import javax.swing.ProgressMonitorInputStream;
-
-import es.gob.afirma.BootLoaderMessages;
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.install.AfirmaBootLoader;
 
@@ -93,14 +89,10 @@ public final class AOBootUtil {
 
     /** Obtiene el flujo de entrada de un fichero (para su lectura) a partir de su URI.
      * @param uri URI del fichero a leer
-     * @param c Componente grafico que invoca al m&eacute;todo (para la modalidad
-     *        del di&aacute;logo de progreso)
-     * @param waitDialog <code>true</code> si deseamos que se muestre un di&aacute;logo
-     *        gr&aacute;fico de espera si la operaci&oacute;n dura mucho, <code>false</code> en caso contrario
      * @return Flujo de entrada hacia el contenido del fichero
      * @throws FileNotFoundException Si el fichero no existe
      * @throws AOException Cuando ocurre cualquier problema obteniendo el flujo */
-    public static InputStream loadFile(final URI uri, final Component c, final boolean waitDialog) throws FileNotFoundException, AOException {
+    public static InputStream loadFile(final URI uri) throws FileNotFoundException, AOException {
 
         // Cuidado: Repinta mal el dialogo de espera, hay que tratar con hilos nuevos
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
@@ -108,8 +100,6 @@ public final class AOBootUtil {
         if (uri == null) {
             throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
         }
-
-        javax.swing.ProgressMonitor pm = null;
 
         if (uri.getScheme().equals("file")) { //$NON-NLS-1$
             // Es un fichero en disco. Las URL de Java no soportan file://, con
@@ -120,12 +110,6 @@ public final class AOBootUtil {
                 if (path.startsWith("//")) {
                     path = path.substring(2);
                 }
-                // Cuidado, el ProgressMonitor no se entera del tamano de los ficheros grandes:
-                // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6445283
-                if (waitDialog) {
-                    return new BufferedInputStream(new ProgressMonitorInputStream(c, BootLoaderMessages.getString("AOBootUtil.0") + " " + path, //$NON-NLS-1$ //$NON-NLS-2$
-                                                                                  new FileInputStream(new File(path))));
-                }
                 return new BufferedInputStream(new FileInputStream(new File(path)));
             }
             catch (final Exception e) {
@@ -135,29 +119,10 @@ public final class AOBootUtil {
         // Es una URL
         final InputStream tmpStream;
         try {
-            if (waitDialog) {
-                final ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(c, BootLoaderMessages.getString("AOBootUtil.0") + uri.toURL().toString(), //$NON-NLS-1$
-                                                                                       uri.toURL().openStream());
-                pm = pmis.getProgressMonitor();
-                // pm.setMillisToDecideToPopup(0);
-                // pm.setMillisToPopup(0);
-
-                // Las URL pocas veces informan del tamano del fichero, asi que ponemos un valor alto
-                // por defecto para segurarnos de que el dialogo se muestra
-                pm.setMaximum(10000000);
-
-                tmpStream = new BufferedInputStream(pmis);
-            }
-            else {
                 tmpStream = new BufferedInputStream(uri.toURL().openStream());
-            }
         }
         catch (final Exception e) {
-            if (pm != null) {
-                pm.close();
-            }
-            throw new AOException("Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e //$NON-NLS-1$ //$NON-NLS-2$
-            );
+            throw new AOException("Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         // Las firmas via URL fallan en la descarga por temas de Sun, asi que descargamos primero
         // y devolvemos un Stream contra un array de bytes
@@ -166,16 +131,7 @@ public final class AOBootUtil {
             tmpBuffer = getDataFromInputStream(tmpStream);
         }
         catch (final Exception e) {
-            if (pm != null) {
-                pm.close();
-            }
             throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        // Hay que cerrar el ProgressMonitor a mano:
-        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4174850
-        if (pm != null) {
-            pm.close();
         }
 
         return new java.io.ByteArrayInputStream(tmpBuffer);
