@@ -88,7 +88,7 @@ public class CabeceraAsistente extends JPanel {
     private void initComponents() {
     	// Configuracion de la ventana
     	setBackground(Color.WHITE);
-    	setPreferredSize(dimensiones);
+    	setPreferredSize(this.dimensiones);
         setBorder(BorderFactory.createEtchedBorder());
         setLayout(new GridBagLayout());
 
@@ -102,20 +102,20 @@ public class CabeceraAsistente extends JPanel {
     	// Etiqueta con el titulo de la ventana
     	JLabel etiquetaTitulo = new JLabel();
     	etiquetaTitulo.setFont(new Font(getFont().getFamily(), 1, getFont().getSize()));
-    	etiquetaTitulo.setText(Messages.getString(MessagesTitulo)); // NOI18N
+    	etiquetaTitulo.setText(Messages.getString(this.MessagesTitulo)); // NOI18N
     	add(etiquetaTitulo, c);
     	
     	c.insets = new Insets(0, 15, 0, 10);
     	c.weighty = 1.0;
 		
-    	if (bloqueTexto == false) {
+    	if (this.bloqueTexto == false) {
 	    	// Etiqueta con la descripcion de la ventana
 	    	JLabel etiquetaDescripcion = new JLabel();
-	    	etiquetaDescripcion.setText(Messages.getString(MessagesDescripcion));
+	    	etiquetaDescripcion.setText(Messages.getString(this.MessagesDescripcion));
 	        add(etiquetaDescripcion, c);
     	}
     	else {
-    		JTextPane textoPanel = PanelesTexto.generarPanelTexto(MessagesDescripcion, true);
+    		JTextPane textoPanel = PanelesTexto.generarPanelTexto(this.MessagesDescripcion, true);
 	        add(textoPanel, c);
     	}
     }

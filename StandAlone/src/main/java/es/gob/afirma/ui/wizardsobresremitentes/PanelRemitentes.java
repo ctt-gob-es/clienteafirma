@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -38,32 +39,36 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCertificateKeyException;
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOConstants.AOKeyStore;
-import es.gob.afirma.misc.AOCryptoUtil;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.signers.AOCMSSigner;
-import es.gob.afirma.signers.aobinarysignhelper.CMSAuthenticatedEnvelopedData;
-import es.gob.afirma.signers.aobinarysignhelper.CMSEnvelopedData;
-import es.gob.afirma.signers.aobinarysignhelper.CMSHelper;
-import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.envelopers.AOEnveloper;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
+import es.gob.afirma.envelopers.cms.AOCMSMultiEnveloper;
+import es.gob.afirma.envelopers.cms.CMSAuthenticatedEnvelopedData;
+import es.gob.afirma.envelopers.cms.CMSEnvelopedData;
+import es.gob.afirma.envelopers.cms.CoSignerEnveloped;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.common.AOKeyStore;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SignFileUtils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.CertificateDestiny;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 import es.gob.afirma.ui.wizardUtils.PanelesTexto;
+import es.gob.afirma.util.signers.AOSignerFactory;
 
 /**
  *
@@ -280,7 +285,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		CertificateDestiny certDest = new CertificateDestiny(keyStoreManager, this);
 		
 		// Comprobamos que el certificado es correcto
-		if (certDest.getAlias() != null && !certDest.equals("")) {
+		if (certDest.getAlias() != null && !certDest.equals("")) { //$NON-NLS-1$
 			DefaultListModel listModel = (DefaultListModel) listaRemitentes.getModel();
 			
 			boolean copiar = true;
@@ -326,14 +331,14 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * almac&eacute;n de claves.
 	 * @param kStore Almac&eacuten de claves
 	 */
-	private PasswordCallback getPreferredPCB(AOConstants.AOKeyStore kStore) {
+	private PasswordCallback getPreferredPCB(AOKeyStore kStore) {
 		if (kStore == null)
 			throw new NullPointerException("No se ha indicado el KeyStore del que desea " +
 				"obtener el PasswordCallBack");
 
 		PasswordCallback pssCallback;
-		if (kStore == AOConstants.AOKeyStore.WINDOWS || kStore == AOConstants.AOKeyStore.WINROOT
-				|| kStore == AOConstants.AOKeyStore.PKCS11 || kStore == AOConstants.AOKeyStore.SINGLE)
+		if (kStore == AOKeyStore.WINDOWS || kStore == AOKeyStore.WINROOT
+				|| kStore == AOKeyStore.PKCS11 || kStore == AOKeyStore.SINGLE)
 			pssCallback = new NullPasswordCallback();
 		else {
 			pssCallback = new UIPasswordCallback(Messages.getString("Wizard.sobres.almacen.pass")+" "+kStore.getDescription(), this);
@@ -385,10 +390,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		envelopedData = doCoEnvelopOperation(envelopedData, contentType, privateKey);
 
     		// Guardamos el sobre generado
-    		File fileFichero = new File(rutafichero);
-    		String path = AOUIManager.saveDataToFile(this, envelopedData, new File(fileFichero.getAbsolutePath()+".csig"), AOUIManager.getOutFileFilter(AOConstants.SIGN_FORMAT_CMS));
+    		File savedFile = AOUIFactory.getSaveDataToFile(envelopedData,
+    		        new File(this.rutafichero + ".csig"), //$NON-NLS-1$
+    		        SignFileUtils.getOutFileFilter(AOSignConstants.SIGN_FORMAT_CMS),
+    		        this);
     		// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
-			if (path == null) {
+			if (savedFile == null) {
 				return false;
 			}
     		
@@ -428,24 +435,24 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		byte[] envelop;
 		X509Certificate[] originatorCertChain = (X509Certificate[]) privateKey.getCertificateChain();
 		
-		if (contentType.equals(AOConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
+		if (contentType.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
 			CMSEnvelopedData enveloper = new CMSEnvelopedData();
 			envelop = enveloper.addOriginatorInfo(data, originatorCertChain);
-		} else if (contentType.equals(AOConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-			AOCMSSigner enveloper = new AOCMSSigner();
+		} else if (contentType.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
+		    AOCMSMultiEnveloper coEnveloper = new AOCMSMultiEnveloper();
 			try {
-				envelop = enveloper.cosign(
+				envelop = coEnveloper.cosign(
 						data,
-						AOConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+						AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
 						privateKey,
 						null);
 			} catch (AOException e) {
-				logger.warning("Ocurrio un error durante el proceso de a�adir un nuevo remitente: "+e);
-	    		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), 
-	    				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+				logger.warning("Ocurrio un error durante el proceso de a�adir un nuevo remitente: "+e); //$NON-NLS-1$
+	    		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),  //$NON-NLS-1$
+	    				Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 	    		return null;
 			}
-		} else if (contentType.equals(AOConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+		} else if (contentType.equals(AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
 			CMSAuthenticatedEnvelopedData enveloper = new CMSAuthenticatedEnvelopedData();
 			envelop = enveloper.addOriginatorInfo(data, originatorCertChain);
 		} else {
@@ -465,12 +472,13 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 */
 	private String comprobarTipo(byte[] data, PrivateKeyEntry privateKey) {
 		String tipo = null;
-		if (CMSHelper.isCMSValid(data, AOConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-			tipo = AOConstants.CMS_CONTENTTYPE_ENVELOPEDDATA;
-		} else if (CMSHelper.isCMSValid(data, AOConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-			tipo = AOConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA;
-		} else if (CMSHelper.isCMSValid(data, AOConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
-			tipo = AOConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
+		AOCMSEnveloper enveloper = new AOCMSEnveloper();
+		if (enveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
+			tipo = AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA;
+		} else if (enveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
+			tipo = AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA;
+		} else if (enveloper.isCMSValid(data, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+			tipo = AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
 		} 
 		else {
 			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.sobre.soportado"), 
@@ -499,16 +507,16 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Recuperamos la clave del certificado
 		PrivateKeyEntry privateKeyEntry = null;
 		try {
-			privateKeyEntry = keyStoreManager.getKeyEntry(seleccionado, AOCryptoUtil.getCertificatePC(kconf.getType(), this));
-		} catch (AOCertificateKeyException e) {
-			throw e;
+			privateKeyEntry = keyStoreManager.getKeyEntry(seleccionado, KeyStoreUtilities.getCertificatePC(kconf.getType(), this));
+		} catch (KeyException e) {
+			throw new AOException("Error al recuperar la clave privada del certificado", e); //$NON-NLS-1$
 		} catch (AOCancelledOperationException e) {
 			// Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
 			// Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
 			// que las relanza en forma de AOException
 			throw e;
 		} catch (Exception e) {
-			logger.severe("No se ha podido obtener el certificado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			logger.severe("No se ha podido obtener el certificado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			throw new AOException(e.getMessage());
 		}
 		

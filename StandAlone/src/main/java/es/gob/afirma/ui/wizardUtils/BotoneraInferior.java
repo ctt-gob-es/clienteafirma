@@ -67,7 +67,7 @@ public class BotoneraInferior extends JPanel {
 	private void initParamenters() {
 		// Configuracion del panel
     	setBorder(BorderFactory.createEtchedBorder());
-        setPreferredSize(dimensiones);
+        setPreferredSize(this.dimensiones);
         setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 1));
 
         // Definicion de botones
@@ -94,8 +94,8 @@ public class BotoneraInferior extends JPanel {
 		add(panelVacio);		
 		
     	// Boton anterior
-        Integer paginas = ventanas.size() - 1;
-        if (posicion.equals(0) || paginas.equals(posicion))
+        Integer paginas = this.ventanas.size() - 1;
+        if (this.posicion.equals(0) || paginas.equals(this.posicion))
         	anterior.setEnabled(false);
         else {
         	 anterior.setMnemonic(KeyEvent.VK_A); //Mnem�nico para el bot�n de anterior
@@ -111,7 +111,7 @@ public class BotoneraInferior extends JPanel {
         add(anterior);
         
         // Boton siguiente
-        if (ventanas.size() == 1 || paginas.equals(posicion))
+        if (this.ventanas.size() == 1 || paginas.equals(this.posicion))
         	siguiente.setVisible(false);
         else {
         	siguiente.setMnemonic(KeyEvent.VK_S); //Mnem�nico para el bot�n de siguiente
@@ -131,7 +131,7 @@ public class BotoneraInferior extends JPanel {
 		add(panelVacio);
         
         // Boton cancelar
-		if (paginas.equals(posicion))
+		if (paginas.equals(this.posicion))
 			cancelar.setVisible(false);
         else {
         	cancelar.setMnemonic(KeyEvent.VK_C); //Mnem�nico para el bot�n de cancelar
@@ -140,14 +140,14 @@ public class BotoneraInferior extends JPanel {
         cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N
         cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-            	for (JDialogWizard ventana : ventanas)
+            	for (JDialogWizard ventana : BotoneraInferior.this.ventanas)
             		ventana.dispose();
             }
         });
         add(cancelar);
 
         // Boton finalizar
-        if (ventanas.size() == 1 || paginas.equals(posicion)) {
+        if (this.ventanas.size() == 1 || paginas.equals(this.posicion)) {
         	 finalizar.setMnemonic(KeyEvent.VK_F); //Mnem�nico para el bot�n de finalizar
         	finalizar.setVisible(true);
         } else 
@@ -156,7 +156,7 @@ public class BotoneraInferior extends JPanel {
         finalizar.setText(Messages.getString("Wizard.finalizar")); // NOI18N
         finalizar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-            	for (JDialogWizard ventana : ventanas)
+            	for (JDialogWizard ventana : BotoneraInferior.this.ventanas)
             		ventana.dispose();
             }
         });
@@ -170,12 +170,12 @@ public class BotoneraInferior extends JPanel {
 	 * @param anterior 	Boton anterior
 	 */
 	protected void siguienteActionPerformed(JButton anterior, JButton siguiente, JButton finalizar) {
-		Integer indice = posicion + 1;
+		Integer indice = this.posicion + 1;
 		
 		//mantenemos el tamaño y posición de la ventana acutual en la ventana siguiente
-		ventanas.get(posicion+1).setBounds(ventanas.get(posicion).getX(), ventanas.get(posicion).getY(), ventanas.get(posicion).getWidth(), ventanas.get(posicion).getHeight());
+		this.ventanas.get(this.posicion+1).setBounds(this.ventanas.get(this.posicion).getX(), this.ventanas.get(this.posicion).getY(), this.ventanas.get(this.posicion).getWidth(), this.ventanas.get(this.posicion).getHeight());
 		
-		ventanas.get(indice).setVisibleAndHide(true, ventanas.get(posicion));
+		this.ventanas.get(indice).setVisibleAndHide(true, this.ventanas.get(this.posicion));
 	}
 
 	/**
@@ -187,13 +187,13 @@ public class BotoneraInferior extends JPanel {
 	protected void anteriorActionPerformed(JButton anterior, JButton siguiente, 
 			JButton finalizar) {
 		// Nos movemos al indice anterior
-		Integer indice = posicion - 1;
+		Integer indice = this.posicion - 1;
 		
 		//ventanas.get(posicion).dispose();
 		//mantenemos el tamaño y posición de la ventana acutual en la ventana anterior
-		ventanas.get(posicion-1).setBounds(ventanas.get(posicion).getX(), ventanas.get(posicion).getY(), ventanas.get(posicion).getWidth(), ventanas.get(posicion).getHeight());
+		this.ventanas.get(this.posicion-1).setBounds(this.ventanas.get(this.posicion).getX(), this.ventanas.get(this.posicion).getY(), this.ventanas.get(this.posicion).getWidth(), this.ventanas.get(this.posicion).getHeight());
 		
-		ventanas.get(indice).setVisibleAndHide(true, ventanas.get(posicion));
+		this.ventanas.get(indice).setVisibleAndHide(true, this.ventanas.get(this.posicion));
 	}
 	
 	/**

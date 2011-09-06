@@ -34,26 +34,24 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOCryptoUtil;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.signers.AOODFSigner;
-import es.gob.afirma.signers.AOOOXMLSigner;
-import es.gob.afirma.signers.AOPDFSigner;
-import es.gob.afirma.signers.AOSigner;
-import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.SignFileUtils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.util.signers.AOSignerFactory;
 
 /**
  * Panel de entrada del archivo
@@ -253,7 +251,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @param dataFilepath	Ruta del fichero a firmar
 	 */
 	private boolean firmarFichero(byte[] data, String formato, String dataFilepath) {
-		AOSigner aoSigner =  AOCryptoUtil.getSigner(formato);
+		AOSigner aoSigner =  AOSignerFactory.getSigner(formato);
 
 		Properties prop = GeneralConfig.getSignConfig();
 		prop.setProperty("format", formato);
@@ -284,10 +282,11 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		
 		if (signedData != null) {
 			// Salvamos el fichero de datos
-			String path = AOUIManager.saveDataToFile(this, signedData, new File(aoSigner.getSignedName(dataFilepath,".signed")),
-					AOUIManager.getOutFileFilter(formato));
+		    final File savedFile = AOUIFactory.getSaveDataToFile(signedData,
+		            new File(aoSigner.getSignedName(dataFilepath, ".signed")), //$NON-NLS-1$
+		            SignFileUtils.getOutFileFilter(formato), this);
 			// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
-			if (path == null) {
+			if (savedFile == null) {
 				return false;
 			}
 		}
@@ -299,7 +298,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		byte[] data = null;
 		InputStream fileIn = null;
 		try {
-			fileIn = AOUtil.loadFile(AOUtil.createURI(filepath), this, true);
+			fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
 			data = AOUtil.getDataFromInputStream(fileIn);
 		} catch (FileNotFoundException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -324,20 +323,31 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	}
 	
 	/**
-	 * Comprueba si los datos correspondientes a la firma son firmas odf, xml o pdf. 
+	 * Comprueba si los datos correspondientes a la firma son firmas odf, xml o pdf.
+	 * Si no es ninguno de ellos, devuelve {@code null}.
 	 * @param sign 	Firma electr&oacute;nica
 	 * @return Formato del archivo
 	 */
-	private String getFormatPdfOdfOoxml(byte[] sign){
-		// Comprobamos si es PDF
-		if (new AOPDFSigner().isValidDataFile(sign)) {
-			return AOConstants.SIGN_FORMAT_PDF;
-		} else if (new AOODFSigner().isValidDataFile(sign)) {
-			return AOConstants.SIGN_FORMAT_ODF;
-		}else if (new AOOOXMLSigner().isValidDataFile(sign)) {
-			return AOConstants.SIGN_FORMAT_OOXML;
-		} else {
-			return null;
-		}
+	private static String getFormatPdfOdfOoxml(byte[] sign){
+	    
+	    final String[][] signersClass = {
+	            {"es.gob.afirma.signers.pades.AOPDFSigner", AOSignConstants.SIGN_FORMAT_PDF},//$NON-NLS-1$
+	            {"es.gob.afirma.signers.odf.AOODFSigner", AOSignConstants.SIGN_FORMAT_ODF}, //$NON-NLS-1$
+	            {"es.gob.afirma.signers.ooxml.AOOOXMLSigner", AOSignConstants.SIGN_FORMAT_OOXML}, //$NON-NLS-1$
+	    };
+	    
+	    for (String[] signer : signersClass) {
+	        try {
+	            Class<?> signerClass = Class.forName(signer[0]);
+	            AOSigner signerObject = (AOSigner) signerClass.newInstance();
+	            if (signerObject.isValidDataFile(sign)) {
+	                return signer[1];
+	            }
+	        } catch (Exception e) {
+	            /* Si falla un signer continuamos con el resto */
+	            e.printStackTrace();
+	        }
+	    }
+	    return null;
 	}
 }

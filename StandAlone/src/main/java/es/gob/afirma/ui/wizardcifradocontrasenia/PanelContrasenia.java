@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.List;
@@ -29,11 +30,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.exceptions.AOInvalidKeyException;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.ui.AOUIManager;
-import es.gob.afirma.ui.AOUIManager.JTextFieldASCIIFilter;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
@@ -141,7 +141,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         
         // Caja de texto con la contrasenia
         campoContrasenia.setToolTipText(Messages.getString("WizardCifrado.contrasenia.description")); // NOI18N
-        campoContrasenia.setDocument(new JTextFieldASCIIFilter(true));
+        campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
         panelCentral.add(campoContrasenia, c);
         
         //Relación entre etiqueta y campo de contraseña
@@ -162,7 +162,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         
         // Caja de texto con la contrasenia
         campoContraseniaRep.setToolTipText(Messages.getString("WizardCifrado.recontrasenia.description")); // NOI18N
-        campoContraseniaRep.setDocument(new JTextFieldASCIIFilter(true));
+        campoContraseniaRep.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
         panelCentral.add(campoContraseniaRep, c);
         
         //Relación entre etiqueta y campo de contraseña
@@ -215,7 +215,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	 * Cifra un fichero dado
 	 * @return	true o false indicando si se ha cifrado correctamente
 	 */
-	private Boolean cifrarFichero() {
+	private boolean cifrarFichero() {
 		char[] contrasenia = campoContrasenia.getPassword();
 		char[] contraseniaRep = campoContraseniaRep.getPassword();
 				
@@ -231,15 +231,12 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		} else {
 			// Generamos la clave necesaria para el cifrado
 			try {
-				cipherKey = cipherConfig.getCipher().decodePassphrase(contrasenia, cipherConfig.getConfig(), null);
-			} catch (AOInvalidKeyException ex) {
-				logger.severe("No se cumplen con los requisitos de contrase\u00F1a del algoritmo: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-				return false;
+				this.cipherKey = this.cipherConfig.getCipher()
+				    .decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
 			} catch (Exception ex) {
-				logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.cifrado"),
-						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+				logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
+				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
+						Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 
 		        // Si el error se dio en el proceso de cifrado y es distinto
 		        // a una clave incorrecta, entonces abortamos la operacion
@@ -271,7 +268,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			byte[] result = null;
 			try {
 				result = cipherConfig.getCipher().cipher(fileContent, cipherConfig.getConfig(), cipherKey);
-			} catch (AOInvalidKeyException ex) {
+			} catch (InvalidKeyException ex) {
 				logger.severe("No se cumplen con los requisitos de contrase\u00F1a del algoritmo: " + ex);
 				JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 				return false;
@@ -290,8 +287,9 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
                 JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             else {
                 // Almacenamos el fichero de salida de la operacion
-                String path = AOUIManager.saveDataToFile(this, result, new File(new File(rutaFichero).getParentFile(), "cifrado"), null);
-                if (path == null) {
+                final File savedFile = AOUIFactory.getSaveDataToFile(result,
+                        new File(new File(rutaFichero).getParentFile(), "cifrado"), null, this);
+                if (savedFile == null) {
 					return false;
 				}
             }
@@ -310,6 +308,6 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
 		if (rutaFichero == null) 
 			throw new NullPointerException("No se ha indicado un fichero de entrada");
-		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero), this, true));
+		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
 	}
 }

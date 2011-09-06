@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.util.List;
 import java.util.logging.Logger;
@@ -30,12 +31,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.exceptions.AOInvalidKeyException;
-import es.gob.afirma.misc.AOCryptoUtil;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
@@ -44,6 +44,7 @@ import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 import es.gob.afirma.ui.wizardUtils.PanelesTexto;
+import es.gob.afirma.util.AOBase64;
 
 /**
  *
@@ -198,6 +199,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
      * Obtiene una clave de cifrado en base 64 del almac&eacute;n de claves del usuario.
      * Se pedira al usuario que inserte la contrase&ntilde;a del almac&eacute;n de claves
      * y seleccione la clave que desea recuperar del mismo.
+     * Si ocurre un error durante la transformaci&oacute;n se devolver&aacute;a {@code null}. 
      * @return Clave en base 64.
      * @throws AOException Ocurri&oacute; un error durate el proceso de configuraci&oacute;n. 
      */
@@ -207,7 +209,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	AOCipherKeyStoreHelper cKs = null;
     	try {
     		cKs = new AOCipherKeyStoreHelper(
-    				AOUIManager.getPassword(Messages.getString("WizardDescifrado.clave.pass"), this)
+    				AOUIFactory.getPassword(Messages.getString("WizardDescifrado.clave.pass"), this) //$NON-NLS-1$
     		);
     	} catch (AOCancelledOperationException e) {
     		throw e;
@@ -218,14 +220,14 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	// Si no se establecio el alias de la clave de cifrado, se la pedimos al usuario
     	String alias = null;
     	try {
-    		alias = AOUIManager.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true);
+    		alias = KeyStoreUtilities.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true);
     	} catch (AOCancelledOperationException e) {
     		throw e;
     	} catch (Exception e) {
     		throw new AOException("Error seleccionar la clave de cifrado", e); //$NON-NLS-1$
     	}
 
-    	return AOCryptoUtil.encodeBase64(cKs.getKey(alias).getEncoded(), false);
+    	return AOBase64.encode(cKs.getKey(alias).getEncoded(), false);
     }
   	
   	/**
@@ -297,7 +299,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
     		try {
     			Key tmpKey = cipherConfig.getCipher().decodeKey(clave, cipherConfig.getConfig(), null);
     			result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
-    		} catch (AOInvalidKeyException e) {
+    		} catch (InvalidKeyException e) {
     			logger.severe("Clave no valida: " + e);
     			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.clave"), 
     					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -322,8 +324,9 @@ public class PanelClave extends JAccessibilityDialogWizard {
     		}
 
     		// Almacenamos el fichero de salida de la operacion
-    		String path = AOUIManager.saveDataToFile(this, result, new File(new File(rutaFichero).getParentFile(), "fichero"), null);
-    		if (path == null) {
+    		final File savedFile = AOUIFactory.getSaveDataToFile(result,
+    		        new File(new File(rutaFichero).getParentFile(), "fichero"), null, this);
+    		if (savedFile == null) {
 				return false;
 			}
     	}
@@ -341,6 +344,6 @@ public class PanelClave extends JAccessibilityDialogWizard {
     private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
     	if (this.rutaFichero == null) 
     		throw new NullPointerException("No se ha indicado un fichero de entrada");
-    	return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero), this, true));
+    	return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
     }
 }

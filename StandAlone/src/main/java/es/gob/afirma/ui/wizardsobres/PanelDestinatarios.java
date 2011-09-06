@@ -34,14 +34,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOConstants.AOKeyStore;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.common.AOKeyStore;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
@@ -310,14 +309,14 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	 * almac&eacute;n de claves.
 	 * @param kStore Almac&eacuten de claves
 	 */
-	private PasswordCallback getPreferredPCB(AOConstants.AOKeyStore kStore) {
+	private PasswordCallback getPreferredPCB(AOKeyStore kStore) {
 		if (kStore == null)
 			throw new NullPointerException("No se ha indicado el KeyStore del que desea " +
 				"obtener el PasswordCallBack");
 
 		PasswordCallback pssCallback;
-		if (kStore == AOConstants.AOKeyStore.WINDOWS || kStore == AOConstants.AOKeyStore.WINROOT
-				|| kStore == AOConstants.AOKeyStore.PKCS11 || kStore == AOConstants.AOKeyStore.SINGLE)
+		if (kStore == AOKeyStore.WINDOWS || kStore == AOKeyStore.WINROOT
+				|| kStore == AOKeyStore.PKCS11 || kStore == AOKeyStore.SINGLE)
 			pssCallback = new NullPasswordCallback();
 		else {
 			pssCallback = new UIPasswordCallback(Messages.getString("Wizard.sobres.almacen.pass")+" "+kStore.getDescription(), this);

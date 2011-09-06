@@ -34,7 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import es.gob.afirma.misc.AOConstants;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -51,13 +51,13 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 	
 	// Listado con las constantes de los formatos del combo
 	private List<String> formatosV = new ArrayList<String>(Arrays.asList(
-			AOConstants.SIGN_FORMAT_XADES_DETACHED,
-			AOConstants.SIGN_FORMAT_XADES_ENVELOPING,
-			AOConstants.SIGN_FORMAT_XADES_ENVELOPED,
-			AOConstants.SIGN_FORMAT_CADES,
-			AOConstants.SIGN_FORMAT_PDF,
-			AOConstants.SIGN_FORMAT_ODF,
-			AOConstants.SIGN_FORMAT_OOXML));
+			AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
+			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
+			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,
+			AOSignConstants.SIGN_FORMAT_CADES,
+			AOSignConstants.SIGN_FORMAT_PDF,
+			AOSignConstants.SIGN_FORMAT_ODF,
+			AOSignConstants.SIGN_FORMAT_OOXML));
 	
 	@Override
 	public int getMinimumRelation(){
@@ -245,7 +245,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 	 * elegida
 	 */
 	private void checkFormatoModo() {
-		if (formatosV.get(comboFormatos.getSelectedIndex()).equals(AOConstants.SIGN_FORMAT_CADES)) {
+		if (formatosV.get(comboFormatos.getSelectedIndex()).equals(AOSignConstants.SIGN_FORMAT_CADES)) {
 			if (radioFirma.isSelected())
 				checkFormato.setEnabled(true); //Se habilita el checkbox
 				checkFormato.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
@@ -280,7 +280,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		if (radio.getName().equals("radioFirma")) {
 			comboFormatos.setEnabled(true);
 			etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R); //Se asigna un atajo a la etiqueta
-			if (comboFormatos.getItemCount() != 0 && formatosV.get(comboFormatos.getSelectedIndex()).equals(AOConstants.SIGN_FORMAT_CADES)) {
+			if (comboFormatos.getItemCount() != 0 && formatosV.get(comboFormatos.getSelectedIndex()).equals(AOSignConstants.SIGN_FORMAT_CADES)) {
 				checkFormato.setSelected(true);
 				checkFormato.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
 				checkFormato.setEnabled(true);

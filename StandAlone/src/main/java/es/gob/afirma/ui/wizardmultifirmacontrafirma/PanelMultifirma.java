@@ -46,18 +46,18 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.exceptions.AOFormatFileException;
-import es.gob.afirma.exceptions.AOInvalidFormatException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOSignConstants.CounterSignTarget;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.misc.tree.TreeModel;
-import es.gob.afirma.signers.AOSigner;
-import es.gob.afirma.signers.AOSignerFactory;
-import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.jse.JSEUtils;
+import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
@@ -66,6 +66,7 @@ import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.util.signers.AOSignerFactory;
 
 
 public class PanelMultifirma extends JAccessibilityDialogWizard {
@@ -129,8 +130,8 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		FileInputStream fis = null;
 		javax.swing.tree.DefaultTreeModel modeloArbolSwing;
 		try {
-			TreeModel modeloArbol = (TreeModel) AOSignerFactory.getSigner(signData).getSignersStructure(signData, false);
-			modeloArbolSwing = AOUIManager.convertToSwingModel(modeloArbol);
+			AOTreeModel modeloArbol = (AOTreeModel) AOSignerFactory.getSigner(signData).getSignersStructure(signData, false);
+			modeloArbolSwing = JSEUtils.convertToSwingModel(modeloArbol);
 
 			arbolFirmas.setModel(modeloArbolSwing);
 
@@ -439,9 +440,10 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				return false;
 
 			// Salvamos el fichero de datos
-			String path = AOUIManager.saveDataToFile(this, signedData, new File(signer.getSignedName(rutaFichero, intText)), null);
+			final File savedFile = AOUIFactory.getSaveDataToFile(signedData,
+                    new File(signer.getSignedName(rutaFichero, intText)), null, this);
 			// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
-			if (path == null) {
+			if (savedFile == null) {
 				return false;
 			}
 		} catch (AOCancelledOperationException e){
@@ -579,7 +581,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		byte[] data = null;
 		InputStream fileIn = null;
 		try {
-			fileIn = AOUtil.loadFile(AOUtil.createURI(filepath), this, true);
+			fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
 			data = AOUtil.getDataFromInputStream(fileIn);
 		} catch (FileNotFoundException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

@@ -18,7 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
-import es.gob.afirma.misc.Platform;
+import es.gob.afirma.core.misc.Platform;
 
 /**
  * Dialogo configurado con los parametros del asistente

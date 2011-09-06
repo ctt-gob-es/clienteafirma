@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileFilter;
+import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
 import java.util.Properties;
@@ -35,19 +36,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCertificateKeyException;
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOCryptoUtil;
-import es.gob.afirma.misc.DirectorySignatureHelper.MassiveType;
-import es.gob.afirma.ui.AOUIManager;
-import es.gob.afirma.ui.AOUIManager.ExtFilter;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.jse.JSEUIManager;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.common.AOKeyStore;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.massive.DirectorySignatureHelper.MassiveType;
 import es.gob.afirma.ui.utils.DirectorySignatureHelperAdv;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
@@ -64,6 +65,47 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 	private static final long serialVersionUID = 1L;
 
 	static Logger logger = Logger.getLogger(PanelMultifirmaMasiva.class.getName());
+	
+	/**
+     * Clave para el filtrado de ficheros seg&uacute;n su extensi&oacute;n.
+     */
+    private class ExtensionsFileFilter implements java.io.FileFilter {
+        
+        private String[] exts; 
+        
+        ExtensionsFileFilter(String[] extensions) {
+            this.exts = extensions;
+        }
+        
+        @Override
+        public boolean accept(File file) {
+            if (file.isDirectory()) {
+                return true;
+            }
+            // getExtension() pasa la extension a minusculas
+            final String extension = getExtension(file);
+            for (final String extension2 : this.exts) {
+                if (extension2.equalsIgnoreCase(extension)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        /** Devuelve la extensi&oacute;n de un fichero.
+         * @param f
+         *        Fichero del cual queremos conocer la extensi&oacute;n
+         * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
+         *         tiene extensi&oacute;n */
+        private final String getExtension(final File f) {
+            final String s = f.getName();
+            final int i = s.lastIndexOf('.');
+            if (i > 0 && i < s.length() - 1) {
+                return s.substring(i + 1).toLowerCase();
+            }
+            return ""; //$NON-NLS-1$
+        }
+    }
 	
 	@Override
 	public int getMinimumRelation(){
@@ -402,9 +444,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         try {
         	PasswordCallback pssCallback;
 
-        	AOConstants.AOKeyStore store = kssc.getType();
-        	if (store == AOConstants.AOKeyStore.WINDOWS || store == AOConstants.AOKeyStore.WINROOT ||
-        			store == AOConstants.AOKeyStore.SINGLE) 
+        	AOKeyStore store = kssc.getType();
+        	if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT ||
+        			store == AOKeyStore.SINGLE) 
         		pssCallback = new NullPasswordCallback();
         	else 
         		pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null); 
@@ -413,16 +455,16 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         			pssCallback, this);
 
         	// Seleccionamos un certificado
-        	String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
+        	String selectedcert = KeyStoreUtilities.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
 
         	// Comprobamos si se ha cancelado la seleccion
         	if (selectedcert == null) 
-        		throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario");
+        		throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
 
         	// Recuperamos la clave del certificado
         	try {
-        		privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, AOCryptoUtil.getCertificatePC(store, this));
-        	} catch (AOCertificateKeyException e) {
+        		privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, this));
+        	} catch (KeyException e) {
         		throw e;
         	} catch (AOCancelledOperationException e) {
         		// Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
@@ -436,7 +478,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	}
 
         	if (privateKeyEntry == null) {
-        		throw new AOCertificateKeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero."); 
+        		throw new KeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero."); 
         	}
         } catch(AOException e){
         	logger.severe(e.toString());
@@ -453,7 +495,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         
         try {
             DirectorySignatureHelperAdv dSigner = new DirectorySignatureHelperAdv(
-            		GeneralConfig.getSignAlgorithm(), algoritmo, AOConstants.SIGN_MODE_IMPLICIT, this);
+            		GeneralConfig.getSignAlgorithm(), algoritmo, AOSignConstants.SIGN_MODE_IMPLICIT, this);
          
             // Establecemos el filtro de ficheros por extension
             dSigner.setFileFilter(getExtensionFileFilter(extensiones));
@@ -462,9 +504,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             dSigner.setOverwritePreviuosFileSigns(checkSobreescribir.isSelected());
 
             Properties config = GeneralConfig.getSignConfig();
-            config.setProperty("mode", modoFormato ? AOConstants.SIGN_MODE_IMPLICIT : AOConstants.SIGN_MODE_EXPLICIT);
-            config.setProperty("format", algoritmo);
-            config.setProperty("ignoreStyleSheets", "true");
+            config.setProperty("mode", modoFormato ? AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
+            config.setProperty("format", algoritmo); //$NON-NLS-1$
+            config.setProperty("ignoreStyleSheets", "true");  //$NON-NLS-1$//$NON-NLS-2$
             
             // Seleccionamos el tipo de operacion
             MassiveType operation = this.getMassiveOperationType(tipo, tipoContrafirma);
@@ -480,21 +522,17 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             if (beep) {
             	Toolkit.getDefaultToolkit().beep();
             }
-        } catch(AOException e){
-        	logger.severe(e.toString());
-        	resultadoFirma = false;
         } catch(Exception e){
         	logger.severe(e.toString());
-        	logger.log(Level.SEVERE, "Exception", e);
         	resultadoFirma = false;
         }
 
         if (resultadoFirma) {
-        	JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.ok"), 
-        			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-2$
+        	JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.ok"),  //$NON-NLS-1$
+        			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$
         } else {
-      		OpenFileMessageDialog.show(this, Messages.getString("Wizard.multifirma.ko"), 
-      				Messages.getString("Wizard.multifirma.ok.titulo"),
+      		OpenFileMessageDialog.show(this, Messages.getString("Wizard.multifirma.ko"),  //$NON-NLS-1$
+      				Messages.getString("Wizard.multifirma.ok.titulo"), //$NON-NLS-1$
       				new File(campoFicheroLog.getText()));
         }
 		
@@ -510,10 +548,10 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 		if (extensiones == null || extensiones.trim().equals("")) {
 			return null;
 		}
-		String[] exts = extensiones.split(",");
-		return new ExtFilter(exts, getExtensionFileFilterDescription(exts));
+
+		return new ExtensionsFileFilter(extensiones.split(","));
 	}
-    
+        
     /**
      * Descripcion de las extensiones
      * @param exts  extensiones

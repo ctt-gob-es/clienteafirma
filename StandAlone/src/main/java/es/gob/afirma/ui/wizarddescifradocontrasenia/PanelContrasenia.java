@@ -17,6 +17,7 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.util.List;
 import java.util.logging.Logger;
@@ -26,11 +27,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.exceptions.AOInvalidKeyException;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.ui.AOUIManager;
-import es.gob.afirma.ui.AOUIManager.JTextFieldASCIIFilter;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
@@ -125,9 +125,9 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         c.gridy	= 1;
 		
         // Caja de texto donde se guarda la clave
-        campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N
-        campoContrasenia.setDocument(new JTextFieldASCIIFilter(true));
-        panelCentral.add(campoContrasenia, c);
+        this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
+        this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
+        panelCentral.add(this.campoContrasenia, c);
     	
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(10, 20, 0, 20);
@@ -136,7 +136,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         
         // Panel que contiene el texto "Introduzca la contrasenia con..."
         panelCentral.add(PanelesTexto.generarPanelTexto(
-				"WizardDescifrado.contrasenia.contenido.texto5", false), c);   
+				"WizardDescifrado.contrasenia.contenido.texto5", false), c);    //$NON-NLS-1$
         
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
@@ -210,7 +210,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		try {
 			Key tmpKey = cipherConfig.getCipher().decodePassphrase(contrasenia, cipherConfig.getConfig(), null);
 			result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
-		} catch (AOInvalidKeyException e) {
+		} catch (InvalidKeyException e) {
 			logger.severe("Contrasena no valida: " + e);
 			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.contrasenia"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -235,9 +235,12 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		}
 
 		// Almacenamos el fichero de salida de la operacion
-		String path = AOUIManager.saveDataToFile(this, result, new File(new File(rutaFichero).getParentFile(), "fichero"), null);
+      
+		final File savedFile = AOUIFactory.getSaveDataToFile(result,
+		        new File(new File(rutaFichero).getParentFile(), "fichero"), null, this);
+
 		// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
-		if (path == null) {
+		if (savedFile == null) {
 			return false;
 		}
 
@@ -254,6 +257,6 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
 		if (rutaFichero == null) 
 			throw new NullPointerException("No se ha indicado un fichero de entrada");
-		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero), this, true));
+		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
 	}
 }

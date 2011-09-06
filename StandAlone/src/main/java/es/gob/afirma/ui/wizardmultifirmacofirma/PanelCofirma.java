@@ -33,14 +33,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.signers.AOSigner;
-import es.gob.afirma.signers.AOSignerFactory;
-import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.jse.JSEUIManager;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
@@ -50,6 +51,7 @@ import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
+import es.gob.afirma.util.signers.AOSignerFactory;
 
 /**
  * Clase que muestra el contenido principal de multifirmas - cofirma.
@@ -322,9 +324,10 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 					return false;
 				}
 				
-				String path = AOUIManager.saveDataToFile(this, coSignedData, new File(signer.getSignedName(ficheroDatos, intText)), null);
+				final File savedFile = AOUIFactory.getSaveDataToFile(coSignedData,
+				        new File(signer.getSignedName(ficheroDatos, intText)), null, this);
 				// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
-				if (path == null) {
+				if (savedFile == null) {
 					return false;
 				}
 				
@@ -360,7 +363,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		prop.setProperty("uri", filepath);
 		
 		// Respetaremos si la firma original contenia o no los datos firmados
-		prop.setProperty("mode", signer.getData(sign) == null ? AOConstants.SIGN_MODE_EXPLICIT : AOConstants.SIGN_MODE_IMPLICIT);
+		prop.setProperty("mode", signer.getData(sign) == null ? AOSignConstants.SIGN_MODE_EXPLICIT : AOSignConstants.SIGN_MODE_IMPLICIT);
 		
 		// Realizamos la cofirma
 		return signer.cosign(data, sign, GeneralConfig.getSignAlgorithm(),	keyEntry, prop);
