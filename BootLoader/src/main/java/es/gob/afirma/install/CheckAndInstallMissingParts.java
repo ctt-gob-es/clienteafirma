@@ -15,10 +15,8 @@ import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,8 +24,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import es.gob.afirma.BootLoaderMessages;
-import es.gob.afirma.callbacks.UIPasswordCallbackLite;
+import javax.script.ScriptEngineManager;
+
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOBootUtil;
 import es.gob.afirma.misc.Platform;
@@ -273,94 +271,37 @@ final class CheckAndInstallMissingParts {
             nssLibDir = getSystemNSSLibDirMacOSX();
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
-                                                      "No se ha encontrado un NSS para configurar: " + e //$NON-NLS-1$
-            );
+            AfirmaBootLoader.LOGGER.severe("No se ha encontrado un NSS para configurar: " + e); //$NON-NLS-1$
             return;
         }
-
-        // Preguntamos la contrasena de usuario privilegiado (para el sudo) de Mac OS X
-        final String sudoPassword = new String(new UIPasswordCallbackLite(BootLoaderMessages.getString("CheckAndInstallMissingParts.30"), //$NON-NLS-1$
-                                                                          parent).getPassword());
 
         if (!nssLibDir.endsWith("/")) {
             nssLibDir = nssLibDir + "/"; //$NON-NLS-1$
         }
 
         final String[] libs = new String[] {
-                                            nssLibDir + "libnspr4.dylib", //$NON-NLS-1$
-                                            nssLibDir + "libplds4.dylib", //$NON-NLS-1$
-                                            nssLibDir + "libplc4.dylib", //$NON-NLS-1$
-                                            nssLibDir + "libmozsqlite3.dylib", //$NON-NLS-1$
-                                            nssLibDir + "libnssutil3.dylib" //$NON-NLS-1$
+            "libnspr4.dylib", //$NON-NLS-1$
+            "libplds4.dylib", //$NON-NLS-1$
+            "libplc4.dylib", //$NON-NLS-1$
+            "libmozsqlite3.dylib", //$NON-NLS-1$
+            "libnssutil3.dylib" //$NON-NLS-1$
         };
 
-        // Con la password de sudo creamos un script temporal para crear enlaces
-        // dinamicos de NSS en /usr/lib
-        // La contrasena quedara en claro en el script, aspecto muy inseguro
-        final StringBuilder sb = new StringBuilder("#!/bin/sh\r\n"); //$NON-NLS-1$
+        // Creamos enlaces simbolicos via AppleScript
+        final StringBuilder sb = new StringBuilder();
         for (final String lib : libs) {
-            sb.append("echo "); //$NON-NLS-1$
-            sb.append(sudoPassword);
-            sb.append(" | sudo -S ln -s "); //$NON-NLS-1$
+            sb.append("ln -s ");
             sb.append(nssLibDir);
             sb.append(lib);
-            sb.append(" /usr/lib"); //$NON-NLS-1$
+            sb.append(" /usr/lib/");
             sb.append(lib);
-            sb.append("\r\n"); //$NON-NLS-1$
+            sb.append("; ");
         }
-
-        // Creamos un fichero temporal para el script
-        final File tmpScript;
         try {
-
-            tmpScript = File.createTempFile("deleteme", ".sh"); //$NON-NLS-1$ //$NON-NLS-2$
-
-            // Instruimos al script para que se borre a si mismo
-            sb.append("echo "); //$NON-NLS-1$
-            sb.append(sudoPassword);
-            sb.append(" | sudo -S rm -f "); //$NON-NLS-1$
-            sb.append(tmpScript.getCanonicalPath());
-            sb.append("\r\n"); //$NON-NLS-1$
-
-            // Escribimos el script
-            final OutputStream fos = new FileOutputStream(tmpScript);
-            fos.write(sb.toString().getBytes());
-            try {
-                fos.flush();
-            }
-            catch (final Exception e) {}
-            try {
-                fos.close();
-            }
-            catch (final Exception e) {}
-
+            new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");    
         }
-        catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning( //$NON-NLS-1$
-                                                       "No se ha podido crear un script para configurar las bibliotecas NSS en Mac OS X: " + e //$NON-NLS-1$
-            );
-            return;
-        }
-
-        // Y lo ejecutamos
-        try {
-            Runtime.getRuntime().exec("/bin/sh " + tmpScript.getCanonicalPath() //$NON-NLS-1$
-            );
-        }
-        catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning( //$NON-NLS-1$
-                                                       "No se ha podido ejecutar el script configuracion de las bibliotecas NSS en Mac OS X: " + e //$NON-NLS-1$
-            );
-            return;
-        }
-
-        // Si el fichero existe (no se ha borrado el solo), intentamos borrarlo desde Java
-        if (tmpScript.exists()) {
-            try {
-                tmpScript.delete();
-            }
-            catch (final Exception e) {}
+        catch(final Exception e) {
+            AfirmaBootLoader.LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e);
         }
 
         // Y reintentamos la carga, para ver si ha surtido efecto
@@ -841,6 +782,10 @@ final class CheckAndInstallMissingParts {
         }
 
         return nssLibDir;
+    }
+    
+    public static void main(String args[]) throws Exception {
+        new CheckAndInstallMissingParts(Platform.OS.MACOSX, Platform.JREVER.J6, null, new URL("http://www.google.com")).configureNSS(null);
     }
 
 }
