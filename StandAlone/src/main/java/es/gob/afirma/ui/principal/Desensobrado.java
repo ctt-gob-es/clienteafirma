@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
 
@@ -31,22 +32,24 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCertificateKeyException;
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOCryptoUtil;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.signers.aobinarysignhelper.CMSDecipherAuthenticatedEnvelopedData;
-import es.gob.afirma.signers.aobinarysignhelper.CMSDecipherEnvelopData;
-import es.gob.afirma.signers.aobinarysignhelper.CMSDecipherSignedAndEnvelopedData;
-import es.gob.afirma.signers.aobinarysignhelper.CMSHelper;
-import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.jse.JSEUIManager;
+import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
+import es.gob.afirma.envelopers.cms.CMSDecipherAuthenticatedEnvelopedData;
+import es.gob.afirma.envelopers.cms.CMSDecipherEnvelopData;
+import es.gob.afirma.envelopers.cms.CMSDecipherSignedAndEnvelopedData;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.common.AOKeyStore;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.HelpUtils;
@@ -315,27 +318,28 @@ public class Desensobrado extends JPanel {
     		// Identificamos el tipo de envoltorio y recuperamos los datos
     		byte[] recoveredData = null;
     		try {
-    			// EnvelopedData
-    			if (CMSHelper.isCMSValid(envelopData, AOConstants.CMS_CONTENTTYPE_ENVELOPEDDATA))
-    				recoveredData = new CMSDecipherEnvelopData().dechiperEnvelopData(envelopData, privateKeyEntry);
-    			// SignedAndEnvelopedData
-    			else if(CMSHelper.isCMSValid(envelopData, AOConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA))
-    				recoveredData = new CMSDecipherSignedAndEnvelopedData().dechiperSignedAndEnvelopData(envelopData, privateKeyEntry);
-    			// AuthenticatedAndEnvelopedData
-    			else if(CMSHelper.isCMSValid(envelopData, AOConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA))
-    				recoveredData = new CMSDecipherAuthenticatedEnvelopedData().dechiperAuthenticatedEnvelopedData(envelopData, privateKeyEntry);
-    			// Envoltorio no reconocido
-    			else {
-    				JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre"), "Error", JOptionPane.ERROR_MESSAGE);
-    				return;
-    			}
+    		    AOCMSEnveloper enveloper = new AOCMSEnveloper();
+    		    // EnvelopedData
+    		    if (enveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
+    		        recoveredData = new CMSDecipherEnvelopData().dechiperEnvelopData(envelopData, privateKeyEntry);
+    		        // SignedAndEnvelopedData
+    		    } else if(enveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
+    		        recoveredData = new CMSDecipherSignedAndEnvelopedData().dechiperSignedAndEnvelopData(envelopData, privateKeyEntry);
+    		        // AuthenticatedAndEnvelopedData
+    		    } else if(enveloper.isCMSValid(envelopData, AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
+    		        recoveredData = new CMSDecipherAuthenticatedEnvelopedData().dechiperAuthenticatedEnvelopedData(envelopData, privateKeyEntry);
+    		        // Envoltorio no reconocido
+    		    } else {
+    		        JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+    		        return;
+    		    }
     		} catch (AOException e) {
-    			logger.severe("Ocurrio un error al abrir el sobre digital: "+e);
-    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre.abrir"), "Error", JOptionPane.ERROR_MESSAGE);
+    			logger.severe("Ocurrio un error al abrir el sobre digital: "+e); //$NON-NLS-1$
+    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre.abrir"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     			return;
     		} catch (Exception e) {
-    			logger.severe("Ocurrio un error al abrir el sobre digital: "+e);
-    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre.abrir"), "Error", JOptionPane.ERROR_MESSAGE);
+    			logger.severe("Ocurrio un error al abrir el sobre digital: "+e); //$NON-NLS-1$
+    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre.abrir"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
     			return;
     		}
 
@@ -346,18 +350,18 @@ public class Desensobrado extends JPanel {
     		}
 
     		// Salvamos los datos
-    		String ruta = AOUIManager.saveDataToFile(this, recoveredData, new File(name), null);
-    		if (ruta != null && checkIniciar.isSelected()){
-    			Utils.openFile(ruta);
+    		File file = AOUIFactory.getSaveDataToFile(recoveredData, new File(name), null, this);
+    		if (file != null && checkIniciar.isSelected()){
+    			Utils.openFile(file);
     		}
     	}
     }
 
     private AOKeyStoreManager getKeyStoreManager(KeyStoreConfiguration ksConfiguration) throws AOException {
     	PasswordCallback pssCallback;
-    	AOConstants.AOKeyStore store = ksConfiguration.getType();
-    	if (store == AOConstants.AOKeyStore.WINDOWS ||
-    			store == AOConstants.AOKeyStore.WINROOT) pssCallback = new NullPasswordCallback();
+    	AOKeyStore store = ksConfiguration.getType();
+    	if (store == AOKeyStore.WINDOWS ||
+    			store == AOKeyStore.WINROOT) pssCallback = new NullPasswordCallback();
     	else  pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
 
     	try {
@@ -376,7 +380,7 @@ public class Desensobrado extends JPanel {
 
     private PrivateKeyEntry getPrivateKeyEntry(AOKeyStoreManager keyStoreManager, JComboBox comboAlmacen) throws AOException {
     	// Seleccionamos un certificado
-    	String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
+    	String selectedcert = KeyStoreUtilities.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
 
     	// Comprobamos si se ha cancelado la seleccion
     	if (selectedcert == null) 
@@ -387,11 +391,11 @@ public class Desensobrado extends JPanel {
     	try {
     		privateKeyEntry = keyStoreManager.getKeyEntry(
     				selectedcert,
-    				AOCryptoUtil.getCertificatePC(((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(), this)
+    				KeyStoreUtilities.getCertificatePC(((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(), this)
     		);
     	}
-    	catch (AOCertificateKeyException e) {
-    		throw e;
+    	catch (KeyException e) {
+    		throw new AOException("Ocurrio un error al extraer la clave privada del certificado", e); //$NON-NLS-1$
     	}
     	catch (AOCancelledOperationException e) {
     		// Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.

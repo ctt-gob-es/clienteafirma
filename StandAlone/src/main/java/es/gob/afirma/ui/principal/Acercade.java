@@ -26,7 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 
-import es.gob.afirma.misc.Platform;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 import es.gob.afirma.ui.wizardcifradocontrasenia.PanelContrasenia;
@@ -71,7 +71,7 @@ public class Acercade extends JFrame {
 		
 		// Logotipo de la ventana
 		JLabel logotipo = new JLabel();
-		logotipo.setIcon(new ImageIcon(getClass().getResource("/resources/images/logo_cliente.png"))); // NOI18N
+		logotipo.setIcon(new ImageIcon(getClass().getResource("/resources/images/logo_cliente.png")));//$NON-NLS-1$
 		getContentPane().add(logotipo, c);
 
 		c.fill = GridBagConstraints.BOTH;

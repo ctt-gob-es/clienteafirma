@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,20 +40,22 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCertificateKeyException;
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.exceptions.AOFormatFileException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOCryptoUtil;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.signers.AOSigner;
-import es.gob.afirma.ui.AOUIManager;
+
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.jse.JSEUIManager;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.common.AOKeyStore;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -60,6 +63,8 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.SignedFileManager;
+import es.gob.afirma.util.signers.AOSignerFactory;
 
 /**
  * Clase que muestra los elementos necesarios para realizar una firma.
@@ -81,11 +86,11 @@ public class Firma extends JPanel {
 	
 	// Constantes de los diferentes formatos de firmado
 	private List<String> formatosV = new ArrayList<String>(Arrays.asList(
-			AOConstants.SIGN_FORMAT_XADES_DETACHED,
-//			AOConstants.SIGN_FORMAT_XADES_ENVELOPING,
+			AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
+//			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
 //			AOConstants.SIGN_FORMAT_XADES_ENVELOPED,
-			AOConstants.SIGN_FORMAT_CADES,
-			AOConstants.SIGN_FORMAT_PDF
+			AOSignConstants.SIGN_FORMAT_CADES,
+			AOSignConstants.SIGN_FORMAT_PDF
 	));
 
 	public Firma() {
@@ -143,7 +148,8 @@ public class Firma extends JPanel {
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				examinarActionPerformed(campoFichero);
 			}
 		});
@@ -209,16 +215,16 @@ public class Firma extends JPanel {
 		if(GeneralConfig.isAvanzados()) {
 			// XAdES Enveloping (Solo en la vista avanzada)
 			formatosL.add("XAdES Enveloping");
-			formatosV.add(AOConstants.SIGN_FORMAT_XADES_ENVELOPING);
+			formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
 			// XAdES Enveloped (Solo en la vista avanzada)
 			formatosL.add("XAdES Enveloped");
-			formatosV.add(AOConstants.SIGN_FORMAT_XADES_ENVELOPED);
+			formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
 			// OOXML (Solo en la vista avanzada)
             formatosL.add("OOXML");
-            formatosV.add(AOConstants.SIGN_FORMAT_OOXML);
+            formatosV.add(AOSignConstants.SIGN_FORMAT_OOXML);
             // ODF (Solo en la vista avanzada)
             formatosL.add("ODF");
-            formatosV.add(AOConstants.SIGN_FORMAT_ODF);
+            formatosV.add(AOSignConstants.SIGN_FORMAT_ODF);
 		}
 		comboFormato.setModel(new DefaultComboBoxModel(formatosL.toArray()));
 		add(comboFormato, c);
@@ -286,11 +292,11 @@ public class Firma extends JPanel {
 		add(panelBotones, c);
 		
 		// Accesos rapidos al menu de ayuda
-		HelpUtils.enableHelpKey(campoFichero, "firma.fichero");
-		HelpUtils.enableHelpKey(examinar, "firma.fichero");
-		HelpUtils.enableHelpKey(comboAlmacen, "firma.almacen");
-		HelpUtils.enableHelpKey(comboFormato, "firma.formato");
-		HelpUtils.enableHelpKey(firmar,"firma");
+		HelpUtils.enableHelpKey(campoFichero, "firma.fichero"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(examinar, "firma.fichero"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(comboAlmacen, "firma.almacen"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(comboFormato, "firma.formato"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(firmar, "firma"); //$NON-NLS-1$
 	}
 
 	/**
@@ -299,7 +305,7 @@ public class Firma extends JPanel {
 	 * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
 	 */
 	private void examinarActionPerformed(JTextField campoFichero) {
-		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
+		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
 		if (selectedFile != null) {
 			campoFichero.setText(selectedFile.getAbsolutePath());
 		}
@@ -325,9 +331,9 @@ public class Firma extends JPanel {
 			try {
 				PasswordCallback pssCallback;
 				KeyStoreConfiguration kssc = (KeyStoreConfiguration)comboAlmacen.getSelectedItem();
-				AOConstants.AOKeyStore store = kssc.getType();
-				if (store == AOConstants.AOKeyStore.WINDOWS || store == AOConstants.AOKeyStore.WINROOT ||
-						store == AOConstants.AOKeyStore.SINGLE) 
+				AOKeyStore store = kssc.getType();
+				if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT ||
+						store == AOKeyStore.SINGLE) 
 					pssCallback = new NullPasswordCallback();
 				else
 					pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null); //$NON-NLS-1$
@@ -341,7 +347,7 @@ public class Firma extends JPanel {
 				);
 
 				// Seleccionamos un certificado
-				String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
+				String selectedcert = KeyStoreUtilities.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
 
 				// Comprobamos si se ha cancelado la seleccion
 				if (selectedcert == null) 
@@ -350,9 +356,9 @@ public class Firma extends JPanel {
 				// Recuperamos la clave del certificado
 				PrivateKeyEntry privateKeyEntry = null;
 				try {
-					privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, AOCryptoUtil.getCertificatePC(store, this));
+					privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, this));
 				}
-				catch (AOCertificateKeyException e) {
+				catch (KeyException e) {
 					throw e;
 				}
 				catch (AOCancelledOperationException e) {
@@ -368,17 +374,17 @@ public class Firma extends JPanel {
 				}
 
 				if (privateKeyEntry == null) {
-					throw new AOCertificateKeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero"); //$NON-NLS-1$
+					throw new KeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero"); //$NON-NLS-1$
 				}
 
 				// Firmamos los datos
 				AOSigner signer = null;
 				try {
-					signer = AOCryptoUtil.getSigner(formato);
+					signer = AOSignerFactory.getSigner(formato);
 				}
 				catch (Exception e) {
-					logger.warning("Formato de firma no soportado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					logger.warning("Formato de firma no soportado: " + e); //$NON-NLS-1$
+					JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
 					setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 					return;
 				}
@@ -396,7 +402,7 @@ public class Firma extends JPanel {
 				byte[] fileData;
 				InputStream fileIn = null;
 				try {
-					fileIn = AOUtil.loadFile(uri, this, true);
+					fileIn = AOUtil.loadFile(uri);
 					fileData = AOUtil.getDataFromInputStream(fileIn);					
 				}
 				catch (FileNotFoundException e) {
@@ -419,15 +425,15 @@ public class Firma extends JPanel {
 				// En el caso de firma CAdES, preguntamos al usuario si desea incluir el documento que
 				// se firma en la propia firma. El documento se incluir� en la firma, salvo que se indique
 				// los contrario
-				String modoFirma = AOConstants.SIGN_MODE_IMPLICIT;
-				if (formato.equals(AOConstants.SIGN_FORMAT_CADES)){ 
+				String modoFirma = AOSignConstants.SIGN_MODE_IMPLICIT;
+				if (formato.equals(AOSignConstants.SIGN_FORMAT_CADES)){ 
 					int incluir = JOptionPane.showConfirmDialog(
 						this,
 					    Messages.getString("Firma.incluir.original"),
 					    "Firma",
 					    JOptionPane.YES_NO_OPTION);
 					
-					modoFirma = (incluir == JOptionPane.NO_OPTION ? AOConstants.SIGN_MODE_EXPLICIT : AOConstants.SIGN_MODE_IMPLICIT);
+					modoFirma = (incluir == JOptionPane.NO_OPTION ? AOSignConstants.SIGN_MODE_EXPLICIT : AOSignConstants.SIGN_MODE_IMPLICIT);
 				}
 				
 				Properties prop = GeneralConfig.getSignConfig();
@@ -470,11 +476,12 @@ public class Firma extends JPanel {
 				}
 
 				// Guardamos la firma en fichero
-				final String saveDataToFile = AOUIManager.saveDataToFile(this, signedData,
-						new File(AOUIManager.getOutFileName(this.getFilename(campoFichero.getText()), formato)), AOUIManager.getOutFileFilter(formato)
-				);
-
-				if (saveDataToFile!= null)
+				final File savedFile = AOUIFactory.getSaveDataToFile(signedData,
+                        new File(SignedFileManager.getOutFileName(this.getFilename(campoFichero.getText()), formato)),
+                        SignedFileManager.getOutFileFilter(formato),
+                        this);
+				
+				if (savedFile!= null)
 					JOptionPane.showMessageDialog(
 						this,
 						Messages.getString("Firma.msg.ok"),  //$NON-NLS-1$

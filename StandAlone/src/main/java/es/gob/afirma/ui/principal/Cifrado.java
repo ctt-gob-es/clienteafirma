@@ -31,7 +31,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import es.gob.afirma.misc.AOConstants;
+import es.gob.afirma.ciphers.AOCipherConstants;
+import es.gob.afirma.core.ciphers.CipherConstants;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -50,32 +51,32 @@ public class Cifrado extends JPanel {
 
 	// Constantes de los mecanismos de cifrado
 	private List<String> mecanismos = new ArrayList<String>(Arrays.asList(
-		AOConstants.KEY_MODE_PASSWORD, 
-		AOConstants.KEY_MODE_USERINPUT
+		AOCipherConstants.KEY_MODE_PASSWORD, 
+		AOCipherConstants.KEY_MODE_USERINPUT
 	));
 
 	// Algoritmos para mecanismo contrasena de cifrado
 	private List<String> algoritmoLc = new ArrayList<String>(Arrays.asList(
-			Messages.getString("Cifrado.origenLc.0"),
-			Messages.getString("Cifrado.origenLc.1"),
-			Messages.getString("Cifrado.origenLc.2")
+			Messages.getString("Cifrado.origenLc.0"), //$NON-NLS-1$
+			Messages.getString("Cifrado.origenLc.1"), //$NON-NLS-1$
+			Messages.getString("Cifrado.origenLc.2") //$NON-NLS-1$
 	));
 
 	// Constantes algoritmos / Mecanismo Contrasena de cifrado
 	private String[] algoritmoVc = new String[]{
-		AOConstants.AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE.getName(),
-		AOConstants.AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40.getName(),
-		AOConstants.AOCipherAlgorithm.PBEWITHMD5ANDDES.getName()
+		CipherConstants.AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE.getName(),
+		CipherConstants.AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40.getName(),
+		CipherConstants.AOCipherAlgorithm.PBEWITHMD5ANDDES.getName()
 	};
 
 	// Constantes algoritmos / Mecanismo Clave de cifrado
 	private String[] algoritmoVr = new String[]{
-		AOConstants.AOCipherAlgorithm.AES.getName(),
-		AOConstants.AOCipherAlgorithm.ARCFOUR.getName(),
-		AOConstants.AOCipherAlgorithm.BLOWFISH.getName(),
-		AOConstants.AOCipherAlgorithm.DES.getName(),
-		AOConstants.AOCipherAlgorithm.TRIPLEDES.getName(),
-		AOConstants.AOCipherAlgorithm.RC2.getName()
+		CipherConstants.AOCipherAlgorithm.AES.getName(),
+		CipherConstants.AOCipherAlgorithm.ARCFOUR.getName(),
+		CipherConstants.AOCipherAlgorithm.BLOWFISH.getName(),
+		CipherConstants.AOCipherAlgorithm.DES.getName(),
+		CipherConstants.AOCipherAlgorithm.TRIPLEDES.getName(),
+		CipherConstants.AOCipherAlgorithm.RC2.getName()
 	};
 
 	public Cifrado() {
@@ -298,7 +299,7 @@ public class Cifrado extends JPanel {
 			JTextField campoFichero) {
 		String algoritmo;
 		String mecanismo = mecanismos.get(comboMecanismo.getSelectedIndex());
-		if (mecanismo.equals(AOConstants.KEY_MODE_PASSWORD))
+		if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD))
 			algoritmo = algoritmoVc[comboAlgoritmo.getSelectedIndex()];
 		else
 			algoritmo = algoritmoVr[comboAlgoritmo.getSelectedIndex()];
@@ -308,7 +309,7 @@ public class Cifrado extends JPanel {
 			JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
 		else {
 			// Se selecciona el primer elemento del combo
-			if (mecanismo.equals(AOConstants.KEY_MODE_PASSWORD)) 
+			if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) 
 				// Se muestra el asistente de cifrado con contrasena
 				new AsistenteCifradoContrasenia(algoritmo,campoFichero.getText());
 			else 
@@ -336,15 +337,16 @@ public class Cifrado extends JPanel {
 	 */
 	private void comboMecanismoItemStateChanged(JComboBox comboMecanismo, JComboBox comboAlgoritmo) {
 		String mecanismo = mecanismos.get(comboMecanismo.getSelectedIndex());
-		if (mecanismo.equals(AOConstants.KEY_MODE_PASSWORD))
+		if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD))
 			comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
 		else {
 			String[] algoritmoLr = new String[]{
-					"Advanced Encryption Standard (AES)",
-					"Alleged RC4","Blowfish",
-					"Data Encryption Standard (DES)",
-					"Triple DES (3DES)",
-					"RC2"
+					"Advanced Encryption Standard (AES)", //$NON-NLS-1$
+					"Alleged RC4", //$NON-NLS-1$
+					"Blowfish", //$NON-NLS-1$
+					"Data Encryption Standard (DES)", //$NON-NLS-1$
+					"Triple DES (3DES)", //$NON-NLS-1$
+					"RC2" //$NON-NLS-1$
 			};
 			comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLr));
 		}
