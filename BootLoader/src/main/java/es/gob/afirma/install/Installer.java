@@ -133,22 +133,22 @@ final class Installer {
         boolean allOK = true;
         boolean licenciaMostrada = false;
 
-		try {
-            if (enviromentInstaller.isEndorsedApacheXMLSecNeeded()) {
-                if (!prepareInstall()) {
-                    return;
-                }
-                licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando Apache XML Security..."); //$NON-NLS-1$
-                enviromentInstaller.installEndorsedApacheXMLSec();
-            }
-        }
-        catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe(
-            "Error instalando Apache XML Security, la ejecucion sobre Java 7 puede fallar: " + e //$NON-NLS-1$
-            );
-            allOK = false;
-        }
+//		try {
+//            if (enviromentInstaller.isEndorsedApacheXMLSecNeeded()) {
+//                if (!prepareInstall()) {
+//                    return;
+//                }
+//                licenciaMostrada = true;
+//                AfirmaBootLoader.LOGGER.info("Instalando Apache XML Security..."); //$NON-NLS-1$
+//                enviromentInstaller.installEndorsedApacheXMLSec();
+//            }
+//        }
+//        catch (final Exception e) {
+//            AfirmaBootLoader.LOGGER.severe(
+//            "Error instalando Apache XML Security, la ejecucion sobre Java 7 puede fallar: " + e //$NON-NLS-1$
+//            );
+//            allOK = false;
+//        }
 
         try {
             if (this.enviromentInstaller.isEndorsedJava5AFirmaDependenciesNeeded()) {
@@ -216,7 +216,7 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                this.enviromentInstaller.configureNSS(this.parentComponent);
+//                this.enviromentInstaller.configureNSS();
             }
         }
         catch (final Exception e) {

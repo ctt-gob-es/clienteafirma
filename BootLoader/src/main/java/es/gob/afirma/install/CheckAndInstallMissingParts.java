@@ -11,13 +11,11 @@ package es.gob.afirma.install;
 
 import static es.gob.afirma.misc.Platform.getEndorsedDir;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -47,11 +45,11 @@ final class CheckAndInstallMissingParts {
     /** Archivo zip con las librerias Xalan en formato JAR necesarias para la firma XML en JDK 5. */
     private static final String XALAN_JARLIBRARY_ZIP = "xalanjar.zip";
 
-    /** Archivo zip con las librerias Apache XMLSec en formato PACK200 necesarias para la firma XML en JDK 7. */
-    private static final String XMLSEC_LIBRARY_ZIP = "xmlsec.zip";
+//    /** Archivo zip con las librerias Apache XMLSec en formato PACK200 necesarias para la firma XML en JDK 7. */
+//    private static final String XMLSEC_LIBRARY_ZIP = "xmlsec.zip";
 
-    /** Archivo zip con las librerias Apache XMLSec en formato JAR necesarias para la firma XML en JDK 7. */
-    private static final String XMLSEC_JARLIBRARY_ZIP = "xmlsecjar.zip";
+//    /** Archivo zip con las librerias Apache XMLSec en formato JAR necesarias para la firma XML en JDK 7. */
+//    private static final String XMLSEC_JARLIBRARY_ZIP = "xmlsecjar.zip";
 
     private final String build;
 
@@ -126,51 +124,51 @@ final class CheckAndInstallMissingParts {
         }
     }
 
-/** Instala las bibliotecas Apache XMLSec para la generaci&oacute;n de firmas XML desde Java 7.
-     * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar. */
-    void installEndorsedApacheXMLSec() throws AOException, IOException, URISyntaxException {
-        File tempDir = null;
-        try {
-            tempDir = AOInstallUtils.createTempFile(true);
-            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_LIBRARY_ZIP), tempDir, SigningCert.INTEGRATOR);
-
-            String filename;
-            for (final File file : tempDir.listFiles()) {
-                filename = file.getName();
-                if (filename.endsWith(".pack.gz")) { //$NON-NLS-1$
-                    AOInstallUtils.unpack(file.getAbsolutePath(),
-                                          Platform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz")));
-                }
-            }
-
-        }
-        catch (final Exception e) {
-            AfirmaBootLoader.LOGGER
-                  .warning("No se ha podido instalar la version PACK200 de Apache XMLSec, se intentara la version JAR: " + e);
-            if (AfirmaBootLoader.DEBUG) {
-                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-            }
-            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_JARLIBRARY_ZIP),
-                                      new File(getEndorsedDir()),
-                                      SigningCert.INTEGRATOR);
-        }
-        finally {
-            if (tempDir != null) {
-                try {
-                    for (final File file : tempDir.listFiles()) {
-                        file.delete();
-                    }
-                    AOInstallUtils.deleteDir(tempDir);
-                }
-                catch (final Exception e) {
-                    // Ignoramos los errores en el borrado
-                }
-            }
-        }
-
-    }
+///** Instala las bibliotecas Apache XMLSec para la generaci&oacute;n de firmas XML desde Java 7.
+//     * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar. */
+//    void installEndorsedApacheXMLSec() throws AOException, IOException, URISyntaxException {
+//        File tempDir = null;
+//        try {
+//            tempDir = AOInstallUtils.createTempFile(true);
+//            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_LIBRARY_ZIP), tempDir, SigningCert.INTEGRATOR);
+//
+//            String filename;
+//            for (final File file : tempDir.listFiles()) {
+//                filename = file.getName();
+//                if (filename.endsWith(".pack.gz")) { //$NON-NLS-1$
+//                    AOInstallUtils.unpack(file.getAbsolutePath(),
+//                                          Platform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz")));
+//                }
+//            }
+//
+//        }
+//        catch (final Exception e) {
+//            AfirmaBootLoader.LOGGER
+//                  .warning("No se ha podido instalar la version PACK200 de Apache XMLSec, se intentara la version JAR: " + e);
+//            if (AfirmaBootLoader.DEBUG) {
+//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+//                e.printStackTrace(new java.io.PrintStream(baos));
+//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+//            }
+//            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_JARLIBRARY_ZIP),
+//                                      new File(getEndorsedDir()),
+//                                      SigningCert.INTEGRATOR);
+//        }
+//        finally {
+//            if (tempDir != null) {
+//                try {
+//                    for (final File file : tempDir.listFiles()) {
+//                        file.delete();
+//                    }
+//                    AOInstallUtils.deleteDir(tempDir);
+//                }
+//                catch (final Exception e) {
+//                    // Ignoramos los errores en el borrado
+//                }
+//            }
+//        }
+//
+//    }
 
     /** Instala el proveedor de seguridad SunMSCAPI.
      * @param installFilesCodeBase Localizaci&oacute;n de los ficheros necesarios para la instalaci&oacute;n
@@ -258,76 +256,76 @@ final class CheckAndInstallMissingParts {
         }
     }
 
-    /** Configura NSS en Mac OS X para permitir la carga desde directorios fuera de
-     * <i>LD_LIBRARY_PATH</i> y <i>PATH</i>.
-     * @param parent Componente padre para los di&aacute;logos gr&aacute;ficos */
-    void configureNSS(final Component parent) throws AOException {
-        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-            return;
-        }
-        String nssLibDir;
-        try {
-            nssLibDir = getSystemNSSLibDirMacOSX();
-        }
-        catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("No se ha encontrado un NSS para configurar: " + e); //$NON-NLS-1$
-            return;
-        }
-
-        if (!nssLibDir.endsWith("/")) {
-            nssLibDir = nssLibDir + "/"; //$NON-NLS-1$
-        }
-
-        final String[] libs = new String[] {
-            "libnspr4.dylib", //$NON-NLS-1$
-            "libplds4.dylib", //$NON-NLS-1$
-            "libplc4.dylib", //$NON-NLS-1$
-            "libmozsqlite3.dylib", //$NON-NLS-1$
-            "libnssutil3.dylib" //$NON-NLS-1$
-        };
-
-        // Creamos enlaces simbolicos via AppleScript
-        final StringBuilder sb = new StringBuilder();
-        for (final String lib : libs) {
-            sb.append("ln -s ");
-            sb.append(nssLibDir);
-            sb.append(lib);
-            sb.append(" /usr/lib/");
-            sb.append(lib);
-            sb.append("; ");
-        }
-        try {
-            Class<?> scriptEngineManagerClass = Class.forName("javax.script.ScriptEngineManager");
-            Object scriptEngineManager = scriptEngineManagerClass.newInstance();
-            Method getEngineByNameMethod = scriptEngineManagerClass.getMethod("getEngineByName", String.class);
-            
-            Object scriptEngine = getEngineByNameMethod.invoke(scriptEngineManager, "AppleScript");
-            
-            Class<?> scriptEngineClass = Class.forName("javax.script.ScriptEngine");
-            Method evalMethod = scriptEngineClass.getMethod("eval", String.class);
-            
-            evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges");
-            
-            //new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");    
-        }
-        catch(final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e);
-        }
-
-        // Y reintentamos la carga, para ver si ha surtido efecto
-        try {
-            System.load(nssLibDir + "libsoftokn3.dylib");
-        }
-        catch (final Throwable e) {
-            if (AfirmaBootLoader.DEBUG) {
-                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-            }
-            throw new AOException("La configuracion de NSS para Mac OS X ha fallado", e);
-        }
-
-    }
+//    /** Configura NSS en Mac OS X para permitir la carga desde directorios fuera de
+//     * <i>LD_LIBRARY_PATH</i> y <i>PATH</i>.
+//     * @param parent Componente padre para los di&aacute;logos gr&aacute;ficos */
+//    void configureNSS() throws AOException {
+//        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+//            return;
+//        }
+//        String nssLibDir;
+//        try {
+//            nssLibDir = getSystemNSSLibDirMacOSX();
+//        }
+//        catch (final Exception e) {
+//            AfirmaBootLoader.LOGGER.severe("No se ha encontrado un NSS para configurar: " + e); //$NON-NLS-1$
+//            return;
+//        }
+//
+//        if (!nssLibDir.endsWith("/")) {
+//            nssLibDir = nssLibDir + "/"; //$NON-NLS-1$
+//        }
+//
+//        final String[] libs = new String[] {
+//            "libnspr4.dylib", //$NON-NLS-1$
+//            "libplds4.dylib", //$NON-NLS-1$
+//            "libplc4.dylib", //$NON-NLS-1$
+//            "libmozsqlite3.dylib", //$NON-NLS-1$
+//            "libnssutil3.dylib" //$NON-NLS-1$
+//        };
+//
+//        // Creamos enlaces simbolicos via AppleScript
+//        final StringBuilder sb = new StringBuilder();
+//        for (final String lib : libs) {
+//            sb.append("ln -s ");
+//            sb.append(nssLibDir);
+//            sb.append(lib);
+//            sb.append(" /usr/lib/");
+//            sb.append(lib);
+//            sb.append("; ");
+//        }
+//        try {
+//            final Class<?> scriptEngineManagerClass = Class.forName("javax.script.ScriptEngineManager");
+//            final Object scriptEngineManager = scriptEngineManagerClass.newInstance();
+//            final Method getEngineByNameMethod = scriptEngineManagerClass.getMethod("getEngineByName", String.class);
+//            
+//            final Object scriptEngine = getEngineByNameMethod.invoke(scriptEngineManager, "AppleScript");
+//            
+//            final Class<?> scriptEngineClass = Class.forName("javax.script.ScriptEngine");
+//            final Method evalMethod = scriptEngineClass.getMethod("eval", String.class);
+//            
+//            evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges");
+//            
+//            //new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");    
+//        }
+//        catch(final Exception e) {
+//            AfirmaBootLoader.LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e);
+//        }
+//
+//        // Y reintentamos la carga, para ver si ha surtido efecto
+//        try {
+//            System.load(nssLibDir + "libsoftokn3.dylib");
+//        }
+//        catch (final Throwable e) {
+//            if (AfirmaBootLoader.DEBUG) {
+//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+//                e.printStackTrace(new java.io.PrintStream(baos));
+//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+//            }
+//            throw new AOException("La configuracion de NSS para Mac OS X ha fallado", e);
+//        }
+//
+//    }
 
     /** Indica si es necesario instalar el proveedor de seguridad SunMSCAPI.
      * @return <code>true</code> si es necesaria la instalaci&oacute;n, <code>false</code> en caso contrario */
@@ -648,16 +646,16 @@ final class CheckAndInstallMissingParts {
                                                                                                                                                                                                                                                                                                                                                                            + "xml-apis-1.3.03.jar").exists()));
     }
 
-	/** Comprueba si los paquetes Apache XMLSec son necesarios en el directorio endorsed del JRE
-     * configurado.
-     * @return Devuelve <code>true</code> si se necesita Apache XMLSec, <code>false</code> en caso contrario. */
-    boolean isEndorsedApacheXMLSecNeeded() {
-        if (!Platform.JREVER.J7.equals(jreVersion)) {
-            return false;
-        }
-        return !(new File(getEndorsedDir() + File.separator + "xmlsec-1.4.4.jar").exists() && new File(getEndorsedDir() + File.separator
-                                                                                                       + "commons-logging-api-1.1.jar").exists());
-    }
+//	/** Comprueba si los paquetes Apache XMLSec son necesarios en el directorio endorsed del JRE
+//     * configurado.
+//     * @return Devuelve <code>true</code> si se necesita Apache XMLSec, <code>false</code> en caso contrario. */
+//    boolean isEndorsedApacheXMLSecNeeded() {
+//        if (!Platform.JREVER.J7.equals(jreVersion)) {
+//            return false;
+//        }
+//        return !(new File(getEndorsedDir() + File.separator + "xmlsec-1.4.4.jar").exists() && new File(getEndorsedDir() + File.separator
+//                                                                                                       + "commons-logging-api-1.1.jar").exists());
+//    }
 
     /** Comprueba si se necesitan las dependencias para la compatibilidad del Cliente AFirma con Java 5.
      * @return <code>true</code> si se necesita instalar las dependencias, <code>false</code> en caso contrario. */
@@ -792,10 +790,6 @@ final class CheckAndInstallMissingParts {
         }
 
         return nssLibDir;
-    }
-    
-    public static void main(String args[]) throws Exception {
-        new CheckAndInstallMissingParts(Platform.OS.MACOSX, Platform.JREVER.J6, null, new URL("http://www.google.com")).configureNSS(null);
     }
 
 }
