@@ -159,8 +159,7 @@ public final class AOCMSSigner implements AOSigner {
         final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 
         // Si la firma que nos introducen es SignedData
-        final boolean signedData = CMSHelper.isCMSValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA);
-        if (signedData) {
+        if (ValidateCMSSignedData.isCMSSignedData(sign)) {
             try {
                 return new CoSigner().coSigner(csp, sign, omitContent, this.dataType, keyEntry, this.atrib, this.uatrib, messageDigest);
             }
@@ -168,15 +167,7 @@ public final class AOCMSSigner implements AOSigner {
                 throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
             }
         }
-        // Si la firma que nos introducen es SignedAndEnvelopedData
-        try {
-            // El parametro omitContent no tiene sentido en un signed and
-            // envelopedData.
-            return new CoSignerEnveloped().coSigner(csp, sign, this.dataType, keyEntry, this.atrib, this.uatrib, messageDigest);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
-        }
+        throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
     }
 
     public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
@@ -212,48 +203,18 @@ public final class AOCMSSigner implements AOSigner {
         }
 
         // Si la firma que nos introducen es SignedData
-        if (CMSHelper.isCMSValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA)) {
+        if (ValidateCMSSignedData.isCMSSignedData(sign)) {
             // Cofirma de la firma usando unicamente el fichero de firmas.
             try {
-                return new CoSigner().coSigner(typeAlgorithm, aCertificados, sign, this.dataType, keyEntry, this.atrib, this.uatrib, null // null
-                                                                                                                           // porque
-                                                                                                                           // no
-                                                                                                                           // nos
-                                                                                                                           // pueden
-                                                                                                                           // dar
-                                                                                                                           // un
-                                                                                                                           // hash
-                                                                                                                           // en
-                                                                                                                           // este
-                                                                                                                           // metodo,
-                                                                                                                           // tendría
-                                                                                                                           // que
-                                                                                                                           // ser
-                                                                                                                           // en el
-                                                                                                                           // que
-                                                                                                                           // incluye
-                                                                                                                           // datos
-                );
+                // No habra messageDigest porque no nos pueden dar un hash
+                // en este metodo, tendria que ser en el que incluye datos
+                return new CoSigner().coSigner(typeAlgorithm, aCertificados, sign, this.dataType, keyEntry, this.atrib, this.uatrib, null);
             }
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
             }
         }
-        // Si la firma que nos introducen es SignedAndEnvelopedData
-
-        // Cofirma de la firma usando unicamente el fichero de firmas.
-        try {
-            return new CoSignerEnveloped().coSigner(typeAlgorithm, aCertificados, sign, this.dataType, keyEntry, this.atrib, this.uatrib, null // null porque no nos
-                                                                                                                                // pueden dar un hash
-                                                                                                                                // en este
-                                                                                                                                // metodo, tendría que
-                                                                                                                                // ser en el que
-                                                                                                                                // incluye datos
-            );
-        }
-        catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
-        }
+        throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
     }
 
     public byte[] countersign(final byte[] sign,
@@ -296,7 +257,7 @@ public final class AOCMSSigner implements AOSigner {
 
         // Si la firma que nos introducen es SignedData
 
-        if (CMSHelper.isCMSValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA)) {
+        if (ValidateCMSSignedData.isCMSSignedData(sign)) {
             try {
                 // CASO DE FIRMA DE ARBOL
                 if (targetType == CounterSignTarget.Tree) {
@@ -338,84 +299,10 @@ public final class AOCMSSigner implements AOSigner {
             catch (final Exception e) {
                 throw new AOException("Error generando la Contrafirma PKCS#7", e); //$NON-NLS-1$
             }
+        } else {
+            throw new AOException("Los datos no se corresponden con una firma CMS valida");     //$NON-NLS-1$
         }
-        // Si la firma es SignedAndEnveloped
-        else {
-
-            try {
-                // CASO DE FIRMA DE ARBOL
-                if (targetType == CounterSignTarget.Tree) {
-                    final int[] nodes = {
-                        0
-                    };
-                    dataSigned =
-                            new CounterSignerEnveloped().counterSignerEnveloped(csp,
-                                                                                sign,
-                                                                                CounterSignTarget.Tree,
-                                                                                nodes,
-                                                                                keyEntry,
-                                                                                this.dataType,
-                                                                                this.atrib,
-                                                                                this.uatrib);
-                }
-                // CASO DE FIRMA DE HOJAS
-                else if (targetType == CounterSignTarget.Leafs) {
-                    final int[] nodes = {
-                        0
-                    };
-                    dataSigned =
-                            new CounterSignerEnveloped().counterSignerEnveloped(csp,
-                                                                                sign,
-                                                                                CounterSignTarget.Leafs,
-                                                                                nodes,
-                                                                                keyEntry,
-                                                                                this.dataType,
-                                                                                this.atrib,
-                                                                                this.uatrib);
-                }
-                // CASO DE FIRMA DE NODOS
-                else if (targetType == CounterSignTarget.Nodes) {
-                    int[] nodesID = new int[targets.length];
-                    for (int i = 0; i < targets.length; i++) {
-                        nodesID[i] = ((Integer) targets[i]).intValue();
-                    }
-                    nodesID = new ReadNodesTree().simplyArray(nodesID);
-                    dataSigned =
-                            new CounterSignerEnveloped().counterSignerEnveloped(csp,
-                                                                                sign,
-                                                                                CounterSignTarget.Nodes,
-                                                                                nodesID,
-                                                                                keyEntry,
-                                                                                this.dataType,
-                                                                                this.atrib,
-                                                                                this.uatrib);
-                }
-                // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
-                else if (targetType == CounterSignTarget.Signers) {
-
-                    // clase que lee los nodos de un fichero firmado (p7s)
-                    final String[] signers = new String[targets.length];
-                    for (int i = 0; i < targets.length; i++){
-                        signers[i] = (String) targets[i];
-                    }
-                    dataSigned =
-                            new CounterSignerEnveloped().counterSignerEnveloped(csp,
-                                                                                sign,
-                                                                                CounterSignTarget.Signers,
-                                                                                new ReadNodesTree().readNodesFromSigners(signers, sign),
-                                                                                keyEntry,
-                                                                                this.dataType,
-                                                                                this.atrib,
-                                                                                this.uatrib);
-
-                }
-            }
-            catch (final Exception e) {
-                throw new AOException("Error generando la Contrafirma PKCS#7", e); //$NON-NLS-1$
-            }
-
-        }
-
+        
         return dataSigned;
     }
 
@@ -436,13 +323,7 @@ public final class AOCMSSigner implements AOSigner {
             return false;
         }
 
-        // Comprobamos la validez
-        boolean signed = CMSHelper.isCMSValid(signData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA);
-        if (!signed) {
-            signed = CMSHelper.isCMSValid(signData, AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA);
-        }
-
-        return signed;
+        return ValidateCMSSignedData.isCMSSignedData(signData);
     }
 
     public boolean isValidDataFile(final byte[] data) {
@@ -511,7 +392,7 @@ public final class AOCMSSigner implements AOSigner {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
 
-        if (!CMSHelper.isCMSValid(signData)) {
+        if (!ValidateCMSSignedData.isCMSSignedData(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
