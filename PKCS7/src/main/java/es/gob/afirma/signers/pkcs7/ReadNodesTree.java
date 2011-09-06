@@ -88,11 +88,11 @@ public final class ReadNodesTree {
 
         // LEEMOS EL FICHERO QUE NOS INTRODUCEN
         final ASN1Sequence dsq = (ASN1Sequence) is.readObject();
-        final Enumeration<?> e = dsq.getObjects();
+        final Enumeration<?> contentsData = dsq.getObjects();
         // Elementos que contienen los elementos OID SignedData
-        e.nextElement();
+        contentsData.nextElement();
         // Contenido de SignedData
-        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
+        final ASN1TaggedObject doj = (ASN1TaggedObject) contentsData.nextElement();
         final ASN1Sequence contentSignedData = (ASN1Sequence) doj.getObject();// contenido
                                                                         // del
                                                                         // SignedData
@@ -106,16 +106,8 @@ public final class ReadNodesTree {
             signerInfosSd = sd.getSignerInfos();
             certificates = sd.getCertificates();
         }
-        catch (final Exception exception) {
-            try {
-                LOGGER.info("No es signedData, probamos con SignedAndEnvelopedData."); //$NON-NLS-1$
-                final SignedAndEnvelopedData sd = new SignedAndEnvelopedData(contentSignedData);
-                signerInfosSd = sd.getSignerInfos();
-                certificates = sd.getCertificates();
-            }
-            catch (final Exception e2) {
-                LOGGER.severe("Error obteniendo los SignerInfos del SignedData: " + e2); //$NON-NLS-1$
-            }
+        catch (final Exception e) {
+            LOGGER.severe("Error obteniendo los SignerInfos del SignedData: " + e); //$NON-NLS-1$
         }
 
         // Para la creacion del arbol

@@ -90,7 +90,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
      *        the object we want converted.
      * @exception IllegalArgumentException
      *            if the object cannot be converted. */
-    static SignedAndEnvelopedData getInstance(final Object obj) {
+    public static SignedAndEnvelopedData getInstance(final Object obj) {
         if (obj == null || obj instanceof SignedAndEnvelopedData) {
             return (SignedAndEnvelopedData) obj;
         }
@@ -102,7 +102,7 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
         throw new IllegalArgumentException("EnvelopedData invalido: " + obj.getClass().getName()); //$NON-NLS-1$
     }
 
-    DERInteger getVersion() {
+    public DERInteger getVersion() {
         return this.version;
     }
 
