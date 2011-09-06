@@ -24,6 +24,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
@@ -66,8 +67,13 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                         MozillaKeyStoreUtilities.createPKCS11NSSConfigFile(MozillaKeyStoreUtilities.getMozillaUserProfileDirectory(), nssDirectory);
 
                 // Cargamos las dependencias necesarias para la correcta carga
-                // del almacen
-                MozillaKeyStoreUtilities.loadNSSDependencies(nssDirectory);
+                // del almacen (en Mac se crean enlaces simbolicos)
+                if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+                    MozillaKeyStoreUtilities.configureMacNSS(nssDirectory);
+                }
+                else {
+                    MozillaKeyStoreUtilities.loadNSSDependencies(nssDirectory);
+                }
 
                 LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile); //$NON-NLS-1$
 

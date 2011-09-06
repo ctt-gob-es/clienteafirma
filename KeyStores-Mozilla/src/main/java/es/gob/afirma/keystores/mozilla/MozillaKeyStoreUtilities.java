@@ -12,6 +12,7 @@ package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -735,4 +736,71 @@ final class MozillaKeyStoreUtilities {
         return null;
     }
 
+    final static void configureMacNSS(String nssBinDir) throws AOException {
+        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+            return;
+        }
+        
+        if (nssBinDir == null) {
+            LOGGER.severe("El directorio de NSS para configurar proporcionado es nulo, no se realizara ninguna accion"); //$NON-NLS-1$
+            return;
+        }
+        
+        if (!nssBinDir.endsWith("/")) { //$NON-NLS-1$
+            nssBinDir = nssBinDir + "/"; //$NON-NLS-1$
+        }
+        
+        // Intentamos la carga, para ver si es necesaria la reconfiguracion
+        try {
+            System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
+            return; // Si funciona salimos sin hacer nada
+        }
+        catch (final Exception e) {
+            // Se ignora el error
+        }
+
+        final String[] libs = new String[] {
+            "libnspr4.dylib", //$NON-NLS-1$
+            "libplds4.dylib", //$NON-NLS-1$
+            "libplc4.dylib", //$NON-NLS-1$
+            "libmozsqlite3.dylib", //$NON-NLS-1$
+            "libnssutil3.dylib" //$NON-NLS-1$
+        };
+
+        // Creamos enlaces simbolicos via AppleScript
+        final StringBuilder sb = new StringBuilder();
+        for (final String lib : libs) {
+            sb.append("ln -s "); //$NON-NLS-1$
+            sb.append(nssBinDir);
+            sb.append(lib);
+            sb.append(" /usr/lib/"); //$NON-NLS-1$
+            sb.append(lib);
+            sb.append("; "); //$NON-NLS-1$
+        }
+        try {
+            final Class<?> scriptEngineManagerClass = Class.forName("javax.script.ScriptEngineManager"); //$NON-NLS-1$
+            final Object scriptEngineManager = scriptEngineManagerClass.newInstance();
+            final Method getEngineByNameMethod = scriptEngineManagerClass.getMethod("getEngineByName", String.class); //$NON-NLS-1$
+            
+            final Object scriptEngine = getEngineByNameMethod.invoke(scriptEngineManager, "AppleScript"); //$NON-NLS-1$
+            
+            final Class<?> scriptEngineClass = Class.forName("javax.script.ScriptEngine"); //$NON-NLS-1$
+            final Method evalMethod = scriptEngineClass.getMethod("eval", String.class); //$NON-NLS-1$
+            
+            evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
+            
+            //new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");    
+        }
+        catch(final Exception e) {
+            LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e); //$NON-NLS-1$
+        }
+
+        // Y reintentamos la carga, para ver si ha surtido efecto
+        try {
+            System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            throw new AOException("La configuracion de NSS para Mac OS X ha fallado", e); //$NON-NLS-1$
+        }
+    }
 }
