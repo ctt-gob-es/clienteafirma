@@ -51,7 +51,8 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
      *         Si no puede inicializarse ning&uacute;n almac&eacute;n de
      *         claves, ni el NSS interno, ni ning&uacute;n PKCS#11 externo
      *         definido en SecMod */
-    public Vector<KeyStore> init() throws AOException {
+    @Override
+    public Vector<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException {
 
         // Por si el proveedor estubiese ya instalado por una ejecucion anterior
         // intentamos obtenerlo directamente
@@ -219,7 +220,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         if (this.kss == null) {
             LOGGER.warning("Se han pedido los alias de un almacen sin inicializar, se intentara inicializar primero"); //$NON-NLS-1$
             try {
-                init();
+                init(null, null, null, null);
             }
             catch (final Exception e) {
                 LOGGER.severe("No se ha podido inicializar el almacen, se devolvera una lista de alias vacia: " + e); //$NON-NLS-1$
