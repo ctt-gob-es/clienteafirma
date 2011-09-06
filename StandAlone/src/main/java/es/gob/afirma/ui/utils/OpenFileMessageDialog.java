@@ -42,7 +42,7 @@ public class OpenFileMessageDialog {
 	public static void show(Component parent, Object message, String title, File file, int optionType) {
 
 		if(file == null)
-			throw new NullPointerException("No se ha indicado el fichero que desea abrir");
+			throw new NullPointerException("No se ha indicado el fichero que desea abrir"); //$NON-NLS-1$
 		
 		if(JOptionPane.showConfirmDialog(
 				parent, message, title, JOptionPane.OK_CANCEL_OPTION, optionType) == JOptionPane.OK_OPTION)

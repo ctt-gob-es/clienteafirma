@@ -9,6 +9,7 @@
  */
 package es.gob.afirma.ui.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +51,18 @@ public class Utils {
 		}
 	}
 
+	/**
+     * Abre un fichero en la aplicaci\u00F3n predefinida por el sistema operativo actual.
+     * @param filepath Ruta completa al fichero.
+     */
+    public static void openFile(File file){
+        try {
+            openFile(file.getCanonicalPath());
+        } catch (Exception e) {
+            openFile(file.getAbsolutePath());
+        }
+    }
+	
 	/**
 	 * Método que devuelve un mnemónico válido para el lenguaje que recibe como parámetro.
 	 * @param listMnemonic lista de mnemónicos que ya han sido utilizados para otros lenguajes.

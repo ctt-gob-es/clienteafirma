@@ -13,8 +13,8 @@ import java.io.File;
 
 import javax.swing.JDialog;
 
-import es.gob.afirma.exceptions.AOUnsupportedSignFormatException;
-import es.gob.afirma.misc.DirectorySignatureHelper;
+import es.gob.afirma.core.AOUnsupportedSignFormatException;
+import es.gob.afirma.massive.DirectorySignatureHelper;
 
 /**
  * M&oacute;dulo para la ejecuci&oacute;n de firmas y multifirmas de ficheros. Durante el proceso
@@ -43,17 +43,17 @@ public class DirectorySignatureHelperAdv extends DirectorySignatureHelper {
 	
 	@Override
 	protected void prepareOperation(File[] files) {
-		progressDialog = new ProgressDialog(this.parent, files.length, Messages.getString("Wizard.multifirma.progress.titulo"));
-		progressDialog.show();
+	    this.progressDialog = new ProgressDialog(this.parent, files.length, Messages.getString("Wizard.multifirma.progress.titulo")); //$NON-NLS-1$
+	    this.progressDialog.show();
 	}
 	
 	@Override
 	protected void disposeOperation() {
-		progressDialog.close();
+	    this.progressDialog.close();
 	}
 	
 	@Override
 	protected void preProcessFile(File file) {
-		progressDialog.processElement(file.getAbsolutePath());
+	    this.progressDialog.processElement(file.getAbsolutePath());
 	}
 }

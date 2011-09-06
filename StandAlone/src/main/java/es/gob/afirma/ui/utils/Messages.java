@@ -9,17 +9,33 @@ import java.util.ResourceBundle;
  */
 public class Messages {
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma", Locale.getDefault());
+	private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
 	
 	public static String getString(String codeString) {
 		try {
 			return bundle.getString(codeString);
 		} catch (MissingResourceException e) {
-			return "##ERROR##Cadena no disponible.";
+			return "##ERROR## Cadena no disponible."; //$NON-NLS-1$
 		}
 	}
 	
+    /** Recupera el texto identificado con la clave proporcionada y sustituye la
+     * subcadenas "%0" por el texto proporcionado.
+     * @param key
+     *        Clave del texto.
+     * @param text
+     *        Texto que se desea insertar.
+     * @return Recuerso textual con la subcadena sustituida. */
+    static String getString(final String key, final String text) {
+        try {
+            return bundle.getString(key).replace("%0", text); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            return '!' + key + '!';
+        }
+    }
+	
 	public static void changeLocale () {
-		bundle = ResourceBundle.getBundle("properties/Idioma", Locale.getDefault());
+		bundle = ResourceBundle.getBundle("properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
 	}
 }

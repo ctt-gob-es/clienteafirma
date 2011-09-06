@@ -11,7 +11,7 @@ package es.gob.afirma.ui.utils;
 
 import java.util.Properties;
 
-import es.gob.afirma.misc.AOConstants;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.ui.principal.MainOptionsPane;
 
 /**
@@ -114,7 +114,7 @@ public class GeneralConfig {
 	
 	private static Properties getDefaultSignatureConfig() {
 		Properties defaultConfig = new Properties();
-		defaultConfig.setProperty("mode", AOConstants.SIGN_MODE_IMPLICIT);
+		defaultConfig.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT);
 		return defaultConfig;
 	}
 }

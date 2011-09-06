@@ -11,10 +11,10 @@ package es.gob.afirma.ui.utils;
 
 import java.util.Vector;
 
-import es.gob.afirma.ciphers.AOCipher;
-import es.gob.afirma.ciphers.AOCipherConfig;
-import es.gob.afirma.ciphers.AOSunJCECipher;
-import es.gob.afirma.misc.AOConstants.AOCipherAlgorithm;
+import es.gob.afirma.ciphers.jce.AOSunJCECipher;
+import es.gob.afirma.core.ciphers.AOCipher;
+import es.gob.afirma.core.ciphers.AOCipherConfig;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 
 /**
  * Clase para configurar un cifrador dado un algoritmo
@@ -25,16 +25,16 @@ public class CipherConfig {
 	private AOCipher cipher;
 	private AOCipherAlgorithm cipherAlgoritm;
 
-	public CipherConfig (String algoritmo) {;
-	configurarCipher(algoritmo);
+	public CipherConfig (String algoritmo) {
+	    configurarCipher(algoritmo);
 	}
 
 	public AOCipherConfig getConfig() {
-		return config;
+		return this.config;
 	}
 
 	public AOCipher getCipher() {
-		return cipher;
+		return this.cipher;
 	}
 
 	private static CipherConfigures[] configures = null;
@@ -73,12 +73,12 @@ public class CipherConfig {
 	 * @param algoritmo
 	 */
 	private void configurarCipher(String algoritmo) {
-		cipherAlgoritm = AOCipherAlgorithm.getValueOf(algoritmo);
+		this.cipherAlgoritm = AOCipherAlgorithm.getValueOf(algoritmo);
         // Recogemos la configuracion actual
-        config = new AOCipherConfig(cipherAlgoritm,null,null);
+		this.config = new AOCipherConfig(this.cipherAlgoritm,null,null);
         
         // Iniciamos el cifrador
-        cipher = getCipher(config);
+		this.cipher = getCipher(this.config);
 	}
 	
 	/**

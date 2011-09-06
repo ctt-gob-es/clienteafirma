@@ -10,22 +10,21 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
+import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
 
-import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCertificateKeyException;
-import es.gob.afirma.exceptions.AOException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.KeyStoreConfiguration;
-import es.gob.afirma.misc.AOConstants;
-import es.gob.afirma.misc.AOCryptoUtil;
-import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.common.AOKeyStore;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
 
 /**
  * Utilidades para las multifirmas
@@ -44,16 +43,14 @@ public class MultisignUtils {
     public AOKeyStoreManager getAOKeyStoreManager(KeyStoreConfiguration kssc, Component padre) throws AOException {
         PasswordCallback pssCallback;
 
-        AOConstants.AOKeyStore store = kssc.getType();
-        if (store == AOConstants.AOKeyStore.WINDOWS || 
-        		store == AOConstants.AOKeyStore.WINROOT || 
-        		store == AOConstants.AOKeyStore.SINGLE) pssCallback = new NullPasswordCallback();
+        AOKeyStore store = kssc.getType();
+        if (store == AOKeyStore.WINDOWS || 
+        		store == AOKeyStore.WINROOT || 
+        		store == AOKeyStore.SINGLE) pssCallback = new NullPasswordCallback();
         else 
         	pssCallback = new UIPasswordCallback(
-    			Messages.getString("Msg.pedir.contraenia") + 
-				" " + 
-				store.getDescription() + 
-				". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null);
+    			Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
+				null);
 
         try {
 	        return AOKeyStoreManagerFactory.getAOKeyStoreManager(
@@ -65,7 +62,7 @@ public class MultisignUtils {
 	        );
         }
         catch(final Exception e) {
-        	throw new AOException("Error inicializando el almacen", e);
+        	throw new AOException("Error inicializando el almacen", e); //$NON-NLS-1$
         }
         
     }
@@ -83,28 +80,28 @@ public class MultisignUtils {
         PrivateKeyEntry privateKeyEntry = null;
         
         // Seleccionamos un certificado
-        String selectedcert = AOUIManager.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), padre, true, true, true);
+        String selectedcert = KeyStoreUtilities.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), padre, true, true, true);
 
         // Comprobamos si se ha cancelado la seleccion
         if (selectedcert == null) 
         	throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
 
-        AOConstants.AOKeyStore store = kssc.getType();
+        AOKeyStore store = kssc.getType();
         try {
         	privateKeyEntry = keyStoreManager.getKeyEntry(
                         selectedcert,
-                        AOCryptoUtil.getCertificatePC(store, padre)
+                        KeyStoreUtilities.getCertificatePC(store, padre)
                         );
-            } catch (AOCertificateKeyException e) {
-                throw e;
+            } catch (KeyException e) {
+                throw new AOException("Error obteniendo la clave privada del certificado", e); //$NON-NLS-1$
             } catch (AOCancelledOperationException e) {
                 // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
                 // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
                 // que las relanza en forma de AOException
                 throw e;
             } catch (Exception e) {
-                logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e);
-                throw new AOException(e.getMessage());
+                logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+                throw new AOException("No se ha podido recuperar el certificado seleccionado", e); //$NON-NLS-1$
             }
             
         return privateKeyEntry;
