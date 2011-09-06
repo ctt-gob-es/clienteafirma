@@ -17,14 +17,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import javax.script.ScriptEngineManager;
 
 import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOBootUtil;
@@ -298,7 +297,18 @@ final class CheckAndInstallMissingParts {
             sb.append("; ");
         }
         try {
-            new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");    
+            Class<?> scriptEngineManagerClass = Class.forName("javax.script.ScriptEngineManager");
+            Object scriptEngineManager = scriptEngineManagerClass.newInstance();
+            Method getEngineByNameMethod = scriptEngineManagerClass.getMethod("getEngineByName", String.class);
+            
+            Object scriptEngine = getEngineByNameMethod.invoke(scriptEngineManager, "AppleScript");
+            
+            Class<?> scriptEngineClass = Class.forName("javax.script.ScriptEngine");
+            Method evalMethod = scriptEngineClass.getMethod("eval", String.class);
+            
+            evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges");
+            
+            //new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");    
         }
         catch(final Exception e) {
             AfirmaBootLoader.LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e);
