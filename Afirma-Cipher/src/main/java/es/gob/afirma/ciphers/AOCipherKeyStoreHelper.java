@@ -30,6 +30,8 @@ import es.gob.afirma.core.misc.Platform;
 /** Utilidades para el manejo de claves de cifrado en el almac&eacute;n privado
  * de AFirma. */
 public final class AOCipherKeyStoreHelper {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Almac&eacute;n de claves de cifrado. */
     private KeyStore ks;
@@ -47,20 +49,20 @@ public final class AOCipherKeyStoreHelper {
      *         Cuando ocurre cualquier problema durante el proceso de
      *         almacenado */
     public void storeKey(final String alias, final Key key) throws AOException {
-        if (ks == null) {
-            throw new AOException("No se puede almacenar una clave en un almacen no inicializado");
+        if (this.ks == null) {
+            throw new AOException("No se puede almacenar una clave en un almacen no inicializado"); //$NON-NLS-1$
         }
         try {
-            ks.setKeyEntry(alias, key, pss, null);
+            this.ks.setKeyEntry(alias, key, this.pss, null);
         }
         catch (final Exception e) {
-            throw new AOException("Error almacenando la clave en el almacen", e);
+            throw new AOException("Error almacenando la clave en el almacen", e); //$NON-NLS-1$
         }
         try {
-            ks.store(new BufferedOutputStream(new FileOutputStream(new File(getCipherKeystore()))), pss);
+            this.ks.store(new BufferedOutputStream(new FileOutputStream(new File(getCipherKeystore()))), this.pss);
         }
         catch (final Exception e) {
-            throw new AOException("Error guardando el almacen de claves", e);
+            throw new AOException("Error guardando el almacen de claves", e); //$NON-NLS-1$
         }
     }
 
@@ -70,10 +72,10 @@ public final class AOCipherKeyStoreHelper {
     public String[] getAliases() {
         final Enumeration<String> aliases;
         try {
-            aliases = ks.aliases();
+            aliases = this.ks.aliases();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error obteniendo los alias del almacen, se devolvera una lista vacia: " + e);
+            LOGGER.severe("Error obteniendo los alias del almacen, se devolvera una lista vacia: " + e); //$NON-NLS-1$
             return new String[0];
         }
         final Vector<String> tmpRet = new Vector<String>();
@@ -88,33 +90,31 @@ public final class AOCipherKeyStoreHelper {
      * @throws AOException
      *         Cuando se produce un error al crear el almac&eacute;n. */
     private void createCipherKeyStore() throws AOException {
-        if (ks == null) {
+        if (this.ks == null) {
             try {
-                ks = KeyStore.getInstance("JCEKS");
+                this.ks = KeyStore.getInstance("JCEKS"); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                throw new AOException("Error obteniendo una instancia de KeyStore JCE", e);
+                throw new AOException("Error obteniendo una instancia de KeyStore JCE", e); //$NON-NLS-1$
             }
         }
         if (new File(getCipherKeystore()).exists()) {
-            Logger.getLogger("es.gob.afirma").warning("Se ha pedido crear un almacen de claves, pero ya existia (" + getCipherKeystore()
-                                                      + "), se borrara el existente y se creara uno nuevo");
-            new File(getCipherKeystore()).delete();
+            throw new AOException("Se ha pedido crear un almacen de claves, pero ya existia uno (" + getCipherKeystore() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         try {
-            ks.load(null, pss);
+            this.ks.load(null, this.pss);
         }
         catch (final Exception e) {
-            throw new AOException("Error creando un KeyStore vacio", e);
+            throw new AOException("Error creando un KeyStore vacio", e); //$NON-NLS-1$
         }
         try {
-            ks.store(new FileOutputStream(new File(getCipherKeystore())), pss);
+            this.ks.store(new FileOutputStream(new File(getCipherKeystore())), this.pss);
         }
         catch (final Exception e) {
-            throw new AOException("Error guardando en disco el KeyStore vacio", e);
+            throw new AOException("Error guardando en disco el KeyStore vacio", e); //$NON-NLS-1$
         }
         if (!new File(getCipherKeystore()).exists()) {
-            throw new AOException("Se creo el KeyStore sin errores, pero este no aparece en el disco");
+            throw new AOException("Se creo el KeyStore sin errores, pero este no aparece en el disco"); //$NON-NLS-1$
         }
     }
 
@@ -124,16 +124,16 @@ public final class AOCipherKeyStoreHelper {
      * @throws IOException
      *         Cuando se inserta una clave incorrecta. */
     public void loadCipherKeyStore() throws AOException, IOException {
-        if (ks == null) {
+        if (this.ks == null) {
             try {
-                ks = KeyStore.getInstance("JCEKS");
+                this.ks = KeyStore.getInstance("JCEKS"); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                throw new AOException("Error al instalanciar un almacen de claves", e);
+                throw new AOException("Error al instalanciar un almacen de claves JCEKS", e); //$NON-NLS-1$
             }
         }
         if (!new File(getCipherKeystore()).exists()) {
-            Logger.getLogger("es.gob.afirma").warning("El almacen no existe, se creara uno nuevo");
+            LOGGER.warning("El almacen no existe, se creara uno nuevo"); //$NON-NLS-1$
             createCipherKeyStore();
         }
         final InputStream ksIs;
@@ -141,22 +141,21 @@ public final class AOCipherKeyStoreHelper {
             ksIs = new FileInputStream(new File(getCipherKeystore()));
         }
         catch (final IOException e) {
-            throw new AOException("Error al cargar el almacen de claves de cifrado", e);
+            throw new AOException("Error al cargar el almacen de claves de cifrado", e); //$NON-NLS-1$
         }
         try {
-            ks.load(new BufferedInputStream(ksIs), pss);
-        }
-        catch (final IOException e) {
-            throw new IOException("La clave insertada no es valida: " + e);
+            this.ks.load(new BufferedInputStream(ksIs), this.pss);
         }
         catch (final Exception e) {
-            throw new AOException("Error al cargar el almacen de claves de cifrado", e);
+            throw new AOException("Error al cargar el almacen de claves de cifrado", e); //$NON-NLS-1$
         }
         finally {
             try {
                 ksIs.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Ignoramos los errores en el cierre
+            }
         }
     }
 
@@ -169,10 +168,10 @@ public final class AOCipherKeyStoreHelper {
      *         Cuando ocurre cualquier problema durante el proceso */
     public Key getKey(final String alias) throws AOException {
         try {
-            return ks.getKey(alias, pss);
+            return this.ks.getKey(alias, this.pss);
         }
         catch (final Exception e) {
-            throw new AOException("Error recuperando la contrasena con alias '" + alias + "'", e);
+            throw new AOException("Error recuperando la contrasena con alias '" + alias + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -186,9 +185,9 @@ public final class AOCipherKeyStoreHelper {
      *         Cuando la contrase&ntilde;a es incorrecta. */
     public AOCipherKeyStoreHelper(final char[] p) throws AOException, IOException {
         if (p == null) {
-            throw new IllegalArgumentException("Se necesita una contrasena para instanciar la clase");
+            throw new IllegalArgumentException("Se necesita una contrasena para instanciar la clase"); //$NON-NLS-1$
         }
-        pss = p.clone();
+        this.pss = p.clone();
         loadCipherKeyStore();
     }
 

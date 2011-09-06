@@ -85,11 +85,12 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
 
     }
 
-    /** return an SignedAndEnvelopedData object from the given object.
+    /** Obtiene un SignedAndEnvelopedData a partir de un objeto dado (que puede ser una secuencia ASN.1 o un mismo SignedAndEnvelopedData)
      * @param obj
-     *        the object we want converted.
+     *        El objeto que queremos convertir en un SignedAndEnvelopedData
+     * @return SignedAndEnvelopedData creado a partir del objeto proporcionado
      * @exception IllegalArgumentException
-     *            if the object cannot be converted. */
+     *            si el objeto de entrada no puede ser convertido */
     public static SignedAndEnvelopedData getInstance(final Object obj) {
         if (obj == null || obj instanceof SignedAndEnvelopedData) {
             return (SignedAndEnvelopedData) obj;
@@ -102,6 +103,8 @@ public final class SignedAndEnvelopedData extends ASN1Encodable {
         throw new IllegalArgumentException("EnvelopedData invalido: " + obj.getClass().getName()); //$NON-NLS-1$
     }
 
+    /** Obtiene la versi&oacute;n de la especificaci&oacute;n usada. 
+     * @return La versi&oacute;n es siempre <code>1</code>*/
     public DERInteger getVersion() {
         return this.version;
     }
