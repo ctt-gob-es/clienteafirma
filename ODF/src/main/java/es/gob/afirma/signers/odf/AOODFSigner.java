@@ -612,11 +612,6 @@ public final class AOODFSigner implements AOSigner {
         return originalName + inTextInt + ".odf"; //$NON-NLS-1$
     }
 
-    /** M&eacute;todo no implementado. */
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
-        // No soportado, se ignora la llamada
-    }
-
     private static void writeXML(final OutputStream outStream, final Node node, final boolean indent) {
         writeXML(new BufferedWriter(new OutputStreamWriter(outStream, Charset.forName("UTF-8"))), node, indent); //$NON-NLS-1$
     }

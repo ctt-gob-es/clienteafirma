@@ -377,25 +377,13 @@ public final class AOCMSSigner implements AOSigner {
         this.uatrib.put(oid, value);
     }
 
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
-
-        // No permitimos el cambio del tipo de dato. CMS/CAdES establece que
-        // siempre
-        // sera de tipo DATA
-        // this.dataType = objectIdentifier;
-
-    }
-
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException, AOException {
-
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
-
         if (!ValidateCMSSignedData.isCMSSignedData(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
-
         return new ObtainContentSignedData().obtainData(signData);
     }
 

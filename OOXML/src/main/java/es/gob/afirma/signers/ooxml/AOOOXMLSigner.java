@@ -221,10 +221,6 @@ public final class AOOOXMLSigner implements AOSigner {
         return isOOXMLFile(data);
     }
 
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
-        // No soportado, se ignora la llamada
-    }
-
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
         return addNewSign(data, algorithm, keyEntry, extraParams);
     }

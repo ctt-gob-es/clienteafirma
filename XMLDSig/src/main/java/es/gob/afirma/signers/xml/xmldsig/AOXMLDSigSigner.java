@@ -113,6 +113,10 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * <dt>ignoreStyleSheets</dt>
  * <dd>Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, si se establece a <code>false</code>
  * s&iacute; las firma</dd>
+ * <dt>mimeType</dt>
+ * <dd>MIME-Type de los datos a firmar</dd>
+ * <dt>encoding</dt>
+ * <dd>Codificaci&oacute;n de los datos a firmar</dd>
  * <dt>avoidBase64Transforms</dt>
  * <dd>No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, si se establece a <code>false</code>
  * act&uacute;a normalmente (s&iacute; las declara)</dd> <!--
@@ -212,12 +216,6 @@ public final class AOXMLDSigSigner implements AOSigner {
     private String algo;
     private Document doc;
 
-    /** Codificaci&oacute;n del contenido a firmar. */
-    private String encoding = null;
-
-    /** Tipo de contenido a firmar. */
-    private String mimeType = null;
-
     static {
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
             public Void run() {
@@ -259,7 +257,12 @@ public final class AOXMLDSigSigner implements AOSigner {
         final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty("ignoreStyleSheets", "true")); //$NON-NLS-1$ //$NON-NLS-2$
         final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", "false")); //$NON-NLS-1$ //$NON-NLS-2$
         final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", "true")); //$NON-NLS-1$ //$NON-NLS-2$
-
+        String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
+        String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+        if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
+            encoding = XMLConstants.BASE64_ENCODING;
+        }
+        
         URI uri = null;
         try {
             uri = new URI(extraParams.getProperty("uri")); //$NON-NLS-1$
@@ -365,20 +368,20 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 // Si no hay asignado un MimeType o es el por defecto
                 // establecemos el de XML
-                if (this.mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(this.mimeType)) {
-                    this.mimeType = "text/xml"; //$NON-NLS-1$
+                if (mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(mimeType)) {
+                    mimeType = "text/xml"; //$NON-NLS-1$
                 }
 
-                if (this.encoding == null) {
-                    this.encoding = docum.getXmlEncoding();
+                if (encoding == null) {
+                    encoding = docum.getXmlEncoding();
                 }
 
                 // Ademas del encoding, sacamos otros datos del doc XML original
 
                 // Hacemos la comprobacion del base64 por si se establecido
                 // desde fuera
-                if (this.encoding != null && !XMLConstants.BASE64_ENCODING.equals(this.encoding)) {
-                    originalXMLProperties.put(OutputKeys.ENCODING, this.encoding);
+                if (encoding != null && !XMLConstants.BASE64_ENCODING.equals(encoding)) {
+                    originalXMLProperties.put(OutputKeys.ENCODING, encoding);
                 }
                 String tmpXmlProp = docum.getXmlVersion();
                 if (tmpXmlProp != null) {
@@ -395,8 +398,8 @@ public final class AOXMLDSigSigner implements AOSigner {
                 if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED)) {
                     dataElement = docum.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "MimeType", this.mimeType); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "Encoding", this.encoding); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
                     dataElement.appendChild(docum.getDocumentElement());
 
                     // Tambien el estilo
@@ -437,13 +440,13 @@ public final class AOXMLDSigSigner implements AOSigner {
                     final Document docFile = dbf.newDocumentBuilder().newDocument();
                     dataElement = docFile.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     uri = null;
-                    this.encoding = XMLConstants.BASE64_ENCODING;
-                    if (this.mimeType == null) {
-                        this.mimeType = XMLConstants.DEFAULT_MIMETYPE;
+                    encoding = XMLConstants.BASE64_ENCODING;
+                    if (mimeType == null) {
+                        mimeType = XMLConstants.DEFAULT_MIMETYPE;
                     }
 
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "Encoding", this.encoding); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
 
                     // Si es base 64, lo firmamos indicando como contenido el
                     // dato pero, ya que puede
@@ -460,8 +463,8 @@ public final class AOXMLDSigSigner implements AOSigner {
                         final byte[] decodedData = Base64.decode(data);
                         final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
                         final String tempMimeType = mimeTypeHelper.getMimeType();
-                        this.mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
-                        dataElement.setAttributeNS(null, "MimeType", this.mimeType); //$NON-NLS-1$
+                        mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
+                        dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
                         dataElement.setTextContent(Base64.encode(decodedData));
                     }
                     else {
@@ -469,7 +472,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                               .info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
 
                         // Usamos el MimeType identificado
-                        dataElement.setAttributeNS(null, "MimeType", this.mimeType); //$NON-NLS-1$
+                        dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
                         dataElement.setTextContent(Base64.encode(data));
                         wasEncodedToBase64 = true;
                     }
@@ -533,7 +536,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
             dataElement = docFile.createElement(DETACHED_CONTENT_ELEMENT_NAME);
 
-            this.encoding = XMLConstants.BASE64_ENCODING;
+            encoding = XMLConstants.BASE64_ENCODING;
             // En el caso de la firma explicita, se firma el Hash de los datos
             // en lugar de los propios datos.
             // En este caso, los indicaremos a traves del MimeType en donde
@@ -544,17 +547,17 @@ public final class AOXMLDSigSigner implements AOSigner {
             // establecido desde fuera.
             String hashAlgoUri;
             if (precalculatedHashAlgorithm != null) {
-                this.mimeType = "hash/" + precalculatedHashAlgorithm.toLowerCase(); //$NON-NLS-1$
+                mimeType = "hash/" + precalculatedHashAlgorithm.toLowerCase(); //$NON-NLS-1$
                 hashAlgoUri = XMLConstants.MESSAGEDIGEST_ALGOS_URI.get(precalculatedHashAlgorithm.toLowerCase());
             }
             else {
-                this.mimeType = "hash/sha1"; //$NON-NLS-1$
+                mimeType = "hash/sha1"; //$NON-NLS-1$
                 hashAlgoUri = XMLConstants.MESSAGEDIGEST_ALGOS_URI.get("sha1"); //$NON-NLS-1$
             }
 
             dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-            dataElement.setAttributeNS(null, "MimeType", this.mimeType); //$NON-NLS-1$
-            dataElement.setAttributeNS(null, "Encoding", this.encoding); //$NON-NLS-1$
+            dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
+            dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
             if (hashAlgoUri != null) {
                 dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri); // TODO: Aqui se agrega el atributo a la Detached Explicita //$NON-NLS-1$
             }
@@ -646,7 +649,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                 }
 
                 final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-                envelopingObject = fac.newXMLObject(structures, objectId, this.mimeType, this.encoding);
+                envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
 
                 // crea la referencia al nuevo elemento Object
                 referenceList.add(fac.newReference("#" + objectId, digestMethod, transformList, OBJURI, referenceId)); //$NON-NLS-1$
@@ -976,9 +979,6 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
 
-        this.encoding = null;
-        this.mimeType = null;
-
         // Si no es enveloped quito los valores para que no se inserte la
         // cabecera de hoja de estilo
         if (!format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)) {
@@ -1119,11 +1119,6 @@ public final class AOXMLDSigSigner implements AOSigner {
         final ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
         XMLUtils.outputDOM(elementRes, baosSig);
         return baosSig.toByteArray();
-    }
-
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mime, final String enc) {
-        this.mimeType = mime;
-        this.encoding = ("base64".equalsIgnoreCase(enc)) ? XMLConstants.BASE64_ENCODING : enc; //$NON-NLS-1$
     }
 
     public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
@@ -1390,6 +1385,10 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+        String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+        if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
+            encoding = XMLConstants.BASE64_ENCODING;
+        }
 
         this.algo = algorithm;
 
@@ -1404,21 +1403,16 @@ public final class AOXMLDSigSigner implements AOSigner {
         try {
             this.doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
 
-            // === Tomamos la configuracion del XML que contrafirmamos ===
-            // Si no hay asignado un MimeType o es el por defecto establecemos
-            // el de XML
-            if (this.mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(this.mimeType)) {
-                this.mimeType = "text/xml"; //$NON-NLS-1$
-            }
-            if (this.encoding == null) {
-                this.encoding = this.doc.getXmlEncoding();
+            // Tomamos la configuracion del XML que contrafirmamos
+            if (encoding == null) {
+                encoding = this.doc.getXmlEncoding();
             }
 
             // Ademas del encoding, sacamos otros datos del doc XML original
             // Hacemos la comprobacion del base64 por si se establecido desde
             // fuera
-            if (this.encoding != null && !XMLConstants.BASE64_ENCODING.equalsIgnoreCase(this.encoding)) {
-                originalXMLProperties.put(OutputKeys.ENCODING, this.encoding);
+            if (encoding != null && !XMLConstants.BASE64_ENCODING.equalsIgnoreCase(encoding)) {
+                originalXMLProperties.put(OutputKeys.ENCODING, encoding);
             }
             String tmpXmlProp = this.doc.getXmlVersion();
             if (tmpXmlProp != null) {
@@ -1431,11 +1425,6 @@ public final class AOXMLDSigSigner implements AOSigner {
                     originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM, tmpXmlProp);
                 }
             }
-
-            // Nos aseguramos que la configuracion no afectara a operaciones
-            // futuras
-            this.encoding = null;
-            this.mimeType = null;
 
             root = this.doc.getDocumentElement();
 

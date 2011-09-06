@@ -96,16 +96,16 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * @return Nombre apropiado para el fichero de firma. */
     String getSignedName(String originalName, String inText);
 
-    /** Establece el formato que tienen los datos que se firman.
-     * @param description
-     *        Descripci&oacute;n opcional del elemento DataObjectFormat
-     * @param objectIdentifier
-     *        Instancia de <code>ObjectIdentifier</code>
-     * @param mimeType
-     *        MimeType de los datos. Por defecto <code>application/octet-stream</code>
-     * @param encoding
-     *        Codificaci&oacute;n de los datos. Por defecto <code>base64</code> */
-    void setDataObjectFormat(String description, String objectIdentifier, String mimeType, String encoding);
+//    /** Establece el formato que tienen los datos que se firman.
+//     * @param description
+//     *        Descripci&oacute;n opcional del elemento DataObjectFormat
+//     * @param objectIdentifier
+//     *        Instancia de <code>ObjectIdentifier</code>
+//     * @param mimeType
+//     *        MimeType de los datos. Por defecto <code>application/octet-stream</code>
+//     * @param encoding
+//     *        Codificaci&oacute;n de los datos. Por defecto <code>base64</code> */
+//    void setDataObjectFormat(String description, String objectIdentifier, String mimeType, String encoding);
 
     /** Recupera los datos originalmente firmados de la firma pasada por
      * par&aacute;metro. En caso de no contener la firma los datos firmados, se

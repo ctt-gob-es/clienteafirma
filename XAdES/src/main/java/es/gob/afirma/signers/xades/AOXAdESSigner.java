@@ -51,7 +51,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.java.xades.security.xml.XAdES.DataObjectFormat;
 import net.java.xades.security.xml.XAdES.DataObjectFormatImpl;
-import net.java.xades.security.xml.XAdES.ObjectIdentifier;
 import net.java.xades.security.xml.XAdES.ObjectIdentifierImpl;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifier;
 import net.java.xades.security.xml.XAdES.SignaturePolicyIdentifierImpl;
@@ -130,6 +129,12 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
  * <dt>referencesDigestMethod</dt>
  * <dd>Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod)</dd>
+ * <dt>mimeType</dt>
+ * <dd>MIME-Type de los datos a firmar</dd>
+ * <dt>encoding</dt>
+ * <dd>Codificaci&oacute;n de los datos a firmar</dd>
+ * <dt>oid<dt>
+ * <dd>OID que identifica el tipo de datos a firmar</dd>
  * <dt>canonicalizationAlgorithm</dt>
  * <dd>Algoritmo de canonicalizaci&oacute;n</dd>
  * <dt>xadesNamespace</dt>
@@ -240,13 +245,6 @@ public final class AOXAdESSigner implements AOSigner {
     private String algo;
     private Document doc;
 
-    // Esta variable solo aplica a XAdES 1.3.2, esta deprecada en XAdES1.4.1
-    private String dataObjectFormatDescription = null;
-    private ObjectIdentifier objectIdentifier = null;
-
-    private String mimeType = null;
-    private String encoding = null;
-
     static {
         AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
             public Void run() {
@@ -290,6 +288,13 @@ public final class AOXAdESSigner implements AOSigner {
         final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", "false")); //$NON-NLS-1$ //$NON-NLS-2$
         final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", "true")); //$NON-NLS-1$ //$NON-NLS-2$
         final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
+        String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+        if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
+            encoding = XMLConstants.BASE64_ENCODING;
+        }
+        String oid = extraParams.getProperty("oid"); //$NON-NLS-1$
+        final ObjectIdentifierImpl objectIdentifier = (oid != null) ? new ObjectIdentifierImpl("OIDAsURN", (oid.startsWith("urn:oid:") ? "" : "urn:oid:") + oid, null, new ArrayList<String>(0)) : null; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         URI uri = null;
         try {
@@ -391,19 +396,19 @@ public final class AOXAdESSigner implements AOSigner {
 
                 // Si no hay asignado un MimeType o es el por defecto
                 // establecemos el de XML
-                if (this.mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(this.mimeType)) {
-                    this.mimeType = "text/xml"; //$NON-NLS-1$
+                if (mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(mimeType)) {
+                    mimeType = "text/xml"; //$NON-NLS-1$
                 }
 
                 // Obtenemos el encoding del documento original
-                if (this.encoding == null) {
-                    this.encoding = docum.getXmlEncoding();
+                if (encoding == null) {
+                    encoding = docum.getXmlEncoding();
                 }
 
                 // Hacemos la comprobacion del base64 por si se establecido
                 // desde fuera
-                if (this.encoding != null && !XMLConstants.BASE64_ENCODING.equals(this.encoding)) {
-                    originalXMLProperties.put(OutputKeys.ENCODING, this.encoding);
+                if (encoding != null && !XMLConstants.BASE64_ENCODING.equals(encoding)) {
+                    originalXMLProperties.put(OutputKeys.ENCODING, encoding);
                 }
 
                 String tmpXmlProp = docum.getXmlVersion();
@@ -421,8 +426,8 @@ public final class AOXAdESSigner implements AOSigner {
                 if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
                     dataElement = docum.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "MimeType", this.mimeType); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "Encoding", this.encoding); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
                     dataElement.appendChild(docum.getDocumentElement());
 
                     // Tambien el estilo
@@ -464,13 +469,13 @@ public final class AOXAdESSigner implements AOSigner {
                     final Document docFile = dbf.newDocumentBuilder().newDocument();
                     dataElement = docFile.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     uri = null;
-                    this.encoding = XMLConstants.BASE64_ENCODING;
-                    if (this.mimeType == null) {
-                        this.mimeType = XMLConstants.DEFAULT_MIMETYPE;
+                    encoding = XMLConstants.BASE64_ENCODING;
+                    if (mimeType == null) {
+                        mimeType = XMLConstants.DEFAULT_MIMETYPE;
                     }
 
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "Encoding", this.encoding); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
 
                     // Si es base 64, lo firmamos indicando como contenido el
                     // dato pero, ya que puede
@@ -487,15 +492,15 @@ public final class AOXAdESSigner implements AOSigner {
                         final byte[] decodedData = Base64.decode(data);
                         final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
                         final String tempMimeType = mimeTypeHelper.getMimeType();
-                        this.mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
-                        dataElement.setAttributeNS(null, "MimeType", this.mimeType); //$NON-NLS-1$
+                        mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
+                        dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
                         dataElement.setTextContent(Base64.encodeBytes(decodedData));
                     }
                     else {
                         LOGGER.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
 
                         // Usamos el MimeType identificado
-                        dataElement.setAttributeNS(null, "MimeType", this.mimeType); //$NON-NLS-1$
+                        dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
                         dataElement.setTextContent(Base64.encodeBytes(data));
                         wasEncodedToBase64 = true;
                     }
@@ -564,7 +569,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
             dataElement = docFile.createElement(DETACHED_CONTENT_ELEMENT_NAME);
 
-            this.encoding = XMLConstants.BASE64_ENCODING;
+            encoding = XMLConstants.BASE64_ENCODING;
             // En el caso de la firma explicita, se firma el Hash de los datos
             // en lugar de los propios datos.
             // En este caso, los indicaremos a traves del MimeType en donde
@@ -575,17 +580,17 @@ public final class AOXAdESSigner implements AOSigner {
             // establecido desde fuera.
             String hashAlgoUri;
             if (precalculatedHashAlgorithm != null) {
-                this.mimeType = "hash/" + precalculatedHashAlgorithm.toLowerCase(); //$NON-NLS-1$
+                mimeType = "hash/" + precalculatedHashAlgorithm.toLowerCase(); //$NON-NLS-1$
                 hashAlgoUri = XMLConstants.MESSAGEDIGEST_ALGOS_URI.get(precalculatedHashAlgorithm.toLowerCase());
             }
             else {
-                this.mimeType = "hash/sha1"; //$NON-NLS-1$
+                mimeType = "hash/sha1"; //$NON-NLS-1$
                 hashAlgoUri = XMLConstants.MESSAGEDIGEST_ALGOS_URI.get("sha1"); //$NON-NLS-1$
             }
 
             dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-            dataElement.setAttributeNS(null, "MimeType", this.mimeType); //$NON-NLS-1$
-            dataElement.setAttributeNS(null, "Encoding", this.encoding); //$NON-NLS-1$
+            dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
+            dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
             if (hashAlgoUri != null) {
                 dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri); //$NON-NLS-1$
             }
@@ -675,7 +680,7 @@ public final class AOXAdESSigner implements AOSigner {
                 }
 
                 final String objectId = "Object-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-                envelopingObject = fac.newXMLObject(structures, objectId, this.mimeType, this.encoding);
+                envelopingObject = fac.newXMLObject(structures, objectId, mimeType, encoding);
 
                 // crea la referencia al nuevo elemento Object
                 referenceList.add(fac.newReference("#" + objectId, digestMethod, transformList, OBJURI, referenceId)); //$NON-NLS-1$
@@ -965,14 +970,12 @@ public final class AOXAdESSigner implements AOSigner {
         // DataObjectFormat
         final ArrayList<DataObjectFormat> objectFormats = new ArrayList<DataObjectFormat>();
         final DataObjectFormat objectFormat = new DataObjectFormatImpl(
-        this.// TODO: Establecer la variable en XAdES 1.3.2, esta deprecado
-        // en XAdES 1.4.1
-                                                                 dataObjectFormatDescription,
-                                                                 this.objectIdentifier,
-                                                                 this.mimeType,
-                                                                 this.encoding,
-                                                                 "#" + referenceId); //$NON-NLS-1$
-
+             null,
+             objectIdentifier,
+             mimeType,
+             encoding,
+             "#" + referenceId //$NON-NLS-1$
+        );
         objectFormats.add(objectFormat);
         xades.setDataObjectFormats(objectFormats);
 
@@ -1049,9 +1052,6 @@ public final class AOXAdESSigner implements AOSigner {
                 LOGGER.info("No se ha eliminado el nodo padre '<AFIRMA>': " + e); //$NON-NLS-1$
             }
         }
-
-        this.encoding = null;
-        this.mimeType = null;
 
         // Si no es enveloped quito los valores para que no se inserte la
         // cabecera de hoja de estilo
@@ -1259,26 +1259,6 @@ public final class AOXAdESSigner implements AOSigner {
             spi.setQualifier(qualifier);
         }
         return spi;
-    }
-
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
-        // La descripcion ya no es valida en XAdES 1.3 y 1.4
-        // TODO: Habilitar solo para XAdES 1.3
-        if (description != null) {
-            this.dataObjectFormatDescription = description;
-        }
-        if (mimeType != null) {
-            this.mimeType = mimeType;
-        }
-        if (encoding != null && (!"".equals(encoding))) { //$NON-NLS-1$
-            this.encoding = encoding;
-        }
-        if (this.encoding.equalsIgnoreCase("base64")) { //$NON-NLS-1$
-            this.encoding = XMLConstants.BASE64_ENCODING;
-        }
-        if (objectIdentifier != null) {
-            this.objectIdentifier = new ObjectIdentifierImpl("OIDAsURN", "urn:oid:" + objectIdentifier, null, new ArrayList<String>(0)); //$NON-NLS-1$ //$NON-NLS-2$
-        }
     }
 
     public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
@@ -1547,6 +1527,11 @@ public final class AOXAdESSigner implements AOSigner {
         if (extraParams == null) {
             extraParams = new Properties();
         }
+        String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
+        if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
+            encoding = XMLConstants.BASE64_ENCODING;
+        }
+        
 
         if (sign == null) {
             throw new IllegalArgumentException("El objeto de firma no puede ser nulo"); //$NON-NLS-1$
@@ -1582,20 +1567,15 @@ public final class AOXAdESSigner implements AOSigner {
         try {
             this.doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
 
-            // Si no hay asignado un MimeType o es el por defecto establecemos
-            // el de XML
-            if (this.mimeType == null || XMLConstants.DEFAULT_MIMETYPE.equals(this.mimeType)) {
-                this.mimeType = "text/xml"; //$NON-NLS-1$
-            }
-            if (this.encoding == null) {
-                this.encoding = this.doc.getXmlEncoding();
+            if (encoding == null) {
+                encoding = this.doc.getXmlEncoding();
             }
 
             // Ademas del encoding, sacamos otros datos del doc XML original.
             // Hacemos la comprobacion del base64 por si se establecido desde
             // fuera
-            if (this.encoding != null && !XMLConstants.BASE64_ENCODING.equals(this.encoding)) {
-                originalXMLProperties.put(OutputKeys.ENCODING, this.encoding);
+            if (encoding != null && !XMLConstants.BASE64_ENCODING.equals(encoding)) {
+                originalXMLProperties.put(OutputKeys.ENCODING, encoding);
             }
             String tmpXmlProp = this.doc.getXmlVersion();
             if (tmpXmlProp != null) {
@@ -1608,11 +1588,6 @@ public final class AOXAdESSigner implements AOSigner {
                     originalXMLProperties.put(OutputKeys.DOCTYPE_SYSTEM, tmpXmlProp);
                 }
             }
-
-            // Nos aseguramos que la configuracion no afectara a operaciones
-            // futuras
-            this.encoding = null;
-            this.mimeType = null;
 
             root = this.doc.getDocumentElement();
 

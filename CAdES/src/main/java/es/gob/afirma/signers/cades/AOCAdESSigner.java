@@ -276,11 +276,6 @@ public final class AOCAdESSigner implements AOSigner {
 
     }
 
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
-        // No permitimos el cambio del tipo de dato. CMS/CAdES establece que
-        // siempre sera de tipo DATA
-    }
-
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$

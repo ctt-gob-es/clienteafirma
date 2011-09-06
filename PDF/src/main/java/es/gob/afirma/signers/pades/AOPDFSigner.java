@@ -165,10 +165,6 @@ public final class AOPDFSigner implements AOSigner {
         return originalName + inTextInt + ".pdf"; //$NON-NLS-1$
     }
 
-    public void setDataObjectFormat(final String description, final String objectIdentifier, final String mimeType, final String encoding) {
-        // Ignoramos, el tipo siempre es PDF
-    }
-
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
         
         SHA2AltNamesProvider.install();
