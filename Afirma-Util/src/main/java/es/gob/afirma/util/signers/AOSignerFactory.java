@@ -143,20 +143,25 @@ public final class AOSignerFactory {
 
     /** Obtiene un manejador para un formato de firma dado. En caso de no
      * encontrar ninguno, se devuelve <code>null</code>.
-     * @param signerID
+     * @param signFormat
      *        Formato de firma para el cual solicitamos el manejador.
      * @return Manejador capaz de firmar en el formato indicado. */
-    public final AOSigner getSigner(final String signerID) {
+    public static final AOSigner getSigner(final String signFormat) {
 
-        if (signersID.contains(signerID)) {
+        // Inicializamos las referencias estaticas
+        if (signerFactory == null) {
+            initialize();
+        }
+        
+        if (signersID.contains(signFormat)) {
             for (final String[] element : ID_SIGNERS) {
-                if (element[0].equals(signerID)) {
+                if (element[0].equals(signFormat)) {
                     return signers.get(element[1]);
                 }
             }
         }
 
-        LOGGER.warning("El formato de firma '" + signerID + "' no esta soportado, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
+        LOGGER.warning("El formato de firma '" + signFormat + "' no esta soportado, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
 
         return null;
     }
