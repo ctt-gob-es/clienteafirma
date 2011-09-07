@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 
@@ -87,7 +88,7 @@ public final class AOSignerFactory {
 
         for (int i = 0; i < ID_SIGNERS.length; i++) {
             try {
-                final AOSigner signer = (AOSigner) Class.forName(ID_SIGNERS[i][1]).newInstance();
+                final AOSigner signer = (AOSigner) AOUtil.classForName(ID_SIGNERS[i][1]).newInstance();
                 signersID.add(ID_SIGNERS[i][0]);
                 if (!signers.containsKey(ID_SIGNERS[i][1])) {
                     signers.put(ID_SIGNERS[i][1], signer);

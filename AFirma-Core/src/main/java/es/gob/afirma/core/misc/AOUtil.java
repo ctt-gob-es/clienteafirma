@@ -19,6 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
@@ -731,6 +733,28 @@ public final class AOUtil {
         }
 
         return parts.toArray(new String[0]);
+    }
+    
+    /** Carga una clase excluyendo de la ruta de b&uacute;squeda de clases las URL que no correspondan con JAR.
+     * @param className Nombre de la clase a cargar
+     * @return Clase cargada
+     * @throws ClassNotFoundException cuando no se encuentra la clase a cargar
+     */
+    public static Class<?> classForName(final String className) throws ClassNotFoundException {
+        if (className == null || "".equals(className)) { //$NON-NLS-1$
+            throw new IllegalArgumentException("La clase a cargar no puede ser nula ni vacia"); //$NON-NLS-1$
+        }
+        ClassLoader classLoader = AOUtil.class.getClassLoader();
+        if (classLoader instanceof URLClassLoader) {
+            Vector<URL> urls = new Vector<URL>();
+            for (URL url : ((URLClassLoader)classLoader).getURLs()) {
+                if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+                    urls.add(url);
+                }
+                classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+            }
+        }
+        return classLoader.loadClass(className);
     }
 }
 

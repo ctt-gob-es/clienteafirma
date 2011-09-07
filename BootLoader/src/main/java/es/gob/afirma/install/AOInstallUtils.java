@@ -18,7 +18,9 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Enumeration;
+import java.util.Vector;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200.Unpacker;
 import java.util.zip.GZIPInputStream;
@@ -421,6 +423,28 @@ final class AOInstallUtils {
                 AfirmaBootLoader.LOGGER.severe("No se ha podido crear el directorio '" + dir.getAbsolutePath() + "'");
             }
         }
+    }
+    
+    /** Carga una clase excluyendo de la ruta de b&uacute;squeda de clases las URL que no correspondan con JAR.
+     * @param className Nombre de la clase a cargar
+     * @return Clase cargada
+     * @throws ClassNotFoundException cuando no se encuentra la clase a cargar
+     */
+    public static Class<?> classForName(final String className) throws ClassNotFoundException {
+        if (className == null || "".equals(className)) { //$NON-NLS-1$
+            throw new IllegalArgumentException("La clase a cargar no puede ser nula ni vacia"); //$NON-NLS-1$
+        }
+        ClassLoader classLoader = AOInstallUtils.class.getClassLoader();
+        if (classLoader instanceof URLClassLoader) {
+            Vector<URL> urls = new Vector<URL>();
+            for (URL url : ((URLClassLoader)classLoader).getURLs()) {
+                if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+                    urls.add(url);
+                }
+                classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+            }
+        }
+        return classLoader.loadClass(className);
     }
 
 }

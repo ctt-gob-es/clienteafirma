@@ -30,6 +30,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
@@ -100,7 +101,7 @@ public class AOKeyStoreManager {
 
             final Provider pkcs7Provider;
             try {
-                pkcs7Provider = (Provider) Class.forName("es.gob.afirma.keystores.single.SingleCertKeyStoreProvider").newInstance(); //$NON-NLS-1$
+                pkcs7Provider = (Provider) AOUtil.classForName("es.gob.afirma.keystores.single.SingleCertKeyStoreProvider").newInstance(); //$NON-NLS-1$
             }
             catch(final Exception e) {
                 throw new AOKeyStoreManagerException("No se ha podido instanciar el proveedor SingleCertKeyStoreProvider", e); //$NON-NLS-1$
@@ -216,7 +217,7 @@ public class AOKeyStoreManager {
             // reinstalarlo
             if (sunMSCAPIProvider == null) {
                 try {
-                    sunMSCAPIProvider = (Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
+                    sunMSCAPIProvider = (Provider) AOUtil.classForName("sun.security.mscapi.SunMSCAPI").newInstance(); //$NON-NLS-1$
                     Security.insertProviderAt(sunMSCAPIProvider, 1);
                 }
                 catch (final Exception e) {
@@ -267,7 +268,7 @@ public class AOKeyStoreManager {
             // sunmscapi.dll tambien lo este
             if (Security.getProvider("SunMSCAPI") == null) { //$NON-NLS-1$
                 try {
-                    Security.addProvider((Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
+                    Security.addProvider((Provider) AOUtil.classForName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
                     throw new AOKeyStoreManagerException("No se ha podido instanciar el proveedor SunMSCAPI", e); //$NON-NLS-1$
@@ -276,7 +277,7 @@ public class AOKeyStoreManager {
             Provider p = Security.getProvider("SunMSCAPIAddressBook"); //$NON-NLS-1$
             if (p == null) {
                 try {
-                    p = (Provider) Class.forName("es.gob.afirma.keystores.SunMSCAPIAddressBook").newInstance(); //$NON-NLS-1$
+                    p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.SunMSCAPIAddressBook").newInstance(); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
                     throw new AOKeyStoreManagerException("No se ha posido instanciar el proveedor SunMSCAPIAddressBook", e); //$NON-NLS-1$
@@ -341,7 +342,7 @@ public class AOKeyStoreManager {
 
                 Constructor<?> sunPKCS11Contructor;
                 try {
-                    sunPKCS11Contructor = Class.forName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
+                    sunPKCS11Contructor = AOUtil.classForName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
                     throw new AOKeyStoreManagerException("No se ha podido obtener el constructor del proveedor SunPKCS11", e); //$NON-NLS-1$
@@ -396,7 +397,7 @@ public class AOKeyStoreManager {
 
             // Anadimos el proveedor de Apple
             try {
-                Security.insertProviderAt((Provider) Class.forName("com.apple.crypto.provider.Apple").newInstance(), 0); //$NON-NLS-1$
+                Security.insertProviderAt((Provider) AOUtil.classForName("com.apple.crypto.provider.Apple").newInstance(), 0); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 throw new AOException("No se ha podido instanciar el proveedor Apple", e); //$NON-NLS-1$

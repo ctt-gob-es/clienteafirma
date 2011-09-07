@@ -5,6 +5,7 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 
 /**
@@ -44,7 +45,7 @@ public class AOUIFactory {
             if (Platform.OS.ANDROID.equals(Platform.getOS())) {
                 throw new UnsupportedOperationException("No se soporta GUI en Android"); //$NON-NLS-1$
             }
-            uiManager = (AOUIManager) Class.forName("es.gob.afirma.core.ui.jse.JSEUIManager").newInstance(); //$NON-NLS-1$
+            uiManager = (AOUIManager) AOUtil.classForName("es.gob.afirma.core.ui.jse.JSEUIManager").newInstance(); //$NON-NLS-1$
             PLAIN_MESSAGE = uiManager.getPlainMessageCode();
             YES_NO_OPTION = uiManager.getYesNoOptionCode();
             WARNING_MESSAGE = uiManager.getWarningMessageCode();

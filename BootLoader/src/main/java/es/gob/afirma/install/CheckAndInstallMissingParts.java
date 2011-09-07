@@ -295,13 +295,13 @@ final class CheckAndInstallMissingParts {
 //            sb.append("; ");
 //        }
 //        try {
-//            final Class<?> scriptEngineManagerClass = Class.forName("javax.script.ScriptEngineManager");
+//            final Class<?> scriptEngineManagerClass = AOInstallUtils.classForName("javax.script.ScriptEngineManager");
 //            final Object scriptEngineManager = scriptEngineManagerClass.newInstance();
 //            final Method getEngineByNameMethod = scriptEngineManagerClass.getMethod("getEngineByName", String.class);
 //            
 //            final Object scriptEngine = getEngineByNameMethod.invoke(scriptEngineManager, "AppleScript");
 //            
-//            final Class<?> scriptEngineClass = Class.forName("javax.script.ScriptEngine");
+//            final Class<?> scriptEngineClass = AOInstallUtils.classForName("javax.script.ScriptEngine");
 //            final Method evalMethod = scriptEngineClass.getMethod("eval", String.class);
 //            
 //            evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges");
@@ -334,7 +334,7 @@ final class CheckAndInstallMissingParts {
             return false;
         }
         try {
-            Class.forName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
+            AOInstallUtils.classForName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return true;
@@ -346,7 +346,7 @@ final class CheckAndInstallMissingParts {
      * @return <code>true</code> si es necesaria la instalaci&oacute;n, <code>false</code> en caso contrario */
     boolean isSunPKCS11Needed() {
         try {
-            Class.forName("sun.security.pkcs11.SunPKCS11"); //$NON-NLS-1$
+            AOInstallUtils.classForName("sun.security.pkcs11.SunPKCS11"); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return true;

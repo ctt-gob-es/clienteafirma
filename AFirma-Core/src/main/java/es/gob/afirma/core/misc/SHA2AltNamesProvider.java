@@ -43,19 +43,19 @@ public final class SHA2AltNamesProvider extends Provider {
             // Se ignora el error
         }
         try {
-            Class.forName(sha256Class);
+            AOUtil.classForName(sha256Class);
         }
         catch(final Throwable e) {
             sha256Class = null;
         }
         try {
-            Class.forName(sha384Class);
+            AOUtil.classForName(sha384Class);
         }
         catch(final Throwable e) {
             sha384Class = null;
         }
         try {
-            Class.forName(sha512Class);
+            AOUtil.classForName(sha512Class);
         }
         catch(final Throwable e) {
             sha512Class = null;

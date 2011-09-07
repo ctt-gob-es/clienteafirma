@@ -224,9 +224,9 @@ public final class AOPDFSigner implements AOSigner {
                 // Extraemos el PKCS1 de la firma
                 try {
                     // iText antiguo
-                    final Field digestField = Class.forName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
+                    final Field digestField = AOUtil.classForName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
                     // iText nuevo
-                    //final Field digestField = Class.forName("com.itextpdf.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
+                    //final Field digestField = AOUtil.classForName("com.itextpdf.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
                     digestField.setAccessible(true);
                     pkcs1Object = digestField.get(pcks7);
                 }

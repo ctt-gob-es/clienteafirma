@@ -24,6 +24,7 @@ import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
@@ -78,7 +79,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
                 LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile); //$NON-NLS-1$
 
                 this.nssProvider =
-                        (Provider) Class.forName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
+                        (Provider) AOUtil.classForName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
                                         .getConstructor(InputStream.class)
                                         .newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
 

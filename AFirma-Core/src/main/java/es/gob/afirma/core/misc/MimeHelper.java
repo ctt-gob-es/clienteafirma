@@ -58,11 +58,11 @@ public final class MimeHelper {
         this.mimeInfo = new MimeInfo();
 
         try {
-            Method getMagicMatchMethod = Class.forName("net.sf.jmimemagic.Magic") //$NON-NLS-1$
+            Method getMagicMatchMethod = AOUtil.classForName("net.sf.jmimemagic.Magic") //$NON-NLS-1$
                 .getMethod("getMagicMatch", new Class[] { byte[].class }); //$NON-NLS-1$
             Object magicMatchObject = getMagicMatchMethod.invoke(null, this.data);
         
-            Class<?> magicMatchClass = Class.forName("net.sf.jmimemagic.MagicMatch"); //$NON-NLS-1$
+            Class<?> magicMatchClass = AOUtil.classForName("net.sf.jmimemagic.MagicMatch"); //$NON-NLS-1$
             this.mimeInfo.mType = (String) magicMatchClass.getMethod("getMimeType", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
             this.mimeInfo.extension = (String) magicMatchClass.getMethod("getExtension", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
             this.mimeInfo.description = (String) magicMatchClass.getMethod("getDescription", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
@@ -72,7 +72,7 @@ public final class MimeHelper {
         }
         catch (final Exception e) {
             try {
-                Class<?> magicMatchNotFoundException = Class.forName("net.sf.jmimemagic.MagicMatchNotFoundException"); //$NON-NLS-1$
+                Class<?> magicMatchNotFoundException = AOUtil.classForName("net.sf.jmimemagic.MagicMatchNotFoundException"); //$NON-NLS-1$
                 if (magicMatchNotFoundException.isInstance(e)) {
                     LOGGER.warning("No se pudo detectar el formato de los datos"); //$NON-NLS-1$
                 } else {

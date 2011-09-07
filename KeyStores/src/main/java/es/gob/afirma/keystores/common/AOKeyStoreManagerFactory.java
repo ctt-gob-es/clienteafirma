@@ -18,6 +18,7 @@ import java.io.InputStream;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
 
@@ -180,7 +181,7 @@ public final class AOKeyStoreManagerFactory {
         else if (store == AOKeyStore.MOZ_UNI) {
             final AOKeyStoreManager ksmUni;
             try {
-                ksmUni = (AOKeyStoreManager) Class.forName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
+                ksmUni = (AOKeyStoreManager) AOUtil.classForName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
             }
             catch(final Exception e) {
                 e.printStackTrace();

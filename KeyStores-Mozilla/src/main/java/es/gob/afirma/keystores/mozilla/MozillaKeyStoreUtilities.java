@@ -778,13 +778,13 @@ final class MozillaKeyStoreUtilities {
             sb.append("; "); //$NON-NLS-1$
         }
         try {
-            final Class<?> scriptEngineManagerClass = Class.forName("javax.script.ScriptEngineManager"); //$NON-NLS-1$
+            final Class<?> scriptEngineManagerClass = AOUtil.classForName("javax.script.ScriptEngineManager"); //$NON-NLS-1$
             final Object scriptEngineManager = scriptEngineManagerClass.newInstance();
             final Method getEngineByNameMethod = scriptEngineManagerClass.getMethod("getEngineByName", String.class); //$NON-NLS-1$
             
             final Object scriptEngine = getEngineByNameMethod.invoke(scriptEngineManager, "AppleScript"); //$NON-NLS-1$
             
-            final Class<?> scriptEngineClass = Class.forName("javax.script.ScriptEngine"); //$NON-NLS-1$
+            final Class<?> scriptEngineClass = AOUtil.classForName("javax.script.ScriptEngine"); //$NON-NLS-1$
             final Method evalMethod = scriptEngineClass.getMethod("eval", String.class); //$NON-NLS-1$
             
             evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges"); //$NON-NLS-1$ //$NON-NLS-2$
