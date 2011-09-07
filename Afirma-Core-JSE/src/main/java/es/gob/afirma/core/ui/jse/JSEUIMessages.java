@@ -65,21 +65,21 @@ final class JSEUIMessages {
         }
     }
 
-//    /** Recupera el texto identificado con la clave proporcionada y sustituye la
-//     * subcadenas "%0" por el texto proporcionado.
-//     * @param key
-//     *        Clave del texto.
-//     * @param text
-//     *        Texto que se desea insertar.
-//     * @return Recuerso textual con la subcadena sustituida. */
-//    static String getString(final String key, final String text) {
-//        try {
-//            return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
-//        }
-//        catch (final Exception e) {
-//            return '!' + key + '!';
-//        }
-//    }
+    /** Recupera el texto identificado con la clave proporcionada y sustituye la
+     * subcadenas "%0" por el texto proporcionado.
+     * @param key
+     *        Clave del texto.
+     * @param text
+     *        Texto que se desea insertar.
+     * @return Recuerso textual con la subcadena sustituida. */
+    static String getString(final String key, final String text) {
+        try {
+            return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            return '!' + key + '!';
+        }
+    }
 
 //    /** Recupera el texto identificado con la clave proporcionada y sustituye las
 //     * subcadenas de tipo "%i" por el texto en la posici&oacute;n 'i' del array

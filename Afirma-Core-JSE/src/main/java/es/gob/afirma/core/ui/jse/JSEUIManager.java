@@ -14,6 +14,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -35,6 +37,17 @@ import es.gob.afirma.core.ui.AOUIManager;
  * @version 0.4 */
 public final class JSEUIManager implements AOUIManager {
 
+
+    /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
+     * @param exts
+     *        Extensiones de fichero permitidas
+     * @param desc
+     *        Descripci&oacute;n del tipo de fichero correspondiente a
+     *        las extensiones
+     */
+    public static FileFilter getFileFilter(final String[] extensions, String description) {
+        return new ExtFilter(extensions, description);
+    }
 
     /** Pregunta al usuario por una contrase&ntilde;a.
      * @param text
@@ -168,6 +181,41 @@ public final class JSEUIManager implements AOUIManager {
 
     }
 
+    /** Filtro de caracteres ASCCI imprimibles. */
+    public static final class JTextFieldASCIIFilter extends PlainDocument {
+
+        private static final long serialVersionUID = 1979726487852842735L;
+
+        private boolean beep = false;
+
+        /** Crea un nuevo filtro para campo de entrada de texto.
+         * @param beepOnError
+         *        <code>true</code> si desea que se reproduzca un sonido
+         *        cuando el usuario introduce un caracter no v&aacute;lido,
+         *        false en caso contrario */
+        public JTextFieldASCIIFilter(final boolean beepOnError) {
+            this.beep = beepOnError;
+        }
+
+        @Override
+        public void insertString(final int offset, final String str, final AttributeSet attr) throws BadLocationException {
+            if (str == null) {
+                return;
+            }
+
+            for (int i = 0; i < str.length(); i++) {
+                if (str.charAt(i) < 32 || str.charAt(i) > 126) {
+                    if (this.beep) {
+                        Toolkit.getDefaultToolkit().beep();
+                    }
+                    return;
+                }
+            }
+            super.insertString(offset, str, attr);
+        }
+
+    }
+    
     public int showConfirmDialog(Object parentComponent, Object message, String title, int optionType, int messageType) {
         Component parent = null;
         if (parentComponent instanceof Component) {
@@ -255,6 +303,112 @@ public final class JSEUIManager implements AOUIManager {
         return null;
     }
     
+    /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
+     * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
+     * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
+     * usuario si desea sobreescribirlo. En caso de cancelar la operaci&oacute;n
+     * se devolvera null, si la operaci&oacute;n finaliza correctamente se
+     * devolver&aacute; el path completo del fichero.
+     * @param data
+     *        Datos que se desean almacenar.
+     * @param selectedFile
+     *        Nombre de fichero por defecto.
+     * @param fileFilter
+     *        Filtro de fichero para el di&aacute;logo de guardado.
+     * @param parent
+     *        Componente padre sobre el que se mostrar&aacute; el
+     *        di&aacute;logo de guardado.
+     * @return Fichero guardado.
+     * @throws NullPointerException
+     *         No se introdujeron los datos que se desean almacenar. */
+    public File saveDataToFile(final byte[] data, final File selectedFile, final FileFilter fileFilter, final Object parent) {
+
+        if (data == null) {
+            Logger.getLogger("es.gob.afirma").warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new NullPointerException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
+        }
+
+        Component parentComponent = null;
+        if (parent instanceof Component) {
+            parentComponent = (Component) parent;
+        }
+        
+        File resultFile = null;
+        boolean tryAgain = true;
+        File file = null;
+        while (tryAgain) {
+
+            tryAgain = false;
+            final JFileChooser fileChooser = new JFileChooser();
+            fileChooser.getAccessibleContext().setAccessibleName(JSEUIMessages.getString("AOUIManager.81")); //$NON-NLS-1$
+            fileChooser.getAccessibleContext().setAccessibleDescription(JSEUIMessages.getString("AOUIManager.82")); //$NON-NLS-1$
+            fileChooser.setToolTipText(JSEUIMessages.getString("AOUIManager.81")); //$NON-NLS-1$
+            fileChooser.setSelectedFile(file);
+
+            // Si se nos ha indicado un nombre de fichero por defecto, lo
+            // establecemos
+            if (selectedFile != null) {
+                fileChooser.setSelectedFile(selectedFile);
+            }
+
+            // Solo aplicamos el filtro cuando este definido para evitar que el
+            // desplegable de la ventana de guardado nos aparecezca vacio
+            if (fileFilter != null) {
+                fileChooser.setFileFilter(fileFilter);
+            }
+
+            int selectedOption = JOptionPane.YES_OPTION;
+            if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(parentComponent)) {
+                file = fileChooser.getSelectedFile();
+                if (file.exists()) {
+                    selectedOption =
+                        JOptionPane.showConfirmDialog(parentComponent,
+                                JSEUIMessages.getString("AOUIManager.77", file.getAbsolutePath()), JSEUIMessages.getString("AOUIManager.85"), JOptionPane.YES_NO_CANCEL_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
+                    if (selectedOption == JOptionPane.CANCEL_OPTION) {
+                        Logger.getLogger("es.gob.afirma").info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$ //$NON-NLS-2$
+                        return null;
+                    }
+                    // Si se ha seleccionado la opcion YES (se desea
+                    // sobreescribir) continuamos
+                    // normalmente con el guardado del fichero
+                }
+
+                if (selectedOption == JOptionPane.NO_OPTION) {
+                    tryAgain = true;
+                }
+                else { // Hemos seleccionado la opcion de sobreescribir
+                    FileOutputStream fos = null;
+                    try {
+                        fos = new FileOutputStream(file);
+                        fos.write(data);
+                    }
+                    catch (final Exception ex) {
+                        Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+                        JOptionPane.showMessageDialog(parentComponent,
+                                JSEUIMessages.getString("AOUIManager.88"), JSEUIMessages.getString("AOUIManager.89"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                        fos = null;
+                        // Volvemos a intentar guardar
+                        tryAgain = true;
+                    }
+                    if (fos != null) {
+                        try {
+                            fos.flush();
+                        }
+                        catch (final Exception e) { /** No hacemos nada. */ }
+                        try {
+                            fos.close();
+                        }
+                        catch (final Exception e) { /** No hacemos nada. */ }
+                    }
+                    resultFile = file;
+                }
+            }
+        }
+
+        // Devolvemos el path del fichero en el que se han guardado los datos
+        return resultFile;
+    }
+    
     /** Filtra los ficheros por extensi&oacute;n para los di&aacute;logos de
      * carga y guardado. Se declara como p&uacute;blico para que pueda ser usado
      * tambi&eacute;n por el interfaz de aplicaci&oacute;n de escritorio. No
@@ -316,7 +470,7 @@ public final class JSEUIManager implements AOUIManager {
         }
 
     }
-
+    
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
      * @param dialogTitle
      *        T&iacute;tulo de la ventana de di&aacute;logo.
