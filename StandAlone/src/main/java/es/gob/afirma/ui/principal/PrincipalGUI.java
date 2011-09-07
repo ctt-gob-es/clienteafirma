@@ -97,6 +97,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	}
 	
 	public PrincipalGUI() {
+	    super();
 		initComponents();
 		iniciarProveedores();
 		this.addComponentListener(new ComponentAdapter() {
