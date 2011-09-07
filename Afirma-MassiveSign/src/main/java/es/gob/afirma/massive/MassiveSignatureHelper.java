@@ -37,6 +37,13 @@ import es.gob.afirma.util.signers.AOSignerFactory;
  * entrada se corresponde con el resultado de la ejecuci&oacute;n de una
  * operaci&oacute;n. */
 public final class MassiveSignatureHelper {
+    
+    private static final String XADES_SIGNER = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
+    private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
+    
+    private static final String REG_FIELD_SEPARATOR = " - "; //$NON-NLS-1$
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Configuracion de la operaci&oacute;n masiva. */
     private MassiveSignConfiguration massiveConfiguration = null;
@@ -49,9 +56,6 @@ public final class MassiveSignatureHelper {
 
     /** Indica si el m&oacute;dulo est&aacute; inicializado. */
     private boolean isInitialized;
-
-    /** Objeto para la impresi&oacute;n de los de consola. */
-    private Logger logger;
     
     /** Contruye el m&oacute;dulo de soporte para la multifirma masiva.
      * @param configuration
@@ -61,10 +65,10 @@ public final class MassiveSignatureHelper {
     public MassiveSignatureHelper(final MassiveSignConfiguration configuration) throws AOException {
 
         if (configuration == null) {
-            throw new IllegalArgumentException("La configuracion de firma masiva no puede ser nula");
+            throw new IllegalArgumentException("La configuracion de firma masiva no puede ser nula"); //$NON-NLS-1$
         }
         if (configuration.massiveOperation == null) {
-            throw new IllegalArgumentException("La configuracion indicada no tiene establecida ninguna operacion masiva");
+            throw new IllegalArgumentException("La configuracion indicada no tiene establecida ninguna operacion masiva"); //$NON-NLS-1$
         }
 
         this.massiveConfiguration = configuration;
@@ -73,9 +77,7 @@ public final class MassiveSignatureHelper {
         this.defaultSigner = AOSignerFactory.getSigner(this.massiveConfiguration.defaultFormat);
         if (this.defaultSigner == null) {
             throw new AOException("Formato de firma no soportado: " + this.massiveConfiguration.defaultFormat); //$NON-NLS-1$
-        }
-
-        this.logger = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+        } 
         
         this.isInitialized = true;
     }
@@ -116,18 +118,17 @@ public final class MassiveSignatureHelper {
     public String signData(final String b64Data) {
 
         if (!this.isInitialized) {
-            this.logger.severe("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
-            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado");
+            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
         }
 
         if (b64Data == null) {
-            this.logger.severe("No se han introducido datos para firmar"); //$NON-NLS-1$
-            this.addLog("Operaci\u00F3n sobre datos: No se han introducido datos para firmar");
+            LOGGER.severe("No se han introducido datos para firmar"); //$NON-NLS-1$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.0")); //$NON-NLS-1$
             return null;
         }
 
-        final Properties config = (Properties) massiveConfiguration.extraParams.clone(); // Configuracion
-        config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$//$NON-NLS-2$
+        final Properties config = (Properties) this.massiveConfiguration.extraParams.clone(); // Configuracion
+        config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$
         final byte[] data = AOBase64.decode(b64Data); // Datos a
                                                                 // firmar
         String operation = null; // Para aclarar mensajes por consola
@@ -135,38 +136,38 @@ public final class MassiveSignatureHelper {
 
         // Ejecutamos la operacion que corresponda
         try {
-            if (massiveConfiguration.massiveOperation == MassiveType.SIGN) { // Firma
-                operation = "firmar"; //$NON-NLS-1$
-                signData = signDataFromData(defaultSigner, data, null, config);
+            if (this.massiveConfiguration.massiveOperation == MassiveType.SIGN) { // Firma
+                operation = "sign"; //$NON-NLS-1$
+                signData = signDataFromData(this.defaultSigner, data, null, config);
             }
-            else if (massiveConfiguration.massiveOperation == MassiveType.COSIGN) { // Cofirma
-                operation = "cofirmar"; //$NON-NLS-1$
-                signData = cosign(defaultSigner, data, config);
+            else if (this.massiveConfiguration.massiveOperation == MassiveType.COSIGN) { // Cofirma
+                operation = "cosign"; //$NON-NLS-1$
+                signData = cosign(this.defaultSigner, data, config);
             }
-            else if (massiveConfiguration.massiveOperation == MassiveType.COUNTERSIGN_ALL) { // Contraforma
+            else if (this.massiveConfiguration.massiveOperation == MassiveType.COUNTERSIGN_ALL) { // Contraforma
                                                                                              // del
                                                                                              // arbol
                                                                                              // completo
-                operation = "contrafirmar el arbol de firmas de"; //$NON-NLS-1$
-                signData = countersignTree(defaultSigner, data, config);
+                operation = "countersign tree"; //$NON-NLS-1$
+                signData = countersignTree(this.defaultSigner, data, config);
             }
             else { // Contrafirma de los nodos hoja
-                operation = "contrafirmar los nodos hoja de"; //$NON-NLS-1$
-                signData = countersignLeafs(defaultSigner, data, config);
+                operation = "countersign tree leafs"; //$NON-NLS-1$
+                signData = countersignLeafs(this.defaultSigner, data, config);
             }
         }
         catch (final AOFormatFileException e) {
-            this.logger.severe("Los datos introducidos no tienen un formato v\u00E1lido: " + e.getMessage()); //$NON-NLS-1$
-            this.addLog("Operaci\u00F3n sobre datos: Los datos introducidos no tienen un formato v\u00E1lido");
+            LOGGER.severe("Los datos introducidos no tienen un formato valido: " + e); //$NON-NLS-1$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.1")); //$NON-NLS-1$
             return null;
         }
         catch (final Exception e) {
-            this.logger.severe("Error al " + operation + " los datos introducidos: " + e.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
-            this.addLog("Operaci\u00F3n sobre datos: " + e.getMessage());
+            LOGGER.severe("Error al " + operation + " los datos introducidos: " + e.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.2") + REG_FIELD_SEPARATOR + operation + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
 
-        this.addLog("Operaci\u00F3n sobre datos: Correcta");
+        this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.3")); //$NON-NLS-1$
 
         return AOBase64.encode(signData, false);
     }
@@ -179,13 +180,12 @@ public final class MassiveSignatureHelper {
     public String signHash(final String b64Hash) {
 
         if (!this.isInitialized) {
-            this.logger.severe("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
-            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado");
+            throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
         }
 
         if (b64Hash == null) {
-            this.logger.severe("No se ha introducido un hash para firmar"); //$NON-NLS-1$
-            this.addLog("Operaci\u00F3n sobre hash: No se ha introducido un hash para firmar");
+            LOGGER.severe("No se ha introducido un hash para firmar"); //$NON-NLS-1$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.4")); //$NON-NLS-1$
             return null;
         }
 
@@ -193,7 +193,7 @@ public final class MassiveSignatureHelper {
         final byte[] hash = AOBase64.decode(b64Hash);
 
         // Solo para aclarar los posibles mensajes por consola, almacenaremos
-        String operation = "firmar";
+        String operation = "sign"; //$NON-NLS-1$
 
         // Firma resultante
         byte[] signData = null;
@@ -203,21 +203,21 @@ public final class MassiveSignatureHelper {
         config.setProperty("headLess", Boolean.toString(true)); //$NON-NLS-1$
         try {
             if (this.massiveConfiguration.massiveOperation == MassiveType.SIGN) { // Firma
-                operation = "firmar"; //$NON-NLS-1$
+                operation = "sign"; //$NON-NLS-1$
                 signData = signDataFromHash(this.defaultSigner, hash, config);
             }
             else if (this.massiveConfiguration.massiveOperation == MassiveType.COSIGN) { // Cofirma
-                operation = "cofirmar"; //$NON-NLS-1$
-                throw new UnsupportedOperationException("La cofirma de un hash no es una operacion valida");
+                operation = "cosign"; //$NON-NLS-1$
+                throw new UnsupportedOperationException("La cofirma de un hash no es una operacion valida"); //$NON-NLS-1$
             }
             else { // Contrafirma
-                operation = "contrafirmar"; //$NON-NLS-1$
-                throw new UnsupportedOperationException("La contrafirma de un hash no es una operacion valida");
+                operation = "countersign"; //$NON-NLS-1$
+                throw new UnsupportedOperationException("La contrafirma de un hash no es una operacion valida"); //$NON-NLS-1$
             }
         }
         catch (final Exception e) {
-            this.logger.severe("Error al " + operation + " el hash '" + b64Hash + "': " + e.getMessage());   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-            this.addLog("Operaci\u00F3n sobre hash: " + e.getMessage());
+            LOGGER.severe("Error al operar sobre el hash '" + b64Hash + "', '" + operation + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.5") + REG_FIELD_SEPARATOR + operation + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
 
@@ -233,13 +233,13 @@ public final class MassiveSignatureHelper {
     public String signFile(final String fileUri) {
 
         if (!this.isInitialized) {
-            this.logger.severe("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
+            LOGGER.severe("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
             throw new IllegalArgumentException("El modulo de firma masiva no ha sido inicializado"); //$NON-NLS-1$
         }
 
         if (fileUri == null) {
-            this.logger.severe("No se ha introducido un fichero para firmar"); //$NON-NLS-1$
-            this.addLog("Operaci\u00F3n sobre fichero: No se ha introducido un fichero para firmar");
+            LOGGER.severe("No se ha introducido un fichero para firmar"); //$NON-NLS-1$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.6")); //$NON-NLS-1$
             return null;
         }
 
@@ -249,8 +249,8 @@ public final class MassiveSignatureHelper {
             uri = AOUtil.createURI(fileUri);
         }
         catch (final Exception e) {
-            this.logger.severe("La URI '" + fileUri + "' no posee un formato valido: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            this.addLog("Operaci\u00F3n sobre fichero: La URI '" + fileUri + "' no posee un formato v\u00E1lido");
+            LOGGER.severe("La URI '" + fileUri + "' no posee un formato valido: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.7") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
             return null;
         }
 
@@ -260,13 +260,13 @@ public final class MassiveSignatureHelper {
             is = AOUtil.loadFile(uri);
         }
         catch (final FileNotFoundException e) {
-            this.logger.severe("No ha sido posible encontrar el fichero '" + fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-            this.addLog("Operaci\u00F3n sobre fichero: No ha sido posible encontrar el fichero '" + fileUri + "'");
+            LOGGER.severe("No ha sido posible encontrar el fichero '" + fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.8") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
             return null;
         }
         catch (final Exception e) {
-            this.logger.severe("No es posible acceder al contenido del fichero '" + fileUri + "': " + e); //$NON-NLS-2$
-            this.addLog("Operaci\u00F3n sobre fichero: No es posible acceder al contenido del fichero '" + fileUri + "'");
+            LOGGER.severe("No es posible acceder al contenido del fichero '" + fileUri + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.9") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
             return null;
         }
 
@@ -276,13 +276,13 @@ public final class MassiveSignatureHelper {
             data = AOUtil.getDataFromInputStream(is);
         }
         catch (final Exception e) {
-            this.logger.severe("No es posible leer el contenido del fichero '" + fileUri + "': " + e); //$NON-NLS-1$
-            this.addLog("Operaci\u00F3n sobre fichero: No es posible leer el contenido del fichero '" + fileUri + "'");
+            LOGGER.severe("No es posible leer el contenido del fichero '" + fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.11") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
             return null;
         }
         if (data == null) {
-            this.logger.severe("El fichero '" + fileUri + "' esta vacio"); //$NON-NLS-1$
-            this.addLog("Operaci\u00F3n sobre fichero: El fichero '" + fileUri + "' esta vacio");
+            LOGGER.severe("El fichero '" + fileUri + "' esta vacio"); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.12") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
             return null;
         }
 
@@ -292,48 +292,48 @@ public final class MassiveSignatureHelper {
             is = null;
         }
         catch (final Exception e) {
-            this.logger.warning("No se ha podido liberar el fichero '" + fileUri + "': " + e); //$NON-NLS-1$
+            LOGGER.warning("No se ha podido liberar el fichero '" + fileUri + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Ejecutamos la operacion que corresponda
         byte[] signData = null;
-        final Properties config = (Properties) massiveConfiguration.extraParams.clone();
+        final Properties config = (Properties) this.massiveConfiguration.extraParams.clone();
         config.setProperty("headLess", Boolean.toString(true));  //$NON-NLS-1$
 
         try {
-            if (massiveConfiguration.massiveOperation == MassiveType.SIGN) { // Firma
-                signData = signDataFromData(defaultSigner, data, uri, config);
+            if (this.massiveConfiguration.massiveOperation == MassiveType.SIGN) { // Firma
+                signData = signDataFromData(this.defaultSigner, data, uri, config);
             }
-            else if (massiveConfiguration.massiveOperation == MassiveType.COSIGN) { // Cofirma
-                signData = cosign(defaultSigner, data, config);
+            else if (this.massiveConfiguration.massiveOperation == MassiveType.COSIGN) { // Cofirma
+                signData = cosign(this.defaultSigner, data, config);
             }
-            else if (massiveConfiguration.massiveOperation == MassiveType.COUNTERSIGN_ALL) { // Contraforma
+            else if (this.massiveConfiguration.massiveOperation == MassiveType.COUNTERSIGN_ALL) { // Contraforma
                                                                                              // del
                                                                                              // arbol
                                                                                              // completo
-                signData = countersignTree(defaultSigner, data, config);
+                signData = countersignTree(this.defaultSigner, data, config);
             }
             else { // Contraforma de los nodos hoja
-                signData = countersignLeafs(defaultSigner, data, config);
+                signData = countersignLeafs(this.defaultSigner, data, config);
             }
         }
         catch (final AOFormatFileException e) {
-            this.logger.severe("El fichero '" + fileUri + "' no tiene un formato v\u00E1lido: " + e.getMessage());
-            this.addLog("Operaci\u00F3n sobre fichero: El fichero '" + fileUri + "' no tiene un formato v\u00E1lido");
+            LOGGER.severe("El fichero '" + fileUri + "' no tiene un formato valido: " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.13") + REG_FIELD_SEPARATOR + fileUri); //$NON-NLS-1$
             return null;
         }
         catch (final Exception e) {
-            this.logger.severe("Error al realizar la operacion "  //$NON-NLS-1$
+            LOGGER.severe("Error al realizar la operacion "  //$NON-NLS-1$
                     + this.massiveConfiguration.massiveOperation
                     + " sobre el fichero '" //$NON-NLS-1$
                     + fileUri
                     + "': " //$NON-NLS-1$
                     + e.getMessage());
-            this.addLog("Operaci\u00F3n sobre fichero: " + e.getMessage());
+            this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.14") + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
             return null;
         }
 
-        this.addLog("Operaci\u00F3n sobre fichero: Correcta");
+        this.addLog(MassiveSignMessages.getString("MassiveSignatureHelper.15")); //$NON-NLS-1$
 
         return AOBase64.encode(signData, false);
     }
@@ -362,7 +362,7 @@ public final class MassiveSignatureHelper {
         }
 
         // Deteccion del MIMEType, solo para XAdES y XMLDSig
-        if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) { //$NON-NLS-1$ //$NON-NLS-2$
+        if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
             final MimeHelper mimeHelper = new MimeHelper(data);
             final String mimeType = mimeHelper.getMimeType();
             if (mimeType != null) {
@@ -371,7 +371,7 @@ public final class MassiveSignatureHelper {
                     config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
-                    this.logger
+                    LOGGER
                           .warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
                 }
             }
@@ -401,33 +401,33 @@ public final class MassiveSignatureHelper {
      *         Cuando ocurre un error durante la operaci&oacute;n de firma. */
     private byte[] signDataFromHash(final AOSigner signer, final byte[] data, final Properties config) throws AOException {
 
-        final int pos = massiveConfiguration.algorithm.indexOf("with");
+        final int pos = this.massiveConfiguration.algorithm.indexOf("with"); //$NON-NLS-1$
         if (pos == -1) {
-            throw new AOException("El algoritmo '" + massiveConfiguration.algorithm
-                                                 + "' no esta soportado para la firma de huellas digitales");
+            throw new AOException("El algoritmo '" + this.massiveConfiguration.algorithm //$NON-NLS-1$
+                                                 + "' no esta soportado para la firma de huellas digitales"); //$NON-NLS-1$
         }
 
         // Configuramos y ejecutamos la operacion
-        config.setProperty("mode", massiveConfiguration.mode);
-        config.setProperty("format", massiveConfiguration.defaultFormat);
-        config.setProperty("precalculatedHashAlgorithm", massiveConfiguration.algorithm.substring(0, pos));
+        config.setProperty("mode", this.massiveConfiguration.mode); //$NON-NLS-1$
+        config.setProperty("format", this.massiveConfiguration.defaultFormat); //$NON-NLS-1$
+        config.setProperty("precalculatedHashAlgorithm", this.massiveConfiguration.algorithm.substring(0, pos)); //$NON-NLS-1$
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
-        if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {  //$NON-NLS-1$//$NON-NLS-2$
+        if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
             final String mimeType = "hash/" + this.massiveConfiguration.getAlgorithm().substring(0, pos).toLowerCase(); //$NON-NLS-1$
             try {
                 config.setProperty("mimeType", mimeType); //$NON-NLS-1$
                 config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                this.logger
+                LOGGER
                       .warning("Error al indicar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
             }
         }
 
         final byte[] signData = signer.sign(data, this.massiveConfiguration.getAlgorithm(), this.massiveConfiguration.getKeyEntry(), config);
         if (signData == null) {
-            throw new AOException("No se generaron datos de firma");
+            throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
         }
         return signData;
     }
@@ -451,11 +451,11 @@ public final class MassiveSignatureHelper {
         final AOSigner validSigner = this.getValidSigner(signer, sign);
 
         // Configuramos y ejecutamos la operacion
-        config.setProperty("mode", massiveConfiguration.mode);
+        config.setProperty("mode", this.massiveConfiguration.mode); //$NON-NLS-1$
 
-        final byte[] signData = validSigner.cosign(sign, massiveConfiguration.algorithm, massiveConfiguration.getKeyEntry(), config);
+        final byte[] signData = validSigner.cosign(sign, this.massiveConfiguration.algorithm, this.massiveConfiguration.getKeyEntry(), config);
         if (signData == null) {
-            throw new AOException("No se generaron datos de firma");
+            throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
         }
         return signData;
     }
@@ -518,9 +518,9 @@ public final class MassiveSignatureHelper {
         // especifico
         final AOSigner validSigner = this.getValidSigner(signer, sign);
 
-        final byte[] signData = validSigner.countersign(sign, massiveConfiguration.algorithm, target, null, massiveConfiguration.getKeyEntry(), config);
+        final byte[] signData = validSigner.countersign(sign, this.massiveConfiguration.algorithm, target, null, this.massiveConfiguration.getKeyEntry(), config);
         if (signData == null) {
-            throw new AOException("No se generaron datos de firma");
+            throw new AOException("No se generaron datos de firma"); //$NON-NLS-1$
         }
         return signData;
     }
@@ -544,13 +544,13 @@ public final class MassiveSignatureHelper {
         AOSigner validSigner = signer;
         if (!this.massiveConfiguration.originalFormat) {
             if (!signer.isSign(signData)) {
-                throw new AOException("La firma introducida no se corresponde con el formato de firma especificado");
+                throw new AOException("La firma introducida no se corresponde con el formato de firma especificado"); //$NON-NLS-1$
             }
         }
         else {
             validSigner = AOSignerFactory.getSigner(signData);
             if (validSigner == null) {
-                throw new AOException("La firma introducida no se corresponde con ning\u00FAn formato soportado");
+                throw new AOException("La firma introducida no se corresponde con ning\u00FAn formato soportado"); //$NON-NLS-1$
             }
         }
         return validSigner;
@@ -570,7 +570,7 @@ public final class MassiveSignatureHelper {
      * multifirma realizada.
      * @return Entrada de log. */
     public String getCurrentLogEntry() {
-        String lastEntry = "";
+        String lastEntry = ""; //$NON-NLS-1$
         if (this.log != null) {
             lastEntry = this.log.get(this.log.size() - 1);
         }
@@ -583,7 +583,7 @@ public final class MassiveSignatureHelper {
         final StringBuilder buffer = new StringBuilder();
         if (this.log != null) {
             for (final String logEntry : this.log) {
-                buffer.append(logEntry).append("\r\n");
+                buffer.append(logEntry).append("\r\n"); //$NON-NLS-1$
             }
         }
         return buffer.toString().trim();
@@ -595,13 +595,13 @@ public final class MassiveSignatureHelper {
 
         private final X509Certificate certificate;
         private final PrivateKeyEntry keyEntry;
-        private MassiveType massiveOperation = null;
-        private String algorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
-        private String mode = AOSignConstants.DEFAULT_SIGN_MODE;
-        private String defaultFormat = AOSignConstants.DEFAULT_SIGN_FORMAT;
-        private boolean originalFormat = true;
+        MassiveType massiveOperation = null;
+        String algorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
+        String mode = AOSignConstants.DEFAULT_SIGN_MODE;
+        String defaultFormat = AOSignConstants.DEFAULT_SIGN_FORMAT;
+        boolean originalFormat = true;
         private final String selectedAlias = null;
-        private Properties extraParams;
+        Properties extraParams;
 
         /** Crea un <i>JavaBean</i> con los par&aacute;metros necesarios para las
          * operaciones de firma masiva.
@@ -618,7 +618,7 @@ public final class MassiveSignatureHelper {
         /** Recupera la operaci&oacute;n masiva configurada.
          * @return Tipo de operaci&oacute;n masiva. */
         public MassiveType getMassiveOperation() {
-            return massiveOperation;
+            return this.massiveOperation;
         }
 
         /** Establece la operaci&oacute;n masiva que deber&aacute; ejecutarse.
@@ -631,7 +631,7 @@ public final class MassiveSignatureHelper {
         /** Recupera el algoritmo de firma configurado.
          * @return Algoritmo de firma. */
         public String getAlgorithm() {
-            return algorithm;
+            return this.algorithm;
         }
 
         /** Estable el algoritmo de firma.
@@ -644,7 +644,7 @@ public final class MassiveSignatureHelper {
         /** Recupera el modo de firma configurado.
          * @return Modo de firma. */
         public String getMode() {
-            return mode;
+            return this.mode;
         }
 
         /** Estable el modo de firma.
@@ -657,7 +657,7 @@ public final class MassiveSignatureHelper {
         /** Recupera el formato de firma configurado por defecto.
          * @return Formato de firma. */
         public String getDefaultFormat() {
-            return defaultFormat;
+            return this.defaultFormat;
         }
 
         /** Estable el formato de firma por defecto (para cuando no se desee
@@ -673,7 +673,7 @@ public final class MassiveSignatureHelper {
          * @return Devuelve {@code true} si se ha configurado que se respete el
          *         formato de firma, {@code false} en caso contrario. */
         public boolean isOriginalFormat() {
-            return originalFormat;
+            return this.originalFormat;
         }
 
         /** Estable si debe utilizarse un formato de firma original en le caso de
@@ -687,19 +687,19 @@ public final class MassiveSignatureHelper {
         /** Recupera el certificado de firma.
          * @return Certificado de firma. */
         public Certificate getCertificate() {
-            return certificate;
+            return this.certificate;
         }
 
         /** Recupera entrada de la clave de firma.
          * @return Entrada de la clave de firma. */
         public PrivateKeyEntry getKeyEntry() {
-            return keyEntry;
+            return this.keyEntry;
         }
 
         /** Recupera el alias del certificado de firma.
          * @return Alias del certficado de firma. */
         public String getSelectedAlias() {
-            return selectedAlias;
+            return this.selectedAlias;
         }
 
         /** Establece par&aacute;metros adicionales para la configuraci&oacute;n

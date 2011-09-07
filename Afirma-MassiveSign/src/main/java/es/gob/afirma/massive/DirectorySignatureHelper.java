@@ -43,8 +43,13 @@ import es.gob.afirma.util.signers.AOSignerFactory;
  * acorde con el objetivo establecido. */
 public class DirectorySignatureHelper {
 
+    private static final String REG_FIELD_SEPARATOR = " - "; //$NON-NLS-1$
+    
     /** Fichero de log por defecto. */
-    private final static String DEFAULT_LOG_FILE = "result.log"; //$NON-NLS-1$
+    private static final String DEFAULT_LOG_FILE = "result.log"; //$NON-NLS-1$
+    
+    private static final String XADES_SIGNER = "es.gob.afirma.signers.xades.AOXAdESSigner"; //$NON-NLS-1$
+    private static final String XMLDSIG_SIGNER = "es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner"; //$NON-NLS-1$
 
     /** Tipo de firma masiva. Declara los tipos de firma masiva que existen:
      * <ul>
@@ -108,7 +113,7 @@ public class DirectorySignatureHelper {
     private String logPath = null;
 
     /** Objeto para la impresi&oacute;n de los de consola. */
-    private Logger logger;
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
     /** Contruye un objeto para la firma masiva. Este objeto se
      * configurar&aacute; con un tipo de firma por defecto. Este tipo
@@ -135,8 +140,6 @@ public class DirectorySignatureHelper {
         if (this.defaultSigner == null) {
             throw new AOUnsupportedSignFormatException("El formato de firma '" + format + "' seleccionado para la firma masiva no esta soportado"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
-        this.logger = this.logger; //$NON-NLS-1$
     }
 
     /** Realiza una firma masiva sobre los ficheros de un directorio. El tipo de
@@ -235,11 +238,10 @@ public class DirectorySignatureHelper {
         }
 
         if (startDir == null) {
-            this.logger.warning("No se ha indicado un directorio de inicio, se usara el actual"); //$NON-NLS-1$ //$NON-NLS-2$
-            startDir = "."; //$NON-NLS-1$
+            LOGGER.warning("No se ha indicado un directorio de inicio, se usara el actual"); //$NON-NLS-1$
         }
 
-        final File id = new File(startDir);
+        final File id = new File((startDir != null) ? startDir : "."); //$NON-NLS-1$
         this.inDir = id.getAbsolutePath();
         if (!id.exists() || !id.isDirectory()) {
             throw new AOException("El directorio de entrada no existe"); //$NON-NLS-1$
@@ -360,19 +362,19 @@ public class DirectorySignatureHelper {
                                final X509Certificate cert,
                                final Properties config) throws AOException {
 
-        if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {
-            throw new IllegalArgumentException("No se ha establecido el formato y modo de firma");
+        if (config == null || !config.containsKey("format") || !config.containsKey("mode")) { //$NON-NLS-1$ //$NON-NLS-2$
+            throw new IllegalArgumentException("No se ha establecido el formato y modo de firma"); //$NON-NLS-1$
         }
 
         final Properties signConfig = (Properties) config.clone();
-        signConfig.setProperty("headLess", "true");
+        signConfig.setProperty("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Establecemos la configuracion de firma por defecto si no se indica
-        if (!signConfig.containsKey("mode")) {
-            signConfig.setProperty("mode", this.mode);
+        if (!signConfig.containsKey("mode")) { //$NON-NLS-1$
+            signConfig.setProperty("mode", this.mode); //$NON-NLS-1$
         }
-        if (!signConfig.containsKey("format")) {
-            signConfig.setProperty("format", this.format);
+        if (!signConfig.containsKey("format")) { //$NON-NLS-1$
+            signConfig.setProperty("format", this.format); //$NON-NLS-1$
         }
 
         // Indica si todas las operaciones se finalizaron correctamente
@@ -386,7 +388,7 @@ public class DirectorySignatureHelper {
         }
 
         if (filenames == null || filenames.length == 0) {
-            this.logger.warning("No se han proporcionado ficheros para firmar"); //$NON-NLS-1$
+            LOGGER.warning("No se han proporcionado ficheros para firmar"); //$NON-NLS-1$
             return true;
         }
 
@@ -394,7 +396,7 @@ public class DirectorySignatureHelper {
             this.outputDir = outDir;
         }
         else {
-            this.logger.warning("No se ha especificado un directorio de salida, se usara el actual"); //$NON-NLS-1$
+            LOGGER.warning("No se ha especificado un directorio de salida, se usara el actual"); //$NON-NLS-1$
             this.outputDir = "."; //$NON-NLS-1$
         }
 
@@ -427,7 +429,7 @@ public class DirectorySignatureHelper {
             allOK = this.massiveCounterSignOperation(type, files, od, originalFormat, keyEntry, cert, signConfig);
         }
         else {
-            this.logger.severe("Operacion masiva no reconocida");  //$NON-NLS-1$
+            LOGGER.severe("Operacion masiva no reconocida");  //$NON-NLS-1$
         }
         this.disposeOperation();
 
@@ -498,12 +500,11 @@ public class DirectorySignatureHelper {
         if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) { //$NON-NLS-1$ //$NON-NLS-2$
             final String mimeType = "hash/" + this.algorithm.substring(0, pos).toLowerCase(); //$NON-NLS-1$
             try {
-                signConfig.setProperty("mimeType", mimeType);
-                signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType));
+                signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
+                signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                this.logger
-                      .warning("Error al indicar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
+                LOGGER.warning("Error al indicar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
             }
         }
 
@@ -530,18 +531,18 @@ public class DirectorySignatureHelper {
         for (final String filename : filenames) {
             tempFile = new File(filename);
             if (!tempFile.exists()) {
-                this.logger.severe("El fichero '" + filename + "' no existe");
-                this.addLogRegistry(Level.SEVERE, "El fichero '" + filename + "' no existe");
+                LOGGER.severe("El fichero '" + filename + "' no existe"); //$NON-NLS-1$ //$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.0") + REG_FIELD_SEPARATOR + filename); //$NON-NLS-1$
                 continue;
             }
             if (!tempFile.isFile()) {
-                this.logger.severe("El archivo '" + filename + "' es un directorio y no puede firmarse");
-                this.addLogRegistry(Level.SEVERE, "El archivo '" + filename + "' es un directorio y no puede firmarse");
+                LOGGER.severe("El archivo '" + filename + "' es un directorio y no puede firmarse"); //$NON-NLS-1$ //$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.1") + REG_FIELD_SEPARATOR + filename); //$NON-NLS-1$
                 continue;
             }
             if (!tempFile.canRead()) {
-                this.logger.severe("No se puede leer el fichero '" + filename + "'");
-                this.addLogRegistry(Level.SEVERE, "No se puede leer el fichero '" + filename + "'");
+                LOGGER.severe("No se puede leer el fichero '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.2") + REG_FIELD_SEPARATOR + filename); //$NON-NLS-1$
                 continue;
             }
             vFiles.add(tempFile);
@@ -578,25 +579,23 @@ public class DirectorySignatureHelper {
                 this.preProcessFile(new File(file.getAbsolutePath()));
             }
             catch (final Exception e) {
-                Logger.getLogger("Error en el preproceso del fichero '" + file.getPath() + "': " + e);
+                LOGGER.warning("Error en el preproceso del fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             // Comprobamos que el fichero actual se pueda firmar con la
             // configuracion de firma actual
             try {
                 if (!this.isValidDataFile(signer, file)) {
-                    this.logger.warning("El fichero '" + file.getPath()
-                                                              + "' no puede ser firmado con la configuracion de firma actual");
-                    this.addLogRegistry(Level.WARNING, "El fichero '" + file.getPath()
-                                                       + "' no puede ser firmado con la configuracion de firma actual");
+                    LOGGER.warning("El fichero '" + file.getPath() + "' no puede ser firmado con la configuracion de firma actual"); //$NON-NLS-1$ //$NON-NLS-2$
+                    this.addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.3") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
                     this.closeStream(fis);
                     allOK = false;
                     continue;
                 }
             }
             catch (final Exception e) {
-                this.logger.warning("No se pudo leer fichero '" + file.getPath() + "': " + e); //$NON-NLS-2$ //$NON-NLS-3$
-                this.addLogRegistry(Level.SEVERE, "No se pudo leer fichero '" + file.getPath() + "'");
+                LOGGER.warning("No se pudo leer fichero '" + file.getPath() + "': " + e);  //$NON-NLS-1$//$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.4") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
                 allOK = false;
                 continue;
             }
@@ -609,8 +608,8 @@ public class DirectorySignatureHelper {
                 dataToSign = AOUtil.getDataFromInputStream(fis);
             }
             catch (final Exception e) {
-                this.logger.warning("No se pudo leer fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$
-                this.addLogRegistry(Level.SEVERE, "No se pudo leer fichero '" + file.getPath() + "'");
+                LOGGER.warning("No se pudo leer fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.4") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
                 dataToSign = null;
                 allOK = false;
                 continue;
@@ -620,7 +619,7 @@ public class DirectorySignatureHelper {
             }
 
             // Deteccion del MIMEType, solo para XAdES y XMLDSig
-            if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
                 final MimeHelper mimeHelper = new MimeHelper(dataToSign);
                 final String mimeType = mimeHelper.getMimeType();
                 if (mimeType != null) {
@@ -629,8 +628,7 @@ public class DirectorySignatureHelper {
                         signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                     }
                     catch (final Exception e) {
-                        this.logger //$NON-NLS-1$
-                              .warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
+                        LOGGER.warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
                     }
                 }
             }
@@ -641,12 +639,12 @@ public class DirectorySignatureHelper {
             }
             catch (final Exception e) {
                 if (e instanceof UnsupportedOperationException) {
-                    this.logger.severe("No ha sido posible firmar el fichero '" + file + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    this.addLogRegistry(Level.SEVERE, "No ha sido posible firmar el fichero '" + file + "': " + e.getMessage());
+                    LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+                    this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + e); //$NON-NLS-1$
                 }
                 else {
-                    this.logger.severe("No ha sido posible firmar el fichero '" + file + "': " + e);  //$NON-NLS-2$//$NON-NLS-3$
-                    this.addLogRegistry(Level.SEVERE, "No ha sido posible firmar el fichero '" + file + "'");
+                    LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
+                    this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.8") + REG_FIELD_SEPARATOR + file); //$NON-NLS-1$
                 }
                 this.closeStream(fis);
                 allOK = false;
@@ -658,8 +656,8 @@ public class DirectorySignatureHelper {
                 allOK = false;
                 continue;
             }
-            this.logger.info("El fichero '" + file.getPath() + "' se ha firmado correctamente"); //$NON-NLS-2$ //$NON-NLS-3$
-            this.addLogRegistry(Level.INFO, "El fichero '" + file.getPath() + "' se ha firmado correctamente");
+            LOGGER.info("El fichero '" + file.getPath() + "' se ha firmado correctamente");  //$NON-NLS-1$//$NON-NLS-2$
+            this.addLogRegistry(Level.INFO, MassiveSignMessages.getString("DirectorySignatureHelper.10") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
         }
         return allOK;
     }
@@ -716,27 +714,27 @@ public class DirectorySignatureHelper {
                 continue;
             }
             if (this.defaultSigner.isSign(originalData)) {
-                textAux = "cofirmado";
+                textAux = "cosign"; //$NON-NLS-1$
                 signer = this.defaultSigner;
-                signConfig.setProperty("uri", file.toURI().toASCIIString());
-                signedData = this.cosign(signer, originalData, algorithm, keyEntry, cert, signConfig);
+                signConfig.setProperty("uri", file.toURI().toASCIIString()); //$NON-NLS-1$
+                signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, cert, signConfig);
             }
             else if (originalFormat) {
                 signer = AOSignerFactory.getSigner(originalData);
                 if (signer != null) {
-                    textAux = "cofirmado";
-                    signedData = this.cosign(signer, originalData, algorithm, keyEntry, cert, signConfig);
+                    textAux = "cosign"; //$NON-NLS-1$
+                    signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, cert, signConfig);
                 }
                 else {
-                    textAux = "firmado";
+                    textAux = "sign"; //$NON-NLS-1$
                     signer = this.defaultSigner;
-                    signedData = this.sign(signer, originalData, algorithm, keyEntry, cert, signConfig);
+                    signedData = this.sign(signer, originalData, this.algorithm, keyEntry, cert, signConfig);
                 }
             }
             else {
-                textAux = "firmado";
+                textAux = "sign"; //$NON-NLS-1$
                 signer = this.defaultSigner;
-                signedData = this.sign(signer, originalData, algorithm, keyEntry, cert, signConfig);
+                signedData = this.sign(signer, originalData, this.algorithm, keyEntry, cert, signConfig);
             }
 
             // Comprobamos si la operacion ha finalizado correctamente
@@ -746,12 +744,11 @@ public class DirectorySignatureHelper {
             }
 
             // Guardamos los datos de la firma
-            if (!this.saveSignToDirectory(file.getPath(), signedData, outDir, signer, ".cosign")) {
+            if (!this.saveSignToDirectory(file.getPath(), signedData, outDir, signer, ".cosign")) { //$NON-NLS-1$
                 allOK = false;
                 continue;
             }
-            this.logger.info("El fichero '" + file.getPath() + "' se ha " + textAux + " correctamente");
-            this.addLogRegistry(Level.INFO, "El fichero '" + file.getPath() + "' se ha " + textAux + " correctamente");
+            this.addLogRegistry(Level.INFO, MassiveSignMessages.getString("DirectorySignatureHelper.11") + REG_FIELD_SEPARATOR + file.getPath() + REG_FIELD_SEPARATOR + textAux); //$NON-NLS-1$
         }
         return allOK;
     }
@@ -783,8 +780,8 @@ public class DirectorySignatureHelper {
             signedData = signer.cosign(signData, algo, keyEntry, signConfig);
         }
         catch (final Exception e) {
-            this.logger.severe("No ha sido posible cofirmar el fichero '" + signConfig.getProperty("uri") + "': " + e);
-            this.addLogRegistry(Level.SEVERE, "No ha sido posible cofirmar el fichero '" + signConfig.getProperty("uri") + "'");
+            LOGGER.severe("No ha sido posible cofirmar el fichero '" + signConfig.getProperty("uri") + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.12") + REG_FIELD_SEPARATOR + signConfig.getProperty("uri"));  //$NON-NLS-1$//$NON-NLS-2$
             signedData = null;
         }
         return signedData;
@@ -812,7 +809,7 @@ public class DirectorySignatureHelper {
                         final Properties signConfig) {
 
         // Deteccion del MIMEType, solo para XAdES y XMLDSig
-        if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) { //$NON-NLS-2$
+        if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
             final MimeHelper mimeHelper = new MimeHelper(data);
             final String mimeType = mimeHelper.getMimeType();
             if (mimeType != null) {
@@ -821,8 +818,7 @@ public class DirectorySignatureHelper {
                     signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
-                    this.logger //$NON-NLS-1$
-                          .warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
+                    LOGGER.warning("No se ha podido detectar el MIME-Type, se utilizara el por defecto y este aspecto no se indicara en el registro de firma masiva: " + e); //$NON-NLS-1$
                 }
             }
         }
@@ -833,8 +829,8 @@ public class DirectorySignatureHelper {
             signedData = signer.sign(data, algo, keyEntry, signConfig);
         }
         catch (final Exception e) {
-            this.logger.severe("No ha sido posible firmar el fichero de datos'" + signConfig.getProperty("uri") + "': " + e);
-            this.addLogRegistry(Level.SEVERE, "No ha sido posible firmar el fichero de datos '" + signConfig.getProperty("uri") + "'");
+            LOGGER.severe("No ha sido posible firmar el fichero de datos'" + signConfig.getProperty("uri") + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.15") + REG_FIELD_SEPARATOR + signConfig.getProperty("uri"));  //$NON-NLS-1$//$NON-NLS-2$
             signedData = null;
         }
         return signedData;
@@ -874,7 +870,7 @@ public class DirectorySignatureHelper {
                     signer = this.getAppropiatedSigner(file);
                 }
                 catch (final Exception e) {
-                    this.addLogRegistry(Level.SEVERE, "No ha sido posible contrafirmar el fichero '" + file + "': " + e.getMessage());
+                    this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.16") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + e); //$NON-NLS-1$
                     allOK = false;
                     continue;
                 }
@@ -888,8 +884,7 @@ public class DirectorySignatureHelper {
                 isSignFile = this.isSign(signer, file);
             }
             catch (final Exception e) {
-                this.addLogRegistry(Level.SEVERE,
-                                    "El fichero '" + file + "' no es un fichero de firma en formato '" + signConfig.getProperty("format") + "'");
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.17") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + signConfig.getProperty("format"));  //$NON-NLS-1$//$NON-NLS-2$
                 allOK = false;
                 continue;
             }
@@ -907,8 +902,8 @@ public class DirectorySignatureHelper {
                     signData = signer.countersign(AOUtil.getDataFromInputStream(fis), this.algorithm, target, null, keyEntry, signConfig);
                 }
                 catch (final Exception e) {
-                    this.logger.severe("No ha sido posible contrafirmar el fichero '" + file.getPath() + "': " + e);
-                    this.addLogRegistry(Level.SEVERE, "No ha sido posible contrafirmar el fichero '" + file.getPath() + "'");
+                    LOGGER.severe("No ha sido posible contrafirmar el fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                    this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.16") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
                     allOK = false;
                     continue;
                 }
@@ -917,23 +912,22 @@ public class DirectorySignatureHelper {
                 }
             }
             else {
-                this.logger.severe("El fichero '" + file //$NON-NLS-1$
+                LOGGER.severe("El fichero '" + file //$NON-NLS-1$
                                                          + "' no es un fichero de firma en formato '" //$NON-NLS-1$
                                                          + signConfig.getProperty("format") //$NON-NLS-1$
                                                          + "'"); //$NON-NLS-1$
-                this.addLogRegistry(Level.SEVERE,
-                                    "El fichero '" + file + "' no es un fichero de firma en formato '" + signConfig.getProperty("format") + "'");
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.17") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + signConfig.getProperty("format")); //$NON-NLS-1$ //$NON-NLS-2$
                 allOK = false;
                 continue;
             }
 
             // Guardamos la firma en disco
-            if (!this.saveSignToDirectory(file.getPath(), signData, outDir, signer, ".countersign")) {
+            if (!this.saveSignToDirectory(file.getPath(), signData, outDir, signer, ".countersign")) { //$NON-NLS-1$
                 allOK = false;
                 continue;
             }
-            this.logger.info("El fichero '" + file.getPath() + "' se ha contrafirmado correctamente");
-            this.addLogRegistry(Level.INFO, "El fichero '" + file.getPath() + "' se ha contrafirmado correctamente");
+            LOGGER.info("El fichero '" + file.getPath() + "' se ha contrafirmado correctamente"); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLogRegistry(Level.INFO, MassiveSignMessages.getString("DirectorySignatureHelper.22") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
         }
         return allOK;
     }
@@ -983,13 +977,13 @@ public class DirectorySignatureHelper {
                 createdParent = parentFile.mkdirs();
             }
             catch (final Exception e) {
-                this.logger.severe("Error al crearse la estructura de directorios del fichero '" + filename + "': " + e);
-                this.addLogRegistry(Level.SEVERE, "Error al crearse la estructura de directorios del fichero '" + filename + "'");
+                LOGGER.severe("Error al crearse la estructura de directorios del fichero '" + filename + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.23") + REG_FIELD_SEPARATOR + filename); //$NON-NLS-1$
                 return false;
             }
             if (!createdParent) {
-                this.logger.severe("No se pudo crear la estructura de directorios del fichero '" + filename + "'");
-                this.addLogRegistry(Level.SEVERE, "No se pudo crear la estructura de directorios del fichero '" + filename + "'");
+                LOGGER.severe("No se pudo crear la estructura de directorios del fichero '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.24") + REG_FIELD_SEPARATOR + filename); //$NON-NLS-1$
                 return false;
             }
         }
@@ -999,10 +993,10 @@ public class DirectorySignatureHelper {
         // otro a base de agregar e incrementar las cifras entre
         // par&eacute;ntesis.
         int ind = 0;
-        inText = (inText != null ? inText : "");
+        inText = (inText != null ? inText : ""); //$NON-NLS-1$
         File finalFile = new File(parentFile, signer.getSignedName(signFilename, inText));
-        while (finalFile.exists() && !overwriteFiles) {
-            finalFile = new File(parentFile, signer.getSignedName(signFilename, inText + "(" + (++ind) + ")"));
+        while (finalFile.exists() && !this.overwriteFiles) {
+            finalFile = new File(parentFile, signer.getSignedName(signFilename, inText + "(" + (++ind) + ")")); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Almacenamos el fichero
@@ -1012,8 +1006,8 @@ public class DirectorySignatureHelper {
             fos.write(signData);
         }
         catch (final Exception e) {
-            this.logger.severe("No se pudo crear la estructura de directorios del fichero '" + filename + "': " + e);
-            this.addLogRegistry(Level.SEVERE, "No se pudo crear la estructura de directorios del fichero '" + finalFile + "'");
+            LOGGER.severe("No se pudo crear la estructura de directorios del fichero '" + filename + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.24") + REG_FIELD_SEPARATOR + finalFile); //$NON-NLS-1$
         }
         finally {
             this.closeStream(fos);
@@ -1037,11 +1031,11 @@ public class DirectorySignatureHelper {
             signer = determineType(file);
         }
         catch (final Exception e) {
-            Logger.getLogger("Error durante el analisis del fichero de firma: " + e);
+            LOGGER.severe("Error durante el analisis del fichero de firma: " + e); //$NON-NLS-1$
             throw e;
         }
         if (signer == null) {
-            throw new IllegalArgumentException("No se ha encontrado un manejador de firma valido para el fichero '" + file.getName() + "'");
+            throw new IllegalArgumentException("No se ha encontrado un manejador de firma valido para el fichero '" + file.getName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return signer;
     }
@@ -1131,8 +1125,8 @@ public class DirectorySignatureHelper {
             return new FileInputStream(file);
         }
         catch (final FileNotFoundException e) {
-            this.logger.severe("No se ha encontrado el fichero '" + file.getPath() + "': " + e);
-            this.addLogRegistry(Level.SEVERE, "No se ha encontrado el fichero '" + file.getPath() + "'");
+            LOGGER.severe("No se ha encontrado el fichero '" + file.getPath() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.26")  + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
             throw e;
         }
     }
@@ -1147,7 +1141,7 @@ public class DirectorySignatureHelper {
                 stream.close();
             }
             catch (final Exception e) {
-                this.logger.warning("Error al cerrar un fichero de recursos");
+                LOGGER.warning("Error al cerrar un fichero de recursos: " + e); //$NON-NLS-1$
             }
         }
     }
@@ -1212,15 +1206,15 @@ public class DirectorySignatureHelper {
     private void addLogRegistry(final Level typeLog, final String logRegistry) {
         if (this.activeLog) {
             if (logRegistry == null) {
-                this.logger.warning("Se ha intentado insertar un registro nulo en el log");
+                LOGGER.warning("Se ha intentado insertar un registro nulo en el log"); //$NON-NLS-1$
                 return;
             }
             if (this.logHandler != null) {
                 try {
-                    this.logHandler.write(("\n" + typeLog.getName() + ": " + logRegistry).getBytes());
+                    this.logHandler.write(("\n" + typeLog.getName() + ": " + logRegistry).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
                 }
                 catch (final IOException e1) {
-                    this.logger.warning("Se ha pudo insertar una entrada en el log de error: " + e1);
+                    LOGGER.warning("Se ha pudo insertar una entrada en el log de error: " + e1); //$NON-NLS-1$
                 }
             }
             if (typeLog == Level.WARNING) {
@@ -1240,7 +1234,7 @@ public class DirectorySignatureHelper {
             return new FileOutputStream(outFile);
         }
         catch (final Exception e) {
-            this.logger.warning("No se ha podido crear el fichero de log");
+            LOGGER.warning("No se ha podido crear el fichero de registro"); //$NON-NLS-1$
             return null;
         }
     }
@@ -1250,21 +1244,21 @@ public class DirectorySignatureHelper {
 
         if (this.logHandler != null) {
             try {
-                logHandler.write(("\n\nAdvertencias emitidas: " + warnCount).getBytes());
-                logHandler.write(("\nErrores emitidos: " + errorCount).getBytes());
+                this.logHandler.write(("\n\n" + MassiveSignMessages.getString("DirectorySignatureHelper.27") + ": " + this.warnCount).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                this.logHandler.write(("\n" + MassiveSignMessages.getString("DirectorySignatureHelper.28") + ": " + this.errorCount).getBytes()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             }
             catch (final Exception e) {
-                this.logger.warning("No se ha podido almacenar el resultado de la operacion en el fichero de log");
+                LOGGER.warning("No se ha podido almacenar el resultado de la operacion en el fichero de log"); //$NON-NLS-1$
             }
             try {
                 this.logHandler.close();
             }
             catch (final Exception e) {
-                this.logger.warning("No se cerrar el fichero de log");
+                LOGGER.warning("No se cerrar el fichero de registro: " + e); //$NON-NLS-1$
             }
         }
-        warnCount = 0;
-        errorCount = 0;
+        this.warnCount = 0;
+        this.errorCount = 0;
     }
 
     /** Obtiene el tipo de firma de un fichero. Si no se puede identificar, se
@@ -1274,27 +1268,25 @@ public class DirectorySignatureHelper {
      * @return Resultado del an&aacute;lisis. */
     private static AOSigner determineType(final File file) throws Exception {
         if (file == null) {
-            throw new IllegalArgumentException("Se ha introducido un fichero de firma nulo");
+            throw new IllegalArgumentException("Se ha introducido un fichero de firma nulo"); //$NON-NLS-1$
         }
         if (!file.exists() || !file.isFile()) {
-            throw new FileNotFoundException("El archivo indicado no existe o no es un fichero de datos");
+            throw new FileNotFoundException("El archivo indicado no existe o no es un fichero de datos"); //$NON-NLS-1$
         }
         if (!file.canRead()) {
-            throw new IOException("No tiene permisos de lectura sobre el fichero indicado");
+            throw new IOException("No tiene permisos de lectura sobre el fichero indicado"); //$NON-NLS-1$
         }
         
         FileInputStream fis = new FileInputStream(file);
         try {
             return AOSignerFactory.getSigner(AOUtil.getDataFromInputStream(fis));
         } catch (Exception e) {
-            throw new IOException("Ocurrio un error al leer el fichero: " + e);
+            throw new IOException("Ocurrio un error al leer el fichero: " + e); //$NON-NLS-1$
         } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (Exception e) {
-                    /* No hacemos nada. */
-                }
+            try {
+                fis.close();
+            } catch (Exception e) {
+                /* No hacemos nada. */
             }
         }
     }
@@ -1310,16 +1302,22 @@ public class DirectorySignatureHelper {
      * @param files
      *        Listado de ficheros que se van a procesar durante la
      *        operaci&oacute;n masiva. */
-    protected void prepareOperation(final File[] files) {}
+    protected void prepareOperation(final File[] files) {
+        // No implementado
+    }
 
     /** Liberamos los recursos de la operaci&oacute;n que hayamos ejecutado
      * simult&aacute;neamente a la operaci&oacute;n masiva. */
-    protected void disposeOperation() {}
+    protected void disposeOperation() {
+     // No implementado
+    }
 
     /** Ejecutamos cualquier operaci&oacute;n antes del procesado de un fichero
      * concreto.
      * @param file
      *        El proximo fichero que se va a procesar. */
-    protected void preProcessFile(final File file) {}
+    protected void preProcessFile(final File file) {
+     // No implementado
+    }
 
 }
