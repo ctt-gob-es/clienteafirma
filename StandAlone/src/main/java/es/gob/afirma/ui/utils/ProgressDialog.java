@@ -14,6 +14,7 @@ import java.awt.Container;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import javax.swing.WindowConstants;
 
 /**
  * Di&aacute;logo con barra de progreso.
@@ -44,36 +45,36 @@ public class ProgressDialog {
 	public ProgressDialog(JDialog parent, int maxValue, String title) {
 		
 		if(maxValue <= 0)
-			throw new IllegalArgumentException("El valor maximo de la barra de progreso no puede ser nulo");
-		
+			throw new IllegalArgumentException("El valor maximo de la barra de progreso no puede ser nulo"); //$NON-NLS-1$
+		 
 		// Barra de progreso
 		this.parent = parent; 
 		this.progressBar = new JProgressBar(0, maxValue);
-		this.ltexto = new JLabel("");
+		this.ltexto = new JLabel(""); //$NON-NLS-1$
 	}
 
 	/** Muestra el di&aacute;logo con al barra de progreso. */
 	public void show() {
 		Container panel = new Container();
-		progressBar.setValue(0);
-	    progressBar.setStringPainted(true);
+		this.progressBar.setValue(0);
+		this.progressBar.setStringPainted(true);
 	    panel.setLayout(null);
-	    panel.add(ltexto);
-	    ltexto.setBounds(20, 15, 250, 20);
-	    panel.add(progressBar);
-	    progressBar.setBounds(20, 35, 260, 19);
+	    panel.add(this.ltexto);
+	    this.ltexto.setBounds(20, 15, 250, 20);
+	    panel.add(this.progressBar);
+	    this.progressBar.setBounds(20, 35, 260, 19);
 
-		dialog = new JDialog(this.parent, Messages.getString("Wizard.multifirma.progress.titulo"), false);
-		dialog.setBounds(parent.getX()+(parent.getWidth()-300)/2, parent.getY()+(parent.getHeight()-100)/2, 300, 100);
-		dialog.setResizable(false);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setVisible(true);
+	    this.dialog = new JDialog(this.parent, Messages.getString("Wizard.multifirma.progress.titulo"), false); //$NON-NLS-1$
+	    this.dialog.setBounds(this.parent.getX()+(this.parent.getWidth()-300)/2, this.parent.getY()+(this.parent.getHeight()-100)/2, 300, 100);
+	    this.dialog.setResizable(false);
+	    this.dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	    this.dialog.setVisible(true);
 	}
 	
 	/** Cierra el di&aacute;logo. */
 	public void close() {
-		if (dialog != null)
-			dialog.setVisible(false);
+		if (this.dialog != null)
+		    this.dialog.setVisible(false);
 	}
 	
 	/**
@@ -82,10 +83,10 @@ public class ProgressDialog {
 	 */
 	public synchronized void processElement(String elementName) {
 		if(elementName == null) 
-			this.ltexto.setText(Messages.getString("Procesando"));
+			this.ltexto.setText(Messages.getString("Procesando")); //$NON-NLS-1$
 		else 
-			this.ltexto.setText(Messages.getString("Procesando.elemento")+" \""+elementName+"\".");
+			this.ltexto.setText(Messages.getString("Procesando.elemento")+" \""+elementName+"\"."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
-		this.progressBar.setValue(++currentValue);
+		this.progressBar.setValue(++this.currentValue);
 	}
 }
