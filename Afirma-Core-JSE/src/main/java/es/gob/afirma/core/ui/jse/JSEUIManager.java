@@ -39,11 +39,12 @@ public final class JSEUIManager implements AOUIManager {
 
 
     /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
-     * @param exts
+     * @param extensions
      *        Extensiones de fichero permitidas
-     * @param desc
+     * @param description
      *        Descripci&oacute;n del tipo de fichero correspondiente a
      *        las extensiones
+     * @return Filtro apto para su uso en un <code>JFileChooser</code>
      */
     public static FileFilter getFileFilter(final String[] extensions, String description) {
         return new ExtFilter(extensions, description);
