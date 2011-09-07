@@ -367,10 +367,8 @@ public final class MassiveSignatureHelper {
             final String mimeType = mimeHelper.getMimeType();
             if (mimeType != null) {
                 try {
-                    signer.setDataObjectFormat(mimeHelper.getDescription(),
-                                               MimeHelper.transformMimeTypeToOid(mimeType),
-                                               mimeType,
-                                               null);
+                    config.setProperty("mimeType", mimeType); //$NON-NLS-1$
+                    config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
                     this.logger
@@ -418,10 +416,8 @@ public final class MassiveSignatureHelper {
         if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) {  //$NON-NLS-1$//$NON-NLS-2$
             final String mimeType = "hash/" + this.massiveConfiguration.getAlgorithm().substring(0, pos).toLowerCase(); //$NON-NLS-1$
             try {
-                signer.setDataObjectFormat("Huella digital precalculada",
-                                           MimeHelper.transformMimeTypeToOid(mimeType),
-                                           mimeType,
-                                           null);
+                config.setProperty("mimeType", mimeType); //$NON-NLS-1$
+                config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 this.logger

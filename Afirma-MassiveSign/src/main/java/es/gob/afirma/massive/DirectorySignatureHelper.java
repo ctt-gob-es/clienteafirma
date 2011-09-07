@@ -498,10 +498,8 @@ public class DirectorySignatureHelper {
         if ((signer.getClass().getName().equals("es.gob.afirma.signers.AOXAdESSigner")) || (signer.getClass().getName().equals("es.gob.afirma.signers.AOXMLDSigSigner"))) { //$NON-NLS-1$ //$NON-NLS-2$
             final String mimeType = "hash/" + this.algorithm.substring(0, pos).toLowerCase(); //$NON-NLS-1$
             try {
-                signer.setDataObjectFormat("Huella digital precalculada", //$NON-NLS-1$
-                                           MimeHelper.transformMimeTypeToOid(mimeType),
-                                           mimeType,
-                                           null);
+                signConfig.setProperty("mimeType", mimeType);
+                signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType));
             }
             catch (final Exception e) {
                 this.logger
@@ -627,10 +625,8 @@ public class DirectorySignatureHelper {
                 final String mimeType = mimeHelper.getMimeType();
                 if (mimeType != null) {
                     try {
-                        signer.setDataObjectFormat(mimeHelper.getDescription(),
-                                                   MimeHelper.transformMimeTypeToOid(mimeType),
-                                                   mimeType,
-                                                   null);
+                        signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
+                        signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                     }
                     catch (final Exception e) {
                         this.logger //$NON-NLS-1$
@@ -821,10 +817,8 @@ public class DirectorySignatureHelper {
             final String mimeType = mimeHelper.getMimeType();
             if (mimeType != null) {
                 try {
-                    signer.setDataObjectFormat(mimeHelper.getDescription(),
-                                               MimeHelper.transformMimeTypeToOid(mimeType),
-                                               mimeType,
-                                               null);
+                    signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
+                    signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
                     this.logger //$NON-NLS-1$
