@@ -131,7 +131,11 @@ public class ResizingAdaptor extends ComponentAdapter {
 				if(componentBorder instanceof TitledBorder){
 					TitledBorder b = (TitledBorder) componentBorder;
 					float resizeFactor = Math.round(relation / getResizingFactorFrame());
-					b.setTitleFont(b.getTitleFont().deriveFont((float) (7 + resizeFactor)));
+					if (b.getTitleFont() != null) {
+					    b.setTitleFont(b.getTitleFont().deriveFont((float) (7 + resizeFactor)));
+					} else {
+					    b.setTitleFont(actualComponent.getFont().deriveFont((float) (7 + resizeFactor)));
+					}
 				}
 			}
 			
@@ -209,7 +213,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	/**
 	 * Redimensiona una imagen contenida en un JButton
 	 * 
-	 * @param factor factor de redimensión
+	 * @param factor factor de redimensi&oacute;n
 	 * @param c Componente de tipo JButton en el que se encuentra la imagen
 	 */
 	public final void resizeImageButton(double factor, Component c) {
