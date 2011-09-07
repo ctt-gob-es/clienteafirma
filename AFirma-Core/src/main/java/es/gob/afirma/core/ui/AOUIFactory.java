@@ -2,6 +2,8 @@ package es.gob.afirma.core.ui;
 
 import java.io.File;
 
+import javax.swing.filechooser.FileFilter;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
 
@@ -142,4 +144,21 @@ public class AOUIFactory {
         return uiManager.getLoadFile(dialogTitle, fileName, description, parent);
     }
 
+    /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar
+     * los datos y los guarda en la misma. Si ocurre un error durante el guardado, se
+     * vuelve a preguntar al usuario por una localizaci&oacute;n, Si el usuario
+     * cancela el di&aacute;logo, se devolver&aacute; {@code null}. 
+     * @param data
+     *        Datos que se desean almacenar.
+     * @param selectedFile
+     *        Localizaci&oacute;n y nombre por defecto del fichero.
+     * @param fileFilter
+     *        Filtro de fichero.
+     * @param parent
+     *        Componente padre (para la modalidad)
+     * @return Fichero en el qeu se almacenan los datos.
+     */
+    public static File getSaveDataToFile(final byte[] data, final File selectedFile, final FileFilter fileFilter, final Object parent) {
+        return uiManager.saveDataToFile(data, selectedFile, fileFilter, parent);
+    }
 }

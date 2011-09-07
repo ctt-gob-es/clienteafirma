@@ -469,13 +469,6 @@ public final class AOUtil {
         return stringbuffer.toString();
     }
 
-    /** Obtiene la ruta absoluta del fichero de almac&eacute;n de las claves de
-     * cifrado.
-     * @return Ruta absoluta del fichero. */
-    public final static String getCipherKeystore() {
-        return Platform.getUserHome() + File.separator + "ciphkeys.jceks"; //$NON-NLS-1$
-    }
-
     /** Recupera un algoritmo de hash a partir del algoritmo de firma introducido
      * s&oacute;lo para su uso para la generaci&oacute;n de hashes. Si el
      * algoritmo no respeta el formato "ALGORITHM_HASH"+with+"AGORITHM_SIGN" se

@@ -12,6 +12,8 @@ package es.gob.afirma.core.ui;
 
 import java.io.File;
 
+import javax.swing.filechooser.FileFilter;
+
 import es.gob.afirma.core.AOCancelledOperationException;
 
 /** Gestor de componentes de interfaz gr&aacute;fico
@@ -156,4 +158,23 @@ public interface AOUIManager {
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     File getLoadFile(String dialogTitle, String fileName, String description, Object parentComponent);
     
+    /** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
+     * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
+     * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
+     * usuario si desea sobreescribirlo. En caso de cancelar la operaci&oacute;n
+     * se devolvera null, si la operaci&oacute;n finaliza correctamente se
+     * devolver&aacute; el path completo del fichero.
+     * @param data
+     *        Datos que se desean almacenar.
+     * @param selectedFile
+     *        Nombre de fichero por defecto.
+     * @param fileFilter
+     *        Filtro de fichero para el di&aacute;logo de guardado.
+     * @param parent
+     *        Componente padre sobre el que se mostrar&aacute; el
+     *        di&aacute;logo de guardado.
+     * @return Fichero guardado.
+     * @throws NullPointerException
+     *         No se introdujeron los datos que se desean almacenar. */
+    File saveDataToFile(final byte[] data, final File selectedFile, final FileFilter fileFilter, final Object parent);
 }
