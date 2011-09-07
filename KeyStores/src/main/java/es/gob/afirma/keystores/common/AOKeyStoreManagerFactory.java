@@ -183,20 +183,20 @@ public final class AOKeyStoreManagerFactory {
                 ksmUni = (AOKeyStoreManager) Class.forName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
             }
             catch(final Exception e) {
+                e.printStackTrace();
                 throw new AOKeystoreAlternativeException(
                      getAlternateKeyStoreType(store),
                      "Error al obteniendo dinamicamente el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
                      e
                  );
             }
-
             try {
-                ksmUni.init(null, null, pssCallback, null);
+                ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, null);
             }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
-                                                         "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
-                                                         e);
+                        "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
+                        e);
             }
             return ksmUni;
         }

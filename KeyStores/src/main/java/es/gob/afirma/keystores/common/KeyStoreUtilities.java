@@ -551,4 +551,28 @@ public final class KeyStoreUtilities {
         return pssCallback;
     }
 
+    /** Recupera el manejador de claves asociado a un certificado seg&uacute;n el
+     * repositorio en el que se aloja.
+     * @param store
+     *        Almace&eacute;n de claves del certificado.
+     * @param parent
+     *        Componente sobre el que se deben visualizar los
+     *        di&aacute;logos modales.
+     * @return Manejador para la solicitud de la clave. */
+    public static PasswordCallback getCertificatePC(final AOKeyStore store, final Component parent) {
+        PasswordCallback pssCallback;
+        if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
+            || store == AOKeyStore.WINADDRESSBOOK
+            || store == AOKeyStore.WINCA
+            || store == AOKeyStore.SINGLE
+            || store == AOKeyStore.MOZ_UNI
+            || store == AOKeyStore.PKCS11) {
+            pssCallback = new NullPasswordCallback();
+        }
+        else {
+            pssCallback = new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
+        }
+
+        return pssCallback;
+    }
 }
