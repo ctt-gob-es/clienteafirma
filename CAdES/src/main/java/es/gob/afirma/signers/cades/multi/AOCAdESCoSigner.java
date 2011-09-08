@@ -9,12 +9,14 @@ import java.util.Properties;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.ValidateCADES;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Operaciones de cofirma CAdES. */
 public class AOCAdESCoSigner implements AOCoSigner {
+    
+    /** Indica si por defecto se debe insertar el atributo SigningCertificateV2 en la firma. */
+    static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
 
     public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
@@ -30,7 +32,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
         }
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(AOCAdESSigner.DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
         byte[] messageDigest = null;
 
@@ -94,7 +96,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
         if (extraParams == null) {
             extraParams = new Properties();
         }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(AOCAdESSigner.DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
         if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;

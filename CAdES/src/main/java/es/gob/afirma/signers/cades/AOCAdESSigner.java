@@ -54,7 +54,7 @@ public final class AOCAdESSigner implements AOSigner {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Indica si por defecto se debe insertar el atributo SigningCertificateV2 en la firma. */
-    public static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
+    private static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
 
     public byte[] sign(byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 

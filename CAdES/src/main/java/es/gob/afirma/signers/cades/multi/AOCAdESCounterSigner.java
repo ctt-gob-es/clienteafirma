@@ -9,13 +9,15 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
-import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cades.ValidateCADES;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
 /** Operaciones de cofirma CAdES. */
 public class AOCAdESCounterSigner implements AOCounterSigner {
+    
+    /** Indica si por defecto se debe insertar el atributo SigningCertificateV2 en la firma. */
+    static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
 
     public byte[] countersign(final byte[] sign,
                               String algorithm,
@@ -26,7 +28,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         if (extraParams == null) {
             extraParams = new Properties();
         }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(AOCAdESSigner.DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
         if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
