@@ -21,6 +21,9 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
+
 import es.gob.afirma.ciphers.AOCipherConstants;
 import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
 import es.gob.afirma.ciphers.jce.AOSunJCECipher;
@@ -28,17 +31,20 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipher;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
-import es.gob.afirma.core.ciphers.CipherConstants;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
 
 /** Manejador de las funcionalidades de cifrado del Cliente @firma. */
 public final class CipherManager {
 
+    /** Caracteres ASCII validos para la contrase&ntilde;a de cifrado. */
+    public final static String ACCEPTED_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; //$NON-NLS-1$
+    
     /** Componente sobre el que se mostrar&aacute;n los di6aaclogos modales. */
     private Component parent = null;
 
@@ -376,8 +382,11 @@ public final class CipherManager {
      * @throws NoSuchAlgorithmException
      *         Algoritmo de cifrado no soportado.
      * @throws AOException
-     *         Ocurri&oacute; un error durante el proceso de cifrado. */
-    public void cipherData() throws IOException, NoSuchAlgorithmException, AOException {
+     *         Ocurri&oacute; un error durante el proceso de cifrado. 
+     * @throws KeyException Cuando la clave de cifrado no sea compatible con el
+     * algoritmo de firma configurado.
+     */
+    public void cipherData() throws IOException, NoSuchAlgorithmException, AOException, KeyException {
 
         byte[] dataToCipher = null;
         if (this.plainData != null) {
@@ -397,7 +406,7 @@ public final class CipherManager {
             }
 
             // En este punto, tenemos la URI de los datos de entrada
-            final InputStream is = AOUtil.loadFile(this.fileUri, this.parent, true, this.fileBase64);
+            final InputStream is = AOUtil.loadFile(this.fileUri);
             dataToCipher = AOUtil.getDataFromInputStream(is);
             try {
                 is.close();
@@ -421,7 +430,10 @@ public final class CipherManager {
      * @throws IllegalArgumentException
      *         Modo de clave no soportado.
      * @throws AOException
-     *         Error durante el proceso de cifrado. */
+     *         Error durante el proceso de cifrado. 
+     * @throws KeyException
+     *         Cuando se indica una clave no v&aacute;lida para el cifrado.
+     */
     public void cipherData(final byte[] dataToCipher) throws NoSuchAlgorithmException, AOException, KeyException {
 
         if (dataToCipher == null) {
@@ -523,7 +535,7 @@ public final class CipherManager {
         }
         else if (this.keyMode.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
             if (this.cipherPassword == null || this.cipherPassword.length == 0) {
-                this.cipherPassword = AOUIFactory.getPassword(AppletMessages.getString("SignApplet.414"), AOCipherConstants.ACCEPTED_CHARS, true, this.parent); //$NON-NLS-1$
+                this.cipherPassword = AOUIFactory.getPassword(AppletMessages.getString("SignApplet.414"), ACCEPTED_CHARS, true, this.parent); //$NON-NLS-1$
             }
             cipherKey = cipher.decodePassphrase(this.cipherPassword, config, null);
         }
@@ -539,13 +551,11 @@ public final class CipherManager {
      *         Operaci&oacute;n cancelada por el usuario.
      * @throws IOException
      *         Si se han pueden leer los datos a cifrar.
-     * @throws NoSuchAlgorithmException
-     *         Si el algoritmo de cifrado no est&aacute; soportado.
      * @throws AOException
      *         Si ocurre alg&uacute; error durante el proceso de cifrado.
-     * @throws InvalidKeyException
-     *         Si la clave de descifrado no es v&aacute;lida */
-    public void decipherData() throws IOException, AOException, InvalidKeyException {
+     * @throws KeyException Cuando la clave para el descifrado no sea correcta.
+     */
+    public void decipherData() throws IOException, AOException, KeyException {
 
         byte[] dataToDecipher = null;
         if (this.cipheredData != null) {
@@ -566,8 +576,14 @@ public final class CipherManager {
             }
 
             // En este punto, tenemos la URI de los datos de entrada
-            final InputStream is = AOUtil.loadFile(this.fileUri, this.parent, true, this.fileBase64);
-            dataToDecipher = AOUtil.getDataFromInputStream(is);
+            final InputStream is =  AOUtil.loadFile(this.fileUri);
+            if (this.fileBase64) {
+                dataToDecipher = Base64.decodeBase64(
+                        AOUtil.getDataFromInputStream(is));
+            } else {
+                dataToDecipher = AOUtil.getDataFromInputStream(is);
+            }
+            
             try {
                 is.close();
             }
@@ -588,7 +604,10 @@ public final class CipherManager {
      * @throws AOException
      *         Cuando ocurre un error durante el desencriptado.
      * @throws InvalidKeyException
-     *         Cuando se proporciona una clave incorrecta. */
+     *         Cuando se proporciona una clave incorrecta. 
+     * @throws KeyException
+     *         Cuando la clave no sea correcta.
+     */
     public void decipherData(final byte[] dataToDecipher) throws AOException, InvalidKeyException, KeyException {
 
         // Si no esta establecido el algoritmo de cifrado usamos el por
@@ -677,7 +696,7 @@ public final class CipherManager {
         String alias = null;
         if (this.cipherKeyAlias == null) {
             try {
-                alias = AOUIFactory.showCertSelectionDialog(cKs.getAliases(), // aliases
+                alias = KeyStoreUtilities.showCertSelectionDialog(cKs.getAliases(), // aliases
                                                             null, // KeyStores
                                                             this.parent, // parent
                                                             true, // comprobar claves privadas

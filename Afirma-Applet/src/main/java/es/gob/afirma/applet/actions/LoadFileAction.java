@@ -10,7 +10,6 @@
 
 package es.gob.afirma.applet.actions;
 
-import java.awt.Component;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
@@ -25,23 +24,12 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
     /** Ruta del fichero que se desea cargar. */
     private URI uri = null;
 
-    /** Indica si los datos del fichero est&aacute;n codificados en Base 64. */
-    private boolean base64Encoded = false;
-
-    /** Indica si debe mostrarse el di&aacute;logo de espera durante la carga del
-     * fichero. */
-    private boolean waitDialog = true;
-
-    /** Componente padre sobre el que mostrar el di&aacute;logo de carga. */
-    private Component parent = null;
-
     /** Construye una acci&oacute;n privilegiada para la carga del contenido de
      * un fichero.
      * @param strUri
      *        Ruta del fichero.
-     * @param parent
-     *        Componente padre. */
-    public LoadFileAction(final String strUri, final Component parent) {
+     */
+    public LoadFileAction(final String strUri) {
 
         try {
             this.uri = AOUtil.createURI(strUri);
@@ -50,43 +38,22 @@ public final class LoadFileAction extends BasicPrivilegedAction<Boolean, byte[]>
             this.setError("La URI '" + strUri + "' no es valida", e); //$NON-NLS-1$ //$NON-NLS-2$
             throw new IllegalArgumentException(this.getErrorMessage(), e);
         }
-        this.parent = parent;
     }
 
     /** Construye una acci&oacute;n privilegiada para la carga del contenido de
      * un fichero.
      * @param fileUri
      *        Ruta del fichero.
-     * @param parent
-     *        Componente padre. */
-    public LoadFileAction(final URI fileUri, final Component parent) {
+     */
+    public LoadFileAction(final URI fileUri) {
         this.uri = fileUri;
-        this.parent = parent;
-    }
-
-    /** Permite establecer si los datos del fichero est&aacute;an codificados en
-     * base 64, para que se decodifiquen y se obtenga la informaci&oacute;n
-     * original.
-     * @param isBase64Encoded
-     *        {@code true} si los datos del fichero est&aacute;n en base 64. */
-    public void setBase64Encoded(final boolean isBase64Encoded) {
-        this.base64Encoded = isBase64Encoded;
-    }
-
-    /** Indica si debe mostrarse un di&aacute;logo de espera durante la carga del
-     * fichero. Por defecto, no se s&iacute; se mostrar&aacute;.
-     * @param showDialog
-     *        <code>true</code> si se desea que se muestre el
-     *        di&aacute;logo, <code>false</code> en caso contrario */
-    public void setWaitDialog(final boolean showDialog) {
-        this.waitDialog = showDialog;
     }
 
     public Boolean run() {
 
         InputStream is = null;
         try {
-            is = AOUtil.loadFile(this.uri, this.parent, this.waitDialog, this.base64Encoded);
+            is = AOUtil.loadFile(this.uri);
             this.setResult(AOUtil.getDataFromInputStream(is));
         }
         catch (final FileNotFoundException e) {

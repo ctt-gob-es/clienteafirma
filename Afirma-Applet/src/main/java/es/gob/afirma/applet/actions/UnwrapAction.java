@@ -16,6 +16,7 @@ import es.gob.afirma.applet.EnveloperManager;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
+import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
 
 /** Acci&oacute;n privilegiada para el desensobrado de datos. La ejecuci&oacute;n
  * de la acci&oacute;n devuelve {@code true} o {@code false} y el resultado

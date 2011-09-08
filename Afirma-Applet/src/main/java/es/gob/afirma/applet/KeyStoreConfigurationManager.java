@@ -21,9 +21,9 @@ import java.util.Vector;
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.applet.callbacks.CachePasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.callbacks.CachePasswordCallback;
 import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
@@ -158,9 +158,10 @@ final class KeyStoreConfigurationManager {
     private void initKeyStore(final String path, final String password) throws AOCancelledOperationException, AOKeystoreAlternativeException {
 
         if (this.showLoadingWarning) {
-            JOptionPane.showMessageDialog(this.parent, "Si desea usar su DNI electr\u00F3nico o cualquier otra tarjeta\r\ninteligente criptogr\u00E1fica / almac\u00E9n de certificados\r\n extra\u00EDble (USB, PCMCIA, etc.), por favor, ins\u00E9rtelo ahora\r\ny pulse el bot\u00F3n Aceptar.",
-                                          "Advertencia",
-                                          JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this.parent,
+                    "Si desea usar su DNI electr\u00F3nico o cualquier otra tarjeta\r\ninteligente criptogr\u00E1fica / almac\u00E9n de certificados\r\n extra\u00EDble (USB, PCMCIA, etc.), por favor, ins\u00E9rtelo ahora\r\ny pulse el bot\u00F3n Aceptar.",
+                    "Advertencia",
+                    JOptionPane.WARNING_MESSAGE);
         }
 
         // Para evitar la perdida de las excepciones que se emitan se relanzaran
@@ -414,7 +415,7 @@ final class KeyStoreConfigurationManager {
      *         certificado. */
     private PasswordCallback getCertificatePasswordCallback() {
         return this.ksPassword == null
-                                      ? AOCryptoUtil.getCertificatePC(this.ks, this.parent)
+                                      ? KeyStoreUtilities.getCertificatePC(this.ks, this.parent)
                                       : new CachePasswordCallback(this.ksPassword.toCharArray());
     }
 
@@ -424,7 +425,7 @@ final class KeyStoreConfigurationManager {
      * @return PasswordCallback para el acceso al almac&eacute;n. */
     private PasswordCallback getKeystorePasswordCallback() {
         return this.ksPassword == null
-                                      ? AOCryptoUtil.getPreferredPCB(this.ks, this.parent)
+                                      ? KeyStoreUtilities.getPreferredPCB(this.ks, this.parent)
                                       : new CachePasswordCallback(this.ksPassword.toCharArray());
     }
 

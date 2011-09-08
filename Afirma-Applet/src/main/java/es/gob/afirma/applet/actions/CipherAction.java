@@ -11,6 +11,7 @@
 package es.gob.afirma.applet.actions;
 
 import java.io.IOException;
+import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 
 import es.gob.afirma.applet.CipherManager;
@@ -62,6 +63,10 @@ public final class CipherAction extends BasicPrivilegedAction<Boolean, Void> {
         }
         catch (final NoSuchAlgorithmException e) {
             setError("Algoritmo de cifrado no soportado", e); //$NON-NLS-1$
+            return Boolean.FALSE;
+        }
+        catch (final KeyException e) {
+            setError("Clave de cifrado no valida", e); //$NON-NLS-1$
             return Boolean.FALSE;
         }
         catch (final IOException e) {

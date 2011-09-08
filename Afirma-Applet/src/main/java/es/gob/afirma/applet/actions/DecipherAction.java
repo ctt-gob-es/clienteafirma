@@ -11,7 +11,7 @@
 package es.gob.afirma.applet.actions;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
+import java.security.KeyException;
 
 import es.gob.afirma.applet.CipherManager;
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -62,7 +62,7 @@ public final class DecipherAction extends BasicPrivilegedAction<Boolean, Void> {
             setError("No se han podido leer los datos a descifrar", e); //$NON-NLS-1$
             return Boolean.FALSE;
         }
-        catch (final InvalidKeyException e) {
+        catch (final KeyException e) {
             setError("Se ha proporcionado una clave incorrecta", e); //$NON-NLS-1$
             return Boolean.FALSE;
         }
