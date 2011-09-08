@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 final class AppletMessages {
-    private static final String BUNDLE_NAME = "es.gob.afirma.cliente.appletmessages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "appletmessages"; //$NON-NLS-1$
 
     private static ResourceBundle RESOURCE_BUNDLE;
 
@@ -27,7 +27,9 @@ final class AppletMessages {
         }
     }
 
-    private AppletMessages() {}
+    private AppletMessages() {
+        // No permitimos la instanciacion
+    }
 
     static String getString(final String key) {
         try {
@@ -47,7 +49,7 @@ final class AppletMessages {
      * @return Recuerso textual con la subcadena sustituida. */
     static String getString(final String key, final String text) {
         try {
-            return RESOURCE_BUNDLE.getString(key).replace("%0", text);
+            return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return '!' + key + '!';
@@ -74,7 +76,7 @@ final class AppletMessages {
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                text = text.replace("%" + i, params[i]);
+                text = text.replace("%" + i, params[i]); //$NON-NLS-1$
             }
         }
 

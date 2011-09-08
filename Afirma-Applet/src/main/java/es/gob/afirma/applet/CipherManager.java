@@ -14,14 +14,24 @@ import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.swing.JOptionPane;
 
+import es.gob.afirma.ciphers.AOCipherConstants;
+import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
+import es.gob.afirma.ciphers.jce.AOSunJCECipher;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.ciphers.AOCipher;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
+import es.gob.afirma.core.ciphers.CipherConstants;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
+import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
@@ -46,7 +56,7 @@ public final class CipherManager {
     private boolean useCipherKeyStore = true;
 
     /** Modo de generaci&oacute;n de clave */
-    private String keyMode = AOConstants.DEFAULT_KEY_MODE;
+    private String keyMode = AOCipherConstants.DEFAULT_KEY_MODE;
 
     /** Clave para el cifrado y desencriptado en base 64 */
     private String cipherB64Key = null;
@@ -83,29 +93,29 @@ public final class CipherManager {
 
     /** Reinicia el componente a su configuraci&oacute;n por defecto. */
     public void initialize() {
-        cipherConfig = new AOCipherConfig(AOCipherAlgorithm.getDefault(), null, null);
-        cipherKeyAlias = null;
-        cipherKeystorePass = null;
-        useCipherKeyStore = true;
-        keyMode = AOConstants.DEFAULT_KEY_MODE;
-        cipherB64Key = null;
-        cipherPassword = null;
-        plainData = null;
-        cipheredData = null;
-        fileUri = null;
-        fileBase64 = false;
+        this.cipherConfig = new AOCipherConfig(AOCipherAlgorithm.getDefault(), null, null);
+        this.cipherKeyAlias = null;
+        this.cipherKeystorePass = null;
+        this.useCipherKeyStore = true;
+        this.keyMode = AOCipherConstants.DEFAULT_KEY_MODE;
+        this.cipherB64Key = null;
+        this.cipherPassword = null;
+        this.plainData = null;
+        this.cipheredData = null;
+        this.fileUri = null;
+        this.fileBase64 = false;
     }
 
     /** Recupera la ruta de fichero configurada.
      * @return Ruta de fichero. */
     public URI getFileUri() {
-        return fileUri;
+        return this.fileUri;
     }
 
     /** Indica si el contenido del fichero configurado est&aacute; en base 64.
      * @return Devuelve {@code true} si el contenido del fichero es base 64, {@code false} en caso contrario. */
     public boolean isFileBase64() {
-        return fileBase64;
+        return this.fileBase64;
     }
 
     /** Establece el fichero a utilizar.
@@ -121,7 +131,7 @@ public final class CipherManager {
     /** Recupera el algoritmo de cifrado configurado.
      * @return Algoritmo de cifrado. */
     public AOCipherAlgorithm getCipherAlgorithm() {
-        return cipherConfig.getAlgorithm();
+        return this.cipherConfig.getAlgorithm();
     }
 
     /** Recupera la configuraci&oacute;n de cifrado: algoritmo/modo/padding. El
@@ -129,7 +139,7 @@ public final class CipherManager {
      * configurados.
      * @return Configuraci&olacute;n de cifrado. */
     public String getCipherAlgorithmConfiguration() {
-        return cipherConfig.toString();
+        return this.cipherConfig.toString();
     }
 
     /** Configura el algoritmo de cifrado.
@@ -218,7 +228,7 @@ public final class CipherManager {
     /** Recupera el alias configurado del almac&eacute;n de claves de cifrado.
      * @return Alias configurado. */
     public String getCipherKeyAlias() {
-        return cipherKeyAlias;
+        return this.cipherKeyAlias;
     }
 
     /** Establece el alias de la clave del almac&eacute;n de claves de cifrado
@@ -233,7 +243,7 @@ public final class CipherManager {
      * claves.
      * @return Contrase&ntilda;a configurada. */
     public char[] getCipherKeystorePass() {
-        return cipherKeystorePass.clone();
+        return this.cipherKeystorePass.clone();
     }
 
     /** Establece la contrase&ntilde;a para la apertura del almac&eacute;n de
@@ -248,7 +258,7 @@ public final class CipherManager {
      * para el guardado de claves.
      * @return Devuelve {@code true} si est&aacute;a habilitado, {@code false} en caso contrario. */
     public boolean isUseCipherKeyStore() {
-        return useCipherKeyStore;
+        return this.useCipherKeyStore;
     }
 
     /** Establece si debe utilizarse el almac&eacute;n de claves de cifrado para
@@ -262,7 +272,7 @@ public final class CipherManager {
     /** Recupera el modo de clave configurado.
      * @return Modo de clave. */
     public String getKeyMode() {
-        return keyMode;
+        return this.keyMode;
     }
 
     /** Establece el modo de clave. Si se introduce un nulo, se
@@ -270,13 +280,13 @@ public final class CipherManager {
      * @param keyMode
      *        Modo de clave. */
     public void setKeyMode(final String keyMode) {
-        this.keyMode = (keyMode == null ? AOConstants.DEFAULT_KEY_MODE : keyMode);
+        this.keyMode = (keyMode == null ? AOCipherConstants.DEFAULT_KEY_MODE : keyMode);
     }
 
     /** Recupera la clave de cifrado.
      * @return Clave de cifrado en base 64. */
     public String getCipherB64Key() {
-        return cipherB64Key;
+        return this.cipherB64Key;
     }
 
     /** Establece la clave de cifrado.
@@ -289,7 +299,7 @@ public final class CipherManager {
     /** recupera la contrase&ntilde;a de cifrado.
      * @return Contrasen&tilde;a de cifrado. */
     public char[] getCipherPassword() {
-        return cipherPassword.clone();
+        return this.cipherPassword.clone();
     }
 
     /** Establece la contrase&ntilde;a de cifrado.
@@ -320,7 +330,7 @@ public final class CipherManager {
     /** Recupera los datos planos para cifrado.
      * @return Datos para cifrar. */
     public byte[] getPlainData() {
-        return plainData.clone();
+        return this.plainData.clone();
     }
 
     /** Establece los datos planos para cifrar.
@@ -333,13 +343,13 @@ public final class CipherManager {
     /** Recupera los dato cifrados.
      * @return Datos cifrados. */
     public byte[] getCipheredData() {
-        return cipheredData.clone();
+        return this.cipheredData.clone();
     }
 
     /** Recupera en base 64 los datos cifrados.
      * @return Datos cifrados en base 64. */
     public String getCipheredDataB64Encoded() {
-        return (cipheredData == null ? null : StringUtils.newStringUtf8(Base64.encodeBase64(cipheredData, false)));
+        return (this.cipheredData == null ? null : StringUtils.newStringUtf8(Base64.encodeBase64(this.cipheredData, false)));
     }
 
     /** Establece los datos cifrados para descifrar.
@@ -370,29 +380,31 @@ public final class CipherManager {
     public void cipherData() throws IOException, NoSuchAlgorithmException, AOException {
 
         byte[] dataToCipher = null;
-        if (plainData != null) {
-            dataToCipher = plainData;
+        if (this.plainData != null) {
+            dataToCipher = this.plainData;
         }
         else {
 
             // Fichero de entrada
-            if (fileUri == null) {
-                final String fileName = AOUIFactory.getLoadFileName(null, null, parent);
+            if (this.fileUri == null) {
+                final String fileName = AOUIFactory.getLoadFileName(null, null, this.parent);
                 try {
-                    fileUri = AOUtil.createURI(fileName);
+                    this.fileUri = AOUtil.createURI(fileName);
                 }
                 catch (final Exception e) {
-                    throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e);
+                    throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e); //$NON-NLS-1$
                 }
             }
 
             // En este punto, tenemos la URI de los datos de entrada
-            final InputStream is = AOUtil.loadFile(fileUri, parent, true, fileBase64);
+            final InputStream is = AOUtil.loadFile(this.fileUri, this.parent, true, this.fileBase64);
             dataToCipher = AOUtil.getDataFromInputStream(is);
             try {
                 is.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Ignoramos los errores en el cierre
+            }
         }
 
         cipherData(dataToCipher);
@@ -410,18 +422,18 @@ public final class CipherManager {
      *         Modo de clave no soportado.
      * @throws AOException
      *         Error durante el proceso de cifrado. */
-    public void cipherData(final byte[] dataToCipher) throws NoSuchAlgorithmException, AOException {
+    public void cipherData(final byte[] dataToCipher) throws NoSuchAlgorithmException, AOException, KeyException {
 
         if (dataToCipher == null) {
-            throw new IllegalArgumentException("Los datos a crifar no pueden ser nulos");
+            throw new IllegalArgumentException("Los datos a crifar no pueden ser nulos"); //$NON-NLS-1$
         }
 
         // Ya tenemos el stream con los datos, vamos a ver que Cipher uso
         final AOCipher cipher = new AOSunJCECipher();
-        final Key cipherKey = getConfiguredKey(cipher, cipherConfig);
+        final Key cipherKey = getConfiguredKey(cipher, this.cipherConfig);
 
         // realizamos la operacion de cifrado
-        cipheredData = cipher.cipher(dataToCipher, cipherConfig, cipherKey);
+        this.cipheredData = cipher.cipher(dataToCipher, this.cipherConfig, cipherKey);
     }
 
     /** Obtiene una clave compatible para una configuraci&oacute;n de cifrado. La
@@ -433,7 +445,7 @@ public final class CipherManager {
      * @throws AOException
      *         Ocurri&oacute; un error al obtener la clave. */
     public Key getConfiguredKey() throws NoSuchAlgorithmException, AOException {
-        return this.getConfiguredKey(new AOSunJCECipher(), cipherConfig);
+        return this.getConfiguredKey(new AOSunJCECipher(), this.cipherConfig);
     }
 
     /** Obtiene una clave compatible para una configuraci&oacute;n de cifrado. La
@@ -457,9 +469,9 @@ public final class CipherManager {
         Key cipherKey;
 
         // Tomamos o generamos la clave, segun nos indique el modo de clave.
-        if (keyMode.equals(AOConstants.KEY_MODE_GENERATEKEY)) {
+        if (this.keyMode.equals(AOCipherConstants.KEY_MODE_GENERATEKEY)) {
             cipherKey = cipher.generateKey(config);
-            cipherB64Key = Base64.encodeBase64String(cipherKey.getEncoded());
+            this.cipherB64Key = Base64.encodeBase64String(cipherKey.getEncoded());
 
             // Si se permite el almacenamiento de las claves, le damos la
             // posibilidad al usuario
@@ -468,18 +480,18 @@ public final class CipherManager {
             // y si se selecciona "Cancelar" o se cierra el dialogo, se
             // cancelara toda la operacion
             // de cifrado.
-            if (useCipherKeyStore) {
+            if (this.useCipherKeyStore) {
                 try {
                     saveCipherKey(config, cipherKey);
                 }
                 catch (final AOMaxAttemptsExceededException e) {
-                    JOptionPane.showMessageDialog(parent, AppletMessages.getString("SignApplet.43"), //$NON-NLS-1$
+                    JOptionPane.showMessageDialog(this.parent, AppletMessages.getString("SignApplet.43"), //$NON-NLS-1$
                                                   AppletMessages.getString("SignApplet.156"), //$NON-NLS-1$
                                                   JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
-        else if (keyMode.equals(AOConstants.KEY_MODE_USERINPUT)) {
+        else if (this.keyMode.equals(AOCipherConstants.KEY_MODE_USERINPUT)) {
 
             /*
              * Cuando se selecciono introducir una clave: - Si el usuario la ha
@@ -491,10 +503,10 @@ public final class CipherManager {
              * el cifrado - Si no se permite, se indica que no se ha introducido
              * ninguna clave para el cifrado
              */
-            if (cipherB64Key != null) {
-                cipherKey = cipher.decodeKey(cipherB64Key, config, null);
+            if (this.cipherB64Key != null) {
+                cipherKey = cipher.decodeKey(this.cipherB64Key, config, null);
             }
-            else if (useCipherKeyStore && AOCipherKeyStoreHelper.storeExists()) {
+            else if (this.useCipherKeyStore && AOCipherKeyStoreHelper.storeExists()) {
                 try {
                     cipherKey = getKeyFromCipherKeyStore();
                 }
@@ -502,21 +514,21 @@ public final class CipherManager {
                     throw e;
                 }
                 catch (final Exception e) {
-                    throw new AOException("Error al extraer una clave del almacen de clave de cifrado", e);
+                    throw new AOException("Error al extraer una clave del almacen de clave de cifrado", e); //$NON-NLS-1$
                 }
             }
             else {
-                throw new AOException("No se ha establecido una clave de cifrado");
+                throw new AOException("No se ha establecido una clave de cifrado"); //$NON-NLS-1$
             }
         }
-        else if (keyMode.equals(AOConstants.KEY_MODE_PASSWORD)) {
-            if (cipherPassword == null || cipherPassword.length == 0) {
-                cipherPassword = AOUIFactory.getPassword(AppletMessages.getString("SignApplet.414"), AOConstants.ACCEPTED_CHARS, true, parent); //$NON-NLS-1$
+        else if (this.keyMode.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
+            if (this.cipherPassword == null || this.cipherPassword.length == 0) {
+                this.cipherPassword = AOUIFactory.getPassword(AppletMessages.getString("SignApplet.414"), AOCipherConstants.ACCEPTED_CHARS, true, this.parent); //$NON-NLS-1$
             }
-            cipherKey = cipher.decodePassphrase(cipherPassword, config, null);
+            cipherKey = cipher.decodePassphrase(this.cipherPassword, config, null);
         }
         else {
-            throw new IllegalArgumentException("Modo de clave no soportado");
+            throw new IllegalArgumentException("Modo de clave no soportado"); //$NON-NLS-1$
         }
 
         return cipherKey;
@@ -531,35 +543,37 @@ public final class CipherManager {
      *         Si el algoritmo de cifrado no est&aacute; soportado.
      * @throws AOException
      *         Si ocurre alg&uacute; error durante el proceso de cifrado.
-     * @throws AOInvalidKeyException
+     * @throws InvalidKeyException
      *         Si la clave de descifrado no es v&aacute;lida */
-    public void decipherData() throws IOException, AOException, AOInvalidKeyException {
+    public void decipherData() throws IOException, AOException, InvalidKeyException {
 
         byte[] dataToDecipher = null;
-        if (cipheredData != null) {
-            dataToDecipher = cipheredData;
+        if (this.cipheredData != null) {
+            dataToDecipher = this.cipheredData;
         }
         else {
 
             // Si no hay una informacion cofrada establecida, la tratamos de
             // leer desde fichero
-            if (fileUri == null) {
-                final String fileName = AOUIFactory.getLoadFileName(null, null, parent);
+            if (this.fileUri == null) {
+                final String fileName = AOUIFactory.getLoadFileName(null, null, this.parent);
                 try {
-                    fileUri = AOUtil.createURI(fileName);
+                    this.fileUri = AOUtil.createURI(fileName);
                 }
                 catch (final Exception e) {
-                    throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e);
+                    throw new IOException("Se ha proporcionado un nombre de fichero no valido: " + e); //$NON-NLS-1$
                 }
             }
 
             // En este punto, tenemos la URI de los datos de entrada
-            final InputStream is = AOUtil.loadFile(fileUri, parent, true, fileBase64);
+            final InputStream is = AOUtil.loadFile(this.fileUri, this.parent, true, this.fileBase64);
             dataToDecipher = AOUtil.getDataFromInputStream(is);
             try {
                 is.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Ignoramos los errores en el cierre
+            }
         }
 
         decipherData(dataToDecipher);
@@ -573,9 +587,9 @@ public final class CipherManager {
      *         Cuando el usuario cancela la operaci&oacute;n.
      * @throws AOException
      *         Cuando ocurre un error durante el desencriptado.
-     * @throws AOInvalidKeyException
+     * @throws InvalidKeyException
      *         Cuando se proporciona una clave incorrecta. */
-    public void decipherData(final byte[] dataToDecipher) throws AOException, AOInvalidKeyException {
+    public void decipherData(final byte[] dataToDecipher) throws AOException, InvalidKeyException, KeyException {
 
         // Si no esta establecido el algoritmo de cifrado usamos el por
         // defecto, pero solo para esta ocasion
@@ -585,11 +599,11 @@ public final class CipherManager {
         // Si el modo de clave es por password, generamos la clave a partir de
         // el.
         // En caso contrario, requeriremos que nos den la clave
-        if (keyMode.equals(AOConstants.KEY_MODE_PASSWORD)) {
-            if (cipherPassword == null || cipherPassword.length == 0) {
-                cipherPassword = AOUIFactory.getPassword(AppletMessages.getString("SignApplet.414"), parent); //$NON-NLS-1$
+        if (this.keyMode.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
+            if (this.cipherPassword == null || this.cipherPassword.length == 0) {
+                this.cipherPassword = AOUIFactory.getPassword(AppletMessages.getString("SignApplet.414"), this.parent); //$NON-NLS-1$
             }
-            decipherKey = decipher.decodePassphrase(cipherPassword, cipherConfig, null);
+            decipherKey = decipher.decodePassphrase(this.cipherPassword, this.cipherConfig, null);
         }
         else {
             // En el caso de trabajar con claves, si no se indico cual debe
@@ -599,7 +613,7 @@ public final class CipherManager {
             // de cifrado. Si no existe el almacen, se le indica que es
             // obligatorio
             // introducir la clave.
-            if (cipherB64Key == null) {
+            if (this.cipherB64Key == null) {
                 if (AOCipherKeyStoreHelper.storeExists()) {
                     try {
                         decipherKey = getKeyFromCipherKeyStore();
@@ -619,12 +633,12 @@ public final class CipherManager {
                 }
             }
             else {
-                decipherKey = decipher.decodeKey(cipherB64Key, cipherConfig, null);
+                decipherKey = decipher.decodeKey(this.cipherB64Key, this.cipherConfig, null);
             }
         }
 
         // Realizamos la operacion de desencriptado
-        plainData = decipher.decipher(dataToDecipher, cipherConfig, decipherKey);
+        this.plainData = decipher.decipher(dataToDecipher, this.cipherConfig, decipherKey);
     }
 
     /** Obtiene una clave de cifrado a partir de una clave del almac&eacute;n del
@@ -646,9 +660,9 @@ public final class CipherManager {
         AOCipherKeyStoreHelper cKs = null;
         try {
             cKs =
-                    new AOCipherKeyStoreHelper(cipherKeystorePass != null
-                                                                         ? cipherKeystorePass
-                                                                         : AOUIFactory.getPassword(AppletMessages.getString("SignApplet.52"), parent) //$NON-NLS-1$
+                    new AOCipherKeyStoreHelper(this.cipherKeystorePass != null
+                                                                         ? this.cipherKeystorePass
+                                                                         : AOUIFactory.getPassword(AppletMessages.getString("SignApplet.52"), this.parent) //$NON-NLS-1$
                     );
         }
         catch (final AOCancelledOperationException e) {
@@ -661,11 +675,11 @@ public final class CipherManager {
         // Si no se establecio el alias de la clave de cifrado, se la pedimos al
         // usuario
         String alias = null;
-        if (cipherKeyAlias == null) {
+        if (this.cipherKeyAlias == null) {
             try {
-                alias = AOUIManager.showCertSelectionDialog(cKs.getAliases(), // aliases
+                alias = AOUIFactory.showCertSelectionDialog(cKs.getAliases(), // aliases
                                                             null, // KeyStores
-                                                            parent, // parent
+                                                            this.parent, // parent
                                                             true, // comprobar claves privadas
                                                             true, // comprobar validez
                                                             true // mostrar caducados
@@ -679,7 +693,7 @@ public final class CipherManager {
             }
         }
         else {
-            alias = cipherKeyAlias;
+            alias = this.cipherKeyAlias;
         }
 
         return cKs.getKey(alias);
@@ -700,7 +714,7 @@ public final class CipherManager {
     private void saveCipherKey(final AOCipherConfig config, final Key cipherKey) throws AOMaxAttemptsExceededException, AOException {
         // Preguntamos si se desea almacenar en el almacen de claves de cifrado
         // y si se acepta y no existe este almacen, lo creamos
-        final int selectedOption = JOptionPane.showConfirmDialog(parent, AppletMessages.getString("SignApplet.40"), //$NON-NLS-1$
+        final int selectedOption = JOptionPane.showConfirmDialog(this.parent, AppletMessages.getString("SignApplet.40"), //$NON-NLS-1$
                                                            AppletMessages.getString("SignApplet.41"), //$NON-NLS-1$
                                                            JOptionPane.YES_NO_CANCEL_OPTION);
 
@@ -714,12 +728,12 @@ public final class CipherManager {
             // Controlamos un maximo de 3 intentos para abrir el almacen cuando
             // no se establecio la contrasena
             AOCipherKeyStoreHelper cKs = null;
-            if (cipherKeystorePass != null) {
+            if (this.cipherKeystorePass != null) {
                 try {
-                    cKs = new AOCipherKeyStoreHelper(cipherKeystorePass);
+                    cKs = new AOCipherKeyStoreHelper(this.cipherKeystorePass);
                 }
                 catch (final IOException e) {
-                    throw new AOException("La contrasena del almacen de claves de cifrado no es valida", e);
+                    throw new AOException("La contrasena del almacen de claves de cifrado no es valida", e); //$NON-NLS-1$
                 }
             }
             else {
@@ -727,25 +741,25 @@ public final class CipherManager {
                 do {
                     numTries++;
                     try {
-                        cKs = new AOCipherKeyStoreHelper(new UIPasswordCallback(AppletMessages.getString("SignApplet.42"), parent).getPassword());
+                        cKs = new AOCipherKeyStoreHelper(new UIPasswordCallback(AppletMessages.getString("SignApplet.42"), this.parent).getPassword()); //$NON-NLS-1$
                     }
                     catch (final IOException e) {
                         if (numTries >= 3) {
-                            throw new AOMaxAttemptsExceededException("Se ha sobrepasado el numero maximo de intentos en la insercion de la clave del almacen");
+                            throw new AOMaxAttemptsExceededException("Se ha sobrepasado el numero maximo de intentos en la insercion de la clave del almacen"); //$NON-NLS-1$
                         }
                     }
                 } while (cKs == null);
             }
 
-            String alias = cipherKeyAlias;
+            String alias = this.cipherKeyAlias;
             if (alias == null) {
                 try {
-                    alias = JOptionPane.showInputDialog(parent, AppletMessages.getString("SignApplet.46"), //$NON-NLS-1$
+                    alias = JOptionPane.showInputDialog(this.parent, AppletMessages.getString("SignApplet.46"), //$NON-NLS-1$
                                                         AppletMessages.getString("SignApplet.47"), //$NON-NLS-1$
                                                         JOptionPane.QUESTION_MESSAGE);
                 }
                 catch (final Exception e) {
-                    throw new AOException("Error al almacenar la clave de cifrado, la clave quedara sin almacenar");
+                    throw new AOException("Error al almacenar la clave de cifrado, la clave quedara sin almacenar"); //$NON-NLS-1$
                 }
                 alias += " (" + config.toString() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
             }

@@ -30,6 +30,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerException;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Almacena una configuracui&oacute;n para el almac&eacute;bn establecido del
@@ -126,19 +127,19 @@ final class KeyStoreConfigurationManager {
     }
 
     private void resetFilters() {
-        certFilters.removeAllElements();
+        this.certFilters.removeAllElements();
     }
 
     void addCertFilter(final CertificateFilter certFilter) {
         if (certFilter != null) {
-            certFilters.add(certFilter);
+            this.certFilters.add(certFilter);
         }
     }
 
     /** Reestablece el almac&eacute;n de certificados por defecto y reinicia su
      * configuraci&oacute;n. */
     void initialize() {
-        this.ks = defaultKeyStore;
+        this.ks = this.defaultKeyStore;
         this.selectedAlias = null;
         this.ksManager = null;
         this.errorMessage = null;
@@ -193,7 +194,7 @@ final class KeyStoreConfigurationManager {
     /** Indica si hay un certificado seleccionado.
      * @return Devuelve {@code true} si hay un certificado seleccionado. */
     boolean isSelectedCertificate() {
-        return ke != null;
+        return this.ke != null;
     }
 
     /** Selecciona un certificado con clave privada del almac&eacute;n, ya sea a
@@ -250,7 +251,7 @@ final class KeyStoreConfigurationManager {
                                                                  AOCertificatesNotFoundException,
                                                                  AOKeystoreAlternativeException, CertificateException, KeyException {
 
-        if (ksManager == null) {
+        if (this.ksManager == null) {
             try {
                 this.initKeyStore(this.ksPath, this.ksPassword);
             }
@@ -262,9 +263,9 @@ final class KeyStoreConfigurationManager {
             }
         }
 
-        if (selectedAlias == null) {
+        if (this.selectedAlias == null) {
             try {
-                selectedAlias = this.showCertSelectionDialog(ksManager.getAliases(), checkPrivateKey);
+                this.selectedAlias = this.showCertSelectionDialog(this.ksManager.getAliases(), checkPrivateKey);
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
@@ -295,7 +296,7 @@ final class KeyStoreConfigurationManager {
      *         Cuando no se ha podido inicializar el almac&eacute;n de
      *         certificados. */
     Certificate getCertificate(final String alias) throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
-        if (ksManager == null) {
+        if (this.ksManager == null) {
             try {
                 this.initKeyStore(this.ksPath, this.ksPassword);
             }
@@ -310,7 +311,7 @@ final class KeyStoreConfigurationManager {
             }
         }
 
-        return ksManager.getCertificate(alias);
+        return this.ksManager.getCertificate(alias);
     }
 
     /** Recupera los alias del almacen seleccionado. Si ocurre alg&uacute;n error
@@ -322,7 +323,7 @@ final class KeyStoreConfigurationManager {
      *         Cuando no se ha podido inicializar el almac&eacute;n de
      *         certificados. */
     String[] getArrayCertificateAlias() throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
-        if (ksManager == null) {
+        if (this.ksManager == null) {
             try {
                 this.initKeyStore(this.ksPath, this.ksPassword);
             }
@@ -337,7 +338,7 @@ final class KeyStoreConfigurationManager {
             }
         }
 
-        return ksManager.getAliases();
+        return this.ksManager.getAliases();
     }
 
     /** Recupera el gestor del almac&eacute;n de certificados actual ya
@@ -348,7 +349,7 @@ final class KeyStoreConfigurationManager {
      * @throws AOKeyStoreManagerException
      *         Cuando no se ha podido inicializar el almac&eacute;n. */
     AOKeyStoreManager getKeyStoreManager() throws AOKeyStoreManagerException, AOKeystoreAlternativeException {
-        if (ksManager == null) {
+        if (this.ksManager == null) {
             try {
                 this.initKeyStore(this.ksPath, this.ksPassword);
             }
@@ -363,13 +364,13 @@ final class KeyStoreConfigurationManager {
             }
         }
 
-        return ksManager;
+        return this.ksManager;
     }
 
     /** Devuelve el almac&eacute;n de certificados configurado.
      * @return Almac&eacute;n de certificados. */
     AOKeyStore getKeyStore() {
-        return ks;
+        return this.ks;
     }
 
     /** Recupera la referencia a la clave privada del certificado.
@@ -395,7 +396,7 @@ final class KeyStoreConfigurationManager {
      *         Cuando el usuario cancel&oacute; la operaci&oacute;n. */
     private String showCertSelectionDialog(final String[] certAlias, final boolean checkPrivateKey) throws AOCertificatesNotFoundException,
                                                                                                    AOCancelledOperationException {
-        return AOUIManager.showCertSelectionDialog(certAlias, // Aliases
+        return KeyStoreUtilities.showCertSelectionDialog(certAlias, // Aliases
                                                    (this.ksManager == null) ? null : this.ksManager.getKeyStores(), // KeyStores
                                                    this.parent, // Panel sobre el que mostrar el dialogo
                                                    checkPrivateKey, // Comprobar accesibilidad de claves privadas
@@ -431,7 +432,7 @@ final class KeyStoreConfigurationManager {
      * @return Certificado seleccionado o nulo si no hab&iacute;a ninguno. */
     X509Certificate getSelectedCertificate() {
         if (this.ke != null) {
-            final Certificate cert = ke.getCertificate();
+            final Certificate cert = this.ke.getCertificate();
             if (cert instanceof X509Certificate) {
                 return (X509Certificate) cert;
             }
@@ -439,13 +440,13 @@ final class KeyStoreConfigurationManager {
         if (this.selectedAlias != null) {
             return this.ksManager.getCertificate(this.selectedAlias);
         }
-        throw new UnsupportedOperationException("No se puede recuperar el Certificado X509");
+        throw new UnsupportedOperationException("No se puede recuperar el Certificado X509"); //$NON-NLS-1$
     }
 
     /** Recupera el alias del certificado seleccionado.
      * @return Alias del certificado. */
     String getSelectedAlias() {
-        return selectedAlias;
+        return this.selectedAlias;
     }
 
     /** Establece el alias del certificado que debe utilizarse.
@@ -512,6 +513,6 @@ final class KeyStoreConfigurationManager {
      * error se devolver&aacute; {@code null}.
      * @return Mensaje de error. */
     String getErrorMessage() {
-        return errorMessage;
+        return this.errorMessage;
     }
 }
