@@ -14,6 +14,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import es.gob.afirma.core.misc.AOUtil;
+
 /** Clase para la obtencion de los recursos textuales del n&uacute;cleo del
  * cliente de firma. */
 final class PDFMessages {
@@ -24,7 +26,7 @@ final class PDFMessages {
 
     static {
         try {
-            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
+            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
         }
         catch (final Exception e) {
             try {
