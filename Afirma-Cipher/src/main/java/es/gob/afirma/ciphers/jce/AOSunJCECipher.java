@@ -193,9 +193,9 @@ public final class AOSunJCECipher implements AOCipher {
             cipher.init(Cipher.DECRYPT_MODE, decipherKey, this.getParams(algorithmConfig));
         }
         catch (final InvalidKeyException e) {
-            throw new KeyException("La clave de descifrado introducida no es valida para el algoritmo '" + algorithmConfig.getAlgorithm() //$NON-NLS-1$
-                                                                                                                                   .getName() + "'", //$NON-NLS-1$
-                                            e);
+            throw new KeyException("La clave de descifrado introducida no es valida para el algoritmo '" //$NON-NLS-1$
+                    + algorithmConfig.getAlgorithm().getName() + "'", //$NON-NLS-1$
+                    e);
         }
         catch (final Exception e) {
             throw new AOException("Error al inicializar el descifrador", e); //$NON-NLS-1$
