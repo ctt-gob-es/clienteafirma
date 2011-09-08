@@ -755,7 +755,7 @@ final class MozillaKeyStoreUtilities {
             System.load(nssBinDir + "libsoftokn3.dylib"); //$NON-NLS-1$
             return; // Si funciona salimos sin hacer nada
         }
-        catch (final Exception e) {
+        catch (final Throwable e) {
             // Se ignora el error
         }
 
