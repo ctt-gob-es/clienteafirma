@@ -26,7 +26,6 @@ import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.massive.DirectorySignatureHelper.MassiveType;
 import es.gob.afirma.util.AOBase64;
 import es.gob.afirma.util.signers.AOSignerFactory;
 
@@ -96,10 +95,8 @@ public final class MassiveSignatureHelper {
      *        Tipo de operaci&oacute;n.
      * @see MassiveType */
     public void setMassiveOperation(MassiveType massiveOperation) {
-        if (massiveOperation == null) {
-            massiveOperation = MassiveType.SIGN;
-        }
-        this.massiveConfiguration.massiveOperation = massiveOperation;
+        this.massiveConfiguration.massiveOperation =
+            (massiveOperation != null ? massiveOperation : MassiveType.SIGN);
     }
 
     /** Libera la configuraci&oacute;n de la operaci&oacute;n masiva e inhabilita
