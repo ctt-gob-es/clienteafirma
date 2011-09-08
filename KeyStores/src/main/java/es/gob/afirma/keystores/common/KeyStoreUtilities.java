@@ -148,7 +148,7 @@ public final class KeyStoreUtilities {
      * @param certFilters
      *        Filtros a aplicar sobre los certificados
      * @return Alias seleccionado por el usuario */
-    public final static Hashtable<String, String> getAlisasesByFriendlyName(final String[] alias,
+    public final static Hashtable<String, String> getAliasesByFriendlyName(final String[] alias,
                                                                             final List<KeyStore> kss,
                                                                             final boolean checkPrivateKeys,
                                                                             final boolean checkValidity,
@@ -333,9 +333,6 @@ public final class KeyStoreUtilities {
      *        ser <code>null</code> si se quiere usar el m&eacute;todo para
      *        seleccionar otra cosa que no sean certificados X.509 (como
      *        claves de cifrado)
-     * @param keyUsageFilter
-     *        Filtro que determina que certificados se van a mostrar
-     *        seg&uacute;n su <code>KeyUsage</code>
      * @param parentComponent
      *        Componente padre (para ls amodalidad)
      * @param checkPrivateKeys
@@ -418,7 +415,7 @@ public final class KeyStoreUtilities {
         }
 
         final Hashtable<String, String> aliassesByFriendlyName =
-                KeyStoreUtilities.getAlisasesByFriendlyName(alias, kss, checkPrivateKeys, checkValidity, showExpiredCertificates, certFilters);
+                KeyStoreUtilities.getAliasesByFriendlyName(alias, kss, checkPrivateKeys, checkValidity, showExpiredCertificates, certFilters);
 
         // Miramos si despues de filtrar las entradas queda alguna o se ha
         // quedado la lista vacia
