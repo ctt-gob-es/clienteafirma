@@ -19,14 +19,15 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOCoSigner;
+import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.beans.AOSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.signers.cades.multi.AOCAdESCoSigner;
-import es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner;
 import es.gob.afirma.signers.pkcs7.ExtractMimeType;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -123,11 +124,27 @@ public final class AOCAdESSigner implements AOSigner {
     }
 
     public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-        return new AOCAdESCoSigner().cosign(data, sign, algorithm, keyEntry, extraParams);
+        try {
+            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCoSigner").newInstance()).cosign(data, sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
+        }
+        catch(AOException e) {
+            throw e;
+        }
+        catch(final Exception e) {
+            throw new UnsupportedOperationException("No se pueden realizar cofirmas CAdES", e); //$NON-NLS-1$
+        }
     }
 
     public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-        return new AOCAdESCoSigner().cosign(sign, algorithm, keyEntry, extraParams);
+        try {
+            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCoSigner").newInstance()).cosign(sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
+        }
+        catch(AOException e) {
+            throw e;
+        }
+        catch(final Exception e) {
+            throw new UnsupportedOperationException("No se pueden realizar cofirmas CAdES", e); //$NON-NLS-1$
+        }
     }
 
     public byte[] countersign(final byte[] sign,
@@ -136,7 +153,15 @@ public final class AOCAdESSigner implements AOSigner {
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
                               Properties extraParams) throws AOException {
-        return new AOCAdESCounterSigner().countersign(sign, algorithm, targetType, targets, keyEntry, extraParams);
+        try {
+            return ((AOCounterSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner").newInstance()).countersign(sign, algorithm, targetType, targets, keyEntry, extraParams); //$NON-NLS-1$
+        }
+        catch(AOException e) {
+            throw e;
+        }
+        catch(final Exception e) {
+            throw new UnsupportedOperationException("No se pueden realizar contrafirmas CAdES", e); //$NON-NLS-1$
+        }
     }
 
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
@@ -145,7 +170,7 @@ public final class AOCAdESSigner implements AOSigner {
             return Rn.readNodesTree(sign, asSimpleSignInfo);
         }
         catch (final Exception ex) {
-            LOGGER.severe("No se ha podido obtener el albol de firmantes de la firma, se devolvera null: " + ex); //$NON-NLS-1$
+            LOGGER.severe("No se ha podido obtener el arbol de firmantes de la firma, se devolvera null: " + ex); //$NON-NLS-1$
         }
         return null;
     }
