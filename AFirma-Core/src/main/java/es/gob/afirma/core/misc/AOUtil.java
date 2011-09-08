@@ -741,9 +741,13 @@ public final class AOUtil {
      * @throws ClassNotFoundException cuando no se encuentra la clase a cargar
      */
     public static Class<?> classForName(final String className) throws ClassNotFoundException {
-        if (className == null || "".equals(className)) { //$NON-NLS-1$
-            throw new IllegalArgumentException("La clase a cargar no puede ser nula ni vacia"); //$NON-NLS-1$
-        }
+        return getCleanClassLoader().loadClass(className);
+    }
+    
+    /** Obtiene un ClassLoader que no incluye URL que no referencien directamente a ficheros JAR.
+     * @return ClassLoader sin URL adicionales a directorios sueltos Web
+     */
+    public static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOUtil.class.getClassLoader();
         if (classLoader instanceof URLClassLoader) {
             Vector<URL> urls = new Vector<URL>();
@@ -754,7 +758,7 @@ public final class AOUtil {
                 classLoader = new URLClassLoader(urls.toArray(new URL[0]));
             }
         }
-        return classLoader.loadClass(className);
+        return classLoader;
     }
 }
 
