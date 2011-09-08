@@ -45,10 +45,10 @@ final class AOJarVerifier {
 
     private static final long SIX_MONTHS = 180 * 24 * 60 * 60 * 1000L; // milliseconds
 
-    private static final String META_INF = "META-INF/";
+    private static final String META_INF = "META-INF/"; //$NON-NLS-1$
 
     // prefix for new signature-related files in META-INF directory
-    private static final String SIG_PREFIX = META_INF + "SIG-";
+    private static final String SIG_PREFIX = META_INF + "SIG-"; //$NON-NLS-1$
 
     /** Verifica la firma JAR de un fichero JAR o ZIP-
      * @param jarName Nombre (incluida ruta) del fichero cuya firma se desea verificar
@@ -57,12 +57,12 @@ final class AOJarVerifier {
      *         problema durante la verificaci&oacute;n */
     void verifyJar(final String jarName, final X509Certificate signerCert) {
 
-        if (jarName == null || "".equals(jarName)) {
-            throw new SecurityException("El fichero proporcionado es nulo o vacio, y por lo tanto no esta firmado");
+        if (jarName == null || "".equals(jarName)) { //$NON-NLS-1$
+            throw new SecurityException("El fichero proporcionado es nulo o vacio, y por lo tanto no esta firmado"); //$NON-NLS-1$
         }
 
         if (signerCert == null) {
-            throw new SecurityException("Es obligatorio proporcionar un certificado para comprobar las firmas");
+            throw new SecurityException("Es obligatorio proporcionar un certificado para comprobar las firmas"); //$NON-NLS-1$
         }
 
         boolean anySigned = false;
@@ -91,7 +91,9 @@ final class AOJarVerifier {
                         try {
                             is.close();
                         }
-                        catch (final Exception e) {}
+                        catch (final Exception e) {
+                         // Ignoramos los errores en el cierre
+                        }
                     }
                 }
             }
@@ -122,11 +124,11 @@ final class AOJarVerifier {
                                 }
 
                                 if (!signerCert.equals(cert)) {
-                                    throw new SecurityException("El certificado firmante no se corresponde con el indicado");
+                                    throw new SecurityException("El certificado firmante no se corresponde con el indicado"); //$NON-NLS-1$
                                 }
                             }
                             else {
-                                throw new SecurityException("El codigo se ha firmado con un certificado que no cumple la norma X.509");
+                                throw new SecurityException("El codigo se ha firmado con un certificado que no cumple la norma X.509"); //$NON-NLS-1$
                             }
                         }
                     } // if isSigned
@@ -134,39 +136,41 @@ final class AOJarVerifier {
                 } // while
             } // if man != null
             else {
-                throw new SecurityException("No se encontro manifest en el fichero ZIP/JAR");
+                throw new SecurityException("No se encontro manifest en el fichero ZIP/JAR"); //$NON-NLS-1$
             }
 
             if (!anySigned) {
-                throw new SecurityException("El fichero ZIP/JAR no esta firmado (faltan firmas o no son procesables)");
+                throw new SecurityException("El fichero ZIP/JAR no esta firmado (faltan firmas o no son procesables)"); //$NON-NLS-1$
             }
 
             if (hasUnsignedEntry) {
-                throw new SecurityException("Hay entradas sin firmar en el fichero ZIP/JAR");
+                throw new SecurityException("Hay entradas sin firmar en el fichero ZIP/JAR"); //$NON-NLS-1$
             }
 
             if (this.hasExpiringCert) {
-                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses");
+                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses"); //$NON-NLS-1$
             }
 
             if (this.hasExpiredCert) {
-                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado");
+                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado"); //$NON-NLS-1$
             }
 
             if (this.notYetValidCert) {
-                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido");
+                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido"); //$NON-NLS-1$
             }
 
         }
         catch (final Exception e) {
-            throw new SecurityException("La firma del fichero JAR/ZIP '" + jarName + "' no es valida o no se ha podido comprobar", e);
+            throw new SecurityException("La firma del fichero JAR/ZIP '" + jarName + "' no es valida o no se ha podido comprobar", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         finally { // close the resource
             if (jf != null) {
                 try {
                     jf.close();
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) {
+                 // Ignoramos los errores en el cierre
+                }
             }
         }
 
@@ -201,7 +205,7 @@ final class AOJarVerifier {
      *         Signature File or PKCS7 block file name */
     private static boolean isBlockOrSF(final String s) {
         // we currently only support DSA and RSA PKCS7 blocks
-        if (s.endsWith(".SF") || s.endsWith(".DSA") || s.endsWith(".RSA")) {
+        if (s.endsWith(".SF") || s.endsWith(".DSA") || s.endsWith(".RSA")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return true;
         }
         return false;

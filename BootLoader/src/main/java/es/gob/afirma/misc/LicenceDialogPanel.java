@@ -62,13 +62,15 @@ public final class LicenceDialogPanel {
         }
         catch (final Exception e2) {
             licenseText = BootLoaderMessages.getString("LicenceDialogPanel.2"); //$NON-NLS-1$
-            AfirmaBootLoader.LOGGER.warning("Error al acceder a las condiciones de la licencia: " + e2); //$NON-NLS-1$ //$NON-NLS-2$
+            AfirmaBootLoader.LOGGER.warning("Error al acceder a las condiciones de la licencia: " + e2); //$NON-NLS-1$
         }
 
         try {
             licenseIs.close();
         }
-        catch (final Exception e) {}
+        catch (final Exception e) {
+            // Ignoramos los errores en el cierre
+        }
 
         // Texto del acuerdo de licencia
         final JTextArea textArea = new JTextArea(licenseText);

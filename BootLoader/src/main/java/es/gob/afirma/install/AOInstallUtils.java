@@ -33,11 +33,15 @@ import es.gob.afirma.misc.AOBootUtil;
 /** Funciones de utilidad para la instalaci&oacute;n del Cliente Afirma. */
 final class AOInstallUtils {
 
-    private AOInstallUtils() {}
+    private AOInstallUtils() {
+        // No permitimos la instanciacion
+    }
     
     private static final int BUFFER_SIZE = 1024;
 
-    static final String PACK200_SUFIX = ".pack.gz";
+    static final String PACK200_SUFIX = ".pack.gz"; //$NON-NLS-1$
+    private static final String JAR_SUFIX = ".jar"; //$NON-NLS-1$
+    
 
     /** Desempaqueta un fichero Pack200 para obtener el fichero JAR equivalente. El fichero
      * JAR resultante se almacenar&aacute; en el mismo directorio que el original y tendr&aacute;
@@ -47,11 +51,11 @@ final class AOInstallUtils {
     static void unpack(final String pack200Filename) throws AOException {
 
         // Obtenemos el nombre del fichero de salida
-        String jarFilename = pack200Filename + ".jar";
-        if (pack200Filename.endsWith(".pack") || pack200Filename.endsWith(".pack.gz")) {
-            jarFilename = pack200Filename.substring(0, pack200Filename.lastIndexOf(".pack"));
-            if (!jarFilename.endsWith(".jar")) {
-                jarFilename += ".jar";
+        String jarFilename = pack200Filename + JAR_SUFIX;
+        if (pack200Filename.endsWith(".pack") || pack200Filename.endsWith(PACK200_SUFIX)) { //$NON-NLS-1$
+            jarFilename = pack200Filename.substring(0, pack200Filename.lastIndexOf(".pack")); //$NON-NLS-1$
+            if (!jarFilename.endsWith(JAR_SUFIX)) {
+                jarFilename += JAR_SUFIX;
             }
         }
 
@@ -65,10 +69,10 @@ final class AOInstallUtils {
      * @throws AOException Cuando ocurre un error durante el desempaquetado. */
     static void unpack(final String pack200Filename, final String targetJarFilename) throws AOException {
         if (pack200Filename == null) {
-            throw new IllegalArgumentException("El Pack200 origen no puede ser nulo");
+            throw new IllegalArgumentException("El Pack200 origen no puede ser nulo"); //$NON-NLS-1$
         }
         if (targetJarFilename == null) {
-            throw new IllegalArgumentException("El JAR de destino no puede ser nulo");
+            throw new IllegalArgumentException("El JAR de destino no puede ser nulo"); //$NON-NLS-1$
         }
         createDirectory(new File(targetJarFilename).getParentFile());
         try {
@@ -76,7 +80,7 @@ final class AOInstallUtils {
                             new FileOutputStream(new File(targetJarFilename)));
         }
         catch (final Exception e) {
-            throw new AOException("Error al desempaquetar el fichero '" + pack200Filename + "'", e);
+            throw new AOException("Error al desempaquetar el fichero '" + pack200Filename + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Eliminamos la version empaquetada
@@ -90,7 +94,7 @@ final class AOInstallUtils {
      * @throws IOException Si ocurre cualquier problema durante la descompresi&oacute;n */
     private static void unpack200gunzip(final InputStream packgz, final OutputStream jar) throws IOException {
         if (packgz == null) {
-            throw new IllegalArgumentException("El pack.gz es nulo");
+            throw new IllegalArgumentException("El pack.gz es nulo"); //$NON-NLS-1$
         }
         final InputStream is = new GZIPInputStream(packgz);
         final Unpacker u = java.util.jar.Pack200.newUnpacker();
@@ -116,7 +120,7 @@ final class AOInstallUtils {
             throw new IllegalArgumentException("El fichero Zip no puede ser nulo"); //$NON-NLS-1$
         }
         if (destDirectory == null) {
-            destDirectory = new File("."); //$NON-NLS-1$
+            throw new IllegalArgumentException("El directorio de destino para descomprimir el Zip no puede ser nulo"); //$NON-NLS-1$
         }
 
         // Si no existe el directorio de destino, lo creamos
@@ -143,7 +147,7 @@ final class AOInstallUtils {
                 entryName = entry.getName();
                 
                 // No decomprimimos entradas con "..", para evitar problemas de seguridad
-                if (entryName.contains("..")) {
+                if (entryName.contains("..")) { //$NON-NLS-1$
                     continue;
                 }
                 
@@ -172,11 +176,15 @@ final class AOInstallUtils {
                     try {
                         fos.flush();
                     }
-                    catch (final Exception e) {}
+                    catch (final Exception e) {
+                        // Ignoramos los errores en el vaciado
+                    }
                     try {
                         fos.close();
                     }
-                    catch (final Exception e) {}
+                    catch (final Exception e) {
+                        // Ignoramos los errores en el cierre
+                    }
                 }
             }
             catch (final Exception e) {
@@ -217,7 +225,7 @@ final class AOInstallUtils {
 
         // Obtenemos el nombre del fichero destino a partir del directorio de destino y el nombre del nuevo
         // fichero o el del fichero remoto si no se indico uno nuevo
-        final String filename = (newFilename != null ? newFilename : urlFile.getPath().substring(urlFile.getPath().lastIndexOf('/'))); //$NON-NLS-1$
+        final String filename = (newFilename != null ? newFilename : urlFile.getPath().substring(urlFile.getPath().lastIndexOf('/')));
         final File outFile = new File(dirDest, filename);
         if (!outFile.getParentFile().exists()) {
             outFile.getParentFile().mkdirs();
@@ -251,13 +259,13 @@ final class AOInstallUtils {
             is.close();
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se pudo cerrar el fichero remoto: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            AfirmaBootLoader.LOGGER.warning("No se pudo cerrar el fichero remoto: " + e); //$NON-NLS-1$
         }
         try {
             fos.close();
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se pudo cerrar el fichero local: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            AfirmaBootLoader.LOGGER.warning("No se pudo cerrar el fichero local: " + e); //$NON-NLS-1$
         }
     }
 
@@ -275,7 +283,7 @@ final class AOInstallUtils {
         File file = null;
         do {
             try {
-                file = File.createTempFile("afirma", null);
+                file = File.createTempFile("afirma", null); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 continue;
@@ -287,7 +295,7 @@ final class AOInstallUtils {
         } while (file != null && file.exists() && n <= 5);
 
         if (n > 5 || file == null) {
-            AfirmaBootLoader.LOGGER.warning("No se pudo crear un fichero temporal");
+            AfirmaBootLoader.LOGGER.warning("No se pudo crear un fichero temporal"); //$NON-NLS-1$
             return null;
         }
 
@@ -319,7 +327,7 @@ final class AOInstallUtils {
 
         // Borramos el propio fichero o directorio
         if (!dir.delete()) {
-            AfirmaBootLoader.LOGGER.severe("No se ha podido eliminar el archivo: " + dir); //$NON-NLS-1$ //$NON-NLS-2$
+            AfirmaBootLoader.LOGGER.severe("No se ha podido eliminar el archivo: " + dir); //$NON-NLS-1$
             success = false;
         }
         return success;
@@ -350,7 +358,9 @@ final class AOInstallUtils {
             try {
                 tempFile.delete();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+                // Ignoramos los errores en el borrado, es responsabilidad del usuario limpiar periodicamente los temporales
+            }
         }
     }
 
@@ -381,7 +391,7 @@ final class AOInstallUtils {
      * @throws SecurityException Cuando se produce cualquier error durante el proceso. */
     private static void checkSign(final File jarFile, final SigningCert sCert) {
         if (AfirmaBootLoader.DEBUG) {
-            AfirmaBootLoader.LOGGER.severe("IMPORTANTE: Modo de depuracion, comprobaciones de firma desactivadas");
+            AfirmaBootLoader.LOGGER.severe("IMPORTANTE: Modo de depuracion, comprobaciones de firma desactivadas"); //$NON-NLS-1$
             return;
         }
         new AOJarVerifier().verifyJar(jarFile.getAbsolutePath(), sCert.getSigningCertificate());
@@ -389,38 +399,38 @@ final class AOInstallUtils {
 
     private static void createDirectory(final File dir) {
         if (dir == null) {
-            AfirmaBootLoader.LOGGER.warning("Se ha pedido crear un directorio nulo, se ignorara la peticion");
+            AfirmaBootLoader.LOGGER.warning("Se ha pedido crear un directorio nulo, se ignorara la peticion"); //$NON-NLS-1$
             return;
         }
         if (dir.exists()) {
             if (!dir.canWrite()) {
-                AfirmaBootLoader.LOGGER.severe("El fichero/directorio '" + dir.getAbsolutePath()
-                                                         + "' ya existe, pero no se tienen derechos de escritura sobre el");
+                AfirmaBootLoader.LOGGER.severe("El fichero/directorio '" + dir.getAbsolutePath() //$NON-NLS-1$
+                                                         + "' ya existe, pero no se tienen derechos de escritura sobre el"); //$NON-NLS-1$
                 return;
             }
             if (dir.isFile()) {
                 if (dir.delete()) {
                     if (dir.mkdir()) {
-                        AfirmaBootLoader.LOGGER.warning("'" + dir.getAbsolutePath()
-                                 + "' ya existia como fichero, se ha borrado y se ha creado un directorio con el mismo nombre");
+                        AfirmaBootLoader.LOGGER.warning("'" + dir.getAbsolutePath() //$NON-NLS-1$
+                                 + "' ya existia como fichero, se ha borrado y se ha creado un directorio con el mismo nombre"); //$NON-NLS-1$
                         return;
                     }
 
-                    AfirmaBootLoader.LOGGER.severe("'" + dir.getAbsolutePath()
-                            + "' ya existia como fichero y se ha borrado, pero no se ha podido crear un directorio con el mismo nombre");
+                    AfirmaBootLoader.LOGGER.severe("'" + dir.getAbsolutePath() //$NON-NLS-1$
+                            + "' ya existia como fichero y se ha borrado, pero no se ha podido crear un directorio con el mismo nombre"); //$NON-NLS-1$
                     return;
                 }
-                AfirmaBootLoader.LOGGER.severe("'" + dir.getAbsolutePath() + "' ya existe como fichero y no se ha podido borrar");
+                AfirmaBootLoader.LOGGER.severe("'" + dir.getAbsolutePath() + "' ya existe como fichero y no se ha podido borrar"); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
         }
         // Si no existe
         else {
             if (!dir.getParentFile().canWrite()) {
-                AfirmaBootLoader.LOGGER.severe("El directorio '" + dir.getParent() + "' no tiene permisos de escritura, se intentara de todas formas");
+                AfirmaBootLoader.LOGGER.severe("El directorio '" + dir.getParent() + "' no tiene permisos de escritura, se intentara de todas formas"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             if (!dir.mkdir()) {
-                AfirmaBootLoader.LOGGER.severe("No se ha podido crear el directorio '" + dir.getAbsolutePath() + "'");
+                AfirmaBootLoader.LOGGER.severe("No se ha podido crear el directorio '" + dir.getAbsolutePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
     }
@@ -438,7 +448,7 @@ final class AOInstallUtils {
         if (classLoader instanceof URLClassLoader) {
             Vector<URL> urls = new Vector<URL>();
             for (URL url : ((URLClassLoader)classLoader).getURLs()) {
-                if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+                if (url.toString().endsWith(JAR_SUFIX)) {
                     urls.add(url);
                 }
                 classLoader = new URLClassLoader(urls.toArray(new URL[0]));

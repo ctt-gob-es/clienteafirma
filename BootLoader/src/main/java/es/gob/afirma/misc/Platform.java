@@ -72,7 +72,9 @@ public final class Platform {
     private static boolean initialized = false;
 
     /** Constructor bloqueado. */
-    private Platform() {}
+    private Platform() {
+        // No permitimos la instanciacion
+    }
 
     /*
      *  Se realiza una inicializacion automatica con las propiedades de la plataforma.
@@ -88,50 +90,50 @@ public final class Platform {
      * Se agrupan las inicializaciones aqu&iacute; para poder llamarlo desde un <code>privilegedAction</code> */
     public static void init() {
         try {
-            userHome = System.getProperty("user.home");
-            javaLibraryPath = System.getProperty("java.library.path");
-            final String osName = System.getProperty("os.name");
+            userHome = System.getProperty("user.home"); //$NON-NLS-1$
+            javaLibraryPath = System.getProperty("java.library.path"); //$NON-NLS-1$
+            final String osName = System.getProperty("os.name"); //$NON-NLS-1$
 
-            if (osName.contains("indows")) {
+            if (osName.contains("indows")) { //$NON-NLS-1$
                 os = OS.WINDOWS;
             }
-            else if (osName.contains("inux")) {
+            else if (osName.contains("inux")) { //$NON-NLS-1$
                 os = OS.LINUX;
             }
-            else if (osName.contains("SunOS") || osName.contains("olaris")) {
+            else if (osName.contains("SunOS") || osName.contains("olaris")) { //$NON-NLS-1$ //$NON-NLS-2$
                 os = OS.SOLARIS;
             }
-            else if (osName.startsWith("Mac OS X")) {
+            else if (osName.startsWith("Mac OS X")) { //$NON-NLS-1$
                 os = OS.MACOSX;
             }
             else {
                 os = OS.OTHER;
-                AfirmaBootLoader.LOGGER.warning("No se ha podido determinar el sistema operativo");
+                AfirmaBootLoader.LOGGER.warning("No se ha podido determinar el sistema operativo"); //$NON-NLS-1$
             }
 
-            javaArch = System.getProperty("sun.arch.data.model");
+            javaArch = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
             if (javaArch == null) {
-                javaArch = System.getProperty("com.ibm.vm.bitmode");
+                javaArch = System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
             }
             javaHome = recoverJavaHome();
             initialized = true;
-            final String jreVersion = System.getProperty("java.version");
-            if (jreVersion.startsWith("1.0") || jreVersion.startsWith("1.1")
-                    || jreVersion.startsWith("1.2")
-                    || jreVersion.startsWith("1.3")
-                    || jreVersion.startsWith("1.4")) {
+            final String jreVersion = System.getProperty("java.version"); //$NON-NLS-1$
+            if (jreVersion.startsWith("1.0") || jreVersion.startsWith("1.1")  //$NON-NLS-1$//$NON-NLS-2$
+                    || jreVersion.startsWith("1.2") //$NON-NLS-1$
+                    || jreVersion.startsWith("1.3") //$NON-NLS-1$
+                    || jreVersion.startsWith("1.4")) { //$NON-NLS-1$
                 javaVersion = JREVER.J4;
             }
-            else if (jreVersion.startsWith("1.5")) {
+            else if (jreVersion.startsWith("1.5")) { //$NON-NLS-1$
                 javaVersion = JREVER.J5;
             }
-            else if (jreVersion.startsWith("1.6")) {
+            else if (jreVersion.startsWith("1.6")) { //$NON-NLS-1$
                 javaVersion = JREVER.J6;
             }
             else {
                 javaVersion = JREVER.J7;
             }
-            osArch = System.getProperty("os.arch");
+            osArch = System.getProperty("os.arch"); //$NON-NLS-1$
         }
         catch (final Exception e) {
             initialized = false;
@@ -194,18 +196,20 @@ public final class Platform {
     private static String recoverJavaHome() {
         String ret = null;
         try {
-            ret = System.getProperty("jnlpx.home");
+            ret = System.getProperty("jnlpx.home"); //$NON-NLS-1$
         }
-        catch (final Exception e) {}
+        catch (final Exception e) {
+            // Ignoramos los errores
+        }
         if (ret != null) {
             return ret.substring(0, ret.lastIndexOf(File.separator));
         }
 
         try {
-            return System.getProperty("java.home");
+            return System.getProperty("java.home"); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se ha podido identificar el directorio de java");
+            AfirmaBootLoader.LOGGER.warning("No se ha podido identificar el directorio de java"); //$NON-NLS-1$
         }
 
         return null;

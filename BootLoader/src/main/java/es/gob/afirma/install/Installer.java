@@ -43,7 +43,7 @@ final class Installer {
     }
 
     /** Componente padre sobre el que se situar&aacute;n los mensajes del instalador. */
-    private Component parentComponent = null;
+    Component parentComponent = null;
 
     /** Componente para la comprobaci&oacute;n e instalaci&oacute;n de las dependencias
      * de entorno del Cliente. */
@@ -66,31 +66,30 @@ final class Installer {
 
     }
 
-    /** Desinstala el cliente de firma al completo.
-     * @return Devuelve <code>true</code> si la desinstalaci&oacute;n finaliz&oacute; correctamente, <code>false</code> en caso contrario. */
-    boolean uninstall() {
+    /** Desinstala el cliente de firma al completo. */
+    void uninstall() {
         final File afirmaDir = new File(Platform.getUserHome() + File.separator + Installer.INSTALL_DIR);
 
-        return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
             /** {@inheritDoc} */
-            public Boolean run() {
+            public Void run() {
                 if (!afirmaDir.exists()) {
                     AfirmaBootLoader.LOGGER.info("El directorio de instalacion no existe, se omitira la operacion"); //$NON-NLS-1$
-                    return Boolean.TRUE;
+                    return null;
                 }
                 try {
                     fileDelete(afirmaDir);
                     JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString("Installer.11"), //$NON-NLS-1$
                                                   BootLoaderMessages.getString("Installer.12"), //$NON-NLS-1$
                                                   JOptionPane.INFORMATION_MESSAGE);
-                    return Boolean.TRUE;
+                    return null;
                 }
                 catch (final Exception e) {
                     AfirmaBootLoader.LOGGER.warning("No se ha podido eliminar el directorio de instalacion: " + e); //$NON-NLS-1$
                     JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString("Installer.13"), //$NON-NLS-1$
                                                   BootLoaderMessages.getString("Installer.12"), //$NON-NLS-1$
                                                   JOptionPane.ERROR_MESSAGE);
-                    return Boolean.TRUE;
+                    return null;
                 }
             }
 
@@ -105,7 +104,7 @@ final class Installer {
                     srcFile.delete();
                 }
             }
-        }).booleanValue();
+        });
 
     }
 
@@ -120,10 +119,10 @@ final class Installer {
                                       BootLoaderMessages.getString("Installer.0"), BootLoaderMessages.getString("Installer.1"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
         final boolean accepted = new LicenceDialogPanel(this.parentComponent).showDisclaimer();
         if (accepted) {
-            AfirmaBootLoader.LOGGER.info("Se ha aceptado el acuerdo de licencia"); //$NON-NLS-1$ //$NON-NLS-2$
+            AfirmaBootLoader.LOGGER.info("Se ha aceptado el acuerdo de licencia"); //$NON-NLS-1$
         }
         else {
-            AfirmaBootLoader.LOGGER.info("No se ha aceptado el acuerdo de licencia, no se instalara el Cliente"); //$NON-NLS-1$ //$NON-NLS-2$
+            AfirmaBootLoader.LOGGER.info("No se ha aceptado el acuerdo de licencia, no se instalara el Cliente"); //$NON-NLS-1$
         }
         return accepted;
     }
@@ -156,7 +155,7 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando dependencias de @firma para Java 5..."); //$NON-NLS-1$ //$NON-NLS-2$
+                AfirmaBootLoader.LOGGER.info("Instalando dependencias de @firma para Java 5..."); //$NON-NLS-1$
                 this.enviromentInstaller.installEndorsedJava5AFirmaDependencies();
             }
         }
@@ -176,7 +175,7 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando Apache XALAN..."); //$NON-NLS-1$ //$NON-NLS-2$
+                AfirmaBootLoader.LOGGER.info("Instalando Apache XALAN..."); //$NON-NLS-1$
                 this.enviromentInstaller.installEndorsedXalan();
             }
         }
@@ -196,7 +195,7 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando NSS..."); //$NON-NLS-1$ //$NON-NLS-2$
+                AfirmaBootLoader.LOGGER.info("Instalando NSS..."); //$NON-NLS-1$
                 this.enviromentInstaller.installNSS();
             }
         }
@@ -210,27 +209,27 @@ final class Installer {
             allOK = false;
         }
 
-        try {
-            if (this.enviromentInstaller.isNSSConfigurationNeeded()) {
-                if (!licenciaMostrada && !prepareInstall()) {
-                    return;
-                }
-                licenciaMostrada = true;
+//        try {
+//            if (this.enviromentInstaller.isNSSConfigurationNeeded()) {
+//                if (!licenciaMostrada && !prepareInstall()) {
+//                    return;
+//                }
+//                licenciaMostrada = true;
 //                this.enviromentInstaller.configureNSS();
-            }
-        }
-        catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e); //$NON-NLS-1$
-            if (AfirmaBootLoader.DEBUG) {
-                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-            }
-            JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString(BootLoaderMessages.getString("Installer.18")), //$NON-NLS-1$
-                                          BootLoaderMessages.getString("Installer.26"), //$NON-NLS-1$
-                                          JOptionPane.WARNING_MESSAGE);
-            allOK = false;
-        }
+//            }
+//        }
+//        catch (final Exception e) {
+//            AfirmaBootLoader.LOGGER.severe("Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e); //$NON-NLS-1$
+//            if (AfirmaBootLoader.DEBUG) {
+//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+//                e.printStackTrace(new java.io.PrintStream(baos));
+//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+//            }
+//            JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString(BootLoaderMessages.getString("Installer.18")), //$NON-NLS-1$
+//                                          BootLoaderMessages.getString("Installer.26"), //$NON-NLS-1$
+//                                          JOptionPane.WARNING_MESSAGE);
+//            allOK = false;
+//        }
 
         try {
             if (this.enviromentInstaller.isSunMSCAPINeeded()) {
@@ -238,7 +237,7 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando SunMSCAPI..."); //$NON-NLS-1$ //$NON-NLS-2$
+                AfirmaBootLoader.LOGGER.info("Instalando SunMSCAPI..."); //$NON-NLS-1$
                 this.enviromentInstaller.installSunMSCAPI();
             }
         }
@@ -258,7 +257,7 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando SunPKCS11..."); //$NON-NLS-1$ //$NON-NLS-2$
+                AfirmaBootLoader.LOGGER.info("Instalando SunPKCS11..."); //$NON-NLS-1$
                 this.enviromentInstaller.installSunPKCS11();
             }
         }

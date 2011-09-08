@@ -8,7 +8,9 @@ public final class WinRegistry {
         initIDs();
     }
 
-    private WinRegistry() {}
+    private WinRegistry() {
+        // No permitimos la instanciacion
+    }
     
     private static final int KEY_READ = 0x20019;
 
@@ -48,7 +50,7 @@ public final class WinRegistry {
         /** Retorna el valor tras realizar el casting al objeto java adecuado, ya sea este un entero,
          * una cadena o en su defecto un array de bytes.
          * @return Valor actual */
-        private Object getValue() {
+        Object getValue() {
             switch (this.type) {
                 case REG_SZ:
                     if (this.data.length <= 0) {

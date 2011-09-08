@@ -13,13 +13,15 @@ public final class WinRegistryWrapper {
             try {
                 AOBootUtil.loadNativeLibrary(Platform.getJavaHome() + "\\bin\\deploy.dll"); //$NON-NLS-1$
             }
-            catch (final Exception e) {
-                AfirmaBootLoader.LOGGER.warning("No se ha podido cargar la libreria de despliegue 'deploy.dll', no se podra acceder al registro de Windows: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            catch (final Throwable e) {
+                AfirmaBootLoader.LOGGER.warning("No se ha podido cargar la libreria de despliegue 'deploy.dll', no se podra acceder al registro de Windows: " + e); //$NON-NLS-1$
             }
         }
     }
 
-    private WinRegistryWrapper() {}
+    private WinRegistryWrapper() {
+        // No permitimos la instanciacion
+    }
 
     /** Clave HKEY_LOCAL_MACHINE del registro de Windows. */
     public static final int HKEY_LOCAL_MACHINE = 0x80000002;
@@ -37,10 +39,10 @@ public final class WinRegistryWrapper {
             return WinRegistry.getString(hKey, path, name);
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe( //$NON-NLS-1$
-                                                      "No se ha podido obtener la clave de registro con ruta '" + //$NON-NLS-1$
-                                                      path
-                                                      + "' y nombre '" + name + "', se devolvera null: " + e //$NON-NLS-1$ //$NON-NLS-2$
+            AfirmaBootLoader.LOGGER.severe(
+                  "No se ha podido obtener la clave de registro con ruta '" + //$NON-NLS-1$
+                  path
+                  + "' y nombre '" + name + "', se devolvera null: " + e //$NON-NLS-1$ //$NON-NLS-2$
             );
         }
         return null;

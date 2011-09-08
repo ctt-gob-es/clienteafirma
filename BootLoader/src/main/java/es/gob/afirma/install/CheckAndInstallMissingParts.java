@@ -37,13 +37,13 @@ final class CheckAndInstallMissingParts {
     private static final long serialVersionUID = -7508890516967067205L;
 
     /** JAR con las clases de compatibilidad del cliente con Java 5 (s&oacute;lo Java 5). */
-    private static final String AFIRMA_JAVA5_JAR = "afirma_5_java_5.jar";
+    private static final String AFIRMA_JAVA5_JAR = "afirma_5_java_5.jar"; //$NON-NLS-1$
 
     /** Archivo zip con las librerias Xalan en formato PACK200 necesarias para la firma XML en JDK 5. */
-    private static final String XALAN_LIBRARY_ZIP = "xalan.zip";
+    private static final String XALAN_LIBRARY_ZIP = "xalan.zip"; //$NON-NLS-1$
 
     /** Archivo zip con las librerias Xalan en formato JAR necesarias para la firma XML en JDK 5. */
-    private static final String XALAN_JARLIBRARY_ZIP = "xalanjar.zip";
+    private static final String XALAN_JARLIBRARY_ZIP = "xalanjar.zip"; //$NON-NLS-1$
 
 //    /** Archivo zip con las librerias Apache XMLSec en formato PACK200 necesarias para la firma XML en JDK 7. */
 //    private static final String XMLSEC_LIBRARY_ZIP = "xmlsec.zip";
@@ -65,7 +65,7 @@ final class CheckAndInstallMissingParts {
      * @param instalDir Directorio de instalaci&oacute;n. */
     CheckAndInstallMissingParts(final OS ost, final JREVER jreVer, final String bld, final URL filesCodeBase) {
         if (filesCodeBase == null) {
-            throw new IllegalArgumentException("Es necesario proporcionar una URL de descarga para los ficheros de instalacion");
+            throw new IllegalArgumentException("Es necesario proporcionar una URL de descarga para los ficheros de instalacion"); //$NON-NLS-1$
         }
         this.installFilesCodeBase = filesCodeBase;
         this.os = ost;
@@ -81,17 +81,16 @@ final class CheckAndInstallMissingParts {
                                      Platform.getJavaArch());
 
         try {
-            AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, this.os.toString() + "_nss_"
+            AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, this.os.toString() + "_nss_" //$NON-NLS-1$
                                                                + Platform.getOsArch()
-                                                               + "_JRE"
+                                                               + "_JRE" //$NON-NLS-1$
                                                                + Platform.getJavaArch()
-                                                               + ".zip"),
+                                                               + ".zip"), //$NON-NLS-1$
                                                                nssDir,
                                                                SigningCert.INTEGRATOR);
         }
         catch (final Exception e) {
-            throw new AOException("No se puede copiar NSS al directorio por defecto, compruebe que no existe previamente y que se cuenta con los permisos adecuados: " + e, e //$NON-NLS-1$
-            );
+            throw new AOException("No se puede copiar NSS al directorio por defecto, compruebe que no existe previamente y que se cuenta con los permisos adecuados: " + e, e); //$NON-NLS-1$
         }
     }
 
@@ -108,8 +107,8 @@ final class CheckAndInstallMissingParts {
             AOInstallUtils.unpack(Platform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning( //$NON-NLS-1$
-                                                       "No se ha podido instalar el paquete de compatibilidad con Java 5 en formato PACK200, se intentara en formato JAR: " + e //$NON-NLS-1$
+            AfirmaBootLoader.LOGGER.warning(
+               "No se ha podido instalar el paquete de compatibilidad con Java 5 en formato PACK200, se intentara en formato JAR: " + e //$NON-NLS-1$
             );
             // Borramos el Pack200 si se llego a copiar
             final File compPack200File = new File(Platform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
@@ -117,7 +116,9 @@ final class CheckAndInstallMissingParts {
                 try {
                     compPack200File.delete();
                 }
-                catch (final Exception ex) {}
+                catch (final Exception ex) {
+                    // Ignoramos los errores en el borrado, es responsabilidad del usuario limpiar periodicamente los temporales
+                }
             }
             // Copiamos el JAR normal
             AOInstallUtils.copyFileFromURL(AOBootUtil.createURLFile(this.installFilesCodeBase, AFIRMA_JAVA5_JAR), new File(Platform.getEndorsedDir()));
@@ -184,7 +185,7 @@ final class CheckAndInstallMissingParts {
 
         // Descomprimimos las DLL de SunMSCAPI en el directorio de binarios del JRE
         AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase,
-                                                           "mscapi_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$
+                                                           "mscapi_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         ), new File(Platform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
         SigningCert.INTEGRATOR);
     }
@@ -203,7 +204,7 @@ final class CheckAndInstallMissingParts {
 
         // Descomprimimos las DLL de SunPKCS11 en el directorio de binarios del JRE
         AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase,
-                                                           this.os.toString() + "_pkcs11lib_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$
+                                                           this.os.toString() + "_pkcs11lib_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         ),
         new File(Platform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
         SigningCert.INTEGRATOR);
@@ -226,14 +227,14 @@ final class CheckAndInstallMissingParts {
             String filename;
             for (final File file : tempDir.listFiles()) {
                 filename = file.getName();
-                if (filename.endsWith(".pack.gz")) {
+                if (filename.endsWith(".pack.gz")) { //$NON-NLS-1$
                     AOInstallUtils.unpack(file.getAbsolutePath(),
-                                          Platform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz")));
+                                          Platform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz"))); //$NON-NLS-1$
                 }
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e);
+            AfirmaBootLoader.LOGGER.warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
@@ -251,7 +252,9 @@ final class CheckAndInstallMissingParts {
                     }
                     AOInstallUtils.deleteDir(tempDir);
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) {
+                 // Ignoramos los errores en el borrado, es responsabilidad del usuario limpiar periodicamente los temporales
+                }
             }
         }
     }
@@ -357,6 +360,11 @@ final class CheckAndInstallMissingParts {
     /** Indica si es necesario instalar una copia local de las biliotecas <i>NSS</i>.
      * @return <code>true</code> si es necesaria la instalaci&oacute;n, <code>false</code> en caso contrario */
     boolean isNSSNeeded() {
+        
+        // SI no hay un directorio con KeyStores de Mozilla no es necesario NSS
+        if (!mozillaUserProfileDirectoryExists()) {
+            return false;
+        }
 
         String nssDir = null;
         String nssLib = null;
@@ -364,15 +372,16 @@ final class CheckAndInstallMissingParts {
         // En Windows solo en Firefox
         if (this.os.equals(OS.WINDOWS)) {
             // Buscamos en el registro el directorio normal de NSS en Windows
-            String dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_CURRENT_USER, "Software\\Classes\\FirefoxURL\\shell\\open\\command", //$NON-NLS-1$
-                                                      "" //$NON-NLS-1$
+            String dir = WinRegistryWrapper.getString(
+                  WinRegistryWrapper.HKEY_CURRENT_USER, "Software\\Classes\\FirefoxURL\\shell\\open\\command", //$NON-NLS-1$
+                  "" //$NON-NLS-1$
             );
             // Segundo intento, ahora el LOCAL_MACHINE
             if (dir == null) {
-                dir =
-                    WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxURL\\shell\\open\\command", //$NON-NLS-1$
-                                                 "" //$NON-NLS-1$
-                    );
+                dir = WinRegistryWrapper.getString(
+                     WinRegistryWrapper.HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxURL\\shell\\open\\command", //$NON-NLS-1$
+                     "" //$NON-NLS-1$
+                );
             }
 
             if (dir != null) {
@@ -380,7 +389,7 @@ final class CheckAndInstallMissingParts {
                 final int pos = regKeyLowCase.indexOf("firefox.exe"); //$NON-NLS-1$
                 if (pos != -1) {
                     dir = dir.substring(0, pos);
-                    if (dir.startsWith("\"")) {
+                    if (dir.startsWith("\"")) { //$NON-NLS-1$
                         dir = dir.substring(1);
                     }
                     if (dir.endsWith(File.separator)) {
@@ -399,16 +408,19 @@ final class CheckAndInstallMissingParts {
         }
         else if (this.os.equals(OS.MACOSX)) {
             final String[] paths = new String[] {
-                                                 "/Applications/Firefox.app/Contents/MacOS", "/lib", "/usr/lib", "/usr/lib/nss", "/Applications/Minefield.app/Contents/MacOS"
+                 "/Applications/Firefox.app/Contents/MacOS",  //$NON-NLS-1$
+                 "/lib",  //$NON-NLS-1$
+                 "/usr/lib",  //$NON-NLS-1$
+                 "/usr/lib/nss",  //$NON-NLS-1$
+                 "/Applications/Minefield.app/Contents/MacOS" //$NON-NLS-1$
             };
             for (final String path : paths) {
-                if (new File(path + "/libsoftokn3.dylib").exists()) {
+                if (new File(path + "/libsoftokn3.dylib").exists()) { //$NON-NLS-1$
                     nssDir = path;
                     break;
                 }
             }
-            if (nssDir != null)
-            {
+            if (nssDir != null) {
                 nssLib = "libnspr4.dylib"; //$NON-NLS-1$
             }
         }
@@ -427,7 +439,7 @@ final class CheckAndInstallMissingParts {
             };
 
             for (final String path : paths) {
-                if (new File(path + "/libsoftokn3.so").exists() && new File(path + "/libnspr4.so").exists()) {
+                if (new File(path + "/libsoftokn3.so").exists() && new File(path + "/libnspr4.so").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
                     nssDir = path;
                 }
                 if (nssDir != null) {
@@ -435,8 +447,7 @@ final class CheckAndInstallMissingParts {
                 }
             }
 
-            if (nssDir != null)
-            {
+            if (nssDir != null) {
                 nssLib = "libnspr4.so"; //$NON-NLS-1$
             }
         }
@@ -451,7 +462,7 @@ final class CheckAndInstallMissingParts {
             }
             catch (final Throwable e) {
                 if (AfirmaBootLoader.DEBUG) {
-                    AfirmaBootLoader.LOGGER.info("No se ha podido cargar NSS: " + e);
+                    AfirmaBootLoader.LOGGER.info("No se ha podido cargar NSS: " + e); //$NON-NLS-1$
                 }
             }
         }
@@ -485,12 +496,12 @@ final class CheckAndInstallMissingParts {
             localVersion = getNssLocalVersion();
         }
         catch (final FileNotFoundException e) {
-            AfirmaBootLoader.LOGGER.warning("No se ha localizado el NSS instalado");
+            AfirmaBootLoader.LOGGER.warning("No se ha localizado el NSS instalado"); //$NON-NLS-1$
             return false;
         }
         catch (final Exception e) {
             AfirmaBootLoader.LOGGER
-            .warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e);
+            .warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e); //$NON-NLS-1$
             return true;
         }
 
@@ -500,7 +511,7 @@ final class CheckAndInstallMissingParts {
         }
         catch (final Exception e) {
             AfirmaBootLoader.LOGGER
-            .warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e);
+            .warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e); //$NON-NLS-1$
             return true;
         }
 
@@ -518,12 +529,12 @@ final class CheckAndInstallMissingParts {
                                        Platform.getJavaArch());
 
         if (!localNSS.exists() || !localNSS.isDirectory()) {
-            throw new FileNotFoundException("El directorio local de NSS no existe: " + localNSS.getAbsolutePath());
+            throw new FileNotFoundException("El directorio local de NSS no existe: " + localNSS.getAbsolutePath()); //$NON-NLS-1$
         }
 
-        final File versionFile = new File(localNSS, "version.txt");
+        final File versionFile = new File(localNSS, "version.txt"); //$NON-NLS-1$
         if (!versionFile.exists() || !versionFile.isFile()) {
-            throw new FileNotFoundException("El fichero de version de NSS no existe: " + versionFile.getAbsolutePath());
+            throw new FileNotFoundException("El fichero de version de NSS no existe: " + versionFile.getAbsolutePath()); //$NON-NLS-1$
         }
 
         return this.getVersion(versionFile);
@@ -540,11 +551,11 @@ final class CheckAndInstallMissingParts {
             AOInstallUtils.copyFileFromURL(
                                            AOBootUtil.createURLFile(
                                                                     this.installFilesCodeBase,
-                                                                    this.os.toString() + "_nss_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".txt"),
+                                                                    this.os.toString() + "_nss_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".txt"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                                                     versionTempFile);
         }
         catch (final Exception e) {
-            throw new IOException("No se pudo comprobar la version remota de NSS: " + e);
+            throw new IOException("No se pudo comprobar la version remota de NSS: " + e); //$NON-NLS-1$
         }
 
         try {
@@ -554,7 +565,9 @@ final class CheckAndInstallMissingParts {
             try {
                 versionTempFile.delete();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+             // Ignoramos los errores en el borrado, es responsabilidad del usuario limpiar periodicamente los temporales
+            }
         }
     }
 
@@ -571,55 +584,57 @@ final class CheckAndInstallMissingParts {
             version = new String(buffer, 0, n);
         }
         catch (final Exception e) {
-            throw new IOException("Error al leer el fichero de version: " + e);
+            throw new IOException("Error al leer el fichero de version: " + e); //$NON-NLS-1$
         }
         finally {
             if (fis != null) {
                 try {
                     fis.close();
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) {
+                    // Ignoramos los errores en el cierre
+                }
             }
         }
         return version;
     }
 
-    /** Indica si las bibliotecas NSS necesitan un proceso adicional de configuraci&oacute;n.
-     * @return <code>true</code> si es necesaria configuraci&oacute;n adicional, <code>false</code> en caso contrario */
-    boolean isNSSConfigurationNeeded() {
-        // IMPORTANTE: Comprobar que el tener NSS 64 bits en /usr/lib no
-        // estropea un Firefox 32 bits
-        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-            return false;
-        }
-
-        try {
-            String nssLibDir = getSystemNSSLibDirMacOSX();
-            if (!nssLibDir.endsWith("/")) { //$NON-NLS-1$
-                nssLibDir = nssLibDir + "/"; //$NON-NLS-1$
-            }
-            System.load(nssLibDir + "libsoftokn3.dylib");
-        }
-        catch (final Exception e) {
-            if (AfirmaBootLoader.DEBUG) {
-                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-            }
-            return true;
-        }
-        catch (final Throwable e) {
-            if (AfirmaBootLoader.DEBUG) {
-                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-            }
-            return true;
-        }
-
-        return false;
-
-    }
+//    /** Indica si las bibliotecas NSS necesitan un proceso adicional de configuraci&oacute;n.
+//     * @return <code>true</code> si es necesaria configuraci&oacute;n adicional, <code>false</code> en caso contrario */
+//    boolean isNSSConfigurationNeeded() {
+//        // IMPORTANTE: Comprobar que el tener NSS 64 bits en /usr/lib no
+//        // estropea un Firefox 32 bits
+//        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
+//            return false;
+//        }
+//
+//        try {
+//            String nssLibDir = getSystemNSSLibDirMacOSX();
+//            if (!nssLibDir.endsWith("/")) { //$NON-NLS-1$
+//                nssLibDir = nssLibDir + "/"; //$NON-NLS-1$
+//            }
+//            System.load(nssLibDir + "libsoftokn3.dylib"); //$NON-NLS-1$
+//        }
+//        catch (final Exception e) {
+//            if (AfirmaBootLoader.DEBUG) {
+//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+//                e.printStackTrace(new java.io.PrintStream(baos));
+//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+//            }
+//            return true;
+//        }
+//        catch (final Throwable e) {
+//            if (AfirmaBootLoader.DEBUG) {
+//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+//                e.printStackTrace(new java.io.PrintStream(baos));
+//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+//            }
+//            return true;
+//        }
+//
+//        return false;
+//
+//    }
 
     /** Comprueba si los paquetes XALAN son necesarios en el directorio endorsed del JRE
      * configurado.
@@ -633,17 +648,17 @@ final class CheckAndInstallMissingParts {
         }
         if (getEndorsedDir() == null) {
             AfirmaBootLoader.LOGGER
-            .severe("No se ha podido determinar el directorio ENDORSED del JRE, por lo que no se considera necesario instalar Apache XALAN");
+            .severe("No se ha podido determinar el directorio ENDORSED del JRE, por lo que no se considera necesario instalar Apache XALAN"); //$NON-NLS-1$
             return false;
         }
-        return !((new File(getEndorsedDir() + File.separator + "serializer.jar").exists() || new File(getEndorsedDir() + File.separator
-                                                                                                      + "serializer-2.7.1.jar").exists()) && (new File(getEndorsedDir() + File.separator
-                                                                                                                                                       + "xalan.jar").exists() || new File(getEndorsedDir() + File.separator
-                                                                                                                                                                                           + "xalan-2.7.1.jar").exists())
-                                                                                                                                                                                           && (new File(getEndorsedDir() + File.separator + "xercesImpl.jar").exists() || new File(getEndorsedDir() + File.separator
-                                                                                                                                                                                                                                                                                   + "xercesImpl-2.9.1.jar").exists()) && (new File(getEndorsedDir() + File.separator
-                                                                                                                                                                                                                                                                                                                                    + "xml-apis.jar").exists() || new File(getEndorsedDir() + File.separator
-                                                                                                                                                                                                                                                                                                                                                                           + "xml-apis-1.3.03.jar").exists()));
+        return !((new File(getEndorsedDir() + File.separator + "serializer.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
+                                                                                                      + "serializer-2.7.1.jar").exists()) && (new File(getEndorsedDir() + File.separator //$NON-NLS-1$
+                                                                                                                                                       + "xalan.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
+                                                                                                                                                                                           + "xalan-2.7.1.jar").exists()) //$NON-NLS-1$
+                                                                                                                                                                                           && (new File(getEndorsedDir() + File.separator + "xercesImpl.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
+                                                                                                                                                                                                                                                                                   + "xercesImpl-2.9.1.jar").exists()) && (new File(getEndorsedDir() + File.separator //$NON-NLS-1$
+                                                                                                                                                                                                                                                                                                                                    + "xml-apis.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
+                                                                                                                                                                                                                                                                                                                                                                           + "xml-apis-1.3.03.jar").exists())); //$NON-NLS-1$
     }
 
 //	/** Comprueba si los paquetes Apache XMLSec son necesarios en el directorio endorsed del JRE
@@ -677,12 +692,12 @@ final class CheckAndInstallMissingParts {
             final String filenames[] = directoryLib.list();
             final List<String> firefoxDirectories = new ArrayList<String>();
             for (final String filename : filenames) {
-                if (filename.startsWith("firefox-")) {
-                    firefoxDirectories.add(filename.replace("firefox-", ""));
+                if (filename.startsWith("firefox-")) { //$NON-NLS-1$
+                    firefoxDirectories.add(filename.replace("firefox-", "")); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
             if (firefoxDirectories.isEmpty()) {
-                return "";
+                return ""; //$NON-NLS-1$
             }
             for (int i = 0; i < firefoxDirectories.size(); i++) {
                 try {
@@ -703,93 +718,131 @@ final class CheckAndInstallMissingParts {
             });
             return firefoxDirectories.get(0);
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
-    private String getSystemNSSLibDirMacOSX() throws FileNotFoundException {
+//    private String getSystemNSSLibDirMacOSX() throws FileNotFoundException {
+//
+//        String nssLibDir = null;
+//
+//        if (new File("/Applications/Firefox.app/Contents/MacOS/libsoftokn3.dylib").exists() && new File("/Applications/Firefox.app/Contents/MacOS/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+//            try {
+//                System.load("/Applications/Firefox.app/Contents/MacOS/libnspr4.dylib"); //$NON-NLS-1$
+//                nssLibDir = "/Applications/Firefox.app/Contents/MacOS"; //$NON-NLS-1$
+//            }
+//            catch (final Throwable e) {
+//                nssLibDir = null;
+//            }
+//        }
+//        if (nssLibDir == null && new File("/lib/libsoftokn3.dylib").exists() && new File("/lib/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+//            try {
+//                System.load("/lib/libnspr4.dylib"); //$NON-NLS-1$
+//                nssLibDir = "/lib"; //$NON-NLS-1$
+//            }
+//            catch (final Throwable e) {
+//                nssLibDir = null;
+//            }
+//        }
+//        if (nssLibDir == null && new File("/usr/lib/libsoftokn3.dylib").exists() && new File("/usr/lib/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+//            try {
+//                System.load("/usr/lib/libnspr4.dylib"); //$NON-NLS-1$
+//                nssLibDir = "/usr/lib"; //$NON-NLS-1$
+//            }
+//            catch (final Throwable e) {
+//                nssLibDir = null;
+//            }
+//        }
+//        if (nssLibDir == null && new File("/usr/lib/nss/libsoftokn3.dylib").exists() && new File("/usr/lib/nss/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+//            try {
+//                System.load("/usr/lib/nss/libnspr4.dylib"); //$NON-NLS-1$
+//                nssLibDir = "/usr/lib/nss"; //$NON-NLS-1$
+//            }
+//            catch (final Throwable e) {
+//                nssLibDir = null;
+//            }
+//        }
+//        if (nssLibDir == null && new File("/Applications/Minefield.app/Contents/MacOS/libsoftokn3.dylib").exists() //$NON-NLS-1$
+//                && new File("/Applications/Minefield.app/Contents/MacOS/libnspr4.dylib").exists()) { //$NON-NLS-1$
+//            try {
+//                System.load("/Applications/Minefield.app/Contents/MacOS/libnspr4.dylib"); //$NON-NLS-1$
+//                nssLibDir = "/Applications/Minefield.app/Contents/MacOS"; //$NON-NLS-1$
+//            }
+//            catch (final Throwable e) {
+//                nssLibDir = null;
+//            }
+//        }
+//        if (nssLibDir == null && new File(Platform.getUserHome() + File.separator
+//                                          + Installer.INSTALL_DIR
+//                                          + File.separator
+//                                          + "nss" //$NON-NLS-1$
+//                                          + Platform.getJavaArch()
+//                                          + File.separator
+//                                          + "libsoftokn3.dylib").exists() //$NON-NLS-1$
+//                                          && new File(Platform.getUserHome() + File.separator
+//                                                      + Installer.INSTALL_DIR
+//                                                      + File.separator
+//                                                      + "nss" //$NON-NLS-1$
+//                                                      + Platform.getJavaArch()
+//                                                      + File.separator
+//                                                      + "libnspr4.dylib").exists()) { //$NON-NLS-1$
+//            try {
+//                System.load(Platform.getUserHome() + File.separator
+//                            + Installer.INSTALL_DIR
+//                            + File.separator
+//                            + "nss" //$NON-NLS-1$
+//                            + Platform.getJavaArch()
+//                            + File.separator
+//                            + "libnspr4.dylib"); //$NON-NLS-1$
+//                nssLibDir = Platform.getUserHome() + File.separator + Installer.INSTALL_DIR + File.separator + "nss" + Platform.getJavaArch(); //$NON-NLS-1$
+//            }
+//            catch (final Throwable e) {
+//                nssLibDir = null;
+//            }
+//        }
+//
+//        if (nssLibDir == null) {
+//            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X"); //$NON-NLS-1$
+//        }
+//
+//        return nssLibDir;
+//    }
+    
+    
+    /** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
+     * @return <code>true</code> si existe el directorio del perfil de usuario de Mozilla /
+     *         Firefox, <code>false</code> en caso contrario */
+    private static boolean mozillaUserProfileDirectoryExists() {
 
-        String nssLibDir = null;
-
-        if (new File("/Applications/Firefox.app/Contents/MacOS/libsoftokn3.dylib").exists() && new File("/Applications/Firefox.app/Contents/MacOS/libnspr4.dylib").exists()) {
-            try {
-                System.load("/Applications/Firefox.app/Contents/MacOS/libnspr4.dylib");
-                nssLibDir = "/Applications/Firefox.app/Contents/MacOS";
+        if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            final String appDataDir = WinRegistryWrapper.getString(
+                 WinRegistryWrapper.HKEY_CURRENT_USER,
+                 "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders", //$NON-NLS-1$
+                 "AppData" //$NON-NLS-1$
+            );
+            if (appDataDir != null) {
+                if (new File(appDataDir + "\\Mozilla\\Firefox\\profiles.ini").exists()) { //$NON-NLS-1$
+                    return true;
+                }
             }
-            catch (final Throwable e) {
-                nssLibDir = null;
-            }
-        }
-        if (nssLibDir == null && new File("/lib/libsoftokn3.dylib").exists() && new File("/lib/libnspr4.dylib").exists()) {
-            try {
-                System.load("/lib/libnspr4.dylib");
-                nssLibDir = "/lib";
-            }
-            catch (final Throwable e) {
-                nssLibDir = null;
-            }
-        }
-        if (nssLibDir == null && new File("/usr/lib/libsoftokn3.dylib").exists() && new File("/usr/lib/libnspr4.dylib").exists()) {
-            try {
-                System.load("/usr/lib/libnspr4.dylib");
-                nssLibDir = "/usr/lib";
-            }
-            catch (final Throwable e) {
-                nssLibDir = null;
-            }
-        }
-        if (nssLibDir == null && new File("/usr/lib/nss/libsoftokn3.dylib").exists() && new File("/usr/lib/nss/libnspr4.dylib").exists()) {
-            try {
-                System.load("/usr/lib/nss/libnspr4.dylib");
-                nssLibDir = "/usr/lib/nss";
-            }
-            catch (final Throwable e) {
-                nssLibDir = null;
-            }
-        }
-        if (nssLibDir == null && new File("/Applications/Minefield.app/Contents/MacOS/libsoftokn3.dylib").exists()
-                && new File("/Applications/Minefield.app/Contents/MacOS/libnspr4.dylib").exists()) {
-            try {
-                System.load("/Applications/Minefield.app/Contents/MacOS/libnspr4.dylib");
-                nssLibDir = "/Applications/Minefield.app/Contents/MacOS";
-            }
-            catch (final Throwable e) {
-                nssLibDir = null;
-            }
-        }
-        if (nssLibDir == null && new File(Platform.getUserHome() + File.separator
-                                          + Installer.INSTALL_DIR
-                                          + File.separator
-                                          + "nss"
-                                          + Platform.getJavaArch()
-                                          + File.separator
-                                          + "libsoftokn3.dylib").exists()
-                                          && new File(Platform.getUserHome() + File.separator
-                                                      + Installer.INSTALL_DIR
-                                                      + File.separator
-                                                      + "nss"
-                                                      + Platform.getJavaArch()
-                                                      + File.separator
-                                                      + "libnspr4.dylib").exists()) {
-            try {
-                System.load(Platform.getUserHome() + File.separator
-                            + Installer.INSTALL_DIR
-                            + File.separator
-                            + "nss"
-                            + Platform.getJavaArch()
-                            + File.separator
-                            + "libnspr4.dylib");
-                nssLibDir = Platform.getUserHome() + File.separator + Installer.INSTALL_DIR + File.separator + "nss" + Platform.getJavaArch();
-            }
-            catch (final Throwable e) {
-                nssLibDir = null;
-            }
+            return false;
         }
 
-        if (nssLibDir == null) {
-            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X");
+        else if (Platform.OS.MACOSX.equals(Platform.getOS())) {
+            // Si es un Mac OS X, profiles.ini esta en una ruta distinta...
+            if (new File(Platform.getUserHome() + "/Library/Application Support/Firefox/profiles.ini").exists()) { //$NON-NLS-1$
+                return true;
+            }
+            return false;
         }
-
-        return nssLibDir;
+        
+        else {
+            // No es Windows ni Mac OS X, entonces es UNIX (Linux / Solaris)
+            if (new File(Platform.getUserHome() + "/.mozilla/firefox/profiles.ini").exists()) { //$NON-NLS-1$
+                return true;
+            }
+        }
+        
+        return false;
     }
 
 }
