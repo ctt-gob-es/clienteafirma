@@ -12,7 +12,8 @@ package es.gob.afirma.signers.xml;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
+
+import es.gob.afirma.core.misc.AOUtil;
 
 /** Clase para la obtencion de los recursos textuales del n&uacute;cleo del
  * cliente de firma. */
@@ -20,21 +21,7 @@ final class XMLMessages {
 
     private static final String BUNDLE_NAME = "xmlmessages"; //$NON-NLS-1$
 
-    private static ResourceBundle RESOURCE_BUNDLE;
-
-    static {
-        try {
-            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
-        }
-        catch (final Exception e) {
-            try {
-                RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
-            }
-            catch (final Exception e1) {
-                Logger.getLogger("es.gob.afirma").severe("No ha podido cargarse el fichero de mensajes localizados: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
-    }
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
 
     private XMLMessages() {
         // No permitimos la instanciacion
