@@ -74,6 +74,29 @@ public class AOUIFactory {
         return uiManager.getPassword(text, c);
     }
     
+    /** Pregunta al usuario por una contrase&ntilde;a. S&oacute;lo admite los caracteres
+     * incluidos en el par&aacute;metro {@code charset} y, en caso de insertar un
+     * car&aacute;cter no permitido, se emitir&aacute;a una advertencia no bloqueante
+     * (sonido, vibraci&oacute;n...) si el par&aacute;metro {@code beep} est&aacute;
+     * activado. 
+     * @param text
+     *        Texto que se muestra en el di&aacute;logo para pedir la
+     *        contrase&ntilde;a
+     * @param charset
+     *        Cadena con los caracteres permitidos para la contrase&ntilde;a.
+     * @param beep
+     *        Indica si se debe dar una se&ntilde;al al usuario al intentar insertar
+     *        un caracter no v&aacute;lido para la contrase&ntilde;a. 
+     * @param c
+     *        Componente padre (para la modalidad)
+     * @return Contrase&ntilde;a introducida por el usuario
+     * @throws AOCancelledOperationException
+     *         Cuando el usuario cancela el proceso de solicitud de
+     *         contrase&ntilde;a */
+    public static char[] getPassword(final String text, final String charset, final boolean beep, final Object c) throws AOCancelledOperationException {
+        return uiManager.getPassword(text, charset, beep, c);
+    }
+    
     /**
      * JOptionPane.showConfirmDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
