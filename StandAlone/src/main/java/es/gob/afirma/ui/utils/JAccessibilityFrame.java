@@ -1,8 +1,16 @@
 package es.gob.afirma.ui.utils;
 import javax.swing.JFrame;
 
+/**
+ * Clase para generar un JFrame con la posibilidad de redimension.
+ * Extiende JFrame.
+ * @author inteco
+ *
+ */
 public abstract class JAccessibilityFrame extends JFrame {
 
+	private static final long serialVersionUID = 1L;
+	
 	private ResizingAdaptor resizingAdaptor;
 	
 	public JAccessibilityFrame(){
@@ -11,8 +19,11 @@ public abstract class JAccessibilityFrame extends JFrame {
 		this.addComponentListener(this.resizingAdaptor);
 	}
 	
-	public abstract int getInitialWidth();
-	public abstract int getInitialHeight();
+	/**
+	 * Relación mínima que se aplica para la redimensión de los componentes.
+	 * Cuanto menor es este número menor es la redimensión aplicada.
+	 * @return int Relación mínima
+	 */
 	public abstract int getMinimumRelation();
 	
 	protected final void callResize(){

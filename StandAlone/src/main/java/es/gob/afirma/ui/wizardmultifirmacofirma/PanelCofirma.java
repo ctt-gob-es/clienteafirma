@@ -67,15 +67,6 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
 	/**
 	 * Configuracion del KeyStore
 	 */

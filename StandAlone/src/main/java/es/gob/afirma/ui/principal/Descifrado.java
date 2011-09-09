@@ -51,7 +51,7 @@ public class Descifrado extends JPanel {
     final static List<String> mecanismos = new ArrayList<String>(Arrays.asList("PASSWORD","USERINPUT"));
 
     // Algoritmos para mecanismo contrasena de cifrado
-    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("ContraseÃ±a con SHA1 y 3DES","Contraseï¿½a con SHA1 y RC2","Contraseï¿½a con MD5 y DES"));
+    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("Contraseña con SHA1 y 3DES","Contraseï¿½a con SHA1 y RC2","Contraseï¿½a con MD5 y DES"));
     final static List<String> algoritmoVc = new ArrayList<String>(Arrays.asList("PBEWithSHA1AndDESede","PBEWithSHA1AndRC2_40","PBEWithMD5AndDES"));
 
     // Algoritmos para mecanismo clave de cifrado

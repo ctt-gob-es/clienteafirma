@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -59,15 +60,6 @@ public class PanelClave extends JAccessibilityDialogWizard {
 	@Override
 	public int getMinimumRelation(){
 		return 9;
-	}
-	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
 	}
 	
 	/**
@@ -125,17 +117,31 @@ public class PanelClave extends JAccessibilityDialogWizard {
         // Panel que contiene el texto "Introduzca la clave con..."
 		panelCentral.add(PanelesTexto.generarPanelTexto(
         		"WizardDescifrado.clave.contenido.texto1", false), c);
-        
-		c.insets = new Insets(20, 20, 0, 0);
+		
+		c.insets = new Insets(20, 20, 0, 20);
 		c.gridwidth	= 1;
 		c.weightx = 1.0;
 		c.gridy	= 1;
+		
+		//Etiqueta con el texto Clave de descifrado
+    	JLabel keyLabel = new JLabel (Messages.getString("WizardDescifrado.clave"));
+    	panelCentral.add(keyLabel, c);
+        
+    	c.insets = new Insets(0, 20, 0, 20);
+		c.gridwidth	= 1;
+		c.weightx = 1.0;
+		c.gridy	= 2;
 		
         // Caja de texto donde se guarda la clave
         campoClave.setToolTipText(Messages.getString("WizardDescifrado.clave.contrasenia.description")); // NOI18N
         panelCentral.add(campoClave, c);
         
-        c.insets = new Insets(20, 10, 0, 20);
+        //Relación entre etiqueta y campo de texto
+        keyLabel.setLabelFor(campoClave);
+       	//Asignación de mnemónico
+        keyLabel.setDisplayedMnemonic(KeyEvent.VK_L);
+        
+        c.insets = new Insets(0, 20, 0, 20);
 		c.weightx = 0.0;
 		c.gridx = 1;
         
@@ -157,7 +163,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		c.gridwidth	= 2;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
-		c.gridy	= 2;
+		c.gridy	= 3;
 		c.gridx = 0;
         
         // Panel que contiene el texto "En caso de obtener..."
@@ -199,7 +205,6 @@ public class PanelClave extends JAccessibilityDialogWizard {
      * Obtiene una clave de cifrado en base 64 del almac&eacute;n de claves del usuario.
      * Se pedira al usuario que inserte la contrase&ntilde;a del almac&eacute;n de claves
      * y seleccione la clave que desea recuperar del mismo.
-     * Si ocurre un error durante la transformaci&oacute;n se devolver&aacute;a {@code null}. 
      * @return Clave en base 64.
      * @throws AOException Ocurri&oacute; un error durate el proceso de configuraci&oacute;n. 
      */
@@ -209,7 +214,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	AOCipherKeyStoreHelper cKs = null;
     	try {
     		cKs = new AOCipherKeyStoreHelper(
-    				AOUIFactory.getPassword(Messages.getString("WizardDescifrado.clave.pass"), this) //$NON-NLS-1$
+    				AOUIFactory.getPassword(Messages.getString("WizardDescifrado.clave.pass"), this)
     		);
     	} catch (AOCancelledOperationException e) {
     		throw e;

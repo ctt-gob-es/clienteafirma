@@ -64,15 +64,6 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		return 8;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
 	/**
 	 * Guarda todas las ventanas del asistente para poder controlar la botonera
 	 * @param ventanas	Listado con todas las paginas del asistente

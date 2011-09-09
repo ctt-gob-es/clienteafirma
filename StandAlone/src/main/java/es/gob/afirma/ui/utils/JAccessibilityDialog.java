@@ -10,9 +10,15 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.JDialog;
 
-import es.gob.afirma.ui.principal.Opciones;
-
+/**
+ * Clase para generar un JDialog con la posibilidad de redimension.
+ * Extiende JDialog
+ * @author inteco
+ *
+ */
 public abstract class JAccessibilityDialog extends JDialog {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public JAccessibilityDialog(){
 		super();
@@ -27,8 +33,11 @@ public abstract class JAccessibilityDialog extends JDialog {
 
 	}
 	
-	public abstract int getInitialWidth();
-	public abstract int getInitialHeight();
+	/**
+	 * Relación mínima que se aplica para la redimensión de los componentes.
+	 * Cuanto menor es este número menor es la redimensión aplicada.
+	 * @return int Relación mínima
+	 */
 	public abstract int getMinimumRelation();
 	
 	/**
@@ -60,7 +69,6 @@ public abstract class JAccessibilityDialog extends JDialog {
 		return null;
 	}
 	
-	
 	/**
 	 * Evento de redimensionado. Comprueba el tamaÃ±o de la ventana para habilitar o deshabilitar el boton
 	 *  de Maximizar ventana
@@ -68,8 +76,8 @@ public abstract class JAccessibilityDialog extends JDialog {
 	public void resized(ComponentEvent e) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-	    Dimension actualSize = Opciones.getJAccessibilityDialog(this).getSize();
-	    Component boton = getComponentByName("maximizar", Opciones.getJAccessibilityDialog(this));
+	    Dimension actualSize = getJAccessibilityDialog(this).getSize();
+	    Component boton = getComponentByName("maximizar", getJAccessibilityDialog(this));
 	    if(boton != null){
 	    	if (actualSize.equals(fullScreen)){
 				boton.setEnabled(false);
@@ -78,4 +86,24 @@ public abstract class JAccessibilityDialog extends JDialog {
 		    }
 	    }
 	}
+	
+	/**
+	 * Busca el JAccessibilityDialog padre de un componente.
+	 * @param component El componente.
+	 * @return El JAccessibilityDialog buscado.
+	 */
+	public static JAccessibilityDialog getJAccessibilityDialog(Component component)
+	{
+		JAccessibilityDialog  resultingJAccessibilityDialog = null;
+		while (component != null && resultingJAccessibilityDialog == null)
+		{
+	        if (component instanceof JAccessibilityDialog){
+	        	resultingJAccessibilityDialog = (JAccessibilityDialog)component;
+	        }
+	        else{
+	        	component = component.getParent();
+	        }
+		 }
+		 return resultingJAccessibilityDialog;
+	 }
 }

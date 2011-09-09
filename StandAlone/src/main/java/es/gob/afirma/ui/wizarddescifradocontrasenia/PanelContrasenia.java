@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -52,15 +54,6 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	@Override
 	public int getMinimumRelation(){
 		return 9;
-	}
-	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
 	}
 	
 	/**
@@ -122,21 +115,39 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		panelCentral.add(PanelesTexto.generarPanelTexto(
 				"WizardDescifrado.contrasenia.contenido.texto1", false), c);
 
-        c.gridy	= 1;
-		
-        // Caja de texto donde se guarda la clave
-        this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
-        this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
-        panelCentral.add(this.campoContrasenia, c);
+		 c.insets = new Insets(20, 20, 0, 20);
+		 c.weightx = 1.0;
+		 c.gridx = 0;
+		 c.gridy	= 1;
+		 
+		//Etiqueta con el texto Contraseña de descifrado
+    	JLabel passwordLabel = new JLabel (Messages.getString("WizardDescifrado.contrasenia"));
+    	panelCentral.add(passwordLabel, c);
     	
+    	 c.insets = new Insets(0, 20, 0, 20);
+		 c.weightx = 1.0;
+		 c.gridx = 0;
+		 c.gridy = 2;
+       
+		
+        // Caja de texto donde se guarda la contraseña
+		 this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
+	     this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
+	     panelCentral.add(this.campoContrasenia, c);
+    	
+        //Relación entre etiqueta y campo de texto
+        passwordLabel.setLabelFor(campoContrasenia);
+      	//Asignación de mnemónico
+        passwordLabel.setDisplayedMnemonic(KeyEvent.VK_O);
+        
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(10, 20, 0, 20);
-        c.gridy	= 2;
+        c.insets = new Insets(20, 20, 0, 20);
+        c.gridy	= 3;
         c.weighty = 1.0;
         
         // Panel que contiene el texto "Introduzca la contrasenia con..."
         panelCentral.add(PanelesTexto.generarPanelTexto(
-				"WizardDescifrado.contrasenia.contenido.texto5", false), c);    //$NON-NLS-1$
+				"WizardDescifrado.contrasenia.contenido.texto5", false), c);    //$NON-NLS-1$   
         
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
@@ -235,7 +246,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		}
 
 		// Almacenamos el fichero de salida de la operacion
-      
+	      
 		final File savedFile = AOUIFactory.getSaveDataToFile(result,
 		        new File(new File(rutaFichero).getParentFile(), "fichero"), null, this);
 

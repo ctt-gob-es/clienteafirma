@@ -18,4 +18,39 @@ public class Constants {
     public static final String PASSWORD_VALID_CHARACTERS =
     	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890.,-@";
 	
+    /**
+     * Width inicial de los JFrame de la aplicacion.
+     */
+    public static final int WINDOW_INITIAL_WIDTH = 550;
+    
+    /**
+     * Height inicial de los JFrame de la aplicacion.
+     */
+    public static final int WINDOW_INITIAL_HEIGHT = 370;
+    
+    /**
+     * Width inicial de los JDialog de la aplicacion.
+     */
+    public static final int OPTION_INITIAL_WIDTH = 490;
+    
+    /**
+     * Height inicial de los JDialog de la aplicacion.
+     */
+    public static final int OPTION_INITIAL_HEIGHT = 485;
+    
+    /**
+     * Width inicial de los JDialogWizard de la aplicacion.
+     */
+    public static final int WIZARD_INITIAL_WIDTH = 630;
+    
+    /**
+     * Height inicial de los JDialogWizard de la aplicacion.
+     */
+    public static final int WIZARD_INITIAL_HEIGHT = 480;
+    
+    /**
+     * Factor de redimensionado para las imagenes    
+     */
+    public static final double RESIZING_IMAGES_FACTOR = 0.0015;
 }
+

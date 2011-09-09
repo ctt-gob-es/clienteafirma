@@ -80,15 +80,6 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
 	/**
 	 * Modelo de la lista
 	 */

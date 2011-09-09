@@ -112,15 +112,6 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
 	/**
 	 * Configuracion del KeyStore
 	 */
@@ -478,7 +469,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	}
 
         	if (privateKeyEntry == null) {
-        		throw new KeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero."); 
+        		throw new KeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero.");  
         	}
         } catch(AOException e){
         	logger.severe(e.toString());
@@ -531,7 +522,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.ok"),  //$NON-NLS-1$
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$
         } else {
-      		OpenFileMessageDialog.show(this, Messages.getString("Wizard.multifirma.ko"),  //$NON-NLS-1$
+        	OpenFileMessageDialog.show(this, Messages.getString("Wizard.multifirma.ko"),  //$NON-NLS-1$
       				Messages.getString("Wizard.multifirma.ok.titulo"), //$NON-NLS-1$
       				new File(campoFicheroLog.getText()));
         }
@@ -548,10 +539,10 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 		if (extensiones == null || extensiones.trim().equals("")) {
 			return null;
 		}
-
+		
 		return new ExtensionsFileFilter(extensiones.split(","));
 	}
-        
+    	
     /**
      * Descripcion de las extensiones
      * @param exts  extensiones

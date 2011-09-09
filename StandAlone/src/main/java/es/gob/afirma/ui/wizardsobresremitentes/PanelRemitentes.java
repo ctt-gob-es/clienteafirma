@@ -86,15 +86,6 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
 	/**
 	 * Ruta donde se encuentra el fichero a ensobrar
 	 */

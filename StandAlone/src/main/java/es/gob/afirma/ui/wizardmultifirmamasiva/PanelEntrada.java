@@ -48,15 +48,6 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
 	/**
 	 * Registra un salto dentro del asistente de la pagina 2 a la 3.
 	 * @param salto	Indica si se ha realizado un salto

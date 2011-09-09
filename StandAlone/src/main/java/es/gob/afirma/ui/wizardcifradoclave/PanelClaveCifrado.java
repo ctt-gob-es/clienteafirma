@@ -70,16 +70,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	public int getMinimumRelation(){
 		return 9;
 	}
-	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
+		
 	/**
 	 * Cifrador configurado para un algoritmo dado
 	 */
@@ -420,8 +411,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 				return false;
 			} else {
 				// Almacenamos el fichero de salida de la operacion
-			    final File savedFile = AOUIFactory.getSaveDataToFile(result, new File(new File(rutaFichero).getParentFile(), "cifrado"), null, this); //$NON-NLS-1$
-				if (savedFile == null) {
+				 final File savedFile = AOUIFactory.getSaveDataToFile(result, new File(new File(rutaFichero).getParentFile(), "cifrado"), null, this); //$NON-NLS-1$
+				 if (savedFile == null) {
 					return false;
 				}
 
@@ -460,7 +451,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 				tries++;
 				try {
 					if (!AOCipherKeyStoreHelper.storeExists()) {
-					    cksh = new AOCipherKeyStoreHelper(
+						cksh = new AOCipherKeyStoreHelper(
 					            AOUIFactory.getPassword(Messages.getString("Cifrado.introducir.pass"), this));
 					} else {
 						cksh = new AOCipherKeyStoreHelper(new UIPasswordCallback(Messages.getString("Cifrado.introducir.pass.almacen"), this).getPassword());

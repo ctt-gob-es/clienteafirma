@@ -23,9 +23,7 @@ import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreePath;
 
 /**
  * Adaptador de componentes para su redimensionamiento
@@ -86,16 +84,16 @@ public class ResizingAdaptor extends ComponentAdapter {
 		double relHeight;
 		float relation;
 		if (theWindow!=null) {
-			relWidth = theWindow.getSize().getWidth() / 390;
-			relHeight = theWindow.getSize().getHeight() / 352;
+			relWidth = theWindow.getSize().getWidth() / Constants.WINDOW_INITIAL_WIDTH;
+			relHeight = theWindow.getSize().getHeight() / Constants.WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theWindow.getMinimumRelation());
 		} else if (theDialog != null) {
-			relWidth = theDialog.getSize().getWidth() / 427;
-			relHeight = theDialog.getSize().getHeight() / 284;
+			relWidth = theDialog.getSize().getWidth() / Constants.OPTION_INITIAL_WIDTH;
+			relHeight = theDialog.getSize().getHeight() / Constants.OPTION_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
 		} else {
-			relWidth = theDialogWizard.getSize().getWidth() / 630;
-			relHeight = theDialogWizard.getSize().getHeight() / 440;
+			relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH;
+			relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
 		}
 
@@ -107,21 +105,19 @@ public class ResizingAdaptor extends ComponentAdapter {
 						float resizeFactor = Math.round(relation / getResizingFactorFrame());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (13 + resizeFactor)));
 					} else if (theDialog != null){
-						System.out.println(actualComponent.getClass().getName());
 						float resizeFactor = Math.round(relation / getResizingFactorDialog());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (7 + resizeFactor)));
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (13 + resizeFactor)));
 					} else {
 						float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (13 + resizeFactor)));
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (12 + resizeFactor)));
 					}
 				} else {
 					if (theWindow != null) {
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) 13));
 					} else if (theDialog != null){
-						System.out.println(actualComponent.getClass().getName());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) 7));
-					} else {
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) 13));
+					} else {
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) 12));
 					}
 				}
 			} 
@@ -167,11 +163,11 @@ public class ResizingAdaptor extends ComponentAdapter {
 				if (((JLabel)actualComponent).getIcon() != null) {
 					float resizeFactor;
 					if(theWindow != null){
-						resizeFactor = (float) (theWindow.getHeight() * 0.0015);
+						resizeFactor = (float) (theWindow.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else if(theDialog != null) {
-						resizeFactor = (float) (theDialog.getHeight() * 0.0015);
+						resizeFactor = (float) (theDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else {
-						resizeFactor = (float) (theDialogWizard.getHeight() * 0.0015);
+						resizeFactor = (float) (theDialogWizard.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}
 					resizeImage(resizeFactor, actualComponent, w, h, multiplicando);
 				}
@@ -182,11 +178,11 @@ public class ResizingAdaptor extends ComponentAdapter {
 				if (((JButton)actualComponent).getIcon() != null) {
 					float resizeFactor;
 					if(theWindow != null){
-						resizeFactor = (float) (theWindow.getHeight() * 0.0015);
+						resizeFactor = (float) (theWindow.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else if(theDialog != null) {
-						resizeFactor = (float) (theDialog.getHeight() * 0.0015);
+						resizeFactor = (float) (theDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else {
-						resizeFactor = (float) (theDialogWizard.getHeight() * 0.0015);
+						resizeFactor = (float) (theDialogWizard.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}
 					resizeImageButton(resizeFactor, actualComponent);
 				}
@@ -197,17 +193,19 @@ public class ResizingAdaptor extends ComponentAdapter {
 	/**
 	 * Redimensiona una imagen
 	 * 
-	 * @param factor factor de redimensión
+	 * @param factor factor de redimension
 	 * @param c Componente de tipo JLabel en el que se encuentra la imagen
 	 * @param w Width inicial de la imagen
 	 * @para h Height inicial de la imagen
 	 * @param multiplicando Valor de multiplicacion para el nuevo tamaño de la imagen. Es mayor cuanto menor sea el tamaño inicial de la imagen
 	 */
 	public final void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
-		ImageIcon image = new ImageIcon();
-		image = (ImageIcon)((JLabel)c).getIcon();
-		ImageIcon newImage = new ImageIcon(image.getImage().getScaledInstance((int) Math.round(w * multiplicando * factor), (int) Math.round(h * multiplicando * factor), java.awt.Image.SCALE_SMOOTH));
-		((JLabel)c).setIcon(newImage);
+		if(JAccessibilityDialogWizard.getJAccessibilityDialogWizard(c)==null){
+			ImageIcon image = new ImageIcon();
+			image = (ImageIcon)((JLabel)c).getIcon();
+			ImageIcon newImage = new ImageIcon(image.getImage().getScaledInstance((int) Math.round(w * multiplicando * factor), (int) Math.round(h * multiplicando * factor), java.awt.Image.SCALE_SMOOTH));
+			((JLabel)c).setIcon(newImage);
+		}
 	}
 	
 	/**
@@ -225,43 +223,11 @@ public class ResizingAdaptor extends ComponentAdapter {
 			((JButton)c).setPreferredSize(new Dimension((int) Math.round(25 * 2 * factor),(int) Math.round(25 * 2 * factor)));
 	}
 	
-	private void imprime(Component componente){
-		System.out.println(componente.getClass().getName());
-		if(componente instanceof Container){
-			Component[] hijos = ((Container) componente).getComponents();
-			if(componente instanceof JTree){
-				TreePath[] paths = ((JTree)componente).getSelectionPaths();
-				if(paths != null){
-					for(int i = 0 ; i < paths.length; i++){
-						for(int j = 0; j < paths[i].getPathCount(); j++){
-							System.out.println(paths[i].getPathComponent(j).getClass().getCanonicalName());
-							if(paths[i].getPathComponent(j) instanceof DefaultMutableTreeNode){
-								DefaultMutableTreeNode node = (DefaultMutableTreeNode) paths[i].getPathComponent(j);
-								for(int k = 0; k < node.getChildCount(); k++){
-									System.out.println(node.getUserObject().getClass().getCanonicalName());
-									System.out.println(node.getUserObject());
-								}
-								System.out.println(node.getUserObject().getClass().getCanonicalName());
-								System.out.println(node.getUserObject());
-							}
-							else{
-								System.out.println("COMPONENTE RARO: " + paths[i].getPathComponent(j).getClass().getCanonicalName());
-							}
-						}
-					}
-				}
-			}
-			
-			for (int i = 0; i < hijos.length; i++) {
-				imprime(hijos[i]);
-			}
-		}
-	}
 	/**
 	 * Identifica los componentes de una ventana para los que se van a realizar el redimensionado.
 	 * 
 	 * @param a Componente para el que se va a comprobar si se va a redimensionar.
-	 * @return Boolean que indica si el componente pasado como parámetro va a ser redimensionado.
+	 * @return Boolean que indica si el componente pasado como par&aacute;metro va a ser redimensionado.
 	 */
 	private boolean isResizable(Component a){
 		if(a instanceof JButton)

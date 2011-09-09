@@ -67,15 +67,6 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
 	/**
 	 * Configuracion del KeyStore
 	 */
@@ -282,7 +273,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		
 		if (signedData != null) {
 			// Salvamos el fichero de datos
-		    final File savedFile = AOUIFactory.getSaveDataToFile(signedData,
+			final File savedFile = AOUIFactory.getSaveDataToFile(signedData,
 		            new File(aoSigner.getSignedName(dataFilepath, ".signed")), //$NON-NLS-1$
 		            SignFileUtils.getOutFileFilter(formato), this);
 			// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
@@ -324,7 +315,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	
 	/**
 	 * Comprueba si los datos correspondientes a la firma son firmas odf, xml o pdf.
-	 * Si no es ninguno de ellos, devuelve {@code null}.
+	 * Si no es ninguno de ellos, devuelve {@code null}. 
 	 * @param sign 	Firma electr&oacute;nica
 	 * @return Formato del archivo
 	 */

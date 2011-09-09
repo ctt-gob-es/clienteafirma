@@ -10,7 +10,6 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -49,14 +48,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityFrame;
 import es.gob.afirma.ui.utils.JStatusBar;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
-
 
 /**
  *
@@ -79,9 +77,21 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		return 7;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		// Dimensiones de la ventana
+	/**
+	 * Posición X inicial de la ventana dependiendo de la resolución de pantalla.
+	 * @return int Posición X
+	 */
+	public int getInitialX() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		return (screenSize.width - 500) / 2 ;
+	}
+	
+	/**
+	 * Posición Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resolución de pantalla.
+	 * @return int Posición Y
+	 */
+	public int getInitialY() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
 		if (Platform.getOS().equals(Platform.OS.MACOSX)){
 			return (screenSize.height - 340) / 2;
@@ -89,15 +99,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			return (screenSize.height - 320) / 2;
 		}
 	}
-	@Override
-	public int getInitialWidth() {
-		// Dimensiones de la ventana
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		return (screenSize.width - 500) / 2 ;
-	}
-	
+		
 	public PrincipalGUI() {
-	    super();
+		super();
 		initComponents();
 		iniciarProveedores();
 		this.addComponentListener(new ComponentAdapter() {
@@ -113,7 +117,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 */
 	private void initComponents() {
 		// Dimensiones de la ventana
-		setBounds(this.getInitialWidth(), this.getInitialHeight(), 550, 370);
+		setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
 		
 		// Parametros ventana
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N

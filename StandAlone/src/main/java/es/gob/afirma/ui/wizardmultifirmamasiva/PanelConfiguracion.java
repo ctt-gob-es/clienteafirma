@@ -43,15 +43,6 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-	
 	/**
 	 * Muestra/oculta el panel de los radio buttons y su explicacion
 	 * @param visible

@@ -6,20 +6,30 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 
-import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
+/**
+ * Clase para generar un JDialogWizard con la posibilidad de redimension.
+ * Extiende JDialogWizard.
+ * @author inteco
+ *
+ */
 public abstract class JAccessibilityDialogWizard extends JDialogWizard{
+	
+	private static final long serialVersionUID = 1L;
 	
 	public JAccessibilityDialogWizard(){
 		super();
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this);
 		this.addComponentListener(adaptador);
-		setMinimumSize(new Dimension(630, 480));
+		setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
 	}
 	
-	public abstract int getInitialWidth();
-	public abstract int getInitialHeight();
+	/**
+	 * Relación mínima que se aplica para la redimensión de los componentes.
+	 * Cuanto menor es este número menor es la redimensión aplicada.
+	 * @return int Relación mínima
+	 */
 	public abstract int getMinimumRelation();
 	
 	/**
@@ -59,8 +69,8 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	public void componentResized(ComponentEvent e) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-	    Dimension actualSize = BotoneraInferior.getJAccessibilityDialogWizard(this).getSize();
-	    Component boton = getComponentByName("maximizar", BotoneraInferior.getJAccessibilityDialogWizard(this));
+	    Dimension actualSize = getJAccessibilityDialogWizard(this).getSize();
+	    Component boton = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
 	    if(boton != null){
 	    	if (actualSize.equals(fullScreen)){
 				boton.setEnabled(false);
@@ -69,4 +79,24 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		    }
 	    }
 	}
+	
+	/**
+	 * Busca el JAccessibilityDialogWizard padre de un componente.
+	 * @param component El componente.
+	 * @return El JAccessibilityDialogWizard buscado.
+	 */
+	public static JAccessibilityDialogWizard getJAccessibilityDialogWizard(Component component)
+	{
+		JAccessibilityDialogWizard  resultingJAccessibilityDialogWizard = null;
+		while (component != null && resultingJAccessibilityDialogWizard == null)
+		{
+	        if (component instanceof JAccessibilityDialogWizard){
+	        	resultingJAccessibilityDialogWizard = (JAccessibilityDialogWizard)component;
+	        }
+	        else{
+	        	component = component.getParent();
+	        }
+		 }
+		 return resultingJAccessibilityDialogWizard;
+	 }
 }

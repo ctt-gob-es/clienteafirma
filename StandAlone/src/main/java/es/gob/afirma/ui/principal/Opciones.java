@@ -29,6 +29,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialog;
@@ -60,22 +61,27 @@ public class Opciones extends JAccessibilityDialog {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		// Dimensiones de la ventana en Windows y Linux
+    /**
+	 * Posición X inicial de la ventana dependiendo de la resolución de pantalla.
+	 * @return int Posición X
+	 */
+    public int getInitialX() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		return (screenSize.width - 426) / 2 ;
+	}
+    
+    /**
+	 * Posición Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resolución de pantalla.
+	 * @return int Posición Y
+	 */
+	public int getInitialY() {
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-                
         if (Platform.getOS().equals(Platform.OS.MACOSX)){
         	return (screenSize.height - 485) / 2;
         } else {
         	return (screenSize.height - 456) / 2;
         }
-	}
-	@Override
-	public int getInitialWidth() {
-		// Dimensiones de la ventana para Windows y Linux
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		return (screenSize.width - 426) / 2 ;
 	}
 	
     /**
@@ -83,7 +89,7 @@ public class Opciones extends JAccessibilityDialog {
      */
     private void initComponents() {
     	// Dimensiones de la ventana en Windows y Linux
-    	setBounds(this.getInitialWidth(), this.getInitialHeight(), 446, 476);
+    	setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(Messages.getString("Opciones.opciones")); // NOI18N
@@ -159,7 +165,7 @@ public class Opciones extends JAccessibilityDialog {
 		
 	    //Espacio entre botones
 		Panel panelVacio = new Panel();
-		panelVacio.setPreferredSize(new Dimension(70, 10));
+		panelVacio.setPreferredSize(new Dimension(50, 10));
 	    
 		// Boton aceptar
         JButton aceptar = new JButton();
@@ -406,24 +412,4 @@ public class Opciones extends JAccessibilityDialog {
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 		
 	}
-	
-	/**
-	 * Busca el JAccessibilityDialog padre de un componente.
-	 * @param component El componente.
-	 * @return El JAccessibilityDialog buscado.
-	 */
-	public static JAccessibilityDialog getJAccessibilityDialog(Component component)
-	{
-		JAccessibilityDialog  resultingJAccessibilityDialog = null;
-		while (component != null && resultingJAccessibilityDialog == null)
-		{
-	        if (component instanceof JAccessibilityDialog){
-	        	resultingJAccessibilityDialog = (JAccessibilityDialog)component;
-	        }
-	        else{
-	        	component = component.getParent();
-	        }
-		 }
-		 return resultingJAccessibilityDialog;
-	 }
 }

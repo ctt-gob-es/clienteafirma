@@ -64,18 +64,9 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	
 	@Override
 	public int getMinimumRelation(){
-		return 9;
+		return 8;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-    
     /**
      * Guarda todas las ventanas del asistente para poder controlar la botonera
      * @param ventanas	Listado con todas las paginas del asistente
@@ -232,7 +223,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			// Generamos la clave necesaria para el cifrado
 			try {
 				this.cipherKey = this.cipherConfig.getCipher()
-				    .decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
+			    .decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
 			} catch (Exception ex) {
 				logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
 				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
@@ -287,7 +278,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
                 JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             else {
                 // Almacenamos el fichero de salida de la operacion
-                final File savedFile = AOUIFactory.getSaveDataToFile(result,
+            	final File savedFile = AOUIFactory.getSaveDataToFile(result,
                         new File(new File(rutaFichero).getParentFile(), "cifrado"), null, this);
                 if (savedFile == null) {
 					return false;

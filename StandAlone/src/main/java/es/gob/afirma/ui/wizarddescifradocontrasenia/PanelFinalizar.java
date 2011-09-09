@@ -53,15 +53,6 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 		return 9;
 	}
 	
-	@Override
-	public int getInitialHeight() {
-		return 440;
-	}
-	@Override
-	public int getInitialWidth() {
-		return 630;
-	}
-    
     /**
      * Inicializacion de los componentes
      */

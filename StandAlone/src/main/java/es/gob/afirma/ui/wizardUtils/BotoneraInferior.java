@@ -9,7 +9,6 @@
  */
 package es.gob.afirma.ui.wizardUtils;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Panel;
@@ -67,7 +66,7 @@ public class BotoneraInferior extends JPanel {
 	private void initParamenters() {
 		// Configuracion del panel
     	setBorder(BorderFactory.createEtchedBorder());
-        setPreferredSize(this.dimensiones);
+    	setPreferredSize(this.dimensiones);
         setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 1));
 
         // Definicion de botones
@@ -90,12 +89,12 @@ public class BotoneraInferior extends JPanel {
         
         //Espacio entre botones
 		Panel panelVacio = new Panel();
-		panelVacio.setPreferredSize(new Dimension(150, 10));
+		panelVacio.setPreferredSize(new Dimension(100, 10));
 		add(panelVacio);		
 		
     	// Boton anterior
-        Integer paginas = this.ventanas.size() - 1;
-        if (this.posicion.equals(0) || paginas.equals(this.posicion))
+		 Integer paginas = this.ventanas.size() - 1;
+	     if (this.posicion.equals(0) || paginas.equals(this.posicion))
         	anterior.setEnabled(false);
         else {
         	 anterior.setMnemonic(KeyEvent.VK_A); //Mnem�nico para el bot�n de anterior
@@ -197,32 +196,12 @@ public class BotoneraInferior extends JPanel {
 	}
 	
 	/**
-	 * Cambia el tamaño de la ventana al tamaño máximo de pantalla menos el tamaño de la barra de tareas de windows
+	 * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		JAccessibilityDialogWizard j = getJAccessibilityDialogWizard(this);
+		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 		
 	}
-	
-	/**
-	 * Busca el JAccessibilityDialogWizard padre de un componente.
-	 * @param component El componente.
-	 * @return El JAccessibilityDialogWizard buscado.
-	 */
-	public static JAccessibilityDialogWizard getJAccessibilityDialogWizard(Component component)
-	{
-		JAccessibilityDialogWizard  resultingJAccessibilityDialogWizard = null;
-		while (component != null && resultingJAccessibilityDialogWizard == null)
-		{
-	        if (component instanceof JAccessibilityDialogWizard){
-	        	resultingJAccessibilityDialogWizard = (JAccessibilityDialogWizard)component;
-	        }
-	        else{
-	        	component = component.getParent();
-	        }
-		 }
-		 return resultingJAccessibilityDialogWizard;
-	 }
 }
