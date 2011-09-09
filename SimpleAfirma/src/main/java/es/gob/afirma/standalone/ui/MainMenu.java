@@ -35,7 +35,7 @@ import com.apple.eawt.Application;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
-import es.gob.afirma.misc.Platform;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 

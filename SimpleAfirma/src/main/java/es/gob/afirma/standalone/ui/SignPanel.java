@@ -74,24 +74,23 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.batik.swing.JSVGCanvas;
 
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.misc.AOCryptoUtil;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.misc.Platform;
-import es.gob.afirma.signers.AOCAdESSigner;
-import es.gob.afirma.signers.AOPDFSigner;
-import es.gob.afirma.signers.AOSigner;
-import es.gob.afirma.signers.AOSignerFactory;
-import es.gob.afirma.signers.AOXAdESSigner;
-import es.gob.afirma.signers.AOXMLDSigSigner;
-import es.gob.afirma.signers.beans.AOSignInfo;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.beans.AOSignInfo;
+import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
 import es.gob.afirma.standalone.VisorFirma;
-import es.gob.afirma.ui.AOUIManager;
+import es.gob.afirma.util.signers.AOSignerFactory;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
@@ -721,7 +720,7 @@ public final class SignPanel extends JPanel {
 
             if (alias == null) {
                 try {
-                    alias = AOUIManager.showCertSelectionDialog(ksm.getAliases(), ksm.getKeyStores(),
+                    alias = KeyStoreUtilities.showCertSelectionDialog(ksm.getAliases(), ksm.getKeyStores(),
                                                                 SignPanel.this,
                                                                 true,
                                                                 true,
@@ -788,12 +787,12 @@ public final class SignPanel extends JPanel {
             try {
                 if (SignPanel.this.cosign) {
                     signResult = SignPanel.this.signer.cosign(SignPanel.this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
-                                              ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), SignPanel.this)),
+                                              ksm.getKeyEntry(alias, KeyStoreUtilities.getPreferredPCB(ksm.getType(), SignPanel.this)),
                                               p);
                 }
                 else {
                     signResult = SignPanel.this.signer.sign(SignPanel.this.dataToSign, "SHA1withRSA", //$NON-NLS-1$
-                            ksm.getKeyEntry(alias, AOCryptoUtil.getPreferredPCB(ksm.getType(), SignPanel.this)),
+                            ksm.getKeyEntry(alias, KeyStoreUtilities.getPreferredPCB(ksm.getType(), SignPanel.this)),
                             p);
                 }
             }

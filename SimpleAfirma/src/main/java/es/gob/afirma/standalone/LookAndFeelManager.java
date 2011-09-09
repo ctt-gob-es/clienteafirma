@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import es.gob.afirma.misc.Platform;
+import es.gob.afirma.core.misc.Platform;
 
 /**
  * Maneja el LookAndFeel aplicado al aplicativo.

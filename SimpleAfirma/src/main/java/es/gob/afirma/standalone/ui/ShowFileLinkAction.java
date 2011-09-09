@@ -8,7 +8,7 @@ import java.io.OutputStream;
 
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.misc.MimeHelper;
+import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.standalone.Messages;
 
 /**

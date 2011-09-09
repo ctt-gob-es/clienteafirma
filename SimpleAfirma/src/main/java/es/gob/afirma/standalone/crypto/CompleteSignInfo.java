@@ -10,8 +10,8 @@
 
 package es.gob.afirma.standalone.crypto;
 
-import es.gob.afirma.misc.tree.TreeModel;
-import es.gob.afirma.signers.beans.AOSignInfo;
+import es.gob.afirma.core.signers.beans.AOSignInfo;
+import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /**
  * Informaci&oacute;n extra&iacute;da de una firma.
@@ -25,7 +25,7 @@ public final class CompleteSignInfo {
 
     private AOSignInfo signInfo;
 
-    private TreeModel signsTree;
+    private AOTreeModel signsTree;
 
     /**
      * Recupera la firma de la que se extraen los datos.
@@ -64,7 +64,7 @@ public final class CompleteSignInfo {
      * Recupera el &aacute;rbol de firma con los datos de cada firma individucal.
      * @return &Aacute;rbol de firma.
      */
-    public TreeModel getSignsTree() {
+    public AOTreeModel getSignsTree() {
         return this.signsTree;
     }
 
@@ -72,7 +72,7 @@ public final class CompleteSignInfo {
      * Establece el &aacute;rbol de firma con los datos de cada firma individucal.
      * @param signsTree &Aacute;rbol de firma.
      */
-    public void setSignsTree(final TreeModel signsTree) {
+    public void setSignsTree(final AOTreeModel signsTree) {
         this.signsTree = signsTree;
     }
 

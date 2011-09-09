@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import es.gob.afirma.signers.AOPDFSigner;
+import es.gob.afirma.signers.pades.AOPDFSigner;
 
 /**
  * M&eacute;todos de utilidad para el an&aacute;lisis de ficheros de datos.

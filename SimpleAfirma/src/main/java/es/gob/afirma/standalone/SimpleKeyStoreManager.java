@@ -14,16 +14,16 @@ import java.awt.Component;
 import java.io.File;
 import java.util.logging.Logger;
 
-import es.gob.afirma.callbacks.NullPasswordCallback;
-import es.gob.afirma.callbacks.UIPasswordCallback;
-import es.gob.afirma.exceptions.AOCancelledOperationException;
-import es.gob.afirma.exceptions.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.AOKeyStoreManager;
-import es.gob.afirma.keystores.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.AOKeystoreAlternativeException;
-import es.gob.afirma.misc.AOConstants.AOKeyStore;
-import es.gob.afirma.misc.AOUtil;
-import es.gob.afirma.misc.Platform;
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.common.AOKeyStore;
+import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.common.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.standalone.ui.DNIePasswordCallback;
 
 /** Gestor simple de <code>KeyStores</code>. Obtiene o un <code>KeyStore</code> de DNIe

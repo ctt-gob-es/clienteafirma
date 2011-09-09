@@ -18,11 +18,11 @@ import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import sun.security.x509.AlgorithmId;
+import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
-import es.gob.afirma.signers.AOCAdESSigner;
-import es.gob.afirma.signers.AOCMSSigner;
-import es.gob.afirma.signers.AOSigner;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cms.AOCMSSigner;
 
 /**
  * Validador de firmas Adobe PDF.
@@ -110,10 +110,9 @@ public final class ValidateBinarySignature {
      */
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
 
-        final String BC = BouncyCastleProvider.PROVIDER_NAME;
-
         final CMSSignedData s = new CMSSignedData(sign);
-        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BC);  //$NON-NLS-1$
+        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$
+        System.out.println(s.getCertificates().getClass().toString()); 
         final SignerInformationStore signers = s.getSignerInfos();
         final Iterator<?> it = signers.getSigners().iterator();
 
@@ -121,8 +120,8 @@ public final class ValidateBinarySignature {
             final SignerInformation signer = (SignerInformation) it.next();
             final Iterator<?> certIt = certStore.getCertificates(signer.getSID()).iterator();
             final X509Certificate cert = (X509Certificate) certIt.next();
-
-            if (!signer.verify(cert, BC)) {
+            
+            if (!signer.verify(cert, BouncyCastleProvider.PROVIDER_NAME)) {
                 throw new Exception("Firma no valida"); //$NON-NLS-1$
             }
 
@@ -161,10 +160,10 @@ public final class ValidateBinarySignature {
             }
         }
 
-        if (certStore.getCertificates(null).size() != s.getCertificates("Collection", BC).getMatches(null).size()) { //$NON-NLS-1$
+        if (certStore.getCertificates(null).size() != s.getCertificates().getMatches(null).size()) {
             throw new CertStoreException("Error en la estructura de certificados de la firma");  //$NON-NLS-1$
         }
-        if (certStore.getCRLs(null).size() != s.getCRLs("Collection", BC).getMatches(null).size()) { //$NON-NLS-1$
+        if (certStore.getCRLs(null).size() != s.getCRLs().getMatches(null).size()) {
             throw new CRLException("Error en la estructura de CRLs de la firma"); //$NON-NLS-1$
         }
     }

@@ -2,7 +2,7 @@ package es.gob.afirma.standalone.ui;
 
 import java.util.logging.Logger;
 
-import es.gob.afirma.misc.Platform;
+import es.gob.afirma.core.misc.Platform;
 
 /** Clase de enlace con la ayuda nativa de Mac OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s

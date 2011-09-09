@@ -8,9 +8,9 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import javax.swing.ImageIcon;
 
-import es.atosorigin.AOCertVerifier;
-import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.standalone.Messages;
+import es.gob.afirma.util.AOCertVerifier;
 
 
 class DnieCertAnalyzer extends CertAnalyzer {

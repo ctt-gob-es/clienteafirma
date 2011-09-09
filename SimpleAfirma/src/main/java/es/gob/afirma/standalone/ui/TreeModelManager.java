@@ -12,18 +12,18 @@ package es.gob.afirma.standalone.ui;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import es.gob.afirma.misc.tree.TreeModel;
-import es.gob.afirma.misc.tree.TreeNode;
+import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.core.util.tree.AOTreeNode;
 
 /** Operaciones para la gesti&oacute;n de objetos TreeModel.
  * @author Carlos Gamuci Mill&aacute;n */
 final class TreeModelManager {
 
-    private final TreeModel tree;
+    private final AOTreeModel tree;
 
     /** Construye una clase de gesti&oacute;n de &aacute;rboles <code>Swing</code>
      * @param tree &Aacute;rbol <code>Swing</code> a gestionar */
-    TreeModelManager(final TreeModel tree) {
+    TreeModelManager(final AOTreeModel tree) {
         this.tree = tree;
     }
 
@@ -32,7 +32,7 @@ final class TreeModelManager {
      * @return &Aacute;rbol Swing. */
     DefaultMutableTreeNode getSwingTree() {
         final DefaultMutableTreeNode swingTreeRoot = new DefaultMutableTreeNode();
-        copyBranch((TreeNode) this.tree.getRoot(), swingTreeRoot);
+        copyBranch((AOTreeNode) this.tree.getRoot(), swingTreeRoot);
         return swingTreeRoot;
     }
 
@@ -40,7 +40,7 @@ final class TreeModelManager {
      * @param treeNode Nodo que deseamos replicar.
      * @param swingTreeNode Nodo al que se desea copiar
      * @return Nodo replicado. */
-    private DefaultMutableTreeNode copyBranch(final TreeNode treeNode, final DefaultMutableTreeNode swingTreeNode) {
+    private DefaultMutableTreeNode copyBranch(final AOTreeNode treeNode, final DefaultMutableTreeNode swingTreeNode) {
         swingTreeNode.setUserObject(treeNode.getUserObject());
         DefaultMutableTreeNode newChild;
         for (int i = 0; i < treeNode.getChildCount(); i++) {

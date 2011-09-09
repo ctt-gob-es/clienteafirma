@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 
-import es.gob.afirma.exceptions.AOCancelledOperationException;
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.standalone.Messages;
 
 /**

@@ -23,7 +23,7 @@ import com.apple.eawt.event.GestureUtilities;
 import com.apple.eawt.event.MagnificationEvent;
 import com.apple.eawt.event.MagnificationListener;
 
-import es.gob.afirma.misc.Platform;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.LookAndFeelManager;
 
 /** Pantalla principal de la aplicaci&oacute;n de Firma F&aacute;cil con AFirma.

@@ -24,13 +24,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.ValidateBinarySignature;
 import es.gob.afirma.signature.ValidateXMLSignature;
-import es.gob.afirma.signers.AOCAdESSigner;
-import es.gob.afirma.signers.AOCMSSigner;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;

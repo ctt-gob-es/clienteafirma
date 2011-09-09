@@ -29,7 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import es.gob.afirma.misc.AOUtil;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;

@@ -4,8 +4,8 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.misc.Platform;
-import es.gob.afirma.misc.WinRegistryWrapper;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 import es.gob.afirma.standalone.Messages;
 
 /**

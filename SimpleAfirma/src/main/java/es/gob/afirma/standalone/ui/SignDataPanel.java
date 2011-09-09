@@ -38,16 +38,16 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-import es.gob.afirma.misc.Platform;
-import es.gob.afirma.signers.AOPDFSigner;
-import es.gob.afirma.signers.AOSigner;
-import es.gob.afirma.signers.AOSignerFactory;
-import es.gob.afirma.signers.beans.AOSimpleSignInfo;
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
+import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
+import es.gob.afirma.util.signers.AOSignerFactory;
 
 final class SignDataPanel extends JPanel {
 

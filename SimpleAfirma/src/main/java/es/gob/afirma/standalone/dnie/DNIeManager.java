@@ -20,7 +20,7 @@ import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.TerminalFactory;
 
-import es.gob.afirma.misc.Platform;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Gestor de almac&eacute;n (<code>KeyStore</code>) DNIe v&iacute;a PKCS#11 y JSR-268.
