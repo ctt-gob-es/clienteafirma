@@ -251,9 +251,7 @@ public final class AOPDFSigner implements AOSigner {
 
     public boolean isSign(final byte[] data) {
         if (data == null) {
-            LOGGER.warning(
-                           "Se han introducido datos nulos para su comprobacion" //$NON-NLS-1$
-            );
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
         return isPdfFile(data);
@@ -281,9 +279,7 @@ public final class AOPDFSigner implements AOSigner {
             new PdfReader(data);
         }
         catch (final BadPasswordException e) {
-            LOGGER.warning(
-                           "El PDF esta protegido con contrasena por lo que no se toma como PDF valido" //$NON-NLS-1$
-            );
+            LOGGER.warning("El PDF esta protegido con contrasena por lo que no se toma como PDF valido"); //$NON-NLS-1$
             return false;
         }
         catch (final Exception e) {
@@ -295,9 +291,7 @@ public final class AOPDFSigner implements AOSigner {
 
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
-            LOGGER.warning(
-                           "Se han introducido datos nulos para su comprobacion" //$NON-NLS-1$
-            );
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
         return isPdfFile(data);
@@ -337,17 +331,6 @@ public final class AOPDFSigner implements AOSigner {
             /* Se deja la pagina tal y como esta */
         }
 
-        /*
-         * Si se solicito una firma explicita, advertimos no son compatibles con
-         * PDF y se ignorara esta configuracion
-         */
-        if (extraParams.containsKey("mode") //$NON-NLS-1$
-            && extraParams.getProperty("mode").equals(AOSignConstants.SIGN_MODE_EXPLICIT)) { //$NON-NLS-1$
-            LOGGER.warning(
-                "El formato de firma PDF no soporta el modo de firma explicita, " + //$NON-NLS-1$
-                    "se ignorara esta configuracion"); //$NON-NLS-1$
-        }
-
         PdfReader pdfReader;
         String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
         try {
@@ -380,8 +363,7 @@ public final class AOPDFSigner implements AOSigner {
         if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED) {
             if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$ //$NON-NLS-2$
                 if (!"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    throw new UnsupportedOperationException("No se permite la firma o cofirma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a true)" //$NON-NLS-1$
-                    );
+                    throw new UnsupportedOperationException("No se permite la firma o cofirma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido a true)"); //$NON-NLS-1$
                 }
             }
             else {
@@ -389,8 +371,7 @@ public final class AOPDFSigner implements AOSigner {
                                                                            PDFMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
                                                                            AOUIFactory.YES_NO_OPTION,
                                                                            AOUIFactory.WARNING_MESSAGE)) {
-                    throw new UnsupportedOperationException("No se ha permitido la firma de un PDF certificado" //$NON-NLS-1$
-                    );
+                    throw new UnsupportedOperationException("No se ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
                 }
             }
         }
@@ -614,6 +595,7 @@ public final class AOPDFSigner implements AOSigner {
         // ***************************************
         // ********************************************************************************
 
+        // Previo: Cadena de certificados
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = ke.getCertificateChain();
         if (certs != null && (certs instanceof X509Certificate[])) {
