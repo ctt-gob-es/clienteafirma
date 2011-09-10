@@ -9,7 +9,7 @@
  */
 package es.gob.afirma.install;
 
-import static es.gob.afirma.misc.Platform.getEndorsedDir;
+import static es.gob.afirma.install.Platform.getEndorsedDir;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,11 +24,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import es.gob.afirma.misc.AOBootUtil;
-import es.gob.afirma.misc.Platform;
-import es.gob.afirma.misc.Platform.JREVER;
-import es.gob.afirma.misc.Platform.OS;
-import es.gob.afirma.misc.WinRegistryWrapper;
+import es.gob.afirma.install.Platform.JREVER;
+import es.gob.afirma.install.Platform.OS;
 
 /** Clase para la comprobaci&oacute;n e instalaci&oacute;n de las dependencias de
  * entorno del Cliente @firma. */

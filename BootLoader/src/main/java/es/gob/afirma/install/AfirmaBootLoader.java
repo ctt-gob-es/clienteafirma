@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import javax.swing.JApplet;
 import javax.swing.SwingUtilities;
 
-import es.gob.afirma.misc.Platform;
 
 /** Clase encargada de instalar el cliente de firma del Ministerio de la Presidencia, tanto
  * las librer&iacute;as de las que depende como el propio applet cliente (cliente + librerias
@@ -24,7 +23,7 @@ import es.gob.afirma.misc.Platform;
 public final class AfirmaBootLoader extends JApplet {
 
     /** Activar a <code>true</code> &uacute;nicamente para pruebas. */
-    public static final boolean DEBUG = false;
+    static final boolean DEBUG = false;
     
     private static final String UNINSTALL_ACTION = "uninstall"; //$NON-NLS-1$
 

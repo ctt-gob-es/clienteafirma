@@ -8,20 +8,20 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
-package es.gob.afirma.misc;
+package es.gob.afirma.install;
 
 import java.io.File;
 import java.util.logging.Logger;
 
 /** Clase para la identificaci&oacute;n de la plataforma Cliente y
  * extracci&oacute;n de datos relativos a la misma. */
-public final class Platform {
+final class Platform {
 
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
     
     /** Sistema operativo. */
-    public enum OS {
+    enum OS {
         /** Microsoft Windows. */
         WINDOWS,
         /** Linux. */
@@ -35,7 +35,7 @@ public final class Platform {
     }
 
     /** Version del entorno de ejecuci&oacute;n de Java. */
-    public enum JREVER {
+    enum JREVER {
         /** Java 4 y anteriores. */
         J4,
         /** Java 5. */
@@ -84,7 +84,7 @@ public final class Platform {
     /** Fuerza la identificaci&oacute;n de la plataforma. Inicializa los valores que pueden
      * reconocerse sin informacion adicional, como el sistema operativo y la versi&oacute;n de Java.
      * Se agrupan las inicializaciones aqu&iacute; para poder llamarlo desde un <code>privilegedAction</code> */
-    public static void init() {
+    static void init() {
 
         userHome = System.getProperty("user.home"); //$NON-NLS-1$
         final String osName = System.getProperty("os.name"); //$NON-NLS-1$
@@ -133,38 +133,38 @@ public final class Platform {
 
     /** Recupera el sistema operativo de ejecuci&oacute;n.
      * @return Sistema operativo actual. */
-    public static Platform.OS getOS() {
+    static Platform.OS getOS() {
         return os;
     }
 
     /** Recupera la arquitectura del sistema operativo seg&uacute;n las
      * propiedades de Java.
      * @return Arquitectura del sistema operativo actual. */
-    public static String getOsArch() {
+    static String getOsArch() {
         return osArch;
     }
 
     /** Recupera la versi&oacute;n de la JVM en ejecuci&oacute;n seg&uacute;n las propiedades de Java.
      * @return Versi&oacute;n de la JVM. */
-    public static JREVER getJavaVersion() {
+    static JREVER getJavaVersion() {
         return javaVersion;
     }
 
     /** Recupera la arquitectura de la JVM en ejecuci&oacute;n seg&uacute;n las propiedades de Java.
      * @return Arquitectura de la JVM. */
-    public static String getJavaArch() {
+    static String getJavaArch() {
         return javaArch;
     }
 
     /** Recupera la ruta del directorio de instalaci&oacute;n de Java.
      * @return Ruta del directorio de instalaci&oacute;n de Java. */
-    public static String getJavaHome() {
+    static String getJavaHome() {
         return javaHome;
     }
 
     /** Recupera la ruta del directorio personal del usuario del sistema operativo.
      * @return Ruta del directorio del usuario. */
-    public static String getUserHome() {
+    static String getUserHome() {
         return userHome;
     }
 
@@ -197,7 +197,7 @@ public final class Platform {
     /** Recupera el directorio "endorsed" de la JRE usada para la instalaci&oacute;n o <code>null</code> si no se pudo determinar ning&uacute;n
      * directorio.
      * @return Directorio "endorsed". */
-    public static String getEndorsedDir() {
+    static String getEndorsedDir() {
 
         if (endorsedDir != null) {
             return endorsedDir;

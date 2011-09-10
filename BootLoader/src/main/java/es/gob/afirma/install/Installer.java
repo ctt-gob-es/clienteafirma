@@ -19,9 +19,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.misc.BootLoaderMessages;
-import es.gob.afirma.misc.LicenceDialogPanel;
-import es.gob.afirma.misc.Platform;
 
 /** Instalador del cliente AFirma.
  * @version 2.0 */
@@ -31,10 +28,10 @@ final class Installer {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     /** Directorio de instalaci&oacute;n. */
-    public static final String INSTALL_DIR = ".cafirma"; //$NON-NLS-1$
+    static final String INSTALL_DIR = ".cafirma"; //$NON-NLS-1$
 
     /** Construcci&oacute;n LITE del cliente Afirma. */
-    public static final String LITE = "LITE"; //$NON-NLS-1$
+    static final String LITE = "LITE"; //$NON-NLS-1$
 
     /** Componente padre sobre el que se situar&aacute;n los mensajes del instalador. */
     private Component parentComponent = null;

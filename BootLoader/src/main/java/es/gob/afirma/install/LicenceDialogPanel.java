@@ -7,7 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
-package es.gob.afirma.misc;
+package es.gob.afirma.install;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -26,20 +26,20 @@ import javax.swing.ScrollPaneConstants;
 
 
 /** Panel con el acuerdo de licencia del cliente de firma @firma versi&oacute;n 3. */
-public final class LicenceDialogPanel {
+final class LicenceDialogPanel {
 
     /** Componente sobre el que se debe mostrar el acuerdo de licencia. */
     private final Component parentComponent;
 
     /** Crea el di&aacute;logo y establece un componente padre sobre el que debe mostrarse.
      * @param parentComponent Componente sobre el que se mostrar&aacute; el acuerdo de licencia. */
-    public LicenceDialogPanel(final Component parentComponent) {
+    LicenceDialogPanel(final Component parentComponent) {
         this.parentComponent = parentComponent;
     }
 
     /** Muestra el texto del acuerdo de licencia.
      * @return Devuelve <code>true</code> si se acepta el acuerdo de licencia, <code>false</code> en caso contrario. */
-    public boolean showDisclaimer() {
+    boolean showDisclaimer() {
 
         // Texto del dialogo
         final Label textLabel = new Label(BootLoaderMessages.getString("LicenceDialogPanel.0")); //$NON-NLS-1$

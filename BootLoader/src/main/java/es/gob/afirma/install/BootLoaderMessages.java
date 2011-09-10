@@ -7,7 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
-package es.gob.afirma.misc;
+package es.gob.afirma.install;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 
 
 /** Gestor de mensajes del BootLoader. */
-public final class BootLoaderMessages {
+final class BootLoaderMessages {
 
     private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
 
@@ -28,7 +28,7 @@ public final class BootLoaderMessages {
     /** Obtiene un mensaje de usuario.
      * @param key Clave del mensaje a obtener
      * @return Mensaje obtenido */
-    public static String getString(final String key) {
+    static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }

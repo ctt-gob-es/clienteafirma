@@ -27,7 +27,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import es.gob.afirma.misc.AOBootUtil;
 
 /** Funciones de utilidad para la instalaci&oacute;n del Cliente Afirma. */
 final class AOInstallUtils {

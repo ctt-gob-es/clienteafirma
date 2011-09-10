@@ -7,7 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
-package es.gob.afirma.misc;
+package es.gob.afirma.install;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +29,7 @@ import java.util.zip.ZipFile;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3 */
-public final class AOBootUtil {
+final class AOBootUtil {
     
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
@@ -50,7 +50,7 @@ public final class AOBootUtil {
      * @return URI (<code>file://</code>) del fichero local o URL
      * @throws URISyntaxException 
      * @throws URISyntaxException cuando ocurre cualquier problema creando la URI */
-    public static URI createURI(String filename) throws URISyntaxException {
+    static URI createURI(String filename) throws URISyntaxException {
 
         if (filename == null) {
             throw new IllegalArgumentException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
@@ -91,7 +91,7 @@ public final class AOBootUtil {
      * @param uri URI del fichero a leer
      * @return Flujo de entrada hacia el contenido del fichero
      * @throws IOException Cuando ocurre cualquier problema obteniendo el flujo*/
-    public static InputStream loadFile(final URI uri) throws IOException {
+    static InputStream loadFile(final URI uri) throws IOException {
 
         // Cuidado: Repinta mal el dialogo de espera, hay que tratar con hilos nuevos
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
@@ -129,7 +129,7 @@ public final class AOBootUtil {
      * @param input Flujo de donde se toman los datos.
      * @return Los datos obtenidos del flujo.
      * @throws IOException Si ocurre cualquier error durante la lectura de datos */
-    public static byte[] getDataFromInputStream(final InputStream input) throws IOException {
+    static byte[] getDataFromInputStream(final InputStream input) throws IOException {
 
         int nBytes = 0;
         final byte[] buffer = new byte[1024];
@@ -145,7 +145,7 @@ public final class AOBootUtil {
      * @param urlBase URL base del fichero.
      * @param filename Nombre del fichero.
      * @return URL de referencia directa al fichero. */
-    public static URL createURLFile(final URL urlBase, final String filename) {
+    static URL createURLFile(final URL urlBase, final String filename) {
         try {
             // TODO: Tratar el caso de urls con caracteres especiales
             String codeBase = urlBase.toString();
@@ -164,7 +164,7 @@ public final class AOBootUtil {
      * @param source Fichero origen con el contenido que queremos copiar.
      * @param dest Fichero destino de los datos.
      * @return Devuelve <code>true</code> si la operac&oacute;n finaliza correctamente, <code>false</code> en caso contrario. */
-    public static boolean copyFile(final File source, final File dest) {
+    static boolean copyFile(final File source, final File dest) {
         if (source == null || dest == null) {
             return false;
         }
@@ -222,7 +222,7 @@ public final class AOBootUtil {
      * y si no se indica la descripci&oacute;n no se mostrar&aacute; nada.
      * @param is Datos del properties cobn la versi&oacute;n.
      * @return Identificador de la versi&oacute;n. */
-    public static String getVersion(final InputStream is) {
+    static String getVersion(final InputStream is) {
         final Properties p = new Properties();
         try {
             p.load(is);
@@ -248,7 +248,7 @@ public final class AOBootUtil {
      * ra&iacute;z de un fichero ZIP.
      * @param zipFilePath Ruta del fichero Zip.
      * @return Versi&oacute;n del m&oacute;dulo que contiene el Zip. */
-    public static String getVersionFromZip(final String zipFilePath) {
+    static String getVersionFromZip(final String zipFilePath) {
 
         String idVersion;
         try {
@@ -274,37 +274,11 @@ public final class AOBootUtil {
         }
         return idVersion;
     }
-
-    /** Carga una librer&iacute;a nativa del sistema.
-     * @param path Ruta a la libreria de sistema. */
-    public static void loadNativeLibrary(final String path) {
-
-        boolean copyOK = false;
-        final int pos = path.lastIndexOf('.');
-        final File file = new File(path);
-        File tempLibrary = null;
-        try {
-            tempLibrary =
-                File.createTempFile(pos < 1 ? file.getName() : file.getName().substring(0, file.getName().indexOf('.')),
-                                            pos < 1 || pos == path.length() - 1 ? null : path.substring(pos));
-
-            // Copiamos el fichero
-            copyOK = copyFile(file, tempLibrary);
-        }
-        catch (final Exception e) {
-            LOGGER.warning("Error al generar una nueva instancia de la libreria " + path + " para su carga: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        LOGGER.info("Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath())); //$NON-NLS-1$
-        System.load((copyOK && tempLibrary != null) ? tempLibrary.getAbsolutePath() : path);
-        if (tempLibrary != null) {
-            tempLibrary.deleteOnExit();
-        }
-    }
     
     /** Obtiene un ClassLoader que no incluye URL que no referencien directamente a ficheros JAR.
      * @return ClassLoader sin URL adicionales a directorios sueltos Web
      */
-    public static ClassLoader getCleanClassLoader() {
+    static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOBootUtil.class.getClassLoader();
         if (classLoader instanceof URLClassLoader) {
             final Vector<URL> urls = new Vector<URL>();
