@@ -24,13 +24,15 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.Logger;
 import java.util.zip.ZipFile;
-
-import es.gob.afirma.install.AfirmaBootLoader;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3 */
 public final class AOBootUtil {
+    
+    /** Gestor de registro. */
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     private AOBootUtil() {
         // No permitimos la instanciacion
@@ -153,7 +155,7 @@ public final class AOBootUtil {
             return AOBootUtil.createURI(codeBase + filename).toURL();
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("No se pudo crear la referencia al fichero '" + filename + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.severe("No se pudo crear la referencia al fichero '" + filename + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             return null;
         }
     }
@@ -194,7 +196,7 @@ public final class AOBootUtil {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("No se ha podido copiar el fichero origen '" + source.getName() //$NON-NLS-1$
+            LOGGER.severe("No se ha podido copiar el fichero origen '" + source.getName() //$NON-NLS-1$
                                                      + "' al destino '" //$NON-NLS-1$
                                                      + dest.getName()
                                                      + "': " //$NON-NLS-1$
@@ -226,7 +228,7 @@ public final class AOBootUtil {
             p.load(is);
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se han podido obtener los datos de version"); //$NON-NLS-1$
+            LOGGER.warning("No se han podido obtener los datos de version"); //$NON-NLS-1$
         }
         final StringBuilder version = new StringBuilder();
         version.append(p.getProperty("version.mayor", "0")).append(".") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -267,7 +269,7 @@ public final class AOBootUtil {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se ha podido identificar el cliente de firma instalado"); //$NON-NLS-1$
+            LOGGER.warning("No se ha podido identificar el cliente de firma instalado"); //$NON-NLS-1$
             idVersion = "0.0.0"; //$NON-NLS-1$
         }
         return idVersion;
@@ -290,9 +292,9 @@ public final class AOBootUtil {
             copyOK = copyFile(file, tempLibrary);
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("Error al generar una nueva instancia de la libreria " + path + " para su carga: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warning("Error al generar una nueva instancia de la libreria " + path + " para su carga: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        AfirmaBootLoader.LOGGER.info("Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath())); //$NON-NLS-1$
+        LOGGER.info("Cargamos " + (tempLibrary == null ? path : tempLibrary.getAbsolutePath())); //$NON-NLS-1$
         System.load((copyOK && tempLibrary != null) ? tempLibrary.getAbsolutePath() : path);
         if (tempLibrary != null) {
             tempLibrary.deleteOnExit();

@@ -11,13 +11,15 @@
 package es.gob.afirma.misc;
 
 import java.io.File;
-
-import es.gob.afirma.install.AfirmaBootLoader;
+import java.util.logging.Logger;
 
 /** Clase para la identificaci&oacute;n de la plataforma Cliente y
  * extracci&oacute;n de datos relativos a la misma. */
 public final class Platform {
 
+    /** Gestor de registro. */
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
+    
     /** Sistema operativo. */
     public enum OS {
         /** Microsoft Windows. */
@@ -101,7 +103,7 @@ public final class Platform {
         }
         else {
             os = OS.OTHER;
-            AfirmaBootLoader.LOGGER.warning("No se ha podido determinar el sistema operativo"); //$NON-NLS-1$
+            LOGGER.warning("No se ha podido determinar el sistema operativo"); //$NON-NLS-1$
         }
 
         javaArch = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
@@ -186,7 +188,7 @@ public final class Platform {
             return System.getProperty("java.home"); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se ha podido identificar el directorio de java"); //$NON-NLS-1$
+            LOGGER.warning("No se ha podido identificar el directorio de java"); //$NON-NLS-1$
         }
 
         return null;

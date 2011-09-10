@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200.Unpacker;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -30,6 +31,9 @@ import es.gob.afirma.misc.AOBootUtil;
 
 /** Funciones de utilidad para la instalaci&oacute;n del Cliente Afirma. */
 final class AOInstallUtils {
+    
+    /** Gestor de registro. */
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     private AOInstallUtils() {
         // No permitimos la instanciacion
@@ -253,13 +257,13 @@ final class AOInstallUtils {
             is.close();
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se pudo cerrar el fichero remoto: " + e); //$NON-NLS-1$
+            LOGGER.warning("No se pudo cerrar el fichero remoto: " + e); //$NON-NLS-1$
         }
         try {
             fos.close();
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se pudo cerrar el fichero local: " + e); //$NON-NLS-1$
+            LOGGER.warning("No se pudo cerrar el fichero local: " + e); //$NON-NLS-1$
         }
     }
 
@@ -289,7 +293,7 @@ final class AOInstallUtils {
         } while (file != null && file.exists() && n <= 5);
 
         if (n > 5 || file == null) {
-            AfirmaBootLoader.LOGGER.warning("No se pudo crear un fichero temporal"); //$NON-NLS-1$
+            LOGGER.warning("No se pudo crear un fichero temporal"); //$NON-NLS-1$
             return null;
         }
 
@@ -321,7 +325,7 @@ final class AOInstallUtils {
 
         // Borramos el propio fichero o directorio
         if (!dir.delete()) {
-            AfirmaBootLoader.LOGGER.severe("No se ha podido eliminar el archivo: " + dir); //$NON-NLS-1$
+            LOGGER.severe("No se ha podido eliminar el archivo: " + dir); //$NON-NLS-1$
             success = false;
         }
         return success;
@@ -383,7 +387,7 @@ final class AOInstallUtils {
      * @throws SecurityException Cuando se produce cualquier error durante el proceso. */
     private static void checkSign(final File jarFile, final SigningCert sCert) {
         if (AfirmaBootLoader.DEBUG) {
-            AfirmaBootLoader.LOGGER.severe("IMPORTANTE: Modo de depuracion, comprobaciones de firma desactivadas"); //$NON-NLS-1$
+            LOGGER.severe("IMPORTANTE: Modo de depuracion, comprobaciones de firma desactivadas"); //$NON-NLS-1$
             return;
         }
         new AOJarVerifier().verifyJar(jarFile.getAbsolutePath(), sCert.getSigningCertificate());
@@ -391,38 +395,38 @@ final class AOInstallUtils {
 
     private static void createDirectory(final File dir) {
         if (dir == null) {
-            AfirmaBootLoader.LOGGER.warning("Se ha pedido crear un directorio nulo, se ignorara la peticion"); //$NON-NLS-1$
+            LOGGER.warning("Se ha pedido crear un directorio nulo, se ignorara la peticion"); //$NON-NLS-1$
             return;
         }
         if (dir.exists()) {
             if (!dir.canWrite()) {
-                AfirmaBootLoader.LOGGER.severe("El fichero/directorio '" + dir.getAbsolutePath() //$NON-NLS-1$
+                LOGGER.severe("El fichero/directorio '" + dir.getAbsolutePath() //$NON-NLS-1$
                                                          + "' ya existe, pero no se tienen derechos de escritura sobre el"); //$NON-NLS-1$
                 return;
             }
             if (dir.isFile()) {
                 if (dir.delete()) {
                     if (dir.mkdir()) {
-                        AfirmaBootLoader.LOGGER.warning("'" + dir.getAbsolutePath() //$NON-NLS-1$
+                        LOGGER.warning("'" + dir.getAbsolutePath() //$NON-NLS-1$
                                  + "' ya existia como fichero, se ha borrado y se ha creado un directorio con el mismo nombre"); //$NON-NLS-1$
                         return;
                     }
 
-                    AfirmaBootLoader.LOGGER.severe("'" + dir.getAbsolutePath() //$NON-NLS-1$
+                    LOGGER.severe("'" + dir.getAbsolutePath() //$NON-NLS-1$
                             + "' ya existia como fichero y se ha borrado, pero no se ha podido crear un directorio con el mismo nombre"); //$NON-NLS-1$
                     return;
                 }
-                AfirmaBootLoader.LOGGER.severe("'" + dir.getAbsolutePath() + "' ya existe como fichero y no se ha podido borrar"); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.severe("'" + dir.getAbsolutePath() + "' ya existe como fichero y no se ha podido borrar"); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
         }
         // Si no existe
         else {
             if (!dir.getParentFile().canWrite()) {
-                AfirmaBootLoader.LOGGER.severe("El directorio '" + dir.getParent() + "' no tiene permisos de escritura, se intentara de todas formas"); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.severe("El directorio '" + dir.getParent() + "' no tiene permisos de escritura, se intentara de todas formas"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             if (!dir.mkdir()) {
-                AfirmaBootLoader.LOGGER.severe("No se ha podido crear el directorio '" + dir.getAbsolutePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.severe("No se ha podido crear el directorio '" + dir.getAbsolutePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
     }

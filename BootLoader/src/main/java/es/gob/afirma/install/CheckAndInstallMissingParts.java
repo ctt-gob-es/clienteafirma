@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import es.gob.afirma.misc.AOBootUtil;
 import es.gob.afirma.misc.Platform;
@@ -32,6 +33,9 @@ import es.gob.afirma.misc.WinRegistryWrapper;
 /** Clase para la comprobaci&oacute;n e instalaci&oacute;n de las dependencias de
  * entorno del Cliente @firma. */
 final class CheckAndInstallMissingParts {
+    
+    /** Gestor de registro. */
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     private static final long serialVersionUID = -7508890516967067205L;
 
@@ -95,7 +99,7 @@ final class CheckAndInstallMissingParts {
             AOInstallUtils.unpack(Platform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning(
+            LOGGER.warning(
                "No se ha podido instalar el paquete de compatibilidad con Java 5 en formato PACK200, se intentara en formato JAR: " + e //$NON-NLS-1$
             );
             // Borramos el Pack200 si se llego a copiar
@@ -173,11 +177,11 @@ final class CheckAndInstallMissingParts {
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e); //$NON-NLS-1$
+            LOGGER.warning("No se ha podido instalar la version PACK200 de Xalan, se intentara la version JAR: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+                LOGGER.warning(new String(baos.toByteArray()));
             }
             AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, XALAN_JARLIBRARY_ZIP),
                                       new File(getEndorsedDir()),
@@ -330,7 +334,7 @@ final class CheckAndInstallMissingParts {
             }
             catch (final Throwable e) {
                 if (AfirmaBootLoader.DEBUG) {
-                    AfirmaBootLoader.LOGGER.info("No se ha podido cargar NSS: " + e); //$NON-NLS-1$
+                    LOGGER.info("No se ha podido cargar NSS: " + e); //$NON-NLS-1$
                 }
             }
         }
@@ -364,12 +368,11 @@ final class CheckAndInstallMissingParts {
             localVersion = getNssLocalVersion();
         }
         catch (final FileNotFoundException e) {
-            AfirmaBootLoader.LOGGER.warning("No se ha localizado el NSS instalado"); //$NON-NLS-1$
+            LOGGER.warning("No se ha localizado el NSS instalado"); //$NON-NLS-1$
             return false;
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER
-            .warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e); //$NON-NLS-1$
+            LOGGER.warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e); //$NON-NLS-1$
             return true;
         }
 
@@ -378,8 +381,7 @@ final class CheckAndInstallMissingParts {
             remoteVersion = getNssRemoteVersion();
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER
-            .warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e); //$NON-NLS-1$
+            LOGGER.warning("No se pudo recuperar la version instalada de NSS en el directorio del Cliente, se considerara actualizado: " + e); //$NON-NLS-1$
             return true;
         }
 
@@ -478,8 +480,7 @@ final class CheckAndInstallMissingParts {
             return false;
         }
         if (getEndorsedDir() == null) {
-            AfirmaBootLoader.LOGGER
-            .severe("No se ha podido determinar el directorio ENDORSED del JRE, por lo que no se considera necesario instalar Apache XALAN"); //$NON-NLS-1$
+            LOGGER.severe("No se ha podido determinar el directorio ENDORSED del JRE, por lo que no se considera necesario instalar Apache XALAN"); //$NON-NLS-1$
             return false;
         }
         return !((new File(getEndorsedDir() + File.separator + "serializer.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$

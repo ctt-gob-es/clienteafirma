@@ -15,6 +15,7 @@ import java.io.File;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
@@ -25,6 +26,9 @@ import es.gob.afirma.misc.Platform;
 /** Instalador del cliente AFirma.
  * @version 2.0 */
 final class Installer {
+    
+    /** Gestor de registro. */
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     /** Directorio de instalaci&oacute;n. */
     public static final String INSTALL_DIR = ".cafirma"; //$NON-NLS-1$
@@ -64,7 +68,7 @@ final class Installer {
             /** {@inheritDoc} */
             public Void run() {
                 if (!afirmaDir.exists()) {
-                    AfirmaBootLoader.LOGGER.info("El directorio de instalacion no existe, se omitira la operacion"); //$NON-NLS-1$
+                    LOGGER.info("El directorio de instalacion no existe, se omitira la operacion"); //$NON-NLS-1$
                     return null;
                 }
                 try {
@@ -75,7 +79,7 @@ final class Installer {
                     return null;
                 }
                 catch (final Exception e) {
-                    AfirmaBootLoader.LOGGER.warning("No se ha podido eliminar el directorio de instalacion: " + e); //$NON-NLS-1$
+                    LOGGER.warning("No se ha podido eliminar el directorio de instalacion: " + e); //$NON-NLS-1$
                     JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString("Installer.13"), //$NON-NLS-1$
                                                   BootLoaderMessages.getString("Installer.12"), //$NON-NLS-1$
                                                   JOptionPane.ERROR_MESSAGE);
@@ -109,10 +113,10 @@ final class Installer {
                                       BootLoaderMessages.getString("Installer.0"), BootLoaderMessages.getString("Installer.1"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
         final boolean accepted = new LicenceDialogPanel(this.parentComponent).showDisclaimer();
         if (accepted) {
-            AfirmaBootLoader.LOGGER.info("Se ha aceptado el acuerdo de licencia"); //$NON-NLS-1$
+            LOGGER.info("Se ha aceptado el acuerdo de licencia"); //$NON-NLS-1$
         }
         else {
-            AfirmaBootLoader.LOGGER.info("No se ha aceptado el acuerdo de licencia, no se instalara el Cliente"); //$NON-NLS-1$
+            LOGGER.info("No se ha aceptado el acuerdo de licencia, no se instalara el Cliente"); //$NON-NLS-1$
         }
         return accepted;
     }
@@ -128,16 +132,16 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando dependencias de @firma para Java 5..."); //$NON-NLS-1$
+                LOGGER.info("Instalando dependencias de @firma para Java 5..."); //$NON-NLS-1$
                 this.enviromentInstaller.installEndorsedJava5AFirmaDependencies();
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("Error instalando las dependencias para Java 5, la ejecucion sobre Java 5 puede fallar: " + e); //$NON-NLS-1$
+            LOGGER.severe("Error instalando las dependencias para Java 5, la ejecucion sobre Java 5 puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+                LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }
@@ -148,16 +152,16 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando Apache XALAN..."); //$NON-NLS-1$
+                LOGGER.info("Instalando Apache XALAN..."); //$NON-NLS-1$
                 this.enviromentInstaller.installEndorsedXalan();
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e); //$NON-NLS-1$
+            LOGGER.severe("Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+                LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }
@@ -168,16 +172,16 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando NSS..."); //$NON-NLS-1$
+                LOGGER.info("Instalando NSS..."); //$NON-NLS-1$
                 this.enviromentInstaller.installNSS();
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e); //$NON-NLS-1$
+            LOGGER.severe("Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+                LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }
@@ -188,16 +192,16 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando SunMSCAPI..."); //$NON-NLS-1$
+                LOGGER.info("Instalando SunMSCAPI..."); //$NON-NLS-1$
                 this.enviromentInstaller.installSunMSCAPI();
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("Error instalando SunMSCAPI, la ejecucion sobre Java 64 bits o Java 5 puede fallar: " + e); //$NON-NLS-1$
+            LOGGER.severe("Error instalando SunMSCAPI, la ejecucion sobre Java 64 bits o Java 5 puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+                LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }
@@ -208,16 +212,16 @@ final class Installer {
                     return;
                 }
                 licenciaMostrada = true;
-                AfirmaBootLoader.LOGGER.info("Instalando SunPKCS11..."); //$NON-NLS-1$
+                LOGGER.info("Instalando SunPKCS11..."); //$NON-NLS-1$
                 this.enviromentInstaller.installSunPKCS11();
             }
         }
         catch (final Exception e) {
-            AfirmaBootLoader.LOGGER.severe("Error instalando SunPKCS11, la ejecucion sobre Java 64 bits puede fallar: " + e); //$NON-NLS-1$
+            LOGGER.severe("Error instalando SunPKCS11, la ejecucion sobre Java 64 bits puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));
-                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
+                LOGGER.warning(new String(baos.toByteArray()));
             }
             allOK = false;
         }

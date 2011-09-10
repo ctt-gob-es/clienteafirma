@@ -30,8 +30,8 @@ public final class AfirmaBootLoader extends JApplet {
 
     private static final long serialVersionUID = -2570412953683244702L;
 
-    /** Gestor de registro para todo el proyecto. */
-    public static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
+    /** Gestor de registro. */
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     @Override
     public void init() {

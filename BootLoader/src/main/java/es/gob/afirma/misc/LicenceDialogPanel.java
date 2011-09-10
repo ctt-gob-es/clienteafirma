@@ -17,6 +17,7 @@ import java.awt.GridBagLayout;
 import java.awt.Label;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -24,7 +25,6 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
 import es.gob.afirma.BootLoaderMessages;
-import es.gob.afirma.install.AfirmaBootLoader;
 
 /** Panel con el acuerdo de licencia del cliente de firma @firma versi&oacute;n 3. */
 public final class LicenceDialogPanel {
@@ -61,7 +61,7 @@ public final class LicenceDialogPanel {
         }
         catch (final Exception e2) {
             licenseText = BootLoaderMessages.getString("LicenceDialogPanel.2"); //$NON-NLS-1$
-            AfirmaBootLoader.LOGGER.warning("Error al acceder a las condiciones de la licencia: " + e2); //$NON-NLS-1$
+            Logger.getLogger("es.gob.afirma").warning("Error al acceder a las condiciones de la licencia: " + e2); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         try {
@@ -73,7 +73,6 @@ public final class LicenceDialogPanel {
 
         // Texto del acuerdo de licencia
         final JTextArea textArea = new JTextArea(licenseText);
-        // textArea.setPreferredSize(new Dimension(150, 400));
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setEditable(false);

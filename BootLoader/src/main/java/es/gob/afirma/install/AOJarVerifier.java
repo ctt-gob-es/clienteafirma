@@ -34,8 +34,12 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Logger;
 
 final class AOJarVerifier {
+    
+    /** Gestor de registro. */
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
     private boolean hasExpiredCert = false;
     private boolean hasExpiringCert = false;
@@ -148,15 +152,15 @@ final class AOJarVerifier {
             }
 
             if (this.hasExpiringCert) {
-                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses"); //$NON-NLS-1$
+                LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado que caduca en los proximos meses"); //$NON-NLS-1$
             }
 
             if (this.hasExpiredCert) {
-                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado"); //$NON-NLS-1$
+                LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado caducado"); //$NON-NLS-1$
             }
 
             if (this.notYetValidCert) {
-                AfirmaBootLoader.LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido"); //$NON-NLS-1$
+                LOGGER.warning("El fichero ZIP/JAR contiene entradas firmadas con un certificado aun no valido"); //$NON-NLS-1$
             }
 
         }
