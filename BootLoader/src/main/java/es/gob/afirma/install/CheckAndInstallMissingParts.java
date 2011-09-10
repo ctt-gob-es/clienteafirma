@@ -18,12 +18,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Vector;
 
-import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.misc.AOBootUtil;
 import es.gob.afirma.misc.Platform;
 import es.gob.afirma.misc.Platform.JREVER;
@@ -337,7 +338,7 @@ final class CheckAndInstallMissingParts {
             return false;
         }
         try {
-            AOInstallUtils.classForName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
+            classForName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return true;
@@ -349,7 +350,7 @@ final class CheckAndInstallMissingParts {
      * @return <code>true</code> si es necesaria la instalaci&oacute;n, <code>false</code> en caso contrario */
     boolean isSunPKCS11Needed() {
         try {
-            AOInstallUtils.classForName("sun.security.pkcs11.SunPKCS11"); //$NON-NLS-1$
+            classForName("sun.security.pkcs11.SunPKCS11"); //$NON-NLS-1$
         }
         catch (final Exception e) {
             return true;
@@ -844,5 +845,28 @@ final class CheckAndInstallMissingParts {
         
         return false;
     }
+    
+    /** Carga una clase excluyendo de la ruta de b&uacute;squeda de clases las URL que no correspondan con JAR.
+     * @param className Nombre de la clase a cargar
+     * @return Clase cargada
+     * @throws ClassNotFoundException cuando no se encuentra la clase a cargar
+     */
+    private Class<?> classForName(final String className) throws ClassNotFoundException {
+        if (className == null || "".equals(className)) { //$NON-NLS-1$
+            throw new IllegalArgumentException("La clase a cargar no puede ser nula ni vacia"); //$NON-NLS-1$
+        }
+        ClassLoader classLoader = AOInstallUtils.class.getClassLoader();
+        if (classLoader instanceof URLClassLoader) {
+            Vector<URL> urls = new Vector<URL>();
+            for (URL url : ((URLClassLoader)classLoader).getURLs()) {
+                if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+                    urls.add(url);
+                }
+                classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+            }
+        }
+        return classLoader.loadClass(className);
+    }
+
 
 }

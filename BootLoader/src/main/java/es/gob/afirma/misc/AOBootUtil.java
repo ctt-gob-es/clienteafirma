@@ -13,18 +13,17 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Properties;
 import java.util.zip.ZipFile;
 
-import es.gob.afirma.exceptions.AOException;
 import es.gob.afirma.install.AfirmaBootLoader;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
@@ -45,11 +44,12 @@ public final class AOBootUtil {
     /** Crea una URI a partir de un nombre de fichero local o una URL.
      * @param filename Nombre del fichero local o URL
      * @return URI (<code>file://</code>) del fichero local o URL
-     * @throws AOException cuando ocurre cualquier problema creando la URI */
-    public static URI createURI(String filename) throws AOException {
+     * @throws URISyntaxException 
+     * @throws URISyntaxException cuando ocurre cualquier problema creando la URI */
+    public static URI createURI(String filename) throws URISyntaxException {
 
         if (filename == null) {
-            throw new AOException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
         }
 
         // Cambiamos los caracteres Windows
@@ -58,13 +58,7 @@ public final class AOBootUtil {
         // Cambiamos los espacios por %20
         filename = filename.replace(" ", "%20"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        final URI uri;
-        try {
-            uri = new URI(filename);
-        }
-        catch (final Exception e) {
-            throw new AOException("Formato de URI incorrecto: " + e); //$NON-NLS-1$
-        }
+        final URI uri = new URI(filename);
 
         // Comprobamos si es un esquema soportado
         final String scheme = uri.getScheme();
@@ -85,16 +79,15 @@ public final class AOBootUtil {
             return createURI("file://" + filename); //$NON-NLS-1$
         }
         
-        throw new AOException("Formato de URI valido pero no soportado '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+        throw new IllegalArgumentException("Formato de URI valido pero no soportado '" + filename + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 
     }
 
     /** Obtiene el flujo de entrada de un fichero (para su lectura) a partir de su URI.
      * @param uri URI del fichero a leer
      * @return Flujo de entrada hacia el contenido del fichero
-     * @throws FileNotFoundException Si el fichero no existe
-     * @throws AOException Cuando ocurre cualquier problema obteniendo el flujo */
-    public static InputStream loadFile(final URI uri) throws FileNotFoundException, AOException {
+     * @throws IOException Cuando ocurre cualquier problema obteniendo el flujo*/
+    public static InputStream loadFile(final URI uri) throws IOException {
 
         // Cuidado: Repinta mal el dialogo de espera, hay que tratar con hilos nuevos
         // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4209604
@@ -106,35 +99,21 @@ public final class AOBootUtil {
         if (uri.getScheme().equals("file")) { //$NON-NLS-1$
             // Es un fichero en disco. Las URL de Java no soportan file://, con
             // lo que hay que diferenciarlo a mano
-            try {
-                // Retiramos el "file://" de la uri
-                String path = uri.getSchemeSpecificPart();
-                if (path.startsWith("//")) { //$NON-NLS-1$
-                    path = path.substring(2);
-                }
-                return new BufferedInputStream(new FileInputStream(new File(path)));
+
+            // Retiramos el "file://" de la uri
+            String path = uri.getSchemeSpecificPart();
+            if (path.startsWith("//")) { //$NON-NLS-1$
+                path = path.substring(2);
             }
-            catch (final Exception e) {
-                throw new AOException("Ocurrio un error intentando abrir un archivo en almacenamiento local: " + e); //$NON-NLS-1$
-            }
+            return new BufferedInputStream(new FileInputStream(new File(path)));
+
         }
         // Es una URL
-        final InputStream tmpStream;
-        try {
-                tmpStream = new BufferedInputStream(uri.toURL().openStream());
-        }
-        catch (final Exception e) {
-            throw new AOException("Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        final InputStream tmpStream = new BufferedInputStream(uri.toURL().openStream());
+
         // Las firmas via URL fallan en la descarga por temas de Sun, asi que descargamos primero
         // y devolvemos un Stream contra un array de bytes
-        final byte[] tmpBuffer;
-        try {
-            tmpBuffer = getDataFromInputStream(tmpStream);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        final byte[] tmpBuffer = getDataFromInputStream(tmpStream);
 
         return new java.io.ByteArrayInputStream(tmpBuffer);
 
