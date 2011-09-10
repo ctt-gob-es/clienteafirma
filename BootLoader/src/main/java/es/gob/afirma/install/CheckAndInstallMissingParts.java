@@ -75,13 +75,13 @@ final class CheckAndInstallMissingParts {
     }
 
     /** Instala las bibliotecas de NSS para el acceso al almac&eacute;n de Mozilla Firefox.
-     * @param installFilesCodeBase Ruta con las bibliotecas a instalar.
-     * @throws AOException Cuando se produce un error durante la instalaci&oacute;n de las bibliotecas. */
-    void installNSS() throws AOException {
+     * @param installFilesCodeBase Ruta con las bibliotecas a instalar 
+     * @throws URISyntaxException 
+     * @throws IOException */
+    void installNSS() throws IOException, URISyntaxException {
         final File nssDir = new File(Platform.getUserHome() + File.separator + Installer.INSTALL_DIR + File.separator + "nss" + //$NON-NLS-1$
                                      Platform.getJavaArch());
 
-        try {
             AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase, this.os.toString() + "_nss_" //$NON-NLS-1$
                                                                + Platform.getOsArch()
                                                                + "_JRE" //$NON-NLS-1$
@@ -89,19 +89,14 @@ final class CheckAndInstallMissingParts {
                                                                + ".zip"), //$NON-NLS-1$
                                                                nssDir,
                                                                SigningCert.INTEGRATOR);
-        }
-        catch (final Exception e) {
-            throw new AOException("No se puede copiar NSS al directorio por defecto, compruebe que no existe previamente y que se cuenta con los permisos adecuados: " + e, e); //$NON-NLS-1$
-        }
     }
 
     /** Instala en el directorio endorsed del JRE en uso el pack de compatibilidad de firma
      * del cliente para la generacion de firmas XML con Java 5.
      * @param installFilesCodeBase Ruta en donde se encuentran los ficheros que se deben instalar.
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
-     * @throws AOException Si ocurre cualquier otro error durante la copia de ficheros
      * @throws IOException Si ocurre un error de entrada/salida */
-    void installEndorsedJava5AFirmaDependencies() throws IOException, AOException, URISyntaxException {
+    void installEndorsedJava5AFirmaDependencies() throws IOException, URISyntaxException {
         try {
             AOInstallUtils.copyFileFromURL(AOBootUtil.createURLFile(this.installFilesCodeBase, AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX),
                                            new File(Platform.getEndorsedDir(), AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX));
@@ -128,7 +123,7 @@ final class CheckAndInstallMissingParts {
 
 ///** Instala las bibliotecas Apache XMLSec para la generaci&oacute;n de firmas XML desde Java 7.
 //     * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar. */
-//    void installEndorsedApacheXMLSec() throws AOException, IOException, URISyntaxException {
+//    void installEndorsedApacheXMLSec() IOException, URISyntaxException {
 //        File tempDir = null;
 //        try {
 //            tempDir = AOInstallUtils.createTempFile(true);
@@ -175,9 +170,8 @@ final class CheckAndInstallMissingParts {
     /** Instala el proveedor de seguridad SunMSCAPI.
      * @param installFilesCodeBase Localizaci&oacute;n de los ficheros necesarios para la instalaci&oacute;n
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
-     * @throws AOException Si ocurre cualquier otro error durante la copia de ficheros
      * @throws IOException Si ocurre un error de entrada/salida */
-    void installSunMSCAPI() throws IOException, AOException, URISyntaxException {
+    void installSunMSCAPI() throws IOException, URISyntaxException {
         // Copiamos el JAR de SunMSCAPI en el directorio de extensiones del JRE
         AOInstallUtils.installFile(AOBootUtil.createURLFile(this.installFilesCodeBase, "sunmscapi.jar"), //$NON-NLS-1$
                                    new File(Platform.getJavaHome() + File.separator
@@ -194,9 +188,8 @@ final class CheckAndInstallMissingParts {
     /** Instala el proveedor de seguridad SunPKCS11.
      * @param installFilesCodeBase Localizaci&oacute;n de los ficheros necesarios para la instalaci&oacute;n
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
-     * @throws AOException Si ocurre cualquier otro error durante la copia de ficheros
      * @throws IOException Si ocurre un error de entrada/salida */
-    void installSunPKCS11() throws IOException, AOException, URISyntaxException {
+    void installSunPKCS11() throws IOException, URISyntaxException {
         // Copiamos el JAR de SunPKCS11 en el directorio de extensiones del JRE
         AOInstallUtils.installFile(AOBootUtil.createURLFile(this.installFilesCodeBase, "sunpkcs11.jar"), //$NON-NLS-1$
                                    new File(Platform.getJavaHome() + File.separator
@@ -214,9 +207,8 @@ final class CheckAndInstallMissingParts {
     /** Instala las bibliotecas Xalan para la generaci&oacute;n de firmas XML desde Java 5.
      * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar.
      * @throws URISyntaxException Si las URI utilizadas no tienen una sintaxis v&aacute;lida
-     * @throws AOException Si ocurre cualquier otro error durante la copia de ficheros
      * @throws IOException Si ocurre un error de entrada/salida */
-    void installEndorsedXalan() throws IOException, AOException, URISyntaxException {
+    void installEndorsedXalan() throws IOException, URISyntaxException {
 
         File tempDir = null;
         try {
@@ -263,7 +255,7 @@ final class CheckAndInstallMissingParts {
 //    /** Configura NSS en Mac OS X para permitir la carga desde directorios fuera de
 //     * <i>LD_LIBRARY_PATH</i> y <i>PATH</i>.
 //     * @param parent Componente padre para los di&aacute;logos gr&aacute;ficos */
-//    void configureNSS() throws AOException {
+//    void configureNSS() {
 //        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
 //            return;
 //        }
@@ -326,7 +318,7 @@ final class CheckAndInstallMissingParts {
 //                e.printStackTrace(new java.io.PrintStream(baos));
 //                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
 //            }
-//            throw new AOException("La configuracion de NSS para Mac OS X ha fallado", e);
+//            throw new IOException("La configuracion de NSS para Mac OS X ha fallado: " + e);
 //        }
 //
 //    }

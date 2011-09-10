@@ -11,6 +11,7 @@ package es.gob.afirma.install;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,8 +45,10 @@ final class AOInstallUtils {
      * JAR resultante se almacenar&aacute; en el mismo directorio que el original y tendr&aacute;
      * por nombre el mismo sin la extension ".pack.gz" o ".pack" y terminado en ".jar".
      * @param pack200Filename Nombre del del fichero Pack200 origen, incluyendo ruta
-     * @throws AOException Cuando ocurre un error durante el desempaquetado */
-    static void unpack(final String pack200Filename) throws AOException {
+     * @throws URISyntaxException 
+     * @throws IOException 
+     * @throws FileNotFoundException */
+    static void unpack(final String pack200Filename) throws FileNotFoundException, IOException, URISyntaxException {
 
         // Obtenemos el nombre del fichero de salida
         String jarFilename = pack200Filename + JAR_SUFIX;
@@ -63,8 +66,10 @@ final class AOInstallUtils {
     /** Desempaqueta un fichero Pack200 para obtener el fichero JAR equivalente.
      * @param pack200Filename Nombre del del fichero Pack200 origen, incluyendo ruta
      * @param targetJarFilename Nombre del fichero de salida, incluyendo ruta
-     * @throws AOException Cuando ocurre un error durante el desempaquetado. */
-    static void unpack(final String pack200Filename, final String targetJarFilename) throws AOException {
+     * @throws URISyntaxException 
+     * @throws IOException 
+     * @throws FileNotFoundException */
+    static void unpack(final String pack200Filename, final String targetJarFilename) throws FileNotFoundException, IOException, URISyntaxException {
         if (pack200Filename == null) {
             throw new IllegalArgumentException("El Pack200 origen no puede ser nulo"); //$NON-NLS-1$
         }
@@ -72,13 +77,8 @@ final class AOInstallUtils {
             throw new IllegalArgumentException("El JAR de destino no puede ser nulo"); //$NON-NLS-1$
         }
         createDirectory(new File(targetJarFilename).getParentFile());
-        try {
-            unpack200gunzip(AOBootUtil.loadFile(AOBootUtil.createURI(pack200Filename)),
+        unpack200gunzip(AOBootUtil.loadFile(AOBootUtil.createURI(pack200Filename)),
                             new FileOutputStream(new File(targetJarFilename)));
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al desempaquetar el fichero '" + pack200Filename + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
 
         // Eliminamos la version empaquetada
         new File(pack200Filename).delete();
@@ -109,9 +109,8 @@ final class AOInstallUtils {
      * actual.
      * @param zipFile Fichero zip
      * @param destDirectory Ruta del directorio en donde deseamos descomprimir
-     * @throws AOException Cuando ocurre cualquier error durante la descompresi&oacute;n de ficheros
      * @throws IOException El nombre de directorio indicado coincide con el de un fichero */
-    private static void unzip(final ZipFile zipFile, File destDirectory) throws AOException, IOException {
+    private static void unzip(final ZipFile zipFile, File destDirectory) throws IOException {
 
         if (zipFile == null) {
             throw new IllegalArgumentException("El fichero Zip no puede ser nulo"); //$NON-NLS-1$
@@ -185,9 +184,9 @@ final class AOInstallUtils {
                 }
             }
             catch (final Exception e) {
-                throw new AOException("Error durante la instalacion, no se pudo instalar la biblioteca '" //$NON-NLS-1$
+                throw new IOException("Error durante la instalacion, no se pudo instalar la biblioteca '" //$NON-NLS-1$
                                       + entry.getName()
-                                      + "'", e //$NON-NLS-1$
+                                      + "': " + e //$NON-NLS-1$
                 );
             }
         }
@@ -197,9 +196,8 @@ final class AOInstallUtils {
      * @param file Fichero que se desea copiar.
      * @param dirDest Directorio local.
      * @throws URISyntaxException Si la URI proporcionada no tiene una sintaxis v&aacute;lifa
-     * @throws AOException Si ocurre cualquier otro error durante la copia
      * @throws IOException Si ocurre un error de entrada/salida */
-    static void copyFileFromURL(final URL file, final File fileDest) throws IOException, AOException, URISyntaxException {
+    static void copyFileFromURL(final URL file, final File fileDest) throws IOException, URISyntaxException {
         copyFileFromURL(file, fileDest.getParentFile(), fileDest.getName());
     }
 
@@ -209,9 +207,8 @@ final class AOInstallUtils {
      * @param newFilename Nombre con el que se almacenar&aacute; el fichero. Si se indica <code>null</code> se almacena con el mismo nombre que
      *        tuviese el fichero remoto.
      * @throws IOException Si ocurren errores de entrada/salida
-     * @throws URISyntaxException Si la URO proporcionada no tiene una sintaxis v&aacute;lida
-     * @throws AOException Si ocurre cualquier otro problema durante la copia */
-    private static void copyFileFromURL(final URL urlFile, final File dirDest, final String newFilename) throws IOException, AOException, URISyntaxException {
+     * @throws URISyntaxException Si la URO proporcionada no tiene una sintaxis v&aacute;lida */
+    private static void copyFileFromURL(final URL urlFile, final File dirDest, final String newFilename) throws IOException, URISyntaxException {
 
         if (urlFile == null) {
             throw new IllegalArgumentException("La URL al fichero remoto no puede ser nula"); //$NON-NLS-1$
@@ -337,10 +334,9 @@ final class AOInstallUtils {
      * @param installationFile Ruta en donde se instalar&aacute;a el fichero.
      * @param signingCa CA que se debe verificar. Nulo cuando no proceda.
      * @throws URISyntaxException Si la URI proporcionada no tiene una sintaxis v&aacute;lida
-     * @throws AOException Si ocurre cualquier otro error durante la copia
      * @throws IOException Si ocurre un error de entrada/salida
      * @throws SecurityException Cuando ocurre un error al validar la firma del fichero */
-    static void installFile(final URL remoteFile, final File installationFile, final SigningCert signingCa) throws IOException, AOException, URISyntaxException {
+    static void installFile(final URL remoteFile, final File installationFile, final SigningCert signingCa) throws IOException, URISyntaxException {
 
         if (signingCa == null) {
             copyFileFromURL(remoteFile, installationFile);
@@ -368,10 +364,9 @@ final class AOInstallUtils {
      * @param installationDir Directorio local en donde descomprimir el Zip.
      * @param signingCa CA que se debe verificar.
      * @throws URISyntaxException Si la URI proporcionada no tiene una sintaxis v&aacute;lida
-     * @throws AOException Si ocurre cualquier otro error durante la copia
      * @throws IOException Si ocurre un error de entrada/salida
      * @throws SecurityException Cuando ocurre un error al validar la firma del fichero */
-    static void installZip(final URL remoteFile, final File installationDir, final SigningCert signingCa) throws IOException, AOException, URISyntaxException {
+    static void installZip(final URL remoteFile, final File installationDir, final SigningCert signingCa) throws IOException, URISyntaxException {
         final File tempFile = createTempFile();
         copyFileFromURL(remoteFile, tempFile);
         if (signingCa != null) {

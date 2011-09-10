@@ -28,7 +28,7 @@ enum SigningCert {
                 .generateCertificate(AOInstallUtils.class.getResourceAsStream(sigCertificatePath));
         }
         catch (final Exception e) {
-            throw new UnsupportedOperationException("No se ha podido cargar el certificado firmante: " + sigCertificatePath, e); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se ha podido cargar el certificado firmante: " + sigCertificatePath, e); //$NON-NLS-1$
         }
     }
 

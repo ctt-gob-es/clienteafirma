@@ -62,14 +62,8 @@ public final class Platform {
     /** Directorio de Java. */
     private static String javaHome;
 
-    /** Directorio de bibliotecas de Java. */
-    private static String javaLibraryPath;
-
     /** Directorio del usuario. */
     private static String userHome;
-
-    /** Indica si est&aacute; inicializada la clase. */
-    private static boolean initialized = false;
 
     /** Constructor bloqueado. */
     private Platform() {
@@ -89,61 +83,50 @@ public final class Platform {
      * reconocerse sin informacion adicional, como el sistema operativo y la versi&oacute;n de Java.
      * Se agrupan las inicializaciones aqu&iacute; para poder llamarlo desde un <code>privilegedAction</code> */
     public static void init() {
-        try {
-            userHome = System.getProperty("user.home"); //$NON-NLS-1$
-            javaLibraryPath = System.getProperty("java.library.path"); //$NON-NLS-1$
-            final String osName = System.getProperty("os.name"); //$NON-NLS-1$
 
-            if (osName.contains("indows")) { //$NON-NLS-1$
-                os = OS.WINDOWS;
-            }
-            else if (osName.contains("inux")) { //$NON-NLS-1$
-                os = OS.LINUX;
-            }
-            else if (osName.contains("SunOS") || osName.contains("olaris")) { //$NON-NLS-1$ //$NON-NLS-2$
-                os = OS.SOLARIS;
-            }
-            else if (osName.startsWith("Mac OS X")) { //$NON-NLS-1$
-                os = OS.MACOSX;
-            }
-            else {
-                os = OS.OTHER;
-                AfirmaBootLoader.LOGGER.warning("No se ha podido determinar el sistema operativo"); //$NON-NLS-1$
-            }
+        userHome = System.getProperty("user.home"); //$NON-NLS-1$
+        final String osName = System.getProperty("os.name"); //$NON-NLS-1$
 
-            javaArch = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
-            if (javaArch == null) {
-                javaArch = System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
-            }
-            javaHome = recoverJavaHome();
-            initialized = true;
-            final String jreVersion = System.getProperty("java.version"); //$NON-NLS-1$
-            if (jreVersion.startsWith("1.0") || jreVersion.startsWith("1.1")  //$NON-NLS-1$//$NON-NLS-2$
-                    || jreVersion.startsWith("1.2") //$NON-NLS-1$
-                    || jreVersion.startsWith("1.3") //$NON-NLS-1$
-                    || jreVersion.startsWith("1.4")) { //$NON-NLS-1$
-                javaVersion = JREVER.J4;
-            }
-            else if (jreVersion.startsWith("1.5")) { //$NON-NLS-1$
-                javaVersion = JREVER.J5;
-            }
-            else if (jreVersion.startsWith("1.6")) { //$NON-NLS-1$
-                javaVersion = JREVER.J6;
-            }
-            else {
-                javaVersion = JREVER.J7;
-            }
-            osArch = System.getProperty("os.arch"); //$NON-NLS-1$
+        if (osName.contains("indows")) { //$NON-NLS-1$
+            os = OS.WINDOWS;
         }
-        catch (final Exception e) {
-            initialized = false;
+        else if (osName.contains("inux")) { //$NON-NLS-1$
+            os = OS.LINUX;
         }
-    }
+        else if (osName.contains("SunOS") || osName.contains("olaris")) { //$NON-NLS-1$ //$NON-NLS-2$
+            os = OS.SOLARIS;
+        }
+        else if (osName.startsWith("Mac OS X")) { //$NON-NLS-1$
+            os = OS.MACOSX;
+        }
+        else {
+            os = OS.OTHER;
+            AfirmaBootLoader.LOGGER.warning("No se ha podido determinar el sistema operativo"); //$NON-NLS-1$
+        }
 
-    /** Indica si la instancia est&aacute;tica est&aacute; inicializada.
-     * @return <code>true</code> si si la instancia est&aacute;tica est&aacute; inicializada, <code>false</code> en caso contrario */
-    public static boolean isInitialized() {
-        return initialized;
+        javaArch = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
+        if (javaArch == null) {
+            javaArch = System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
+        }
+        javaHome = recoverJavaHome();
+
+        final String jreVersion = System.getProperty("java.version"); //$NON-NLS-1$
+        if (jreVersion.startsWith("1.0") || jreVersion.startsWith("1.1")  //$NON-NLS-1$//$NON-NLS-2$
+                || jreVersion.startsWith("1.2") //$NON-NLS-1$
+                || jreVersion.startsWith("1.3") //$NON-NLS-1$
+                || jreVersion.startsWith("1.4")) { //$NON-NLS-1$
+            javaVersion = JREVER.J4;
+        }
+        else if (jreVersion.startsWith("1.5")) { //$NON-NLS-1$
+            javaVersion = JREVER.J5;
+        }
+        else if (jreVersion.startsWith("1.6")) { //$NON-NLS-1$
+            javaVersion = JREVER.J6;
+        }
+        else {
+            javaVersion = JREVER.J7;
+        }
+        osArch = System.getProperty("os.arch"); //$NON-NLS-1$
     }
 
     /** Recupera el sistema operativo de ejecuci&oacute;n.
@@ -175,12 +158,6 @@ public final class Platform {
      * @return Ruta del directorio de instalaci&oacute;n de Java. */
     public static String getJavaHome() {
         return javaHome;
-    }
-
-    /** Recupera la propiedad Path de Java.
-     * @return Propiedad en el Path de Java. */
-    public static String getJavaLibraryPath() {
-        return javaLibraryPath;
     }
 
     /** Recupera la ruta del directorio personal del usuario del sistema operativo.
