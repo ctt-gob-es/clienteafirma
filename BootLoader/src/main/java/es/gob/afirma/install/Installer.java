@@ -32,18 +32,8 @@ final class Installer {
     /** Construcci&oacute;n LITE del cliente Afirma. */
     public static final String LITE = "LITE"; //$NON-NLS-1$
 
-    /** Distintos sistemas operativos entre los que distingue el instalador del cliente. */
-    enum OS {
-        WINDOWS, // Sistemas operativos Windows
-        LINUX, // Sistemas operativos Linux
-        SOLARIS, // Sistemas operativos Solaris
-        MACINTOSH, // Sistemas operativos Mac OS X
-        OTHER
-        // Otro distinto a los anteriores
-    }
-
     /** Componente padre sobre el que se situar&aacute;n los mensajes del instalador. */
-    Component parentComponent = null;
+    private Component parentComponent = null;
 
     /** Componente para la comprobaci&oacute;n e instalaci&oacute;n de las dependencias
      * de entorno del Cliente. */
