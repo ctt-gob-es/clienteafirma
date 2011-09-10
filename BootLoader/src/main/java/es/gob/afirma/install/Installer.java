@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
-import es.gob.afirma.BootLoaderMessages;
+import es.gob.afirma.misc.BootLoaderMessages;
 import es.gob.afirma.misc.LicenceDialogPanel;
 import es.gob.afirma.misc.Platform;
 

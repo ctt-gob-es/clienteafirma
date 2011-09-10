@@ -307,8 +307,8 @@ public final class AOBootUtil {
     public static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOBootUtil.class.getClassLoader();
         if (classLoader instanceof URLClassLoader) {
-            Vector<URL> urls = new Vector<URL>();
-            for (URL url : ((URLClassLoader)classLoader).getURLs()) {
+            final Vector<URL> urls = new Vector<URL>();
+            for (final URL url : ((URLClassLoader)classLoader).getURLs()) {
                 if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
                     urls.add(url);
                 }

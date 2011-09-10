@@ -24,7 +24,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
-import es.gob.afirma.BootLoaderMessages;
 
 /** Panel con el acuerdo de licencia del cliente de firma @firma versi&oacute;n 3. */
 public final class LicenceDialogPanel {

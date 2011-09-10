@@ -7,13 +7,12 @@
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
-package es.gob.afirma;
+package es.gob.afirma.misc;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import es.gob.afirma.misc.AOBootUtil;
 
 /** Gestor de mensajes del BootLoader. */
 public final class BootLoaderMessages {
