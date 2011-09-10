@@ -132,23 +132,6 @@ final class Installer {
         boolean allOK = true;
         boolean licenciaMostrada = false;
 
-//		try {
-//            if (enviromentInstaller.isEndorsedApacheXMLSecNeeded()) {
-//                if (!prepareInstall()) {
-//                    return;
-//                }
-//                licenciaMostrada = true;
-//                AfirmaBootLoader.LOGGER.info("Instalando Apache XML Security..."); //$NON-NLS-1$
-//                enviromentInstaller.installEndorsedApacheXMLSec();
-//            }
-//        }
-//        catch (final Exception e) {
-//            AfirmaBootLoader.LOGGER.severe(
-//            "Error instalando Apache XML Security, la ejecucion sobre Java 7 puede fallar: " + e //$NON-NLS-1$
-//            );
-//            allOK = false;
-//        }
-
         try {
             if (this.enviromentInstaller.isEndorsedJava5AFirmaDependenciesNeeded()) {
                 if (!licenciaMostrada && !prepareInstall()) {
@@ -208,28 +191,6 @@ final class Installer {
             }
             allOK = false;
         }
-
-//        try {
-//            if (this.enviromentInstaller.isNSSConfigurationNeeded()) {
-//                if (!licenciaMostrada && !prepareInstall()) {
-//                    return;
-//                }
-//                licenciaMostrada = true;
-//                this.enviromentInstaller.configureNSS();
-//            }
-//        }
-//        catch (final Exception e) {
-//            AfirmaBootLoader.LOGGER.severe("Error configurando NSS, la ejecucion sobre Firefox puede fallar: " + e); //$NON-NLS-1$
-//            if (AfirmaBootLoader.DEBUG) {
-//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-//                e.printStackTrace(new java.io.PrintStream(baos));
-//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-//            }
-//            JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString(BootLoaderMessages.getString("Installer.18")), //$NON-NLS-1$
-//                                          BootLoaderMessages.getString("Installer.26"), //$NON-NLS-1$
-//                                          JOptionPane.WARNING_MESSAGE);
-//            allOK = false;
-//        }
 
         try {
             if (this.enviromentInstaller.isSunMSCAPINeeded()) {

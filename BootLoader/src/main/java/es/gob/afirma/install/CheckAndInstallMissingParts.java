@@ -18,12 +18,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Vector;
 
 import es.gob.afirma.misc.AOBootUtil;
 import es.gob.afirma.misc.Platform;
@@ -45,12 +43,6 @@ final class CheckAndInstallMissingParts {
 
     /** Archivo zip con las librerias Xalan en formato JAR necesarias para la firma XML en JDK 5. */
     private static final String XALAN_JARLIBRARY_ZIP = "xalanjar.zip"; //$NON-NLS-1$
-
-//    /** Archivo zip con las librerias Apache XMLSec en formato PACK200 necesarias para la firma XML en JDK 7. */
-//    private static final String XMLSEC_LIBRARY_ZIP = "xmlsec.zip";
-
-//    /** Archivo zip con las librerias Apache XMLSec en formato JAR necesarias para la firma XML en JDK 7. */
-//    private static final String XMLSEC_JARLIBRARY_ZIP = "xmlsecjar.zip";
 
     private final String build;
 
@@ -120,52 +112,6 @@ final class CheckAndInstallMissingParts {
             AOInstallUtils.copyFileFromURL(AOBootUtil.createURLFile(this.installFilesCodeBase, AFIRMA_JAVA5_JAR), new File(Platform.getEndorsedDir()));
         }
     }
-
-///** Instala las bibliotecas Apache XMLSec para la generaci&oacute;n de firmas XML desde Java 7.
-//     * @param installFilesCodeBase Ruta en donde se encuentra el fichero Zip con las bibliotecas que se desean instalar. */
-//    void installEndorsedApacheXMLSec() IOException, URISyntaxException {
-//        File tempDir = null;
-//        try {
-//            tempDir = AOInstallUtils.createTempFile(true);
-//            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_LIBRARY_ZIP), tempDir, SigningCert.INTEGRATOR);
-//
-//            String filename;
-//            for (final File file : tempDir.listFiles()) {
-//                filename = file.getName();
-//                if (filename.endsWith(".pack.gz")) { //$NON-NLS-1$
-//                    AOInstallUtils.unpack(file.getAbsolutePath(),
-//                                          Platform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz")));
-//                }
-//            }
-//
-//        }
-//        catch (final Exception e) {
-//            AfirmaBootLoader.LOGGER
-//                  .warning("No se ha podido instalar la version PACK200 de Apache XMLSec, se intentara la version JAR: " + e);
-//            if (AfirmaBootLoader.DEBUG) {
-//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-//                e.printStackTrace(new java.io.PrintStream(baos));
-//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-//            }
-//            AOInstallUtils.installZip(AOBootUtil.createURLFile(installFilesCodeBase, XMLSEC_JARLIBRARY_ZIP),
-//                                      new File(getEndorsedDir()),
-//                                      SigningCert.INTEGRATOR);
-//        }
-//        finally {
-//            if (tempDir != null) {
-//                try {
-//                    for (final File file : tempDir.listFiles()) {
-//                        file.delete();
-//                    }
-//                    AOInstallUtils.deleteDir(tempDir);
-//                }
-//                catch (final Exception e) {
-//                    // Ignoramos los errores en el borrado
-//                }
-//            }
-//        }
-//
-//    }
 
     /** Instala el proveedor de seguridad SunMSCAPI.
      * @param installFilesCodeBase Localizaci&oacute;n de los ficheros necesarios para la instalaci&oacute;n
@@ -252,77 +198,6 @@ final class CheckAndInstallMissingParts {
         }
     }
 
-//    /** Configura NSS en Mac OS X para permitir la carga desde directorios fuera de
-//     * <i>LD_LIBRARY_PATH</i> y <i>PATH</i>.
-//     * @param parent Componente padre para los di&aacute;logos gr&aacute;ficos */
-//    void configureNSS() {
-//        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-//            return;
-//        }
-//        String nssLibDir;
-//        try {
-//            nssLibDir = getSystemNSSLibDirMacOSX();
-//        }
-//        catch (final Exception e) {
-//            AfirmaBootLoader.LOGGER.severe("No se ha encontrado un NSS para configurar: " + e); //$NON-NLS-1$
-//            return;
-//        }
-//
-//        if (!nssLibDir.endsWith("/")) {
-//            nssLibDir = nssLibDir + "/"; //$NON-NLS-1$
-//        }
-//
-//        final String[] libs = new String[] {
-//            "libnspr4.dylib", //$NON-NLS-1$
-//            "libplds4.dylib", //$NON-NLS-1$
-//            "libplc4.dylib", //$NON-NLS-1$
-//            "libmozsqlite3.dylib", //$NON-NLS-1$
-//            "libnssutil3.dylib" //$NON-NLS-1$
-//        };
-//
-//        // Creamos enlaces simbolicos via AppleScript
-//        final StringBuilder sb = new StringBuilder();
-//        for (final String lib : libs) {
-//            sb.append("ln -s ");
-//            sb.append(nssLibDir);
-//            sb.append(lib);
-//            sb.append(" /usr/lib/");
-//            sb.append(lib);
-//            sb.append("; ");
-//        }
-//        try {
-//            final Class<?> scriptEngineManagerClass = AOInstallUtils.classForName("javax.script.ScriptEngineManager");
-//            final Object scriptEngineManager = scriptEngineManagerClass.newInstance();
-//            final Method getEngineByNameMethod = scriptEngineManagerClass.getMethod("getEngineByName", String.class);
-//            
-//            final Object scriptEngine = getEngineByNameMethod.invoke(scriptEngineManager, "AppleScript");
-//            
-//            final Class<?> scriptEngineClass = AOInstallUtils.classForName("javax.script.ScriptEngine");
-//            final Method evalMethod = scriptEngineClass.getMethod("eval", String.class);
-//            
-//            evalMethod.invoke(scriptEngine, "do shell script \"" + sb.toString() + "\" with administrator privileges");
-//            
-//            //new ScriptEngineManager().getEngineByName("AppleScript").eval("do shell script \"" + sb.toString() + "\" with administrator privileges");    
-//        }
-//        catch(final Exception e) {
-//            AfirmaBootLoader.LOGGER.severe("No se ha podido crear los enlaces simbolicos para NSS: " + e);
-//        }
-//
-//        // Y reintentamos la carga, para ver si ha surtido efecto
-//        try {
-//            System.load(nssLibDir + "libsoftokn3.dylib");
-//        }
-//        catch (final Throwable e) {
-//            if (AfirmaBootLoader.DEBUG) {
-//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-//                e.printStackTrace(new java.io.PrintStream(baos));
-//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-//            }
-//            throw new IOException("La configuracion de NSS para Mac OS X ha fallado: " + e);
-//        }
-//
-//    }
-
     /** Indica si es necesario instalar el proveedor de seguridad SunMSCAPI.
      * @return <code>true</code> si es necesaria la instalaci&oacute;n, <code>false</code> en caso contrario */
     boolean isSunMSCAPINeeded() {
@@ -330,9 +205,9 @@ final class CheckAndInstallMissingParts {
             return false;
         }
         try {
-            classForName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
+            AOBootUtil.getCleanClassLoader().loadClass("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
         }
-        catch (final Exception e) {
+        catch (final Throwable e) {
             return true;
         }
         return false;
@@ -342,9 +217,9 @@ final class CheckAndInstallMissingParts {
      * @return <code>true</code> si es necesaria la instalaci&oacute;n, <code>false</code> en caso contrario */
     boolean isSunPKCS11Needed() {
         try {
-            classForName("sun.security.pkcs11.SunPKCS11"); //$NON-NLS-1$
+            AOBootUtil.getCleanClassLoader().loadClass("sun.security.pkcs11.SunPKCS11"); //$NON-NLS-1$
         }
-        catch (final Exception e) {
+        catch (final Throwable e) {
             return true;
         }
         return false;
@@ -592,43 +467,6 @@ final class CheckAndInstallMissingParts {
         return version;
     }
 
-//    /** Indica si las bibliotecas NSS necesitan un proceso adicional de configuraci&oacute;n.
-//     * @return <code>true</code> si es necesaria configuraci&oacute;n adicional, <code>false</code> en caso contrario */
-//    boolean isNSSConfigurationNeeded() {
-//        // IMPORTANTE: Comprobar que el tener NSS 64 bits en /usr/lib no
-//        // estropea un Firefox 32 bits
-//        if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
-//            return false;
-//        }
-//
-//        try {
-//            String nssLibDir = getSystemNSSLibDirMacOSX();
-//            if (!nssLibDir.endsWith("/")) { //$NON-NLS-1$
-//                nssLibDir = nssLibDir + "/"; //$NON-NLS-1$
-//            }
-//            System.load(nssLibDir + "libsoftokn3.dylib"); //$NON-NLS-1$
-//        }
-//        catch (final Exception e) {
-//            if (AfirmaBootLoader.DEBUG) {
-//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-//                e.printStackTrace(new java.io.PrintStream(baos));
-//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-//            }
-//            return true;
-//        }
-//        catch (final Throwable e) {
-//            if (AfirmaBootLoader.DEBUG) {
-//                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-//                e.printStackTrace(new java.io.PrintStream(baos));
-//                AfirmaBootLoader.LOGGER.warning(new String(baos.toByteArray()));
-//            }
-//            return true;
-//        }
-//
-//        return false;
-//
-//    }
-
     /** Comprueba si los paquetes XALAN son necesarios en el directorio endorsed del JRE
      * configurado.
      * @return Devuelve <code>true</code> si se necesita XALAN, <code>false</code> en caso contrario. */
@@ -653,17 +491,6 @@ final class CheckAndInstallMissingParts {
                                                                                                                                                                                                                                                                                                                                     + "xml-apis.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
                                                                                                                                                                                                                                                                                                                                                                            + "xml-apis-1.3.03.jar").exists())); //$NON-NLS-1$
     }
-
-//	/** Comprueba si los paquetes Apache XMLSec son necesarios en el directorio endorsed del JRE
-//     * configurado.
-//     * @return Devuelve <code>true</code> si se necesita Apache XMLSec, <code>false</code> en caso contrario. */
-//    boolean isEndorsedApacheXMLSecNeeded() {
-//        if (!Platform.JREVER.J7.equals(jreVersion)) {
-//            return false;
-//        }
-//        return !(new File(getEndorsedDir() + File.separator + "xmlsec-1.4.4.jar").exists() && new File(getEndorsedDir() + File.separator
-//                                                                                                       + "commons-logging-api-1.1.jar").exists());
-//    }
 
     /** Comprueba si se necesitan las dependencias para la compatibilidad del Cliente AFirma con Java 5.
      * @return <code>true</code> si se necesita instalar las dependencias, <code>false</code> en caso contrario. */
@@ -713,93 +540,6 @@ final class CheckAndInstallMissingParts {
         }
         return ""; //$NON-NLS-1$
     }
-
-//    private String getSystemNSSLibDirMacOSX() throws FileNotFoundException {
-//
-//        String nssLibDir = null;
-//
-//        if (new File("/Applications/Firefox.app/Contents/MacOS/libsoftokn3.dylib").exists() && new File("/Applications/Firefox.app/Contents/MacOS/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
-//            try {
-//                System.load("/Applications/Firefox.app/Contents/MacOS/libnspr4.dylib"); //$NON-NLS-1$
-//                nssLibDir = "/Applications/Firefox.app/Contents/MacOS"; //$NON-NLS-1$
-//            }
-//            catch (final Throwable e) {
-//                nssLibDir = null;
-//            }
-//        }
-//        if (nssLibDir == null && new File("/lib/libsoftokn3.dylib").exists() && new File("/lib/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
-//            try {
-//                System.load("/lib/libnspr4.dylib"); //$NON-NLS-1$
-//                nssLibDir = "/lib"; //$NON-NLS-1$
-//            }
-//            catch (final Throwable e) {
-//                nssLibDir = null;
-//            }
-//        }
-//        if (nssLibDir == null && new File("/usr/lib/libsoftokn3.dylib").exists() && new File("/usr/lib/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
-//            try {
-//                System.load("/usr/lib/libnspr4.dylib"); //$NON-NLS-1$
-//                nssLibDir = "/usr/lib"; //$NON-NLS-1$
-//            }
-//            catch (final Throwable e) {
-//                nssLibDir = null;
-//            }
-//        }
-//        if (nssLibDir == null && new File("/usr/lib/nss/libsoftokn3.dylib").exists() && new File("/usr/lib/nss/libnspr4.dylib").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
-//            try {
-//                System.load("/usr/lib/nss/libnspr4.dylib"); //$NON-NLS-1$
-//                nssLibDir = "/usr/lib/nss"; //$NON-NLS-1$
-//            }
-//            catch (final Throwable e) {
-//                nssLibDir = null;
-//            }
-//        }
-//        if (nssLibDir == null && new File("/Applications/Minefield.app/Contents/MacOS/libsoftokn3.dylib").exists() //$NON-NLS-1$
-//                && new File("/Applications/Minefield.app/Contents/MacOS/libnspr4.dylib").exists()) { //$NON-NLS-1$
-//            try {
-//                System.load("/Applications/Minefield.app/Contents/MacOS/libnspr4.dylib"); //$NON-NLS-1$
-//                nssLibDir = "/Applications/Minefield.app/Contents/MacOS"; //$NON-NLS-1$
-//            }
-//            catch (final Throwable e) {
-//                nssLibDir = null;
-//            }
-//        }
-//        if (nssLibDir == null && new File(Platform.getUserHome() + File.separator
-//                                          + Installer.INSTALL_DIR
-//                                          + File.separator
-//                                          + "nss" //$NON-NLS-1$
-//                                          + Platform.getJavaArch()
-//                                          + File.separator
-//                                          + "libsoftokn3.dylib").exists() //$NON-NLS-1$
-//                                          && new File(Platform.getUserHome() + File.separator
-//                                                      + Installer.INSTALL_DIR
-//                                                      + File.separator
-//                                                      + "nss" //$NON-NLS-1$
-//                                                      + Platform.getJavaArch()
-//                                                      + File.separator
-//                                                      + "libnspr4.dylib").exists()) { //$NON-NLS-1$
-//            try {
-//                System.load(Platform.getUserHome() + File.separator
-//                            + Installer.INSTALL_DIR
-//                            + File.separator
-//                            + "nss" //$NON-NLS-1$
-//                            + Platform.getJavaArch()
-//                            + File.separator
-//                            + "libnspr4.dylib"); //$NON-NLS-1$
-//                nssLibDir = Platform.getUserHome() + File.separator + Installer.INSTALL_DIR + File.separator + "nss" + Platform.getJavaArch(); //$NON-NLS-1$
-//            }
-//            catch (final Throwable e) {
-//                nssLibDir = null;
-//            }
-//        }
-//
-//        if (nssLibDir == null) {
-//            throw new FileNotFoundException("No se ha podido determinar la localizacion de NSS en Mac OS X"); //$NON-NLS-1$
-//        }
-//
-//        return nssLibDir;
-//    }
-    
     
     /** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
      * @return <code>true</code> si existe el directorio del perfil de usuario de Mozilla /
@@ -837,28 +577,5 @@ final class CheckAndInstallMissingParts {
         
         return false;
     }
-    
-    /** Carga una clase excluyendo de la ruta de b&uacute;squeda de clases las URL que no correspondan con JAR.
-     * @param className Nombre de la clase a cargar
-     * @return Clase cargada
-     * @throws ClassNotFoundException cuando no se encuentra la clase a cargar
-     */
-    private Class<?> classForName(final String className) throws ClassNotFoundException {
-        if (className == null || "".equals(className)) { //$NON-NLS-1$
-            throw new IllegalArgumentException("La clase a cargar no puede ser nula ni vacia"); //$NON-NLS-1$
-        }
-        ClassLoader classLoader = AOInstallUtils.class.getClassLoader();
-        if (classLoader instanceof URLClassLoader) {
-            Vector<URL> urls = new Vector<URL>();
-            for (URL url : ((URLClassLoader)classLoader).getURLs()) {
-                if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
-                    urls.add(url);
-                }
-                classLoader = new URLClassLoader(urls.toArray(new URL[0]));
-            }
-        }
-        return classLoader.loadClass(className);
-    }
-
 
 }

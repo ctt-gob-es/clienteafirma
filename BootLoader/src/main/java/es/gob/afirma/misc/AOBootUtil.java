@@ -19,9 +19,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.zip.ZipFile;
 
 import es.gob.afirma.install.AfirmaBootLoader;
@@ -295,6 +297,23 @@ public final class AOBootUtil {
         if (tempLibrary != null) {
             tempLibrary.deleteOnExit();
         }
+    }
+    
+    /** Obtiene un ClassLoader que no incluye URL que no referencien directamente a ficheros JAR.
+     * @return ClassLoader sin URL adicionales a directorios sueltos Web
+     */
+    public static ClassLoader getCleanClassLoader() {
+        ClassLoader classLoader = AOBootUtil.class.getClassLoader();
+        if (classLoader instanceof URLClassLoader) {
+            Vector<URL> urls = new Vector<URL>();
+            for (URL url : ((URLClassLoader)classLoader).getURLs()) {
+                if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+                    urls.add(url);
+                }
+                classLoader = new URLClassLoader(urls.toArray(new URL[0]));
+            }
+        }
+        return classLoader;
     }
 
 }
