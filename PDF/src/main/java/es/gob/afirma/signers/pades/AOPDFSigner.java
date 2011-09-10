@@ -178,28 +178,20 @@ public final class AOPDFSigner implements AOSigner {
         }
         catch (final BadPasswordException e) {
             try {
-                
                 pdfReader =
-                        new PdfReader(sign, new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null)).getBytes() //$NON-NLS-1$
-                        );
+                        new PdfReader(sign, new String(AOUIFactory.getPassword(PDFMessages.getString("AOPDFSigner.0"), null)).getBytes()); //$NON-NLS-1$
             }
             catch (final BadPasswordException e2) {
-                LOGGER.severe(
-                              "La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2 //$NON-NLS-1$
-                );
+                LOGGER.severe("La contrasena del PDF no es valida, se devolvera un arbol vacio: " + e2); //$NON-NLS-1$
                 return new AOTreeModel(root, root.getChildCount());
             }
             catch (final Exception e3) {
-                LOGGER.severe(
-                              "No se ha podido leer el PDF, se devolvera un arbol vacio: " + e3 //$NON-NLS-1$
-                );
+                LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e3); //$NON-NLS-1$
                 return new AOTreeModel(root, root.getChildCount());
             }
         }
         catch (final Exception e) {
-            LOGGER.severe(
-                          "No se ha podido leer el PDF, se devolvera un arbol vacio: " + e //$NON-NLS-1$
-            );
+            LOGGER.severe("No se ha podido leer el PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
             return new AOTreeModel(root, root.getChildCount());
         }
 
@@ -207,9 +199,7 @@ public final class AOPDFSigner implements AOSigner {
             af = pdfReader.getAcroFields();
         }
         catch (final Exception e) {
-            LOGGER.severe(
-                          "No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e //$NON-NLS-1$
-            );
+            LOGGER.severe("No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: " + e); //$NON-NLS-1$
             return new AOTreeModel(root, root.getChildCount());
         }
         final ArrayList<?> names = af.getSignatureNames();
@@ -279,8 +269,8 @@ public final class AOPDFSigner implements AOSigner {
             new PdfReader(data);
         }
         catch (final BadPasswordException e) {
-            LOGGER.warning("El PDF esta protegido con contrasena por lo que no se toma como PDF valido"); //$NON-NLS-1$
-            return false;
+            LOGGER.warning("El PDF esta protegido con contrasena, se toma como PDF valido"); //$NON-NLS-1$
+            return true;
         }
         catch (final Exception e) {
             return false;
@@ -660,16 +650,13 @@ public final class AOPDFSigner implements AOSigner {
      *        Nombre original del PDF
      * @return Nombre del PDF ya firmado */
     public static String getSignedName(final String originalName) {
-        if (originalName == null)
-         {
+        if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
-        if (originalName.endsWith(".pdf")) //$NON-NLS-1$
-         {
+        if (originalName.endsWith(".pdf")) { //$NON-NLS-1${
             return originalName.replace(".pdf", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        if (originalName.endsWith(".PDF")) //$NON-NLS-1$
-         {
+        if (originalName.endsWith(".PDF")) { //$NON-NLS-1$
             return originalName.replace(".PDF", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return originalName + ".signed.pdf"; //$NON-NLS-1$
@@ -687,14 +674,12 @@ public final class AOPDFSigner implements AOSigner {
     }
 
     public AOSignInfo getSignInfo(final byte[] data) throws AOInvalidFormatException, AOException {
-        if (data == null)
-         {
+        if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
 
         if (!isSign(data)) {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma" //$NON-NLS-1$
-            );
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
 
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_PDF);
