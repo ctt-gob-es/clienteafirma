@@ -33,6 +33,8 @@ public class TestPAdES {
     private static final Properties[] PADES_MODES;
     
     private static final String[] TEST_FILES = { "TEST_PDF.pdf" }; //$NON-NLS-1$
+
+    private static final String TEST_FILE_PWD = "TEST_PDF_Password.pdf"; //$NON-NLS-1$
     
     static {
         final Properties p1 = new Properties();
@@ -61,6 +63,41 @@ public class TestPAdES {
             AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
             AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA,
     };
+    
+    /**
+     * Prueba la firma de un PDF protegido con contrase&ntilde;a.
+     * @throws Exception en cualquier error
+     */
+    @Test
+    public void testPasswordSignature() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+
+        KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        
+        AOSigner signer = new AOPDFSigner();
+        
+        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_PWD));
+         
+        Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
+    
+        final String prueba = "Firma PAdES de PDF con contrasena en SHA512withRSA"; //$NON-NLS-1$
+        
+        System.out.println(prueba);
+        
+        final Properties extraParams = new Properties();
+        extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        extraParams.put("ownerPassword", "password"); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        
+        Assert.assertNotNull(prueba, result);
+        Assert.assertTrue(signer.isSign(result));
+        
+    }
+    
     
     /**
      * Prueba de firma convencional.
