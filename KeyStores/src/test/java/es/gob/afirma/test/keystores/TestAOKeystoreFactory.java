@@ -15,13 +15,19 @@ import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 
+/**
+ * Pruebas de AOKeyStoreFactory
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
+ */
 public class TestAOKeystoreFactory {
     
+    /** Pruebas de AOKeyStoreFactory de los tipos sin dependencias de otros m&oacute;dulos
+     * @throws Exception
+     */
     @Test
     public void testAOKeystoreFactory() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -62,7 +68,6 @@ public class TestAOKeystoreFactory {
         Assert.assertNotNull(aliases);
         X509Certificate cert = ksm.getCertificate("anf usuario activo"); //$NON-NLS-1$
         Assert.assertNotNull(cert);
-        
         
     }
 
