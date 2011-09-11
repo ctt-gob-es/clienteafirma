@@ -21,6 +21,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
  * proporcionando adem&aacute;s ciertos m&eacute;todos de utilidad. Contiene
@@ -168,7 +169,7 @@ public final class AOKeyStoreManagerFactory {
                                                                                                                                                               * WINDEPLOY
                                                                                                                                                               */)) {
             try {
-                ksm.init(store, null, pssCallback, null);
+                ksm.init(store, null, new NullPasswordCallback(), null);
             }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
@@ -208,7 +209,7 @@ public final class AOKeyStoreManagerFactory {
         // http://developer.apple.com/technotes/tn2002/tn2110.html
         else if (Platform.getOS().equals(Platform.OS.MACOSX) && store == AOKeyStore.APPLE) {
             try {
-                ksm.init(store, null, pssCallback, null);
+                ksm.init(store, null, new NullPasswordCallback(), null);
             }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$

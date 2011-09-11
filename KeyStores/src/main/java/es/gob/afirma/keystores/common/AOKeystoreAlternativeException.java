@@ -28,9 +28,6 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
     AOKeystoreAlternativeException(final AOKeyStore ks, final String desc, final Exception e) {
         super(desc, e);
-        if (ks == null) {
-            throw new IllegalArgumentException("Es necesario proporcionar un AOKeyStore alternativo"); //$NON-NLS-1$
-        }
         this.alternativeKs = ks;
     }
 
@@ -42,9 +39,6 @@ public final class AOKeystoreAlternativeException extends Exception {
      *        Mensaje descriptivo de la excepci&oacute;n. */
     AOKeystoreAlternativeException(final AOKeyStore ks, final String desc) {
         super(desc);
-        if (ks == null) {
-            throw new IllegalArgumentException("Es necesario proporcionar un AOKeyStore alternativo"); //$NON-NLS-1$
-        }
         this.alternativeKs = ks;
     }
 

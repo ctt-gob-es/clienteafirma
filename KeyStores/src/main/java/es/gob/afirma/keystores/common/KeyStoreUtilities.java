@@ -536,16 +536,12 @@ public final class KeyStoreUtilities {
                                                                "obtener la PasswordCallBack"); //$NON-NLS-1$
         }
 
-        PasswordCallback pssCallback;
         if (kStore == AOKeyStore.WINDOWS || kStore == AOKeyStore.WINROOT
-            || kStore == AOKeyStore.PKCS11
             || kStore == AOKeyStore.APPLE) {
-            pssCallback = new NullPasswordCallback();
+                return new NullPasswordCallback();
         }
-        else {
-            pssCallback = new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getDescription()), parent); //$NON-NLS-1$
-        }
-        return pssCallback;
+        return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getDescription()), parent); //$NON-NLS-1$
+
     }
 
     /** Recupera el manejador de claves asociado a un certificado seg&uacute;n el
@@ -557,19 +553,15 @@ public final class KeyStoreUtilities {
      *        di&aacute;logos modales.
      * @return Manejador para la solicitud de la clave. */
     public static PasswordCallback getCertificatePC(final AOKeyStore store, final Component parent) {
-        PasswordCallback pssCallback;
         if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
             || store == AOKeyStore.WINADDRESSBOOK
             || store == AOKeyStore.WINCA
             || store == AOKeyStore.SINGLE
             || store == AOKeyStore.MOZ_UNI
-            || store == AOKeyStore.PKCS11) {
-            pssCallback = new NullPasswordCallback();
+            || store == AOKeyStore.PKCS11
+            || store == AOKeyStore.APPLE) {
+                return new NullPasswordCallback();
         }
-        else {
-            pssCallback = new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
-        }
-
-        return pssCallback;
+        return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
     }
 }
