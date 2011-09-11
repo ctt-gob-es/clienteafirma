@@ -36,9 +36,9 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-class CAdESTriPhaseSigner {
+public class CAdESTriPhaseSigner {
     
-    static byte[] preSign(final String digestAlgorithmName, 
+    public static byte[] preSign(final String digestAlgorithmName, 
                           final byte[] content, 
                           final X509Certificate[] signerCertificateChain,
                           final String policyIdentifier,
@@ -80,7 +80,7 @@ class CAdESTriPhaseSigner {
 
     }
     
-    static byte[] postSign(final String digestAlgorithmName,
+    public static byte[] postSign(final String digestAlgorithmName,
                            final byte[] content,
                            final X509Certificate[] signerCertificateChain,
                            final byte[] signature,
