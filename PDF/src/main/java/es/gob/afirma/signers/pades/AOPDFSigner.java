@@ -351,12 +351,15 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED) {
-            if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                if (!"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    throw new UnsupportedOperationException("No se permite la firma o cofirma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido a true)"); //$NON-NLS-1$
+            if (!"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                if ("false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                    throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
                 }
-            }
-            else {
+    
+                if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$//$NON-NLS-2$
+                    throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
+                }
+    
                 if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null, PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
                                                                            PDFMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
                                                                            AOUIFactory.YES_NO_OPTION,
@@ -364,6 +367,8 @@ public final class AOPDFSigner implements AOSigner {
                     throw new UnsupportedOperationException("No se ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
                 }
             }
+
+
         }
 
         // ******************************************************************************

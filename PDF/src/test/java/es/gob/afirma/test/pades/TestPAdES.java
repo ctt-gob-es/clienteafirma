@@ -35,6 +35,7 @@ public class TestPAdES {
     private static final String[] TEST_FILES = { "TEST_PDF.pdf" }; //$NON-NLS-1$
 
     private static final String TEST_FILE_PWD = "TEST_PDF_Password.pdf"; //$NON-NLS-1$
+    private static final String TEST_FILE_CTF = "TEST_PDF_Certified.pdf"; //$NON-NLS-1$
     
     static {
         final Properties p1 = new Properties();
@@ -162,5 +163,63 @@ public class TestPAdES {
                 
             }
         }
+    }
+    
+
+    /**
+     * Prueba la firma de un PDF certificado.
+     * @throws Exception en cualquier error
+     */
+    @Test
+    public void testCertifiedSignature() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+
+        KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+        
+        AOSigner signer = new AOPDFSigner();
+        
+        final byte[] testPdf = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(TEST_FILE_CTF));
+         
+        Assert.assertTrue("No se ha reconocido como un PDF", signer.isValidDataFile(testPdf)); //$NON-NLS-1$
+    
+        final String prueba = "Firma PAdES de PDF certificado en SHA512withRSA"; //$NON-NLS-1$
+        
+        System.out.println(prueba);
+        
+        Properties extraParams = new Properties();
+        extraParams.put("allowSigningCertifiedPdfs", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        
+        Assert.assertNotNull(prueba, result);
+        Assert.assertTrue(signer.isSign(result));
+        
+        extraParams = new Properties();
+        extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        boolean failed = false;
+        try {
+            result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        }
+        catch(final Exception e) {
+            failed = true;
+        }
+        Assert.assertTrue("Deberia haber fallado", failed); //$NON-NLS-1$
+        
+        extraParams = new Properties();
+        extraParams.put("allowSigningCertifiedPdfs", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        failed = false;
+        try {
+            result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$
+        }
+        catch(final Exception e) {
+            failed = true;
+        }
+        Assert.assertTrue("Deberia haber fallado", failed); //$NON-NLS-1$
+        
     }
 }
