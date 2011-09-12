@@ -11,10 +11,7 @@
 package es.gob.afirma.install;
 
 import java.awt.Component;
-import java.io.File;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -26,9 +23,6 @@ final class Installer {
     
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
-
-    /** Directorio de instalaci&oacute;n. */
-    static final String INSTALL_DIR = ".cafirma"; //$NON-NLS-1$
 
     /** Construcci&oacute;n LITE del cliente Afirma. */
     static final String LITE = "LITE"; //$NON-NLS-1$
@@ -54,48 +48,6 @@ final class Installer {
         // Manejador para la comprobacion e instalacion de las dependencias del cliente
         // propias del entorno (Manejadores de repositorios, bibliotecas de terceros,...)
         this.enviromentInstaller = new CheckAndInstallMissingParts(Platform.getOS(), Platform.getJavaVersion(), build, codeBase);
-
-    }
-
-    /** Desinstala el cliente de firma al completo. */
-    void uninstall() {
-        final File afirmaDir = new File(Platform.getUserHome() + File.separator + Installer.INSTALL_DIR);
-
-        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-            /** {@inheritDoc} */
-            public Void run() {
-                if (!afirmaDir.exists()) {
-                    LOGGER.info("El directorio de instalacion no existe, se omitira la operacion"); //$NON-NLS-1$
-                    return null;
-                }
-                try {
-                    fileDelete(afirmaDir);
-                    JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString("Installer.11"), //$NON-NLS-1$
-                                                  BootLoaderMessages.getString("Installer.12"), //$NON-NLS-1$
-                                                  JOptionPane.INFORMATION_MESSAGE);
-                    return null;
-                }
-                catch (final Exception e) {
-                    LOGGER.warning("No se ha podido eliminar el directorio de instalacion: " + e); //$NON-NLS-1$
-                    JOptionPane.showMessageDialog(Installer.this.parentComponent, BootLoaderMessages.getString("Installer.13"), //$NON-NLS-1$
-                                                  BootLoaderMessages.getString("Installer.12"), //$NON-NLS-1$
-                                                  JOptionPane.ERROR_MESSAGE);
-                    return null;
-                }
-            }
-
-            private void fileDelete(final File srcFile) {
-                if (srcFile.isDirectory()) {
-                    for (final File f : srcFile.listFiles()) {
-                        fileDelete(f);
-                    }
-                    srcFile.delete();
-                }
-                else {
-                    srcFile.delete();
-                }
-            }
-        });
 
     }
 
@@ -155,26 +107,6 @@ final class Installer {
         }
         catch (final Exception e) {
             LOGGER.severe("Error instalando Apache Xalan, la ejecucion sobre Java 5 puede fallar: " + e); //$NON-NLS-1$
-            if (AfirmaBootLoader.DEBUG) {
-                final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                e.printStackTrace(new java.io.PrintStream(baos));
-                LOGGER.warning(new String(baos.toByteArray()));
-            }
-            allOK = false;
-        }
-
-        try {
-            if (this.enviromentInstaller.isNSSNeeded()) {
-                if (!licenciaMostrada && !prepareInstall()) {
-                    return;
-                }
-                licenciaMostrada = true;
-                LOGGER.info("Instalando NSS..."); //$NON-NLS-1$
-                this.enviromentInstaller.installNSS();
-            }
-        }
-        catch (final Exception e) {
-            LOGGER.severe("Error instalando NSS, la ejecucion sobre Firefox puede fallar: " + e); //$NON-NLS-1$
             if (AfirmaBootLoader.DEBUG) {
                 final java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
                 e.printStackTrace(new java.io.PrintStream(baos));

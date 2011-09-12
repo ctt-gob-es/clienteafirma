@@ -24,8 +24,6 @@ public final class AfirmaBootLoader extends JApplet {
 
     /** Activar a <code>true</code> &uacute;nicamente para pruebas. */
     static final boolean DEBUG = false;
-    
-    private static final String UNINSTALL_ACTION = "uninstall"; //$NON-NLS-1$
 
     private static final long serialVersionUID = -2570412953683244702L;
 
@@ -56,12 +54,7 @@ public final class AfirmaBootLoader extends JApplet {
             codeBase = this.getCodeBase();
         }
         
-        if (UNINSTALL_ACTION.equalsIgnoreCase(getParameter("action"))) { //$NON-NLS-1$
-            uninstall();
-        }
-        else {
-            install(getParameter("installType"), codeBase); //$NON-NLS-1$
-        }
+        install(getParameter("installType"), codeBase); //$NON-NLS-1$
         
     }
 
@@ -88,12 +81,6 @@ public final class AfirmaBootLoader extends JApplet {
             }
         });
 
-    }
-
-    /** Desinstala localmente las dependecias de entorno operativo del Cliente de Firma. */
-    private void uninstall() {
-        LOGGER.info("Invocando desinstalar()"); //$NON-NLS-1$
-        new Installer(AfirmaBootLoader.this, null, null).uninstall();
     }
 
 }
