@@ -9,10 +9,8 @@
  */
 package es.gob.afirma.standalone;
 
-import java.awt.Component;
 import java.awt.Toolkit;
 import java.net.URL;
-import java.util.Hashtable;
 
 import javax.help.DefaultHelpBroker;
 import javax.help.HelpBroker;
@@ -25,14 +23,15 @@ import javax.swing.JFrame;
  */
 final class JavaHelp {
 	
-	private static final Hashtable<String, Component> components = new Hashtable<String, Component>();
-	private static HelpBroker helpBroker;
-	private static HelpSet helpset = null;
- 
+    private static HelpBroker helpBroker;
+    
+//	private static final Hashtable<String, Component> components = new Hashtable<String, Component>();
+//	private static HelpSet helpset = null;
+	
 	static {
         try {
             // Cargamos el archivo de datos de la ayuda
-            final URL hsURL = HelpBroker.class.getResource("/help/help_set-es_ES.hs"); //$NON-NLS-1$
+            final URL hsURL = HelpBroker.class.getResource("/help/JavaHelp/help_set-es_ES.hs"); //$NON-NLS-1$
             
             // Creamos la ventana de ayuda
             final HelpSet hset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
