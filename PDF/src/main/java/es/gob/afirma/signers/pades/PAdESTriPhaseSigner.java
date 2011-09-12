@@ -62,7 +62,7 @@ class PAdESTriPhaseSigner {
         catch (final Exception e) { 
             /* Se deja la pagina tal y como esta */
         }
-        
+
         // Comprobaciones de contrasena en el PDF
         final PdfReader pdfReader;
         final String ownerPassword = extraParams.getProperty("ownerPassword"); //$NON-NLS-1$
@@ -84,7 +84,7 @@ class PAdESTriPhaseSigner {
                 throw new AOException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
             }
         }
-        
+
         // Comprobaciones de adjuntos en los PDF
         PdfArray array;
         PdfDictionary annot;
@@ -138,13 +138,13 @@ class PAdESTriPhaseSigner {
                 }
             }
         }
-        
+
         // Los derechos van firmados por Adobe, y como desde iText se invalidan
         // es mejor quitarlos
         pdfReader.removeUsageRights();
-    
-        baos = new ByteArrayOutputStream();
-    
+
+        this.baos = new ByteArrayOutputStream();
+
         // Activar el atributo de "agregar firma" (cuarto parametro del metodo
         // "PdfStamper.createSignature") hace que se cree una nueva revision del
         // documento y evita que las firmas previas queden invalidadas. Sin embargo, este
@@ -156,18 +156,18 @@ class PAdESTriPhaseSigner {
         try {
             stp = PdfStamper.createSignature(
                   pdfReader, // PDF de entrada
-                  baos, // Salida
+                  this.baos, // Salida
                   '\0', // Mantener version
                   null, // No crear temporal
                   pdfReader.getAcroFields().getSignatureNames().size() > 0 // Si hay mas firmas, creo una revision
             );
         }
         catch(final Exception e) {
-            throw new AOException("Error al crear el campo de firma en el PDF", e);
+            throw new AOException("Error al crear el campo de firma en el PDF", e); //$NON-NLS-1$
         }
         
         // Aplicamos todos los atributos de firma
-        sap = stp.getSignatureAppearance();
+        this.sap = stp.getSignatureAppearance();
         stp.setFullCompression();
         sap.setAcro6Layers(true);
         sap.setLayer2Text(""); //$NON-NLS-1$
@@ -205,8 +205,7 @@ class PAdESTriPhaseSigner {
                 }
             }
         }
-        
-        
+
         // Pagina en donde se imprime la firma
         if (page == LAST_PAGE) {
             page = pdfReader.getNumberOfPages();
@@ -234,7 +233,7 @@ class PAdESTriPhaseSigner {
         // Rubrica de la firma
         if (rubricJpegImage != null) {
             try {
-                sap.setImage(new Jpeg(rubricJpegImage));
+                this.sap.setImage(new Jpeg(rubricJpegImage));
             }
             catch (final Exception e) {
                 LOGGER.severe(
@@ -244,12 +243,12 @@ class PAdESTriPhaseSigner {
         }
         
         sap.setCrypto(null, signerCertificateChain, null, null);
-        
+
         final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
         if (sap.getSignDate() != null) {
             dic.setDate(new PdfDate(sap.getSignDate()));
         }
-        dic.setName(PdfPKCS7.getSubjectFields((X509Certificate) signerCertificateChain[0]).getField("CN")); //$NON-NLS-1$
+        dic.setName(PdfPKCS7.getSubjectFields(signerCertificateChain[0]).getField("CN")); //$NON-NLS-1$
         if (sap.getReason() != null) {
             dic.setReason(sap.getReason());
         }
@@ -267,10 +266,10 @@ class PAdESTriPhaseSigner {
         exc.put(PdfName.CONTENTS, new Integer(CSIZE * 2 + 2));
         
         try {
-            sap.preClose(exc);
+            this.sap.preClose(exc);
         }
         catch (final Exception e) {
-            throw new AOException("No se ha podido cerrar el conjunto de atributos de la firma PDF", e);
+            throw new AOException("No se ha podido cerrar el conjunto de atributos de la firma PDF", e); //$NON-NLS-1$
         }
         
         // Calculamos el MessageDigest
@@ -279,7 +278,7 @@ class PAdESTriPhaseSigner {
             md = MessageDigest.getInstance(digestAlgorithmName);
         }
         catch (NoSuchAlgorithmException e) {
-            throw new AOException("El algoritmo de huella digital no es valido", e);
+            throw new AOException("El algoritmo de huella digital no es valido", e); //$NON-NLS-1$
         }
         md.update(inPDF);
         
@@ -317,12 +316,12 @@ class PAdESTriPhaseSigner {
         System.arraycopy(completeCAdESSignature, 0, outc, 0, completeCAdESSignature.length);
         dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));
         try {
-            sap.close(dic2);
+            this.sap.close(dic2);
         }
         catch (final Exception e) {
-            throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e);
+            throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
         }
-        return baos.toByteArray();
+        return this.baos.toByteArray();
         
     }
     

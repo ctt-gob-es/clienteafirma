@@ -1,5 +1,8 @@
 package es.gob.afirma.test.pades;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
@@ -161,6 +164,13 @@ public class TestPAdES {
                     Assert.assertEquals(result, signer.getData(result));
                     
                     Assert.assertEquals(AOSignConstants.SIGN_FORMAT_PDF, signer.getSignInfo(result).getFormat());
+                    
+                    final File saveFile = File.createTempFile(algo, ".pdf"); //$NON-NLS-1$
+                    final OutputStream os = new FileOutputStream(saveFile);
+                    os.write(result);
+                    os.flush();
+                    os.close();
+                    System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
                     
                 }
                 
