@@ -12,6 +12,7 @@ package es.gob.afirma.ui.utils;
 import java.util.Properties;
 
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
 import es.gob.afirma.ui.principal.MainOptionsPane;
 
 /**
@@ -59,6 +60,21 @@ public class GeneralConfig {
 		return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false"));
 	}
 
+	/**
+	 * Indica si el ususario ha activado o desactivado la opcion de maximizar todas las ventanas
+	 * @return boolean Indicando el estado de la opcion
+	 */
+	public static boolean isMaximized() {
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, "false"));
+	}
+	
+	/**
+	 * Indica si el ususario ha activado o desactivado la opcion de cursor de texto grande
+	 * @return boolean Indicando el estado de la opcion
+	 */
+	public static boolean isBigCaret() {
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false"));
+	}
 	
 	public static void setOption(String optionKey, String optionValue) {
 		configOptions.setProperty(optionKey, optionValue);

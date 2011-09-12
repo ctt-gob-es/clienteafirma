@@ -10,7 +10,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.Caret;
 
+import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
 
@@ -77,6 +80,10 @@ public class ContextOptionsPane {
         campoMotivo = new JTextField();
         campoMotivo.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.motivo")); // NOI18N
         campoMotivo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.motivo")); // NOI18N
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoMotivo.setCaret(caret);
+		}
         contextPanel.add(campoMotivo, c2);
         
         //Relación entre etiqueta y campo de texto
@@ -100,6 +107,10 @@ public class ContextOptionsPane {
         campoLugar = new JTextField();
         campoLugar.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.lugar")); // NOI18N
         campoLugar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.lugar")); // NOI18N
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoLugar.setCaret(caret);
+		}
         contextPanel.add(campoLugar, c2);
         
         //Relación entre etiqueta y campo de texto
@@ -122,6 +133,10 @@ public class ContextOptionsPane {
         campoDatos = new JTextField();
         campoDatos.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.datos")); // NOI18N
         campoDatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.datos")); // NOI18N
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoDatos.setCaret(caret);
+		}
         contextPanel.add(campoDatos, c2);
         
         //Relación entre etiqueta y campo de texto

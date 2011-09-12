@@ -27,7 +27,10 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.Caret;
 
+import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -114,6 +117,10 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.directorio.description"));
         campoDirectorio.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.directorio"));
         campoDirectorio.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.directorio.description"));
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoDirectorio.setCaret(caret);
+		}
         panelCentral.add(campoDirectorio, c);
         
         //Relación entre etiqueta y campo de texto
@@ -166,6 +173,10 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         campoExtensiones.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.aplicar.description"));
         campoExtensiones.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.aplicar"));
         campoExtensiones.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.aplicar.description"));
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoExtensiones.setCaret(caret);
+		}
         panelCentral.add(campoExtensiones, c);
         
         //Relación entre etiqueta y campo de texto

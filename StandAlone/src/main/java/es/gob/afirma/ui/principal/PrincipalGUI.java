@@ -69,8 +69,18 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 	private static final String DEFAULT_LOCALE = "es_ES";
 	
+	private int actualPositionX = -1;
+	
+	private int actualPositionY = -1;
+	
+	private int actualWidth = -1;
+	
+	private int actualHeight = -1;
+	
 	public static JStatusBar bar = new JStatusBar();
 	private JTabbedPane panelPest = null;
+
+	//private boolean highContrast;
 	
 	@Override
 	public int getMinimumRelation(){
@@ -106,6 +116,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		iniciarProveedores();
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -380,7 +394,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	public void crearPaneles() {
 		// Eliminamos los paneles que haya actualmente antes de insertar los nuevos
 		panelPest.removeAll();
-
+		if (GeneralConfig.isMaximized()){
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		} else {
+			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
+				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
+			}
+		}
 		// Insertar la pestana de firma
 		JPanel panelFirma = new Firma();
 		panelFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
@@ -549,6 +570,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		//Al repintar la pantalla principal para quitar o poner las opciones avanzadas hay que ajustar 
 		//la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
 		this.callResize();
+		//setHighContrast(true);
 	}
 
 	private void panelPestMouseMoved(MouseEvent evt){
@@ -608,12 +630,49 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	}
 	
 	/**
-	 * Evento de redimensionado. Redimensiona el tamaÃ±o de la barra de estado y de su contenido
+	 * Evento de redimensionado. Redimensiona el tamaÃ±o de la barra de estado 
+	 * y de su contenido, también almacena los valores actuales de posicion y tamaño de
+	 * la ventana.
 	 * 
 	 */
 	public void resized(ComponentEvent e) {
 		Dimension screenSize = this.getSize();
 	    bar.setPreferredSize(new Dimension((int) screenSize.getWidth()*10/100,(int) screenSize.getHeight()*5/100));
 	    bar.setLabelSize((int) screenSize.getWidth(),(int) screenSize.getHeight()*4/100);
+	    screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
+			actualPositionX = this.getX();
+			actualPositionY = this.getY();
+			actualWidth = this.getWidth();
+			actualHeight = this.getHeight();
+		}
 	}
+	/*public void setHighContrast(boolean highContrast) {
+		this.highContrast = highContrast;
+		try {
+			if (this.highContrast) {
+				MetalTheme theme = new HighContrastTheme();
+				// set the chosen theme
+
+				MetalLookAndFeel.setCurrentTheme(theme);
+
+				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+
+			} else {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			}
+		} catch (ClassNotFoundException e1) {
+			System.out.println(e1.getMessage());
+		} catch (InstantiationException e1) {
+			System.out.println(e1.getMessage());
+		} catch (IllegalAccessException e1) {
+			System.out.println(e1.getMessage());
+		} catch (UnsupportedLookAndFeelException e1) {
+			System.out.println(e1.getMessage());
+		}
+		SwingUtilities.updateComponentTreeUI(this);
+
+		this.validate();
+		this.repaint();
+	}*/
 }

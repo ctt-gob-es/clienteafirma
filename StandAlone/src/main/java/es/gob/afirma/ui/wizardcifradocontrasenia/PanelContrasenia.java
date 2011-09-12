@@ -29,12 +29,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.ui.utils.CipherConfig;
+import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -133,6 +136,10 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         // Caja de texto con la contrasenia
         campoContrasenia.setToolTipText(Messages.getString("WizardCifrado.contrasenia.description")); // NOI18N
         campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoContrasenia.setCaret(caret);
+		}
         panelCentral.add(campoContrasenia, c);
         
         //Relación entre etiqueta y campo de contraseña
@@ -154,6 +161,10 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         // Caja de texto con la contrasenia
         campoContraseniaRep.setToolTipText(Messages.getString("WizardCifrado.recontrasenia.description")); // NOI18N
         campoContraseniaRep.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoContraseniaRep.setCaret(caret);
+		}
         panelCentral.add(campoContraseniaRep, c);
         
         //Relación entre etiqueta y campo de contraseña

@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -49,6 +50,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.massive.DirectorySignatureHelper.MassiveType;
+import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.DirectorySignatureHelperAdv;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
@@ -263,6 +265,10 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.directorio.description"));
         campoDirectorio.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana4.directorio"));
         campoDirectorio.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.directorio.description"));
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoDirectorio.setCaret(caret);
+		}
         panelCentral.add(campoDirectorio, c);
         
         //Relaci�n entre etiqueta y campo de texto
@@ -314,6 +320,10 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         campoFicheroLog.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.log.description"));
         campoFicheroLog.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana4.log"));
         campoFicheroLog.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.log.description"));
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoFicheroLog.setCaret(caret);
+		}
         panelCentral.add(campoFicheroLog, c);
         
         //Relaci�n entre etiqueta y campo de texto

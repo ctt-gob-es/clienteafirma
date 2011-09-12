@@ -51,6 +51,9 @@ public class Opciones extends JAccessibilityDialog {
     /** Panel con la configurac&oacute;n de las firmas PDF del aplicativo. */
     private ContextOptionsPane contextOptions;
     
+    /** Panel con la configurac&oacute;n de las firmas PDF del aplicativo. */
+    private AccessibilityOptionsPane accessibilityOptions;
+    
     public Opciones(PrincipalGUI mainGUI) {
     	this.mainGui = mainGUI;
         initComponents();
@@ -89,13 +92,18 @@ public class Opciones extends JAccessibilityDialog {
      */
     private void initComponents() {
     	// Dimensiones de la ventana en Windows y Linux
-    	setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    	if (GeneralConfig.isMaximized()){
+    		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+    	} else {
+    		setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    	}
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(Messages.getString("Opciones.opciones")); // NOI18N
         setResizable(true);
         getContentPane().setLayout(new GridBagLayout());
-        setMinimumSize(new Dimension(getSize().width + 20, getSize().height));
+        setMinimumSize(new Dimension(getSize().width, getSize().height));
         
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -123,6 +131,16 @@ public class Opciones extends JAccessibilityDialog {
         		Messages.getString("Opciones.contexto"));
         
         contextOptions.loadConfig(GeneralConfig.getConfig());
+        
+        //Opciones de accesibilidad
+        accessibilityOptions =  new AccessibilityOptionsPane();
+        
+        mainPanel.addTab(Messages.getString("Opciones.accesibilidad"),
+        		null,
+        		accessibilityOptions.getConfigurationPanel(),
+        		Messages.getString("Opciones.accesibilidadTip"));
+        
+        accessibilityOptions.loadConfig(GeneralConfig.getConfig());
         
         // Definicion de mnem�nicos.
         int tabNum = 0;
@@ -177,6 +195,7 @@ public class Opciones extends JAccessibilityDialog {
             	Properties config = new Properties();
             	config.putAll(mainOptions.getConfig());
             	config.putAll(contextOptions.getConfig());
+            	config.putAll(accessibilityOptions.getConfig());
             	
             	Properties signatureConfig = new Properties();
             	signatureConfig.putAll(mainOptions.getSignatureConfig());
@@ -378,9 +397,9 @@ public class Opciones extends JAccessibilityDialog {
 	 */
     private void aceptarActionPerformed(Properties config, Properties signatureConfig) {
 
-    	// Si se ha cambiado de vista (simple <-> avanzada) actualizamos la ventana principal
-    	Boolean needUpdateGUI = (GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)));
-
+    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes, actualizamos la ventana principal
+    	Boolean needUpdateGUI = ((GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)))|| (GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) || (GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE))));
+    	    	
     	// Guardamos el estado actual de la configuracion de la herramienta
     	GeneralConfig.loadConfig(config);
     	

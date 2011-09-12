@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -17,6 +18,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,6 +35,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -39,6 +43,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.Caret;
 
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -58,6 +63,8 @@ import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.DashBorder;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
@@ -129,6 +136,22 @@ public class Firma extends JPanel {
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
 		campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Firma.buscar.caja")); // NOI18N
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N
+		/*campoFichero.addFocusListener(new FocusListener() {
+			
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+				campoFichero.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+			}
+			
+			public void focusGained(FocusEvent e) {
+				// TODO Auto-generated method stub				
+				campoFichero.setBorder(new DashBorder(Color.BLACK, new Insets(2, 2, 2, 2)));
+			}
+		});*/
+		if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoFichero.setCaret(caret);
+		}
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto

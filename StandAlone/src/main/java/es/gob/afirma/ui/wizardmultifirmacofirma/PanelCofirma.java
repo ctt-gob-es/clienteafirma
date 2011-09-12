@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -42,6 +43,7 @@ import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
@@ -126,6 +128,10 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		
 		// Caja de texto donde se guarda el nombre del archivo de datos
 		campoDatos.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description"));
+		 if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoDatos.setCaret(caret);
+		}
 		panelCentral.add(campoDatos, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -165,6 +171,10 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		
 		// Caja de texto donde se guarda el nombre del archivo de la firma
 		campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma.description")); // NOI18N
+		 if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoFirma.setCaret(caret);
+		}
 		panelCentral.add(campoFirma, c);
 		
 		//Relación entre etiqueta y campo de texto

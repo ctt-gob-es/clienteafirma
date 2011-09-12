@@ -28,12 +28,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.ui.utils.CipherConfig;
+import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -133,6 +136,10 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         // Caja de texto donde se guarda la contraseña
 		 this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
 	     this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
+	     if (GeneralConfig.isBigCaret()) {
+				Caret caret = new ConfigureCaret();
+				campoContrasenia.setCaret(caret);
+			}
 	     panelCentral.add(this.campoContrasenia, c);
     	
         //Relación entre etiqueta y campo de texto

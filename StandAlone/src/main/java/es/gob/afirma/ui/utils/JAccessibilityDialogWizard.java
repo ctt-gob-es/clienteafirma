@@ -22,7 +22,12 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		super();
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this);
 		this.addComponentListener(adaptador);
-		setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+		if (GeneralConfig.isMaximized()){
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		} else {
+			setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+		}
 	}
 	
 	/**

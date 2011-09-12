@@ -30,9 +30,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.Caret;
 
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -82,6 +85,10 @@ public class Ensobrado extends JPanel {
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion")));
         campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.buscar.caja")); // NOI18N
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoFichero.setCaret(caret);
+		}
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto

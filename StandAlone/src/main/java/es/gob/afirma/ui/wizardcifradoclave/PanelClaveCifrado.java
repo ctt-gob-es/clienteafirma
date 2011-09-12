@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.Caret;
 
 import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -48,6 +49,8 @@ import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.CipherConfig;
+import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -157,6 +160,10 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         		checkGuardar.setEnabled(true);
         	}
 		});
+        if (GeneralConfig.isBigCaret()) {
+			Caret caret = new ConfigureCaret();
+			campoClave.setCaret(caret);
+		}
         panelCentral.add(campoClave, c);
         
         //Relación entre etiqueta y campo de texto
