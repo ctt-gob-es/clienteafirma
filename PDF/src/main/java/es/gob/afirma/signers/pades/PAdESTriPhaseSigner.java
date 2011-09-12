@@ -26,6 +26,7 @@ import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 
 class PAdESTriPhaseSigner {
@@ -280,7 +281,7 @@ class PAdESTriPhaseSigner {
         catch (NoSuchAlgorithmException e) {
             throw new AOException("El algoritmo de huella digital no es valido", e); //$NON-NLS-1$
         }
-        md.update(inPDF);
+        md.update(AOUtil.getDataFromInputStream(this.sap.getRangeStream()));
         
         // Prefirma CAdES
         return CAdESTriPhaseSigner.preSign(
