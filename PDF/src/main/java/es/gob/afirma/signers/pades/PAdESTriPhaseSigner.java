@@ -38,24 +38,140 @@ class PAdESTriPhaseSigner {
     // Atributos que hay que conservar de prefirma a postfirma
     private ByteArrayOutputStream baos;
     private PdfSignatureAppearance sap;
+    
+    private final GregorianCalendar tmpCal = new GregorianCalendar();
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -666;
     
     byte[] preSign(final String digestAlgorithmName,
-                          final byte[] inPDF, 
-                          final X509Certificate[] signerCertificateChain,
-                          final byte[] rubricJpegImage,
-                          Properties extraParams) throws IOException, AOException {
+                   final byte[] inPDF, 
+                   final X509Certificate[] signerCertificateChain,
+                   final byte[] rubricJpegImage,
+                   Properties extraParams) throws IOException, AOException {
         
         // Lectura de parametros adicionales
-        final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")); //$NON-NLS-1$ //$NON-NLS-2$
+        if (extraParams == null) {
+            extraParams = new Properties();
+        }
+        
+        final String policyIdentifier = extraParams.getProperty("policyIdentifier"); //$NON-NLS-1$
+        final String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
+        
+        PdfTriPhaseSession pts = getSessionData(inPDF, signerCertificateChain, rubricJpegImage, extraParams);
+        this.baos = pts.getBAOS();
+        this.sap = pts.getSAP();
+        
+        // Calculamos el MessageDigest
+        final MessageDigest md;
+        try {
+            md = MessageDigest.getInstance(digestAlgorithmName);
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new AOException("El algoritmo de huella digital no es valido", e); //$NON-NLS-1$
+        }
+        md.update(AOUtil.getDataFromInputStream(this.sap.getRangeStream()));
+        
+        // Prefirma CAdES
+        return CAdESTriPhaseSigner.preSign(
+            digestAlgorithmName, 
+            null, 
+            signerCertificateChain, 
+            policyIdentifier, 
+            (policyQualifier != null) ? policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "") : null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$, 
+            true, 
+            md.digest(),
+            this.tmpCal.getTime()
+        );
+    }
+
+    /**
+     * Post-firma en PAdES.
+     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma
+     * @param signerCertificateChain Cadena de certificados del firmante
+     * @param signature Resultado de la firma PKCS#1 v1.5
+     * @param signedAttributes Resultado de la pre-firma CAdES (PAdES)
+     * @return PDF firmado
+     * @throws AOException en caso de cualquier tipo de error
+     * @throws IOException 
+     */
+    byte[] postSign(final String digestAlgorithmName,
+                    final byte[] inPDF,
+                    final X509Certificate[] signerCertificateChain,
+                    final byte[] rubricJpegImage,
+                    final Properties extraParams,
+                    final byte[] signature,
+                    final byte[] signedAttributes) throws AOException, IOException {
+        
+        final byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(digestAlgorithmName, null, signerCertificateChain, signature, signedAttributes);
+        final byte[] outc = new byte[CSIZE];
+
+        final PdfDictionary dic2 = new PdfDictionary();
+        System.arraycopy(completeCAdESSignature, 0, outc, 0, completeCAdESSignature.length);
+        dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));
+        
+        PdfTriPhaseSession pts = getSessionData(inPDF, signerCertificateChain, rubricJpegImage, extraParams);
+        PdfSignatureAppearance sharedSAP = pts.getSAP();
+        ByteArrayOutputStream sharedBAOS = pts.getBAOS();
+        
+        try {
+           sharedSAP.close(dic2);
+//            this.sap.close(dic2);
+        }
+        catch (final Exception e) {
+            throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
+        }
+//        return this.baos.toByteArray();
+        return sharedBAOS.toByteArray();
+        
+    }
+    
+    /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
+     * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
+     * el eje horizontal de izquierda a derecha y en el vertical de abajo a
+     * arriba. */
+    private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
+        try {
+            return new Rectangle(Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftX")), //$NON-NLS-1$
+                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftY")), //$NON-NLS-1$
+                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightX")), //$NON-NLS-1$
+                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightY")) //$NON-NLS-1$
+            );
+        }
+        catch (final Exception e) {
+            return null;
+        }
+    }
+    
+    private static class PdfTriPhaseSession {
+        
+        final PdfSignatureAppearance sap;
+        final ByteArrayOutputStream baos;
+        
+        PdfTriPhaseSession(final PdfSignatureAppearance s, final ByteArrayOutputStream b) {
+            this.sap = s;
+            this.baos = b;
+        }
+        
+        ByteArrayOutputStream getBAOS() {
+            return this.baos;
+        }
+        
+        PdfSignatureAppearance getSAP() {
+            return this.sap;
+        }
+    }
+    
+    private PdfTriPhaseSession getSessionData(final byte[] inPDF, 
+                                              final X509Certificate[] signerCertificateChain,
+                                              final byte[] rubricJpegImage,
+                                              final Properties extraParams) throws IOException, AOException {
+        
         final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
         final String signField = extraParams.getProperty("signField"); //$NON-NLS-1$
         final String signatureProductionCity = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
         final String signerContact = extraParams.getProperty("signerContact"); //$NON-NLS-1$
-        final String policyIdentifier = extraParams.getProperty("policyIdentifier"); //$NON-NLS-1$
-        final String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
+
         int page = 1;
         try {
             page = Integer.parseInt(extraParams.getProperty("signaturePage")); //$NON-NLS-1$
@@ -144,8 +260,8 @@ class PAdESTriPhaseSigner {
         // es mejor quitarlos
         pdfReader.removeUsageRights();
 
-        this.baos = new ByteArrayOutputStream();
-
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
         // Activar el atributo de "agregar firma" (cuarto parametro del metodo
         // "PdfStamper.createSignature") hace que se cree una nueva revision del
         // documento y evita que las firmas previas queden invalidadas. Sin embargo, este
@@ -157,7 +273,7 @@ class PAdESTriPhaseSigner {
         try {
             stp = PdfStamper.createSignature(
                   pdfReader, // PDF de entrada
-                  this.baos, // Salida
+                  baos, // Salida
                   '\0', // Mantener version
                   null, // No crear temporal
                   pdfReader.getAcroFields().getSignatureNames().size() > 0 // Si hay mas firmas, creo una revision
@@ -168,7 +284,7 @@ class PAdESTriPhaseSigner {
         }
         
         // Aplicamos todos los atributos de firma
-        this.sap = stp.getSignatureAppearance();
+        final PdfSignatureAppearance sap = stp.getSignatureAppearance();
         stp.setFullCompression();
         sap.setAcro6Layers(true);
         sap.setLayer2Text(""); //$NON-NLS-1$
@@ -182,9 +298,8 @@ class PAdESTriPhaseSigner {
         if (reason != null) {
             sap.setReason(reason);
         }
-        if (useSystemDateTime) {
-            sap.setSignDate(new GregorianCalendar());
-        }
+        
+        sap.setSignDate(tmpCal);
 
         if (pdfReader.isEncrypted() && ownerPassword != null) {
             if ("true".equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -234,7 +349,7 @@ class PAdESTriPhaseSigner {
         // Rubrica de la firma
         if (rubricJpegImage != null) {
             try {
-                this.sap.setImage(new Jpeg(rubricJpegImage));
+                sap.setImage(new Jpeg(rubricJpegImage));
             }
             catch (final Exception e) {
                 LOGGER.severe(
@@ -247,7 +362,7 @@ class PAdESTriPhaseSigner {
 
         final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
         if (sap.getSignDate() != null) {
-            dic.setDate(new PdfDate(sap.getSignDate()));
+            dic.setDate(new PdfDate(tmpCal));
         }
         dic.setName(PdfPKCS7.getSubjectFields(signerCertificateChain[0]).getField("CN")); //$NON-NLS-1$
         if (sap.getReason() != null) {
@@ -267,80 +382,14 @@ class PAdESTriPhaseSigner {
         exc.put(PdfName.CONTENTS, new Integer(CSIZE * 2 + 2));
         
         try {
-            this.sap.preClose(exc);
+            sap.preClose(exc);
         }
         catch (final Exception e) {
             throw new AOException("No se ha podido cerrar el conjunto de atributos de la firma PDF", e); //$NON-NLS-1$
         }
         
-        // Calculamos el MessageDigest
-        final MessageDigest md;
-        try {
-            md = MessageDigest.getInstance(digestAlgorithmName);
-        }
-        catch (NoSuchAlgorithmException e) {
-            throw new AOException("El algoritmo de huella digital no es valido", e); //$NON-NLS-1$
-        }
-        md.update(AOUtil.getDataFromInputStream(this.sap.getRangeStream()));
+        return new PdfTriPhaseSession(sap, baos);
         
-        // Prefirma CAdES
-        return CAdESTriPhaseSigner.preSign(
-            digestAlgorithmName, 
-            null, 
-            signerCertificateChain, 
-            policyIdentifier, 
-            (policyQualifier != null) ? policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "") : null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$, 
-            true, 
-            md.digest()
-        );
-    }
-
-    /**
-     * Post-firma en PAdES.
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma
-     * @param signerCertificateChain Cadena de certificados del firmante
-     * @param signature Resultado de la firma PKCS#1 v1.5
-     * @param signedAttributes Resultado de la pre-firma CAdES (PAdES)
-     * @return PDF firmado
-     * @throws AOException en caso de cualquier tipo de error
-     */
-    byte[] postSign(final String digestAlgorithmName,
-                                  final X509Certificate[] signerCertificateChain,
-                                  final byte[] signature,
-                                  final byte[] signedAttributes
-                      ) throws AOException {
-        
-        final byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(digestAlgorithmName, null, signerCertificateChain, signature, signedAttributes);
-        final byte[] outc = new byte[CSIZE];
-
-        final PdfDictionary dic2 = new PdfDictionary();
-        System.arraycopy(completeCAdESSignature, 0, outc, 0, completeCAdESSignature.length);
-        dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));
-        try {
-            this.sap.close(dic2);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
-        }
-        return this.baos.toByteArray();
-        
-    }
-    
-    /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
-     * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
-     * el eje horizontal de izquierda a derecha y en el vertical de abajo a
-     * arriba. */
-    private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
-        try {
-            return new Rectangle(Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftX")), //$NON-NLS-1$
-                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftY")), //$NON-NLS-1$
-                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightX")), //$NON-NLS-1$
-                                 Integer.parseInt(extraParams.getProperty("signaturePositionOnPageUpperRightY")) //$NON-NLS-1$
-            );
-        }
-        catch (final Exception e) {
-            return null;
-        }
     }
 
 }
