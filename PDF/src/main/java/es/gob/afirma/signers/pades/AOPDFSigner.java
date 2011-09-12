@@ -55,6 +55,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
+import es.gob.afirma.signers.cades.PKCS1ExternalizableSigner;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Clase para la firma electr&oacute;nica de ficheros Adobe PDF.
@@ -122,7 +123,13 @@ public final class AOPDFSigner implements AOSigner {
             extraParams = new Properties();
         }
         try {
-            return signPDF(keyEntry, data, extraParams, signAlgorithm);
+            X509Certificate[] certChain = (X509Certificate[]) keyEntry.getCertificateChain(); 
+            
+            final PAdESTriPhaseSigner padesTri = new PAdESTriPhaseSigner();
+            final byte[] preSignature = padesTri.preSign(AOSignConstants.getDigestAlgorithmName(algorithm), data, certChain, null, extraParams);
+            final byte[] signature = PKCS1ExternalizableSigner.sign(algorithm, keyEntry, preSignature);
+            return padesTri.postSign(AOSignConstants.getDigestAlgorithmName(algorithm), certChain, signature, preSignature);
+            //return signPDF(keyEntry, data, extraParams, signAlgorithm);
         }
         catch (final InvalidPdfException e) {
             throw new AOFormatFileException("El documento no era un PDF valido"); //$NON-NLS-1$
