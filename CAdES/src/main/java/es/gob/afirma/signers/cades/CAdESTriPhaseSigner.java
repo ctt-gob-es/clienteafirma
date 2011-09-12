@@ -36,8 +36,23 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
+/**
+ * Firmador trif&aacute;sico CAdES.
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class CAdESTriPhaseSigner {
     
+    /**
+     * Genera los atributos firmados CAdES (prefirma).
+     * @param digestAlgorithmName Algoritmo de huella digital
+     * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
+     * @param signerCertificateChain Cadena de certificados del firmante
+     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
+     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica
+     * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
+     * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>
+     * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
+     * @throws AOException
+     */
     public static byte[] preSign(final String digestAlgorithmName, 
                           final byte[] content, 
                           final X509Certificate[] signerCertificateChain,
@@ -80,6 +95,15 @@ public class CAdESTriPhaseSigner {
 
     }
     
+    /** Realiza una firma CAdES completa.
+     * @param digestAlgorithmName Algoritmo de huella digital
+     * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
+     * @param signerCertificateChain Cadena de certificados del firmante
+     * @param signature Firma PKCS#1 v1.5 de los atributos firmados
+     * @param signedAttributes Atributos firmados (prefirma)
+     * @return Firma CAdES completa
+     * @throws AOException  
+     */
     public static byte[] postSign(final String digestAlgorithmName,
                            final byte[] content,
                            final X509Certificate[] signerCertificateChain,
