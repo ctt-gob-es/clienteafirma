@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -112,6 +113,8 @@ public final class GenCAdESEPESSignedData {
             messageDigest = md.digest();
         }
         
+        final Date signDate = new Date();
+        
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
             content, 
@@ -119,7 +122,8 @@ public final class GenCAdESEPESSignedData {
             policyIdentifier, 
             policyQualifier, 
             signingCertificateV2, 
-            messageDigest
+            messageDigest,
+            signDate
         );
         
         final byte[] signature = PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry, preSignature);
@@ -129,7 +133,18 @@ public final class GenCAdESEPESSignedData {
             content, 
             signerCertificateChain,  
             signature,
-            preSignature
+            // Volvemos a crear la prefirma simulando una firma trifasica en la que la postfirma no cuenta con el
+            // resultado de la prefirma
+            CAdESTriPhaseSigner.preSign(
+                AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
+                content, 
+                signerCertificateChain, 
+                policyIdentifier, 
+                policyQualifier, 
+                signingCertificateV2, 
+                messageDigest,
+                signDate
+            )
         );
 
     }

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -50,6 +51,7 @@ public class CAdESTriPhaseSigner {
      * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica
      * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
      * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>
+     * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
      * @throws AOException
      */
@@ -59,7 +61,8 @@ public class CAdESTriPhaseSigner {
                           final String policyIdentifier,
                           final String policyQualifier,
                           final boolean signingCertificateV2,
-                          final byte[] messageDigest) throws AOException {
+                          final byte[] messageDigest,
+                          final Date signDate) throws AOException {
         
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
@@ -77,7 +80,8 @@ public class CAdESTriPhaseSigner {
                      policyIdentifier,
                      policyQualifier,
                      signingCertificateV2,
-                     messageDigest
+                     messageDigest,
+                     signDate
                   )
                )
             );

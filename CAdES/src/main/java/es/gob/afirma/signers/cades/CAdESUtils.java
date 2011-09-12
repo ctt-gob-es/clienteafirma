@@ -53,6 +53,7 @@ public class CAdESUtils {
      * @param dataType
      *        Identifica el tipo del contenido a firmar.
      * @param messageDigest
+     * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
      * @throws java.security.NoSuchAlgorithmException
@@ -64,7 +65,8 @@ public class CAdESUtils {
                                                   final String policyIdentifier,
                                                   final String policyQualifier,
                                                   final boolean signingCertificateV2,
-                                                  final byte[] messageDigest) throws NoSuchAlgorithmException,
+                                                  final byte[] messageDigest,
+                                                  final Date signDate) throws NoSuchAlgorithmException,
                                                                                      IOException,
                                                                                      CertificateEncodingException {
         
@@ -81,7 +83,7 @@ public class CAdESUtils {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        final ASN1EncodableVector contexExpecific = initContexExpecific(digestAlgorithmName, datos, PKCSObjectIdentifiers.data.getId(), messageDigest);
+        final ASN1EncodableVector contexExpecific = initContexExpecific(digestAlgorithmName, datos, PKCSObjectIdentifiers.data.getId(), messageDigest, signDate);
 
         // Serial Number
         // comentar lo de abajo para version del rfc 3852
@@ -276,7 +278,7 @@ public class CAdESUtils {
      * @param messageDigest
      * @return ASN1EncodableVector
      * @throws NoSuchAlgorithmException */
-    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest) throws NoSuchAlgorithmException {
+    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest, final Date signDate) throws NoSuchAlgorithmException {
         // authenticatedAttributes
         final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
@@ -286,7 +288,7 @@ public class CAdESUtils {
         }
 
         // fecha de firma
-        ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
+        ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(signDate))));
 
         // MessageDigest
         ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString((messageDigest != null) ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
