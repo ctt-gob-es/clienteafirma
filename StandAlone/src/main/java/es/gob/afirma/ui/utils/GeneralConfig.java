@@ -76,6 +76,14 @@ public class GeneralConfig {
 		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false"));
 	}
 	
+	/**
+	 * Indica si el ususario ha activado o desactivado la opcion de remarcar elementos con foco
+	 * @return boolean Indicando el estado de la opcion
+	 */
+	public static boolean isRemarked() {
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false"));
+	}
+	
 	public static void setOption(String optionKey, String optionValue) {
 		configOptions.setProperty(optionKey, optionValue);
 	}
