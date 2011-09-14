@@ -108,6 +108,9 @@ public class Desensobrado extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoFichero);
+		}
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -133,6 +136,9 @@ public class Desensobrado extends JPanel {
         });
         examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinar);
+        }
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -159,6 +165,9 @@ public class Desensobrado extends JPanel {
         comboAlmacen.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.almacen.combo")); // NOI18N
         comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N
         cargarComboAlmacen(comboAlmacen);
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboAlmacen);
+        }
         add(comboAlmacen, c);
         
         //Relación entre etiqueta y combo
@@ -189,6 +198,9 @@ public class Desensobrado extends JPanel {
         checkInicar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check")); // NOI18N
         checkInicar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.check.check.description")); // NOI18N
         checkInicar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkInicar);
+        }
         add(checkInicar, c);
 		
 		c.weighty = 1.0;
@@ -224,7 +236,10 @@ public class Desensobrado extends JPanel {
         });
         extraer.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.btnDescifrar")); // NOI18N
         extraer.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
-		
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(extraer);
+        }
+        
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(extraer, BorderLayout.CENTER);
 		

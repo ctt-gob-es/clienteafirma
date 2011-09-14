@@ -34,6 +34,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardmultifirmacofirma.AsistenteCofirma;
 import es.gob.afirma.ui.wizardmultifirmacontrafirma.AsistenteContrafirmas;
 
@@ -72,6 +73,9 @@ public class MultifirmaSimple extends JPanel {
 		comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(comboAlmacen);
+		}
 		cargarComboAlmacen(comboAlmacen);
 		add(comboAlmacen, c);
 		
@@ -106,6 +110,9 @@ public class MultifirmaSimple extends JPanel {
 		} else {
 			cofirma.setMnemonic(KeyEvent.VK_G); //Se asigna el atajo para el modo simple
 		}
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(cofirma);
+		}
 		panelTipos.add(cofirma);
 
 		// Radiobutton contrafirma
@@ -123,6 +130,9 @@ public class MultifirmaSimple extends JPanel {
 			contrafirma.setMnemonic(KeyEvent.VK_T); //Se asigna el atajo para el modo avanzado
 		} else {
 			contrafirma.setMnemonic(KeyEvent.VK_E); //Se asigna el atajo para el modo simple
+		}
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(contrafirma);
 		}
 
 		panelTipos.add(contrafirma);
@@ -165,6 +175,9 @@ public class MultifirmaSimple extends JPanel {
 				firmarActionPerformed(comboAlmacen, cofirma);
 			}
 		});
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(firmar);
+		}
 		
 		cons.ipadx = 0;
 		cons.gridx = 1;

@@ -39,6 +39,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizarddescifradoclave.AsistenteDescifradoClave;
 import es.gob.afirma.ui.wizarddescifradocontrasenia.AsistenteDescifradoContrasenia;
 
@@ -98,6 +99,9 @@ public class Descifrado extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoFichero);
+		}
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -123,6 +127,9 @@ public class Descifrado extends JPanel {
         });
         examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinar);
+		}
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -155,6 +162,9 @@ public class Descifrado extends JPanel {
             }
         });
         comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Descifrado.origenL.0"),Messages.getString("Descifrado.origenL.1")}));
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboMecanismo);
+		}
         add(comboMecanismo, c);
         
         // En la vista simple, no se permitirá configurar el origen de la clave
@@ -192,6 +202,9 @@ public class Descifrado extends JPanel {
         comboAlgoritmo.getAccessibleContext().setAccessibleName(Messages.getString("Descifrado.formato.combo")); // NOI18N
         comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N
         comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboAlgoritmo);
+		}
 		add(comboAlgoritmo, c);
 		
 		// En la vista simple, no se permitirá configurar el algoritmo de descifrado
@@ -242,6 +255,9 @@ public class Descifrado extends JPanel {
         });
         descifrar.getAccessibleContext().setAccessibleName(Messages.getString("Descifrado.btndescifrar")); // NOI18N
         descifrar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(descifrar);
+		}
         
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(descifrar, BorderLayout.CENTER);

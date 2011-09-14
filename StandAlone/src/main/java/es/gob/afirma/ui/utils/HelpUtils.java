@@ -172,6 +172,9 @@ public class HelpUtils {
 				getHelp().setCurrentID(pagina);
 			}
 		});
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(botonAyuda);
+        }
 		
 		return botonAyuda;
 	}

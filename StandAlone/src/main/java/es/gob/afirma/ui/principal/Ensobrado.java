@@ -39,6 +39,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardsobres.AsistenteEnsobrar;
 import es.gob.afirma.ui.wizardsobresremitentes.AsistenteRemitentes;
 
@@ -89,6 +90,9 @@ public class Ensobrado extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoFichero);
+        }
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -114,6 +118,9 @@ public class Ensobrado extends JPanel {
         });
         examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinar);
+        }
 		add(examinar, c);
 		
 		c.insets = new Insets(5, 13, 0, 13);
@@ -139,6 +146,9 @@ public class Ensobrado extends JPanel {
 					comboTipos.setEnabled(true);
 			}
 		});
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkAnadir);
+        }
         add(checkAnadir, c);
 
         c.insets = new Insets(13, 13, 0, 13);
@@ -161,6 +171,9 @@ public class Ensobrado extends JPanel {
         comboTipos.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
         comboTipos.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.opciones.combo.description")); // NOI18N
         cargarComboTipos();
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboTipos);
+        }
         add(comboTipos, c);
         
       //Relación entre etiqueta y combo
@@ -203,6 +216,9 @@ public class Ensobrado extends JPanel {
         });
         generar.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.btnGenerar")); // NOI18N
         generar.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.btnGenerar.description")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(generar);
+        }
         
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(generar, BorderLayout.CENTER);

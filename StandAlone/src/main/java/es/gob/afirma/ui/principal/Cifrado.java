@@ -41,6 +41,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardcifradoclave.AsistenteCifradoClave;
 import es.gob.afirma.ui.wizardcifradocontrasenia.AsistenteCifradoContrasenia;
 
@@ -119,6 +120,9 @@ public class Cifrado extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(campoFichero);
+		}		
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -143,6 +147,9 @@ public class Cifrado extends JPanel {
 			}
 		});       
 		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(examinar);
+		}
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -175,6 +182,9 @@ public class Cifrado extends JPanel {
 		comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave")); // NOI18N
 		comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave")); // NOI18N
 		comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Cifrado.origenL.0"),Messages.getString("Cifrado.origenL.1")}));
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(comboMecanismo);
+		}
 		add(comboMecanismo, c);
 		
 		// En la vista simple, no se permitirá configurar el origen de la clave
@@ -213,6 +223,9 @@ public class Cifrado extends JPanel {
 		comboAlgoritmo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.formato.combo")); // NOI18N
 		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.combo.description")); // NOI18N
 		comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(comboAlgoritmo);
+		}
 		add(comboAlgoritmo, c);
 		
 		// En la vista simple, no se permitirá configurar el algoritmo de cifrado
@@ -261,6 +274,9 @@ public class Cifrado extends JPanel {
 			}
 		});
 		cifrar.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.btncifrar.description")); // NOI18N
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(cifrar);
+		}
 		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(cifrar, BorderLayout.CENTER);

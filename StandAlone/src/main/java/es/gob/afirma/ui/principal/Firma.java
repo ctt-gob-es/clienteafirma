@@ -10,7 +10,6 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -18,8 +17,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,7 +32,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
-import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -64,13 +60,13 @@ import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
-import es.gob.afirma.ui.utils.DashBorder;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.SignedFileManager;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.util.signers.AOSignerFactory;
 
 /**
@@ -136,18 +132,9 @@ public class Firma extends JPanel {
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
 		campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Firma.buscar.caja")); // NOI18N
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N
-		/*campoFichero.addFocusListener(new FocusListener() {
-			
-			public void focusLost(FocusEvent e) {
-				// TODO Auto-generated method stub
-				campoFichero.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-			}
-			
-			public void focusGained(FocusEvent e) {
-				// TODO Auto-generated method stub				
-				campoFichero.setBorder(new DashBorder(Color.BLACK, new Insets(2, 2, 2, 2)));
-			}
-		});*/
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(campoFichero);
+		}
 		if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
@@ -170,6 +157,7 @@ public class Firma extends JPanel {
 		examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
+		examinar.setMinimumSize(examinar.getSize());
 		examinar.addActionListener(new ActionListener() {
 			@Override
             public void actionPerformed(ActionEvent evt) {
@@ -177,6 +165,9 @@ public class Firma extends JPanel {
 			}
 		});
 		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(examinar);
+		}
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -203,6 +194,9 @@ public class Firma extends JPanel {
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
 		comboAlmacen.getAccessibleContext().setAccessibleName(Messages.getString("Firma.almacen.certificados")); // NOI18N
 		comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(comboAlmacen);
+		}
 		cargarComboAlmacen(comboAlmacen);
 		add(comboAlmacen, c);
 		
@@ -250,6 +244,9 @@ public class Firma extends JPanel {
             formatosV.add(AOSignConstants.SIGN_FORMAT_ODF);
 		}
 		comboFormato.setModel(new DefaultComboBoxModel(formatosL.toArray()));
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(comboFormato);
+		}
 		add(comboFormato, c);
 		
 		//Relación entre etiqueta y combo
@@ -290,7 +287,10 @@ public class Firma extends JPanel {
 			}
 		});
 		firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
-
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(firmar);
+		}
+		
 		cons.ipadx = 0;
 		cons.gridx = 1;
 		cons.weightx = 1.0;

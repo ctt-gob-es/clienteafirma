@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -20,7 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -114,6 +117,16 @@ public class Utils {
 					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+10));
 				}
 			});
+			if (button.getIcon() != null) {			
+				button.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						button.setBorder(BorderFactory.createEmptyBorder());
+					}		
+					public void focusGained(FocusEvent e) {
+						button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+					}
+				});
+			}
 		}
 		if (component instanceof JTextField){
 			final JTextField textField = (JTextField) component;
@@ -157,6 +170,17 @@ public class Utils {
 				}
 				public void focusGained(FocusEvent e) {
 					label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+				}
+			});
+		}
+		if (component instanceof JCheckBox){
+			final JCheckBox checkBox = (JCheckBox) component;
+			checkBox.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()-10));
+				}
+				public void focusGained(FocusEvent e) {
+					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()+10));
 				}
 			});
 		}

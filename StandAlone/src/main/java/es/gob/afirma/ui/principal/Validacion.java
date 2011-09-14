@@ -30,8 +30,10 @@ import javax.swing.JPanel;
 
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 /**
  *
@@ -71,6 +73,10 @@ public class Validacion extends JPanel {
 		JLabel etiqueta = new JLabel();
 		etiqueta.setText(Messages.getString("Validacion.texto.parte1")); // NOI18N
 //		etiqueta.setBounds(91, 60, 402, 20);
+		etiqueta.setFocusable(true);
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(etiqueta);
+		}
 		add(etiqueta, c);
 
 		c.insets = new Insets(5, 13, 0, 13);
@@ -80,6 +86,10 @@ public class Validacion extends JPanel {
 		etiqueta = new JLabel();
 		etiqueta.setText(Messages.getString("Validacion.texto.parte2")); // NOI18N
 //		etiqueta.setBounds(71, 80, 422, 20);
+		etiqueta.setFocusable(true);
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(etiqueta);
+		}
 		add(etiqueta, c);
 
 		c.gridy = 3;
@@ -89,6 +99,10 @@ public class Validacion extends JPanel {
 		etiqueta.setForeground(new Color(55, 55, 254));
 		etiqueta.setText(Messages.getString("Validacion.texto.parte4")); // NOI18N
 //		etiqueta.setBounds(111, 100, 312, 20);
+		etiqueta.setFocusable(true);
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(etiqueta);
+		}
 		add(etiqueta, c);
 
 		c.gridy = 4;
@@ -96,6 +110,10 @@ public class Validacion extends JPanel {
 		// Etiqueta Cuatro: Pulse el boton inferior
 		etiqueta = new JLabel();
 		etiqueta.setText(Messages.getString("Validacion.texto.parte5")); // NOI18N
+		etiqueta.setFocusable(true);
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(etiqueta);
+		}
 		add(etiqueta, c);
 
 		c.gridy = 5;
@@ -103,6 +121,10 @@ public class Validacion extends JPanel {
 		// Etiqueta Cinco: En su navegador web
 		etiqueta = new JLabel();
 		etiqueta.setText(Messages.getString("Validacion.texto.parte6")); // NOI18N
+		etiqueta.setFocusable(true);
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(etiqueta);
+		}
 		add(etiqueta, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -140,7 +162,9 @@ public class Validacion extends JPanel {
 		});
 		valide.getAccessibleContext().setAccessibleName(Messages.getString("Validacion.btnValide")); // NOI18N
 		valide.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.btnValide.description")); // NOI18N
-		
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(valide);
+		}
 		cons.ipadx = 0;
 		cons.gridx = 1;
 		cons.weightx = 1.0;

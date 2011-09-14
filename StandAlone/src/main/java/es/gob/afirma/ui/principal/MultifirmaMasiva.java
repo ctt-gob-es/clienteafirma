@@ -29,9 +29,11 @@ import javax.swing.JPanel;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardmultifirmamasiva.AsistenteMultifirmaMasiva;
 
 /**
@@ -73,6 +75,9 @@ public class MultifirmaMasiva extends JPanel {
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		cargarComboAlmacen(comboAlmacen);
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboAlmacen);
+        }
 		add(comboAlmacen, c);
 		
 		//Relación entre etiqueta y combo
@@ -98,6 +103,9 @@ public class MultifirmaMasiva extends JPanel {
 		alerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre")); // NOI18N
 		alerta.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
 		alerta.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(alerta);
+        }
 		panelTipos.add(alerta);
 		
 		add(panelTipos, c);
@@ -134,6 +142,9 @@ public class MultifirmaMasiva extends JPanel {
 			}
 		});
 		firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirmar")); // NOI18N
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(firmar);
+        }
 		
 		cons.ipadx = 0;
 		cons.weightx = 1.0;
