@@ -471,27 +471,6 @@ public final class AOUtil {
         return stringbuffer.toString();
     }
 
-    /** Recupera un algoritmo de hash a partir del algoritmo de firma introducido
-     * s&oacute;lo para su uso para la generaci&oacute;n de hashes. Si el
-     * algoritmo no respeta el formato "ALGORITHM_HASH"+with+"AGORITHM_SIGN" se
-     * devuelve nulo.
-     * @param signatureAlgorithm
-     *        Nombre del algoritmo de firma
-     * @return Algoritmo de hash. */
-    public final static String getDigestAlgorithm(final String signatureAlgorithm) {
-
-        final int withPos = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
-        if (withPos == -1) {
-            return null;
-        }
-
-        String digestAlg = signatureAlgorithm.substring(0, withPos);
-        if (digestAlg.startsWith("SHA")) { //$NON-NLS-1$
-            digestAlg = "SHA-" + digestAlg.substring(3); //$NON-NLS-1$
-        }
-        return digestAlg;
-    }
-
     /** Recupera el texto con un identificador de versi&oacute;n a partir de un
      * properties indicado a trav&eacute;s de un <code>InputStream</code>. Las
      * propiedades del properties que definen la versi&oacute;n son:<br/>
