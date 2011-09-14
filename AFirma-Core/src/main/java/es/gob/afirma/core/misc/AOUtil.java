@@ -720,7 +720,8 @@ public final class AOUtil {
      * @throws ClassNotFoundException cuando no se encuentra la clase a cargar
      */
     public static Class<?> classForName(final String className) throws ClassNotFoundException {
-        return getCleanClassLoader().loadClass(className);
+        getCleanClassLoader().loadClass(className);
+        return Class.forName(className);
     }
     
     /** Obtiene un ClassLoader que no incluye URL que no referencien directamente a ficheros JAR.
