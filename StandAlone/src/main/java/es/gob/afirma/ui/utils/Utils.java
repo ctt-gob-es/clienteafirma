@@ -9,11 +9,23 @@
  */
 package es.gob.afirma.ui.utils;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
@@ -84,5 +96,70 @@ public class Utils {
 		}
 		//TODO: mejorar para que en el caso de que no encuentre mnemónico pueda cambiar alguno de los anteriores
 		return 0;
+	}
+	
+	/**
+	 * Configura el formato del remarcado del componente al ser seleccionado.
+	 * @param component El componente seleccionado.
+	 * @return JComponent El componente con el remarcado configurado.
+	 */
+	public static JComponent remarcar(JComponent component){
+		if (component instanceof JButton){
+			final JButton button = (JButton) component;
+			button.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-10));
+				}		
+				public void focusGained(FocusEvent e) {
+					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+10));
+				}
+			});
+		}
+		if (component instanceof JTextField){
+			final JTextField textField = (JTextField) component;
+			textField.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					textField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+				}
+				public void focusGained(FocusEvent e) {
+					textField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+				}
+			});
+		}
+		if (component instanceof JComboBox){
+			final JComboBox comboBox = (JComboBox) component;
+			comboBox.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+				}
+				
+				public void focusGained(FocusEvent e) {
+					comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));//(new DashBorder(Color.BLACK, new Insets(-1,-1,-1,-1)));
+				}
+			});
+		}
+		if (component instanceof JRadioButton){
+			final JRadioButton radioButton = (JRadioButton) component;
+			radioButton.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()-10));
+				}
+				public void focusGained(FocusEvent e) {
+					radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()+10));
+				}
+			});
+		}
+		if (component instanceof JLabel){
+			final JLabel label = (JLabel) component;
+			label.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					label.setBorder(BorderFactory.createEmptyBorder());
+				}
+				public void focusGained(FocusEvent e) {
+					label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+				}
+			});
+		}
+		return component;
 	}
 }
