@@ -50,6 +50,7 @@ import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.SignFileUtils;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -132,6 +133,9 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoFirma.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoFirma);
+        }
         panelCentral.add(campoFirma, c);
         
         //Relación entre etiqueta y campo de texto
@@ -155,6 +159,9 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
             	examinarFirmaActionPerformed();
             }
         });
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinarFirma);
+        }
         panelCentral.add(examinarFirma, c);
         
         c.fill = GridBagConstraints.BOTH;

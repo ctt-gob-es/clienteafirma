@@ -41,10 +41,12 @@ import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.CertificateDestiny;
@@ -130,8 +132,11 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		
 		// Combo con las listas de destinatarios
 		final JComboBox comboDestinatarios = new JComboBox();
-		comboDestinatarios.setToolTipText(Messages.getString("Wizard.sobres.pagina1.comboDestinatarios.description")); 
+		comboDestinatarios.setToolTipText(Messages.getString("Wizard.sobres.pagina1.comboDestinatarios.description"));
 		cargarCombo(comboDestinatarios);
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboDestinatarios);
+        }
 		panelCentral.add(comboDestinatarios, c);
 		
 		//Relación entre etiqueta y combo
@@ -158,6 +163,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 						eliminar);
 			}
 		});
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(anadir);
+        }
 		panelCentral.add(anadir, c);
 		
 		c.insets = new Insets(10, 20, 0, 20);
@@ -186,6 +194,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		// Lista con los destinatarios
 		listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description"));
 		listaDestinatarios.setModel(new DefaultListModel());
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(listaDestinatarios);
+        }
 
 		panelLista.setViewportView(listaDestinatarios);
 		
@@ -217,6 +228,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 				eliminarActionPerformed((DefaultListModel) listaDestinatarios.getModel(), eliminar);
 			}
 		});
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(eliminar);
+        }
 		panelCentral.add(eliminar, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);

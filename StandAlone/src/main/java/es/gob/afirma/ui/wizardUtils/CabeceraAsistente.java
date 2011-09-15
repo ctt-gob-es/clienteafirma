@@ -21,7 +21,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 /**
  * Clase para generar la parte superior de los asistentes
@@ -103,6 +105,10 @@ public class CabeceraAsistente extends JPanel {
     	JLabel etiquetaTitulo = new JLabel();
     	etiquetaTitulo.setFont(new Font(getFont().getFamily(), 1, getFont().getSize()));
     	etiquetaTitulo.setText(Messages.getString(this.MessagesTitulo)); // NOI18N
+    	etiquetaTitulo.setFocusable(true);
+    	if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(etiquetaTitulo);
+        }
     	add(etiquetaTitulo, c);
     	
     	c.insets = new Insets(0, 15, 0, 10);

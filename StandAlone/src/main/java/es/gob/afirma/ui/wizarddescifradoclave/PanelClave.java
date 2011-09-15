@@ -44,6 +44,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -141,6 +142,9 @@ public class PanelClave extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoClave.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoClave);
+        }
         panelCentral.add(campoClave, c);
         
         //Relación entre etiqueta y campo de texto
@@ -163,6 +167,9 @@ public class PanelClave extends JAccessibilityDialogWizard {
             }
         });
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardDescifrado.clave.boton")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinar);
+        }
         panelCentral.add(examinar, c);
         
         c.fill = GridBagConstraints.BOTH;

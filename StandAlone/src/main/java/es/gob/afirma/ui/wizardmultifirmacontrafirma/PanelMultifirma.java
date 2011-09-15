@@ -63,6 +63,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -255,6 +256,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion4")}
 		));
 		comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboFirmas);
+        }
 		panelCentral.add(comboFirmas, c);
 		
 		 //Relación entre etiqueta y combo
@@ -307,7 +311,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
 		arbolFirmas.setSelectionRow(0);
 		arbolFirmas.setRootVisible(false);
-
+		if(GeneralConfig.isRemarked()){
+			Utils.remarcar(arbolFirmas);
+		}
 		// Panel del arbol (firmantes seleccionados)
 		panelArbol.setViewportView(arbolFirmas);
 		panelCentral.add(panelArbol, c);

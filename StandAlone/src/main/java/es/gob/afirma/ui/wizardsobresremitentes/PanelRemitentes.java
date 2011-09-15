@@ -58,11 +58,13 @@ import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.signers.cms.AOCMSSigner;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SignFileUtils;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.CertificateDestiny;
@@ -173,6 +175,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			}
 		});
 		cargarCombo(comboRepositorios);
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboRepositorios);
+        }
 		panelCentral.add(comboRepositorios, c);
 		
 		c.insets = new Insets(0, 10, 0, 20);
@@ -190,6 +195,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				anadirActionPerformed(comboRepositorios, eliminar, anadir);
 			}
 		});
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(anadir);
+        }
 		panelCentral.add(anadir, c);
 		
 		c.insets = new Insets(10, 20, 0, 20);
@@ -207,6 +215,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Listado de remitentes
 		listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description"));
 		listaRemitentes.setModel(new DefaultListModel());
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(listaRemitentes);
+        }
 		panelLista.setViewportView(listaRemitentes);
 		
 		c.ipady = 0;
@@ -231,7 +242,10 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				eliminarActionPerformed(comboRepositorios, eliminar, anadir);
 			}
 		});
-		eliminar.getAccessibleContext().setAccessibleDescription(Messages.getString("wizard.sobres.eliminar.remitente")); 
+		eliminar.getAccessibleContext().setAccessibleDescription(Messages.getString("wizard.sobres.eliminar.remitente"));
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(eliminar);
+        }
 		panelCentral.add(eliminar, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);

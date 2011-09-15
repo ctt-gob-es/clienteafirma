@@ -27,8 +27,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.JTree;
 
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
@@ -181,6 +185,39 @@ public class Utils {
 				}
 				public void focusGained(FocusEvent e) {
 					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()+10));
+				}
+			});
+		}
+		if (component instanceof JTextPane){
+			final JTextPane textPane = (JTextPane) component;
+			textPane.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					textPane.setBorder(BorderFactory.createEmptyBorder());
+				}
+				public void focusGained(FocusEvent e) {
+					textPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+				}
+			});
+		}
+		if (component instanceof JTree){
+			final JTree tree = (JTree) component;
+			tree.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					tree.setBorder(BorderFactory.createEmptyBorder());
+				}
+				public void focusGained(FocusEvent e) {
+					tree.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+				}
+			});
+		}
+		if (component instanceof JList){
+			final JList list = (JList) component;
+			list.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					list.setBorder(BorderFactory.createEmptyBorder());
+				}
+				public void focusGained(FocusEvent e) {
+					list.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
 			});
 		}

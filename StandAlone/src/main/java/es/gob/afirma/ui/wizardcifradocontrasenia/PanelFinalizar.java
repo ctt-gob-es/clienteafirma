@@ -19,8 +19,10 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -78,6 +80,10 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
         
         // Etiqueta felicidades
     	JLabel etiqueta = new JLabel(Messages.getString("Wizard.sobres.final1")); // NOI18N
+    	etiqueta.setFocusable(true);
+    	if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(etiqueta);
+        }
     	panelCentral.add(etiqueta, c);
     	
     	c.weighty = 1.0;

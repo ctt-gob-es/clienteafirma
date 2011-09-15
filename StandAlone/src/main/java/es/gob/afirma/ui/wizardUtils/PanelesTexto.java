@@ -11,7 +11,9 @@ package es.gob.afirma.ui.wizardUtils;
 
 import javax.swing.JTextPane;
 
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 /**
  * Clase para generar bloques de texto
@@ -35,6 +37,10 @@ public class PanelesTexto {
         bloqueTexto.setText(Messages.getString(bundleTexto));
         bloqueTexto.setOpaque(opaco);
         bloqueTexto.setBorder(null);
+        bloqueTexto.setFocusable(true);
+        if(GeneralConfig.isRemarked()){
+        	Utils.remarcar(bloqueTexto);
+        }
         
         return bloqueTexto;
 	}

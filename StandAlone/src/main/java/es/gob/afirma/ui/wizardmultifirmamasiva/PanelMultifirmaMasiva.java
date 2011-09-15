@@ -58,6 +58,7 @@ import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.OpenFileMessageDialog;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -269,6 +270,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoDirectorio.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoDirectorio);
+        }
         panelCentral.add(campoDirectorio, c);
         
         //Relaci�n entre etiqueta y campo de texto
@@ -290,6 +294,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             	examinarDirectorioActionPerformed();
             }
         });
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinarDirectorio);
+        }
         panelCentral.add(examinarDirectorio, c);
         
         c.insets = new Insets(5, 20, 0, 20);
@@ -302,6 +309,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         checkSobreescribir.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
         checkSobreescribir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
         checkSobreescribir.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkSobreescribir);
+        }
         panelCentral.add(checkSobreescribir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
@@ -324,6 +334,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoFicheroLog.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoFicheroLog);
+        }
         panelCentral.add(campoFicheroLog, c);
         
         //Relaci�n entre etiqueta y campo de texto
@@ -344,6 +357,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                 examinarFicheroLogActionPerformed();
             }
         });
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinarFichero);
+        }
         panelCentral.add(examinarFichero, c);
         
         c.fill = GridBagConstraints.BOTH;

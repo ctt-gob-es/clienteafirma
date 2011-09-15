@@ -35,6 +35,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -121,6 +122,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoDirectorio.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoDirectorio);
+        }
         panelCentral.add(campoDirectorio, c);
         
         //Relación entre etiqueta y campo de texto
@@ -143,6 +147,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
                 examinarActionPerformed();
             }
         });
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinar);
+        }
         panelCentral.add(examinar, c);
         
         c.insets = new Insets(5, 20, 0, 20);
@@ -156,6 +163,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         checkIncluir.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.check.incluir"));
         checkIncluir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description"));
         checkIncluir.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkIncluir);
+        }
         panelCentral.add(checkIncluir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
@@ -177,6 +187,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoExtensiones.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoExtensiones);
+        }
         panelCentral.add(campoExtensiones, c);
         
         //Relación entre etiqueta y campo de texto

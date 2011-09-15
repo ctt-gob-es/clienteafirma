@@ -41,6 +41,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -140,6 +141,9 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoContrasenia.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoContrasenia);
+        }
         panelCentral.add(campoContrasenia, c);
         
         //Relación entre etiqueta y campo de contraseña
@@ -165,6 +169,9 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoContraseniaRep.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoContraseniaRep);
+        }
         panelCentral.add(campoContraseniaRep, c);
         
         //Relación entre etiqueta y campo de contraseña

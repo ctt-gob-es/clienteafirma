@@ -26,9 +26,11 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextPane;
 
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -109,6 +111,9 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         checkRespectar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana2.check.respetar")); 
         checkRespectar.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.check.respetar.description"));
         checkRespectar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkRespectar);
+        }
         panelCentral.add(checkRespectar, c);
         
         c.gridy = 2;
@@ -134,6 +139,9 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         radioTodos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description"));
         radioTodos.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al botón de radio
         radioTodos.setSelected(true);
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(radioTodos);
+        }
         panelRadios.add(radioTodos, cons);
         
         cons.gridy = 1;
@@ -143,6 +151,9 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         radioUltimos.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana2.panel.radio2")); 
         radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description"));
         radioUltimos.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botón de radio
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(radioUltimos);
+        }
         panelRadios.add(radioUltimos, cons);
         
         // Grupo de radiobuttons

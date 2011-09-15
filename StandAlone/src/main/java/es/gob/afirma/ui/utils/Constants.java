@@ -41,12 +41,12 @@ public class Constants {
     /**
      * Width inicial de los JDialogWizard de la aplicacion.
      */
-    public static final int WIZARD_INITIAL_WIDTH = 630;
+    public static final int WIZARD_INITIAL_WIDTH = 640;
     
     /**
      * Height inicial de los JDialogWizard de la aplicacion.
      */
-    public static final int WIZARD_INITIAL_HEIGHT = 480;
+    public static final int WIZARD_INITIAL_HEIGHT = 490;
     
     /**
      * Factor de redimensionado para las imagenes    

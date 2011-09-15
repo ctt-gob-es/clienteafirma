@@ -54,6 +54,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -164,6 +165,9 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoClave.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoClave);
+        }
         panelCentral.add(campoClave, c);
         
         //Relación entre etiqueta y campo de texto
@@ -186,6 +190,9 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
             }
         });
         autogenerar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.autogenerar")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(autogenerar);
+        }
         panelCentral.add(autogenerar, c);
         
         c.insets = new Insets(0, 10, 0, 20);
@@ -203,6 +210,9 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
             }
         });
         almacen.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.almacen")); // NOI18N
+        if(GeneralConfig.isRemarked()){
+        	Utils.remarcar(almacen);
+        }
         panelCentral.add(almacen, c);
         
 		c.insets = new Insets(10, 20, 0, 20);
@@ -216,6 +226,9 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         checkGuardar.setToolTipText(Messages.getString("WizardCifrado.check.description")); // NOI18N
         checkGuardar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.check")); // NOI18N
         checkGuardar.setMnemonic(KeyEvent.VK_G);
+        if(GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkGuardar);
+        }
         panelCentral.add(checkGuardar, c);
 
         c.fill = GridBagConstraints.BOTH;

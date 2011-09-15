@@ -22,8 +22,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 /**
  * Clase para generar la parte inferior de la ventana con la botonera
@@ -85,6 +87,9 @@ public class BotoneraInferior extends JPanel {
 				maximizarActionPerformed();
 			}
 		});
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(maximizar);
+        }
         add(maximizar);
         
         //Espacio entre botones
@@ -106,6 +111,9 @@ public class BotoneraInferior extends JPanel {
                 anteriorActionPerformed(anterior, siguiente, finalizar);
             }
         });
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(anterior);
+        }
        
         add(anterior);
         
@@ -122,6 +130,9 @@ public class BotoneraInferior extends JPanel {
                 siguienteActionPerformed(anterior, siguiente, finalizar);
             }
         });
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(siguiente);
+        }
         add(siguiente);
 
         // Espacio entre botones
@@ -143,6 +154,9 @@ public class BotoneraInferior extends JPanel {
             		ventana.dispose();
             }
         });
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(cancelar);
+        }
         add(cancelar);
 
         // Boton finalizar
@@ -159,6 +173,9 @@ public class BotoneraInferior extends JPanel {
             		ventana.dispose();
             }
         });
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(finalizar);
+        }
         add(finalizar);
 	}
 

@@ -50,6 +50,7 @@ import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -132,6 +133,9 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoDatos.setCaret(caret);
 		}
+		if (GeneralConfig.isRemarked()){
+	       	Utils.remarcar(campoDatos);
+	       }
 		panelCentral.add(campoDatos, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -153,6 +157,9 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 				examinarDatosActionPerformed();
 			}
 		});
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinarDatos);
+        }
 		panelCentral.add(examinarDatos, c);
 
 		c.insets = new Insets(20, 20, 0, 20);
@@ -175,6 +182,9 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoFirma.setCaret(caret);
 		}
+		if (GeneralConfig.isRemarked()){
+	       	Utils.remarcar(campoFirma);
+	    }
 		panelCentral.add(campoFirma, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -195,6 +205,9 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 				examinarFirmaActionPerformed();
 			}
 		});
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(examinarFirma);
+        }
 		panelCentral.add(examinarFirma, c);
 		
 		c.fill = GridBagConstraints.BOTH;

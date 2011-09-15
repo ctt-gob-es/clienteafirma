@@ -35,9 +35,11 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -138,6 +140,9 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		radioFirma.setName("radioFirma");
 		radioFirma.setSelected(true);
 		radioFirma.setMnemonic(KeyEvent.VK_F); //Se asigna un atajo al botón de radio
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(radioFirma);
+        }
 		panelOperaciones.add(radioFirma, cons);
 		
 		cons.insets = new Insets(0, 0, 0, 0);
@@ -151,6 +156,9 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		radioCofirma.addItemListener(this);
 		radioCofirma.setName("radioCofirma");
 		radioCofirma.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al botón de radio
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(radioCofirma);
+        }
 		panelOperaciones.add(radioCofirma, cons);
 		
 		cons.insets = new Insets(0, 0, 0, 0);
@@ -164,6 +172,9 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		radioContrafirma.addItemListener(this);
 		radioContrafirma.setName("radioContrafirma");
 		radioContrafirma.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botón de radio
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(radioContrafirma);
+        }
 		panelOperaciones.add(radioContrafirma, cons);
 		
 		// Agrupamos los radiobutton para que solo se pueda marcar uno
@@ -198,6 +209,9 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 			}
 		});
 		cargarCombo();
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboFormatos);
+        }
 		panelCentral.add(comboFormatos, c);
 		
 		//Relación entre etiqueta y combo
@@ -219,6 +233,9 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		checkFormato.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.modo.formato.description")); // NOI18N
 		checkFormato.setMnemonic(0); //Se quita el atajo al deshabilitar el checkbox
 		checkFormato.setEnabled(false);
+		if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkFormato);
+        }
 		panelCentral.add(checkFormato, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);
