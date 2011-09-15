@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 /**
  * Manejador de la configuraci&oacute;n de accesibilidad de la interfaz.
@@ -86,6 +87,9 @@ public class AccessibilityOptionsPane {
         checkFontSize.setSelected(GeneralConfig.isAvanzados()); 
         checkFontSize.setBounds(12, 20, 340, 23);
         checkFontSize.setMnemonic(KeyEvent.VK_R); // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkFontSize);
+        }
         textPanel.add(checkFontSize, c2);
         
         //Checkbox para habilitar la opcion de configuracion del estilo de fuente
@@ -95,6 +99,9 @@ public class AccessibilityOptionsPane {
         checkFontStyle.setSelected(GeneralConfig.isAvanzados()); 
         checkFontStyle.setBounds(12, 20, 340, 23);
         checkFontStyle.setMnemonic(KeyEvent.VK_N); // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkFontStyle);
+        }
         textPanel.add(checkFontStyle, c2);
     	
     	panel.add(textPanel, c);
@@ -116,6 +123,9 @@ public class AccessibilityOptionsPane {
         checkHighContrast.setSelected(GeneralConfig.isAvanzados()); 
         checkHighContrast.setBounds(12, 20, 340, 23);
         checkHighContrast.setMnemonic(KeyEvent.VK_L); // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkHighContrast);
+        }
         colorPanel.add(checkHighContrast, c2);
         
         panel.add(colorPanel, c);
@@ -137,6 +147,9 @@ public class AccessibilityOptionsPane {
         checkFocusVisible.setSelected(GeneralConfig.isAvanzados()); 
         checkFocusVisible.setBounds(12, 20, 340, 23);
         checkFocusVisible.setMnemonic(KeyEvent.VK_F); // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkFocusVisible);
+        }
         focusPanel.add(checkFocusVisible, c2);
         
         panel.add(focusPanel, c);
@@ -158,6 +171,9 @@ public class AccessibilityOptionsPane {
         checkWindowSize.setSelected(GeneralConfig.isAvanzados()); 
         checkWindowSize.setBounds(12, 20, 340, 23);
         checkWindowSize.setMnemonic(KeyEvent.VK_V); // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkWindowSize);
+        }
         windowPanel.add(checkWindowSize, c2);
         
         panel.add(windowPanel, c);   
@@ -179,6 +195,9 @@ public class AccessibilityOptionsPane {
         checkCursorSize.setSelected(GeneralConfig.isAvanzados()); 
         checkCursorSize.setBounds(12, 20, 340, 23);
         checkCursorSize.setMnemonic(KeyEvent.VK_R); // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkCursorSize);
+        }
         cursorPanel.add(checkCursorSize, c2);
         
         panel.add(cursorPanel, c);
@@ -194,17 +213,25 @@ public class AccessibilityOptionsPane {
         
         //Boton Valores por defecto
         valores.setText("Valores por defecto");
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(valores);
+        }
+        buttonPanel.add(valores);
         
         //Boton guardar
         guardar.setText("Guardar");
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(guardar);
+        }
+        buttonPanel.add(guardar);
         
         //Boton cancelar
         cargar.setText("Cargar");
-        
-        buttonPanel.add(valores);
-        buttonPanel.add(guardar);
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(cargar);
+        }
         buttonPanel.add(cargar);
-        
+
         panel.add(buttonPanel, c);
         // Rellenamos el hueco libre con un panel vacio
         c.gridy = c.gridy + 1;

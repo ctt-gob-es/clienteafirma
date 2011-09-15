@@ -115,10 +115,10 @@ public class Utils {
 			final JButton button = (JButton) component;
 			button.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent e) {
-					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-10));
+					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
 				}		
 				public void focusGained(FocusEvent e) {
-					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+10));
+					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
 				}
 			});
 			if (button.getIcon() != null) {			

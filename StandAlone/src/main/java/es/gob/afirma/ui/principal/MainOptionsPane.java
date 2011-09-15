@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 
 /**
@@ -102,6 +103,9 @@ public class MainOptionsPane {
         checkHabilitar.setSelected(GeneralConfig.isAvanzados()); 
         checkHabilitar.setBounds(12, 20, 340, 23);
         checkHabilitar.setMnemonic(KeyEvent.VK_H); // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkHabilitar);
+        }
         generalPanel.add(checkHabilitar, c2);
         
         panel.add(generalPanel, c);
@@ -131,6 +135,9 @@ public class MainOptionsPane {
         comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N
         //comboAlgoritmo.setModel(new DefaultComboBoxModel(Arrays.asList("SHA-1","SHA-512","SHA-384","SHA-256").toArray()));
         comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoK.toArray()));
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(comboAlgoritmo);
+        }
         criptografiaPanel.add(comboAlgoritmo, c2);
         
         //Relación entre etiqueta y combo
@@ -148,6 +155,9 @@ public class MainOptionsPane {
         checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
         checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
         checkXML.setMnemonic(KeyEvent.VK_U);  // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkXML);
+        }
         criptografiaPanel.add(checkXML, c2);
         c.weighty = 0.3;
         c.fill = GridBagConstraints.BOTH;
@@ -169,6 +179,9 @@ public class MainOptionsPane {
         checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
         checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
         checkAddPolicy.setMnemonic(KeyEvent.VK_O); // Asignación de mnemónico al checkbox
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(checkAddPolicy);
+        }
         
         policyPanel.add(checkAddPolicy, c2);
         c2.gridy = c2.gridy + 1; 
@@ -180,6 +193,9 @@ public class MainOptionsPane {
         
         textPolicyOid = new JTextField();
         textPolicyOid.setEnabled(false);
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(textPolicyOid);
+        }
         
         //Relación entre etiqueta y campo de texto
         policyOidLabel.setLabelFor(textPolicyOid);
@@ -194,6 +210,9 @@ public class MainOptionsPane {
         
         textPolicyUrl = new JTextField();
         textPolicyUrl.setEnabled(false);
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(textPolicyUrl);
+        }
         
         //Relación entre etiqueta y campo de texto
         policyUrlLabel.setLabelFor(textPolicyUrl);

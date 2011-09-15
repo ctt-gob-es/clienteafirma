@@ -34,6 +34,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialog;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 /**
  * Clase que muestra el panel de opciones.
@@ -180,10 +181,13 @@ public class Opciones extends JAccessibilityDialog {
 	    		maximizarActionPerformed();
 			}
 		});
+	    if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(maximizar);
+        }
 		
 	    //Espacio entre botones
 		Panel panelVacio = new Panel();
-		panelVacio.setPreferredSize(new Dimension(50, 10));
+		panelVacio.setPreferredSize(new Dimension(30, 10));
 	    
 		// Boton aceptar
         JButton aceptar = new JButton();
@@ -205,6 +209,9 @@ public class Opciones extends JAccessibilityDialog {
             }
         });
         aceptar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(aceptar);
+        }
         
         // Boton cancelar
         JButton	cancelar = new JButton();
@@ -216,6 +223,9 @@ public class Opciones extends JAccessibilityDialog {
             }
         });
         cancelar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(cancelar);
+        }
         
         
         // Panel en donde se insertan los botones maximizar, aceptar y cancelar

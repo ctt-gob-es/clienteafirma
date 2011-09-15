@@ -16,6 +16,7 @@ import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 /**
  * Panel con la configuraci&oacute;n de contexto de las firmas de la interfaz.
@@ -84,6 +85,9 @@ public class ContextOptionsPane {
 			Caret caret = new ConfigureCaret();
 			campoMotivo.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoMotivo);
+        }
         contextPanel.add(campoMotivo, c2);
         
         //Relación entre etiqueta y campo de texto
@@ -111,6 +115,9 @@ public class ContextOptionsPane {
 			Caret caret = new ConfigureCaret();
 			campoLugar.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoLugar);
+        }
         contextPanel.add(campoLugar, c2);
         
         //Relación entre etiqueta y campo de texto
@@ -137,6 +144,9 @@ public class ContextOptionsPane {
 			Caret caret = new ConfigureCaret();
 			campoDatos.setCaret(caret);
 		}
+        if (GeneralConfig.isRemarked()){
+        	Utils.remarcar(campoDatos);
+        }
         contextPanel.add(campoDatos, c2);
         
         //Relación entre etiqueta y campo de texto
