@@ -37,6 +37,7 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.TitledBorder;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 
@@ -234,7 +235,12 @@ public class Utils {
 				component.setBackground(Color.WHITE);
 			} else if(component instanceof JCheckBox) {
 				component.setForeground(Color.WHITE);
-			} else{
+			} else if(component instanceof JPanel){
+				if (((TitledBorder)component.getBorder()).getTitle()!=null){
+					((TitledBorder)component.getBorder()).setTitleColor(Color.WHITE);
+				}
+			}
+			else{
 				component.setForeground(Color.WHITE);
 				component.setBackground(Color.BLACK);
 			}

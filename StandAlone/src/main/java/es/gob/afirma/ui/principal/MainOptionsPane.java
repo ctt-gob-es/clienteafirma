@@ -1,5 +1,6 @@
 package es.gob.afirma.ui.principal;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -18,6 +19,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
 
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
@@ -89,6 +91,7 @@ public class MainOptionsPane {
     	// Panel general
     	JPanel generalPanel = new JPanel(new GridBagLayout());
     	generalPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.general"))); // NOI18N
+    	Utils.setContrastColor(generalPanel);
 
     	GridBagConstraints c2 = new GridBagConstraints();
         c2.fill = GridBagConstraints.HORIZONTAL;
@@ -106,6 +109,7 @@ public class MainOptionsPane {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkHabilitar);
         }
+        Utils.setContrastColor(checkHabilitar);
         generalPanel.add(checkHabilitar, c2);
         
         panel.add(generalPanel, c);
@@ -114,6 +118,8 @@ public class MainOptionsPane {
         // Panel criptografï¿½a
         JPanel criptografiaPanel = new JPanel(new GridBagLayout());
         criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
+        Utils.setContrastColor(criptografiaPanel);
+        
 
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(4, 13, 0, 13);
@@ -122,6 +128,7 @@ public class MainOptionsPane {
         
         // Etiqueta algoritmo de huella digital
         JLabel etiquetaAlgoritmo = new JLabel(Messages.getString("Opciones.criptografia.algoritmo.parte"));
+        Utils.setContrastColor(etiquetaAlgoritmo);
         criptografiaPanel.add(etiquetaAlgoritmo, c2);
         
         c2.insets = new Insets(5, 13, 0, 13);
@@ -138,6 +145,7 @@ public class MainOptionsPane {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(comboAlgoritmo);
         }
+        Utils.setContrastColor(comboAlgoritmo);
         criptografiaPanel.add(comboAlgoritmo, c2);
         
         //Relación entre etiqueta y combo
@@ -158,6 +166,7 @@ public class MainOptionsPane {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkXML);
         }
+        Utils.setContrastColor(checkXML);
         criptografiaPanel.add(checkXML, c2);
         c.weighty = 0.3;
         c.fill = GridBagConstraints.BOTH;
@@ -169,6 +178,7 @@ public class MainOptionsPane {
      // Panel Politica de firma
     	JPanel policyPanel = new JPanel(new GridBagLayout());
     	policyPanel.setBorder(BorderFactory.createTitledBorder("Pol\u00EDtica de firma")); // NOI18N
+    	Utils.setContrastColor(policyPanel);
 
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(5, 13, 0, 13);
@@ -182,12 +192,14 @@ public class MainOptionsPane {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkAddPolicy);
         }
+        Utils.setContrastColor(checkAddPolicy);
         
         policyPanel.add(checkAddPolicy, c2);
         c2.gridy = c2.gridy + 1; 
         
         final JLabel policyOidLabel = new JLabel("Identificador de la pol\u00EDtica de firma (OID):");
         policyOidLabel.setEnabled(false);
+        Utils.setContrastColor(policyOidLabel);
         policyPanel.add(policyOidLabel, c2);
         c2.gridy = c2.gridy + 1;
         
@@ -196,6 +208,7 @@ public class MainOptionsPane {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(textPolicyOid);
         }
+        Utils.setContrastColor(textPolicyOid);
         
         //Relación entre etiqueta y campo de texto
         policyOidLabel.setLabelFor(textPolicyOid);
@@ -205,6 +218,7 @@ public class MainOptionsPane {
         
         final JLabel policyUrlLabel = new JLabel("Ruta de la pol\u00EDtica de firma (URL):");
         policyUrlLabel.setEnabled(false);
+        Utils.setContrastColor(policyUrlLabel);
         policyPanel.add(policyUrlLabel, c2);
         c2.gridy = c2.gridy + 1;
         
@@ -213,6 +227,7 @@ public class MainOptionsPane {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(textPolicyUrl);
         }
+        Utils.setContrastColor(textPolicyUrl);
         
         //Relación entre etiqueta y campo de texto
         policyUrlLabel.setLabelFor(textPolicyUrl);

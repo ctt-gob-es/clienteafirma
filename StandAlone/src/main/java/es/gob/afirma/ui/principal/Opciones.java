@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 import java.util.Properties;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -121,7 +122,6 @@ public class Opciones extends JAccessibilityDialog {
         		null,
         		mainOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.general"));
-
         mainOptions.loadConfig(GeneralConfig.getConfig());
         
         contextOptions =  new ContextOptionsPane();
@@ -142,6 +142,7 @@ public class Opciones extends JAccessibilityDialog {
         		Messages.getString("Opciones.accesibilidadTip"));
         
         accessibilityOptions.loadConfig(GeneralConfig.getConfig());
+        Utils.setContrastColor(mainPanel);
         
         // Definicion de mnem�nicos.
         int tabNum = 0;
@@ -185,6 +186,7 @@ public class Opciones extends JAccessibilityDialog {
 	    if (GeneralConfig.isRemarked()){
         	Utils.remarcar(maximizar);
         }
+	    Utils.setContrastColor(maximizar);
 		
 	    //Espacio entre botones
 		Panel panelVacio = new Panel();
@@ -213,6 +215,7 @@ public class Opciones extends JAccessibilityDialog {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(aceptar);
         }
+        Utils.setContrastColor(aceptar);
         
         // Boton cancelar
         JButton	cancelar = new JButton();
@@ -227,6 +230,7 @@ public class Opciones extends JAccessibilityDialog {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(cancelar);
         }
+        Utils.setContrastColor(cancelar);
         
         
         // Panel en donde se insertan los botones maximizar, aceptar y cancelar
