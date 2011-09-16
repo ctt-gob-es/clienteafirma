@@ -10,7 +10,6 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -82,6 +81,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	private int actualWidth = -1;
 	
 	private int actualHeight = -1;
+	
+	private JMenuBar menu;
 	
 	public static JStatusBar bar = new JStatusBar();
 	private JTabbedPane panelPest = null;
@@ -157,13 +158,11 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		getContentPane().add(panelPest, BorderLayout.CENTER);
 
 		// Menu
-		JMenuBar menu = new JMenuBar();
+		menu = new JMenuBar();
 		// Menu de herramientas
-		JMenu herramientas = generarMenuHerramientas();
-		menu.add(herramientas);
+		generarMenuHerramientas();
 		// Menu de ayuda
-		JMenu ayuda = generarMenuAyuda();
-		menu.add(ayuda);
+		generarMenuAyuda();		
 		
 		setJMenuBar(menu);
 		
@@ -198,13 +197,15 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Genera el menu Herramientas con los submenus Opciones, Idiomas, Salir.
 	 * @return	Menu de herramientas
 	 */
-	private JMenu generarMenuHerramientas() {
+	public JMenu generarMenuHerramientas() {
+		menu.removeAll();
 		// Opcion del menu principal - Herramientas
 		JMenu herramientas = new JMenu();
 		herramientas.setMnemonic(KeyEvent.VK_S);
 		herramientas.setText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
 		herramientas.setToolTipText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
 		Utils.setContrastColor(herramientas);
+		menu.add(herramientas);
 		
 		// Subopcion menu Herramientas - Opciones
 		JMenuItem opciones = new JMenuItem();
@@ -215,6 +216,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				opcionesActionPerformed();
 			}
 		});
+		Utils.setContrastColor(opciones);
 		herramientas.add(opciones);
 
 		// Subopcion menu Herramientas - Idiomas
@@ -267,6 +269,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				//Se asigna un mnemónico que no haya sido utilizado
 				opcionIdioma.setMnemonic(Utils.getLanguageMnemonic(mnemonicList, languageName.toLowerCase()));
 				
+				Utils.setContrastColor(opcionIdioma);
 				menuIdioma.add(opcionIdioma);
 				grupo.add(opcionIdioma);
 
@@ -282,6 +285,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				});
 			}
 
+		Utils.setContrastColor(menuIdioma);
 		herramientas.add(menuIdioma);
 
 		
@@ -298,6 +302,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				salirActionPerformed();
 			}
 		});
+		Utils.setContrastColor(salir);
 		herramientas.add(salir);
 		
 		return herramientas;
@@ -307,12 +312,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Genera el menu de ayuda con las opciones Ayuda, Acerca de.
 	 * @return	Menu de ayuda
 	 */
-	private JMenu generarMenuAyuda() {
+	public JMenu generarMenuAyuda() {
 		// Opcion del menu principal - Ayuda
 		JMenu ayuda = new JMenu();
 		ayuda.setMnemonic(KeyEvent.VK_Y);
 		ayuda.setText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N
 		ayuda.setToolTipText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N
+		Utils.setContrastColor(ayuda);
+		menu.add(ayuda);
 
 		// Subopcion menu Ayuda - Ayuda
 		JMenuItem ayudaHTML = new JMenuItem();
@@ -323,6 +330,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				ayudaHTMLActionPerformed();
 			}
 		});
+		Utils.setContrastColor(ayudaHTML);
 		ayuda.add(ayudaHTML);
 		
 		// Subopcion menu Ayuda - Acerca de
@@ -335,6 +343,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			}
 		});
 
+		Utils.setContrastColor(acerca);
 		ayuda.add(acerca);
 
 		return ayuda;

@@ -420,6 +420,8 @@ public class Opciones extends JAccessibilityDialog {
     	// Si se ha cambiado la vista de simple a avanzada o viceversa reconstruimos la interfaz
     	if (needUpdateGUI && mainGui != null) {
     		mainGui.crearPaneles();
+    		mainGui.generarMenuHerramientas();
+    		mainGui.generarMenuAyuda();
     	}
     	
     	// Cerramos la pantalla
