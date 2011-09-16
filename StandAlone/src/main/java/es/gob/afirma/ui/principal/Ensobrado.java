@@ -73,6 +73,7 @@ public class Ensobrado extends JPanel {
         // Etiqueta fichero a ensobrar digitalmente
         JLabel etiquetaFichero = new JLabel();
         etiquetaFichero.setText(Messages.getString("Ensobrado.buscar")); // NOI18N
+        Utils.setContrastColor(etiquetaFichero);
 		add(etiquetaFichero, c);
 		
 		c.insets = new Insets(0, 13, 0, 0);
@@ -121,6 +122,7 @@ public class Ensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(examinar);
         }
+        Utils.setContrastColor(examinar);
 		add(examinar, c);
 		
 		c.insets = new Insets(5, 13, 0, 13);
@@ -149,6 +151,7 @@ public class Ensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkAnadir);
         }
+        Utils.setContrastColor(checkAnadir);
         add(checkAnadir, c);
 
         c.insets = new Insets(13, 13, 0, 13);
@@ -157,6 +160,7 @@ public class Ensobrado extends JPanel {
         // Etiqueta almacen o repositorio
         JLabel etiquetaOpciones = new JLabel();
         etiquetaOpciones.setText(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
+        Utils.setContrastColor(etiquetaOpciones);
         add(etiquetaOpciones, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -174,6 +178,7 @@ public class Ensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(comboTipos);
         }
+        Utils.setContrastColor(comboTipos);
         add(comboTipos, c);
         
       //Relación entre etiqueta y combo
@@ -219,6 +224,7 @@ public class Ensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(generar);
         }
+        Utils.setContrastColor(generar);
         
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(generar, BorderLayout.CENTER);

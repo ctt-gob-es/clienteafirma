@@ -28,11 +28,17 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.MetalTheme;
 
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
@@ -108,9 +114,8 @@ public class Utils {
 	/**
 	 * Configura el formato del remarcado del componente al ser seleccionado.
 	 * @param component El componente seleccionado.
-	 * @return JComponent El componente con el remarcado configurado.
 	 */
-	public static JComponent remarcar(JComponent component){
+	public static void remarcar(JComponent component){
 		if (component instanceof JButton){
 			final JButton button = (JButton) component;
 			button.addFocusListener(new FocusListener() {
@@ -221,6 +226,19 @@ public class Utils {
 				}
 			});
 		}
-		return component;
 	}
+	
+	public static void setContrastColor (JComponent component){
+		if (GeneralConfig.isHighContrast()){
+			if (component instanceof JComboBox){
+				component.setBackground(Color.WHITE);
+			} else if(component instanceof JCheckBox) {
+				component.setForeground(Color.WHITE);
+			} else{
+				component.setForeground(Color.WHITE);
+				component.setBackground(Color.BLACK);
+			}
+		}
+	}
+		
 }

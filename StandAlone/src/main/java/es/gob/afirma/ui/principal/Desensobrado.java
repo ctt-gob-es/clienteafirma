@@ -91,6 +91,7 @@ public class Desensobrado extends JPanel {
     	// Etiqueta sobre digital a abrir
     	JLabel etiquetaFichero = new JLabel();
     	etiquetaFichero.setText(Messages.getString("Desensobrado.buscar")); // NOI18N
+    	Utils.setContrastColor(etiquetaFichero);
 		add(etiquetaFichero, c);
 		
 		c.insets = new Insets(0, 13, 0, 0);
@@ -139,6 +140,7 @@ public class Desensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(examinar);
         }
+        Utils.setContrastColor(examinar);
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -150,6 +152,7 @@ public class Desensobrado extends JPanel {
         // Etiqueta almacen o repositorio
         JLabel etiquetaAlmacen = new JLabel();
         etiquetaAlmacen.setText(Messages.getString("Desensobrado.almacen")); // NOI18N
+        Utils.setContrastColor(etiquetaAlmacen);
         add(etiquetaAlmacen, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -168,6 +171,7 @@ public class Desensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(comboAlmacen);
         }
+        Utils.setContrastColor(comboAlmacen);
         add(comboAlmacen, c);
         
         //Relación entre etiqueta y combo
@@ -184,6 +188,7 @@ public class Desensobrado extends JPanel {
         // Etiqueta con las opciones de apertura
         JLabel etiquetaOpciones = new JLabel();
         etiquetaOpciones.setText(Messages.getString("Desensobrado.opciones")); // NOI18N
+        Utils.setContrastColor(etiquetaOpciones);
         add(etiquetaOpciones, c);
         
 		c.insets = new Insets(0, 13, 0, 13);
@@ -201,6 +206,7 @@ public class Desensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkInicar);
         }
+        Utils.setContrastColor(checkInicar);
         add(checkInicar, c);
 		
 		c.weighty = 1.0;
@@ -239,6 +245,7 @@ public class Desensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(extraer);
         }
+        Utils.setContrastColor(extraer);
         
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(extraer, BorderLayout.CENTER);

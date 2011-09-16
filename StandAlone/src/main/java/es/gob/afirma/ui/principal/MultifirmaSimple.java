@@ -61,6 +61,7 @@ public class MultifirmaSimple extends JPanel {
 		// Etiqueta almacen / repositorio de certificados
 		JLabel etiquetaAlmacen = new JLabel();
 		etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N
+		Utils.setContrastColor(etiquetaAlmacen);
 		add(etiquetaAlmacen, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -76,6 +77,7 @@ public class MultifirmaSimple extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(comboAlmacen);
 		}
+		Utils.setContrastColor(comboAlmacen);
 		cargarComboAlmacen(comboAlmacen);
 		add(comboAlmacen, c);
 		
@@ -113,6 +115,7 @@ public class MultifirmaSimple extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(cofirma);
 		}
+		Utils.setContrastColor(cofirma);
 		panelTipos.add(cofirma);
 
 		// Radiobutton contrafirma
@@ -134,6 +137,7 @@ public class MultifirmaSimple extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(contrafirma);
 		}
+		Utils.setContrastColor(contrafirma);
 
 		panelTipos.add(contrafirma);
 		
@@ -178,6 +182,7 @@ public class MultifirmaSimple extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(firmar);
 		}
+		Utils.setContrastColor(firmar);
 		
 		cons.ipadx = 0;
 		cons.gridx = 1;

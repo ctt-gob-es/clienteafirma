@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -43,14 +44,19 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.MetalTheme;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.HighContrastTheme;
 import es.gob.afirma.ui.utils.JAccessibilityFrame;
 import es.gob.afirma.ui.utils.JStatusBar;
 import es.gob.afirma.ui.utils.Messages;
@@ -79,8 +85,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	public static JStatusBar bar = new JStatusBar();
 	private JTabbedPane panelPest = null;
-
-	//private boolean highContrast;
 	
 	@Override
 	public int getMinimumRelation(){
@@ -200,7 +204,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		herramientas.setMnemonic(KeyEvent.VK_S);
 		herramientas.setText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
 		herramientas.setToolTipText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
-
+		Utils.setContrastColor(herramientas);
+		
 		// Subopcion menu Herramientas - Opciones
 		JMenuItem opciones = new JMenuItem();
 		opciones.setText(Messages.getString("Opciones.opciones")); // NOI18N
@@ -570,7 +575,12 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		//Al repintar la pantalla principal para quitar o poner las opciones avanzadas hay que ajustar 
 		//la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
 		this.callResize();
-		//setHighContrast(true);
+		
+		if (GeneralConfig.isHighContrast()){
+			setHighContrast(true);
+		} else {
+			setHighContrast(false);
+		}
 	}
 
 	private void panelPestMouseMoved(MouseEvent evt){
@@ -647,16 +657,20 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			actualHeight = this.getHeight();
 		}
 	}
-	/*public void setHighContrast(boolean highContrast) {
-		this.highContrast = highContrast;
+	
+	/**
+	 * Activa y desactiva el visionado en alto contraste
+	 * @param highContrast Boolean que indica el estado del Alto Contraste
+	 */
+	public void setHighContrast(boolean highContrast) {
 		try {
-			if (this.highContrast) {
+			if (highContrast) {
 				MetalTheme theme = new HighContrastTheme();
 				// set the chosen theme
 
 				MetalLookAndFeel.setCurrentTheme(theme);
 
-				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");	
 
 			} else {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -674,5 +688,5 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 		this.validate();
 		this.repaint();
-	}*/
+	}
 }

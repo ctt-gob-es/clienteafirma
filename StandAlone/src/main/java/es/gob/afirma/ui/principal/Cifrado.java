@@ -103,6 +103,7 @@ public class Cifrado extends JPanel {
 		JLabel etiquetaFichero = new JLabel();
 		etiquetaFichero.setText(Messages.getString("Cifrado.buscar")); // NOI18N
 		etiquetaFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.description")); // NOI18N
+		Utils.setContrastColor(etiquetaFichero);
 		add(etiquetaFichero, c);
 		
 		c.insets = new Insets(0, 13, 0, 0);
@@ -150,6 +151,7 @@ public class Cifrado extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(examinar);
 		}
+		Utils.setContrastColor(examinar);
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -161,6 +163,7 @@ public class Cifrado extends JPanel {
 		// Etiqueta mecanismo cifrado
 		JLabel etiquetaMecanismo = new JLabel();
 		etiquetaMecanismo.setText(Messages.getString("Cifrado.origen.clave")); // NOI18N
+		Utils.setContrastColor(etiquetaMecanismo);
 		add(etiquetaMecanismo, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -185,6 +188,7 @@ public class Cifrado extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(comboMecanismo);
 		}
+		Utils.setContrastColor(comboMecanismo);
 		add(comboMecanismo, c);
 		
 		// En la vista simple, no se permitirá configurar el origen de la clave
@@ -209,6 +213,7 @@ public class Cifrado extends JPanel {
 		JLabel etiquetaAlgoritmo = new JLabel();
 		etiquetaAlgoritmo.setText(Messages.getString("Cifrado.formato")); // NOI18N
 		etiquetaAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.description")); // NOI18N
+		Utils.setContrastColor(etiquetaAlgoritmo);
 		add(etiquetaAlgoritmo, c);
 		
 		c.insets = new Insets(0, 13, 0, 13);
@@ -226,6 +231,7 @@ public class Cifrado extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(comboAlgoritmo);
 		}
+		Utils.setContrastColor(comboAlgoritmo);
 		add(comboAlgoritmo, c);
 		
 		// En la vista simple, no se permitirá configurar el algoritmo de cifrado
@@ -277,6 +283,7 @@ public class Cifrado extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(cifrar);
 		}
+		Utils.setContrastColor(cifrar);
 		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(cifrar, BorderLayout.CENTER);

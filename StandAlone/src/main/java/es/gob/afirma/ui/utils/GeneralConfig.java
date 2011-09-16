@@ -84,6 +84,14 @@ public class GeneralConfig {
 		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false"));
 	}
 	
+	/**
+	 * Indica si el ususario ha activado o desactivado la opcion de alto contraste
+	 * @return boolean Indicando el estado de la opcion
+	 */
+	public static boolean isHighContrast() {
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, "false"));
+	}
+	
 	public static void setOption(String optionKey, String optionValue) {
 		configOptions.setProperty(optionKey, optionValue);
 	}

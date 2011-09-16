@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -117,6 +118,7 @@ public class Firma extends JPanel {
 		JLabel etiquetaFichero = new JLabel();
 		etiquetaFichero.setText(Messages.getString("Firma.buscar")); // NOI18N
 		etiquetaFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.description")); // NOI18N
+		Utils.setContrastColor(etiquetaFichero);
 		add(etiquetaFichero, c);
 		
 		c.insets = new Insets(0, 13, 0, 0);
@@ -168,6 +170,7 @@ public class Firma extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(examinar);
 		}
+		Utils.setContrastColor(examinar);
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -179,6 +182,7 @@ public class Firma extends JPanel {
 		// Etiqueta para el Almacen / repositorio
 		JLabel etiquetaAlmacen = new JLabel();
 		etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N
+		Utils.setContrastColor(etiquetaAlmacen);
 		add(etiquetaAlmacen, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -198,6 +202,7 @@ public class Firma extends JPanel {
 			Utils.remarcar(comboAlmacen);
 		}
 		cargarComboAlmacen(comboAlmacen);
+		Utils.setContrastColor(comboAlmacen);
 		add(comboAlmacen, c);
 		
 		//Relación entre etiqueta y combo
@@ -214,6 +219,7 @@ public class Firma extends JPanel {
 		// Etiqueta formato / formato
 		JLabel etiquetaFormato = new JLabel();
 		etiquetaFormato.setText(Messages.getString("Firma.formato")); // NOI18N
+		Utils.setContrastColor(etiquetaFormato);
 		add(etiquetaFormato, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -247,6 +253,7 @@ public class Firma extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(comboFormato);
 		}
+		Utils.setContrastColor(comboFormato);
 		add(comboFormato, c);
 		
 		//Relación entre etiqueta y combo
@@ -290,6 +297,7 @@ public class Firma extends JPanel {
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(firmar);
 		}
+		Utils.setContrastColor(firmar);
 		
 		cons.ipadx = 0;
 		cons.gridx = 1;

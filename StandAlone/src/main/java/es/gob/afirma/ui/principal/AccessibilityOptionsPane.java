@@ -86,7 +86,7 @@ public class AccessibilityOptionsPane {
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         checkFontSize.setSelected(GeneralConfig.isAvanzados()); 
         checkFontSize.setBounds(12, 20, 340, 23);
-        checkFontSize.setMnemonic(KeyEvent.VK_R); // Asignación de mnemónico al checkbox
+        checkFontSize.setMnemonic(KeyEvent.VK_D); // Asignación de mnemónico al checkbox
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkFontSize);
         }
@@ -194,7 +194,7 @@ public class AccessibilityOptionsPane {
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         checkCursorSize.setSelected(GeneralConfig.isAvanzados()); 
         checkCursorSize.setBounds(12, 20, 340, 23);
-        checkCursorSize.setMnemonic(KeyEvent.VK_R); // Asignación de mnemónico al checkbox
+        checkCursorSize.setMnemonic(KeyEvent.VK_E); // Asignación de mnemónico al checkbox
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkCursorSize);
         }
@@ -213,6 +213,7 @@ public class AccessibilityOptionsPane {
         
         //Boton Valores por defecto
         valores.setText("Valores por defecto");
+        valores.setMnemonic(KeyEvent.VK_O);
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(valores);
         }
@@ -220,6 +221,7 @@ public class AccessibilityOptionsPane {
         
         //Boton guardar
         guardar.setText("Guardar");
+        guardar.setMnemonic(KeyEvent.VK_U);
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(guardar);
         }
@@ -227,6 +229,7 @@ public class AccessibilityOptionsPane {
         
         //Boton cancelar
         cargar.setText("Cargar");
+        cargar.setMnemonic(KeyEvent.VK_R);
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(cargar);
         }
