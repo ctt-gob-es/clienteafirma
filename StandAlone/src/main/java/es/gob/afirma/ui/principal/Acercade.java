@@ -28,6 +28,7 @@ import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 import es.gob.afirma.ui.wizardcifradocontrasenia.PanelContrasenia;
 
@@ -85,6 +86,7 @@ public class Acercade extends JFrame {
 		versionInterfaz.setText(Messages.getString("version.interfaz") + "  " + Main.VERSION); // NOI18N
 		versionInterfaz.setBorder(null);
 		versionInterfaz.setEditable(false); //Para que no sea editable
+		Utils.setContrastColor(versionInterfaz);
 		getContentPane().add(versionInterfaz, c);
 		
 		c.insets = new Insets(5, 20, 0, 20);
@@ -95,6 +97,7 @@ public class Acercade extends JFrame {
 		version.setText(Messages.getString("version") + "  " + getVersion()); // NOI18N
 		version.setBorder(null);
 		version.setEditable(false); //Para que no sea editable
+		Utils.setContrastColor(version);
 		getContentPane().add(version, c);
 
 		c.insets = new Insets(15, 20, 0, 20);
@@ -121,6 +124,7 @@ public class Acercade extends JFrame {
 				aceptarActionPerformed();
 			}
 		});
+		Utils.setContrastColor(aceptar);
 		getContentPane().add(aceptar, c);
 	}
 
