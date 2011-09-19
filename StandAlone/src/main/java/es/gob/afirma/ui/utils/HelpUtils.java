@@ -102,11 +102,11 @@ public class HelpUtils {
 	/**
 	 * Activa el acceso a la ventana de ayuda por la pulsacion de una tecla
 	 * @param component	Componente que se va a mostrar al pulsar la tecla
-	 * @param key		Tecla que se debe pulsar para mostrar la ventana
+	 * @param id Identificador de la entrada de la ayuda a la que se desea acceder.
 	 */
-	public static void enableHelpKey(Component component, String key) {
-		components.put(key, component);
-		getHelp().enableHelpKey(component, key, helpset);
+	public static void enableHelpKey(Component component, String id) {
+		components.put(id, component);
+		getHelp().enableHelpKey(component, id, helpset);
 	}	
 	
 	/**
