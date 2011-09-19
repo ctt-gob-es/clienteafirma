@@ -49,7 +49,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
-import es.gob.afirma.massive.DirectorySignatureHelper.MassiveType;
+import es.gob.afirma.massive.MassiveType;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.DirectorySignatureHelperAdv;
 import es.gob.afirma.ui.utils.GeneralConfig;
