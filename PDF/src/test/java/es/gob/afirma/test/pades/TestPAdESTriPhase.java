@@ -121,7 +121,7 @@ public class TestPAdESTriPhase {
                 file +
                 "'"; //$NON-NLS-1$
                 
-                System.out.println(prueba);
+                Logger.getLogger("es.gob.afirma").info(prueba); //$NON-NLS-1$
                 
                 byte[] result = sign(testPdf, algo, pke, p1);
                 
@@ -150,7 +150,7 @@ public class TestPAdESTriPhase {
                 os.write(result);
                 os.flush();
                 os.close();
-                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+                Logger.getLogger("es.gob.afirma").info("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
                 
             }
                 

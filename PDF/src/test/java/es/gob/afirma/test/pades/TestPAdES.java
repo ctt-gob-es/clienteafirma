@@ -89,7 +89,7 @@ public class TestPAdES {
     
         final String prueba = "Firma PAdES de PDF con contrasena en SHA512withRSA"; //$NON-NLS-1$
         
-        System.out.println(prueba);
+        Logger.getLogger("es.gob.afirma").info(prueba); //$NON-NLS-1$
         
         final Properties extraParams = new Properties();
         extraParams.put("headLess", "true"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -141,7 +141,7 @@ public class TestPAdES {
                     file +
                     "'"; //$NON-NLS-1$
                     
-                    System.out.println(prueba);
+                    Logger.getLogger("es.gob.afirma").info(prueba); //$NON-NLS-1$
                     
                     byte[] result = signer.sign(testPdf, algo, pke, extraParams);
                     
@@ -170,7 +170,7 @@ public class TestPAdES {
                     os.write(result);
                     os.flush();
                     os.close();
-                    System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
+                    Logger.getLogger("es.gob.afirma").info("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$
                     
                 }
                 
@@ -201,7 +201,7 @@ public class TestPAdES {
     
         final String prueba = "Firma PAdES de PDF certificado en SHA512withRSA"; //$NON-NLS-1$
         
-        System.out.println(prueba);
+        Logger.getLogger("es.gob.afirma").info(prueba);
         
         Properties extraParams = new Properties();
         extraParams.put("allowSigningCertifiedPdfs", "true"); //$NON-NLS-1$ //$NON-NLS-2$

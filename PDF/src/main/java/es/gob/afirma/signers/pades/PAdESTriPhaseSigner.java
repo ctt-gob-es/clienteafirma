@@ -149,8 +149,6 @@ public class PAdESTriPhaseSigner {
                     final byte[] signedAttributes,
                     final String fileID) throws AOException, IOException {
         
-        System.out.println(new String(Base64.encode(signedAttributes)));
-        
         final byte[] completeCAdESSignature = CAdESTriPhaseSigner.postSign(digestAlgorithmName, null, signerCertificateChain, signature, signedAttributes);
         final byte[] outc = new byte[CSIZE];
 
