@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.wizardmultifirmamasiva;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -86,6 +87,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     	
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.pagina2.titulo", "Wizard.multifirma.pagina2.titulo.explicacion", null, true);
+        Utils.setContrastColor(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		
         // Panel central
@@ -114,6 +116,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkRespectar);
         }
+        Utils.setContrastColor(checkRespectar);
         panelCentral.add(checkRespectar, c);
         
         c.gridy = 2;
@@ -125,7 +128,8 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 		c.gridy = 3;
     	
     	// Panel que engloba los radiobuttons
-    	panelRadios.setBorder(BorderFactory.createTitledBorder(Messages.getString("Wizard.multifirma.ventana2.panel"))); 
+    	panelRadios.setBorder(BorderFactory.createTitledBorder(Messages.getString("Wizard.multifirma.ventana2.panel")));
+    	Utils.setContrastColor(panelRadios);
     	panelRadios.setLayout(new GridBagLayout());
     	
     	GridBagConstraints cons = new GridBagConstraints();
@@ -142,6 +146,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(radioTodos);
         }
+        Utils.setContrastColor(radioTodos);
         panelRadios.add(radioTodos, cons);
         
         cons.gridy = 1;
@@ -154,6 +159,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(radioUltimos);
         }
+        Utils.setContrastColor(radioUltimos);
         panelRadios.add(radioUltimos, cons);
         
         // Grupo de radiobuttons

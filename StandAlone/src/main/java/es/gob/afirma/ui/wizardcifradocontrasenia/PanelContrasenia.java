@@ -105,6 +105,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
     	
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null, true);
+        Utils.setContrastColor(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
         
     	// Panel central
@@ -129,6 +130,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Introduzca una contrasenia"
         JLabel etiquetaContrasenia = new JLabel();
         etiquetaContrasenia.setText(Messages.getString("WizardCifrado.contrasenia")); // NOI18N
+        Utils.setContrastColor(etiquetaContrasenia);
         panelCentral.add(etiquetaContrasenia, c);
         
         c.gridy = 2;
@@ -144,6 +146,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(campoContrasenia);
         }
+        Utils.setContrastColor(campoContrasenia);
         panelCentral.add(campoContrasenia, c);
         
         //Relación entre etiqueta y campo de contraseña
@@ -157,6 +160,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Introduzca de nuevo..."
         JLabel etiquetaContraseniaRep = new JLabel();
         etiquetaContraseniaRep.setText(Messages.getString("WizardCifrado.recontrasenia")); // NOI18N
+        Utils.setContrastColor(etiquetaContraseniaRep);
         panelCentral.add(etiquetaContraseniaRep, c);
         
         c.gridy = 4;
@@ -172,6 +176,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(campoContraseniaRep);
         }
+        Utils.setContrastColor(campoContraseniaRep);
         panelCentral.add(campoContraseniaRep, c);
         
         //Relación entre etiqueta y campo de contraseña

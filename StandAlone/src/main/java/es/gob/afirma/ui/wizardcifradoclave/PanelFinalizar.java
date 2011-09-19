@@ -76,6 +76,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
         JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
         panelCentral.setLayout(new GridBagLayout());
+        Utils.setContrastColor(panelCentral);
     	
         // Etiqueta felicidades
     	JLabel etiqueta = new JLabel(Messages.getString("Wizard.sobres.final1")); // NOI18N
@@ -83,6 +84,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
     	if (GeneralConfig.isRemarked()){
         	Utils.remarcar(etiqueta);
         }
+    	Utils.setContrastColor(etiqueta);
     	panelCentral.add(etiqueta, c);
     	
     	c.weighty = 1.0;

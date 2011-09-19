@@ -101,6 +101,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
     	
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardDescifrado.contrasenia.explicacion.titulo", "WizardDescifrado.contrasenia.explicacion", null, true);
+        Utils.setContrastColor(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
         
     	// Panel central
@@ -126,6 +127,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		 
 		//Etiqueta con el texto Contraseña de descifrado
     	JLabel passwordLabel = new JLabel (Messages.getString("WizardDescifrado.contrasenia"));
+    	Utils.setContrastColor(passwordLabel);
     	panelCentral.add(passwordLabel, c);
     	
     	 c.insets = new Insets(0, 20, 0, 20);
@@ -144,6 +146,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	     if (GeneralConfig.isRemarked()){
 	        	Utils.remarcar(campoContrasenia);
 	        }
+	     Utils.setContrastColor(campoContrasenia);
 	     panelCentral.add(this.campoContrasenia, c);
     	
         //Relación entre etiqueta y campo de texto

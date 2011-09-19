@@ -9,6 +9,8 @@
  */
 package es.gob.afirma.ui.wizardUtils;
 
+import java.awt.Color;
+
 import javax.swing.JTextPane;
 
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -41,6 +43,7 @@ public class PanelesTexto {
         if(GeneralConfig.isRemarked()){
         	Utils.remarcar(bloqueTexto);
         }
+        Utils.setContrastColor(bloqueTexto);
         
         return bloqueTexto;
 	}

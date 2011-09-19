@@ -90,6 +90,7 @@ public class BotoneraInferior extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(maximizar);
         }
+        Utils.setContrastColor(maximizar);
         add(maximizar);
         
         //Espacio entre botones
@@ -114,6 +115,7 @@ public class BotoneraInferior extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(anterior);
         }
+        Utils.setContrastColor(anterior);
        
         add(anterior);
         
@@ -133,6 +135,7 @@ public class BotoneraInferior extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(siguiente);
         }
+        Utils.setContrastColor(siguiente);
         add(siguiente);
 
         // Espacio entre botones
@@ -157,6 +160,7 @@ public class BotoneraInferior extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(cancelar);
         }
+        Utils.setContrastColor(cancelar);
         add(cancelar);
 
         // Boton finalizar
@@ -176,6 +180,7 @@ public class BotoneraInferior extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(finalizar);
         }
+        Utils.setContrastColor(finalizar);
         add(finalizar);
 	}
 

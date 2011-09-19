@@ -235,10 +235,20 @@ public class Utils {
 				component.setBackground(Color.WHITE);
 			} else if(component instanceof JCheckBox) {
 				component.setForeground(Color.WHITE);
+			} else if(component instanceof JTree){
+				component.setForeground(Color.WHITE);
+			} else if(component instanceof JList){
+				component.setForeground(Color.WHITE);
 			} else if(component instanceof JPanel){
-				if (((TitledBorder)component.getBorder()).getTitle()!=null){
-					((TitledBorder)component.getBorder()).setTitleColor(Color.WHITE);
+				if (component.getBorder()!=null){
+					if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){
+						if (((TitledBorder)component.getBorder())!=null){
+							((TitledBorder)component.getBorder()).setTitleColor(Color.WHITE);
+						}
+					}
 				}
+				component.setForeground(Color.WHITE);
+				component.setBackground(Color.BLACK);
 			}
 			else{
 				component.setForeground(Color.WHITE);

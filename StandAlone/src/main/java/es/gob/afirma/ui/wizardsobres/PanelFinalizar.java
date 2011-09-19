@@ -69,6 +69,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
         JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
         panelCentral.setLayout(new GridBagLayout());
+        Utils.setContrastColor(panelCentral);
     	
         // Configuramos el layout
         GridBagConstraints c = new GridBagConstraints();
@@ -83,6 +84,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
     	if (GeneralConfig.isRemarked()){
         	Utils.remarcar(etiqueta);
         }
+    	Utils.setContrastColor(etiqueta);
     	panelCentral.add(etiqueta, c);
     	
     	// Panel con el texto "El sobre digital..."

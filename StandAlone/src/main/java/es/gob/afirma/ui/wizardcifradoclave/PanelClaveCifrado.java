@@ -119,6 +119,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.explicacion.titulo", "WizardCifrado.explicacion", null, true);
+        Utils.setContrastColor(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
         
     	// Panel central
@@ -145,6 +146,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	
     	//Etiqueta con el texto Clave de cifrado
     	JLabel encodeKeyLabel = new JLabel (Messages.getString("WizardCifrado.claveCifrado"));
+    	Utils.setContrastColor(encodeKeyLabel);
     	panelCentral.add(encodeKeyLabel, c);
         
     	c.fill = GridBagConstraints.HORIZONTAL;
@@ -168,6 +170,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(campoClave);
         }
+        Utils.setContrastColor(campoClave);
         panelCentral.add(campoClave, c);
         
         //Relación entre etiqueta y campo de texto
@@ -193,6 +196,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(autogenerar);
         }
+        Utils.setContrastColor(autogenerar);
         panelCentral.add(autogenerar, c);
         
         c.insets = new Insets(0, 10, 0, 20);
@@ -213,6 +217,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         if(GeneralConfig.isRemarked()){
         	Utils.remarcar(almacen);
         }
+        Utils.setContrastColor(almacen);
         panelCentral.add(almacen, c);
         
 		c.insets = new Insets(10, 20, 0, 20);
@@ -229,6 +234,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         if(GeneralConfig.isRemarked()){
         	Utils.remarcar(checkGuardar);
         }
+        Utils.setContrastColor(checkGuardar);
         panelCentral.add(checkGuardar, c);
 
         c.fill = GridBagConstraints.BOTH;

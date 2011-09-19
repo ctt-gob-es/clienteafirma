@@ -215,6 +215,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		// Panel con la cabecera
 		CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana2.titulo", 
 				"Wizard.multifirma.simple.contrafirma.ventana2.titulo.description", null, true);
+		Utils.setContrastColor(panelSuperior);
 		getContentPane().add(panelSuperior, BorderLayout.NORTH);
 
 		// Panel central
@@ -230,6 +231,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		// Etiqueta con el texto "Firmas que desea..."
 		JLabel etiquetaFirmas = new JLabel();
 		etiquetaFirmas.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas"));
+		Utils.setContrastColor(etiquetaFirmas);
 		panelCentral.add(etiquetaFirmas, c);
 
 		// Combo con tipos de firmas
@@ -259,6 +261,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(comboFirmas);
         }
+		Utils.setContrastColor(comboFirmas);
 		panelCentral.add(comboFirmas, c);
 		
 		 //Relación entre etiqueta y combo
@@ -272,6 +275,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
 		// Etiqueta con el texto "Arbol de firmas"
 		etiqueta.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.arbol"));
+		Utils.setContrastColor(etiqueta);
 		panelCentral.add(etiqueta, c);
 
 		/*
@@ -314,6 +318,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		if(GeneralConfig.isRemarked()){
 			Utils.remarcar(arbolFirmas);
 		}
+		Utils.setContrastColor(arbolFirmas);
 		// Panel del arbol (firmantes seleccionados)
 		panelArbol.setViewportView(arbolFirmas);
 		panelCentral.add(panelArbol, c);

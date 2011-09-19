@@ -96,6 +96,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		
 		// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.sobres.pagina1.titulo", "Wizard.sobres.pagina1.titulo.explicacion", null, true);
+        Utils.setContrastColor(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		
         // Panel central
@@ -121,6 +122,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Anadir un destinatario..."
         JLabel etiquetaAnadir = new JLabel();
         etiquetaAnadir.setText(Messages.getString("wizard.sobres.aniadir.destinatario"));
+        Utils.setContrastColor(etiquetaAnadir);
 		panelCentral.add(etiquetaAnadir, c);
 		
 		c.insets = new Insets(0, 20, 0, 0);
@@ -137,6 +139,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(comboDestinatarios);
         }
+		Utils.setContrastColor(comboDestinatarios);
 		panelCentral.add(comboDestinatarios, c);
 		
 		//Relación entre etiqueta y combo
@@ -166,6 +169,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(anadir);
         }
+		Utils.setContrastColor(anadir);
 		panelCentral.add(anadir, c);
 		
 		c.insets = new Insets(10, 20, 0, 20);
@@ -176,6 +180,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		 // Etiqueta con el texto "Destinatarios"
         JLabel destLabel = new JLabel();
         destLabel.setText(Messages.getString("wizard.sobres.listaDestinatarios"));
+        Utils.setContrastColor(destLabel);
 		panelCentral.add(destLabel, c);
 		
 		c.insets = new Insets(0, 20, 0, 20);
@@ -197,6 +202,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(listaDestinatarios);
         }
+		Utils.setContrastColor(listaDestinatarios);
 
 		panelLista.setViewportView(listaDestinatarios);
 		
@@ -231,6 +237,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(eliminar);
         }
+		Utils.setContrastColor(eliminar);
 		panelCentral.add(eliminar, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);

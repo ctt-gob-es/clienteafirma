@@ -89,6 +89,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
     	
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.ventana3.titulo", "Wizard.multifirma.ventana3.titulo.descripcion", null, true);
+        Utils.setContrastColor(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		
         // Panel central
@@ -106,6 +107,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
     	// Etiqueta con el texto "Directorio con los..."
     	JLabel etiquetaFirma = new JLabel();
     	etiquetaFirma.setText(Messages.getString("Wizard.multifirma.ventana3.directorio"));
+    	Utils.setContrastColor(etiquetaFirma);
         panelCentral.add(etiquetaFirma, c);
     	
         c.insets = new Insets(0, 20, 0, 0);
@@ -125,6 +127,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(campoDirectorio);
         }
+        Utils.setContrastColor(campoDirectorio);
         panelCentral.add(campoDirectorio, c);
         
         //Relación entre etiqueta y campo de texto
@@ -150,6 +153,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(examinar);
         }
+        Utils.setContrastColor(examinar);
         panelCentral.add(examinar, c);
         
         c.insets = new Insets(5, 20, 0, 20);
@@ -166,6 +170,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(checkIncluir);
         }
+        Utils.setContrastColor(checkIncluir);
         panelCentral.add(checkIncluir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
@@ -174,6 +179,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Aplicar solo a los..."
         JLabel etiquetaAplicar = new JLabel();
         etiquetaAplicar.setText(Messages.getString("Wizard.multifirma.ventana3.aplicar"));
+        Utils.setContrastColor(etiquetaAplicar);
         panelCentral.add(etiquetaAplicar, c);
         
         c.insets = new Insets(0, 20, 0, 20);
@@ -190,6 +196,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(campoExtensiones);
         }
+        Utils.setContrastColor(campoExtensiones);
         panelCentral.add(campoExtensiones, c);
         
         //Relación entre etiqueta y campo de texto

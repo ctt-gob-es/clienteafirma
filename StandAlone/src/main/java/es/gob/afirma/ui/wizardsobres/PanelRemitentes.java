@@ -155,6 +155,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		
 		// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.sobres.pagina2.titulo", "Wizard.sobres.pagina2.titulo.explicacion", null, true);
+        Utils.setContrastColor(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		
         // Panel central
@@ -180,6 +181,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Anadir remitente desde..."
         etiquetaAnadir = new JLabel();
         etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante"));
+        Utils.setContrastColor(etiquetaAnadir);
 		panelCentral.add(etiquetaAnadir, c);
 		
 		c.insets = new Insets(0, 20, 0, 0);
@@ -195,6 +197,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(comboRepositorios);
         }
+		Utils.setContrastColor(comboRepositorios);
 		cargarCombo(comboRepositorios);
 		panelCentral.add(comboRepositorios, c);
 		
@@ -224,6 +227,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(anadir);
         }
+		Utils.setContrastColor(anadir);
 		panelCentral.add(anadir, c);
 		
 		c.insets = new Insets(10, 20, 0, 20);
@@ -234,6 +238,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		 // Etiqueta con el texto "Remitentes"
         JLabel senderLabel = new JLabel();
         senderLabel.setText(Messages.getString("wizard.sobres.listaRemitentes"));
+        Utils.setContrastColor(senderLabel);
 		panelCentral.add(senderLabel, c);
 		
 		c.insets = new Insets(0, 20, 0, 20);
@@ -255,6 +260,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(listaRemitentes);
         }
+		Utils.setContrastColor(listaRemitentes);
 		panelLista.setViewportView(listaRemitentes);
 		
 		//Relación entre etiqueta y lista
@@ -289,6 +295,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(eliminar);
         }
+		Utils.setContrastColor(eliminar);
 		panelCentral.add(eliminar, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);

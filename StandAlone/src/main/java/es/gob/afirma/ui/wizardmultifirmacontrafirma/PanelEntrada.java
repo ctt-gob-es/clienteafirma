@@ -102,6 +102,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana1.titulo", 
         		"Wizard.multifirma.simple.contrafirma.ventana1.titulo.descripcion", null, true);
+        Utils.setContrastColor(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 
         // Panel central
@@ -119,6 +120,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
     	// Etiqueta "Fichero de datos:"
     	JLabel etiquetaFirma = new JLabel();
     	etiquetaFirma.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero"));
+    	Utils.setContrastColor(etiquetaFirma);
         panelCentral.add(etiquetaFirma, c);
         
         c.insets = new Insets(0, 20, 0, 0);
@@ -136,6 +138,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(campoFirma);
         }
+        Utils.setContrastColor(campoFirma);
         panelCentral.add(campoFirma, c);
         
         //Relación entre etiqueta y campo de texto
@@ -162,6 +165,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(examinarFirma);
         }
+        Utils.setContrastColor(examinarFirma);
         panelCentral.add(examinarFirma, c);
         
         c.fill = GridBagConstraints.BOTH;

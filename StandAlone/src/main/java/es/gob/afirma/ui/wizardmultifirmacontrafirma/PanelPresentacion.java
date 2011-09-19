@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -65,6 +66,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         // Panel con el contenido
         JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
+        Utils.setContrastColor(panelCentral);
         panelCentral.setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();

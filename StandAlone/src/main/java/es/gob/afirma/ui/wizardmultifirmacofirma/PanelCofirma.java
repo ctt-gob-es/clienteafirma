@@ -103,6 +103,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		
 		// Panel con la cabecera
 		CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.ventana1.titulo", "Wizard.multifirma.simple.ventana1.titulo.descripcion", null, true);
+		Utils.setContrastColor(panelSuperior);
 		getContentPane().add(panelSuperior, BorderLayout.NORTH);
 
 		// Panel central
@@ -121,6 +122,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		// Etiqueta "Fichero de datos:"
 		JLabel etiquetaDatos = new JLabel();
 		etiquetaDatos.setText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos"));
+		Utils.setContrastColor(etiquetaDatos);
 		panelCentral.add(etiquetaDatos, c);
 
 		c.insets = new Insets(0, 20, 0, 0);
@@ -136,6 +138,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
 	       	Utils.remarcar(campoDatos);
 	       }
+		Utils.setContrastColor(campoDatos);
 		panelCentral.add(campoDatos, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -160,6 +163,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(examinarDatos);
         }
+		Utils.setContrastColor(examinarDatos);
 		panelCentral.add(examinarDatos, c);
 
 		c.insets = new Insets(20, 20, 0, 20);
@@ -170,6 +174,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		// Etiqueta "Fichero de firma:"
 		JLabel etiquetaFirma = new JLabel();
 		etiquetaFirma.setText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma"));
+		Utils.setContrastColor(etiquetaFirma);
 		panelCentral.add(etiquetaFirma, c);
 
 		c.insets = new Insets(0, 20, 0, 0);
@@ -185,6 +190,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
 	       	Utils.remarcar(campoFirma);
 	    }
+		Utils.setContrastColor(campoFirma);
 		panelCentral.add(campoFirma, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -208,6 +214,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		if (GeneralConfig.isRemarked()){
         	Utils.remarcar(examinarFirma);
         }
+		Utils.setContrastColor(examinarFirma);
 		panelCentral.add(examinarFirma, c);
 		
 		c.fill = GridBagConstraints.BOTH;

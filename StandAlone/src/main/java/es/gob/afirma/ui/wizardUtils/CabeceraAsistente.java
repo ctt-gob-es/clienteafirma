@@ -109,6 +109,7 @@ public class CabeceraAsistente extends JPanel {
     	if (GeneralConfig.isRemarked()){
         	Utils.remarcar(etiquetaTitulo);
         }
+    	Utils.setContrastColor(etiquetaTitulo);
     	add(etiquetaTitulo, c);
     	
     	c.insets = new Insets(0, 15, 0, 10);
