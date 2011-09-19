@@ -1,5 +1,4 @@
 /*
- * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un applet de libre distribucion cuyo codigo fuente puede ser consultado
  * y descargado desde www.ctt.map.es.
  * Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de Espana
@@ -17,13 +16,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.io.File;
 import java.net.URL;
 import java.security.Provider;
@@ -33,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -41,13 +37,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 
@@ -72,7 +67,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String DEFAULT_LOCALE = "es_ES";
+	private static final String DEFAULT_LOCALE = "es_ES"; //$NON-NLS-1$
 	
 	private int actualPositionX = -1;
 	
@@ -85,7 +80,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	private JMenuBar menu;
 	
 	public static JStatusBar bar = new JStatusBar();
-	private JTabbedPane panelPest = null;
+	
+//	private JTabbedPane panelPest = null;
+	
+	private HorizontalTabbedPanel htPanel;
 	
 	@Override
 	public int getMinimumRelation(){
@@ -147,15 +145,20 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Icono de @firma
 		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
 
-		// Carga del contorno principal
-		panelPest = new JTabbedPane();
-		panelPest.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		panelPest.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent evt) {
-				panelPestStateChanged();
-			}
-		});
-		getContentPane().add(panelPest, BorderLayout.CENTER);
+		
+		
+		// Componentes principales
+		this.htPanel = new HorizontalTabbedPanel();
+		getContentPane().add(this.htPanel, BorderLayout.CENTER);
+		
+//		panelPest = new JTabbedPane();
+//		panelPest.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+//		panelPest.addChangeListener(new ChangeListener() {
+//			public void stateChanged(ChangeEvent evt) {
+//				panelPestStateChanged();
+//			}
+//		});
+//		getContentPane().add(panelPest, BorderLayout.CENTER);
 
 		// Menu
 		menu = new JMenuBar();
@@ -349,12 +352,12 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		return ayuda;
 	}
 
-	/**
-	 * Panel cambiar estado: Reinicia el estado de la barra de estado
-	 */
-	private void panelPestStateChanged() {
-		setNuevoEstado("");
-	}
+//	/**
+//	 * Panel cambiar estado: Reinicia el estado de la barra de estado
+//	 */
+//	private void panelPestStateChanged() {
+//		setNuevoEstado("");
+//	}
 
 	/**
 	 * Seleccion menu opciones: Muestra la ventana modal con las opciones
@@ -406,181 +409,191 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * las distintas funcionalidades.
 	 */
 	public void crearPaneles() {
-		// Eliminamos los paneles que haya actualmente antes de insertar los nuevos
-		panelPest.removeAll();
-		if (GeneralConfig.isMaximized()){
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-		} else {
-			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
-			}
-		}
-		// Insertar la pestana de firma
-		JPanel panelFirma = new Firma();
-		panelFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
-		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"),
-				new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")),
-				panelFirma,
-				Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
+	    
+	    this.htPanel.reset();
 
-		// Insertar la pestana de multifirma
-		JPanel panelMultifirmaSimple = new MultifirmaSimple();
-		panelMultifirmaSimple.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
-		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma"),
-				new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")),
-				panelMultifirmaSimple,
-				Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
+	    // Panel de firma
+	    JToggleButton buttonFirma = this.createToggleButton(
+	            Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), //$NON-NLS-1$
+              new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")), //$NON-NLS-1$
+              new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")));  //$NON-NLS-1$
+	    buttonFirma.setMnemonic(KeyEvent.VK_F);
+	    JPanel panelFirma = new Firma();
+	    panelFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
+	    this.htPanel.addTab(buttonFirma, panelFirma);
+	    
+        // Panel de multifirma
+	       JToggleButton buttonMultifirma = this.createToggleButton(
+	                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma"), //$NON-NLS-1$
+	              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")), //$NON-NLS-1$
+	              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")));  //$NON-NLS-1$
+	       buttonMultifirma.setMnemonic(KeyEvent.VK_M);
+        JPanel panelMultifirmaSimple = new MultifirmaSimple();
+        panelMultifirmaSimple.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
+        this.htPanel.addTab(buttonMultifirma, panelMultifirmaSimple);
+	    
+        // Panel de multifirma masiva
+        JToggleButton buttonMultifirmaMasiva = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"), //$NON-NLS-1$
+              new ImageIcon(getClass().getResource("/resources/images/masiva_mini_ico.png")), //$NON-NLS-1$
+              new ImageIcon(getClass().getResource("/resources/images/masiva_mini_ico.png")));  //$NON-NLS-1$
+        buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
+        JPanel panelMultifirmaMasiva =  new MultifirmaMasiva();
+        panelMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
+        this.htPanel.addTab(buttonMultifirmaMasiva, panelMultifirmaMasiva);
 
+        // Panel de validacion y extraccion de documentos
+        JToggleButton buttonValidacion = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion"), //$NON-NLS-1$
+              new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")), //$NON-NLS-1$
+              new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")));  //$NON-NLS-1$
+        buttonValidacion.setMnemonic(KeyEvent.VK_V);
+        JPanel panelValidacion = new Validacion();
+        panelValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
+        this.htPanel.addTab(buttonValidacion, panelValidacion);
 
-		// Insertar la pestana de multifirma masiva (solo en la vista avanzada)
-		JPanel panelMultifirmaMasiva = null;
-		if(GeneralConfig.isAvanzados()) {
-			panelMultifirmaMasiva =  new MultifirmaMasiva();
-			panelMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
-			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"),
-					new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")),
-					panelMultifirmaMasiva,
-					Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description"));
-		}
+        // Panel de cifrado simetrico
+        JToggleButton buttonCifrado = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado"), //$NON-NLS-1$
+                new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png")), //$NON-NLS-1$
+                new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png"))); //$NON-NLS-1$
+        buttonCifrado.setMnemonic(KeyEvent.VK_C);
+        JPanel panelCifrado = new Cifrado();
+        panelCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
+        this.htPanel.addTab(buttonCifrado, panelCifrado);
 
-		// Insertar la pestana de validaci�n
-		JPanel panelValidacion = new Validacion();
-		panelValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
-		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion"),
-				new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")),
-				panelValidacion,
-				Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
+        // Panel de Descifrado
+        JToggleButton buttonDescifrado = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado"), //$NON-NLS-1$
+                new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png")), //$NON-NLS-1$
+                new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png"))); //$NON-NLS-1$
+        buttonDescifrado.setMnemonic(KeyEvent.VK_D);
+        JPanel panelDescifrado = new Descifrado();
+        panelDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
+        this.htPanel.addTab(buttonDescifrado, panelDescifrado);
 
-		// Insertar la pestana de Cifrado
-		JPanel panelCifrado = new Cifrado();
-		panelCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description"));
-		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado"),
-				new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png")),
-				panelCifrado,
-				Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description"));
+        // Panel de Ensobrado
+        JToggleButton buttonEnsobrado = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"), //$NON-NLS-1$
+                new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png")), //$NON-NLS-1$
+                new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png"))); //$NON-NLS-1$
+        buttonEnsobrado.setMnemonic(KeyEvent.VK_S);
+        JPanel panelEnsobrado = new Ensobrado();
+        panelEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
+        this.htPanel.addTab(buttonEnsobrado, panelEnsobrado);
 
-		// Insertar la pestana de Descifrado
-		JPanel panelDescifrado = new Descifrado();
-		panelDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description"));
-		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado"),
-				new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png")),
-				panelDescifrado,
-				Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description"));
+        // Panel de Desensobrado
+        JToggleButton buttonDesensobrado = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"), //$NON-NLS-1$
+                new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png")), //$NON-NLS-1$
+                new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png"))); //$NON-NLS-1$
+        buttonDesensobrado.setMnemonic(KeyEvent.VK_N);
+        JPanel panelDesensobrado = new Desensobrado();
+        panelDesensobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description")); //$NON-NLS-1$
+        this.htPanel.addTab(buttonDesensobrado, panelDesensobrado);
+        
+        
+              
+//		// Eliminamos los paneles que haya actualmente antes de insertar los nuevos
+//		panelPest.removeAll();
+//		if (GeneralConfig.isMaximized()){
+//			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+//		} else {
+//			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
+//				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
+//			}
+//		}
+//		// Insertar la pestana de firma
+//		JPanel panelFirma = new Firma();
+//		panelFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
+//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"),
+//				new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")),
+//				panelFirma,
+//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
+//
+//		// Insertar la pestana de multifirma
+//		JPanel panelMultifirmaSimple = new MultifirmaSimple();
+//		panelMultifirmaSimple.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
+//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma"),
+//				new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")),
+//				panelMultifirmaSimple,
+//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
+//
+//
+//		// Insertar la pestana de multifirma masiva (solo en la vista avanzada)
+//		JPanel panelMultifirmaMasiva = null;
+//		if(GeneralConfig.isAvanzados()) {
+//			panelMultifirmaMasiva =  new MultifirmaMasiva();
+//			panelMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
+//			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"),
+//					new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")),
+//					panelMultifirmaMasiva,
+//					Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description"));
+//		}
+//
+//		// Insertar la pestana de validaci�n
+//		JPanel panelValidacion = new Validacion();
+//		panelValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
+//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion"),
+//				new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")),
+//				panelValidacion,
+//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
+//
+//		// Insertar la pestana de Cifrado
+//		JPanel panelCifrado = new Cifrado();
+//		panelCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description"));
+//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado"),
+//				new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png")),
+//				panelCifrado,
+//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description"));
+//
+//		// Insertar la pestana de Descifrado
+//		JPanel panelDescifrado = new Descifrado();
+//		panelDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description"));
+//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado"),
+//				new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png")),
+//				panelDescifrado,
+//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description"));
+//
+//		// Insertar la pestana de Ensobrado  (solo en la vista avanzada)
+//		JPanel panelEnsobrado = null;
+//		if(GeneralConfig.isAvanzados()) {
+//			panelEnsobrado = new Ensobrado();
+//			panelEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description"));
+//			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"),
+//					new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png")),
+//					panelEnsobrado,
+//					Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description"));
+//		}
+//
+//		// Insertar la pestana de Desensobrado  (solo en la vista avanzada)
+//		JPanel panelDesensobrado = null;
+//		if(GeneralConfig.isAvanzados()) {
+//			panelDesensobrado = new Desensobrado();
+//			panelDesensobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description"));
+//			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"),
+//					new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png")),
+//					panelDesensobrado,
+//					Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description"));
+//		}
 
-		// Insertar la pestana de Ensobrado  (solo en la vista avanzada)
-		JPanel panelEnsobrado = null;
-		if(GeneralConfig.isAvanzados()) {
-			panelEnsobrado = new Ensobrado();
-			panelEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description"));
-			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"),
-					new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png")),
-					panelEnsobrado,
-					Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description"));
-		}
+//		panelPest.addMouseMotionListener(new MouseMotionAdapter() {
+//			public void mouseMoved(MouseEvent evt) {
+//				panelPestMouseMoved(evt);
+//			}
+//		});
 
-		// Insertar la pestana de Desensobrado  (solo en la vista avanzada)
-		JPanel panelDesensobrado = null;
-		if(GeneralConfig.isAvanzados()) {
-			panelDesensobrado = new Desensobrado();
-			panelDesensobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description"));
-			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"),
-					new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png")),
-					panelDesensobrado,
-					Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description"));
-		}
-
-		panelPest.addMouseMotionListener(new MouseMotionAdapter() {
-			public void mouseMoved(MouseEvent evt) {
-				panelPestMouseMoved(evt);
-			}
-		});
-
-		// Definicion de mnemonicos.
-		int tabNum = 0;
-
-		// Firma
-		panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_F);
-		// Multifirma simple
-		panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_M);
-		// Multifirma masiva
-		if (GeneralConfig.isAvanzados()) 
-			panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_I);
-		// Validacion
-		panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_V);
-		// Cifrado
-		panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_C);
-		// Descifrado
-		panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_D);
-		// Ensobrado
-		if(GeneralConfig.isAvanzados()) 
-			panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_S);
-		// Desensobrado
-		if(GeneralConfig.isAvanzados()) 
-			panelPest.setMnemonicAt(tabNum++, KeyEvent.VK_N);
-
-		HelpUtils.enableHelpKey(panelFirma,"firma");
-		HelpUtils.enableHelpKey(panelMultifirmaSimple,"multifirma");
-		if (panelMultifirmaMasiva != null)
-			HelpUtils.enableHelpKey(panelMultifirmaMasiva,"firma.masiva");
-		HelpUtils.enableHelpKey(panelValidacion,"validacion");
-		HelpUtils.enableHelpKey(panelCifrado,"cifrado");
-		HelpUtils.enableHelpKey(panelDescifrado,"descifrado");
-		if (panelEnsobrado != null)
-			HelpUtils.enableHelpKey(panelEnsobrado,"ensobrado");
-		if (panelDesensobrado != null)
-			HelpUtils.enableHelpKey(panelDesensobrado,"desensobrado");
-		panelPest.addFocusListener(new FocusListener() {
-			public void focusLost(FocusEvent e) { 
-				
-			}
-
-			public void focusGained(FocusEvent arg0) {
-				final int index = panelPest.getSelectedIndex();
-				int tab = 0;
-				if (index == tab)
-					HelpUtils.enableHelpKey(panelPest,"firma");
-				else{
-					tab++;
-					if (index == tab)
-						HelpUtils.enableHelpKey(panelPest,"multifirma");
-					else{
-						tab++;
-						if(GeneralConfig.isAvanzados()){
-
-							if (index == tab){
-								HelpUtils.enableHelpKey(panelPest,"firma.masiva");					    		
-							}
-							tab++;					    	   
-						}
-						if (index == tab)
-							HelpUtils.enableHelpKey(panelPest,"validacion");
-						else
-						{
-							tab++;
-							if (index == tab)
-								HelpUtils.enableHelpKey(panelPest,"cifrado");
-							else{
-								tab++;
-								if (index == tab)
-									HelpUtils.enableHelpKey(panelPest,"descifrado");
-								else{
-									tab++;
-									if(GeneralConfig.isAvanzados()){
-										if (index == tab)
-											HelpUtils.enableHelpKey(panelPest,"ensobrado");
-										tab++;
-									}
-									if(GeneralConfig.isAvanzados())
-										if (index == tab)
-											HelpUtils.enableHelpKey(panelPest,"desensobrado");
-								}
-							}
-						}
-					}
-				}
-			}
-		});
+		HelpUtils.enableHelpKey(panelFirma, "firma"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(panelMultifirmaSimple, "multifirma"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(panelMultifirmaMasiva, "firma.masiva"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(panelValidacion, "validacion"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(panelCifrado, "cifrado"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(panelDescifrado, "descifrado"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(panelEnsobrado, "ensobrado"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(panelDesensobrado, "desensobrado"); //$NON-NLS-1$
+		
+		
 		//Al repintar la pantalla principal para quitar o poner las opciones avanzadas hay que ajustar 
 		//la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
 		this.callResize();
@@ -592,22 +605,39 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		}
 	}
 
-	private void panelPestMouseMoved(MouseEvent evt){
-		Object src = evt.getSource();
-		if (src instanceof JTabbedPane){
-			JTabbedPane panel = (JTabbedPane) src;
-			setNuevoEstado(panel.getToolTipText(evt));
-		}
+	/**
+	 * Crea un bot&oacute;n que se queda pulsado tras hacer clic en &eacute;l. Al volver a
+	 * hacer clic sobre &eacute;l vuelve a su posici&oacute;n original.
+	 * @param text Texto del bot&oacute;n.
+	 * @param icon Icono por defecto.
+	 * @param selectedIcon Icono en el estado seleccionado.
+	 * @return Bot&oacute;n creado.
+	 */
+	private JToggleButton createToggleButton(final String text, final Icon icon,
+	        final Icon selectedIcon) {
+	    
+	        JToggleButton tButton = new JToggleButton(text, icon);
+	        tButton.setHorizontalAlignment(SwingConstants.LEFT);
+	        tButton.setSelectedIcon(selectedIcon);
+	        return tButton;
 	}
+	
+//	private void panelPestMouseMoved(MouseEvent evt){
+//		Object src = evt.getSource();
+//		if (src instanceof JTabbedPane){
+//			JTabbedPane panel = (JTabbedPane) src;
+//			setNuevoEstado(panel.getToolTipText(evt));
+//		}
+//	}
 
 	/**
 	 * Inicia los proveedores
 	 */
 	private void iniciarProveedores(){
 		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-			Security.removeProvider("SunMSCAPI");
+			Security.removeProvider("SunMSCAPI"); //$NON-NLS-1$
 			try {
-				Security.addProvider((Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance());
+				Security.addProvider((Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
 			} catch (InstantiationException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
