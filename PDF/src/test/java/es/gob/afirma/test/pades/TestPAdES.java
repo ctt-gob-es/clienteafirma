@@ -201,7 +201,7 @@ public class TestPAdES {
     
         final String prueba = "Firma PAdES de PDF certificado en SHA512withRSA"; //$NON-NLS-1$
         
-        Logger.getLogger("es.gob.afirma").info(prueba);
+        Logger.getLogger("es.gob.afirma").info(prueba); //$NON-NLS-1$
         
         Properties extraParams = new Properties();
         extraParams.put("allowSigningCertifiedPdfs", "true"); //$NON-NLS-1$ //$NON-NLS-2$
