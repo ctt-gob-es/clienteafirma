@@ -238,7 +238,7 @@ public class Utils {
 			} else if(component instanceof JTree){
 				component.setForeground(Color.WHITE);
 			} else if(component instanceof JList){
-				component.setForeground(Color.WHITE);
+				component.setForeground(Color.BLACK);
 			} else if(component instanceof JPanel){
 				if (component.getBorder()!=null){
 					if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){
