@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import org.bouncycastle.util.encoders.Base64;
-
 import com.lowagie.text.Jpeg;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfDate;
