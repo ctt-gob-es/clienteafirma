@@ -2,6 +2,7 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -18,6 +19,7 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfDate;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfPKCS7;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignature;
@@ -380,9 +382,17 @@ public class PAdESTriPhaseSigner {
         catch (final Exception e) {
             throw new AOException("No se ha podido cerrar el conjunto de atributos de la firma PDF", e); //$NON-NLS-1$
         }
+
+        PdfObject pdfObject;
+        try {
+            Class<?> pdfStamperImpClass = Class.forName("com.lowagie.text.pdf.PdfStamperImp"); //$NON-NLS-1$
+            Method getFileIdMethod = pdfStamperImpClass.getMethod("getFileID", (Class[]) null); //$NON-NLS-1$
+            pdfObject = (PdfObject) getFileIdMethod.invoke(stp.getWriter(), (Object[]) null);
+        } catch (Exception e) {
+            throw new AOException("Necesita un iText modificado para la realizacion de firmas trifasicas", e); //$NON-NLS-1$
+        }
         
-        return new PdfTriPhaseSession(sap, baos, new String(((com.lowagie.text.pdf.PdfStamperImp)stp.getWriter()).getFileID().getBytes()));
-        
+        return new PdfTriPhaseSession(sap, baos, new String(pdfObject.getBytes()));
     }
     
 
