@@ -413,7 +413,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
      * Comprueba que el archivo log seleccionado es correcto y guarda su nombre en el campo de texto
      */
     private void examinarFicheroLogActionPerformed() {
-    	File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
+    	File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Wizard.multifirma.chooserLog.tittle"));
     	if (selectedFile != null) {
     		campoFicheroLog.setText(selectedFile.getAbsolutePath());
     	}
