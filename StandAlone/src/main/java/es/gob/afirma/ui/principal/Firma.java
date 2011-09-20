@@ -160,6 +160,7 @@ public class Firma extends JPanel {
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.setMinimumSize(examinar.getSize());
+		examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar"));
 		examinar.addActionListener(new ActionListener() {
 			@Override
             public void actionPerformed(ActionEvent evt) {
@@ -286,6 +287,7 @@ public class Firma extends JPanel {
 		firmar.setMnemonic(KeyEvent.VK_R);
 		firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N
 		firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
+		firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar"));
 		firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
 		firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
 		firmar.addActionListener(new ActionListener() {
