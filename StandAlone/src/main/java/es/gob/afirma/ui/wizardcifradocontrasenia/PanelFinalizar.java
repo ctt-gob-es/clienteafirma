@@ -25,6 +25,7 @@ import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
+import es.gob.afirma.ui.wizardUtils.InfoLabel;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
@@ -79,21 +80,12 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 		c.weightx = 1.0;
 		c.gridx = 0;
         
-        // Etiqueta felicidades
-    	JLabel etiqueta = new JLabel(Messages.getString("Wizard.sobres.final1")); // NOI18N
-    	etiqueta.setFocusable(true);
-    	if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(etiqueta);
-        }
-    	Utils.setContrastColor(etiqueta);
-    	panelCentral.add(etiqueta, c);
-    	
-    	c.weighty = 1.0;
-    	c.gridy = 1;
-    	
-    	// Panel con el texto "Ha finalizado con..."
-    	panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"Wizard.sobres.final.final1", true), c);
+        // Etiqueta "felicidades" y "Ha finalizado con..."
+		String textLabel = Messages.getString("Wizard.sobres.final1") +
+				"<br/>"+"<br/>" + Messages.getString("Wizard.sobres.final.final1") ;
+		
+		InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
+		panelCentral.add(finalizeLabel, c);
     	
     	getContentPane().add(panelCentral, BorderLayout.CENTER);
     }
