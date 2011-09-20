@@ -18,14 +18,13 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
+import es.gob.afirma.ui.wizardUtils.InfoLabel;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
 
 /**
@@ -77,20 +76,16 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         Utils.setContrastColor(panelCentral);
         panelCentral.setLayout(new GridBagLayout());
 
-        // Panel con el texto "Bienvenido al asistente..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"Wizard.sobres.presentacion.pass.presentacion1", true), c);
 
-        // Panel con el texto "El proceso de cifrado..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"Wizard.sobres.presentacion.pass.presentacion2", true), c);
-        
-        c.weighty = 1.0;
-        
-        // Panel con el texto "A continuacion..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"Wizard.sobres.presentacion.pass.presentacion3", true), c);
-        
+        //Panel con el texto "Bienvenido al asistente..."
+
+        String textLabel = Messages.getString("Wizard.sobres.presentacion.pass.presentacion1") +
+        		"<br/>"+"<br/>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion2")+
+        		"<br/>"+"<br/>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
+        InfoLabel presentationLabel = new InfoLabel(textLabel, false);
+
+        panelCentral.add(presentationLabel, c);
+
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
     }
