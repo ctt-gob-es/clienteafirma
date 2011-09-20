@@ -81,8 +81,6 @@ public class BotoneraInferior extends JPanel {
         //Boton maximizar
         maximizar.setText(Messages.getString("Wizard.maximizar"));
         maximizar.setName("maximizar");
-        //Accesibilidad
-        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar"));
         maximizar.setMnemonic(KeyEvent.VK_M);
         maximizar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -111,8 +109,6 @@ public class BotoneraInferior extends JPanel {
         }
         anterior.setText(Messages.getString("Wizard.anterior")); // NOI18N
 
-        //Accesibilidad
-        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.anterior"));
         anterior.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 anteriorActionPerformed(anterior, siguiente, finalizar);
@@ -133,8 +129,7 @@ public class BotoneraInferior extends JPanel {
         	siguiente.setVisible(true);
         }
         siguiente.setText(Messages.getString("Wizard.siguiente")); // NOI18N
-        //Accesibilidad
-        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.siguiente"));
+
         siguiente.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 siguienteActionPerformed(anterior, siguiente, finalizar);
@@ -159,8 +154,6 @@ public class BotoneraInferior extends JPanel {
         	cancelar.setVisible(true);
         }
         cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N
-        //Accesibilidad
-        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.cancelar"));
         cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	for (JDialogWizard ventana : BotoneraInferior.this.ventanas)
@@ -181,8 +174,7 @@ public class BotoneraInferior extends JPanel {
         	finalizar.setVisible(false);
 
         finalizar.setText(Messages.getString("Wizard.finalizar")); // NOI18N
-        //Accesibilidad
-        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.finalizar"));
+
         finalizar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	for (JDialogWizard ventana : BotoneraInferior.this.ventanas)
