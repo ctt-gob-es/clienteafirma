@@ -29,10 +29,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -138,6 +140,17 @@ public class Utils {
 				});
 			}
 		}
+		if (component instanceof JToggleButton){
+			final JToggleButton button = (JToggleButton) component;
+			button.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
+				}		
+				public void focusGained(FocusEvent e) {
+					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
+				}
+			});
+		}		
 		if (component instanceof JTextField){
 			final JTextField textField = (JTextField) component;
 			textField.addFocusListener(new FocusListener() {
@@ -231,7 +244,7 @@ public class Utils {
 	
 	public static void setContrastColor (JComponent component){
 		if (GeneralConfig.isHighContrast()){
-			if (component instanceof JComboBox){
+			if (component instanceof JComboBox || component instanceof JPasswordField || component instanceof JTextField){
 				component.setBackground(Color.WHITE);
 			} else if(component instanceof JCheckBox) {
 				component.setForeground(Color.WHITE);
@@ -249,10 +262,16 @@ public class Utils {
 				}
 				component.setForeground(Color.WHITE);
 				component.setBackground(Color.BLACK);
-			}
+			} else if (component instanceof JStatusBar){
+				((JLabel)component.getComponent(0)).setForeground(Color.WHITE);
+			}			
 			else{
 				component.setForeground(Color.WHITE);
 				component.setBackground(Color.BLACK);
+			}
+		} else {
+			if (component instanceof JStatusBar){
+				((JLabel)component.getComponent(0)).setForeground(Color.BLACK);
 			}
 		}
 	}

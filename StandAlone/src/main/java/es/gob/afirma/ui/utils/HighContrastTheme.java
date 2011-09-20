@@ -41,13 +41,14 @@ public class HighContrastTheme extends MetalTheme {
 	private final ColorUIResource secondary3 = new ColorUIResource(Color.BLACK);
 
 	/**
-	 * Fuente para el control
+	 * Fuente para el control. En este caso indica la fuente para los Warnings
+	 *  y Ventanas de Cargar/guardar
 	 */
-	private final FontUIResource controlFont = new FontUIResource("SansSerif", Font.BOLD, 10);
+	private final FontUIResource controlFont = new FontUIResource("SansSerif", Font.PLAIN, 12);
 	/**
-	 * Fuente para el sistema
+	 * Fuente para el sistema. En este caso indica la fuente para los ToolTip
 	 */
-	private final FontUIResource systemFont = new FontUIResource("Dialog", Font.PLAIN, 10);
+	private final FontUIResource systemFont = new FontUIResource("Dialog", Font.PLAIN, 12);
 	/**
 	 * Fuente para la ventana
 	 */

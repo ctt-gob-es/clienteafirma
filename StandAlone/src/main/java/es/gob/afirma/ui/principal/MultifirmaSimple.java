@@ -94,6 +94,7 @@ public class MultifirmaSimple extends JPanel {
 		// Panel que engloba los tipos de multifirma
 		JPanel panelTipos = new JPanel(new GridLayout(0, 1));
 		panelTipos.setBorder(BorderFactory.createTitledBorder(Messages.getString("MultifirmaSimple.opciones"))); // NOI18N
+		Utils.setContrastColor(panelTipos);
 
 		// Radiobutton cofirma
 		final JRadioButton cofirma = new JRadioButton();

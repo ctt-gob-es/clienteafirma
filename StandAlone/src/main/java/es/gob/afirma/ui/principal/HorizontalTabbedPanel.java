@@ -18,6 +18,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+import es.gob.afirma.ui.utils.JAccessibilityFrame;
+import es.gob.afirma.ui.utils.Utils;
+
 /**
  * Panel que contiene un listado de botones seleccionables y un espacio para la
  * visualizaci&oacute;n de componentes. Cuando el usuario selecciona un bot&oacute;n
@@ -116,7 +119,7 @@ public class HorizontalTabbedPanel extends Container {
             
             this.layoutConstraints.fill = GridBagConstraints.BOTH;
             this.layoutConstraints.weightx = 1.0;
-            this.layoutConstraints.weighty = 1.0;
+            this.layoutConstraints.weighty = 1.0;          
         }
         
         @Override
@@ -133,6 +136,8 @@ public class HorizontalTabbedPanel extends Container {
                         SelectButtonListener.this.mainContainer.getHeight());
                 
                 SelectButtonListener.this.mainContainer.validate();
+                
+                JAccessibilityFrame.getJAccessibilityFrame(this.mainContainer).callResize();
             }
         }
         

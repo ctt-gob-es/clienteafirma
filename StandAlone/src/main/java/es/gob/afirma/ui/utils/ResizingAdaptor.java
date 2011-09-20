@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -231,6 +232,8 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 */
 	private boolean isResizable(Component a){
 		if(a instanceof JButton)
+			return true;
+		else if(a instanceof JToggleButton)
 			return true;
 		else if(a instanceof JLabel)
 			return true;

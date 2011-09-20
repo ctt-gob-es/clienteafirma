@@ -160,7 +160,7 @@ public class Firma extends JPanel {
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.setMinimumSize(examinar.getSize());
-		examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar"));
+		examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
 		examinar.addActionListener(new ActionListener() {
 			@Override
             public void actionPerformed(ActionEvent evt) {
@@ -197,7 +197,7 @@ public class Firma extends JPanel {
 		comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
-		comboAlmacen.getAccessibleContext().setAccessibleName(Messages.getString("Firma.almacen.certificados")); // NOI18N
+		comboAlmacen.getAccessibleContext().setAccessibleName("Selecciones"); // NOI18N
 		comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(comboAlmacen);

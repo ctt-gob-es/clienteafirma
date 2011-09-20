@@ -94,6 +94,7 @@ public class MultifirmaMasiva extends JPanel {
 		// Panel que engloba los tipos de multifirma
 		JPanel panelTipos = new JPanel(new GridLayout());
 		panelTipos.setBorder(BorderFactory.createTitledBorder(Messages.getString("PrincipalGUI.multifirma.panel.opciones"))); // NOI18N
+		Utils.setContrastColor(panelTipos);
 		
 		// Checkbox alerta sonora
 		final JCheckBox alerta = new JCheckBox();

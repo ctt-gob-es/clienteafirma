@@ -9,6 +9,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -24,12 +25,14 @@ import java.net.URL;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -40,6 +43,7 @@ import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
@@ -191,7 +195,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		bar.setLabelWidth((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth());
 		bar.setStatus("");
 		bar.setLeftMargin(3);
+		
 		getContentPane().add(bar, BorderLayout.SOUTH);
+		
 
 		crearPaneles();
 	}
@@ -348,7 +354,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 		Utils.setContrastColor(acerca);
 		ayuda.add(acerca);
-
+		
+		this.callResize();
 		return ayuda;
 	}
 
@@ -412,6 +419,26 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    
 	    this.htPanel.reset();
 
+	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
+	    // la ventana principal con el tamaño adecuado
+	    if (GeneralConfig.isMaximized()){
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		} else {
+			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
+				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
+			}
+		}
+	    	
+	    // Comprobacion del estado del Alto Contraste para que se creen los paneles
+	    // con la configuracion adecuada
+	    if (GeneralConfig.isHighContrast()){
+			setHighContrast(true);
+		} else {
+			setHighContrast(false);
+		}
+	    Utils.setContrastColor(bar);
+	    
 	    // Panel de firma
 	    JToggleButton buttonFirma = this.createToggleButton(
 	            Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), //$NON-NLS-1$
@@ -419,7 +446,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
               new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")));  //$NON-NLS-1$
 	    buttonFirma.setMnemonic(KeyEvent.VK_F);
 	    JPanel panelFirma = new Firma();
-	    panelFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
+	    buttonFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
 	    this.htPanel.addTab(buttonFirma, panelFirma);
 	    
         // Panel de multifirma
@@ -429,7 +456,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")));  //$NON-NLS-1$
 	       buttonMultifirma.setMnemonic(KeyEvent.VK_M);
         JPanel panelMultifirmaSimple = new MultifirmaSimple();
-        panelMultifirmaSimple.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
+        buttonMultifirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma")+ " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonMultifirma, panelMultifirmaSimple);
 	    
         // Panel de multifirma masiva
@@ -439,7 +466,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
               new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")));  //$NON-NLS-1$
         buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
         JPanel panelMultifirmaMasiva =  new MultifirmaMasiva();
-        panelMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
+        buttonMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonMultifirmaMasiva, panelMultifirmaMasiva);
 
         // Panel de validacion y extraccion de documentos
@@ -449,7 +476,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
               new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")));  //$NON-NLS-1$
         buttonValidacion.setMnemonic(KeyEvent.VK_V);
         JPanel panelValidacion = new Validacion();
-        panelValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
+        buttonValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonValidacion, panelValidacion);
 
         // Panel de cifrado simetrico
@@ -459,7 +486,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png"))); //$NON-NLS-1$
         buttonCifrado.setMnemonic(KeyEvent.VK_C);
         JPanel panelCifrado = new Cifrado();
-        panelCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
+        buttonCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonCifrado, panelCifrado);
 
         // Panel de Descifrado
@@ -469,7 +496,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png"))); //$NON-NLS-1$
         buttonDescifrado.setMnemonic(KeyEvent.VK_D);
         JPanel panelDescifrado = new Descifrado();
-        panelDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
+        buttonDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonDescifrado, panelDescifrado);
 
         // Panel de Ensobrado
@@ -479,7 +506,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png"))); //$NON-NLS-1$
         buttonEnsobrado.setMnemonic(KeyEvent.VK_S);
         JPanel panelEnsobrado = new Ensobrado();
-        panelEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
+        buttonEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonEnsobrado, panelEnsobrado);
 
         // Panel de Desensobrado
@@ -489,7 +516,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png"))); //$NON-NLS-1$
         buttonDesensobrado.setMnemonic(KeyEvent.VK_N);
         JPanel panelDesensobrado = new Desensobrado();
-        panelDesensobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description")); //$NON-NLS-1$
+        buttonDesensobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonDesensobrado, panelDesensobrado);
         
         
@@ -598,11 +625,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		//la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
 		this.callResize();
 		
-		if (GeneralConfig.isHighContrast()){
-			setHighContrast(true);
-		} else {
-			setHighContrast(false);
-		}
+		
 	}
 
 	/**
@@ -619,6 +642,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	        JToggleButton tButton = new JToggleButton(text, icon);
 	        tButton.setHorizontalAlignment(SwingConstants.LEFT);
 	        tButton.setSelectedIcon(selectedIcon);
+	        if (GeneralConfig.isRemarked()){
+	        	Utils.remarcar(tButton);
+	        }
+	        Utils.setContrastColor(tButton);
 	        return tButton;
 	}
 	
@@ -702,6 +729,11 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * @param highContrast Boolean que indica el estado del Alto Contraste
 	 */
 	public void setHighContrast(boolean highContrast) {
+		// TODO Alto contraste en ventanas de Cargar / Guardar fichero
+//		UIDefaults d = UIManager.getDefaults();
+//		Enumeration<Object> claves = d.keys();
+//		while (claves.hasMoreElements())
+//		   System.out.println(claves.nextElement());
 		try {
 			if (highContrast) {
 				MetalTheme theme = new HighContrastTheme();
@@ -709,10 +741,24 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 				MetalLookAndFeel.setCurrentTheme(theme);
 
-				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");	
+				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+				
+				UIManager.put("OptionPane.messageForeground",Color.WHITE);
+				UIManager.put("Button.foreground",Color.WHITE);
+				UIManager.put("ToolTip.foreground",Color.WHITE);
+				UIManager.put("ToolTip.background",Color.BLACK);
+				
+				UIManager.put("FileChooserUI","com.sun.java.swing.plaf.windows.WindowsFileChooserUI");
+					
+				
 
 			} else {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				UIManager.put("OptionPane.messageForeground",Color.BLACK);
+				UIManager.put("Button.foreground",Color.BLACK);
+				UIManager.put("ToolTip.foreground",Color.BLACK);
+				UIManager.put("ToolTip.background",new Color(255,255,225));
+				System.out.println(UIManager.get("FileChooserUI"));
 			}
 		} catch (ClassNotFoundException e1) {
 			System.out.println(e1.getMessage());

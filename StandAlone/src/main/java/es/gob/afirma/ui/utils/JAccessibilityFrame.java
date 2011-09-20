@@ -1,4 +1,6 @@
 package es.gob.afirma.ui.utils;
+import java.awt.Component;
+
 import javax.swing.JFrame;
 
 /**
@@ -26,7 +28,27 @@ public abstract class JAccessibilityFrame extends JFrame {
 	 */
 	public abstract int getMinimumRelation();
 	
-	protected final void callResize(){
+	public final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
+	
+	/**
+	 * Busca el JAccessibilityFrame padre de un componente.
+	 * @param component El componente.
+	 * @return El JAccessibilityFrame buscado.
+	 */
+	public static JAccessibilityFrame getJAccessibilityFrame(Component component)
+	{
+		JAccessibilityFrame  resultingJAccessibilityFrame = null;
+		while (component != null && resultingJAccessibilityFrame == null)
+		{
+	        if (component instanceof JAccessibilityFrame){
+	        	resultingJAccessibilityFrame = (JAccessibilityFrame)component;
+	        }
+	        else{
+	        	component = component.getParent();
+	        }
+		 }
+		 return resultingJAccessibilityFrame;
+	 }
 }
