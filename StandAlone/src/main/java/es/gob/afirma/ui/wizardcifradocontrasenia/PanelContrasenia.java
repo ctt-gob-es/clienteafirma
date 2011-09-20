@@ -138,6 +138,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         
         // Caja de texto con la contrasenia
         campoContrasenia.setToolTipText(Messages.getString("WizardCifrado.contrasenia.description")); // NOI18N
+        campoContrasenia.getAccessibleContext().setAccessibleName(campoContrasenia.getToolTipText());
         campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
@@ -168,6 +169,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         
         // Caja de texto con la contrasenia
         campoContraseniaRep.setToolTipText(Messages.getString("WizardCifrado.recontrasenia.description")); // NOI18N
+        campoContraseniaRep.getAccessibleContext().setAccessibleName(campoContraseniaRep.getToolTipText());
         campoContraseniaRep.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
