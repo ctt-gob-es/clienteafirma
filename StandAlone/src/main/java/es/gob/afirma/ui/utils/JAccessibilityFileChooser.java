@@ -1,16 +1,23 @@
 package es.gob.afirma.ui.utils;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 
 import java.awt.event.KeyEvent;
 
 import java.io.File;
+import java.util.Enumeration;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * Clase que extiende JFileChooser para hacerla accesible.
@@ -30,13 +37,18 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 */
 	public JAccessibilityFileChooser (File file)
 	 {
-		
 		super(file);
+//		UIDefaults d = UIManager.getDefaults();
+//		Enumeration<Object> claves = d.keys();
+//		while (claves.hasMoreElements())
+//		   System.out.println(claves.nextElement());
+		
 		
 		//Asignación de mnemonics
 		
 		//Etiqueta buscar en ...
 		setLabelMnemonics((Container)this, "FileChooser.lookInLabelText", KeyEvent.VK_B);
+		//setHighContrast((Container)this);
 		
 		//Botón Cancelar
 		setButtonMnemonics((Container)this, "FileChooser.cancelButtonText", KeyEvent.VK_C);
@@ -97,7 +109,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	        	//Se le asigna el mnemónico
 	        	label.setDisplayedMnemonic(mnemonic);
 		    }
-	      }else if (comp instanceof Container) {
+	      } else if (comp instanceof Container) {
 	    	  	//Llamada recursiva
 		    	setLabelMnemonics((Container)comp, key, mnemonic);
 		    }
@@ -165,5 +177,44 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		    }
 	    }//for
 	  }
-
+	/**
+	 * Asigna el mnemónico indicado a la etiqueta identificada por la clave .
+	 * @param c contenedor global
+	 * @param key clave del componente al que se le va a asignar el mnemónico.
+	 * @param mnemonic mnemónico que se va a asignar al componente
+	 */
+	public void setHighContrast(Container c) {
+		 //Número de componentes del contenedor
+	    int len = c.getComponentCount();
+	    //Se recorren los elementos que forman el contenedor
+	    for (int i = 0; i < len; i++) {
+	      Component comp = c.getComponent(i);  //Se obtiene un componente
+	      //Se comprueba si es de tipo etiqueta
+	      if (comp instanceof JLabel) {
+	        JLabel label = (JLabel)comp;
+	        if (GeneralConfig.isHighContrast()){
+	        	label.setForeground(Color.WHITE);
+	        } else {
+	        	label.setForeground(Color.BLACK);
+	        }
+	      } else if(comp instanceof JToggleButton){
+	    	  JToggleButton toggleButton = (JToggleButton)comp;
+	    	  if (GeneralConfig.isHighContrast()){
+	    		  toggleButton.setForeground(Color.WHITE);
+	    	  } else {
+	    		  toggleButton.setForeground(Color.BLACK);
+	    	  }
+	      } else if (comp instanceof JComboBox){
+	    	  JComboBox comboBox = (JComboBox)comp;
+	    	  if (GeneralConfig.isHighContrast()){
+	    		  comboBox.setBackground(Color.WHITE);
+	    	  } else {
+	    		  comboBox.setBackground(Color.BLACK);  
+	    	  }
+	      } else if (comp instanceof Container) {
+	    	  	//Llamada recursiva
+	    	  setHighContrast((Container)comp);
+		    }
+	    }//for
+	  }
 }
