@@ -158,6 +158,7 @@ public class HelpUtils {
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		botonAyuda.setMnemonic(KeyEvent.VK_H); //Se le asigna un mnemónico al botón de ayuda
+		botonAyuda.getAccessibleContext().setAccessibleName(botonAyuda.getToolTipText());
 		//Se asigna una dimensiï¿½n al botï¿½n segï¿½n su icono
 		Dimension dimension = new Dimension(12,27);
 		botonAyuda.setPreferredSize(dimension);
