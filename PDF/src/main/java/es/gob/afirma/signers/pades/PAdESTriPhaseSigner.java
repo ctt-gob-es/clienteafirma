@@ -166,8 +166,7 @@ public class PAdESTriPhaseSigner {
             throw new AOException("Error al cerrar el PDF para finalizar el proceso de firma", e); //$NON-NLS-1$
         }
         
-        return new String(baos.toByteArray()).replace(badFileID, fileID).getBytes();
-        
+        return new String(baos.toByteArray(), "ISO-8859-1").replace(badFileID, fileID).getBytes("ISO-8859-1"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
     /** Devuelve la posici&oacute;n de la p&aacute;gina en donde debe agregarse
