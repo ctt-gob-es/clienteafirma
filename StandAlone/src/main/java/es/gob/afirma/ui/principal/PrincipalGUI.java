@@ -435,8 +435,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         // Panel de multifirma masiva
         JToggleButton buttonMultifirmaMasiva = this.createToggleButton(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"), //$NON-NLS-1$
-              new ImageIcon(getClass().getResource("/resources/images/masiva_mini_ico.png")), //$NON-NLS-1$
-              new ImageIcon(getClass().getResource("/resources/images/masiva_mini_ico.png")));  //$NON-NLS-1$
+              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")), //$NON-NLS-1$
+              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")));  //$NON-NLS-1$
         buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
         JPanel panelMultifirmaMasiva =  new MultifirmaMasiva();
         panelMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$

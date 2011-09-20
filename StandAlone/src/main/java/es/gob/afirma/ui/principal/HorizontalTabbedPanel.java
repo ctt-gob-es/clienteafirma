@@ -132,7 +132,7 @@ public class HorizontalTabbedPanel extends Container {
                         SelectButtonListener.this.mainContainer.getWidth(),
                         SelectButtonListener.this.mainContainer.getHeight());
                 
-                SelectButtonListener.this.mainContainer.revalidate();
+                SelectButtonListener.this.mainContainer.validate();
             }
         }
         
