@@ -104,19 +104,19 @@ public class ResizingAdaptor extends ComponentAdapter {
 				if (relation > 10) {
 					if (theWindow != null) {
 						float resizeFactor = Math.round(relation / getResizingFactorFrame());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (13 + resizeFactor)));
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theDialog != null){
 						float resizeFactor = Math.round(relation / getResizingFactorDialog());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (13 + resizeFactor)));
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else {
 						float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (12 + resizeFactor)));
 					}
 				} else {
 					if (theWindow != null) {
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) 13));
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else if (theDialog != null){
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) 13));
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else {
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) 12));
 					}
@@ -222,6 +222,19 @@ public class ResizingAdaptor extends ComponentAdapter {
 					(int) Math.round(25 * 2 * factor), java.awt.Image.SCALE_SMOOTH));
 			((JButton)c).setIcon(newImage);
 			((JButton)c).setPreferredSize(new Dimension((int) Math.round(25 * 2 * factor),(int) Math.round(25 * 2 * factor)));
+	}
+	
+	/**
+	 * Devuelve el tamaño de la fuente en función de las opciones de accesibilidad
+	 * @return
+	 */
+	private float getFontSize(){
+		if(GeneralConfig.isBigFontSize()){
+			return 15;
+		}
+		else{
+			return 13;
+		}
 	}
 	
 	/**

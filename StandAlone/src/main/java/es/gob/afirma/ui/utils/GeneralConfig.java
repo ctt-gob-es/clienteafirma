@@ -92,6 +92,22 @@ public class GeneralConfig {
 		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, "false"));
 	}
 	
+	/**
+	 * Indica si el ususario ha activado o desactivado la opcion de tamaño de fuente grande
+	 * @return boolean Indicando el estado de la opcion
+	 */
+	public static boolean isBigFontSize() {
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, "false"));
+	}
+	
+	/**
+	 * Indica si el ususario ha activado o desactivado la opcion de fuente en negrita
+	 * @return boolean Indicando el estado de la opcion
+	 */
+	public static boolean isFontBold() {
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, "false"));
+	}
+	
 	public static void setOption(String optionKey, String optionValue) {
 		configOptions.setProperty(optionKey, optionValue);
 	}
