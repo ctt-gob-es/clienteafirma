@@ -139,6 +139,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         
         // Caja de texto con la contrasenia
         campoContrasenia.setToolTipText(Messages.getString("WizardCifrado.contrasenia.description")); // NOI18N
+        campoContrasenia.getAccessibleContext().setAccessibleName(etiquetaContrasenia.getText()+" "+"ALT+I");
         campoContrasenia.getAccessibleContext().setAccessibleDescription(campoContrasenia.getToolTipText());
         campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
         if (GeneralConfig.isBigCaret()) {
@@ -170,6 +171,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         
         // Caja de texto con la contrasenia
         campoContraseniaRep.setToolTipText(Messages.getString("WizardCifrado.recontrasenia.description")); // NOI18N
+        campoContraseniaRep.getAccessibleContext().setAccessibleName(etiquetaContraseniaRep.getText()+" "+"ALT+N");
         campoContraseniaRep.getAccessibleContext().setAccessibleDescription(campoContraseniaRep.getToolTipText());
         campoContraseniaRep.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
         if (GeneralConfig.isBigCaret()) {
