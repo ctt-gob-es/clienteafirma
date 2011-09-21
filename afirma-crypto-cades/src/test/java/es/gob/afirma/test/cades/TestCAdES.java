@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
@@ -133,6 +134,7 @@ public final class TestCAdES {
      * @throws Exception en cualquier error
      */
     @Test
+    @Ignore
     public void testCoSignature() throws Exception {
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
