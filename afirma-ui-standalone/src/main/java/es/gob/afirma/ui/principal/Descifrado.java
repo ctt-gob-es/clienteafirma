@@ -83,6 +83,7 @@ public class Descifrado extends JPanel {
         JLabel etiquetaFichero = new JLabel();
         etiquetaFichero.setText(Messages.getString("Descifrado.buscar")); // NOI18N
         Utils.setContrastColor(etiquetaFichero);
+        Utils.setFontBold(etiquetaFichero);
 		add(etiquetaFichero, c);
 		
 		c.insets = new Insets(0, 13, 0, 0);
@@ -104,6 +105,7 @@ public class Descifrado extends JPanel {
         	Utils.remarcar(campoFichero);
 		}
         Utils.setContrastColor(campoFichero);
+        Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -133,6 +135,7 @@ public class Descifrado extends JPanel {
         	Utils.remarcar(examinar);
 		}
         Utils.setContrastColor(examinar);
+        Utils.setFontBold(examinar);
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -145,6 +148,7 @@ public class Descifrado extends JPanel {
         JLabel etiquetaMecanismo = new JLabel();
         etiquetaMecanismo.setText(Messages.getString("Descifrado.origen.clave")); // NOI18N
         Utils.setContrastColor(etiquetaMecanismo);
+        Utils.setFontBold(etiquetaMecanismo);
         add(etiquetaMecanismo, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -170,6 +174,7 @@ public class Descifrado extends JPanel {
         	Utils.remarcar(comboMecanismo);
 		}
         Utils.setContrastColor(comboMecanismo);
+        Utils.setFontBold(comboMecanismo);
         add(comboMecanismo, c);
         
         // En la vista simple, no se permitirá configurar el origen de la clave
@@ -193,6 +198,7 @@ public class Descifrado extends JPanel {
         JLabel etiquetaAlgoritmo = new JLabel();
         etiquetaAlgoritmo.setText(Messages.getString("Descifrado.formato")); // NOI18N
         Utils.setContrastColor(etiquetaAlgoritmo);
+        Utils.setFontBold(etiquetaAlgoritmo);
 		add(etiquetaAlgoritmo, c);
 		
 		c.insets = new Insets(0, 13, 0, 13);
@@ -212,6 +218,7 @@ public class Descifrado extends JPanel {
         	Utils.remarcar(comboAlgoritmo);
 		}
         Utils.setContrastColor(comboAlgoritmo);
+        Utils.setFontBold(comboAlgoritmo);
 		add(comboAlgoritmo, c);
 		
 		// En la vista simple, no se permitirá configurar el algoritmo de descifrado
@@ -266,6 +273,7 @@ public class Descifrado extends JPanel {
         	Utils.remarcar(descifrar);
 		}
         Utils.setContrastColor(descifrar);
+        Utils.setFontBold(descifrar);
         
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(descifrar, BorderLayout.CENTER);

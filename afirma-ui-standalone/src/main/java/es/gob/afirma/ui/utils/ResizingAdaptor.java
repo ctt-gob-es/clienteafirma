@@ -110,7 +110,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else {
 						float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (12 + resizeFactor)));
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					}
 				} else {
 					if (theWindow != null) {
@@ -118,7 +118,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 					} else if (theDialog != null){
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else {
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) 12));
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					}
 				}
 			} 
@@ -230,10 +230,18 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 */
 	private float getFontSize(){
 		if(GeneralConfig.isBigFontSize()){
-			return 15;
+			if (theDialogWizard != null){
+				return 14;
+			} else {
+				return 15;
+			}
 		}
 		else{
-			return 13;
+			if (theDialogWizard != null){
+				return 12;
+			} else {
+				return 13;
+			}
 		}
 	}
 	

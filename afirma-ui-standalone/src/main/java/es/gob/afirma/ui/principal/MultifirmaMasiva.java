@@ -63,6 +63,7 @@ public class MultifirmaMasiva extends JPanel {
 		JLabel etiquetaAlmacen = new JLabel();
 		etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N
 		Utils.setContrastColor(etiquetaAlmacen);
+		Utils.setFontBold(etiquetaAlmacen);
 		add(etiquetaAlmacen, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -80,6 +81,7 @@ public class MultifirmaMasiva extends JPanel {
         	Utils.remarcar(comboAlmacen);
         }
 		Utils.setContrastColor(comboAlmacen);
+		Utils.setFontBold(comboAlmacen);
 		add(comboAlmacen, c);
 		
 		//Relación entre etiqueta y combo
@@ -95,6 +97,7 @@ public class MultifirmaMasiva extends JPanel {
 		JPanel panelTipos = new JPanel(new GridLayout());
 		panelTipos.setBorder(BorderFactory.createTitledBorder(Messages.getString("PrincipalGUI.multifirma.panel.opciones"))); // NOI18N
 		Utils.setContrastColor(panelTipos);
+		Utils.setFontBold(panelTipos);
 		
 		// Checkbox alerta sonora
 		final JCheckBox alerta = new JCheckBox();
@@ -110,6 +113,7 @@ public class MultifirmaMasiva extends JPanel {
         	Utils.remarcar(alerta);
         }
 		Utils.setContrastColor(alerta);
+		Utils.setFontBold(alerta);
 		panelTipos.add(alerta);
 		
 		add(panelTipos, c);
@@ -150,6 +154,7 @@ public class MultifirmaMasiva extends JPanel {
         	Utils.remarcar(firmar);
         }
 		Utils.setContrastColor(firmar);
+		Utils.setFontBold(firmar);
 		
 		cons.ipadx = 0;
 		cons.weightx = 1.0;

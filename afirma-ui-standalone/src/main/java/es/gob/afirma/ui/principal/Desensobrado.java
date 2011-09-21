@@ -92,6 +92,7 @@ public class Desensobrado extends JPanel {
     	JLabel etiquetaFichero = new JLabel();
     	etiquetaFichero.setText(Messages.getString("Desensobrado.buscar")); // NOI18N
     	Utils.setContrastColor(etiquetaFichero);
+    	Utils.setFontBold(etiquetaFichero);
 		add(etiquetaFichero, c);
 		
 		c.insets = new Insets(0, 13, 0, 0);
@@ -112,6 +113,7 @@ public class Desensobrado extends JPanel {
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(campoFichero);
 		}
+        Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -141,6 +143,7 @@ public class Desensobrado extends JPanel {
         	Utils.remarcar(examinar);
         }
         Utils.setContrastColor(examinar);
+        Utils.setFontBold(examinar);
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -153,6 +156,7 @@ public class Desensobrado extends JPanel {
         JLabel etiquetaAlmacen = new JLabel();
         etiquetaAlmacen.setText(Messages.getString("Desensobrado.almacen")); // NOI18N
         Utils.setContrastColor(etiquetaAlmacen);
+        Utils.setFontBold(etiquetaAlmacen);
         add(etiquetaAlmacen, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -172,6 +176,7 @@ public class Desensobrado extends JPanel {
         	Utils.remarcar(comboAlmacen);
         }
         Utils.setContrastColor(comboAlmacen);
+        Utils.setFontBold(comboAlmacen);
         add(comboAlmacen, c);
         
         //Relación entre etiqueta y combo
@@ -189,6 +194,7 @@ public class Desensobrado extends JPanel {
         JLabel etiquetaOpciones = new JLabel();
         etiquetaOpciones.setText(Messages.getString("Desensobrado.opciones")); // NOI18N
         Utils.setContrastColor(etiquetaOpciones);
+        Utils.setFontBold(etiquetaOpciones);
         add(etiquetaOpciones, c);
         
 		c.insets = new Insets(0, 13, 0, 13);
@@ -207,6 +213,7 @@ public class Desensobrado extends JPanel {
         	Utils.remarcar(checkInicar);
         }
         Utils.setContrastColor(checkInicar);
+        Utils.setFontBold(checkInicar);
         add(checkInicar, c);
 		
 		c.weighty = 1.0;
@@ -246,6 +253,7 @@ public class Desensobrado extends JPanel {
         	Utils.remarcar(extraer);
         }
         Utils.setContrastColor(extraer);
+        Utils.setFontBold(extraer);
         
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(extraer, BorderLayout.CENTER);

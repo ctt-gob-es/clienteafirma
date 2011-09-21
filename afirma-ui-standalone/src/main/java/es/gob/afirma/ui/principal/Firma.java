@@ -139,6 +139,7 @@ public class Firma extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
+		Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -182,6 +183,7 @@ public class Firma extends JPanel {
 		JLabel etiquetaAlmacen = new JLabel();
 		etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N
 		Utils.setContrastColor(etiquetaAlmacen);
+		Utils.setFontBold(etiquetaAlmacen);
 		add(etiquetaAlmacen, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -202,6 +204,7 @@ public class Firma extends JPanel {
 		}
 		cargarComboAlmacen(comboAlmacen);
 		Utils.setContrastColor(comboAlmacen);
+		Utils.setFontBold(comboAlmacen);
 		add(comboAlmacen, c);
 		
 		//Relación entre etiqueta y combo
@@ -219,6 +222,7 @@ public class Firma extends JPanel {
 		JLabel etiquetaFormato = new JLabel();
 		etiquetaFormato.setText(Messages.getString("Firma.formato")); // NOI18N
 		Utils.setContrastColor(etiquetaFormato);
+		Utils.setFontBold(etiquetaFormato);
 		add(etiquetaFormato, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -253,6 +257,7 @@ public class Firma extends JPanel {
 			Utils.remarcar(comboFormato);
 		}
 		Utils.setContrastColor(comboFormato);
+		Utils.setFontBold(comboFormato);
 		add(comboFormato, c);
 		
 		//Relación entre etiqueta y combo
@@ -298,6 +303,7 @@ public class Firma extends JPanel {
 			Utils.remarcar(firmar);
 		}
 		Utils.setContrastColor(firmar);
+		Utils.setFontBold(firmar);
 		
 		cons.ipadx = 0;
 		cons.gridx = 1;

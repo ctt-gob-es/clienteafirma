@@ -104,6 +104,7 @@ public class Cifrado extends JPanel {
 		etiquetaFichero.setText(Messages.getString("Cifrado.buscar")); // NOI18N
 		etiquetaFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.description")); // NOI18N
 		Utils.setContrastColor(etiquetaFichero);
+		Utils.setFontBold(etiquetaFichero);
 		add(etiquetaFichero, c);
 		
 		c.insets = new Insets(0, 13, 0, 0);
@@ -123,7 +124,8 @@ public class Cifrado extends JPanel {
 		}
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(campoFichero);
-		}		
+		}
+		Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto
@@ -152,6 +154,7 @@ public class Cifrado extends JPanel {
 			Utils.remarcar(examinar);
 		}
 		Utils.setContrastColor(examinar);
+		Utils.setFontBold(examinar);
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
@@ -164,6 +167,7 @@ public class Cifrado extends JPanel {
 		JLabel etiquetaMecanismo = new JLabel();
 		etiquetaMecanismo.setText(Messages.getString("Cifrado.origen.clave")); // NOI18N
 		Utils.setContrastColor(etiquetaMecanismo);
+		Utils.setFontBold(etiquetaMecanismo);
 		add(etiquetaMecanismo, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -189,6 +193,7 @@ public class Cifrado extends JPanel {
 			Utils.remarcar(comboMecanismo);
 		}
 		Utils.setContrastColor(comboMecanismo);
+		Utils.setFontBold(comboMecanismo);
 		add(comboMecanismo, c);
 		
 		// En la vista simple, no se permitirá configurar el origen de la clave
@@ -214,6 +219,7 @@ public class Cifrado extends JPanel {
 		etiquetaAlgoritmo.setText(Messages.getString("Cifrado.formato")); // NOI18N
 		etiquetaAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.description")); // NOI18N
 		Utils.setContrastColor(etiquetaAlgoritmo);
+		Utils.setFontBold(etiquetaAlgoritmo);
 		add(etiquetaAlgoritmo, c);
 		
 		c.insets = new Insets(0, 13, 0, 13);
@@ -232,6 +238,7 @@ public class Cifrado extends JPanel {
 			Utils.remarcar(comboAlgoritmo);
 		}
 		Utils.setContrastColor(comboAlgoritmo);
+		Utils.setFontBold(comboAlgoritmo);
 		add(comboAlgoritmo, c);
 		
 		// En la vista simple, no se permitirá configurar el algoritmo de cifrado
@@ -284,6 +291,7 @@ public class Cifrado extends JPanel {
 			Utils.remarcar(cifrar);
 		}
 		Utils.setContrastColor(cifrar);
+		Utils.setFontBold(cifrar);
 		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(cifrar, BorderLayout.CENTER);

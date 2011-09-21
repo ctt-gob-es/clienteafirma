@@ -78,6 +78,7 @@ public class Validacion extends JPanel {
 			Utils.remarcar(etiqueta);
 		}
 		Utils.setContrastColor(etiqueta);
+		Utils.setFontBold(etiqueta);
 		add(etiqueta, c);
 
 		c.insets = new Insets(5, 13, 0, 13);
@@ -92,6 +93,7 @@ public class Validacion extends JPanel {
 			Utils.remarcar(etiqueta);
 		}
 		Utils.setContrastColor(etiqueta);
+		Utils.setFontBold(etiqueta);
 		add(etiqueta, c);
 
 		c.gridy = 3;
@@ -106,6 +108,7 @@ public class Validacion extends JPanel {
 			Utils.remarcar(etiqueta);
 		}
 		Utils.setContrastColor(etiqueta);
+		Utils.setFontBold(etiqueta);
 		add(etiqueta, c);
 
 		c.gridy = 4;
@@ -118,6 +121,7 @@ public class Validacion extends JPanel {
 			Utils.remarcar(etiqueta);
 		}
 		Utils.setContrastColor(etiqueta);
+		Utils.setFontBold(etiqueta);
 		add(etiqueta, c);
 
 		c.gridy = 5;
@@ -130,6 +134,7 @@ public class Validacion extends JPanel {
 			Utils.remarcar(etiqueta);
 		}
 		Utils.setContrastColor(etiqueta);
+		Utils.setFontBold(etiqueta);
 		add(etiqueta, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
@@ -171,6 +176,7 @@ public class Validacion extends JPanel {
 			Utils.remarcar(valide);
 		}
 		Utils.setContrastColor(valide);
+		Utils.setFontBold(valide);
 		cons.ipadx = 0;
 		cons.gridx = 1;
 		cons.weightx = 1.0;
