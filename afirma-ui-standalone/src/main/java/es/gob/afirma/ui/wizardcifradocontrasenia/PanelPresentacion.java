@@ -65,10 +65,13 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         
         // Configuramos el layout
         GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(20, 20, 0, 20);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(20, 20, 20, 20);
 		c.weightx = 1.0;
+		c.weighty = 1.0;
 		c.gridx = 0;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.NORTHWEST;
 		
 		// Panel con el contenido
         JPanel panelCentral = new JPanel();
@@ -77,13 +80,13 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         panelCentral.setLayout(new GridBagLayout());
 
 
-        //Panel con el texto "Bienvenido al asistente..."
-
+        //Etiqueta con el texto "Bienvenido al asistente..."
         String textLabel = Messages.getString("Wizard.sobres.presentacion.pass.presentacion1") +
-        		"<br/>"+"<br/>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion2")+
-        		"<br/>"+"<br/>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
+        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion2")+
+        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
         InfoLabel presentationLabel = new InfoLabel(textLabel, false);
-
+      
+        //Se añade la etiqueta al panel
         panelCentral.add(presentationLabel, c);
 
         getContentPane().add(panelCentral, BorderLayout.CENTER);
