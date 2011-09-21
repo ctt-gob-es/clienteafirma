@@ -44,6 +44,7 @@ import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
+import es.gob.afirma.ui.wizardUtils.InfoLabel;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
@@ -120,9 +121,11 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		c.weightx = 1.0;
 		c.gridx = 0;
     	
-        // Panel que contiene el texto "Introduzca una contrasenia de..."
-		panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"WizardCifrado.contrasenia.contenido.texto1", false), c);
+        // Etiqueta que contiene el texto "Introduzca una contrasenia de..."
+		InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto1"), false);
+		panelCentral.add(insertLabel, c);
+		/*panelCentral.add(PanelesTexto.generarPanelTexto(
+        		"WizardCifrado.contrasenia.contenido.texto1", false), c);*/
         
 		c.gridy = 1;
 		c.insets = new Insets(20, 20, 0, 20);
@@ -191,9 +194,11 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         c.weighty = 1.0;
         c.insets = new Insets(20, 20, 0, 20);
         
-        // Panel que contiene el texto "El olvido o perdida..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"WizardCifrado.contrasenia.contenido.texto5", false), c);
+        // Etiqueta que contiene el texto "El olvido o perdida..."
+        InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto5"), false);
+		panelCentral.add(lostLabel, c);
+       /* panelCentral.add(PanelesTexto.generarPanelTexto(
+        		"WizardCifrado.contrasenia.contenido.texto5", false), c);*/
         
         getContentPane().add(panelCentral, BorderLayout.CENTER);
 
