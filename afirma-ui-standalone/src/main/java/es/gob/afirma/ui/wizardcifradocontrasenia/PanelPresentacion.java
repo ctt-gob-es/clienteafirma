@@ -69,7 +69,6 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         c.insets = new Insets(20, 20, 0, 20);
 		c.weightx = 1.0;
 		c.gridx = 0;
-		c.anchor = GridBagConstraints.NORTH;
 		
 		// Panel con el contenido
         JPanel panelCentral = new JPanel();
@@ -81,10 +80,10 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         //Panel con el texto "Bienvenido al asistente..."
 
         String textLabel = Messages.getString("Wizard.sobres.presentacion.pass.presentacion1") +
-        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion2")+
-        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
+        		"<br/>"+"<br/>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion2")+
+        		"<br/>"+"<br/>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
         InfoLabel presentationLabel = new InfoLabel(textLabel, false);
-       // presentationLabel.setVerticalTextPosition(JLabel.TOP);
+
         panelCentral.add(presentationLabel, c);
 
         getContentPane().add(panelCentral, BorderLayout.CENTER);

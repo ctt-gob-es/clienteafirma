@@ -242,10 +242,6 @@ public class Utils {
 		}
 	}
 	
-	/**
-	 * Configura el comportamiento de ciertos componentes en Alto Contraste
-	 * @param component Componente al que aplicar el alto contraste
-	 */
 	public static void setContrastColor (JComponent component){
 		if (GeneralConfig.isHighContrast()){
 			if (component instanceof JComboBox || component instanceof JPasswordField || component instanceof JTextField){
@@ -276,44 +272,6 @@ public class Utils {
 		} else {
 			if (component instanceof JStatusBar){
 				((JLabel)component.getComponent(0)).setForeground(Color.BLACK);
-			}
-		}
-	}
-	
-	/**
-	 * Aplica el tamaño de fuente grande
-	 * @param component Componente al que aplicar el tamaño de fuente.
-	 */
-	public static void setBigFontSize(JComponent component){
-		if (GeneralConfig.isBigFontSize()){
-			if (component instanceof JLabel){
-				JLabel label = (JLabel) component;
-				System.out.println(label.getFont().getSize());
-				label.setFont(label.getFont().deriveFont((float)35));
-				System.out.println(label.getFont().getSize());
-			}
-			if (component instanceof JButton){
-				JButton button = (JButton) component;
-				System.out.println(button.getFont().getSize());
-				button.setFont(button.getFont().deriveFont((float)35));
-				System.out.println(button.getFont().getSize());
-			}
-		}
-	}
-	
-	/**
-	 * Aplica el estilo de fuente negrita
-	 * @param component Componente al que aplicar el estilo de fuente negrita.
-	 */
-	public static void setFontBold(JComponent component){
-		if (GeneralConfig.isFontBold()){
-			if (component instanceof JLabel){
-				JLabel label = (JLabel) component;
-				label.setFont(new Font(label.getFont().getName(),Font.BOLD , label.getFont().getSize()));
-			}
-			if (component instanceof JButton){
-				JButton button = (JButton) component;
-				button.setFont(new Font(button.getFont().getName(),Font.BOLD , button.getFont().getSize()));
 			}
 		}
 	}
