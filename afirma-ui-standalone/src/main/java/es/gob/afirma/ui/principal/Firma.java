@@ -117,6 +117,7 @@ public class Firma extends JPanel {
 		etiquetaFichero.setText(Messages.getString("Firma.buscar")); // NOI18N
 		etiquetaFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.description")); // NOI18N
 		Utils.setContrastColor(etiquetaFichero);
+		Utils.setFontBold(etiquetaFichero);
 		add(etiquetaFichero, c);
 		
 		c.insets = new Insets(0, 13, 0, 0);
@@ -168,6 +169,7 @@ public class Firma extends JPanel {
 			Utils.remarcar(examinar);
 		}
 		Utils.setContrastColor(examinar);
+		Utils.setFontBold(examinar);
 		add(examinar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
