@@ -86,7 +86,7 @@ public class Ensobrado extends JPanel {
         campoFichero.setToolTipText(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N
         campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion")));
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion")));
-		campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + O"); // NOI18N
+		campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + O."); // NOI18N
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
@@ -177,7 +177,7 @@ public class Ensobrado extends JPanel {
         comboTipos.setToolTipText(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
         comboTipos.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
         comboTipos.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
-        comboTipos.getAccessibleContext().setAccessibleName(etiquetaOpciones.getText() + " " + Messages.getString("Ensobrado.opciones.combo.status") +" ALT + T"); // NOI18N
+        comboTipos.getAccessibleContext().setAccessibleName(etiquetaOpciones.getText() + " " + Messages.getString("Ensobrado.opciones.combo.status") +" ALT + T."); // NOI18N
         comboTipos.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.opciones.combo.description")); // NOI18N
         cargarComboTipos();
         if (GeneralConfig.isRemarked()){
