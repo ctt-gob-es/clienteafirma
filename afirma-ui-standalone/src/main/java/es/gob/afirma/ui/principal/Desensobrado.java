@@ -102,7 +102,7 @@ public class Desensobrado extends JPanel {
         campoFichero.setToolTipText(Messages.getString("Desensobrado.buscar.caja.description")); // NOI18N
         campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.buscar.caja.description.status")));
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.buscar.caja.description.status")));
-        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + O"); // NOI18N
+        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + O."); // NOI18N
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.buscar.caja.description")); // NOI18N
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
@@ -167,7 +167,7 @@ public class Desensobrado extends JPanel {
         comboAlmacen.setToolTipText(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N
         comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.almacen.combo.description.status")));
         comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.almacen.combo.description.status")));
-        comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+ " " + Messages.getString("Desensobrado.almacen.combo.description.status") + " ALT + A"); // NOI18N
+        comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+ " " + Messages.getString("Desensobrado.almacen.combo.description.status") + " ALT + A."); // NOI18N
         comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N
         cargarComboAlmacen(comboAlmacen);
         if (GeneralConfig.isRemarked()){
