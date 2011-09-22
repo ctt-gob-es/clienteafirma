@@ -106,6 +106,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null, true);
         Utils.setContrastColor(panelSuperior);
+        Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
         
     	// Panel central
@@ -132,6 +133,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         JLabel etiquetaContrasenia = new JLabel();
         etiquetaContrasenia.setText(Messages.getString("WizardCifrado.contrasenia")); // NOI18N
         Utils.setContrastColor(etiquetaContrasenia);
+        Utils.setFontBold(etiquetaContrasenia);
         panelCentral.add(etiquetaContrasenia, c);
         
         c.gridy = 2;
@@ -150,6 +152,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         	Utils.remarcar(campoContrasenia);
         }
         Utils.setContrastColor(campoContrasenia);
+        Utils.setFontBold(campoContrasenia);
         panelCentral.add(campoContrasenia, c);
         
         //Relación entre etiqueta y campo de contraseña
@@ -164,6 +167,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         JLabel etiquetaContraseniaRep = new JLabel();
         etiquetaContraseniaRep.setText(Messages.getString("WizardCifrado.recontrasenia")); // NOI18N
         Utils.setContrastColor(etiquetaContraseniaRep);
+        Utils.setFontBold(etiquetaContraseniaRep);
         panelCentral.add(etiquetaContraseniaRep, c);
         
         c.gridy = 4;
@@ -182,6 +186,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         	Utils.remarcar(campoContraseniaRep);
         }
         Utils.setContrastColor(campoContraseniaRep);
+        Utils.setFontBold(campoContraseniaRep);
         panelCentral.add(campoContraseniaRep, c);
         
         //Relación entre etiqueta y campo de contraseña

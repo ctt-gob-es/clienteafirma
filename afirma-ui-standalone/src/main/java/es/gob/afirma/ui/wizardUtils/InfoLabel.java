@@ -32,6 +32,7 @@ public class InfoLabel extends JLabel{
 	        	Utils.remarcar(this);
 	        }
 		 Utils.setContrastColor(this);
+		 Utils.setFontBold(this);
 		
 	}
 }

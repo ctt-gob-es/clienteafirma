@@ -84,6 +84,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
         	Utils.remarcar(etiqueta);
         }
     	Utils.setContrastColor(etiqueta);
+    	Utils.setFontBold(etiqueta);
     	panelCentral.add(etiqueta, c);
     	
     	// Panel con el texto "El sobre digital..."

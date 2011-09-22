@@ -286,6 +286,15 @@ public class Utils {
 	 */
 	public static void setFontBold(JComponent component){
 		if (GeneralConfig.isFontBold()){
+			if(component instanceof JPanel){
+				if (component.getBorder()!=null){
+					if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){
+						if (((TitledBorder)component.getBorder())!=null){
+							((TitledBorder)component.getBorder()).setTitleFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
+						}
+					}
+				}
+			}
 			component.setFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
 		}
 	}

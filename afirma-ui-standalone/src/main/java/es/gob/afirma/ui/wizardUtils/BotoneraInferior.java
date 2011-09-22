@@ -21,6 +21,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
@@ -91,6 +92,7 @@ public class BotoneraInferior extends JPanel {
         	Utils.remarcar(maximizar);
         }
         Utils.setContrastColor(maximizar);
+        Utils.setFontBold(maximizar);
         
         add(maximizar);
         
@@ -118,6 +120,7 @@ public class BotoneraInferior extends JPanel {
         	Utils.remarcar(anterior);
         }
         Utils.setContrastColor(anterior);
+        Utils.setFontBold(anterior);
        
         add(anterior);
         
@@ -139,6 +142,7 @@ public class BotoneraInferior extends JPanel {
         	Utils.remarcar(siguiente);
         } 
         Utils.setContrastColor(siguiente);
+        Utils.setFontBold(siguiente);
         add(siguiente);
 
         // Espacio entre botones
@@ -164,6 +168,7 @@ public class BotoneraInferior extends JPanel {
         	Utils.remarcar(cancelar);
         }
         Utils.setContrastColor(cancelar);
+        Utils.setFontBold(cancelar);
         add(cancelar);
 
         // Boton finalizar
@@ -185,6 +190,7 @@ public class BotoneraInferior extends JPanel {
         	Utils.remarcar(finalizar);
         }
         Utils.setContrastColor(finalizar);
+        Utils.setFontBold(finalizar);
         add(finalizar);
 	}
 

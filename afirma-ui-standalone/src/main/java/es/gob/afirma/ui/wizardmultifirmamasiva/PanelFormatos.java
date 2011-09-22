@@ -102,6 +102,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.firma.pagina1.titulo", "Wizard.firma.pafina1.titulo.explicacion", null, true);
         Utils.setContrastColor(panelSuperior);
+        Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		
         // Panel central
@@ -127,6 +128,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
         JPanel panelOperaciones = new JPanel();
         panelOperaciones.setBorder(BorderFactory.createTitledBorder(Messages.getString("Wizard.multifirma.ventana1.panel.operacion")));
         Utils.setContrastColor(panelOperaciones);
+        Utils.setFontBold(panelOperaciones);
 		panelOperaciones.setLayout(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
@@ -146,6 +148,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
         	Utils.remarcar(radioFirma);
         }
 		Utils.setContrastColor(radioFirma);
+		Utils.setFontBold(radioFirma);
 		panelOperaciones.add(radioFirma, cons);
 		
 		cons.insets = new Insets(0, 0, 0, 0);
@@ -163,6 +166,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
         	Utils.remarcar(radioCofirma);
         }
 		Utils.setContrastColor(radioCofirma);
+		Utils.setFontBold(radioCofirma);
 		panelOperaciones.add(radioCofirma, cons);
 		
 		cons.insets = new Insets(0, 0, 0, 0);
@@ -180,6 +184,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
         	Utils.remarcar(radioContrafirma);
         }
 		Utils.setContrastColor(radioContrafirma);
+		Utils.setFontBold(radioContrafirma);
 		panelOperaciones.add(radioContrafirma, cons);
 		
 		// Agrupamos los radiobutton para que solo se pueda marcar uno
@@ -197,6 +202,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		// Etiqueta con el texto formato
 		etiquetaFormato.setText(Messages.getString("Firma.formato"));
 		Utils.setContrastColor(etiquetaFormato);
+		Utils.setFontBold(etiquetaFormato);
 		panelCentral.add(etiquetaFormato, c);
 		
 		c.insets = new Insets(0, 20, 0, 20);
@@ -219,6 +225,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
         	Utils.remarcar(comboFormatos);
         }
 		Utils.setContrastColor(comboFormatos);
+		Utils.setFontBold(comboFormatos);
 		panelCentral.add(comboFormatos, c);
 		
 		//Relación entre etiqueta y combo
@@ -244,6 +251,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
         	Utils.remarcar(checkFormato);
         }
 		Utils.setContrastColor(checkFormato);
+		Utils.setFontBold(checkFormato);
 		panelCentral.add(checkFormato, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);

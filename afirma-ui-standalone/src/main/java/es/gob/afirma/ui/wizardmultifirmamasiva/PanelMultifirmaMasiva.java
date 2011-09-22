@@ -239,6 +239,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.ventana4.titulo", "Wizard.multifirma.ventana4.titulo.descripcion", null, true);
         Utils.setContrastColor(panelSuperior);
+        Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		
         // Panel central
@@ -257,6 +258,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     	JLabel etiquetaFirma = new JLabel();
     	etiquetaFirma.setText(Messages.getString("Wizard.multifirma.ventana4.directorio"));
     	Utils.setContrastColor(etiquetaFirma);
+    	Utils.setFontBold(etiquetaFirma);
         panelCentral.add(etiquetaFirma, c);
         
         c.insets = new Insets(0, 20, 0, 0);
@@ -276,6 +278,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	Utils.remarcar(campoDirectorio);
         }
         Utils.setContrastColor(campoDirectorio);
+        Utils.setFontBold(campoDirectorio);
         panelCentral.add(campoDirectorio, c);
         
         //Relaci�n entre etiqueta y campo de texto
@@ -301,6 +304,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	Utils.remarcar(examinarDirectorio);
         }
         Utils.setContrastColor(examinarDirectorio);
+        Utils.setFontBold(examinarDirectorio);
         panelCentral.add(examinarDirectorio, c);
         
         c.insets = new Insets(5, 20, 0, 20);
@@ -317,6 +321,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	Utils.remarcar(checkSobreescribir);
         }
         Utils.setContrastColor(checkSobreescribir);
+        Utils.setFontBold(checkSobreescribir);
         panelCentral.add(checkSobreescribir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
@@ -325,6 +330,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Fichero de log"
         etiquetaFichero.setText(Messages.getString("Wizard.multifirma.ventana4.log"));
         Utils.setContrastColor(etiquetaFichero);
+        Utils.setFontBold(etiquetaFichero);
         panelCentral.add(etiquetaFichero, c);
         
         c.insets = new Insets(0, 20, 0, 0);
@@ -344,6 +350,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	Utils.remarcar(campoFicheroLog);
         }
         Utils.setContrastColor(campoFicheroLog);
+        Utils.setFontBold(campoFicheroLog);
         panelCentral.add(campoFicheroLog, c);
         
         //Relaci�n entre etiqueta y campo de texto
@@ -368,6 +375,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	Utils.remarcar(examinarFichero);
         }
         Utils.setContrastColor(examinarFichero);
+        Utils.setFontBold(examinarFichero);
         panelCentral.add(examinarFichero, c);
         
         c.fill = GridBagConstraints.BOTH;

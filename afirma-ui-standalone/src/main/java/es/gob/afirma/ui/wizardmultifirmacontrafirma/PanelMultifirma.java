@@ -216,6 +216,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana2.titulo", 
 				"Wizard.multifirma.simple.contrafirma.ventana2.titulo.description", null, true);
 		Utils.setContrastColor(panelSuperior);
+		Utils.setFontBold(panelSuperior);
 		getContentPane().add(panelSuperior, BorderLayout.NORTH);
 
 		// Panel central
@@ -232,6 +233,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		JLabel etiquetaFirmas = new JLabel();
 		etiquetaFirmas.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas"));
 		Utils.setContrastColor(etiquetaFirmas);
+		Utils.setFontBold(etiquetaFirmas);
 		panelCentral.add(etiquetaFirmas, c);
 
 		// Combo con tipos de firmas
@@ -262,6 +264,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
         	Utils.remarcar(comboFirmas);
         }
 		Utils.setContrastColor(comboFirmas);
+		Utils.setFontBold(comboFirmas);
 		panelCentral.add(comboFirmas, c);
 		
 		 //Relación entre etiqueta y combo
@@ -276,6 +279,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		// Etiqueta con el texto "Arbol de firmas"
 		etiqueta.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.arbol"));
 		Utils.setContrastColor(etiqueta);
+		Utils.setFontBold(etiqueta);
 		panelCentral.add(etiqueta, c);
 
 		/*
@@ -319,6 +323,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			Utils.remarcar(arbolFirmas);
 		}
 		Utils.setContrastColor(arbolFirmas);
+		Utils.setFontBold(arbolFirmas);
 		// Panel del arbol (firmantes seleccionados)
 		panelArbol.setViewportView(arbolFirmas);
 		panelCentral.add(panelArbol, c);
@@ -334,6 +339,10 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		 */
 
 		// Lista de firmantes ()
+		if (GeneralConfig.isRemarked()){
+			Utils.remarcar(listaFirmantes);
+		}
+		Utils.setFontBold(listaFirmantes);
 		listaFirmantes.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes")); // NOI18N
 		listaFirmantes.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes.description")); // NOI18N
 

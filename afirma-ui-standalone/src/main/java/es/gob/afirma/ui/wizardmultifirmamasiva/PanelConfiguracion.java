@@ -88,6 +88,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.pagina2.titulo", "Wizard.multifirma.pagina2.titulo.explicacion", null, true);
         Utils.setContrastColor(panelSuperior);
+        Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		
         // Panel central
@@ -117,6 +118,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         	Utils.remarcar(checkRespectar);
         }
         Utils.setContrastColor(checkRespectar);
+        Utils.setFontBold(checkRespectar);
         panelCentral.add(checkRespectar, c);
         
         c.gridy = 2;
@@ -130,6 +132,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     	// Panel que engloba los radiobuttons
     	panelRadios.setBorder(BorderFactory.createTitledBorder(Messages.getString("Wizard.multifirma.ventana2.panel")));
     	Utils.setContrastColor(panelRadios);
+    	Utils.setFontBold(panelRadios);
     	panelRadios.setLayout(new GridBagLayout());
     	
     	GridBagConstraints cons = new GridBagConstraints();
@@ -147,6 +150,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         	Utils.remarcar(radioTodos);
         }
         Utils.setContrastColor(radioTodos);
+        Utils.setFontBold(radioTodos);
         panelRadios.add(radioTodos, cons);
         
         cons.gridy = 1;
@@ -160,6 +164,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         	Utils.remarcar(radioUltimos);
         }
         Utils.setContrastColor(radioUltimos);
+        Utils.setFontBold(radioUltimos);
         panelRadios.add(radioUltimos, cons);
         
         // Grupo de radiobuttons

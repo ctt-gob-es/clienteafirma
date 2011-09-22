@@ -104,6 +104,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardDescifrado.clave.explicacion.titulo", "WizardDescifrado.clave.explicacion", null, true);
         Utils.setContrastColor(panelSuperior);
+        Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
         
     	// Panel central
@@ -131,6 +132,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		//Etiqueta con el texto Clave de descifrado
     	JLabel keyLabel = new JLabel (Messages.getString("WizardDescifrado.clave"));
     	Utils.setContrastColor(keyLabel);
+    	Utils.setFontBold(keyLabel);
     	panelCentral.add(keyLabel, c);
         
     	c.insets = new Insets(0, 20, 0, 20);
@@ -148,6 +150,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
         	Utils.remarcar(campoClave);
         }
         Utils.setContrastColor(campoClave);
+        Utils.setFontBold(campoClave);
         panelCentral.add(campoClave, c);
         
         //Relación entre etiqueta y campo de texto
@@ -174,6 +177,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
         	Utils.remarcar(examinar);
         }
         Utils.setContrastColor(examinar);
+        Utils.setFontBold(examinar);
         panelCentral.add(examinar, c);
         
         c.fill = GridBagConstraints.BOTH;

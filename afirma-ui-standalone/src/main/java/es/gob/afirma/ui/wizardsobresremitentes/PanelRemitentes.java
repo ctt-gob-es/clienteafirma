@@ -135,6 +135,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Panel con la cabecera
         CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.sobres.remitentes.titulo", "Wizard.sobres.remitentes.titulo.explicacion", null, true);
         Utils.setContrastColor(panelSuperior);
+        Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
 		
         // Panel central
@@ -160,6 +161,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         JLabel etiquetaAnadir = new JLabel();
         etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante"));
         Utils.setContrastColor(etiquetaAnadir);
+        Utils.setFontBold(etiquetaAnadir);
 		panelCentral.add(etiquetaAnadir, c);
 		
 		c.insets = new Insets(0, 20, 0, 0);
@@ -181,6 +183,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         	Utils.remarcar(comboRepositorios);
         }
 		Utils.setContrastColor(comboRepositorios);
+		Utils.setFontBold(comboRepositorios);
 		panelCentral.add(comboRepositorios, c);
 		
 		c.insets = new Insets(0, 10, 0, 20);
@@ -202,6 +205,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         	Utils.remarcar(anadir);
         }
 		Utils.setContrastColor(anadir);
+		Utils.setFontBold(anadir);
 		panelCentral.add(anadir, c);
 		
 		c.insets = new Insets(10, 20, 0, 20);
@@ -223,6 +227,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         	Utils.remarcar(listaRemitentes);
         }
 		Utils.setContrastColor(listaRemitentes);
+		Utils.setFontBold(listaRemitentes);
 		panelLista.setViewportView(listaRemitentes);
 		
 		c.ipady = 0;
@@ -252,6 +257,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         	Utils.remarcar(eliminar);
         }
 		Utils.setContrastColor(eliminar);
+		Utils.setFontBold(eliminar);
 		panelCentral.add(eliminar, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);

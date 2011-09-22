@@ -44,6 +44,7 @@ public class PanelesTexto {
         	Utils.remarcar(bloqueTexto);
         }
         Utils.setContrastColor(bloqueTexto);
+        Utils.setFontBold(bloqueTexto);
         
         return bloqueTexto;
 	}
