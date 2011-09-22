@@ -63,6 +63,7 @@ public class ContextOptionsPane {
         JPanel contextPanel = new JPanel(new GridBagLayout());
         contextPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.firmas"))); // NOI18N
         Utils.setContrastColor(contextPanel);
+        Utils.setFontBold(contextPanel);
         
         GridBagConstraints c2 = new GridBagConstraints();
         c2.fill = GridBagConstraints.HORIZONTAL;
@@ -74,6 +75,7 @@ public class ContextOptionsPane {
         JLabel etiquetaMotivo = new JLabel();
         etiquetaMotivo.setText(Messages.getString("Opciones.firmas.motivo")); // NOI18N
         Utils.setContrastColor(etiquetaMotivo);
+        Utils.setFontBold(etiquetaMotivo);
         contextPanel.add(etiquetaMotivo, c2);
         
         c2.insets = new Insets(5, 13, 0, 13);
@@ -91,6 +93,7 @@ public class ContextOptionsPane {
         	Utils.remarcar(campoMotivo);
         }
         Utils.setContrastColor(campoMotivo);
+        Utils.setFontBold(campoMotivo);
         contextPanel.add(campoMotivo, c2);
         
         //Relación entre etiqueta y campo de texto
@@ -106,6 +109,7 @@ public class ContextOptionsPane {
         JLabel etiquetaLugar = new JLabel();
         etiquetaLugar.setText(Messages.getString("Opciones.firmas.lugar")); // NOI18N
         Utils.setContrastColor(etiquetaLugar);
+        Utils.setFontBold(etiquetaLugar);
         contextPanel.add(etiquetaLugar, c2);
         
         c2.insets = new Insets(5, 13, 0, 13);
@@ -123,6 +127,7 @@ public class ContextOptionsPane {
         	Utils.remarcar(campoLugar);
         }
         Utils.setContrastColor(campoLugar);
+        Utils.setFontBold(campoLugar);
         contextPanel.add(campoLugar, c2);
         
         //Relación entre etiqueta y campo de texto
@@ -137,6 +142,7 @@ public class ContextOptionsPane {
         JLabel etiquetaDatos = new JLabel();
         etiquetaDatos.setText(Messages.getString("Opciones.firmas.datos")); // NOI18N
         Utils.setContrastColor(etiquetaDatos);
+        Utils.setFontBold(etiquetaDatos);
         contextPanel.add(etiquetaDatos, c2);
 
         c2.insets = new Insets(5, 13, 5, 13);
@@ -154,6 +160,7 @@ public class ContextOptionsPane {
         	Utils.remarcar(campoDatos);
         }
         Utils.setContrastColor(campoDatos);
+        Utils.setFontBold(campoDatos);
         contextPanel.add(campoDatos, c2);
         
         //Relación entre etiqueta y campo de texto

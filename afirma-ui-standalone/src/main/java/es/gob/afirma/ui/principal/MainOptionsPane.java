@@ -92,6 +92,7 @@ public class MainOptionsPane {
     	JPanel generalPanel = new JPanel(new GridBagLayout());
     	generalPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.general"))); // NOI18N
     	Utils.setContrastColor(generalPanel);
+    	Utils.setFontBold(generalPanel);
 
     	GridBagConstraints c2 = new GridBagConstraints();
         c2.fill = GridBagConstraints.HORIZONTAL;
@@ -110,6 +111,7 @@ public class MainOptionsPane {
         	Utils.remarcar(checkHabilitar);
         }
         Utils.setContrastColor(checkHabilitar);
+        Utils.setFontBold(checkHabilitar);
         generalPanel.add(checkHabilitar, c2);
         
         panel.add(generalPanel, c);
@@ -119,7 +121,7 @@ public class MainOptionsPane {
         JPanel criptografiaPanel = new JPanel(new GridBagLayout());
         criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
         Utils.setContrastColor(criptografiaPanel);
-        
+        Utils.setFontBold(criptografiaPanel);
 
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(4, 13, 0, 13);
@@ -129,6 +131,7 @@ public class MainOptionsPane {
         // Etiqueta algoritmo de huella digital
         JLabel etiquetaAlgoritmo = new JLabel(Messages.getString("Opciones.criptografia.algoritmo.parte"));
         Utils.setContrastColor(etiquetaAlgoritmo);
+        Utils.setFontBold(etiquetaAlgoritmo);
         criptografiaPanel.add(etiquetaAlgoritmo, c2);
         
         c2.insets = new Insets(5, 13, 0, 13);
@@ -146,6 +149,7 @@ public class MainOptionsPane {
         	Utils.remarcar(comboAlgoritmo);
         }
         Utils.setContrastColor(comboAlgoritmo);
+        Utils.setFontBold(comboAlgoritmo);
         criptografiaPanel.add(comboAlgoritmo, c2);
         
         //Relación entre etiqueta y combo
@@ -167,6 +171,7 @@ public class MainOptionsPane {
         	Utils.remarcar(checkXML);
         }
         Utils.setContrastColor(checkXML);
+        Utils.setFontBold(checkXML);
         criptografiaPanel.add(checkXML, c2);
         c.weighty = 0.3;
         c.fill = GridBagConstraints.BOTH;
@@ -179,6 +184,7 @@ public class MainOptionsPane {
     	JPanel policyPanel = new JPanel(new GridBagLayout());
     	policyPanel.setBorder(BorderFactory.createTitledBorder("Pol\u00EDtica de firma")); // NOI18N
     	Utils.setContrastColor(policyPanel);
+    	Utils.setFontBold(policyPanel);
 
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(5, 13, 0, 13);
@@ -193,6 +199,7 @@ public class MainOptionsPane {
         	Utils.remarcar(checkAddPolicy);
         }
         Utils.setContrastColor(checkAddPolicy);
+        Utils.setFontBold(checkAddPolicy);
         
         policyPanel.add(checkAddPolicy, c2);
         c2.gridy = c2.gridy + 1; 
@@ -200,6 +207,7 @@ public class MainOptionsPane {
         final JLabel policyOidLabel = new JLabel("Identificador de la pol\u00EDtica de firma (OID):");
         policyOidLabel.setEnabled(false);
         Utils.setContrastColor(policyOidLabel);
+        Utils.setFontBold(policyOidLabel);
         policyPanel.add(policyOidLabel, c2);
         c2.gridy = c2.gridy + 1;
         
@@ -209,6 +217,7 @@ public class MainOptionsPane {
         	Utils.remarcar(textPolicyOid);
         }
         Utils.setContrastColor(textPolicyOid);
+        Utils.setFontBold(textPolicyOid);
         
         //Relación entre etiqueta y campo de texto
         policyOidLabel.setLabelFor(textPolicyOid);
@@ -219,6 +228,7 @@ public class MainOptionsPane {
         final JLabel policyUrlLabel = new JLabel("Ruta de la pol\u00EDtica de firma (URL):");
         policyUrlLabel.setEnabled(false);
         Utils.setContrastColor(policyUrlLabel);
+        Utils.setFontBold(policyUrlLabel);
         policyPanel.add(policyUrlLabel, c2);
         c2.gridy = c2.gridy + 1;
         
@@ -228,6 +238,7 @@ public class MainOptionsPane {
         	Utils.remarcar(textPolicyUrl);
         }
         Utils.setContrastColor(textPolicyUrl);
+        Utils.setFontBold(textPolicyUrl);
         
         //Relación entre etiqueta y campo de texto
         policyUrlLabel.setLabelFor(textPolicyUrl);

@@ -187,6 +187,7 @@ public class Opciones extends JAccessibilityDialog {
         	Utils.remarcar(maximizar);
         }
 	    Utils.setContrastColor(maximizar);
+	    Utils.setFontBold(maximizar);
 		
 	    //Espacio entre botones
 		Panel panelVacio = new Panel();
@@ -216,6 +217,7 @@ public class Opciones extends JAccessibilityDialog {
         	Utils.remarcar(aceptar);
         }
         Utils.setContrastColor(aceptar);
+        Utils.setFontBold(aceptar);
         
         // Boton cancelar
         JButton	cancelar = new JButton();
@@ -231,7 +233,7 @@ public class Opciones extends JAccessibilityDialog {
         	Utils.remarcar(cancelar);
         }
         Utils.setContrastColor(cancelar);
-        
+        Utils.setFontBold(cancelar);        
         
         // Panel en donde se insertan los botones maximizar, aceptar y cancelar
         JPanel buttonPanel = new JPanel();

@@ -74,6 +74,7 @@ public class AccessibilityOptionsPane {
     	JPanel textPanel = new JPanel(new GridBagLayout());
     	textPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.texto"))); // NOI18N
     	Utils.setContrastColor(textPanel);
+    	Utils.setFontBold(textPanel);
     	
     	GridBagConstraints c2 = new GridBagConstraints();
         c2.fill = GridBagConstraints.HORIZONTAL;
@@ -92,6 +93,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(checkFontSize);
         }
         Utils.setContrastColor(checkFontSize);
+        Utils.setFontBold(checkFontSize);
         textPanel.add(checkFontSize, c2);
         
         //Checkbox para habilitar la opcion de configuracion del estilo de fuente
@@ -105,6 +107,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(checkFontStyle);
         }
         Utils.setContrastColor(checkFontStyle);
+        Utils.setFontBold(checkFontStyle);
         textPanel.add(checkFontStyle, c2);
     	
     	panel.add(textPanel, c);
@@ -114,6 +117,7 @@ public class AccessibilityOptionsPane {
     	JPanel colorPanel = new JPanel(new GridBagLayout());
     	colorPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.color"))); // NOI18N
     	Utils.setContrastColor(colorPanel);
+    	Utils.setFontBold(colorPanel);
     	
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(5, 13, 0, 13);
@@ -131,6 +135,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(checkHighContrast);
         }
         Utils.setContrastColor(checkHighContrast);
+        Utils.setFontBold(checkHighContrast);
         colorPanel.add(checkHighContrast, c2);
         
         panel.add(colorPanel, c);
@@ -140,6 +145,7 @@ public class AccessibilityOptionsPane {
     	JPanel focusPanel = new JPanel(new GridBagLayout());
     	focusPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.foco"))); // NOI18N
     	Utils.setContrastColor(focusPanel);
+    	Utils.setFontBold(focusPanel);
     	
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(5, 13, 0, 13);
@@ -157,6 +163,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(checkFocusVisible);
         }
         Utils.setContrastColor(checkFocusVisible);
+        Utils.setFontBold(checkFocusVisible);
         focusPanel.add(checkFocusVisible, c2);
         
         panel.add(focusPanel, c);
@@ -166,6 +173,7 @@ public class AccessibilityOptionsPane {
     	JPanel windowPanel = new JPanel(new GridBagLayout());
     	windowPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.ventana"))); // NOI18N
     	Utils.setContrastColor(windowPanel);
+    	Utils.setFontBold(windowPanel);
     	
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(5, 13, 0, 13);
@@ -183,6 +191,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(checkWindowSize);
         }
         Utils.setContrastColor(checkWindowSize);
+        Utils.setFontBold(checkWindowSize);
         windowPanel.add(checkWindowSize, c2);
         
         panel.add(windowPanel, c);   
@@ -192,6 +201,7 @@ public class AccessibilityOptionsPane {
     	JPanel cursorPanel = new JPanel(new GridBagLayout());
     	cursorPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.cursor"))); // NOI18N
     	Utils.setContrastColor(cursorPanel);
+    	Utils.setFontBold(cursorPanel);
     	
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(5, 13, 0, 13);
@@ -209,6 +219,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(checkCursorSize);
         }
         Utils.setContrastColor(checkCursorSize);
+        Utils.setFontBold(checkCursorSize);
         cursorPanel.add(checkCursorSize, c2);
         
         panel.add(cursorPanel, c);
@@ -229,6 +240,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(valores);
         }
         Utils.setContrastColor(valores);
+        Utils.setFontBold(valores);
         buttonPanel.add(valores);
         
         //Boton guardar
@@ -238,6 +250,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(guardar);
         }
         Utils.setContrastColor(guardar);
+        Utils.setFontBold(guardar);
         buttonPanel.add(guardar);
         
         //Boton cancelar
@@ -247,6 +260,7 @@ public class AccessibilityOptionsPane {
         	Utils.remarcar(cargar);
         }
         Utils.setContrastColor(cargar);
+        Utils.setFontBold(cargar);
         buttonPanel.add(cargar);
 
         panel.add(buttonPanel, c);
