@@ -170,7 +170,7 @@ public class Utils {
 				}
 				
 				public void focusGained(FocusEvent e) {
-					comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));//(new DashBorder(Color.BLACK, new Insets(-1,-1,-1,-1)));
+					comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
 			});
 		}
@@ -178,10 +178,10 @@ public class Utils {
 			final JRadioButton radioButton = (JRadioButton) component;
 			radioButton.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent e) {
-					radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()-10));
+					radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()-5));
 				}
 				public void focusGained(FocusEvent e) {
-					radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()+10));
+					radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()+5));
 				}
 			});
 		}
@@ -200,10 +200,10 @@ public class Utils {
 			final JCheckBox checkBox = (JCheckBox) component;
 			checkBox.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent e) {
-					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()-10));
+					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()-5));
 				}
 				public void focusGained(FocusEvent e) {
-					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()+10));
+					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()+5));
 				}
 			});
 		}
