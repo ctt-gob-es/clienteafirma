@@ -95,8 +95,9 @@ public class Descifrado extends JPanel {
         campoFichero.setToolTipText(Messages.getString("Descifrado.buscar.caja.description")); // NOI18N
         campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.buscar.caja.description")));
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.buscar.caja.description")));
-        campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Descifrado.buscar.caja")); // NOI18N
-        campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.buscar.caja.description")); // NOI18N
+        campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + E."); // NOI18N
+		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
+     
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
@@ -129,8 +130,9 @@ public class Descifrado extends JPanel {
                 examinarActionPerformed(campoFichero);
             }
         });
-        examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
-        examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+        examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description"));
+		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+		
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(examinar);
 		}
@@ -160,8 +162,9 @@ public class Descifrado extends JPanel {
         final JComboBox comboMecanismo = new JComboBox();
         final JComboBox comboAlgoritmo = new JComboBox();
         comboMecanismo.setToolTipText(Messages.getString("Descifrado.origen.clave.combo.description")); // NOI18N
-        comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Descifrado.origen.clave.combo")); // NOI18N
-        comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.origen.clave.combo.description")); // NOI18N
+
+		comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave") +" "+ Messages.getString("Descifrado.origen.clave.combo.description")+" ALT + A."); // NOI18N
+		comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N
         comboMecanismo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.origen.clave.combo.description")));
         comboMecanismo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.origen.clave.combo.description")));
         comboMecanismo.addItemListener(new ItemListener() {
@@ -180,6 +183,10 @@ public class Descifrado extends JPanel {
         // En la vista simple, no se permitirá configurar el origen de la clave
  		if(!GeneralConfig.isAvanzados()) {
  			comboMecanismo.setEnabled(false); //Se deshabilita la opción
+ 			//Opciones para el lector de pantalla
+			etiquetaMecanismo.setFocusable(true);
+			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + ". La opción por defecto del combo es: " 
+			+ Messages.getString("Cifrado.origenL.0") + ". Este combo está deshabilitado para el modo no avanzado.");
  		} else {
  			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
  			//Relación entre etiqueta y combo
@@ -211,9 +218,10 @@ public class Descifrado extends JPanel {
         comboAlgoritmo.setToolTipText(Messages.getString("Descifrado.formato.combo.description")); // NOI18N
         comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.formato.combo.description")));
         comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.formato.combo.description")));
-        comboAlgoritmo.getAccessibleContext().setAccessibleName(Messages.getString("Descifrado.formato.combo")); // NOI18N
-        comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N
+        comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+ Messages.getString("Descifrado.formato.combo.description")+" ALT + G."); // NOI18N); // NOI18N
+		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N
         comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
+        
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(comboAlgoritmo);
 		}
@@ -224,6 +232,10 @@ public class Descifrado extends JPanel {
 		// En la vista simple, no se permitirá configurar el algoritmo de descifrado
 		if(!GeneralConfig.isAvanzados()) {
 			comboAlgoritmo.setEnabled(false); //Se deshabilita la opción
+			//Opciones para el lector de pantalla
+			etiquetaAlgoritmo.setFocusable(true);
+			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + ". La opción por defecto del combo es: " 
+			+ Messages.getString("Cifrado.origenLc.0") + ". Este combo está deshabilitado para el modo no avanzado.");
 		} else {
 			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
 			//Relación entre etiqueta y combo
@@ -267,7 +279,7 @@ public class Descifrado extends JPanel {
                 descifrarActionPerformed(comboMecanismo, comboAlgoritmo, campoFichero);
             }
         });
-        descifrar.getAccessibleContext().setAccessibleName(Messages.getString("Descifrado.btndescifrar")); // NOI18N
+        descifrar.getAccessibleContext().setAccessibleName(descifrar.getText()+ " " + Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
         descifrar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(descifrar);

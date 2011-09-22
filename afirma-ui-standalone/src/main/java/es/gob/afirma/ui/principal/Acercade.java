@@ -23,13 +23,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 import es.gob.afirma.ui.wizardcifradocontrasenia.PanelContrasenia;
 
 /**
@@ -64,61 +64,46 @@ public class Acercade extends JFrame {
 		getContentPane().setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.NONE;
+        c.fill = GridBagConstraints.HORIZONTAL;
 		c.insets = new Insets(20, 20, 0, 20);
 		c.gridwidth = 3;
 		c.weightx = 1.0;
-		c.gridx = 1;
+		
+		c.gridx = 0;
+		c.gridy = 0;
 		
 		// Logotipo de la ventana
 		JLabel logotipo = new JLabel();
 		logotipo.setIcon(new ImageIcon(getClass().getResource("/resources/images/logo_cliente.png")));//$NON-NLS-1$
+		logotipo.setHorizontalAlignment(SwingConstants.CENTER);
 		getContentPane().add(logotipo, c);
 
-		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(10, 20, 0, 20);
-		c.gridwidth = 3;
-		c.gridx = 0;
+		c.gridy = 1;
 		
-		// Version del interfaz
-		JTextPane versionInterfaz = new JTextPane();
-		versionInterfaz.setOpaque(false);
-		versionInterfaz.setText(Messages.getString("version.interfaz") + "  " + Main.VERSION); // NOI18N
-		versionInterfaz.setBorder(null);
-		versionInterfaz.setEditable(false); //Para que no sea editable
-		Utils.setContrastColor(versionInterfaz);
+		// Versión del interfaz y Versión de la aplicación
+		String version = Messages.getString("version.interfaz") + "  " + Main.VERSION + "<br>"
+		+ Messages.getString("version") + "  " + getVersion();
+		InfoLabel versionInterfaz = new InfoLabel(version, false);
 		getContentPane().add(versionInterfaz, c);
-		
-		c.insets = new Insets(5, 20, 0, 20);
-		
-		// Version de la aplicacion
-		JTextPane version = new JTextPane();
-		version.setOpaque(false);
-		version.setText(Messages.getString("version") + "  " + getVersion()); // NOI18N
-		version.setBorder(null);
-		version.setEditable(false); //Para que no sea editable
-		Utils.setContrastColor(version);
-		getContentPane().add(version, c);
 
 		c.insets = new Insets(15, 20, 0, 20);
-		
-		// Parrafo con el texto Cliente @firma...
-		getContentPane().add(PanelesTexto.generarPanelTexto(
-				"acercade.descripcion2", false), c);
-
-		// Parrafo con el texto El Ministerio de Politica...
-		getContentPane().add(PanelesTexto.generarPanelTexto(
-				"acercade.descripcion", false), c);
+		c.gridy = 2;
+		// Parrafo con el texto Cliente @firma... y con el texto El Ministerio de Politica...
+		String desc = Messages.getString("acercade.descripcion2") + "<br><br>" + Messages.getString("acercade.descripcion"); 
+		InfoLabel descLabel = new InfoLabel(desc, false);
+		getContentPane().add(descLabel, c);
 		
 		c.fill = GridBagConstraints.NONE;
 		c.insets = new Insets(20, 0, 20, 0);
 		c.gridwidth = 1;
-		c.gridx = 1;
+		c.gridy = 3;
 		
 		// Boton aceptar
 		JButton aceptar = new JButton();
 		aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
-		aceptar.setMnemonic(KeyEvent.VK_A); //Se asijna un atajo al boton aceptar
+		aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
+		aceptar.getAccessibleContext().setAccessibleName(aceptar.getText());
 		aceptar.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				aceptarActionPerformed();
