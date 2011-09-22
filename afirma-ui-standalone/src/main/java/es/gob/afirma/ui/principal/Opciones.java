@@ -56,12 +56,19 @@ public class Opciones extends JAccessibilityDialog {
     /** Panel con la configurac&oacute;n de las firmas PDF del aplicativo. */
     private AccessibilityOptionsPane accessibilityOptions;
     
+    /** Indica si alguna accion del usuario necesita de un refresco de pantalla. */
+    private static Boolean update;
+    
     public Opciones(PrincipalGUI mainGUI) {
     	this.mainGui = mainGUI;
         initComponents();
     }
-  
-    @Override
+
+	public static void setUpdate(Boolean update) {
+		Opciones.update = update;
+	}
+
+	@Override
 	public int getMinimumRelation(){
 		return 9;
 	}
@@ -415,7 +422,7 @@ public class Opciones extends JAccessibilityDialog {
     private void aceptarActionPerformed(Properties config, Properties signatureConfig) {
 
     	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tamaño de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
-    	Boolean needUpdateGUI = ((GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)))|| (GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) || (GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE)))|| (GeneralConfig.isRemarked() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE)))|| (GeneralConfig.isHighContrast() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST)))|| (GeneralConfig.isBigFontSize() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)))|| (GeneralConfig.isFontBold() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE))));
+    	Boolean needUpdateGUI = ((GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)))|| (GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) || (GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE)))|| (GeneralConfig.isRemarked() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE)))|| (GeneralConfig.isHighContrast() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST)))|| (GeneralConfig.isBigFontSize() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)))|| (GeneralConfig.isFontBold() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE)))|| update);
     	    	
     	// Guardamos el estado actual de la configuracion de la herramienta
     	GeneralConfig.loadConfig(config);
@@ -425,6 +432,7 @@ public class Opciones extends JAccessibilityDialog {
     	
     	// Si se ha cambiado la vista de simple a avanzada o viceversa reconstruimos la interfaz
     	if (needUpdateGUI && mainGui != null) {
+    		update = false;
     		mainGui.crearPaneles();
     		mainGui.generarMenuHerramientas();
     		mainGui.generarMenuAyuda();
@@ -434,7 +442,7 @@ public class Opciones extends JAccessibilityDialog {
     	dispose();
     }
 
-    /**
+	/**
      * Cierra la ventana
      */
     private void cancelarActionPerformed() {

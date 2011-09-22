@@ -4,12 +4,15 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -62,8 +65,16 @@ public class AccessibilityOptionsPane {
 	/** Casilla de verificacion del tamaño del cursor de texto. */ 
 	private JCheckBox checkCursorSize;
 	
+	/**	Estado de las opciones de accesibilidad. */
+	private Boolean[] optionState;
+	
 	public AccessibilityOptionsPane(){
 		panel = new JPanel(new GridBagLayout());
+		initComponents();
+	}
+	
+	private void initComponents(){
+		panel.removeAll();
 		GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
@@ -235,6 +246,15 @@ public class AccessibilityOptionsPane {
         
         //Boton Valores por defecto
         valores.setText("Valores por defecto");
+        valores.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				valoresActionPerformed();
+				
+				
+			}
+		});
         valores.setMnemonic(KeyEvent.VK_O);
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(valores);
@@ -301,5 +321,27 @@ public class AccessibilityOptionsPane {
     	config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Boolean.toString(checkCursorSize.isSelected()));
     	
     	return config;
+	}
+	
+	/**
+	 * Aplica los valores por defecto.
+	 */
+	private void valoresActionPerformed(){
+		Opciones.setUpdate(true);
+		restore(panel);
+	}
+	
+	/**
+	 * Desactiva la seleccion de todos los JcheckBox de la ventana 
+	 */
+	private void restore(JPanel panel){
+		for (int i=0; i<panel.getComponentCount();i++){
+			if (panel.getComponent(i) instanceof JCheckBox){
+				((JCheckBox)panel.getComponent(i)).setSelected(false);
+			} else if (panel.getComponent(i) instanceof JPanel){
+				JPanel interiorPanel = (JPanel)panel.getComponent(i);
+				restore(interiorPanel);
+			}
+		}
 	}
 }
