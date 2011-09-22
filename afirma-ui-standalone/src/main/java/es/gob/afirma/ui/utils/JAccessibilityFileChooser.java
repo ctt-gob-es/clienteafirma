@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
@@ -38,17 +39,14 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	public JAccessibilityFileChooser (File file)
 	 {
 		super(file);
-//		UIDefaults d = UIManager.getDefaults();
-//		Enumeration<Object> claves = d.keys();
-//		while (claves.hasMoreElements())
-//		   System.out.println(claves.nextElement());
 		
+		//Alto contraste
+		setHighContrast((Container)this);
 		
 		//Asignación de mnemonics
 		
 		//Etiqueta buscar en ...
 		setLabelMnemonics((Container)this, "FileChooser.lookInLabelText", KeyEvent.VK_B);
-		//setHighContrast((Container)this);
 		
 		//Botón Cancelar
 		setButtonMnemonics((Container)this, "FileChooser.cancelButtonText", KeyEvent.VK_C);

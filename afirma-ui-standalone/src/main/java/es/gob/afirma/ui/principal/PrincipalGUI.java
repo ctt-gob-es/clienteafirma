@@ -646,6 +646,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	        	Utils.remarcar(tButton);
 	        }
 	        Utils.setContrastColor(tButton);
+	        Utils.setFontBold(tButton);
 	        return tButton;
 	}
 	
@@ -747,10 +748,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				UIManager.put("Button.foreground",Color.WHITE);
 				UIManager.put("ToolTip.foreground",Color.WHITE);
 				UIManager.put("ToolTip.background",Color.BLACK);
-				
-				UIManager.put("FileChooserUI","com.sun.java.swing.plaf.windows.WindowsFileChooserUI");
-					
-				
 
 			} else {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -758,7 +755,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				UIManager.put("Button.foreground",Color.BLACK);
 				UIManager.put("ToolTip.foreground",Color.BLACK);
 				UIManager.put("ToolTip.background",new Color(255,255,225));
-				System.out.println(UIManager.get("FileChooserUI"));
 			}
 		} catch (ClassNotFoundException e1) {
 			System.out.println(e1.getMessage());
