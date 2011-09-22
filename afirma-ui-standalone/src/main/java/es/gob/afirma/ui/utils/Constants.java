@@ -21,7 +21,7 @@ public class Constants {
     /**
      * Width inicial de los JFrame de la aplicacion.
      */
-    public static final int WINDOW_INITIAL_WIDTH = 550;
+    public static final int WINDOW_INITIAL_WIDTH = 650;
     
     /**
      * Height inicial de los JFrame de la aplicacion.
