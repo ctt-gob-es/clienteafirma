@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>es.gob.afirma</groupId>
+  <version>3.2.0</version>
+  <artifactId>afirma-client</artifactId>
+  <packaging>pom</packaging>
+  <name>afirma-client</name>
+
+  <modules>
+    <module>afirma-core</module>
+    <module>afirma-util</module>
+    <module>afirma-core-keystores</module>
+    <module>afirma-core-firmaweb</module>
+    <module>afirma-core-massive</module>
+    <module>afirma-crypto-core-pkcs7</module>
+    <module>afirma-crypto-cms</module>
+    <module>afirma-crypto-cades</module>
+    <module>afirma-crypto-cades-enveloper</module>
+    <!--<module>afirma-crypto-cades-multi</module>-->
+    <module>afirma-crypto-pdf-itext</module>
+    <module>afirma-crypto-pdf</module>
+    <module>afirma-crypto-cipher</module>
+    <module>afirma-ui-standalone</module>
+    <module>afirma-ui-simpleafirma</module>
+    <module>afirma-bootloader</module>
+  </modules>
+</project>
