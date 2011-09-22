@@ -18,12 +18,12 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
-import es.gob.afirma.ui.wizardUtils.InfoLabel;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 
