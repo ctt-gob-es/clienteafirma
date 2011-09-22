@@ -81,61 +81,31 @@ public class Validacion extends JPanel {
 		
 		// Etiqueta Uno: Puede realizar las validaciones .
 		String text1 = "<p align=\"center\">" + Messages.getString("Validacion.texto.parte1")+"</p>"+"<p align=\"center\">"+Messages.getString("Validacion.texto.parte2")+"</p>";
-		//String text1 = "<p align=\"center\">" + Messages.getString("Validacion.texto.parte1")+"<br>"+Messages.getString("Validacion.texto.parte2")+"</p>";
 		InfoLabel infoLabel1 = new InfoLabel(text1, false);
+		//Se centra el texto
 		infoLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-		/*infoLabel1.setBackground(Color.red);
-		infoLabel1.setOpaque(true);*/
+		//Se pone a negrita
 		Utils.setFontBold(infoLabel1);
-		/*JLabel etiqueta = new JLabel();
-		etiqueta.setText(Messages.getString("Validacion.texto.parte1")); // NOI18N
-//		etiqueta.setBounds(91, 60, 402, 20);
-		etiqueta.setFocusable(true);
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(etiqueta);
-		}
-		Utils.setContrastColor(etiqueta);
-		Utils.setFontBold(etiqueta);*/
+
 		add(infoLabel1, c);
 
 		c.insets = new Insets(5, 13, 0, 13);
-
 		c.gridy = 2;
-		// Etiqueta Dos: mediante la aplicacion web
-		/*etiqueta = new JLabel();
-		etiqueta.setText(Messages.getString("Validacion.texto.parte2")); // NOI18N
-//		etiqueta.setBounds(71, 80, 422, 20);
-		etiqueta.setFocusable(true);
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(etiqueta);
-		}
-		Utils.setContrastColor(etiqueta);
-		Utils.setFontBold(etiqueta);
-		add(etiqueta, c);
 
-		c.gridy = 3;*/
-		
-		// Etiqueta Tres: enlace inicioAPP
-		//JLabel enlace = new JLabel();
-		//InfoLabel enlace = new InfoLabel("<p align=\"center\">" +  Messages.getString("Validacion.texto.parte4") + "</p>", false);
+		// Etiqueta Dos: enlace inicioAPP
+	
 		InfoLabel enlace = new InfoLabel(Messages.getString("Validacion.texto.parte4"), false);
+		//se centra el texto
 		enlace.setHorizontalAlignment(SwingConstants.CENTER);
-		//InfoLabel enlace = new InfoLabel(Messages.getString("Validacion.texto.parte4"), false);
+
 		enlace.setForeground(new Color(55, 55, 254));
-		/*enlace.setOpaque(true);
-		enlace.setBackground(Color.red);*/
-		//enlace.setText(Messages.getString("Validacion.texto.parte4")); // NOI18N
-//		etiqueta.setBounds(111, 100, 312, 20);
-		/*enlace.setFocusable(true);
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(enlace);
-		}
-		Utils.setContrastColor(enlace);*/
 		Utils.setFontBold(enlace);
+		//Se añade
 		add(enlace, c);
 		
 		c.gridy = 3;
 		
+		// Etiqueta Tres: Pulse el boton inferior..
 		String text2 = "<p align=\"center\">" +  Messages.getString("Validacion.texto.parte5")+"</p>" + "<p align=\"center\">" + Messages.getString("Validacion.texto.parte6") + "</p>";
 		InfoLabel infoLabel2 = new InfoLabel(text2, false);
 		infoLabel2.setHorizontalAlignment(SwingConstants.CENTER);
@@ -143,32 +113,6 @@ public class Validacion extends JPanel {
 		
 		add(infoLabel2, c);
 
-		/*c.gridy = 4;
-		
-		// Etiqueta Cuatro: Pulse el boton inferior
-		etiqueta = new JLabel();
-		etiqueta.setText(Messages.getString("Validacion.texto.parte5")); // NOI18N
-		etiqueta.setFocusable(true);
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(etiqueta);
-		}
-		Utils.setContrastColor(etiqueta);
-		Utils.setFontBold(etiqueta);
-		add(etiqueta, c);
-
-		c.gridy = 5;
-		
-		// Etiqueta Cinco: En su navegador web
-		etiqueta = new JLabel();
-		etiqueta.setText(Messages.getString("Validacion.texto.parte6")); // NOI18N
-		etiqueta.setFocusable(true);
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(etiqueta);
-		}
-		Utils.setContrastColor(etiqueta);
-		Utils.setFontBold(etiqueta);
-		add(etiqueta, c);
-*/
 		c.insets = new Insets(0, 13, 0, 13);
 		c.weighty = 1.0;
 		//c.gridy = 6;
@@ -177,7 +121,6 @@ public class Validacion extends JPanel {
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
 		JPanel emptyPanel = new JPanel();
 		add(emptyPanel, c);
-		
 		
 		// Panel con los botones
 		JPanel panelBotones = new JPanel(new GridBagLayout());
