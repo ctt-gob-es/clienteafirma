@@ -86,7 +86,7 @@ public class Ensobrado extends JPanel {
         campoFichero.setToolTipText(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N
         campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion")));
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion")));
-        campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.buscar.caja")); // NOI18N
+		campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + O"); // NOI18N
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
@@ -119,8 +119,8 @@ public class Ensobrado extends JPanel {
                 examinarActionPerformed(campoFichero);
             }
         });
-        examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
-        examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+        examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
+		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(examinar);
         }
@@ -141,7 +141,7 @@ public class Ensobrado extends JPanel {
         checkAnadir.setToolTipText(Messages.getString("Ensobrado.check.description")); // NOI18N
         checkAnadir.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.check.description.status")));
         checkAnadir.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.check.description.status")));
-        checkAnadir.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.check")); // NOI18N
+        checkAnadir.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.check") + " " + Messages.getString("Ensobrado.check.description.status")); // NOI18N
         checkAnadir.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.check.description")); // NOI18N
         checkAnadir.addChangeListener(new ChangeListener() {	
 			public void stateChanged(ChangeEvent arg0) {
@@ -177,7 +177,7 @@ public class Ensobrado extends JPanel {
         comboTipos.setToolTipText(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
         comboTipos.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
         comboTipos.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
-        comboTipos.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
+        comboTipos.getAccessibleContext().setAccessibleName(etiquetaOpciones.getText() + " " + Messages.getString("Ensobrado.opciones.combo.status") +" ALT + T"); // NOI18N
         comboTipos.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.opciones.combo.description")); // NOI18N
         cargarComboTipos();
         if (GeneralConfig.isRemarked()){
@@ -225,7 +225,7 @@ public class Ensobrado extends JPanel {
             	PrincipalGUI.setNuevoEstado(Messages.getString("Ensobrado.btnGenerar.generado"));
             }
         });
-        generar.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.btnGenerar")); // NOI18N
+        generar.getAccessibleContext().setAccessibleName(generar.getText() + " " + Messages.getString("Ensobrado.btnGenerar.description.status")); // NOI18N
         generar.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.btnGenerar.description")); // NOI18N
         if (GeneralConfig.isRemarked()){
         	Utils.remarcar(generar);
