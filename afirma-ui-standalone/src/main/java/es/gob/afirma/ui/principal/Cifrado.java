@@ -118,8 +118,6 @@ public class Cifrado extends JPanel {
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.buscar.caja.description.status")));
 		campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + T."); // NOI18N
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
-		//campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.buscar.caja")); // NOI18N
-		//campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
 		if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
