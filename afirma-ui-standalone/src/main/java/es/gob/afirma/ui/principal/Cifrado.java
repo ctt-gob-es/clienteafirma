@@ -116,8 +116,10 @@ public class Cifrado extends JPanel {
 		campoFichero.setToolTipText(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
 		campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.buscar.caja.description.status")));
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.buscar.caja.description.status")));
-		campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.buscar.caja")); // NOI18N
+		campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + T."); // NOI18N
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
+		//campoFichero.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.buscar.caja")); // NOI18N
+		//campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
 		if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
@@ -142,6 +144,8 @@ public class Cifrado extends JPanel {
 		examinar.setMnemonic(KeyEvent.VK_E);
 		examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
 		examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+		examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
+		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addActionListener(new ActionListener() {
@@ -149,7 +153,7 @@ public class Cifrado extends JPanel {
 				examinarActionPerformed(campoFichero);
 			}
 		});       
-		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+		
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(examinar);
 		}
@@ -186,8 +190,8 @@ public class Cifrado extends JPanel {
 				comboMecanismoItemStateChanged(comboMecanismo, comboAlgoritmo);
 			}
 		});
-		comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave")); // NOI18N
-		comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave")); // NOI18N
+		comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave") +" "+ Messages.getString("Cifrado.origen.clave.combo.description.status") + " ALT + A."); // NOI18N
+		comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N
 		comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Cifrado.origenL.0"),Messages.getString("Cifrado.origenL.1")}));
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(comboMecanismo);
@@ -199,6 +203,10 @@ public class Cifrado extends JPanel {
 		// En la vista simple, no se permitirá configurar el origen de la clave
 		if(!GeneralConfig.isAvanzados()) {
 			comboMecanismo.setEnabled(false); //Se deshabilita la opción
+			//Opciones para el lector de pantalla
+			etiquetaMecanismo.setFocusable(true);
+			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + ". La opción por defecto del combo es: " 
+			+ Messages.getString("Cifrado.origenL.0") + ". Este combo está deshabilitado para el modo no avanzado.");
 		} else {
 			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
 			//Relación entre etiqueta y combo
@@ -231,7 +239,7 @@ public class Cifrado extends JPanel {
 		comboAlgoritmo.setToolTipText(Messages.getString("Cifrado.formato.combo.description")); // NOI18N
 		comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.formato.combo.description.status")));
 		comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.formato.combo.description.status")));
-		comboAlgoritmo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.formato.combo")); // NOI18N
+		comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+ Messages.getString("Cifrado.formato.combo.description.status")+" ALT + G."); // NOI18N); // NOI18N
 		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.combo.description")); // NOI18N
 		comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
 		if (GeneralConfig.isRemarked()){
@@ -244,6 +252,10 @@ public class Cifrado extends JPanel {
 		// En la vista simple, no se permitirá configurar el algoritmo de cifrado
 		if(!GeneralConfig.isAvanzados()) {
 			comboAlgoritmo.setEnabled(false); //Se deshabilita la opción
+			//Opciones para el lector de pantalla
+			etiquetaAlgoritmo.setFocusable(true);
+			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + ". La opción por defecto del combo es: " 
+			+ Messages.getString("Cifrado.origenLc.0") + ". Este combo está deshabilitado para el modo no avanzado.");
 		} else {
 			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
 			//Relación entre etiqueta y combo
@@ -286,6 +298,7 @@ public class Cifrado extends JPanel {
 				PrincipalGUI.setNuevoEstado(Messages.getString("Cifrado.statusbar.cipher.action"));
 			}
 		});
+		cifrar.getAccessibleContext().setAccessibleName(cifrar.getText()+ " " + Messages.getString("Cifrado.btncifrar.description.status"));
 		cifrar.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.btncifrar.description")); // NOI18N
 		if (GeneralConfig.isRemarked()){
 			Utils.remarcar(cifrar);
