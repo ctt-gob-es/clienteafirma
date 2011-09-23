@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="us-ascii"?>
+
+<examples>
+
+    <section xmlns='http://www.example.com/books-r-us'>
+	<title>Book-Signing Event</title>
+	<signing>
+	    <author title="Mr." name="Vikram Seth"/>
+	    <book title="A Suitable Boy" price="$2295" />
+	</signing>
+    </section>
+
+    <reservation xmlns:html="http://www.w3.org/TR/REC-html40">
+	<name html:class="largeSansSerif">Seth, Vikram</name>
+	<seat class="Y" html:class="largeMonotype">33B</seat>
+	<html:a href='/servlets/ResStatus'>Check Status</html:a>
+	<departure>1997-05-24T19:22:00+5</departure>
+    </reservation>
+
+</examples>

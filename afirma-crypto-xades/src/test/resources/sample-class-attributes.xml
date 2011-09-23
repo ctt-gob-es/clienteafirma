@@ -1,0 +1,10 @@
+<?xml-stylesheet href="#s1" type="text/css"?>
+<doc>
+  <s id="s1">
+    s { display: none }
+    p { display: block }
+    p.note { color: red }
+  </s>
+  <p>Some text... </p>
+  <p class="note">A note... </p>
+</doc>

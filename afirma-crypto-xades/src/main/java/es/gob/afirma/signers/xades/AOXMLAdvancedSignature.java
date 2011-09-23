@@ -33,10 +33,6 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
 import net.java.xades.security.xml.WrappedKeyStorePlace;
 import net.java.xades.security.xml.XmlWrappedKeyInfo;
-import net.java.xades.security.xml.XAdES.QualifyingProperties;
-import net.java.xades.security.xml.XAdES.SignedProperties;
-import net.java.xades.security.xml.XAdES.UnsignedProperties;
-import net.java.xades.security.xml.XAdES.UnsignedSignatureProperties;
 import net.java.xades.security.xml.XAdES.XAdES_BES;
 import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 

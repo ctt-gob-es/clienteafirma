@@ -19,6 +19,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,64 +94,78 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * <p>
  * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
  * <dl>
- * <dt>uri</dt>
- * <dd>URI en la que se encuentra el documento, necesario en el caso de modo expl&iacute;cito y formato detached</dd>
- * <dt>mode</dt>
- * <dd>Modo de firma a usar (Expl&iacute;cita o Impl&iacute;cita)</dd>
- * <dt>format</dt>
- * <dd>Formato en que se realizar&aacute; la firma</dd>
- * <dt>policyIdentifier</dt>
- * <dd>URL identificadora de la pol&iacute;tica de firma (normalmente una URL hacia el documento que describe la pol&iacute;tica)</dd>
- * <dt>policyDescription</dt>
- * <dd>Descripci&oacute;n de la pol&iacute;tica</dd>
- * <dt>policyQualifier</dt>
- * <dd>OID calificador de la pol&iacute;tica de firma</dd>
- * <dt>signerClaimedRole</dt>
- * <dd>Cargo atribuido para el firmante</dd>
- * <dt>signerCertifiedRole</dt>
- * <dd>Cargo confirmado para el firmante</dd>
- * <dt>precalculatedHashAlgorithm</dt>
- * <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
- * <dt>signatureProductionCity</dt>
- * <dd>Ciudad en la que se realiza la firma</dd>
- * <dt>signatureProductionProvince</dt>
- * <dd>Provincia en la que se realiza la firma</dd>
- * <dt>signatureProductionPostalCode</dt>
- * <dd>C&oacute;digo postal en el que se realiza la firma</dd>
- * <dt>signatureProductionCountry</dt>
- * <dd>Pa&iacute;s en el que se realiza la firma</dd>
- * <dt>xmlTransforms</dt>
- * <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo</dd>
- * <dt>xmlTransform<i>n</i>Type</dt>
- * <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C)</dd>
- * <dt>xmlTransform<i>n</i>Subtype</dt>
- * <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2)</dd>
- * <dt>xmlTransform<i>n</i>Body</dt>
- * <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
- * <dt>referencesDigestMethod</dt>
- * <dd>Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod)</dd>
- * <dt>mimeType</dt>
- * <dd>MIME-Type de los datos a firmar</dd>
- * <dt>encoding</dt>
- * <dd>Codificaci&oacute;n de los datos a firmar</dd>
- * <dt>oid<dt>
- * <dd>OID que identifica el tipo de datos a firmar</dd>
- * <dt>canonicalizationAlgorithm</dt>
- * <dd>Algoritmo de canonicalizaci&oacute;n</dd>
- * <dt>xadesNamespace</dt>
- * <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd> <!--
- * <dt>xmlDSigNamespacePrefix</dt>
- * <dd>Prefijo del espacio de nombres de XMLDSig (normalmente "dsig" o "ds")</dd> -->
- * <dt>ignoreStyleSheets</dt>
- * <dd>Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, si se establece a <code>false</code>
- * act&uacute;a normalmente (s&iacute; las firma)</dd>
- * <dt>avoidBase64Transforms</dt>
- * <dd>No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, si se establece a <code>false</code>
- * act&uacute;a normalmente (s&iacute; las declara)</dd> <!--
- * <dt>headLess</dt>
- * <dd>Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, si se establece a <code>false</code> act&uacute;a
- * normalmente (puede mostrar di&aacute;logos, por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
- * &Uacute;til para los procesos desatendidos y por lotes</dd> -->
+ *  <dt><b>uri</b></dt>
+ *   <dd>URI en la que se encuentra el documento, necesario en el caso de modo expl&iacute;cito y formato detached</dd>
+ *  <dt><b>mode</b></dt>
+ *   <dd>Modo de firma a usar (Expl&iacute;cita o Impl&iacute;cita)</dd>
+ *  <dt><b>format</b></dt>
+ *   <dd>Formato en que se realizar&aacute; la firma</dd>
+ *  <dt><b>policyIdentifier</b></dt>
+ *   <dd>Identificadora de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
+ *  <dt><b>policyIdentifierHash</b></dt>
+ *   <dd>
+ *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
+ *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+ *   </dd>
+ *  <dt><b>policyIdentifierHashAlgorithm</b></dt>
+ *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
+ *  <dt><b>policyDescription</b></dt>
+ *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
+ *  <dt><b>policyQualifier</b></dt>
+ *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+ *  <dt><b>signerClaimedRole</b></dt>
+ *   <dd>Cargo atribuido para el firmante</dd>
+ *  <dt><b>signerCertifiedRole</b></dt>
+ *   <dd>Cargo confirmado para el firmante</dd>
+ *  <dt><b>precalculatedHashAlgorithm</b></dt>
+ *   <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
+ *  <dt><b>signatureProductionCity</b></dt>
+ *   <dd>Ciudad en la que se realiza la firma</dd>
+ *  <dt><b>signatureProductionProvince</b></dt>
+ *   <dd>Provincia en la que se realiza la firma</dd>
+ *  <dt><b>signatureProductionPostalCode</b></dt>
+ *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
+ *  <dt><b>signatureProductionCountry</b></dt>
+ *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
+ *  <dt><b>xmlTransforms</b></dt>
+ *   <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo</dd>
+ *  <dt><b>xmlTransform<i>n</i>Type</b></dt>
+ *   <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C)</dd>
+ *  <dt><b>xmlTransform<i>n</i>Subtype</b></dt>
+ *   <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2)</dd>
+ *  <dt><b>xmlTransform<i>n</i>Body</b></dt>
+ *   <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
+ *  <dt><b>referencesDigestMethod</b></dt>
+ *   <dd>Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod)</dd>
+ *  <dt><b>mimeType</b></dt>
+ *   <dd>MIME-Type de los datos a firmar</dd>
+ *  <dt><b>encoding</b></dt>
+ *   <dd>Codificaci&oacute;n de los datos a firmar</dd>
+ *  <dt><b>oid</b><dt>
+ *   <dd>OID que identifica el tipo de datos a firmar</dd>
+ *  <dt><b>canonicalizationAlgorithm</b></dt>
+ *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
+ *  <dt><b>xadesNamespace</b></dt>
+ *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd> <!--
+ *  <dt><b>xmlDSigNamespacePrefix</b></dt>
+ *   <dd>Prefijo del espacio de nombres de XMLDSig (normalmente "dsig" o "ds")</dd> -->
+ *  <dt><b>ignoreStyleSheets</b></dt>
+ *   <dd>
+ *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, 
+ *    si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las firma)
+ *   </dd>
+ *  <dt><b>avoidBase64Transforms</b></dt>
+ *   <dd>
+ *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, 
+ *    si se establece a <code>false</code> act&uacute;a normalmente (s&iacute; las declara)
+ *   </dd>
+ *  <dt><b>headLess</b></dt>
+ *   <dd>
+ *    Evita cualquier interacci&oacute;n con el usuario si se establece a <code>true</code>, 
+ *    si se establece a <code>false</code> act&uacute;a normalmente (puede mostrar di&aacute;logos, 
+ *    por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
+ *    &Uacute;til para los procesos desatendidos y por lotes
+ *   </dd>
  * </dl>
  * <p>
  * Tratamiento de las hojas de estilo en firmas XML:
@@ -218,7 +233,6 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * </ul> </ul>
  * </p>
  * @version 0.3 */
-@SuppressWarnings("restriction")
 public final class AOXAdESSigner implements AOSigner {
     
     static final Logger LOGGER = Logger.getLogger("es.agob.afirma"); //$NON-NLS-1$
@@ -261,15 +275,7 @@ public final class AOXAdESSigner implements AOSigner {
         });
     }
 
-    public byte[] sign(final byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-
-        // Algoritmos de firma con nombres alternativos
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
@@ -427,7 +433,9 @@ public final class AOXAdESSigner implements AOSigner {
                     dataElement = docum.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
                     dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
+                    if (encoding != null && (!"".equals(encoding))) { //$NON-NLS-1$
+                        dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
+                    }
                     dataElement.appendChild(docum.getDocumentElement());
 
                     // Tambien el estilo
@@ -920,12 +928,13 @@ public final class AOXAdESSigner implements AOSigner {
         );
 
         // SigningCertificate
-        final X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
-        xades.setSigningCertificate(cert);
+        xades.setSigningCertificate((X509Certificate) keyEntry.getCertificate());
 
         // SignaturePolicyIdentifier
         final SignaturePolicyIdentifier spi =
                 getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
+                          extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
+                          extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
                           extraParams.getProperty("policyDescription"), //$NON-NLS-1$
                           extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
         if (spi != null) {
@@ -1025,9 +1034,18 @@ public final class AOXAdESSigner implements AOSigner {
             }
         }
 
-        // genera la firma
+        // Cadena de certificados
+        Certificate[] rawcerts = keyEntry.getCertificateChain();
+        List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
+        for (Certificate c : rawcerts) {
+            if (c instanceof X509Certificate) {
+                certificates.add((X509Certificate)c);
+            }
+        }
+        
+        // Genera la firma
         try {
-            xmlSignature.sign(cert, keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null /* TSA */ //$NON-NLS-1$
+            xmlSignature.sign(certificates, keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null /* TSA */ //$NON-NLS-1$
             );
         }
         catch (final NoSuchAlgorithmException e) {
@@ -1236,13 +1254,40 @@ public final class AOXAdESSigner implements AOSigner {
         return new SignatureProductionPlaceImpl(city, province, postalCode, country);
     }
 
-    private SignaturePolicyIdentifier getPolicy(final String identifier, final String description, final String qualifier) {
+    private SignaturePolicyIdentifier getPolicy(final String identifier,
+                                                final String identifierHash,
+                                                final String identifierHashAlgorithm,
+                                                final String description, 
+                                                final String qualifier) {
         if (identifier == null) {
             return null;
         }
+        
+        String hashAlgo = null;
+        if (identifierHashAlgorithm != null) {
+            String normalDigAlgo = null;
+            try {
+                normalDigAlgo = AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
+            }
+            catch(final Exception e) {
+                LOGGER.warning("El algoritmo de huella digital para el identificador de politica de firma no es valido, se intentara dereferenciar la politica y se aplicara SHA1: " + e); //$NON-NLS-1$
+            }
+            if ("SHA1".equals(normalDigAlgo)) { //$NON-NLS-1$
+                hashAlgo = DigestMethod.SHA1;
+            }
+            else if ("SHA-256".equals(normalDigAlgo)) { //$NON-NLS-1$
+                hashAlgo = DigestMethod.SHA256;
+            }
+            else if ("SHA-512".equals(normalDigAlgo)) { //$NON-NLS-1$
+                hashAlgo = DigestMethod.SHA512;
+            }
+            else if ("RIPEMD160".equals(normalDigAlgo)) { //$NON-NLS-1$
+                hashAlgo = DigestMethod.RIPEMD160;
+            }
+        }
         final SignaturePolicyIdentifier spi = new SignaturePolicyIdentifierImpl(false);
         try {
-            spi.setIdentifier(identifier);
+            spi.setIdentifier(identifier, (hashAlgo != null) ? identifierHash : null, hashAlgo);
         }
         catch (final Exception e) {
             LOGGER.warning("No se ha podido acceder al identificador ('" + identifier //$NON-NLS-1$
@@ -1261,14 +1306,7 @@ public final class AOXAdESSigner implements AOSigner {
         return spi;
     }
 
-    public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
@@ -1398,9 +1436,11 @@ public final class AOXAdESSigner implements AOSigner {
 
         // SignaturePolicyIdentifier
         final SignaturePolicyIdentifier spi =
-                getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                          extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-                          extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
+            getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
+                      extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
+                      extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
+                      extraParams.getProperty("policyDescription"), //$NON-NLS-1$
+                      extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
         if (spi != null) {
             xades.setSignaturePolicyIdentifier(spi);
         }
@@ -1518,7 +1558,7 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     public byte[] countersign(final byte[] sign,
-                              String algorithm,
+                              final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
@@ -1535,13 +1575,6 @@ public final class AOXAdESSigner implements AOSigner {
 
         if (sign == null) {
             throw new IllegalArgumentException("El objeto de firma no puede ser nulo"); //$NON-NLS-1$
-        }
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
@@ -1891,9 +1924,11 @@ public final class AOXAdESSigner implements AOSigner {
 
         // SignaturePolicyIdentifier
         final SignaturePolicyIdentifier spi =
-                getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                          extraParams.getProperty("policyDescription"), //$NON-NLS-1$
-                          extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
+            getPolicy(extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
+                      extraParams.getProperty("policyIdentifierHash"), //$NON-NLS-1$
+                      extraParams.getProperty("policyIdentifierHashAlgorithm"), //$NON-NLS-1$
+                      extraParams.getProperty("policyDescription"), //$NON-NLS-1$
+                      extraParams.getProperty("policyQualifier")); //$NON-NLS-1$
         if (spi != null) {
             xades.setSignaturePolicyIdentifier(spi);
         }
@@ -2354,4 +2389,5 @@ public final class AOXAdESSigner implements AOSigner {
 
         return mType;
     }
+    
 }
