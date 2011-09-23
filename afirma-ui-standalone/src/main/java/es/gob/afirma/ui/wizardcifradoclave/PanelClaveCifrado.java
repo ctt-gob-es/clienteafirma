@@ -42,23 +42,21 @@ import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
-import es.gob.afirma.core.envelopers.AOEnveloper;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 import es.gob.afirma.util.AOBase64;
 
 /**
@@ -134,16 +132,18 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 		c.weightx = 1.0;
 		c.gridwidth = 3;
 		c.gridx = 0;
+		c.gridy = 0;
+
     	
-        // Panel que contiene el texto "Introduzca una clave de..."
-    	panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"WizardCifrado.contenido.texto1", false), c);
-    	
-    	c.insets = new Insets(20, 20, 0, 0);
-    	c.gridwidth = 1;
-    	c.weightx = 0.0;
-    	c.gridx = 0;
-    	c.gridy = 1;
+        // Etiqueta que contiene el texto "Introduzca una clave de..."
+		InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto1"), false);
+		panelCentral.add(insertLabel, c);
+
+		
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		c.insets = new Insets(20, 20, 0, 20);
     	
     	//Etiqueta con el texto Clave de cifrado
     	JLabel encodeKeyLabel = new JLabel (Messages.getString("WizardCifrado.claveCifrado"));
@@ -151,15 +151,15 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	Utils.setFontBold(encodeKeyLabel);
     	panelCentral.add(encodeKeyLabel, c);
         
-    	c.fill = GridBagConstraints.HORIZONTAL;
-    	c.insets = new Insets(0, 20, 0, 0);
-    	c.gridwidth = 1;
-    	c.weightx = 1.0;
-    	c.gridx = 0;
-    	c.gridy = 2;
+    	 c.gridx = 0;
+    	 c.gridy = 2;
+    	 c.gridwidth = 1;
+    	 c.insets = new Insets(0, 20, 0, 0);
     	
         // Caja de texto donde se escribe la clave
         campoClave.setToolTipText(Messages.getString("WizardCifrado.campoClave.description")); // NOI18N
+        campoClave.getAccessibleContext().setAccessibleName(encodeKeyLabel.getText() + " " + "ALT + V.");
+        campoClave.getAccessibleContext().setAccessibleDescription(encodeKeyLabel.getToolTipText());
         campoClave.addKeyListener(new KeyAdapter() {
         	public void keyPressed(KeyEvent e) {
         		checkGuardar.setEnabled(true);
@@ -193,7 +193,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
                 autogenerarActionPerformed();
             }
         });
-        autogenerar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.autogenerar")); // NOI18N
+        autogenerar.getAccessibleContext().setAccessibleName(autogenerar.getText() + " " + autogenerar.getToolTipText()); // NOI18N
+        autogenerar.getAccessibleContext().setAccessibleDescription(autogenerar.getToolTipText()); // NOI18N
         Utils.remarcar(autogenerar);
         Utils.setContrastColor(autogenerar);
         Utils.setFontBold(autogenerar);
@@ -213,7 +214,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
             	almacenActionPerformed();
             }
         });
-        almacen.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.almacen")); // NOI18N
+        almacen.getAccessibleContext().setAccessibleName(almacen.getText()+ " " + almacen.getToolTipText()); // NOI18N
+        almacen.getAccessibleContext().setAccessibleDescription(almacen.getToolTipText()); // NOI18N
         Utils.remarcar(almacen);
         Utils.setContrastColor(almacen);
         Utils.setFontBold(almacen);
@@ -222,13 +224,13 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 		c.insets = new Insets(10, 20, 0, 20);
 		c.weightx = 1.0;
 		c.gridwidth = 3;
-		c.gridx = 0;
 		c.gridy = 3;
+		c.gridx = 0;
 		
 		// Checkbox para guardar en el almacen
         checkGuardar.setText(Messages.getString("WizardCifrado.check")); // NOI18N
         checkGuardar.setToolTipText(Messages.getString("WizardCifrado.check.description")); // NOI18N
-        checkGuardar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.check")); // NOI18N
+        checkGuardar.getAccessibleContext().setAccessibleDescription(checkGuardar.getToolTipText()); // NOI18N
         checkGuardar.setMnemonic(KeyEvent.VK_G);
         Utils.remarcar(checkGuardar);
         Utils.setContrastColor(checkGuardar);
@@ -240,9 +242,10 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 		c.gridy = 4;
 		c.weighty = 1.0;
         
-		// Panel que contiene el texto "Adicionalmente, puede almacenar..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"WizardCifrado.contenido.texto5", false), c);
+		 // Etiqueta que contiene el texto "Adicionalmente, puede almacenar..."
+        InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto5"), false);
+		panelCentral.add(lostLabel, c);
+
         
         getContentPane().add(panelCentral, BorderLayout.CENTER);
 

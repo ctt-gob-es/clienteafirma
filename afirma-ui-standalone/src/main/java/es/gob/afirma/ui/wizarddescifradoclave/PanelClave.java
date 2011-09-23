@@ -42,13 +42,13 @@ import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 import es.gob.afirma.util.AOBase64;
 
 /**
@@ -119,11 +119,11 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		c.weightx = 1.0;
 		c.gridwidth	= 2;
 		c.gridx = 0;
-    	
-        // Panel que contiene el texto "Introduzca la clave con..."
-		panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"WizardDescifrado.clave.contenido.texto1", false), c);
 		
+		 // Etiqueta que contiene el texto "Introduzca la clave con..."
+		InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardDescifrado.clave.contenido.texto1"), false);
+		panelCentral.add(insertLabel, c);
+
 		c.insets = new Insets(20, 20, 0, 20);
 		c.gridwidth	= 1;
 		c.weightx = 1.0;
@@ -142,6 +142,8 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		
         // Caja de texto donde se guarda la clave
         campoClave.setToolTipText(Messages.getString("WizardDescifrado.clave.contrasenia.description")); // NOI18N
+        campoClave.getAccessibleContext().setAccessibleName(keyLabel.getText() + " " + "ALT + L.");
+	    campoClave.getAccessibleContext().setAccessibleDescription(keyLabel.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoClave.setCaret(caret);
@@ -170,7 +172,8 @@ public class PanelClave extends JAccessibilityDialogWizard {
                 examinarActionPerformed();
             }
         });
-        examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardDescifrado.clave.boton")); // NOI18N
+        examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + examinar.getToolTipText()); // NOI18N
+        examinar.getAccessibleContext().setAccessibleDescription(examinar.getToolTipText()); // NOI18N
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
@@ -184,10 +187,10 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		c.gridy	= 3;
 		c.gridx = 0;
         
-        // Panel que contiene el texto "En caso de obtener..."
-		panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"WizardDescifrado.clave.contenido.texto5", false), c);
-        
+		 // Etiqueta que contiene el texto "En caso de obtener..."
+        InfoLabel endLabel = new InfoLabel(Messages.getString("WizardDescifrado.clave.contenido.texto5"), false);
+		panelCentral.add(endLabel, c);
+
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
         // Accesos rapidos al menu de ayuda
