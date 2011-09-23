@@ -28,6 +28,7 @@ public final class XMLConstants {
         {
             put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$
             // Introducimos variantes para hacerlo mas robusto
+            put("RSA", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
             put("SHA-1withRSA", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
             put("SHA1withRSAEncryption", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
             put("SHA-1withRSAEncryption", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
