@@ -25,14 +25,12 @@ import java.net.URL;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -43,7 +41,6 @@ import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
@@ -214,6 +211,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		herramientas.setText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
 		herramientas.setToolTipText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
 		Utils.setContrastColor(herramientas);
+		Utils.setFontBold(herramientas);
+		Utils.remarcar(herramientas);
 		menu.add(herramientas);
 		
 		// Subopcion menu Herramientas - Opciones
@@ -226,8 +225,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			}
 		});
 		Utils.setContrastColor(opciones);
+		Utils.setFontBold(opciones);
 		herramientas.add(opciones);
-
 		// Subopcion menu Herramientas - Idiomas
 		JMenu menuIdioma = new JMenu();
 		menuIdioma.setText(Messages.getString("Opciones.general.idioma")); // NOI18N
@@ -279,6 +278,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				opcionIdioma.setMnemonic(Utils.getLanguageMnemonic(mnemonicList, languageName.toLowerCase()));
 				
 				Utils.setContrastColor(opcionIdioma);
+				Utils.setFontBold(opcionIdioma);
 				menuIdioma.add(opcionIdioma);
 				grupo.add(opcionIdioma);
 
@@ -295,6 +295,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			}
 
 		Utils.setContrastColor(menuIdioma);
+		Utils.setFontBold(menuIdioma);
 		herramientas.add(menuIdioma);
 
 		
@@ -312,6 +313,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			}
 		});
 		Utils.setContrastColor(salir);
+		Utils.setFontBold(salir);
 		herramientas.add(salir);
 		
 		return herramientas;
@@ -328,6 +330,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		ayuda.setText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N
 		ayuda.setToolTipText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N
 		Utils.setContrastColor(ayuda);
+		Utils.setFontBold(ayuda);
+		Utils.remarcar(ayuda);
 		menu.add(ayuda);
 
 		// Subopcion menu Ayuda - Ayuda
@@ -340,6 +344,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			}
 		});
 		Utils.setContrastColor(ayudaHTML);
+		Utils.setFontBold(ayudaHTML);
 		ayuda.add(ayudaHTML);
 		
 		// Subopcion menu Ayuda - Acerca de
@@ -353,6 +358,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		});
 
 		Utils.setContrastColor(acerca);
+		Utils.setFontBold(acerca);
 		ayuda.add(acerca);
 		
 		this.callResize();

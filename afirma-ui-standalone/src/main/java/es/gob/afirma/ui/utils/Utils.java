@@ -10,7 +10,6 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -21,27 +20,23 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.MetalTheme;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
@@ -119,126 +114,142 @@ public class Utils {
 	 * @param component El componente seleccionado.
 	 */
 	public static void remarcar(JComponent component){
-		if (component instanceof JButton){
-			final JButton button = (JButton) component;
-			button.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
-				}		
-				public void focusGained(FocusEvent e) {
-					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
-				}
-			});
-			if (button.getIcon() != null) {			
+		if (GeneralConfig.isRemarked()){
+			if (component instanceof JButton){
+				final JButton button = (JButton) component;
 				button.addFocusListener(new FocusListener() {
 					public void focusLost(FocusEvent e) {
-						button.setBorder(BorderFactory.createEmptyBorder());
+						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
 					}		
 					public void focusGained(FocusEvent e) {
-						button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
+					}
+				});
+				if (button.getIcon() != null) {			
+					button.addFocusListener(new FocusListener() {
+						public void focusLost(FocusEvent e) {
+							button.setBorder(BorderFactory.createEmptyBorder());
+						}		
+						public void focusGained(FocusEvent e) {
+							button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
+					});
+				}
+			}
+			if (component instanceof JToggleButton){
+				final JToggleButton button = (JToggleButton) component;
+				button.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
+					}		
+					public void focusGained(FocusEvent e) {
+						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
+					}
+				});
+			}		
+			if (component instanceof JTextField){
+				final JTextField textField = (JTextField) component;
+				textField.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						textField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+					}
+					public void focusGained(FocusEvent e) {
+						textField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 					}
 				});
 			}
-		}
-		if (component instanceof JToggleButton){
-			final JToggleButton button = (JToggleButton) component;
-			button.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
-				}		
-				public void focusGained(FocusEvent e) {
-					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
-				}
-			});
-		}		
-		if (component instanceof JTextField){
-			final JTextField textField = (JTextField) component;
-			textField.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					textField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-				}
-				public void focusGained(FocusEvent e) {
-					textField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				}
-			});
-		}
-		if (component instanceof JComboBox){
-			final JComboBox comboBox = (JComboBox) component;
-			comboBox.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-				}
-				
-				public void focusGained(FocusEvent e) {
-					comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				}
-			});
-		}
-		if (component instanceof JRadioButton){
-			final JRadioButton radioButton = (JRadioButton) component;
-			radioButton.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()-5));
-				}
-				public void focusGained(FocusEvent e) {
-					radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()+5));
-				}
-			});
-		}
-		if (component instanceof JLabel){
-			final JLabel label = (JLabel) component;
-			label.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					label.setBorder(BorderFactory.createEmptyBorder());
-				}
-				public void focusGained(FocusEvent e) {
-					label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				}
-			});
-		}
-		if (component instanceof JCheckBox){
-			final JCheckBox checkBox = (JCheckBox) component;
-			checkBox.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()-5));
-				}
-				public void focusGained(FocusEvent e) {
-					checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()+5));
-				}
-			});
-		}
-		if (component instanceof JTextPane){
-			final JTextPane textPane = (JTextPane) component;
-			textPane.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					textPane.setBorder(BorderFactory.createEmptyBorder());
-				}
-				public void focusGained(FocusEvent e) {
-					textPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				}
-			});
-		}
-		if (component instanceof JTree){
-			final JTree tree = (JTree) component;
-			tree.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					tree.setBorder(BorderFactory.createEmptyBorder());
-				}
-				public void focusGained(FocusEvent e) {
-					tree.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				}
-			});
-		}
-		if (component instanceof JList){
-			final JList list = (JList) component;
-			list.addFocusListener(new FocusListener() {
-				public void focusLost(FocusEvent e) {
-					list.setBorder(BorderFactory.createEmptyBorder());
-				}
-				public void focusGained(FocusEvent e) {
-					list.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				}
-			});
+			if (component instanceof JComboBox){
+				final JComboBox comboBox = (JComboBox) component;
+				comboBox.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+					}
+					
+					public void focusGained(FocusEvent e) {
+						comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+					}
+				});
+			}
+			if (component instanceof JRadioButton){
+				final JRadioButton radioButton = (JRadioButton) component;
+				radioButton.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()-5));
+					}
+					public void focusGained(FocusEvent e) {
+						radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()+5));
+					}
+				});
+			}
+			if (component instanceof JLabel){
+				final JLabel label = (JLabel) component;
+				label.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						label.setBorder(BorderFactory.createEmptyBorder());
+					}
+					public void focusGained(FocusEvent e) {
+						label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+					}
+				});
+			}
+			if (component instanceof JCheckBox){
+				final JCheckBox checkBox = (JCheckBox) component;
+				checkBox.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()-5));
+					}
+					public void focusGained(FocusEvent e) {
+						checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()+5));
+					}
+				});
+			}
+			if (component instanceof JTextPane){
+				final JTextPane textPane = (JTextPane) component;
+				textPane.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						textPane.setBorder(BorderFactory.createEmptyBorder());
+					}
+					public void focusGained(FocusEvent e) {
+						textPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+					}
+				});
+			}
+			if (component instanceof JTree){
+				final JTree tree = (JTree) component;
+				tree.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						tree.setBorder(BorderFactory.createEmptyBorder());
+					}
+					public void focusGained(FocusEvent e) {
+						tree.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+					}
+				});
+			}
+			if (component instanceof JList){
+				final JList list = (JList) component;
+				list.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						list.setBorder(BorderFactory.createEmptyBorder());
+					}
+					public void focusGained(FocusEvent e) {
+						list.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+					}
+				});
+			}
+			if (component instanceof JMenu){
+				final JMenu menu = (JMenu) component;
+				menu.addMenuListener(new MenuListener() {
+					public void menuSelected(MenuEvent e) {
+						menu.setFont(new Font(menu.getFont().getName(), menu.getFont().getStyle(), menu.getFont().getSize()+5));
+					}
+					public void menuDeselected(MenuEvent e) {
+						menu.setFont(new Font(menu.getFont().getName(), menu.getFont().getStyle(), menu.getFont().getSize()-5));
+					}
+					public void menuCanceled(MenuEvent e) {
+						
+					}
+				});
+			}
 		}
 	}
 	
