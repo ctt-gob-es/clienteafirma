@@ -23,7 +23,6 @@ import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -34,6 +33,10 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
 import net.java.xades.security.xml.WrappedKeyStorePlace;
 import net.java.xades.security.xml.XmlWrappedKeyInfo;
+import net.java.xades.security.xml.XAdES.QualifyingProperties;
+import net.java.xades.security.xml.XAdES.SignedProperties;
+import net.java.xades.security.xml.XAdES.UnsignedProperties;
+import net.java.xades.security.xml.XAdES.UnsignedSignatureProperties;
 import net.java.xades.security.xml.XAdES.XAdES_BES;
 import net.java.xades.security.xml.XAdES.XMLAdvancedSignature;
 
@@ -48,7 +51,6 @@ import org.w3c.dom.Element;
  * <li>Se puede establecer la URL del espacio de nombres de XAdES</li>
  * <li>Se puede a&ntilde;adir una hoja de estilo en modo <i>enveloping</i> dentro de la firma
  * </ul> */
-@SuppressWarnings("restriction")
 final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
 
     private AOXMLAdvancedSignature(final XAdES_BES xades) {
@@ -93,32 +95,31 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
         }
     }
 
-    @Override
-    protected KeyInfo newKeyInfo(final X509Certificate certificate, final String keyInfoId) throws KeyException {
+    private KeyInfo newKeyInfo(final List<X509Certificate> certificates, final String keyInfoId) throws KeyException {
         final KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
         final List<X509Certificate> x509DataList = new ArrayList<X509Certificate>();
         if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
-            x509DataList.add(certificate);
+            for (final X509Certificate cert : certificates) {
+                x509DataList.add(cert);
+            }
         }
         final List<XMLStructure> newList = new ArrayList<XMLStructure>();
-        newList.add(keyInfoFactory.newKeyValue(certificate.getPublicKey()));
+        newList.add(keyInfoFactory.newKeyValue(certificates.get(0).getPublicKey()));
         newList.add(keyInfoFactory.newX509Data(x509DataList));
         return keyInfoFactory.newKeyInfo(newList, keyInfoId);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public void sign(final X509Certificate certificate,
+    public void sign(final List<X509Certificate> certificates,
                      final PrivateKey privateKey,
                      final String signatureMethod,
-                     final List refsIdList,
+                     final List<?> refsIdList,
                      final String signatureIdPrefix,
-                     final String tsaURL) throws MarshalException, XMLSignatureException, GeneralSecurityException, TransformException {
+                     final String tsaURL) throws MarshalException, XMLSignatureException, GeneralSecurityException {
 
-        final List<?> referencesIdList = new ArrayList(refsIdList);
+        final List<?> referencesIdList = new ArrayList<Object>(refsIdList);
 
-        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace())) {
-            this.xades.setSigningCertificate(certificate);
+        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certificates != null && certificates.size() > 0) {
+            this.xades.setSigningCertificate(certificates.get(0));
         }
 
         addXMLObject(marshalXMLSignature(this.xadesNamespace, signatureIdPrefix, referencesIdList, tsaURL));
@@ -137,7 +138,7 @@ final class AOXMLAdvancedSignature extends XMLAdvancedSignature {
                 fac.newXMLSignature(fac.newSignedInfo(fac.newCanonicalizationMethod(this.canonicalizationMethod, (C14NMethodParameterSpec) null),
                                                       fac.newSignatureMethod(signatureMethod, null),
                                                       documentReferences),
-                                    newKeyInfo(certificate, keyInfoId),
+                                    newKeyInfo(certificates, keyInfoId),
                                     getXMLObjects(),
                                     getSignatureId(signatureIdPrefix),
                                     getSignatureValueId(signatureIdPrefix));
