@@ -18,13 +18,13 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
 /**
  * Panel explicativo de presentacion
@@ -70,28 +70,22 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
 
         // Configuramos el layout
         GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(20, 20, 0, 20);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(20, 20, 20, 20);
 		c.weightx = 1.0;
+		c.weighty = 1.0;
 		c.gridx = 0;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		
+		//Etiqueta con el texto "Bienvenido al asistente..."
+        String textLabel = Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto1") +
+        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto2")+
+        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto3")+
+        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.simple.cofirma.presentacion.texto4");
+        InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         
-		// Panel con el texto "Bienvenido al asistente..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"Wizard.multifirma.simple.cofirma.presentacion.texto1", true), c);
-        
-        // Panel con el texto "La cofirma es el..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"Wizard.multifirma.simple.cofirma.presentacion.texto2", true), c);
-        
-        // Panel con el texto "Para realizar la cofirma..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"Wizard.multifirma.simple.cofirma.presentacion.texto3", true), c);
-        
-        c.weighty = 1.0;
-        
-        // Panel con el texto "Para la cofirma de un..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-        		"Wizard.multifirma.simple.cofirma.presentacion.texto4", true), c);
+        panelCentral.add(presentationLabel, c);
         
         getContentPane().add(panelCentral, BorderLayout.CENTER);
     }
