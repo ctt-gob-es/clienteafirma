@@ -83,7 +83,7 @@ public class ContextOptionsPane {
         
         // Caja de texto para el motivo de la firma
         campoMotivo = new JTextField();
-        campoMotivo.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.motivo")); // NOI18N
+        campoMotivo.getAccessibleContext().setAccessibleName(etiquetaMotivo.getText() + " ALT + O."); // NOI18N
         campoMotivo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.motivo")); // NOI18N
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
@@ -115,7 +115,7 @@ public class ContextOptionsPane {
         
         // Caja de texto para el lugar donde se realiza la firma
         campoLugar = new JTextField();
-        campoLugar.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.lugar")); // NOI18N
+        campoLugar.getAccessibleContext().setAccessibleName(etiquetaLugar.getText() + " ALT + L."); // NOI18N
         campoLugar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.lugar")); // NOI18N
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
@@ -146,7 +146,7 @@ public class ContextOptionsPane {
         
         // Caja de texto para los datos de contacto
         campoDatos = new JTextField();
-        campoDatos.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.datos")); // NOI18N
+        campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " ALT + D."); // NOI18N
         campoDatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.datos")); // NOI18N
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
