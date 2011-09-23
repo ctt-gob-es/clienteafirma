@@ -89,9 +89,7 @@ public class ContextOptionsPane {
 			Caret caret = new ConfigureCaret();
 			campoMotivo.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoMotivo);
-        }
+        Utils.remarcar(campoMotivo);
         Utils.setContrastColor(campoMotivo);
         Utils.setFontBold(campoMotivo);
         contextPanel.add(campoMotivo, c2);
@@ -123,9 +121,7 @@ public class ContextOptionsPane {
 			Caret caret = new ConfigureCaret();
 			campoLugar.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoLugar);
-        }
+        Utils.remarcar(campoLugar);
         Utils.setContrastColor(campoLugar);
         Utils.setFontBold(campoLugar);
         contextPanel.add(campoLugar, c2);
@@ -156,9 +152,7 @@ public class ContextOptionsPane {
 			Caret caret = new ConfigureCaret();
 			campoDatos.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoDatos);
-        }
+        Utils.remarcar(campoDatos);
         Utils.setContrastColor(campoDatos);
         Utils.setFontBold(campoDatos);
         contextPanel.add(campoDatos, c2);

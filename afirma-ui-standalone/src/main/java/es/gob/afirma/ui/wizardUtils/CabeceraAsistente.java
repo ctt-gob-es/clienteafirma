@@ -106,10 +106,8 @@ public class CabeceraAsistente extends JPanel {
     	etiquetaTitulo.setFont(new Font(getFont().getFamily(), 1, getFont().getSize()));
     	etiquetaTitulo.setText(Messages.getString(this.MessagesTitulo)); // NOI18N
     	etiquetaTitulo.setFocusable(true);
-    	if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(etiquetaTitulo);
-        }
-    	Utils.setContrastColor(etiquetaTitulo);
+    	Utils.remarcar(etiquetaTitulo);
+        Utils.setContrastColor(etiquetaTitulo);
     	add(etiquetaTitulo, c);
     	
     	c.insets = new Insets(0, 15, 0, 10);

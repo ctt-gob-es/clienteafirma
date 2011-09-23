@@ -133,9 +133,7 @@ public class Firma extends JPanel {
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
 		campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" "+"ALT + G.");
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(campoFichero);
-		}
+		Utils.remarcar(campoFichero);
 		if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
@@ -167,9 +165,7 @@ public class Firma extends JPanel {
 				examinarActionPerformed(campoFichero);
 			}
 		});
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(examinar);
-		}
+		Utils.remarcar(examinar);
 		Utils.setContrastColor(examinar);
 		Utils.setFontBold(examinar);
 		add(examinar, c);
@@ -200,9 +196,7 @@ public class Firma extends JPanel {
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
 		comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description") + " ALT + A."); // NOI18N
 
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(comboAlmacen);
-		}
+		Utils.remarcar(comboAlmacen);
 		cargarComboAlmacen(comboAlmacen);
 		Utils.setContrastColor(comboAlmacen);
 		Utils.setFontBold(comboAlmacen);
@@ -254,9 +248,7 @@ public class Firma extends JPanel {
             formatosV.add(AOSignConstants.SIGN_FORMAT_ODF);
 		}
 		comboFormato.setModel(new DefaultComboBoxModel(formatosL.toArray()));
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(comboFormato);
-		}
+		Utils.remarcar(comboFormato);
 		Utils.setContrastColor(comboFormato);
 		Utils.setFontBold(comboFormato);
 		add(comboFormato, c);
@@ -300,9 +292,7 @@ public class Firma extends JPanel {
 			}
 		});
 		firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(firmar);
-		}
+		Utils.remarcar(firmar);
 		Utils.setContrastColor(firmar);
 		Utils.setFontBold(firmar);
 		

@@ -78,9 +78,7 @@ public class MultifirmaMasiva extends JPanel {
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		cargarComboAlmacen(comboAlmacen);
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(comboAlmacen);
-        }
+		Utils.remarcar(comboAlmacen);
 		Utils.setContrastColor(comboAlmacen);
 		Utils.setFontBold(comboAlmacen);
 		add(comboAlmacen, c);
@@ -110,9 +108,7 @@ public class MultifirmaMasiva extends JPanel {
 		alerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre") +" "+Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
 		alerta.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
 		alerta.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(alerta);
-        }
+		Utils.remarcar(alerta);
 		Utils.setContrastColor(alerta);
 		Utils.setFontBold(alerta);
 		panelTipos.add(alerta);
@@ -153,9 +149,7 @@ public class MultifirmaMasiva extends JPanel {
 			}
 		});
 
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(firmar);
-        }
+		Utils.remarcar(firmar);
 		Utils.setContrastColor(firmar);
 		Utils.setFontBold(firmar);
 		

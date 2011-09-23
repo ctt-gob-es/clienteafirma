@@ -196,10 +196,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Combo con los repositorios / almacenes
 		final JComboBox comboRepositorios = new JComboBox();
 		comboRepositorios.setToolTipText(Messages.getString("wizard.comboRepositorios.description"));
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(comboRepositorios);
-        }
-		Utils.setContrastColor(comboRepositorios);
+		Utils.remarcar(comboRepositorios);
+        Utils.setContrastColor(comboRepositorios);
 		Utils.setFontBold(comboRepositorios);
 		cargarCombo(comboRepositorios);
 		panelCentral.add(comboRepositorios, c);
@@ -227,10 +225,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				anadirActionPerformed(comboRepositorios, eliminar, anadir);
 			}
 		});
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(anadir);
-        }
-		Utils.setContrastColor(anadir);
+		Utils.remarcar(anadir);
+        Utils.setContrastColor(anadir);
 		Utils.setFontBold(anadir);
 		panelCentral.add(anadir, c);
 		
@@ -262,10 +258,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Listado de remitentes
 		listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description"));
 		listaRemitentes.setModel(new DefaultListModel());
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(listaRemitentes);
-        }
-		Utils.setContrastColor(listaRemitentes);
+		Utils.remarcar(listaRemitentes);
+        Utils.setContrastColor(listaRemitentes);
 		Utils.setFontBold(listaRemitentes);
 		panelLista.setViewportView(listaRemitentes);
 		
@@ -298,10 +292,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			}
 		});
 		eliminar.getAccessibleContext().setAccessibleDescription(Messages.getString("wizard.sobres.eliminar.remitente"));
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(eliminar);
-        }
-		Utils.setContrastColor(eliminar);
+		Utils.remarcar(eliminar);
+        Utils.setContrastColor(eliminar);
 		Utils.setFontBold(eliminar);
 		panelCentral.add(eliminar, c);
 		

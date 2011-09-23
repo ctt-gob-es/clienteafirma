@@ -138,10 +138,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		final JComboBox comboDestinatarios = new JComboBox();
 		comboDestinatarios.setToolTipText(Messages.getString("Wizard.sobres.pagina1.comboDestinatarios.description"));
 		cargarCombo(comboDestinatarios);
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(comboDestinatarios);
-        }
-		Utils.setContrastColor(comboDestinatarios);
+		Utils.remarcar(comboDestinatarios);
+        Utils.setContrastColor(comboDestinatarios);
 		Utils.setFontBold(comboDestinatarios);
 		panelCentral.add(comboDestinatarios, c);
 		
@@ -169,10 +167,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 						eliminar);
 			}
 		});
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(anadir);
-        }
-		Utils.setContrastColor(anadir);
+		Utils.remarcar(anadir);
+        Utils.setContrastColor(anadir);
 		Utils.setFontBold(anadir);
 		panelCentral.add(anadir, c);
 		
@@ -204,10 +200,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		// Lista con los destinatarios
 		listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description"));
 		listaDestinatarios.setModel(new DefaultListModel());
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(listaDestinatarios);
-        }
-		Utils.setContrastColor(listaDestinatarios);
+		Utils.remarcar(listaDestinatarios);
+        Utils.setContrastColor(listaDestinatarios);
 		Utils.setFontBold(listaDestinatarios);
 
 		panelLista.setViewportView(listaDestinatarios);
@@ -240,10 +234,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 				eliminarActionPerformed((DefaultListModel) listaDestinatarios.getModel(), eliminar);
 			}
 		});
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(eliminar);
-        }
-		Utils.setContrastColor(eliminar);
+		Utils.remarcar(eliminar);
+        Utils.setContrastColor(eliminar);
 		Utils.setFontBold(eliminar);
 		panelCentral.add(eliminar, c);
 		

@@ -190,10 +190,8 @@ public class Opciones extends JAccessibilityDialog {
 	    		maximizarActionPerformed();
 			}
 		});
-	    if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(maximizar);
-        }
-	    Utils.setContrastColor(maximizar);
+	    Utils.remarcar(maximizar);
+        Utils.setContrastColor(maximizar);
 	    Utils.setFontBold(maximizar);
 		
 	    //Espacio entre botones
@@ -220,9 +218,7 @@ public class Opciones extends JAccessibilityDialog {
             }
         });
         aceptar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(aceptar);
-        }
+        Utils.remarcar(aceptar);
         Utils.setContrastColor(aceptar);
         Utils.setFontBold(aceptar);
         
@@ -236,9 +232,7 @@ public class Opciones extends JAccessibilityDialog {
             }
         });
         cancelar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(cancelar);
-        }
+        Utils.remarcar(cancelar);
         Utils.setContrastColor(cancelar);
         Utils.setFontBold(cancelar);        
         

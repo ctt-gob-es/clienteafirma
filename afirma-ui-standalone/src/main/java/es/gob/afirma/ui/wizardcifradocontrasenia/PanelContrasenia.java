@@ -148,9 +148,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoContrasenia.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoContrasenia);
-        }
+        Utils.remarcar(campoContrasenia);
         Utils.setContrastColor(campoContrasenia);
         Utils.setFontBold(campoContrasenia);
         panelCentral.add(campoContrasenia, c);
@@ -182,9 +180,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoContraseniaRep.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoContraseniaRep);
-        }
+        Utils.remarcar(campoContraseniaRep);
         Utils.setContrastColor(campoContraseniaRep);
         Utils.setFontBold(campoContraseniaRep);
         panelCentral.add(campoContraseniaRep, c);

@@ -173,10 +173,8 @@ public class HelpUtils {
 				getHelp().setCurrentID(pagina);
 			}
 		});
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(botonAyuda);
-        }
-		
+		Utils.remarcar(botonAyuda);
+        
 		return botonAyuda;
 	}
 

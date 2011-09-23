@@ -40,9 +40,7 @@ public class PanelesTexto {
         bloqueTexto.setOpaque(opaco);
         bloqueTexto.setBorder(null);
         bloqueTexto.setFocusable(true);
-        if(GeneralConfig.isRemarked()){
-        	Utils.remarcar(bloqueTexto);
-        }
+        Utils.remarcar(bloqueTexto);
         Utils.setContrastColor(bloqueTexto);
         Utils.setFontBold(bloqueTexto);
         

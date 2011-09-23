@@ -169,9 +169,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoClave.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoClave);
-        }
+        Utils.remarcar(campoClave);
         Utils.setContrastColor(campoClave);
         Utils.setFontBold(campoClave);
         panelCentral.add(campoClave, c);
@@ -196,9 +194,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
             }
         });
         autogenerar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.autogenerar")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(autogenerar);
-        }
+        Utils.remarcar(autogenerar);
         Utils.setContrastColor(autogenerar);
         Utils.setFontBold(autogenerar);
         panelCentral.add(autogenerar, c);
@@ -218,9 +214,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
             }
         });
         almacen.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.almacen")); // NOI18N
-        if(GeneralConfig.isRemarked()){
-        	Utils.remarcar(almacen);
-        }
+        Utils.remarcar(almacen);
         Utils.setContrastColor(almacen);
         Utils.setFontBold(almacen);
         panelCentral.add(almacen, c);
@@ -236,9 +230,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         checkGuardar.setToolTipText(Messages.getString("WizardCifrado.check.description")); // NOI18N
         checkGuardar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardCifrado.check")); // NOI18N
         checkGuardar.setMnemonic(KeyEvent.VK_G);
-        if(GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkGuardar);
-        }
+        Utils.remarcar(checkGuardar);
         Utils.setContrastColor(checkGuardar);
         Utils.setFontBold(checkGuardar);
         panelCentral.add(checkGuardar, c);

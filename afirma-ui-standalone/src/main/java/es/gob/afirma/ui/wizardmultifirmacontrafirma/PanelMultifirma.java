@@ -260,10 +260,8 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion4")}
 		));
 		comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(comboFirmas);
-        }
-		Utils.setContrastColor(comboFirmas);
+		Utils.remarcar(comboFirmas);
+        Utils.setContrastColor(comboFirmas);
 		Utils.setFontBold(comboFirmas);
 		panelCentral.add(comboFirmas, c);
 		
@@ -319,9 +317,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
 		arbolFirmas.setSelectionRow(0);
 		arbolFirmas.setRootVisible(false);
-		if(GeneralConfig.isRemarked()){
-			Utils.remarcar(arbolFirmas);
-		}
+		Utils.remarcar(arbolFirmas);
 		Utils.setContrastColor(arbolFirmas);
 		Utils.setFontBold(arbolFirmas);
 		// Panel del arbol (firmantes seleccionados)
@@ -339,9 +335,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		 */
 
 		// Lista de firmantes ()
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(listaFirmantes);
-		}
+		Utils.remarcar(listaFirmantes);
 		Utils.setFontBold(listaFirmantes);
 		listaFirmantes.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes")); // NOI18N
 		listaFirmantes.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes.description")); // NOI18N

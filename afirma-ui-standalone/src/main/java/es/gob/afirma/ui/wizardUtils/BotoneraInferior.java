@@ -88,9 +88,7 @@ public class BotoneraInferior extends JPanel {
 				maximizarActionPerformed();
 			}
 		});
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(maximizar);
-        }
+        Utils.remarcar(maximizar);
         Utils.setContrastColor(maximizar);
         Utils.setFontBold(maximizar);
         
@@ -116,9 +114,7 @@ public class BotoneraInferior extends JPanel {
                 anteriorActionPerformed(anterior, siguiente, finalizar);
             }
         });
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(anterior);
-        }
+        Utils.remarcar(anterior);
         Utils.setContrastColor(anterior);
         Utils.setFontBold(anterior);
        
@@ -138,9 +134,7 @@ public class BotoneraInferior extends JPanel {
                 siguienteActionPerformed(anterior, siguiente, finalizar);
             }
         });
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(siguiente);
-        } 
+        Utils.remarcar(siguiente);
         Utils.setContrastColor(siguiente);
         Utils.setFontBold(siguiente);
         add(siguiente);
@@ -164,9 +158,7 @@ public class BotoneraInferior extends JPanel {
             		ventana.dispose();
             }
         });
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(cancelar);
-        }
+        Utils.remarcar(cancelar);
         Utils.setContrastColor(cancelar);
         Utils.setFontBold(cancelar);
         add(cancelar);
@@ -186,9 +178,7 @@ public class BotoneraInferior extends JPanel {
             		ventana.dispose();
             }
         });
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(finalizar);
-        }
+        Utils.remarcar(finalizar);
         Utils.setContrastColor(finalizar);
         Utils.setFontBold(finalizar);
         add(finalizar);

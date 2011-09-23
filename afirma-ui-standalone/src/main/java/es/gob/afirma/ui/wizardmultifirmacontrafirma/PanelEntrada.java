@@ -137,9 +137,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoFirma.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoFirma);
-        }
+        Utils.remarcar(campoFirma);
         Utils.setContrastColor(campoFirma);
         Utils.setFontBold(campoFirma);
         panelCentral.add(campoFirma, c);
@@ -165,9 +163,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
             	examinarFirmaActionPerformed();
             }
         });
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinarFirma);
-        }
+        Utils.remarcar(examinarFirma);
         Utils.setContrastColor(examinarFirma);
         Utils.setFontBold(examinarFirma);
         panelCentral.add(examinarFirma, c);

@@ -69,6 +69,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
         panelCentral.setBackground(Color.WHITE);
         panelCentral.setLayout(new GridBagLayout());
         Utils.setContrastColor(panelCentral);
+        Utils.remarcar(panelCentral);
         Utils.setFontBold(panelCentral);
     	
         // Configuramos el layout

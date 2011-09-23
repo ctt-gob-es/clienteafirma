@@ -145,9 +145,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 				Caret caret = new ConfigureCaret();
 				campoContrasenia.setCaret(caret);
 			}
-	     if (GeneralConfig.isRemarked()){
-	        	Utils.remarcar(campoContrasenia);
-	        }
+	     Utils.remarcar(campoContrasenia);
 	     Utils.setContrastColor(campoContrasenia);
 	     Utils.setFontBold(campoContrasenia);
 	     panelCentral.add(this.campoContrasenia, c);

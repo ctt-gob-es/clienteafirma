@@ -100,9 +100,7 @@ public class AccessibilityOptionsPane {
         checkFontSize.setSelected(GeneralConfig.isAvanzados()); 
         checkFontSize.setBounds(12, 20, 340, 23);
         checkFontSize.setMnemonic(KeyEvent.VK_D); // Asignación de mnemónico al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkFontSize);
-        }
+        Utils.remarcar(checkFontSize);
         Utils.setContrastColor(checkFontSize);
         Utils.setFontBold(checkFontSize);
         textPanel.add(checkFontSize, c2);
@@ -114,9 +112,7 @@ public class AccessibilityOptionsPane {
         checkFontStyle.setSelected(GeneralConfig.isAvanzados()); 
         checkFontStyle.setBounds(12, 20, 340, 23);
         checkFontStyle.setMnemonic(KeyEvent.VK_N); // Asignación de mnemónico al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkFontStyle);
-        }
+        Utils.remarcar(checkFontStyle);
         Utils.setContrastColor(checkFontStyle);
         Utils.setFontBold(checkFontStyle);
         textPanel.add(checkFontStyle, c2);
@@ -142,9 +138,7 @@ public class AccessibilityOptionsPane {
         checkHighContrast.setSelected(GeneralConfig.isAvanzados()); 
         checkHighContrast.setBounds(12, 20, 340, 23);
         checkHighContrast.setMnemonic(KeyEvent.VK_L); // Asignación de mnemónico al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkHighContrast);
-        }
+        Utils.remarcar(checkHighContrast);
         Utils.setContrastColor(checkHighContrast);
         Utils.setFontBold(checkHighContrast);
         colorPanel.add(checkHighContrast, c2);
@@ -170,9 +164,7 @@ public class AccessibilityOptionsPane {
         checkFocusVisible.setSelected(GeneralConfig.isAvanzados()); 
         checkFocusVisible.setBounds(12, 20, 340, 23);
         checkFocusVisible.setMnemonic(KeyEvent.VK_F); // Asignación de mnemónico al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkFocusVisible);
-        }
+        Utils.remarcar(checkFocusVisible);
         Utils.setContrastColor(checkFocusVisible);
         Utils.setFontBold(checkFocusVisible);
         focusPanel.add(checkFocusVisible, c2);
@@ -198,9 +190,7 @@ public class AccessibilityOptionsPane {
         checkWindowSize.setSelected(GeneralConfig.isAvanzados()); 
         checkWindowSize.setBounds(12, 20, 340, 23);
         checkWindowSize.setMnemonic(KeyEvent.VK_V); // Asignación de mnemónico al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkWindowSize);
-        }
+        Utils.remarcar(checkWindowSize);
         Utils.setContrastColor(checkWindowSize);
         Utils.setFontBold(checkWindowSize);
         windowPanel.add(checkWindowSize, c2);
@@ -226,9 +216,7 @@ public class AccessibilityOptionsPane {
         checkCursorSize.setSelected(GeneralConfig.isAvanzados()); 
         checkCursorSize.setBounds(12, 20, 340, 23);
         checkCursorSize.setMnemonic(KeyEvent.VK_E); // Asignación de mnemónico al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkCursorSize);
-        }
+        Utils.remarcar(checkCursorSize);
         Utils.setContrastColor(checkCursorSize);
         Utils.setFontBold(checkCursorSize);
         cursorPanel.add(checkCursorSize, c2);
@@ -256,9 +244,7 @@ public class AccessibilityOptionsPane {
 			}
 		});
         valores.setMnemonic(KeyEvent.VK_O);
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(valores);
-        }
+        Utils.remarcar(valores);
         Utils.setContrastColor(valores);
         Utils.setFontBold(valores);
         buttonPanel.add(valores);
@@ -266,9 +252,7 @@ public class AccessibilityOptionsPane {
         //Boton guardar
         guardar.setText("Guardar");
         guardar.setMnemonic(KeyEvent.VK_U);
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(guardar);
-        }
+        Utils.remarcar(guardar);
         Utils.setContrastColor(guardar);
         Utils.setFontBold(guardar);
         buttonPanel.add(guardar);
@@ -276,9 +260,7 @@ public class AccessibilityOptionsPane {
         //Boton cancelar
         cargar.setText("Cargar");
         cargar.setMnemonic(KeyEvent.VK_R);
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(cargar);
-        }
+        Utils.remarcar(cargar);
         Utils.setContrastColor(cargar);
         Utils.setFontBold(cargar);
         buttonPanel.add(cargar);

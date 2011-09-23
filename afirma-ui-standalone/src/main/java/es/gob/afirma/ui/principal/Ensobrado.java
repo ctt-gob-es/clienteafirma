@@ -92,9 +92,7 @@ public class Ensobrado extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoFichero);
-        }
+        Utils.remarcar(campoFichero);
         Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
@@ -121,9 +119,7 @@ public class Ensobrado extends JPanel {
         });
         examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
 		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinar);
-        }
+        Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
 		add(examinar, c);
@@ -151,9 +147,7 @@ public class Ensobrado extends JPanel {
 					comboTipos.setEnabled(true);
 			}
 		});
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkAnadir);
-        }
+        Utils.remarcar(checkAnadir);
         Utils.setContrastColor(checkAnadir);
         Utils.setFontBold(checkAnadir);
         add(checkAnadir, c);
@@ -180,9 +174,7 @@ public class Ensobrado extends JPanel {
         comboTipos.getAccessibleContext().setAccessibleName(etiquetaOpciones.getText() + " " + Messages.getString("Ensobrado.opciones.combo.status") +" ALT + T."); // NOI18N
         comboTipos.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.opciones.combo.description")); // NOI18N
         cargarComboTipos();
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(comboTipos);
-        }
+        Utils.remarcar(comboTipos);
         Utils.setContrastColor(comboTipos);
         Utils.setFontBold(comboTipos);
         add(comboTipos, c);
@@ -227,9 +219,7 @@ public class Ensobrado extends JPanel {
         });
         generar.getAccessibleContext().setAccessibleName(generar.getText() + " " + Messages.getString("Ensobrado.btnGenerar.description.status")); // NOI18N
         generar.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.btnGenerar.description")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(generar);
-        }
+        Utils.remarcar(generar);
         Utils.setContrastColor(generar);
         Utils.setFontBold(generar);
         

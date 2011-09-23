@@ -146,9 +146,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoClave.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoClave);
-        }
+        Utils.remarcar(campoClave);
         Utils.setContrastColor(campoClave);
         Utils.setFontBold(campoClave);
         panelCentral.add(campoClave, c);
@@ -173,9 +171,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
             }
         });
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("WizardDescifrado.clave.boton")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinar);
-        }
+        Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
         panelCentral.add(examinar, c);

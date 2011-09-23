@@ -108,9 +108,7 @@ public class Desensobrado extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoFichero);
-		}
+        Utils.remarcar(campoFichero);
         Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
@@ -137,9 +135,7 @@ public class Desensobrado extends JPanel {
         });
         examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + Messages.getString("PrincipalGUI.Examinar.description.status") ); // NOI18N
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinar);
-        }
+        Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
 		add(examinar, c);
@@ -170,9 +166,7 @@ public class Desensobrado extends JPanel {
         comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+ " " + Messages.getString("Desensobrado.almacen.combo.description.status") + " ALT + A."); // NOI18N
         comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N
         cargarComboAlmacen(comboAlmacen);
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(comboAlmacen);
-        }
+        Utils.remarcar(comboAlmacen);
         Utils.setContrastColor(comboAlmacen);
         Utils.setFontBold(comboAlmacen);
         add(comboAlmacen, c);
@@ -207,9 +201,7 @@ public class Desensobrado extends JPanel {
         checkInicar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check") + " " +Messages.getString("Desensobrado.check.check.description.status")); // NOI18N
         checkInicar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.check.check.description")); // NOI18N
         checkInicar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkInicar);
-        }
+        Utils.remarcar(checkInicar);
         Utils.setContrastColor(checkInicar);
         Utils.setFontBold(checkInicar);
         add(checkInicar, c);
@@ -247,9 +239,7 @@ public class Desensobrado extends JPanel {
         });
         extraer.getAccessibleContext().setAccessibleName(extraer.getText() + " " + Messages.getString("Desensobrado.btnDescifrar.description.status")); // NOI18N
         extraer.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(extraer);
-        }
+        Utils.remarcar(extraer);
         Utils.setContrastColor(extraer);
         Utils.setFontBold(extraer);
         

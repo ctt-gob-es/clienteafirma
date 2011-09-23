@@ -102,9 +102,7 @@ public class Descifrado extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoFichero);
-		}
+        Utils.remarcar(campoFichero);
         Utils.setContrastColor(campoFichero);
         Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
@@ -133,9 +131,7 @@ public class Descifrado extends JPanel {
         examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description"));
 		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
 		
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinar);
-		}
+        Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
 		add(examinar, c);
@@ -173,9 +169,7 @@ public class Descifrado extends JPanel {
             }
         });
         comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Descifrado.origenL.0"),Messages.getString("Descifrado.origenL.1")}));
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(comboMecanismo);
-		}
+        Utils.remarcar(comboMecanismo);
         Utils.setContrastColor(comboMecanismo);
         Utils.setFontBold(comboMecanismo);
         add(comboMecanismo, c);
@@ -222,9 +216,7 @@ public class Descifrado extends JPanel {
 		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N
         comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
         
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(comboAlgoritmo);
-		}
+        Utils.remarcar(comboAlgoritmo);
         Utils.setContrastColor(comboAlgoritmo);
         Utils.setFontBold(comboAlgoritmo);
 		add(comboAlgoritmo, c);
@@ -281,9 +273,7 @@ public class Descifrado extends JPanel {
         });
         descifrar.getAccessibleContext().setAccessibleName(descifrar.getText()+ " " + Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
         descifrar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(descifrar);
-		}
+        Utils.remarcar(descifrar);
         Utils.setContrastColor(descifrar);
         Utils.setFontBold(descifrar);
         

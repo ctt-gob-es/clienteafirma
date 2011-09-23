@@ -28,10 +28,8 @@ public class InfoLabel extends JLabel{
 		super("<HTML>" + text + "</HTML>");
 		this.setFocusable(true);
 		this.setOpaque(opaque);
-		 if(GeneralConfig.isRemarked()){
-	        	Utils.remarcar(this);
-	        }
-		 Utils.setContrastColor(this);
+		Utils.remarcar(this);
+	    Utils.setContrastColor(this);
 		
 	}
 }

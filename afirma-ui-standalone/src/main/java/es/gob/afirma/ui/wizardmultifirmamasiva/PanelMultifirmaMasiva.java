@@ -274,9 +274,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoDirectorio.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoDirectorio);
-        }
+        Utils.remarcar(campoDirectorio);
         Utils.setContrastColor(campoDirectorio);
         Utils.setFontBold(campoDirectorio);
         panelCentral.add(campoDirectorio, c);
@@ -300,9 +298,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             	examinarDirectorioActionPerformed();
             }
         });
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinarDirectorio);
-        }
+        Utils.remarcar(examinarDirectorio);
         Utils.setContrastColor(examinarDirectorio);
         Utils.setFontBold(examinarDirectorio);
         panelCentral.add(examinarDirectorio, c);
@@ -317,9 +313,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         checkSobreescribir.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
         checkSobreescribir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
         checkSobreescribir.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkSobreescribir);
-        }
+        Utils.remarcar(checkSobreescribir);
         Utils.setContrastColor(checkSobreescribir);
         Utils.setFontBold(checkSobreescribir);
         panelCentral.add(checkSobreescribir, c);
@@ -346,9 +340,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoFicheroLog.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoFicheroLog);
-        }
+        Utils.remarcar(campoFicheroLog);
         Utils.setContrastColor(campoFicheroLog);
         Utils.setFontBold(campoFicheroLog);
         panelCentral.add(campoFicheroLog, c);
@@ -371,9 +363,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                 examinarFicheroLogActionPerformed();
             }
         });
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinarFichero);
-        }
+        Utils.remarcar(examinarFichero);
         Utils.setContrastColor(examinarFichero);
         Utils.setFontBold(examinarFichero);
         panelCentral.add(examinarFichero, c);

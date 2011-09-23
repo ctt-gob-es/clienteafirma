@@ -114,9 +114,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         checkRespectar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana2.check.respetar")); 
         checkRespectar.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.check.respetar.description"));
         checkRespectar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkRespectar);
-        }
+        Utils.remarcar(checkRespectar);
         Utils.setContrastColor(checkRespectar);
         Utils.setFontBold(checkRespectar);
         panelCentral.add(checkRespectar, c);
@@ -146,9 +144,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         radioTodos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description"));
         radioTodos.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al botón de radio
         radioTodos.setSelected(true);
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(radioTodos);
-        }
+        Utils.remarcar(radioTodos);
         Utils.setContrastColor(radioTodos);
         Utils.setFontBold(radioTodos);
         panelRadios.add(radioTodos, cons);
@@ -160,9 +156,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         radioUltimos.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana2.panel.radio2")); 
         radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description"));
         radioUltimos.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botón de radio
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(radioUltimos);
-        }
+        Utils.remarcar(radioUltimos);
         Utils.setContrastColor(radioUltimos);
         Utils.setFontBold(radioUltimos);
         panelRadios.add(radioUltimos, cons);

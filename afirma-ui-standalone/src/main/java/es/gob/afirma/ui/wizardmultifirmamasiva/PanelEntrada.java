@@ -126,9 +126,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoDirectorio.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoDirectorio);
-        }
+        Utils.remarcar(campoDirectorio);
         Utils.setContrastColor(campoDirectorio);
         Utils.setFontBold(campoDirectorio);
         panelCentral.add(campoDirectorio, c);
@@ -153,9 +151,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
                 examinarActionPerformed();
             }
         });
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinar);
-        }
+        Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
         panelCentral.add(examinar, c);
@@ -171,9 +167,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         checkIncluir.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.check.incluir"));
         checkIncluir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description"));
         checkIncluir.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(checkIncluir);
-        }
+        Utils.remarcar(checkIncluir);
         Utils.setContrastColor(checkIncluir);
         Utils.setFontBold(checkIncluir);
         panelCentral.add(checkIncluir, c);
@@ -199,9 +193,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoExtensiones.setCaret(caret);
 		}
-        if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(campoExtensiones);
-        }
+        Utils.remarcar(campoExtensiones);
         Utils.setContrastColor(campoExtensiones);
         Utils.setFontBold(campoExtensiones);
         panelCentral.add(campoExtensiones, c);

@@ -137,10 +137,8 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoDatos.setCaret(caret);
 		}
-		if (GeneralConfig.isRemarked()){
-	       	Utils.remarcar(campoDatos);
-	       }
-		Utils.setContrastColor(campoDatos);
+		Utils.remarcar(campoDatos);
+	    Utils.setContrastColor(campoDatos);
 		Utils.setFontBold(campoDatos);
 		panelCentral.add(campoDatos, c);
 		
@@ -163,10 +161,8 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 				examinarDatosActionPerformed();
 			}
 		});
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinarDatos);
-        }
-		Utils.setContrastColor(examinarDatos);
+		Utils.remarcar(examinarDatos);
+        Utils.setContrastColor(examinarDatos);
 		Utils.setFontBold(examinarDatos);
 		panelCentral.add(examinarDatos, c);
 
@@ -192,10 +188,8 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 			Caret caret = new ConfigureCaret();
 			campoFirma.setCaret(caret);
 		}
-		if (GeneralConfig.isRemarked()){
-	       	Utils.remarcar(campoFirma);
-	    }
-		Utils.setContrastColor(campoFirma);
+		Utils.remarcar(campoFirma);
+	    Utils.setContrastColor(campoFirma);
 		Utils.setFontBold(campoFirma);
 		panelCentral.add(campoFirma, c);
 		
@@ -217,10 +211,8 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 				examinarFirmaActionPerformed();
 			}
 		});
-		if (GeneralConfig.isRemarked()){
-        	Utils.remarcar(examinarFirma);
-        }
-		Utils.setContrastColor(examinarFirma);
+		Utils.remarcar(examinarFirma);
+        Utils.setContrastColor(examinarFirma);
 		Utils.setFontBold(examinarFirma);
 		panelCentral.add(examinarFirma, c);
 		

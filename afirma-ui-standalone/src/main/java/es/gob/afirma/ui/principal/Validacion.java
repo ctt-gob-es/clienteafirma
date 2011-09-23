@@ -148,9 +148,7 @@ public class Validacion extends JPanel {
 		});
 		valide.getAccessibleContext().setAccessibleName(Messages.getString("Validacion.btnValide") + " " + Messages.getString("Validacion.btnValide.description.status")); // NOI18N
 		valide.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.btnValide.description")); // NOI18N
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(valide);
-		}
+		Utils.remarcar(valide);
 		Utils.setContrastColor(valide);
 		Utils.setFontBold(valide);
 		cons.ipadx = 0;

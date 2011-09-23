@@ -648,9 +648,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	        JToggleButton tButton = new JToggleButton(text, icon);
 	        tButton.setHorizontalAlignment(SwingConstants.LEFT);
 	        tButton.setSelectedIcon(selectedIcon);
-	        if (GeneralConfig.isRemarked()){
-	        	Utils.remarcar(tButton);
-	        }
+	        Utils.remarcar(tButton);
 	        Utils.setContrastColor(tButton);
 	        Utils.setFontBold(tButton);
 	        return tButton;

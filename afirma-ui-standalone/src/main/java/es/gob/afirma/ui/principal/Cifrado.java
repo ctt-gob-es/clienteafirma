@@ -122,9 +122,7 @@ public class Cifrado extends JPanel {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);
 		}
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(campoFichero);
-		}
+		Utils.remarcar(campoFichero);
 		Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
@@ -152,9 +150,7 @@ public class Cifrado extends JPanel {
 			}
 		});       
 		
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(examinar);
-		}
+		Utils.remarcar(examinar);
 		Utils.setContrastColor(examinar);
 		Utils.setFontBold(examinar);
 		add(examinar, c);
@@ -191,9 +187,7 @@ public class Cifrado extends JPanel {
 		comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave") +" "+ Messages.getString("Cifrado.origen.clave.combo.description.status") + " ALT + A."); // NOI18N
 		comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N
 		comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Cifrado.origenL.0"),Messages.getString("Cifrado.origenL.1")}));
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(comboMecanismo);
-		}
+		Utils.remarcar(comboMecanismo);
 		Utils.setContrastColor(comboMecanismo);
 		Utils.setFontBold(comboMecanismo);
 		add(comboMecanismo, c);
@@ -240,9 +234,7 @@ public class Cifrado extends JPanel {
 		comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+ Messages.getString("Cifrado.formato.combo.description.status")+" ALT + G."); // NOI18N); // NOI18N
 		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.combo.description")); // NOI18N
 		comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(comboAlgoritmo);
-		}
+		Utils.remarcar(comboAlgoritmo);
 		Utils.setContrastColor(comboAlgoritmo);
 		Utils.setFontBold(comboAlgoritmo);
 		add(comboAlgoritmo, c);
@@ -298,9 +290,7 @@ public class Cifrado extends JPanel {
 		});
 		cifrar.getAccessibleContext().setAccessibleName(cifrar.getText()+ " " + Messages.getString("Cifrado.btncifrar.description.status"));
 		cifrar.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.btncifrar.description")); // NOI18N
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(cifrar);
-		}
+		Utils.remarcar(cifrar);
 		Utils.setContrastColor(cifrar);
 		Utils.setFontBold(cifrar);
 		

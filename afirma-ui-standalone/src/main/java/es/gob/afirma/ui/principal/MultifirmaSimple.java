@@ -76,9 +76,7 @@ public class MultifirmaSimple extends JPanel {
 		comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")+" ALT + A."); // NOI18N
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(comboAlmacen);
-		}
+		Utils.remarcar(comboAlmacen);
 		Utils.setContrastColor(comboAlmacen);
 		Utils.setFontBold(comboAlmacen);
 		cargarComboAlmacen(comboAlmacen);
@@ -117,9 +115,7 @@ public class MultifirmaSimple extends JPanel {
 		} else {
 			cofirma.setMnemonic(KeyEvent.VK_G); //Se asigna el atajo para el modo simple
 		}
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(cofirma);
-		}
+		Utils.remarcar(cofirma);
 		Utils.setContrastColor(cofirma);
 		Utils.setFontBold(cofirma);
 		panelTipos.add(cofirma);
@@ -140,9 +136,7 @@ public class MultifirmaSimple extends JPanel {
 		} else {
 			contrafirma.setMnemonic(KeyEvent.VK_E); //Se asigna el atajo para el modo simple
 		}
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(contrafirma);
-		}
+		Utils.remarcar(contrafirma);
 		Utils.setContrastColor(contrafirma);
 		Utils.setFontBold(contrafirma);
 
@@ -188,9 +182,7 @@ public class MultifirmaSimple extends JPanel {
 				firmarActionPerformed(comboAlmacen, cofirma);
 			}
 		});
-		if (GeneralConfig.isRemarked()){
-			Utils.remarcar(firmar);
-		}
+		Utils.remarcar(firmar);
 		Utils.setContrastColor(firmar);
 		Utils.setFontBold(firmar);
 		
