@@ -38,13 +38,14 @@ import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
+
 
 /**
  * Clase que muestra el contenido principal del descifrado de una contrasenia.
@@ -117,9 +118,9 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		c.weightx = 1.0;
 		c.gridx = 0;
     	
-        // Panel que contiene el texto "Introduzca la contrasenia con..."
-		panelCentral.add(PanelesTexto.generarPanelTexto(
-				"WizardDescifrado.contrasenia.contenido.texto1", false), c);
+		// Etiqueta que contiene el texto "Introduzca una contrasenia de..."
+		InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardDescifrado.contrasenia.contenido.texto1"), false);
+		panelCentral.add(insertLabel, c);
 
 		 c.insets = new Insets(20, 20, 0, 20);
 		 c.weightx = 1.0;
@@ -132,7 +133,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
     	Utils.setFontBold(passwordLabel);
     	panelCentral.add(passwordLabel, c);
     	
-    	 c.insets = new Insets(0, 20, 0, 20);
+    	 c.insets = new Insets(5, 20, 0, 20);
 		 c.weightx = 1.0;
 		 c.gridx = 0;
 		 c.gridy = 2;
@@ -140,6 +141,8 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		
         // Caja de texto donde se guarda la contraseña
 		 this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
+		 campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + "ALT + O.");
+	     campoContrasenia.getAccessibleContext().setAccessibleDescription(campoContrasenia.getToolTipText());
 	     this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
 	     if (GeneralConfig.isBigCaret()) {
 				Caret caret = new ConfigureCaret();
@@ -160,10 +163,10 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         c.gridy	= 3;
         c.weighty = 1.0;
         
-        // Panel que contiene el texto "Introduzca la contrasenia con..."
-        panelCentral.add(PanelesTexto.generarPanelTexto(
-				"WizardDescifrado.contrasenia.contenido.texto5", false), c);    //$NON-NLS-1$   
-        
+        // Etiqueta que contiene el texto "Introduzca la contrasenia con..."
+        InfoLabel endLabel = new InfoLabel(Messages.getString("WizardDescifrado.contrasenia.contenido.texto5"), false);
+		panelCentral.add(endLabel, c);
+      
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
         // Accesos rapidos al menu de ayuda
