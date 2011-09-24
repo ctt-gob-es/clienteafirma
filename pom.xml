@@ -24,6 +24,8 @@
     <module>afirma-crypto-pdf-itext</module>
     <module>afirma-crypto-pdf</module>
     <module>afirma-crypto-cipher</module>
+    <module>afirma-crypto-xades</module>
+    <module>afirma-crypto-core-xml</module>
     <module>afirma-ui-standalone</module>
     <module>afirma-ui-simpleafirma</module>
   </modules>
