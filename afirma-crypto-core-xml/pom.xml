@@ -17,6 +17,12 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.xml</groupId>
+      <artifactId>xmldsign</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.sun.xml.security</groupId>
       <artifactId>apache-xmlsec</artifactId>
       <version>1.0.1</version>
