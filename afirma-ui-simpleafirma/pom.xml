@@ -18,15 +18,45 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.apple</groupId>
-      <artifactId>applejavaextensions</artifactId>
-      <version>1.5.4</version>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-util</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>es.gob.afirma</groupId>
-      <artifactId>afirma-client</artifactId>
-      <version>3.2.0</version>
+      <artifactId>afirma-crypto-pdf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-xades</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-core-keystores</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cms</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-crypto-cades</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.apple</groupId>
+      <artifactId>applejavaextensions</artifactId>
+      <version>1.5.4</version>
     </dependency>
 
     <dependency>
