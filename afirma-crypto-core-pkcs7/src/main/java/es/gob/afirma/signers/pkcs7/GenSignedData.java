@@ -308,21 +308,10 @@ public final class GenSignedData {
             ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
         }
 
-        // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equals("SHA512")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-512"; //$NON-NLS-1$
-        }
-        else if (digestAlgorithm.equals("SHA384")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-384"; //$NON-NLS-1$
-        }
-        else if (digestAlgorithm.equals("SHA256")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-256"; //$NON-NLS-1$
-        }
-
         // Si nos viene el hash de fuera no lo calculamos
         final byte[] md;
         if (messageDigest == null || messageDigest.length < 1) {
-            md = MessageDigest.getInstance(digestAlgorithm).digest(datos);
+            md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestAlgorithm)).digest(datos);
         }
         else {
             md = messageDigest;
