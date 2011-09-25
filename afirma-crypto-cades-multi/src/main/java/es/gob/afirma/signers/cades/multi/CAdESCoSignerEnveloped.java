@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -121,10 +122,14 @@ final class CAdESCoSignerEnveloped {
      *        archivo a firmar como los datos del firmante.
      * @param sign
      *        Archivo que contiene las firmas.
-     * @param policy
-     *        Url de la Politica aplicada.
-     * @param qualifier
-     *        OID de la pol&iacute;tica.
+     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
+     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
+     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
+     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
+     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
+     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
+     *                                      <code>0</code>
+     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
@@ -147,8 +152,10 @@ final class CAdESCoSignerEnveloped {
      *         firma. */
     byte[] coSigner(final P7ContentSignerParameters parameters,
                            final byte[] sign,
-                           final String policy,
-                           final String qualifier,
+                           final String policyIdentifier,
+                           final String policyIdentifierHash,
+                           final String policyIdentifierHashAlgorithm,
+                           final String policyQualifier,
                            final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
@@ -220,12 +227,16 @@ final class CAdESCoSignerEnveloped {
         if (messageDigest == null) {
             final ASN1EncodableVector contextExpecific =
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-                                             digestAlgorithm,
-                                             parameters.getContent(),
-                                             policy,
-                                             qualifier,
-                                             signingCertificateV2,
-                                             null);
+                     digestAlgorithm,
+                     parameters.getContent(),
+                     policyIdentifier,
+                     policyIdentifierHash,
+                     policyIdentifierHashAlgorithm,
+                     policyQualifier,
+                     signingCertificateV2,
+                     null,
+                     new Date()
+                 );
 
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -233,12 +244,16 @@ final class CAdESCoSignerEnveloped {
         else {
             final ASN1EncodableVector contextExpecific =
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-                                             digestAlgorithm,
-                                             null,
-                                             policy,
-                                             qualifier,
-                                             signingCertificateV2,
-                                             messageDigest);
+                     digestAlgorithm,
+                     null,
+                     policyIdentifier,
+                     policyIdentifierHash,
+                     policyIdentifierHashAlgorithm,
+                     policyQualifier,
+                     signingCertificateV2,
+                     messageDigest,
+                     new Date()
+                );
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         }
@@ -292,10 +307,14 @@ final class CAdESCoSignerEnveloped {
      *        de firma.
      * @param data
      *        Archivo que contiene las firmas.
-     * @param policy
-     *        Url de la Politica aplicada.
-     * @param qualifier
-     *        OID de la pol&iacute;tica.
+     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
+     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
+     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
+     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
+     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
+     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
+     *                                      <code>0</code>
+     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
@@ -319,8 +338,10 @@ final class CAdESCoSignerEnveloped {
     byte[] coSigner(final String signatureAlgorithm,
                            final X509Certificate[] signerCertificateChain,
                            final InputStream data,
-                           final String policy,
-                           final String qualifier,
+                           final String policyIdentifier,
+                           final String policyIdentifierHash,
+                           final String policyIdentifierHashAlgorithm,
+                           final String policyQualifier,
                            final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
@@ -420,12 +441,16 @@ final class CAdESCoSignerEnveloped {
         if (messageDigest != null) {
             final ASN1EncodableVector contextExpecific =
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
-                                             digestAlgorithm,
-                                             null,
-                                             policy,
-                                             qualifier,
-                                             signingCertificateV2,
-                                             messageDigest);
+                     digestAlgorithm,
+                     null,
+                     policyIdentifier,
+                     policyIdentifierHash,
+                     policyIdentifierHashAlgorithm,
+                     policyQualifier,
+                     signingCertificateV2,
+                     messageDigest,
+                     new Date()
+                );
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         }

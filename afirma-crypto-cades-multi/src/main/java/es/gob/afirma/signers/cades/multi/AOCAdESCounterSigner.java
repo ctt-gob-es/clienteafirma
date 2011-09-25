@@ -53,19 +53,26 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, xCerts);
 
-        // Recuperamos la polictica de firma si se indico
-        String policyQualifier = null;
-        String policyIdentifier = null;
-        if (extraParams.containsKey("policyQualifier")) { //$NON-NLS-1$
-            policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
-            policyIdentifier = extraParams.getProperty("policyIdentifier"); //$NON-NLS-1$
-        }
-
         // Datos firmados.
         byte[] dataSigned = null;
 
+        // Politica de firma
+        String policyIdentifier = null;
+        // Nos puede venir como URN o como OID
+        try {
+            policyIdentifier =
+                    extraParams.getProperty("policyIdentifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        }
+        catch (final Exception e) {
+            // Se ignora, podemos no tener politica
+        }
+        final String policyIdentifierHash = extraParams.getProperty("policyIdentifierHash"); //$NON-NLS-1$
+        String policyIdentifierHashAlgorithm = null;
+        if (policyIdentifier != null && policyIdentifierHash != null && policyIdentifierHash != "0") { //$NON-NLS-1$
+            
+        }
+        
         // Si la firma que nos introducen es SignedData
-        //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
         final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
         if (signedData) {
             try {
@@ -82,7 +89,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                                                    nodes,
                                                                    keyEntry,
                                                                    policyIdentifier,
-                                                                   policyQualifier,
+                                                                   policyIdentifierHash,
+                                                                   policyIdentifierHashAlgorithm,
+                                                                   extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                    signingCertificateV2);
                 }
                 // CASO DE FIRMA DE HOJAS
@@ -97,7 +106,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                                                    nodes,
                                                                    keyEntry,
                                                                    policyIdentifier,
-                                                                   policyQualifier,
+                                                                   policyIdentifierHash,
+                                                                   policyIdentifierHashAlgorithm,
+                                                                   extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                    signingCertificateV2);
                 }
                 // CASO DE FIRMA DE NODOS
@@ -114,7 +125,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                                                    nodesID,
                                                                    keyEntry,
                                                                    policyIdentifier,
-                                                                   policyQualifier,
+                                                                   policyIdentifierHash,
+                                                                   policyIdentifierHashAlgorithm,
+                                                                   extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                    signingCertificateV2);
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -134,7 +147,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                                                    nodes2,
                                                                    keyEntry,
                                                                    policyIdentifier,
-                                                                   policyQualifier,
+                                                                   policyIdentifierHash,
+                                                                   policyIdentifierHashAlgorithm,
+                                                                   extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                    signingCertificateV2);
 
                 }
@@ -162,7 +177,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                                                         nodes,
                                                                         keyEntry,
                                                                         policyIdentifier,
-                                                                        policyQualifier,
+                                                                        policyIdentifierHash,
+                                                                        policyIdentifierHashAlgorithm,
+                                                                        extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                         signingCertificateV2);
             }
             // CASO DE FIRMA DE HOJAS
@@ -177,7 +194,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                                                         nodes,
                                                                         keyEntry,
                                                                         policyIdentifier,
-                                                                        policyQualifier,
+                                                                        policyIdentifierHash,
+                                                                        policyIdentifierHashAlgorithm,
+                                                                        extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                         signingCertificateV2);
             }
             // CASO DE FIRMA DE NODOS
@@ -194,7 +213,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                                                         nodesID,
                                                                         keyEntry,
                                                                         policyIdentifier,
-                                                                        policyQualifier,
+                                                                        policyIdentifierHash,
+                                                                        policyIdentifierHashAlgorithm,
+                                                                        extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                         signingCertificateV2);
             }
             // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -214,7 +235,9 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
                                                                         nodes2,
                                                                         keyEntry,
                                                                         policyIdentifier,
-                                                                        policyQualifier,
+                                                                        policyIdentifierHash,
+                                                                        policyIdentifierHashAlgorithm,
+                                                                        extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                         signingCertificateV2);
 
             }

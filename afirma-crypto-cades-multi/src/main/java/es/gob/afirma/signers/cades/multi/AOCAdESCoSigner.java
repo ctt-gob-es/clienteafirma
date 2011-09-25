@@ -18,7 +18,10 @@ public class AOCAdESCoSigner implements AOCoSigner {
     /** Indica si por defecto se debe insertar el atributo SigningCertificateV2 en la firma. */
     static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
 
-    public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] data, 
+                         final byte[] sign, String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         Properties extraParams) throws AOException {
 
         if (extraParams == null) {
             extraParams = new Properties();
@@ -56,8 +59,23 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
 
+        // Politica de firma
+        String policyIdentifier = null;
+        // Nos puede venir como URN o como OID
         try {
-            String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
+            policyIdentifier =
+                    extraParams.getProperty("policyIdentifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        }
+        catch (final Exception e) {
+            // Se ignora, podemos no tener politica
+        }
+        final String policyIdentifierHash = extraParams.getProperty("policyIdentifierHash"); //$NON-NLS-1$
+        String policyIdentifierHashAlgorithm = null;
+        if (policyIdentifier != null && policyIdentifierHash != null && policyIdentifierHash != "0") { //$NON-NLS-1$
+            
+        }
+        
+        try {
 
             // Si la firma que nos introducen es SignedData
             //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
@@ -67,23 +85,31 @@ public class AOCAdESCoSigner implements AOCoSigner {
                 final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
                 final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 
-                return new CAdESCoSigner().coSigner(csp,
-                                                    sign,
-                                                    omitContent,
-                                                    extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                    policyQualifier,
-                                                    signingCertificateV2,
-                                                    keyEntry,
-                                                    messageDigest);
+                return new CAdESCoSigner().coSigner(
+                    csp,
+                    sign,
+                    omitContent,
+                    policyIdentifier,
+                    policyIdentifierHash,
+                    policyIdentifierHashAlgorithm,
+                    extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
+                    signingCertificateV2,
+                    keyEntry,
+                    messageDigest
+                );
             }
 
-            return new CAdESCoSignerEnveloped().coSigner(csp,
-                                                         sign,
-                                                         extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                         policyQualifier,
-                                                         signingCertificateV2,
-                                                         keyEntry,
-                                                         messageDigest);
+            return new CAdESCoSignerEnveloped().coSigner(
+                 csp,
+                 sign,
+                 policyIdentifier,
+                 policyIdentifierHash,
+                 policyIdentifierHashAlgorithm,
+                 extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
+                 signingCertificateV2,
+                 keyEntry,
+                 messageDigest
+            );
 
         }
         catch (final Exception e) {
@@ -91,7 +117,10 @@ public class AOCAdESCoSigner implements AOCoSigner {
         }
     }
 
-    public byte[] cosign(byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] sign, 
+                         String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         Properties extraParams) throws AOException {
 
         if (extraParams == null) {
             extraParams = new Properties();
@@ -122,7 +151,21 @@ public class AOCAdESCoSigner implements AOCoSigner {
             }
         }
 
-        final String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
+        // Politica de firma
+        String policyIdentifier = null;
+        // Nos puede venir como URN o como OID
+        try {
+            policyIdentifier =
+                    extraParams.getProperty("policyIdentifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        }
+        catch (final Exception e) {
+            // Se ignora, podemos no tener politica
+        }
+        final String policyIdentifierHash = extraParams.getProperty("policyIdentifierHash"); //$NON-NLS-1$
+        String policyIdentifierHashAlgorithm = null;
+        if (policyIdentifier != null && policyIdentifierHash != null && policyIdentifierHash != "0") { //$NON-NLS-1$
+            
+        }
 
         // Si la firma que nos introducen es SignedData
         //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
@@ -132,8 +175,10 @@ public class AOCAdESCoSigner implements AOCoSigner {
                 return new CAdESCoSigner().coSigner(typeAlgorithm,
                                                     aCertificados,
                                                     new ByteArrayInputStream(sign),
-                                                    extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                    policyQualifier,
+                                                    policyIdentifier,
+                                                    policyIdentifierHash,
+                                                    policyIdentifierHashAlgorithm,
+                                                    extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                     signingCertificateV2,
                                                     keyEntry,
                                                     null // null porque no nos pueden dar un hash
@@ -151,8 +196,10 @@ public class AOCAdESCoSigner implements AOCoSigner {
             return new CAdESCoSignerEnveloped().coSigner(typeAlgorithm,
                                                          aCertificados,
                                                          new ByteArrayInputStream(sign),
-                                                         extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                         policyQualifier,
+                                                         policyIdentifier,
+                                                         policyIdentifierHash,
+                                                         policyIdentifierHashAlgorithm,
+                                                         extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                          signingCertificateV2,
                                                          keyEntry,
                                                          null // null porque no nos pueden dar un hash en este

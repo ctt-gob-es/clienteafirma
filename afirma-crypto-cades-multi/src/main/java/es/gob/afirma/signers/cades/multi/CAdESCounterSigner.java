@@ -17,6 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -67,29 +68,45 @@ final class CAdESCounterSigner {
     private int actualIndex = 0;
     private ASN1Set signedAttr2;
 
-    private String globalPolicy = ""; //$NON-NLS-1$
-    private String GlobalOidQualifier = null;
-    private boolean GlobalsigningCertificateV2;
+    private String globalPolicyIdentifier = ""; //$NON-NLS-1$
+    private String globalPolicyIdentifierHash = null;
+    private String globalPolicyIdentifierHashAlgorithm = null;
+    private String globalPolicyQualifier = null;
+    private boolean globalSigningCertificateV2;
 
 
-    /** Obtiene el Oid del qualificador de pol&iacute;tica
-     * @return Oid de calificador de pol&iacute;tica */
-    private String getGlobalOidQualifier() {
-        return this.GlobalOidQualifier;
+    private String getGlobalPolicyQualifier() {
+        return this.globalPolicyQualifier;
     }
 
-    /** Establece el Oid del qualificador de pol&iacute;tica
-     * @param globalOidQualifier
-     *        Oid de calificador de pol&iacute;tica */
-    private void setGlobalOidQualifier(final String globalOidQualifier) {
-        this.GlobalOidQualifier = globalOidQualifier;
+    private String getGlobalPolicyIdentifier() {
+        return this.globalPolicyIdentifier;
+    }
+    
+    private String getGlobalPolicyIdentifierHash() {
+        return this.globalPolicyIdentifierHash;
+    }
+    
+    private String getGlobalPolicyIdentifierHashAlgorithm() {
+        return this.globalPolicyIdentifierHashAlgorithm;
+    }
+    
+    /** Establece la pol&iacute;tica de firma. */
+    private void setGlobalPolicy(final String identifier, 
+                           final String identifierHash, 
+                           final String identifierHashAlgorithm, 
+                           final String qualifier) {
+        this.globalPolicyQualifier = qualifier;
+        this.globalPolicyIdentifier = identifier;
+        this.globalPolicyIdentifierHash = identifierHash;
+        this.globalPolicyIdentifierHashAlgorithm = identifierHashAlgorithm;
     }
 
     /** Obtiene el tipo de atributo firmado signingCertificate o
      * signingCertificateV2
      * @return tipo de atributo firmado. */
-    private boolean isGlobalsigningCertificateV2() {
-        return this.GlobalsigningCertificateV2;
+    private boolean isGlobalSigningCertificateV2() {
+        return this.globalSigningCertificateV2;
     }
 
     /** Define si el atributo firmado es signingCertificate o
@@ -97,20 +114,7 @@ final class CAdESCounterSigner {
      * @param globalsigningCertificateV2
      *        tipo de atributo */
     private void setGlobalsigningCertificateV2(final boolean globalsigningCertificateV2) {
-        this.GlobalsigningCertificateV2 = globalsigningCertificateV2;
-    }
-
-    /** Obtiene la pol&iacute;tica global.
-     * @return politica de firma. */
-    String getGlobalPolicy() {
-        return this.globalPolicy;
-    }
-
-    /** Establece la pol&iacute;tica de firma.
-     * @param globalPolicy
-     *        política de firma (URL). */
-    void setGlobalPolicy(final String globalPolicy) {
-        this.globalPolicy = globalPolicy;
+        this.globalSigningCertificateV2 = globalsigningCertificateV2;
     }
 
     /** Constructor de la clase. Se crea una contrafirma a partir de los datos
@@ -156,14 +160,15 @@ final class CAdESCounterSigner {
                                 final CounterSignTarget targetType,
                                 final int[] targets,
                                 final PrivateKeyEntry keyEntry,
-                                final String policy,
-                                final String qualifier,
+                                final String policyIdentifier,
+                                final String policyIdentifierHash,
+                                final String policyIdentifierHashAlgorithm,
+                                final String policyQualifier,
                                 final boolean signingCertificateV2) throws IOException, NoSuchAlgorithmException, CertificateException, AOException {
 
         // Introducimos la pol&iacute;tica en variable global por comodidad.
         // &Eacute;sta no var&iacute;a.
-        this.setGlobalPolicy(policy);
-        this.setGlobalOidQualifier(qualifier);
+        this.setGlobalPolicy(policyIdentifier, policyIdentifierHash, policyIdentifierHashAlgorithm, policyQualifier);
         this.setGlobalsigningCertificateV2(signingCertificateV2);
 
         final ASN1InputStream is = new ASN1InputStream(data);
@@ -962,23 +967,19 @@ final class CAdESCounterSigner {
 
         digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
-        // ATRIBUTOS FINALES
-        // recuperamos las variables globales
-        final String politica = getGlobalPolicy();
-        final boolean signingCertificateV2 = isGlobalsigningCertificateV2();
-        final String qualifier = getGlobalOidQualifier();
-
-        // // ATRIBUTOS
-
         // authenticatedAttributes
         final ASN1EncodableVector contextExcepcific =
                 CAdESUtils.generateSignerInfo(cert,
                                          digestAlgorithm,
                                          si.getEncryptedDigest().getOctets(),
-                                         politica,
-                                         qualifier,
-                                         signingCertificateV2,
-                                         null);
+                                         getGlobalPolicyIdentifier(),
+                                         getGlobalPolicyIdentifierHash(),
+                                         getGlobalPolicyIdentifierHashAlgorithm(),
+                                         getGlobalPolicyQualifier(),
+                                         isGlobalSigningCertificateV2(),
+                                         null,
+                                         new Date()
+                );
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
         unsignedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
 
