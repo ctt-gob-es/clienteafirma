@@ -47,8 +47,14 @@ public class CAdESUtils {
      * @param digestAlgorithmOID
      * @param datos
      *        Datos firmados.
-     * @param policyIdentifier
-     * @param policyQualifier
+     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
+     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
+     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
+     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
+     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
+     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
+     *                                      <code>0</code>
+     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
      * @param signingCertificateV2
      * @param dataType
      *        Identifica el tipo del contenido a firmar.
@@ -63,12 +69,16 @@ public class CAdESUtils {
                                                   final String digestAlgorithmName,
                                                   final byte[] datos,
                                                   final String policyIdentifier,
+                                                  final String policyIdentifierHash,
+                                                  final String policyIdentifierHashAlgorithm,
                                                   final String policyQualifier,
                                                   final boolean signingCertificateV2,
                                                   final byte[] messageDigest,
                                                   final Date signDate) throws NoSuchAlgorithmException,
                                                                                      IOException,
                                                                                      CertificateEncodingException {
+        
+        //TODO: Incorporar la politica segun la nueva interpretacion 
         
         // ALGORITMO DE HUELLA DIGITAL
         final AlgorithmIdentifier digestAlgorithmOID;

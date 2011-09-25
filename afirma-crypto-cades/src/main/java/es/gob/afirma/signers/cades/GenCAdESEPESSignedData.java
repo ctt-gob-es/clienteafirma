@@ -65,10 +65,14 @@ public final class GenCAdESEPESSignedData {
      * @param omitContent
      *        Par&aacute;metro qeu indica si en la firma va el contenido del
      *        fichero o s&oacute;lo va de forma referenciada.
-     * @param policyIdentifier
-     *        Url de la Politica aplicada.
-     * @param policyQualifier
-     *        OID de la pol&iacute;tica.
+     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
+     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
+     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
+     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
+     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
+     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
+     *                                      <code>0</code>
+     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
@@ -93,6 +97,8 @@ public final class GenCAdESEPESSignedData {
     public byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                      final boolean omitContent,
                                      final String policyIdentifier,
+                                     final String policyIdentifierHash,
+                                     final String policyIdentifierHashAlgorithm,
                                      final String policyQualifier,
                                      final boolean signingCertificateV2,
                                      final PrivateKeyEntry keyEntry,
@@ -119,7 +125,9 @@ public final class GenCAdESEPESSignedData {
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
             content, 
             signerCertificateChain, 
-            policyIdentifier, 
+            policyIdentifier,
+            policyIdentifierHash,
+            policyIdentifierHashAlgorithm,
             policyQualifier, 
             signingCertificateV2, 
             messageDigest,
@@ -139,7 +147,9 @@ public final class GenCAdESEPESSignedData {
                 AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
                 content, 
                 signerCertificateChain, 
-                policyIdentifier, 
+                policyIdentifier,
+                policyIdentifierHash,
+                policyIdentifierHashAlgorithm,
                 policyQualifier, 
                 signingCertificateV2, 
                 messageDigest,

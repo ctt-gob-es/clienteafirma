@@ -37,17 +37,25 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
  * <p>
  * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
  * <dl>
- * <dt>mode</dt>
- * <dd>Modo de firma a usar (Expl&iacute;cita = <code>explicit</code> o Impl&iacute;cita = <code>implicit</code>)</dd>
- * <dt>policyIdentifier</dt>
- * <dd>URL identificadora de la pol&iacute;tica de firma (normalmente una URL hacia el documento que describe la pol&iacute;tica)</dd>
- * <dt>policyQualifier</dt>
- * <dd>OID calificador de la pol&iacute;tica de firma</dd>
- * <dt>precalculatedHashAlgorithm</dt>
- * <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
- * <dt>signingCertificateV2</dt>
- * <dd>Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo <i>Signing Certificate</i> de CAdES. Si no se establece
- * o se hace a <code>false</code> se utilizara la versi&oacute;n 1</dd>
+ *  <dt><b>mode</b></dt>
+ *   <dd>Modo de firma a usar (Expl&iacute;cita = <code>explicit</code> o Impl&iacute;cita = <code>implicit</code>)</dd>
+ *  <dt><b>policyIdentifier</b></dt>
+ *   <dd>Identificadora de la pol&iacute;tica de firma (normalmente un OID que identifica &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable)</dd>
+ *  <dt><b>policyIdentifierHash</b></dt>
+ *   <dd>
+ *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato ASN.1 procesable).
+ *    Si no se indica, y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible universalmente se usar&aacute; <code>0</code> 
+ *   </dd>
+ *  <dt><b>policyIdentifierHashAlgorithm</b></dt>
+ *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
+ *  <dt><b>precalculatedHashAlgorithm</b></dt>
+ *   <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
+ *  <dt><b>signingCertificateV2</b></dt>
+ *   <dd>
+ *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo 
+ *    <i>Signing Certificate</i> de CAdES. Si no se establece
+ *    o se hace a <code>false</code> se utilizara la versi&oacute;n 1
+ *   </dd>
  * </dl>
  * @version 0.3 */
 public final class AOCAdESSigner implements AOSigner {
@@ -99,20 +107,29 @@ public final class AOCAdESSigner implements AOSigner {
             if (mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null) {
                 omitContent = true;
             }
-            String policyQualifier = null;
+            
+            // Politica de firma
+            String policyIdentifier = null;
             // Nos puede venir como URN o como OID
             try {
-                policyQualifier =
-                        extraParams.getProperty("policyQualifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+                policyIdentifier =
+                        extraParams.getProperty("policyIdentifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
             }
             catch (final Exception e) {
                 // Se ignora, podemos no tener politica
             }
-
+            final String policyIdentifierHash = extraParams.getProperty("policyIdentifierHash"); //$NON-NLS-1$
+            String policyIdentifierHashAlgorithm = null;
+            if (policyIdentifier != null && policyIdentifierHash != null && policyIdentifierHash != "0") { //$NON-NLS-1$
+                
+            }
+            
             return new GenCAdESEPESSignedData().generateSignedData(csp,
                                                                    omitContent,
-                                                                   extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                                   policyQualifier,
+                                                                   policyIdentifier,
+                                                                   policyIdentifierHash,
+                                                                   policyIdentifierHashAlgorithm,
+                                                                   extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
                                                                    signingCertificateV2,
                                                                    keyEntry,
                                                                    messageDigest);
