@@ -1,6 +1,5 @@
 package es.gob.afirma.test.xades;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -37,13 +36,13 @@ public final class TestXAdES {
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
-    private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
-    
-    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
-    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
-    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
+//    private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
+//    private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
+//    private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
+//    
+//    private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
+//    private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
+//    private static final String CERT_ALIAS3 = "1"; //$NON-NLS-1$
     
     private static final Properties[] XADES_MODES;
     
