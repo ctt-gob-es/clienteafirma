@@ -398,20 +398,14 @@ public final class MassiveSignatureHelper {
      *         Cuando ocurre un error durante la operaci&oacute;n de firma. */
     private byte[] signDataFromHash(final AOSigner signer, final byte[] data, final Properties config) throws AOException {
 
-        final int pos = this.massiveConfiguration.algorithm.indexOf("with"); //$NON-NLS-1$
-        if (pos == -1) {
-            throw new AOException("El algoritmo '" + this.massiveConfiguration.algorithm //$NON-NLS-1$
-                                                 + "' no esta soportado para la firma de huellas digitales"); //$NON-NLS-1$
-        }
-
         // Configuramos y ejecutamos la operacion
         config.setProperty("mode", this.massiveConfiguration.mode); //$NON-NLS-1$
         config.setProperty("format", this.massiveConfiguration.defaultFormat); //$NON-NLS-1$
-        config.setProperty("precalculatedHashAlgorithm", this.massiveConfiguration.algorithm.substring(0, pos)); //$NON-NLS-1$
+        config.setProperty("precalculatedHashAlgorithm", AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.algorithm)); //$NON-NLS-1$
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
         if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
-            final String mimeType = "hash/" + this.massiveConfiguration.getAlgorithm().substring(0, pos).toLowerCase(); //$NON-NLS-1$
+            final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.massiveConfiguration.algorithm).toLowerCase(); //$NON-NLS-1$
             try {
                 config.setProperty("mimeType", mimeType); //$NON-NLS-1$
                 config.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$

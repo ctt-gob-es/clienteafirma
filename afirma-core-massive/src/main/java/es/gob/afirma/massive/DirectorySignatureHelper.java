@@ -30,6 +30,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.util.AOBase64;
@@ -366,10 +367,6 @@ public class DirectorySignatureHelper {
         // Inicializamos el vector de ficheros firmados
         this.signedFilenames.removeAllElements();
 
-        if (type == null) {
-            type = MassiveType.SIGN;
-        }
-
         if (filenames == null || filenames.length == 0) {
             LOGGER.warning("No se han proporcionado ficheros para firmar"); //$NON-NLS-1$
             return true;
@@ -402,13 +399,13 @@ public class DirectorySignatureHelper {
         // Realizamos la operacion masiva correspondiente
         final File[] files = this.getFiles(filenames);
         this.prepareOperation(files.clone());
-        if (type == MassiveType.SIGN) {
+        if (MassiveType.SIGN.equals(type) || type == null) { // Asumimos que null es el por defecto: MassiveType.SIGN
             allOK = this.massiveSignOperation(files, od, keyEntry, cert, signConfig);
         }
-        else if (type == MassiveType.COSIGN) {
+        else if (MassiveType.COSIGN.equals(type)) {
             allOK = this.massiveCosignOperation(files, od, originalFormat, keyEntry, cert, signConfig);
         }
-        else if (type == MassiveType.COUNTERSIGN_ALL || type == MassiveType.COUNTERSIGN_LEAFS) {
+        else if (MassiveType.COUNTERSIGN_ALL.equals(type) || MassiveType.COUNTERSIGN_LEAFS.equals(type)) {
             allOK = this.massiveCounterSignOperation(type, files, od, originalFormat, keyEntry, cert, signConfig);
         }
         else {
@@ -464,12 +461,6 @@ public class DirectorySignatureHelper {
 
         final AOSigner signer = (configuredSigner != null ? configuredSigner : this.defaultSigner);
 
-        // Establecemos el algoritmo de Hash
-        final int pos = this.algorithm.indexOf("with"); //$NON-NLS-1$
-        if (pos == -1) {
-            throw new AOException("El algoritmo '" + this.algorithm + "' no esta soportado para la firma de hashes");  //$NON-NLS-1$//$NON-NLS-2$
-        }
-
         // Configuramos y ejecutamos la operacion
         if (!signConfig.containsKey("mode")) { //$NON-NLS-1$
             signConfig.setProperty("mode", this.mode); //$NON-NLS-1$
@@ -477,11 +468,11 @@ public class DirectorySignatureHelper {
         if (!signConfig.containsKey("format")) { //$NON-NLS-1$
             signConfig.setProperty("format", this.format); //$NON-NLS-1$
         }
-        signConfig.setProperty("precalculatedHashAlgorithm", this.algorithm.substring(0, pos)); //$NON-NLS-1$
+        signConfig.setProperty("precalculatedHashAlgorithm", AOSignConstants.getDigestAlgorithmName(this.algorithm)); //$NON-NLS-1$
 
         // Introduccion MIMEType "hash/algo", solo para XAdES y XMLDSig
         if ((signer.getClass().getName().equals(XADES_SIGNER)) || (signer.getClass().getName().equals(XMLDSIG_SIGNER))) {
-            final String mimeType = "hash/" + this.algorithm.substring(0, pos).toLowerCase(); //$NON-NLS-1$
+            final String mimeType = "hash/" + AOSignConstants.getDigestAlgorithmName(this.algorithm).toLowerCase(); //$NON-NLS-1$
             try {
                 signConfig.setProperty("mimeType", mimeType); //$NON-NLS-1$
                 signConfig.setProperty("oid", MimeHelper.transformMimeTypeToOid(mimeType)); //$NON-NLS-1$
@@ -982,10 +973,9 @@ public class DirectorySignatureHelper {
         // otro a base de agregar e incrementar las cifras entre
         // par&eacute;ntesis.
         int ind = 0;
-        inText = (inText != null ? inText : ""); //$NON-NLS-1$
-        File finalFile = new File(parentFile, signer.getSignedName(signFilename, inText));
+        File finalFile = new File(parentFile, signer.getSignedName(signFilename, (inText != null ? inText : ""))); //$NON-NLS-1$
         while (finalFile.exists() && !this.overwriteFiles) {
-            finalFile = new File(parentFile, signer.getSignedName(signFilename, inText + "(" + (++ind) + ")"));  //$NON-NLS-1$//$NON-NLS-2$
+            finalFile = new File(parentFile, signer.getSignedName(signFilename, (inText != null ? inText : "") + "(" + (++ind) + ")"));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         }
 
         // Almacenamos el fichero
