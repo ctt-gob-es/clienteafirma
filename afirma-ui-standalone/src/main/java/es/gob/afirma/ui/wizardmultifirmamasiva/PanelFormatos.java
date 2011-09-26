@@ -35,15 +35,14 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
 class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 
@@ -116,9 +115,13 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
         c.insets = new Insets(20, 20, 0, 20);
 		c.weightx = 1.0;
     	
+		//Etiqueta "La operacion seleccionada..."
+        InfoLabel operationLabel = new InfoLabel(Messages.getString("Wizard.multifirma.ventana1.explicacion"), false);
+        panelCentral.add(operationLabel, c);
+        
     	// Etiqueta "La operacion seleccionada..."
-		panelCentral.add(PanelesTexto.generarPanelTexto(
-				"Wizard.multifirma.ventana1.explicacion", false), c);
+		/*panelCentral.add(PanelesTexto.generarPanelTexto(
+				"Wizard.multifirma.ventana1.explicacion", false), c);*/
 
         c.insets = new Insets(20, 20, 0, 20);
 		c.weightx = 1.0;
@@ -138,7 +141,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		
 		// Radio button firma
 		radioFirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.firma"));
-		radioFirma.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana1.radio.firma"));
+		radioFirma.getAccessibleContext().setAccessibleName(radioFirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.firma.description"));
 		radioFirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.firma.description"));
 		radioFirma.addItemListener(this);
 		radioFirma.setName("radioFirma");
@@ -155,7 +158,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		
 		// Radio button cofirma
 		radioCofirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.cofirma"));
-		radioCofirma.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana1.radio.cofirma"));
+		radioCofirma.getAccessibleContext().setAccessibleName(radioCofirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.cofirma.description"));
 		radioCofirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.cofirma.description"));
 		radioCofirma.addItemListener(this);
 		radioCofirma.setName("radioCofirma");
@@ -171,7 +174,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		
 		// Radio button contrafirma
 		radioContrafirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma"));
-		radioContrafirma.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma"));
+		radioContrafirma.getAccessibleContext().setAccessibleName(radioContrafirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma.description"));
 		radioContrafirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma.description"));
 		radioContrafirma.addItemListener(this);
 		radioContrafirma.setName("radioContrafirma");
@@ -207,8 +210,8 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		
 		// Combo con los formatos
 		comboFormatos.setToolTipText(Messages.getString("Firma.formato.description"));
-		comboFormatos.getAccessibleContext().setAccessibleName(Messages.getString("Firma.formato"));
-		comboFormatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.formato.description"));
+		comboFormatos.getAccessibleContext().setAccessibleName(etiquetaFormato.getText() + " " + comboFormatos.getToolTipText() + "ALT + R.");
+		comboFormatos.getAccessibleContext().setAccessibleDescription(comboFormatos.getToolTipText());
 		comboFormatos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				checkFormatoModo();
@@ -235,8 +238,8 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		checkFormato.setSelected(true);
 		checkFormato.setText(Messages.getString("Firma.modo.formato")); // NOI18N
 		checkFormato.setToolTipText(Messages.getString("Firma.modo.formato.description")); // NOI18N
-		checkFormato.getAccessibleContext().setAccessibleName(Messages.getString("Firma.modo.formato")); // NOI18N
-		checkFormato.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.modo.formato.description")); // NOI18N
+		checkFormato.getAccessibleContext().setAccessibleName(checkFormato.getText() + " " + checkFormato.getToolTipText()); // NOI18N
+		checkFormato.getAccessibleContext().setAccessibleDescription(checkFormato.getToolTipText()); // NOI18N
 		checkFormato.setMnemonic(0); //Se quita el atajo al deshabilitar el checkbox
 		checkFormato.setEnabled(false);
 		Utils.remarcar(checkFormato);

@@ -16,17 +16,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import es.gob.afirma.ui.utils.GeneralConfig;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
 /**
  *
@@ -73,25 +71,20 @@ class PanelFinalizar extends JAccessibilityDialogWizard {
     	
         // Configuramos el layout
         GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(20, 20, 0, 20);
-		c.weightx = 1.0;
-		c.gridx = 0;
-        
-        // Etiqueta felicidades
-    	JLabel etiqueta = new JLabel(Messages.getString("Wizard.sobres.final1")); // NOI18N
-    	etiqueta.setFocusable(true);
-    	Utils.remarcar(etiqueta);
-        Utils.setContrastColor(etiqueta);
-    	Utils.setFontBold(etiqueta);
-    	panelCentral.add(etiqueta, c);
-    	
-    	c.gridy = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(20, 20, 20, 20);
+        c.weightx = 1.0;
 		c.weighty = 1.0;
-    	
-    	// Panel con el texto "Ha finalizado con..."
-		panelCentral.add(PanelesTexto.generarPanelTexto(
-				"Wizard.multifirma.simple.final.descripcion", true), c);
+		c.gridx = 0;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		
+		 // Etiqueta "felicidades" y "Ha finalizado con..."
+		String textLabel = Messages.getString("Wizard.sobres.final1") +
+				"<br>"+"<br>" + Messages.getString("Wizard.multifirma.simple.final.descripcion") ;
+		
+		InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
+		panelCentral.add(finalizeLabel, c);
     	
     	getContentPane().add(panelCentral, BorderLayout.CENTER);
     }

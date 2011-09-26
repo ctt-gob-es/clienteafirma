@@ -120,8 +120,8 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         
         // Caja de texto donde se guarda el directorio de entrada
         campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.directorio.description"));
-        campoDirectorio.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.directorio"));
-        campoDirectorio.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.directorio.description"));
+        campoDirectorio.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoDirectorio.getToolTipText() + "ALT + D.");
+        campoDirectorio.getAccessibleContext().setAccessibleDescription(campoDirectorio.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoDirectorio.setCaret(caret);
@@ -146,6 +146,8 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         examinar.setMnemonic(KeyEvent.VK_E);
         examinar.setText(Messages.getString("PrincipalGUI.Examinar"));
         examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + examinar.getToolTipText());
+        examinar.getAccessibleContext().setAccessibleDescription(examinar.getToolTipText());
         examinar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 examinarActionPerformed();
@@ -164,8 +166,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         
         // Checkbox con el texto "Incluir subdirectorios..."
         checkIncluir.setText(Messages.getString("Wizard.multifirma.ventana3.check.incluir"));
-        checkIncluir.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.check.incluir"));
-        checkIncluir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description"));
+        checkIncluir.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description"));
+        checkIncluir.getAccessibleContext().setAccessibleName(checkIncluir.getText() + " " + checkIncluir.getToolTipText());
+        checkIncluir.getAccessibleContext().setAccessibleDescription(checkIncluir.getToolTipText());
         checkIncluir.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
         Utils.remarcar(checkIncluir);
         Utils.setContrastColor(checkIncluir);
@@ -187,8 +190,8 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         
         // Caja de texto para escribir las extensiones
         campoExtensiones.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.aplicar.description"));
-        campoExtensiones.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana3.aplicar"));
-        campoExtensiones.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana3.aplicar.description"));
+        campoExtensiones.getAccessibleContext().setAccessibleName(etiquetaAplicar.getText() + " " + campoExtensiones.getToolTipText() + "ALT + P.");
+        campoExtensiones.getAccessibleContext().setAccessibleDescription(etiquetaAplicar.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoExtensiones.setCaret(caret);

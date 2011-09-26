@@ -25,7 +25,6 @@ import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -40,8 +39,6 @@ import javax.swing.text.Caret;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
@@ -268,8 +265,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         
         // Caja de texto donde se guarda el nombre del directorio de firmas
         campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.directorio.description"));
-        campoDirectorio.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana4.directorio"));
-        campoDirectorio.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.directorio.description"));
+        campoDirectorio.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoDirectorio.getToolTipText() + "ALT + D");
+        campoDirectorio.getAccessibleContext().setAccessibleDescription(campoDirectorio.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoDirectorio.setCaret(caret);
@@ -293,6 +290,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         examinarDirectorio.setMnemonic(KeyEvent.VK_E);
         examinarDirectorio.setText(Messages.getString("PrincipalGUI.Examinar"));
         examinarDirectorio.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        examinarDirectorio.getAccessibleContext().setAccessibleName(examinarDirectorio.getText() + " " + examinarDirectorio.getToolTipText());
+        examinarDirectorio.getAccessibleContext().setAccessibleDescription(examinarDirectorio.getToolTipText());
         examinarDirectorio.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	examinarDirectorioActionPerformed();
@@ -310,7 +309,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         
         // Checkbox con el texto "Sobreescribir ficheros"
         checkSobreescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
-        checkSobreescribir.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
+        checkSobreescribir.getAccessibleContext().setAccessibleName(checkSobreescribir.getText() + " " +Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
         checkSobreescribir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
         checkSobreescribir.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al checkbox
         Utils.remarcar(checkSobreescribir);
@@ -323,6 +322,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         
         // Etiqueta con el texto "Fichero de log"
         etiquetaFichero.setText(Messages.getString("Wizard.multifirma.ventana4.log"));
+        etiquetaFichero.setFocusable(true); //Se hace focusable por temas de accesibilidad
+        etiquetaFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + Messages.getString("Wizard.multifirma.ventana4.log.description") +" .Esta opción permanecerá desactivada hasta que se incluya un directorio de firmas.");
         Utils.setContrastColor(etiquetaFichero);
         Utils.setFontBold(etiquetaFichero);
         panelCentral.add(etiquetaFichero, c);
@@ -334,8 +335,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         // Caja de texto donde se guarda el nombre del fichero log
         campoFicheroLog.setEnabled(false);
         campoFicheroLog.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.log.description"));
-        campoFicheroLog.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana4.log"));
-        campoFicheroLog.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.log.description"));
+        campoFicheroLog.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " " + campoFicheroLog.getToolTipText() + "ALT + F");
+        campoFicheroLog.getAccessibleContext().setAccessibleDescription(etiquetaFichero.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoFicheroLog.setCaret(caret);
@@ -358,6 +359,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         examinarFichero.setMnemonic(0); //mnemï¿½nico vacï¿½o puesto que por defecto estï¿½ deshabilitado
         examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar"));
         examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        examinarFichero.getAccessibleContext().setAccessibleName(examinarFichero.getText() + " " + examinarFichero.getToolTipText());
+        examinarFichero.getAccessibleContext().setAccessibleDescription(examinarFichero.getToolTipText());
         examinarFichero.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 examinarFicheroLogActionPerformed();
@@ -405,6 +408,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     	examinarFichero.setEnabled(true);
     	examinarFichero.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico asignado puesto que se habilita el botï¿½n
     	campoFicheroLog.setEnabled(true);
+    	etiquetaFichero.setFocusable(false); //Ahora el elemento focusable será el campo de texto, no la etiqueta
     }
 
     /**
