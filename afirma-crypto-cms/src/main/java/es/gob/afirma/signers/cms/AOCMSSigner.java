@@ -54,18 +54,9 @@ public final class AOCMSSigner implements AOSigner {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    public byte[] sign(final byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
 
@@ -113,18 +104,9 @@ public final class AOCMSSigner implements AOSigner {
         }
     }
 
-    public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
 
@@ -170,22 +152,12 @@ public final class AOCMSSigner implements AOSigner {
         throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
     }
 
-    public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
             this.dataType = PKCSObjectIdentifiers.data.getId();
         }
-
-        // Algoritmo de firma.
-        final String typeAlgorithm = algorithm;
 
         // Array de certificados
         X509Certificate[] aCertificados = new X509Certificate[0];
@@ -208,7 +180,7 @@ public final class AOCMSSigner implements AOSigner {
             try {
                 // No habra messageDigest porque no nos pueden dar un hash
                 // en este metodo, tendria que ser en el que incluye datos
-                return new CoSigner().coSigner(typeAlgorithm, aCertificados, sign, this.dataType, keyEntry, this.atrib, this.uatrib, null);
+                return new CoSigner().coSigner(algorithm, aCertificados, sign, this.dataType, keyEntry, this.atrib, this.uatrib, null);
             }
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
@@ -218,18 +190,11 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     public byte[] countersign(final byte[] sign,
-                              String algorithm,
+                              final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
                               final Properties extraParams) throws AOException {
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();

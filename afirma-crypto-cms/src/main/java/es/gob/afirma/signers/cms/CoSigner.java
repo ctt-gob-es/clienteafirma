@@ -179,23 +179,10 @@ final class CoSigner {
         }
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
-        AlgorithmIdentifier digAlgId;
+        
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
-        String digestAlgorithm = null;
-        String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
-        if (with > 0) {
-            digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
-            if (and > 0) {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-            }
-            else {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4);
-            }
-        }
-
-        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
         final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
@@ -220,7 +207,7 @@ final class CoSigner {
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -276,7 +263,7 @@ final class CoSigner {
      *        Atributos firmados adicionales.
      * @param uatrib
      *        Atributos no firmados adicionales.
-     * @param messageDigest
+     * @param digest
      *        Hash a aplicar en la firma.
      * @return El archivo de firmas con la nueva firma.
      * @throws java.io.IOException
@@ -295,7 +282,9 @@ final class CoSigner {
                            final PrivateKeyEntry keyEntry,
                            final Map<String, byte[]> atrib,
                            final Map<String, byte[]> uatrib,
-                           byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
+                           final byte[] digest) throws IOException, NoSuchAlgorithmException, CertificateException {
+        
+        byte[] messageDigest = digest.clone();
 
         final ASN1InputStream is = new ASN1InputStream(sign);
 
@@ -352,22 +341,8 @@ final class CoSigner {
         }
 
         // buscamos que tipo de algoritmo es y lo codificamos con su OID
-        AlgorithmIdentifier digAlgId;
-        // String signatureAlgorithm = parameters.getSignatureAlgorithm();
-        String digestAlgorithm = null;
-        String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
-        if (with > 0) {
-            digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
-            if (and > 0) {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-            }
-            else {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4);
-            }
-        }
-        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
         final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
@@ -385,7 +360,7 @@ final class CoSigner {
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -492,19 +467,8 @@ final class CoSigner {
         // fecha de firma
         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
-        // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equalsIgnoreCase("SHA512")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-512"; //$NON-NLS-1$
-        }
-        else if (digestAlgorithm.equalsIgnoreCase("SHA384")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-384"; //$NON-NLS-1$
-        }
-        else if (digestAlgorithm.equalsIgnoreCase("SHA256")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-256"; //$NON-NLS-1$
-        }
-
         // Si nos viene el hash de fuera no lo calculamos
-        final byte[] md = MessageDigest.getInstance(digestAlgorithm).digest(datos);
+        final byte[] md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestAlgorithm)).digest(datos);
 
         // MessageDigest
         ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(md.clone()))));
