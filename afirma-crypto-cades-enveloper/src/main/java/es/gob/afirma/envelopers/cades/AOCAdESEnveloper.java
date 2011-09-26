@@ -16,6 +16,7 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 import es.gob.afirma.core.envelopers.AOEnveloper;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Funcionalidad de sobres digitales con CAdES. */
@@ -52,7 +53,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
      *        digital.
      * @param cipherAlgorithm 
      *        Algoritmo utilizado para cifrar
-     * @param extraParams
+     * @param xParams
      *        Par&aacute;metros adicionales
      * @return Envoltorio CADES.
      * @throws AOException
@@ -63,12 +64,11 @@ public class AOCAdESEnveloper implements AOEnveloper {
                           final PrivateKeyEntry keyEntry,
                           final X509Certificate[] certDest,
                           final AOCipherAlgorithm cipherAlgorithm,
-                          String dataType,
-                          Properties extraParams) throws AOException {
+                          final String datTyp,
+                          final Properties xParams) throws AOException {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams !=null) ? xParams : new Properties();
+
         final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", "false")); //$NON-NLS-1$ //$NON-NLS-2$
 
         // Comprobamos que el archivo a tratar no sea nulo.
@@ -106,9 +106,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
         }
 
         // tipos de datos a firmar.
-        if (dataType == null) {
-            dataType = PKCSObjectIdentifiers.data.getId();
-        }
+        final String dataType = (datTyp != null) ? datTyp : PKCSObjectIdentifiers.data.getId();
 
         // Datos firmados.
         byte[] dataSigned = null;
@@ -129,19 +127,17 @@ public class AOCAdESEnveloper implements AOEnveloper {
 
         try {
             // Busqueda del tipo que nos han solicitado.
-            if ((type == null) || (type.equals(""))) { //$NON-NLS-1$
-                type = AOSignConstants.DEFAULT_CMS_CONTENTTYPE;
-            }
+
             // Es Data.
-            else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DATA)) {
+            if (AOSignConstants.CMS_CONTENTTYPE_DATA.equals(type)) {
                 dataSigned = new CAdESData().genData(csp);
             }
             // Es Digested Data.
-            else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA)) {
+            else if (AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA.equals(type)) {
                 dataSigned = new CAdESDigestedData().genDigestedData(csp, dataType);
             }
-            // Es Enveloped Data.
-            else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
+            // Es Enveloped Data. El null y el vacio se consideran Enveloped Data, el por defecto
+            else if (AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA.equals(type)  || type == null || "".equals(type)) { //$NON-NLS-1$
                 if (keyEntry != null) {
                     dataSigned = new CAdESEnvelopedData().genEnvelopedData(csp, config, certDest, dataType);
                 }
@@ -151,16 +147,13 @@ public class AOCAdESEnveloper implements AOEnveloper {
             }
             // Es Signed and Enveloped Data.
             else {
-                dataType = PKCSObjectIdentifiers.signedData.getId();
-                String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
                 dataSigned =
                         new CAdESEPESSignedAndEnvelopedData().genCADESEPESSignedAndEnvelopedData(csp,
                                                                                                  config,
-                                                                                                 extraParams.getProperty("policyIdentifier"), //$NON-NLS-1$
-                                                                                                 policyQualifier,
+                                                                                                 new AdESPolicy(extraParams),
                                                                                                  signingCertificateV2,
                                                                                                  certDest,
-                                                                                                 dataType,
+                                                                                                 PKCSObjectIdentifiers.signedData.getId(),
                                                                                                  keyEntry);
             }
         }

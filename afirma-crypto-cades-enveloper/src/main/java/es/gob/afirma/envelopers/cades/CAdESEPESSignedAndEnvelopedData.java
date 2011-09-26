@@ -48,6 +48,7 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
@@ -136,8 +137,7 @@ final class CAdESEPESSignedAndEnvelopedData {
      *         Si no se encuentra un algoritmo v&aacute;lido. */
     byte[] genCADESEPESSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
                                                      final AOCipherConfig config,
-                                                     final String policy,
-                                                     final String qualifier,
+                                                     final AdESPolicy policy,
                                                      final boolean signingCertificateV2,
                                                      final X509Certificate[] certDest,
                                                      final String dataType,
@@ -198,7 +198,6 @@ final class CAdESEPESSignedAndEnvelopedData {
                                          digAlgId,
                                          parameters.getContent(),
                                          policy,
-                                         qualifier,
                                          signingCertificateV2,
                                          dataType,
                                          null);
@@ -294,14 +293,6 @@ final class CAdESEPESSignedAndEnvelopedData {
 
     /** M&eacute;todo que inserta remitentes en el "OriginatorInfo" de un sobre
      * de tipo AuthenticatedEnvelopedData.
-     * @param data
-     *        fichero que tiene la firma.
-     * @param parameters
-     * @param keyEntry
-     * @param dataType
-     * @param policy
-     * @param qualifier
-     * @param signingCertificateV2
      * @return La nueva firma AuthenticatedEnvelopedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
      *         nueva. */
@@ -309,8 +300,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                     final P7ContentSignerParameters parameters,
                                     final PrivateKeyEntry keyEntry,
                                     final String dataType,
-                                    final String policy,
-                                    final String qualifier,
+                                    final AdESPolicy policy,
                                     final boolean signingCertificateV2) {
         // boolean isValid = false;
         byte[] retorno = null;
@@ -377,7 +367,6 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                      digAlgId,
                                                      parameters.getContent(),
                                                      policy,
-                                                     qualifier,
                                                      signingCertificateV2,
                                                      dataType,
                                                      null);
@@ -394,7 +383,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                   identifier,
                                                   signedAttr,
                                                   unSignedAttr,
-                                                  sun.security.x509.AlgorithmId.get("RSA"), //$NON-NLS-1$
+                                                  "RSA", //$NON-NLS-1$
                                                   this.signedAttr2);
 
                     // introducimos el nuevo Signer

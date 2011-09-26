@@ -78,6 +78,8 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 
@@ -328,18 +330,10 @@ class CAdESUtils {
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param cert
-     *        Certificado de firma.
-     * @param digestAlgorithm
-     *        Algoritmo Firmado.
-     * @param digAlgId
-     * @param datos
-     *        Datos firmados.
-     * @param politica
-     * @param qualifier
-     * @param signingCertificateV2
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
+     * @param cert Certificado del firmante
+     * @param datos Datos firmados
+     * @param policy Pol&iacute;tica de firma
+     * @param dataType Identifica el tipo del contenido a firmar
      * @param messageDigest
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
@@ -350,8 +344,7 @@ class CAdESUtils {
                                                          final String digestAlgorithm,
                                                          final AlgorithmIdentifier digAlgId,
                                                          final byte[] datos,
-                                                         final String politica,
-                                                         final String qualifier,
+                                                         final AdESPolicy policy,
                                                          final boolean signingCertificateV2,
                                                          final String dataType,
                                                          final byte[] messageDigest) throws NoSuchAlgorithmException,
@@ -591,15 +584,10 @@ class CAdESUtils {
                                              final SignerIdentifier identifier,
                                              final ASN1Set signedAttr,
                                              final ASN1Set unSignedAttr,
-                                             final sun.security.x509.AlgorithmId digestAlgorithmIdEnc,
+                                             final String keyAlgorithm,
                                              final ASN1Set signedAttr2) throws IOException {
-        final AlgorithmIdentifier encAlgId;
-        try {
-            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString());
-        }
-        catch (final Exception e3) {
-            throw new IOException("Error de codificacion: " + e3); //$NON-NLS-1$
-        }
+
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
 
         final ASN1OctetString sign2;
         try {
