@@ -127,15 +127,14 @@ public final class AOODFSigner implements AOSigner {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso
      * @since 1.6.0_10 */
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         if (algorithm != null && !algorithm.equalsIgnoreCase("SHA1withRSA")) { //$NON-NLS-1$
             LOGGER.warning("Las firmas ODF s\u00F3lo soportan el algoritmo de firma SHA1withRSA"); //$NON-NLS-1$
         }
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+        
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final boolean useOpenOffice31Mode = "true".equalsIgnoreCase(extraParams.getProperty("useOpenOffice31Mode")); //$NON-NLS-1$ //$NON-NLS-2$
 
