@@ -157,12 +157,10 @@ final class CAdESEPESSignedAndEnvelopedData {
         final String signatureAlgorithm;
         final String digestAlgorithm;
         final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
-        final String keyAlgorithm;
 
         try {
             signatureAlgorithm = parameters.getSignatureAlgorithm();
             digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            keyAlgorithm = CAdESUtils.getKeyAlgorithm(signatureAlgorithm);
 
             final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
             digestAlgs.add(digAlgId);
@@ -210,7 +208,7 @@ final class CAdESEPESSignedAndEnvelopedData {
         // digEncryptionAlgorithm
         final AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
+            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
@@ -348,12 +346,10 @@ final class CAdESEPESSignedAndEnvelopedData {
                     final String signatureAlgorithm;
                     final String digestAlgorithm;
                     final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
-                    final String keyAlgorithm;
 
                     try {
                         signatureAlgorithm = parameters.getSignatureAlgorithm();
                         digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-                        keyAlgorithm = CAdESUtils.getKeyAlgorithm(signatureAlgorithm);
 
                         final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
                         digestAlgs.add(digAlgId);
@@ -398,7 +394,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                   identifier,
                                                   signedAttr,
                                                   unSignedAttr,
-                                                  sun.security.x509.AlgorithmId.get(keyAlgorithm),
+                                                  sun.security.x509.AlgorithmId.get("RSA"), //$NON-NLS-1$
                                                   this.signedAttr2);
 
                     // introducimos el nuevo Signer

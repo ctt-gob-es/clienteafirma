@@ -779,29 +779,4 @@ class CAdESUtils {
         return certificates;
     }
 
-    /** Obtiene la clave del algoritmo
-     * @param signatureAlgorithm
-     * @param digestAlgorithmId
-     * @return keyAlgorithm
-     * @throws IOException */
-    static String getKeyAlgorithm(final String signatureAlgorithm) throws IOException {
-        try {
-            String keyAlgorithm = null;
-            final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
-            if (with > 0) {
-                final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
-                if (and > 0) {
-                    keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-                }
-                else {
-                    keyAlgorithm = signatureAlgorithm.substring(with + 4);
-                }
-            }
-
-            return keyAlgorithm;
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
-        }
-    }    
 }
