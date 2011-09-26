@@ -48,18 +48,17 @@ public final class AOUtil {
     };
 
     /** Crea una URI a partir de un nombre de fichero local o una URL.
-     * @param filename
-     *        Nombre del fichero local o URL
+     * @param file Nombre del fichero local o URL
      * @return URI (<code>file://</code>) del fichero local o URL
      * @throws AOException
      *         cuando ocurre cualquier problema creando la URI */
-    public final static URI createURI(String filename) throws AOException {
+    public final static URI createURI(final String file) throws AOException {
 
-        if (filename == null) {
+        if (file == null || "".equals(file)) { //$NON-NLS-1$
             throw new AOException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
         }
 
-        filename = filename.trim();
+        String filename = file.trim();
 
         if ("".equals(filename)) { //$NON-NLS-1$
             throw new AOException("La URI no puede ser una cadena vacia"); //$NON-NLS-1$

@@ -222,13 +222,16 @@ public final class AOSignConstants {
      * @return Nombre del algoritmo de huella digital */
     public static String getDigestAlgorithmName(final String pseudoName) {
         final String upperPseudoName = pseudoName.toUpperCase();
-        if (upperPseudoName.equals("SHA") || upperPseudoName.equals("http://www.w3.org/2000/09/xmldsig#sha1".toUpperCase()) //$NON-NLS-1$ //$NON-NLS-2$
+        if (upperPseudoName.equals("SHA")  //$NON-NLS-1$
+            || upperPseudoName.equals("http://www.w3.org/2000/09/xmldsig#sha1".toUpperCase()) //$NON-NLS-1$
             || upperPseudoName.startsWith("SHA1") //$NON-NLS-1$
-            || upperPseudoName.startsWith("SHA-1")) { //$NON-NLS-1$
+            || upperPseudoName.startsWith("SHA-1")) //$NON-NLS-1$            
+        {
             return "SHA1"; //$NON-NLS-1$
         }
 
-        if (upperPseudoName.equals("http://www.w3.org/2001/04/xmlenc#sha256".toUpperCase()) || upperPseudoName.startsWith("SHA256") //$NON-NLS-1$ //$NON-NLS-2$
+        if (upperPseudoName.equals("http://www.w3.org/2001/04/xmlenc#sha256".toUpperCase())  //$NON-NLS-1$
+            || upperPseudoName.startsWith("SHA256") //$NON-NLS-1$
             || upperPseudoName.startsWith("SHA-256")) { //$NON-NLS-1$
             return "SHA-256"; //$NON-NLS-1$
         }
@@ -237,12 +240,14 @@ public final class AOSignConstants {
             return "SHA-384"; //$NON-NLS-1$
         }
 
-        if (upperPseudoName.equals("http://www.w3.org/2001/04/xmlenc#sha512".toUpperCase()) || upperPseudoName.startsWith("SHA512") //$NON-NLS-1$ //$NON-NLS-2$
+        if (upperPseudoName.equals("http://www.w3.org/2001/04/xmlenc#sha512".toUpperCase())  //$NON-NLS-1$
+            || upperPseudoName.startsWith("SHA512") //$NON-NLS-1$
             || upperPseudoName.startsWith("SHA-512")) { //$NON-NLS-1$
             return "SHA-512"; //$NON-NLS-1$
         }
 
-        if (upperPseudoName.equals("http://www.w3.org/2001/04/xmlenc#ripemd160".toUpperCase()) || upperPseudoName.startsWith("RIPEMD160") //$NON-NLS-1$ //$NON-NLS-2$
+        if (upperPseudoName.equals("http://www.w3.org/2001/04/xmlenc#ripemd160".toUpperCase())  //$NON-NLS-1$
+            || upperPseudoName.startsWith("RIPEMD160") //$NON-NLS-1$
             || upperPseudoName.startsWith("RIPEMD-160")) { //$NON-NLS-1$
             return "RIPEMD160"; //$NON-NLS-1$
         }
