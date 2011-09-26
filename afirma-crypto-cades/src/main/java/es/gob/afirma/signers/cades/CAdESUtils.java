@@ -32,6 +32,7 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -40,38 +41,22 @@ public class CAdESUtils {
     
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param cert
-     *        Certificado de firma.
-     * @param digestAlgorithmName
-     *        Algoritmo Firmado.
-     * @param digestAlgorithmOID
-     * @param datos
-     *        Datos firmados.
-     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
-     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
-     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
-     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
-     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
-     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
-     *                                      <code>0</code>
-     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
+     * @param cert Certificado de firma.
+     * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
+     * @param datos Datos firmados.
+     * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
-     * @param messageDigest
+     * @param dataType Tipo del contenido a firmar.
+     * @param messageDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
-     * @return Los datos necesarios para generar la firma referente a los datos
-     *         del usuario.
+     * @return Los datos necesarios para generar la firma referente a los datos del usuario.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws CertificateEncodingException */
     public static ASN1EncodableVector generateSignerInfo(final X509Certificate cert,
                                                   final String digestAlgorithmName,
                                                   final byte[] datos,
-                                                  final String policyIdentifier,
-                                                  final String policyIdentifierHash,
-                                                  final String policyIdentifierHashAlgorithm,
-                                                  final String policyQualifier,
+                                                  final AdESPolicy policy,
                                                   final boolean signingCertificateV2,
                                                   final byte[] messageDigest,
                                                   final Date signDate) throws NoSuchAlgorithmException,

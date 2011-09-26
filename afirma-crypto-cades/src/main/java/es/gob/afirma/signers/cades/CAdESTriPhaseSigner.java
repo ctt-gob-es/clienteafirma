@@ -34,6 +34,7 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
@@ -47,14 +48,7 @@ public class CAdESTriPhaseSigner {
      * @param digestAlgorithmName Algoritmo de huella digital
      * @param content Datos a firmar (usar <code>null</code> si no se desean a&ntilde;adir a la firma)
      * @param signerCertificateChain Cadena de certificados del firmante
-     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
-     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
-     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
-     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
-     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
-     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
-     *                                      <code>0</code>
-     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
+     * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
      * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
@@ -64,10 +58,7 @@ public class CAdESTriPhaseSigner {
     public static byte[] preSign(final String digestAlgorithmName, 
                           final byte[] content, 
                           final X509Certificate[] signerCertificateChain,
-                          final String policyIdentifier,
-                          final String policyIdentifierHash,
-                          final String policyIdentifierHashAlgorithm,
-                          final String policyQualifier,
+                          final AdESPolicy policy,
                           final boolean signingCertificateV2,
                           final byte[] messageDigest,
                           final Date signDate) throws AOException {
@@ -85,10 +76,7 @@ public class CAdESTriPhaseSigner {
                      signerCertificateChain[0],
                      digestAlgorithmName,
                      content,
-                     policyIdentifier,
-                     policyIdentifierHash,
-                     policyIdentifierHashAlgorithm,
-                     policyQualifier,
+                     policy,
                      signingCertificateV2,
                      messageDigest,
                      signDate

@@ -27,6 +27,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.beans.AOSignInfo;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.signers.pkcs7.ExtractMimeType;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
@@ -65,15 +66,9 @@ public final class AOCAdESSigner implements AOSigner {
     /** Indica si por defecto se debe insertar el atributo SigningCertificateV2 en la firma. */
     private static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
 
-    public byte[] sign(byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] sign(byte[] data, String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
         final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
@@ -107,29 +102,10 @@ public final class AOCAdESSigner implements AOSigner {
             if (mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null) {
                 omitContent = true;
             }
-            
-            // Politica de firma
-            String policyIdentifier = null;
-            // Nos puede venir como URN o como OID
-            try {
-                policyIdentifier =
-                        extraParams.getProperty("policyIdentifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-            }
-            catch (final Exception e) {
-                // Se ignora, podemos no tener politica
-            }
-            final String policyIdentifierHash = extraParams.getProperty("policyIdentifierHash"); //$NON-NLS-1$
-            String policyIdentifierHashAlgorithm = null;
-            if (policyIdentifier != null && policyIdentifierHash != null && policyIdentifierHash != "0") { //$NON-NLS-1$
-                
-            }
-            
+                        
             return new GenCAdESEPESSignedData().generateSignedData(csp,
                                                                    omitContent,
-                                                                   policyIdentifier,
-                                                                   policyIdentifierHash,
-                                                                   policyIdentifierHashAlgorithm,
-                                                                   extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
+                                                                   new AdESPolicy(extraParams),
                                                                    signingCertificateV2,
                                                                    keyEntry,
                                                                    messageDigest);

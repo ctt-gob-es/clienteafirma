@@ -6,12 +6,14 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.util.Properties;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import sun.security.pkcs11.SunPKCS11;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -56,7 +58,7 @@ public class MiniTestDNI {
         boolean signingCertificateV2 = true; 
         byte[] messageDigest = null; // Se calcula internamente el digest de los datos a firmar. 
         
-        byte[] firma = genCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, /* policy*/ null, null, null, /* qualifier */ null, signingCertificateV2, pke, messageDigest);
+        byte[] firma = genCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, new AdESPolicy(new Properties()), signingCertificateV2, pke, messageDigest);
         
         Assert.assertNotNull(firma);
 

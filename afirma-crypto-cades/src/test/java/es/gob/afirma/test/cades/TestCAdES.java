@@ -196,54 +196,21 @@ public final class TestCAdES {
         return pke;
     }
     
-    /**
-     * Firma.
-     * @param signer
-     * @param data
-     * @param algorithm
-     * @param pke
-     * @param params
-     * @return
-     */
     private byte[] sign(AOSigner signer, byte[] data, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
         return signer.sign(data, algorithm, pke, params);
     }
     
-    /**
-     * Cofirma sin necesidad de los datos originales.
-     * @param signer
-     * @param sign
-     * @param algorithm
-     * @param pke
-     * @param params
-     * @return
-     */
+    /** Cofirma sin necesidad de los datos originales. */
     private byte[] cosign(AOSigner signer, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
         return signer.cosign(sign, algorithm, pke, params);
     }
     
-    /**
-     * Cofirma utilizando los datos originales.
-     * @param signer
-     * @param data
-     * @param sign
-     * @param algorithm
-     * @param pke
-     * @param params
-     * @return
-     */
+
     private byte[] cosign(AOSigner signer, byte[] data, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
         return signer.cosign(data, sign, algorithm, pke, params);
     }
     
-    /**
-     * Hace las comprobaciones b&aacute;sicas de una firma.
-     * @param signer
-     * @param sign
-     * @param pke
-     * @param signsAlias
-     * @param prueba
-     */
+    /** Hace las comprobaciones b&aacute;sicas de una firma. */
     private void checkSign(AOSigner signer, byte[] sign, PrivateKeyEntry[] pke, String[] signsAlias, String prueba) {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));

@@ -20,6 +20,7 @@ import java.util.Date;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Clase que implementa firma digital CMS Advanced Electronic Signatures
@@ -65,14 +66,7 @@ public final class GenCAdESEPESSignedData {
      * @param omitContent
      *        Par&aacute;metro qeu indica si en la firma va el contenido del
      *        fichero o s&oacute;lo va de forma referenciada.
-     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
-     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
-     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
-     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
-     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
-     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
-     *                                      <code>0</code>
-     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
+     * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
@@ -96,10 +90,7 @@ public final class GenCAdESEPESSignedData {
      *         (formato o clave incorrecto,...) */
     public byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                      final boolean omitContent,
-                                     final String policyIdentifier,
-                                     final String policyIdentifierHash,
-                                     final String policyIdentifierHashAlgorithm,
-                                     final String policyQualifier,
+                                     final AdESPolicy policy,
                                      final boolean signingCertificateV2,
                                      final PrivateKeyEntry keyEntry,
                                      byte[] messageDigest) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
@@ -113,24 +104,15 @@ public final class GenCAdESEPESSignedData {
         
         final byte[] content = (omitContent) ? null : parameters.getContent();
         
-        if (messageDigest == null && parameters.getContent() != null) {
-            final MessageDigest md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm));
-            md.update(parameters.getContent());
-            messageDigest = md.digest();
-        }
-        
         final Date signDate = new Date();
         
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
             content, 
             signerCertificateChain, 
-            policyIdentifier,
-            policyIdentifierHash,
-            policyIdentifierHashAlgorithm,
-            policyQualifier, 
+            policy, 
             signingCertificateV2, 
-            messageDigest,
+            (messageDigest == null && parameters.getContent() != null) ? MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) : messageDigest,
             signDate
         );
         
@@ -147,10 +129,7 @@ public final class GenCAdESEPESSignedData {
                 AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
                 content, 
                 signerCertificateChain, 
-                policyIdentifier,
-                policyIdentifierHash,
-                policyIdentifierHashAlgorithm,
-                policyQualifier, 
+                policy, 
                 signingCertificateV2, 
                 messageDigest,
                 signDate
