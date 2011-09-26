@@ -204,19 +204,19 @@ public final class Utils {
     /** A&ntilde;ade la cabecera de hoja de estilo a un XML dado.
      * @param xml
      *        XML origen
-     * @param type
+     * @param tpy
      *        Tipo de hoja de estilo
      * @param href
      *        Reeferncia a la hoja de estilo
      * @return XML con la cabecera de declaraci&oacute;n de hoja de estilo
      *         a&ntilde;adida */
-    private static String addStyleSheetHeader(final String xml, String type, final String href) {
+    private static String addStyleSheetHeader(final String xml, String tpy, final String href) {
         if (href == null) {
             return xml;
         }
-        if (type == null) {
-            type = "text/xsl"; //$NON-NLS-1$
-        }
+                
+        final String type = (tpy != null) ? tpy : "text/xsl"; //$NON-NLS-1$
+
         if (xml == null || "".equals(xml)) { //$NON-NLS-1$
             return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><?xml-stylesheet type=\"" + //$NON-NLS-1$
                    type
@@ -235,23 +235,23 @@ public final class Utils {
 
     /** Obtiene los par&aacute;metros de la cabecera de definici&oacute;n de la
      * hoja de estilo de un XML.
-     * @param xml
+     * @param inputXML
      *        XML de entrada
      * @return Properties con los par&aacute;metros encontrados en la cabecera,
      *         o un Properties vac&iacute;o si el XML no declaraba una hoja de
      *         estilo */
-    public static Properties getStyleSheetHeader(String xml) {
+    public static Properties getStyleSheetHeader(final String inputXML) {
         final Properties ret = new Properties();
-        if (xml == null) {
+        if (inputXML == null) {
             return ret;
         }
-        final int startPos = xml.indexOf("<?xml-stylesheet "); //$NON-NLS-1$
+        final int startPos = inputXML.indexOf("<?xml-stylesheet "); //$NON-NLS-1$
         if (startPos == -1) {
             return ret;
         }
-        xml = xml.substring(startPos);
-        xml =
-                xml.substring(0, xml.indexOf('>') + 1)
+        
+        String xml = inputXML.substring(startPos);
+        xml = xml.substring(0, xml.indexOf('>') + 1)
                    .replace("<?xml-stylesheet ", "").replace("?>", "").replace(" ", "\n").replace("\"", "").replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
         try {
             ret.load(new ByteArrayInputStream(xml.getBytes()));
@@ -267,21 +267,18 @@ public final class Utils {
     /** A&ntilde;ade transformaciones seg&uacute; la sintaxis de
      * par&aacute;metros adicionales en fichero de propiedades del Cliente @firma
      * a una lista pre-existente.
-     * @param transformList
+     * @param transforms
      *        Lista a la que a&ntilde;adir las transformaciones
-     * @param extraParams
+     * @param xParams
      *        Informaci&oacute;n sobre las transformaciones a a&ntilde;adir
      * @param xmlSignaturePrefix
      *        Prefijo XMLDSig */
-    public static void addCustomTransforms(List<Transform> transformList, Properties extraParams, final String xmlSignaturePrefix) {
+    public static void addCustomTransforms(final List<Transform> transforms, final Properties xParams, final String xmlSignaturePrefix) {
 
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
-        if (transformList == null) {
-            transformList = new ArrayList<Transform>();
-        }
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+
+        final List<Transform> transformList = (transforms != null) ? transforms : new ArrayList<Transform>();
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         // primero compruebo si hay transformaciones a medida
         final int numTransforms = Integer.parseInt(extraParams.getProperty("xmlTransforms", "0")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -753,7 +750,7 @@ public final class Utils {
     /** Escribe un XML como texto.
      * @param node
      *        Nodo XML que queremos pasar a trexto
-     * @param xmlProps
+     * @param props
      *        Propiedades del XML (<i>version</i>, <i>encoding</i>,
      *        <i>standalone</i>)
      * @param styleHref
@@ -762,11 +759,9 @@ public final class Utils {
      * @param styleType
      *        Tipo de la hoja de estilo del XML (puede ser nulo)
      * @return Cadena de texto con el XML en forma de array de octetos */
-    public final static byte[] writeXML(final Node node, Hashtable<String, String> xmlProps, final String styleHref, final String styleType) {
+    public final static byte[] writeXML(final Node node, final Hashtable<String, String> props, final String styleHref, final String styleType) {
 
-        if (xmlProps == null) {
-            xmlProps = new Hashtable<String, String>(0);
-        }
+        final Hashtable<String, String> xmlProps = (props != null) ? props : new Hashtable<String, String>(0);
 
         // La codificacion por defecto sera UTF-8
         final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ? xmlProps.get(OutputKeys.ENCODING) : "UTF-8"; //$NON-NLS-1$
@@ -838,16 +833,15 @@ public final class Utils {
         serializer.write(node, output);
     }
 
-    private final static void writeXMLwithJRE(final Writer writer, final Node node, final boolean indent, Hashtable<String, String> properties) {
+    private final static void writeXMLwithJRE(final Writer writer, final Node node, final boolean indent, final Hashtable<String, String> props) {
         try {
             final DOMSource domSource = new DOMSource(node);
             final StreamResult streamResult = new StreamResult(writer);
             final TransformerFactory tf = TransformerFactory.newInstance();
             final Transformer serializer = tf.newTransformer();
 
-            if (properties == null) {
-                properties = new Hashtable<String, String>();
-            }
+            final Hashtable<String, String> properties = (props != null) ? props : new Hashtable<String, String>();
+
             // Por defecto, si no hay eclarada una codificacion, se utiliza
             // UTF-8
             if (!properties.containsKey(OutputKeys.ENCODING) || "".equals(properties.get(OutputKeys.ENCODING))) { //$NON-NLS-1$
