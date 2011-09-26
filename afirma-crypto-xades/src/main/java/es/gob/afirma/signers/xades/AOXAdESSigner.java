@@ -275,16 +275,15 @@ public final class AOXAdESSigner implements AOSigner {
         });
     }
 
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
         final String format = extraParams.getProperty("format", AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING); //$NON-NLS-1$
         final String mode = extraParams.getProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
@@ -1171,32 +1170,6 @@ public final class AOXAdESSigner implements AOSigner {
                 // TODO: Revisar si es conveniente eliminar las firmas a traves
                 // de transformadas
 
-                // ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                // final XMLSignatureFactory fac =
-                // XMLSignatureFactory.getInstance("DOM");
-                // Transform t = fac.newTransform(
-                // Transform.XPATH,
-                // new XPathFilterParameterSpec(
-                // "not(ancestor-or-self::" + XML_SIGNATURE_PREFIX +
-                // ":Signature)",
-                // Collections.singletonMap(XML_SIGNATURE_PREFIX,
-                // XMLSignature.XMLNS)
-                // )
-                // );
-                //
-                // t.transform(new OctetStreamData(new
-                // ByteArrayInputStream(sign)), null, baos);
-                //
-                // return baos.toByteArray();
-
-                // Transformer xmlTranformer =
-                // TransformerFactory.newInstance().newTransformer(source);
-                // xmlTranformer.transform(new StreamSource(new
-                // ByteArrayInputStream(sign)), new StreamResult(baos));
-                // elementRes =
-                // DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new
-                // ByteArrayInputStream(baos.toByteArray());
-
                 // obtiene las firmas y las elimina
                 final NodeList signatures = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
                 for (int i = 0; i < signatures.getLength(); i++) {
@@ -1306,16 +1279,15 @@ public final class AOXAdESSigner implements AOSigner {
         return spi;
     }
 
-    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams: new Properties();
+
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
@@ -1562,11 +1534,10 @@ public final class AOXAdESSigner implements AOSigner {
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
-                              Properties extraParams) throws AOException {
+                              final Properties xParams) throws AOException {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
         String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
@@ -1746,24 +1717,24 @@ public final class AOXAdESSigner implements AOSigner {
      * targets
      * @param root
      *        Elemento raiz del documento xml que contiene las firmas
-     * @param targets
+     * @param tgts
      *        Array con las posiciones de los nodos a contrafirmar
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
     private void countersignNodes(final Element root,
-                                  Object[] targets,
+                                  Object[] tgts,
                                   final PrivateKeyEntry keyEntry,
                                   final Properties extraParams,
                                   final String algorithm) throws AOException {
 
         // descarta las posiciones que esten repetidas
         final List<Integer> targetsList = new ArrayList<Integer>();
-        for (int i = 0; i < targets.length; i++) {
-            if (!targetsList.contains(targets[i])) {
-                targetsList.add((Integer) targets[i]);
+        for (int i = 0; i < tgts.length; i++) {
+            if (!targetsList.contains(tgts[i])) {
+                targetsList.add((Integer) tgts[i]);
             }
         }
-        targets = targetsList.toArray();
+        Object[] targets = targetsList.toArray();
 
         // obtiene todas las firmas
         final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
@@ -1839,11 +1810,10 @@ public final class AOXAdESSigner implements AOSigner {
      *        Algoritmo de firma XML
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    private void cs(final Element signature, final PrivateKeyEntry keyEntry, Properties extraParams, final String algorithm) throws AOException {
+    private void cs(final Element signature, final PrivateKeyEntry keyEntry, final Properties xParams, final String algorithm) throws AOException {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
