@@ -363,6 +363,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				comboRepositorios.setEnabled(false);
 				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
 				etiquetaAnadir.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
+				etiquetaAnadir.setFocusable(true);
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else
@@ -403,6 +404,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón puesto que se ha habilitado
 			comboRepositorios.setEnabled(true); 
 			etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
+			etiquetaAnadir.setFocusable(false);
 			eliminar.setEnabled(false);
 			eliminar.setMnemonic(0); //Se asigna un atajo vacio al botón ya que ha sido deshabilitado
 		}
@@ -427,6 +429,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón puesto que se ha habilitado
 			comboRepositorios.setEnabled(true);
 			etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
+			etiquetaAnadir.setFocusable(false);
 			eliminar.setEnabled(false);
 			eliminar.setMnemonic(0); //Se asigna un atajo vacio al botón ya que ha sido deshabilitado
 		}
