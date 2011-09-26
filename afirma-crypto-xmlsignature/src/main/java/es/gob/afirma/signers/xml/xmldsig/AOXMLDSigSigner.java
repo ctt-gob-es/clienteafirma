@@ -232,24 +232,15 @@ public final class AOXMLDSigSigner implements AOSigner {
         });
     }
 
-    public byte[] sign(final byte[] data, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-
-        // Algoritmos de firma con nombres alternativos
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
         final String format = extraParams.getProperty("format", AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING); //$NON-NLS-1$
         final String mode = extraParams.getProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
@@ -1121,23 +1112,15 @@ public final class AOXMLDSigSigner implements AOSigner {
         return baosSig.toByteArray();
     }
 
-    public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
 
@@ -1362,27 +1345,19 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     public byte[] countersign(final byte[] sign,
-                              String algorithm,
+                              final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
-                              Properties extraParams) throws AOException {
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+                              final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
         String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
@@ -1544,24 +1519,28 @@ public final class AOXMLDSigSigner implements AOSigner {
      * targets
      * @param root
      *        Elemento raiz del documento xml que contiene las firmas
-     * @param targets
+     * @param tgts
      *        Array con las posiciones de los nodos a contrafirmar
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
     private void countersignNodes(final Element root,
-                                  Object[] targets,
+                                  Object[] tgts,
                                   final PrivateKeyEntry keyEntry,
                                   final String refsDigestMethod,
                                   final String canonicalizationAlgorithm) throws AOException {
 
+        if (tgts == null) {
+            throw new IllegalArgumentException("La lista de nodos a contrafirmar no puede ser nula"); //$NON-NLS-1$
+        }
+        
         // descarta las posiciones que esten repetidas
         final List<Integer> targetsList = new ArrayList<Integer>();
-        for (int i = 0; i < targets.length; i++) {
-            if (!targetsList.contains(targets[i])) {
-                targetsList.add((Integer) targets[i]);
+        for (int i = 0; i < tgts.length; i++) {
+            if (!targetsList.contains(tgts[i])) {
+                targetsList.add((Integer) tgts[i]);
             }
         }
-        targets = targetsList.toArray();
+        final Object[] targets = targetsList.toArray();
 
         final AOTreeNode tree = new AOTreeNode("AFIRMA"); //$NON-NLS-1$
 
