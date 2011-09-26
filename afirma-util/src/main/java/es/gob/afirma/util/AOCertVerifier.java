@@ -342,17 +342,19 @@ public final class AOCertVerifier {
 
     /** A&ntilde;ade certificados ra&iacute;z como parte de la cadena de
      * confianza.
-     * @param server
+     * @param svr
      *        Servidor LDAP donde se encuentran los certificados
      * @param location
      *        Ruta hacia los certificados dentro del servidor LDAP */
-    public void addRootCertificatesFromLdap(String server, final LdapName location) {
-        if (server == null || "".equals(server) || location == null) { //$NON-NLS-1$
+    public void addRootCertificatesFromLdap(final String svr, final LdapName location) {
+        if (svr == null || "".equals(svr) || location == null) { //$NON-NLS-1$
             LOGGER.warning(
                            "No se pueden anadir certificados desde un servidor o una localizacion nula o vacia" //$NON-NLS-1$
             );
             return;
         }
+        
+        String server = svr;
 
         // Comprobamos que el nombre sea correcto
         if (server.startsWith("ldap://")) //$NON-NLS-1$
