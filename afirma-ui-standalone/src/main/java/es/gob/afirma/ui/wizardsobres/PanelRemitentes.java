@@ -39,7 +39,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -57,6 +56,7 @@ import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
@@ -65,7 +65,6 @@ import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.CertificateDestiny;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
 /**
  *
@@ -172,10 +171,10 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		c.weightx = 1.0;
 		c.gridx = 0;
     	
-    	// Panel con el texto "Puede anadir uno o..."
-    	JTextPane panelTexto = PanelesTexto.generarPanelTexto("Wizard.sobres.pagina2.contenido.explicacion1", false);
-        panelCentral.add(panelTexto, c);
-        
+		//Etiqueta con el texto "Puede anadir uno o..."
+		InfoLabel labelText = new InfoLabel(Messages.getString("Wizard.sobres.pagina2.contenido.explicacion1"), false);
+		panelCentral.add(labelText, c);
+
         c.gridy = 1;
 		c.gridwidth = 1;
         
@@ -196,6 +195,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Combo con los repositorios / almacenes
 		final JComboBox comboRepositorios = new JComboBox();
 		comboRepositorios.setToolTipText(Messages.getString("wizard.comboRepositorios.description"));
+		comboRepositorios.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + comboRepositorios.getToolTipText() + " ALT + D.");
+		comboRepositorios.getAccessibleContext().setAccessibleDescription(comboRepositorios.getToolTipText());
 		Utils.remarcar(comboRepositorios);
         Utils.setContrastColor(comboRepositorios);
 		Utils.setFontBold(comboRepositorios);
@@ -220,6 +221,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		anadir.setText(Messages.getString("wizard.aniadir")); 
 		anadir.setAutoscrolls(true);
 		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón
+		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
+		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboRepositorios, eliminar, anadir);
@@ -258,6 +261,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Listado de remitentes
 		listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description"));
 		listaRemitentes.setModel(new DefaultListModel());
+		listaRemitentes.getAccessibleContext().setAccessibleName(senderLabel.getText() + " "+ listaRemitentes.getToolTipText());
+		listaRemitentes.getAccessibleContext().setAccessibleDescription(listaRemitentes.getToolTipText());
 		Utils.remarcar(listaRemitentes);
         Utils.setContrastColor(listaRemitentes);
 		Utils.setFontBold(listaRemitentes);
@@ -285,7 +290,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Boton eliminar
 		eliminar.setEnabled(false);
 		eliminar.setToolTipText(Messages.getString("Wizard.sobres.eliminar.remitente.description"));
-		eliminar.setText(Messages.getString("wizard.sobres.eliminar.remitente")); 
+		eliminar.setText(Messages.getString("wizard.sobres.eliminar.remitente"));
+		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
+		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				eliminarActionPerformed(comboRepositorios, eliminar, anadir);
@@ -301,7 +308,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 
 		// Accesos rapidos al menu de ayuda
 		HelpUtils.enableHelpKey(comboRepositorios,"ensobrado.wizard.repositorio.remitente");
-		HelpUtils.enableHelpKey(panelTexto,"ensobrado.wizard. remitentes");
+		HelpUtils.enableHelpKey(labelText,"ensobrado.wizard. remitentes");
 	}
 
 	/**
@@ -355,6 +362,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				anadir.setMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el botón
 				comboRepositorios.setEnabled(false);
 				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
+				etiquetaAnadir.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + ".El combo ha sido deshabilitado puesto que se ha seleccionado un remitente ya.");
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else

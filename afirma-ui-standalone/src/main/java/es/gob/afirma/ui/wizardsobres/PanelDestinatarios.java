@@ -32,7 +32,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
@@ -41,8 +40,8 @@ import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
-import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
@@ -51,7 +50,6 @@ import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.CertificateDestiny;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.ui.wizardUtils.PanelesTexto;
 
 /**
  *
@@ -113,9 +111,10 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		c.weightx = 1.0;
 		c.gridx = 0;
     	
-    	// Panel con el texto "Puede anadir uno o..."
-		JTextPane panelTexto = PanelesTexto.generarPanelTexto("Wizard.sobres.pagina1.contenido.explicacion1", false);
-		panelCentral.add(panelTexto, c);
+    	// Etiqueta con el texto "Puede anadir uno o..."
+		InfoLabel labelText = new InfoLabel(Messages.getString("Wizard.sobres.pagina1.contenido.explicacion1"), false);
+		/*JTextPane panelTexto = PanelesTexto.generarPanelTexto("Wizard.sobres.pagina1.contenido.explicacion1", false);
+		panelCentral.add(panelTexto, c);*/
 		
 		c.gridy = 1;
 		c.gridwidth = 1;
@@ -137,6 +136,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		// Combo con las listas de destinatarios
 		final JComboBox comboDestinatarios = new JComboBox();
 		comboDestinatarios.setToolTipText(Messages.getString("Wizard.sobres.pagina1.comboDestinatarios.description"));
+		comboDestinatarios.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + comboDestinatarios.getToolTipText() + "ALT + D.");
+		comboDestinatarios.getAccessibleContext().setAccessibleDescription(comboDestinatarios.getToolTipText());
 		cargarCombo(comboDestinatarios);
 		Utils.remarcar(comboDestinatarios);
         Utils.setContrastColor(comboDestinatarios);
@@ -161,6 +162,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		anadir.setText(Messages.getString("wizard.aniadir"));
 		anadir.setAutoscrolls(true);
 		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón
+		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
+		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboDestinatarios, (DefaultListModel) listaDestinatarios.getModel(), 
@@ -200,6 +203,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		// Lista con los destinatarios
 		listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description"));
 		listaDestinatarios.setModel(new DefaultListModel());
+		listaDestinatarios.getAccessibleContext().setAccessibleName(destLabel.getText() + " "+ listaDestinatarios.getToolTipText());
+		listaDestinatarios.getAccessibleContext().setAccessibleDescription(listaDestinatarios.getToolTipText());
 		Utils.remarcar(listaDestinatarios);
         Utils.setContrastColor(listaDestinatarios);
 		Utils.setFontBold(listaDestinatarios);
@@ -229,6 +234,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		eliminar.setToolTipText(Messages.getString("wizard.eliminar.description"));
 		eliminar.setEnabled(false);
 		eliminar.setText(Messages.getString("wizard.sobres.eliminar.destinatario"));
+		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
+		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				eliminarActionPerformed((DefaultListModel) listaDestinatarios.getModel(), eliminar);
@@ -243,7 +250,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 
 		// Accesos rapidos al menu de ayuda
 		HelpUtils.enableHelpKey(comboDestinatarios,"ensobrado.wizard.repositorio.destinatario");
-		HelpUtils.enableHelpKey(panelTexto,"ensobrado.wizard.destinatarios");
+		HelpUtils.enableHelpKey(labelText,"ensobrado.wizard.destinatarios");
 	}
 
 	/**
