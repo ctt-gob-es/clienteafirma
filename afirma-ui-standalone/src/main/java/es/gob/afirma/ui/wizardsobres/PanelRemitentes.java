@@ -362,7 +362,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				anadir.setMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el botón
 				comboRepositorios.setEnabled(false);
 				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
-				etiquetaAnadir.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + ".El combo ha sido deshabilitado puesto que se ha seleccionado un remitente ya.");
+				etiquetaAnadir.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else

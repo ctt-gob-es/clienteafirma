@@ -179,8 +179,8 @@ public class Descifrado extends JPanel {
  			comboMecanismo.setEnabled(false); //Se deshabilita la opción
  			//Opciones para el lector de pantalla
 			etiquetaMecanismo.setFocusable(true);
-			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + ". La opción por defecto del combo es: " 
-			+ Messages.getString("Cifrado.origenL.0") + ". Este combo está deshabilitado para el modo no avanzado.");
+			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") 
+			+ Messages.getString("Cifrado.origenL.0") + " "+ Messages.getString("Cifrado.origen.clave.combo.disabled"));
  		} else {
  			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
  			//Relación entre etiqueta y combo
@@ -226,8 +226,8 @@ public class Descifrado extends JPanel {
 			comboAlgoritmo.setEnabled(false); //Se deshabilita la opción
 			//Opciones para el lector de pantalla
 			etiquetaAlgoritmo.setFocusable(true);
-			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + ". La opción por defecto del combo es: " 
-			+ Messages.getString("Cifrado.origenLc.0") + ". Este combo está deshabilitado para el modo no avanzado.");
+			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") 
+			+ Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled"));
 		} else {
 			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
 			//Relación entre etiqueta y combo

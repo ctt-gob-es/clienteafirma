@@ -323,7 +323,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         // Etiqueta con el texto "Fichero de log"
         etiquetaFichero.setText(Messages.getString("Wizard.multifirma.ventana4.log"));
         etiquetaFichero.setFocusable(true); //Se hace focusable por temas de accesibilidad
-        etiquetaFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + Messages.getString("Wizard.multifirma.ventana4.log.description") +" .Esta opción permanecerá desactivada hasta que se incluya un directorio de firmas.");
+        etiquetaFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + Messages.getString("Wizard.multifirma.ventana4.log.description") +" " + Messages.getString("Wizard.multifirma.chooserLog.disabled"));
         Utils.setContrastColor(etiquetaFichero);
         Utils.setFontBold(etiquetaFichero);
         panelCentral.add(etiquetaFichero, c);
