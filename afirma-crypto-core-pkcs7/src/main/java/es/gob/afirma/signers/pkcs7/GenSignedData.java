@@ -32,7 +32,6 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BERConstructedOctetString;
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -147,36 +146,16 @@ public final class GenSignedData {
         // buscamos que timo de algoritmo es y lo codificamos con su OID
 
         final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
-        AlgorithmIdentifier digAlgId;
-
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
-        String digestAlgorithm = null;
-        String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
-        if (with > 0) {
-            digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
-            if (and > 0) {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-            }
-            else {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4);
-            }
-        }
-
-        try {
-            digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
-        }
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         digestAlgs.add(digAlgId);
 
         // 3. CONTENTINFO
         // si se introduce el contenido o no
 
-        ContentInfo encInfo = null;
+        ContentInfo encInfo;
         final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
 
         if (omitContent == false) {
@@ -227,9 +206,6 @@ public final class GenSignedData {
 
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
-        // AlgorithmIdentifier
-        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
-
         // // ATRIBUTOS
 
         // ATRIBUTOS FIRMADOS
@@ -251,7 +227,7 @@ public final class GenSignedData {
         // digEncryptionAlgorithm
         final AlgorithmIdentifier encAlgId;
         try {
-            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
+            encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e); //$NON-NLS-1$
