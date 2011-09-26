@@ -81,10 +81,13 @@ final class AOSecMod {
      *         durante la b&acute;squeda
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    static Vector<ModuleName> getModules(String profileDir) throws AOException {
-        if (profileDir == null || "".equals(profileDir)) { //$NON-NLS-1$
-            throw new AOException("El directorio del perfil de Mozilla era nulo"); //$NON-NLS-1$
+    static Vector<ModuleName> getModules(final String dir) throws AOException {
+        
+        if (dir == null || "".equals(dir)) { //$NON-NLS-1$
+            throw new IllegalArgumentException("El directorio del perfil de Mozilla no puede ser nulo"); //$NON-NLS-1$
         }
+        
+        String profileDir = dir;
 
         if (modules == null) {
 

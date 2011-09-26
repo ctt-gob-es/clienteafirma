@@ -585,9 +585,9 @@ final class MozillaKeyStoreUtilities {
      * @param nssPath
      *        Ruta al directorio de NSS (terminado en barra).
      * @return Listado con los nombres de las bibliotecas. */
-    private static String[] getSoftkn3Dependencies(String nssPath) {
+    private static String[] getSoftkn3Dependencies(final String path) {
 
-        if (nssPath == null) {
+        if (path == null) {
             return new String[0];
         }
 
@@ -596,7 +596,7 @@ final class MozillaKeyStoreUtilities {
             return new String[0];
         }
 
-        nssPath = (!nssPath.endsWith(File.separator) ? nssPath + File.separator : nssPath);
+        final String nssPath = (!path.endsWith(File.separator) ? path + File.separator : path);
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             // Mozilla Firefox 4.0
@@ -736,19 +736,18 @@ final class MozillaKeyStoreUtilities {
         return null;
     }
 
-    final static void configureMacNSS(String nssBinDir) throws AOException {
+    final static void configureMacNSS(String binDir) throws AOException {
+        
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;
         }
         
-        if (nssBinDir == null) {
+        if (binDir == null) {
             LOGGER.severe("El directorio de NSS para configurar proporcionado es nulo, no se realizara ninguna accion"); //$NON-NLS-1$
             return;
         }
         
-        if (!nssBinDir.endsWith("/")) { //$NON-NLS-1$
-            nssBinDir = nssBinDir + "/"; //$NON-NLS-1$
-        }
+        final String nssBinDir = (binDir.endsWith("/")) ? binDir : binDir + "/"; //$NON-NLS-1$ //$NON-NLS-2$
         
         // Intentamos la carga, para ver si es necesaria la reconfiguracion
         try {
