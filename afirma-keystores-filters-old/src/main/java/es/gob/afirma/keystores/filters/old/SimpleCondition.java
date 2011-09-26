@@ -17,6 +17,8 @@ import es.gob.afirma.core.AOException;
  */
 @Deprecated
 final class SimpleCondition extends AClause implements ConditionConstants {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 	
     private String field;
     private Operator operator;
@@ -106,7 +108,7 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             else throw new AOException("Campo desconocido:" + this.field); //$NON-NLS-1$
             o2 = this.aux;
             
-            Logger.getLogger("es.gob.afirma").info("\nValor extraido del certificado: " + o1+"\nValor patron del filtro: " + o2); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            LOGGER.info("\nValor extraido del certificado: " + o1+"\nValor patron del filtro: " + o2); //$NON-NLS-1$ //$NON-NLS-2$
             
             return this.operator.eval(o1, o2);
         }
@@ -115,83 +117,84 @@ final class SimpleCondition extends AClause implements ConditionConstants {
         }
     } 			
 
-    private String asciiHexToString(String ah) {
-        if(!ah.startsWith("#")) { //$NON-NLS-1$
-            return ah;
+    private String asciiHexToString(final String ahex) {
+        
+        if(!ahex.startsWith("#")) { //$NON-NLS-1$
+            return ahex;
         }
         
-        ah = ah.replaceAll("#", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        final String ah = ahex.replaceAll("#", ""); //$NON-NLS-1$ //$NON-NLS-2$
         String tmpStr;
-        StringBuilder outStr = new StringBuilder();
+        final StringBuilder outStr = new StringBuilder();
         for (int i=0;i<ah.length()/2;i++) {
             tmpStr = ah.substring(i*2, i*2+2);
             tmpStr = tmpStr.trim();
             
-            if      (tmpStr.equalsIgnoreCase("30")) outStr.append("0"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("31")) outStr.append("1"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("32")) outStr.append("2"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("33")) outStr.append("3"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("34")) outStr.append("4"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("35")) outStr.append("5"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("36")) outStr.append("6"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("37")) outStr.append("7"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("38")) outStr.append("8"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("39")) outStr.append("9"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("41")) outStr.append("A"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("42")) outStr.append("B"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("43")) outStr.append("C"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("44")) outStr.append("D"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("45")) outStr.append("E"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("46")) outStr.append("F"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("47")) outStr.append("G"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("48")) outStr.append("H"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("49")) outStr.append("I"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("4a")) outStr.append("J"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("4b")) outStr.append("K"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("4c")) outStr.append("L"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("4d")) outStr.append("M"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("4e")) outStr.append("N"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("4f")) outStr.append("O"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("50")) outStr.append("P"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("51")) outStr.append("Q"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("52")) outStr.append("R"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("53")) outStr.append("S"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("54")) outStr.append("T"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("55")) outStr.append("U"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("56")) outStr.append("V"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("57")) outStr.append("W"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("58")) outStr.append("X"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("59")) outStr.append("Y"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("5a")) outStr.append("Z"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("61")) outStr.append("a");  //$NON-NLS-1$//$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("62")) outStr.append("b"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("63")) outStr.append("c"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("64")) outStr.append("d"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("65")) outStr.append("e"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("66")) outStr.append("f"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("67")) outStr.append("g"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("68")) outStr.append("h"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("69")) outStr.append("i"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("6a")) outStr.append("j"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("6b")) outStr.append("k"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("6c")) outStr.append("l"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("6d")) outStr.append("m"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("6e")) outStr.append("n"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("6f")) outStr.append("o"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("70")) outStr.append("p"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("71")) outStr.append("q"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("72")) outStr.append("r"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("73")) outStr.append("s"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("74")) outStr.append("t"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("75")) outStr.append("u"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("76")) outStr.append("v"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("77")) outStr.append("w"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("78")) outStr.append("x"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("79")) outStr.append("y"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("7a")) outStr.append("z"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("2d")) outStr.append("-"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("5f")) outStr.append("_"); //$NON-NLS-1$ //$NON-NLS-2$
-            else if (tmpStr.equalsIgnoreCase("20")) outStr.append(" "); //$NON-NLS-1$ //$NON-NLS-2$
+            if      (tmpStr.equalsIgnoreCase("30")) { outStr.append("0"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("31")) { outStr.append("1"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("32")) { outStr.append("2"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("33")) { outStr.append("3"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("34")) { outStr.append("4"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("35")) { outStr.append("5"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("36")) { outStr.append("6"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("37")) { outStr.append("7"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("38")) { outStr.append("8"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("39")) { outStr.append("9"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("41")) { outStr.append("A"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("42")) { outStr.append("B"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("43")) { outStr.append("C"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("44")) { outStr.append("D"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("45")) { outStr.append("E"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("46")) { outStr.append("F"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("47")) { outStr.append("G"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("48")) { outStr.append("H"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("49")) { outStr.append("I"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("4a")) { outStr.append("J"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("4b")) { outStr.append("K"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("4c")) { outStr.append("L"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("4d")) { outStr.append("M"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("4e")) { outStr.append("N"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("4f")) { outStr.append("O"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("50")) { outStr.append("P"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("51")) { outStr.append("Q"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("52")) { outStr.append("R"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("53")) { outStr.append("S"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("54")) { outStr.append("T"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("55")) { outStr.append("U"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("56")) { outStr.append("V"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("57")) { outStr.append("W"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("58")) { outStr.append("X"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("59")) { outStr.append("Y"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("5a")) { outStr.append("Z"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("61")) { outStr.append("a"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("62")) { outStr.append("b"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("63")) { outStr.append("c"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("64")) { outStr.append("d"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("65")) { outStr.append("e"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("66")) { outStr.append("f"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("67")) { outStr.append("g"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("68")) { outStr.append("h"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("69")) { outStr.append("i"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("6a")) { outStr.append("j"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("6b")) { outStr.append("k"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("6c")) { outStr.append("l"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("6d")) { outStr.append("m"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("6e")) { outStr.append("n"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("6f")) { outStr.append("o"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("70")) { outStr.append("p"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("71")) { outStr.append("q"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("72")) { outStr.append("r"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("73")) { outStr.append("s"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("74")) { outStr.append("t"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("75")) { outStr.append("u"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("76")) { outStr.append("v"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("77")) { outStr.append("w"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("78")) { outStr.append("x"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("79")) { outStr.append("y"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("7a")) { outStr.append("z"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("2d")) { outStr.append("-"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("5f")) { outStr.append("_"); } //$NON-NLS-1$ //$NON-NLS-2$
+            else if (tmpStr.equalsIgnoreCase("20")) { outStr.append(" "); } //$NON-NLS-1$ //$NON-NLS-2$
         }
         
         return outStr.toString();
@@ -219,9 +222,9 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             }
             return ln;
         }
-        catch(Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("No se ha tratado el nombre X400 antes de aplicar un filtro: " + ln); //$NON-NLS-1$ //$NON-NLS-2$
-            Logger.getLogger("es.gob.afirma").warning("Excepcion: "+e); //$NON-NLS-1$ //$NON-NLS-2$
+        catch(final Exception e) {
+            LOGGER.warning("No se ha tratado el nombre X400 antes de aplicar un filtro: " + ln); //$NON-NLS-1$
+            LOGGER.warning("Excepcion: "+e); //$NON-NLS-1$
             return ln;
         }
         
