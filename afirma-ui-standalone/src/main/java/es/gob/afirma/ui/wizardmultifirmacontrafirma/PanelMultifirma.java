@@ -259,7 +259,10 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion3"),
 				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion4")}
 		));
+		
 		comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N
+		comboFirmas.getAccessibleContext().setAccessibleName(etiquetaFirmas.getText() + " " +comboFirmas.getToolTipText() + "ALT + F.");
+		comboFirmas.getAccessibleContext().setAccessibleDescription(comboFirmas.getToolTipText());
 		Utils.remarcar(comboFirmas);
         Utils.setContrastColor(comboFirmas);
 		Utils.setFontBold(comboFirmas);
@@ -315,6 +318,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			public void treeExpanded(TreeExpansionEvent event) {}
 		}); 
 		arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
+		arbolFirmas.getAccessibleContext().setAccessibleName(etiqueta.getText() + " " + arbolFirmas.getToolTipText() + "ALT + R.");
 		arbolFirmas.setSelectionRow(0);
 		arbolFirmas.setRootVisible(false);
 		Utils.remarcar(arbolFirmas);

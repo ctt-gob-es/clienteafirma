@@ -131,7 +131,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         
         // Caja de texto donde se guarda el nombre del archivo de firma
         campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description")); // NOI18N
-        campoFirma.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero.description")); // NOI18N
+        campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoFirma.getToolTipText() + "ALT + F."); // NOI18N
         campoFirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero.description")); // NOI18N
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
@@ -157,7 +157,8 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         JButton	examinarFirma = new JButton();
         examinarFirma.setMnemonic(KeyEvent.VK_E);
         examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar"));
-        examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); 
+        examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
         examinarFirma.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	examinarFirmaActionPerformed();
