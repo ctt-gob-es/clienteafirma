@@ -29,18 +29,19 @@ public final class AOCipherConfig {
     private AOCipherPadding padding;
 
     /** Construyye una configuraci&oacute;n de cifrado.
-     * @param ciphAlgo
+     * @param algo
      *        Algoritmo de cifrado
-     * @param ciphMode
+     * @param mode
      *        Modo de bloque para el cifrado
-     * @param ciphPadding
+     * @param padd
      *        Relleno (<i>padding</i>) del cifrado */
-    public AOCipherConfig(AOCipherAlgorithm ciphAlgo, AOCipherBlockMode ciphMode, AOCipherPadding ciphPadding) {
+    public AOCipherConfig(final AOCipherAlgorithm algo, final AOCipherBlockMode mode, AOCipherPadding padd) {
+
         // En caso de nulos tomamos defectos y algunas combinaciones
         // predefinidas
-        if (ciphAlgo == null) {
-            ciphAlgo = AOCipherAlgorithm.getDefault();
-        }
+        AOCipherAlgorithm ciphAlgo = (algo != null) ? algo : AOCipherAlgorithm.getDefault();
+        
+        AOCipherBlockMode ciphMode = mode;
         if (ciphMode == null) {
             if (ciphAlgo.equals(AOCipherAlgorithm.PBEWITHMD5ANDDES) || ciphAlgo.equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE)
                 || ciphAlgo.equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40)) {
@@ -50,6 +51,8 @@ public final class AOCipherConfig {
                 ciphMode = AOCipherBlockMode.ECB;
             }
         }
+        
+        AOCipherPadding ciphPadding = padd;
         if (ciphPadding == null) {
             if (ciphAlgo.equals(AOCipherAlgorithm.ARCFOUR)) {
                 ciphPadding = AOCipherPadding.NOPADDING;

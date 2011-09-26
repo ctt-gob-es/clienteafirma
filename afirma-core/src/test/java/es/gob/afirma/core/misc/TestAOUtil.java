@@ -19,54 +19,56 @@ import org.junit.Test;
  */
 public final class TestAOUtil {
 
+    /** Prueba para el getCN(), reconstruido para prescindir de javax.naming.
+     * @throws Exception */
     @Test
     public void testGetCN() throws Exception {
         final String principals[][] = {
-                {"CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"},
-                {" CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"},
-                {"CN=\"fulanito, Menganito\", C=ES", "fulanito, Menganito"},
-                {"CN=fulanito Menganito, C=ES", "fulanito Menganito"},
-                {"CN=fulanito Menganito , C=ES", "fulanito Menganito"},
-                {"CN = fulanito Menganito, C=ES", "fulanito Menganito"},
-                {"CN=fulanito Menganito, C=ES", "fulanito Menganito"},
-                {"C=ES, CN=fulanito Menganito", "fulanito Menganito"},
-                {"C=ES,CN=fulanito Menganito", "fulanito Menganito"},
-                {"C=ES,CN =fulanito Menganito", "fulanito Menganito"},
-                {"C=ES,CN = fulanito Menganito", "fulanito Menganito"},
-                {"C=ES,CN=fulanito Menganito", "fulanito Menganito"},
-                {"C=ES,CN =\"fulanito Menganito\"", "fulanito Menganito"},
-                {"C=ES,CN= \"fulanito Menganito\"", "fulanito Menganito"},
-                {"OU=\"mi organizacion\", C=ES", "mi organizacion"},
-                {" OU=\"mi organizacion\", C=ES", "mi organizacion"},
-                {"OU=\"mi organizacion\", C=ES", "mi organizacion"},
-                {"OU=mi organizacion, C=ES", "mi organizacion"},
-                {"OU=mi organizacion , C=ES", "mi organizacion"},
-                {"OU = mi organizacion, C=ES", "mi organizacion"},
-                {"OU=mi organizacion, C=ES", "mi organizacion"},
-                {"C=ES, OU=mi organizacion", "mi organizacion"},
-                {"C=ES, OU = mi organizacion", "mi organizacion"},
-                {"C=ES,OU=mi organizacion", "mi organizacion"},
-                {"C=ES,OU = mi organizacion", "mi organizacion"},
-                {"C=ES,OU=\"mi organizacion\"", "mi organizacion"},
-                {"C=ES,OU= \"mi organizacion\"", "mi organizacion"},
-                {"PCN=mi organizacion, C=ES", "mi organizacion"},
-                {"CN=, C=ES", ""},
-                {"C=ES, PCN=fulanito Menganito", "ES"},
-                {"C=ES, P CN=\"fulanito Menganito\"", "fulanito Menganito"},
-                {"C=ES, P ,CN=\"fulanito Menganito\"", "fulanito Menganito"},
-                {"C=ES, CN=\"\"", ""},
-                {"C=ES, CN=", ""},
-                {"C=ES, CN=\"", ""},
-                {"C=ES, CN=\" ", " "},
-                {"C=ES, CN", "ES"},
-                {"C=ES, CN a", "ES"},
-                {"Hola Mundo!!", "Hola Mundo!!"},
+                {"CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {" CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=\"fulanito, Menganito\", C=ES", "fulanito, Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=fulanito Menganito, C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=fulanito Menganito , C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN = fulanito Menganito, C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=fulanito Menganito, C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN=fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN =fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN = fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN=fulanito Menganito", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN =\"fulanito Menganito\"", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,CN= \"fulanito Menganito\"", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=\"mi organizacion\", C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {" OU=\"mi organizacion\", C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=\"mi organizacion\", C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=mi organizacion, C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=mi organizacion , C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU = mi organizacion, C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"OU=mi organizacion, C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, OU=mi organizacion", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, OU = mi organizacion", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,OU=mi organizacion", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,OU = mi organizacion", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,OU=\"mi organizacion\"", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES,OU= \"mi organizacion\"", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"PCN=mi organizacion, C=ES", "mi organizacion"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"CN=, C=ES", ""}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, PCN=fulanito Menganito", "ES"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, P CN=\"fulanito Menganito\"", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, P ,CN=\"fulanito Menganito\"", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=\"\"", ""}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=", ""}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=\"", ""}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN=\" ", " "}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN", "ES"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"C=ES, CN a", "ES"}, //$NON-NLS-1$ //$NON-NLS-2$
+                {"Hola Mundo!!", "Hola Mundo!!"}, //$NON-NLS-1$ //$NON-NLS-2$
                 {null, null}
         };
         
-        for (String principal[] : principals) {
-            System.out.println(principal[0] + ": " + principal[1]);
-            Assert.assertEquals("El metodo getCN() no devuelve el resultado correcto para " + principal[0], AOUtil.getCN(principal[0]), principal[1]);
+        for (final String principal[] : principals) {
+            System.out.println(principal[0] + ": " + principal[1]); //$NON-NLS-1$
+            Assert.assertEquals("El metodo getCN() no devuelve el resultado correcto para " + principal[0], AOUtil.getCN(principal[0]), principal[1]); //$NON-NLS-1$
         }
     }
 }
