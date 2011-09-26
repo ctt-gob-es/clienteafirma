@@ -2,7 +2,6 @@ package es.gob.afirma.ui.utils;
 
 import javax.swing.JLabel;
 
-import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.Utils;
 
 /**
@@ -30,6 +29,7 @@ public class InfoLabel extends JLabel{
 		this.setOpaque(opaque);
 		Utils.remarcar(this);
 	    Utils.setContrastColor(this);
+	    Utils.setFontBold(this);
 		
 	}
 }
