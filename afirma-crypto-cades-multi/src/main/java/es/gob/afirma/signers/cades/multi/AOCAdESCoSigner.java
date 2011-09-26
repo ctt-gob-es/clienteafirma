@@ -9,6 +9,7 @@ import java.util.Properties;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.cades.ValidateCADES;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -58,22 +59,6 @@ public class AOCAdESCoSigner implements AOCoSigner {
         }
 
         final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
-
-        // Politica de firma
-        String policyIdentifier = null;
-        // Nos puede venir como URN o como OID
-        try {
-            policyIdentifier =
-                    extraParams.getProperty("policyIdentifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-        }
-        catch (final Exception e) {
-            // Se ignora, podemos no tener politica
-        }
-        final String policyIdentifierHash = extraParams.getProperty("policyIdentifierHash"); //$NON-NLS-1$
-        String policyIdentifierHashAlgorithm = null;
-        if (policyIdentifier != null && policyIdentifierHash != null && policyIdentifierHash != "0") { //$NON-NLS-1$
-            
-        }
         
         try {
 
@@ -89,10 +74,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                     csp,
                     sign,
                     omitContent,
-                    policyIdentifier,
-                    policyIdentifierHash,
-                    policyIdentifierHashAlgorithm,
-                    extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
+                    new AdESPolicy(extraParams),
                     signingCertificateV2,
                     keyEntry,
                     messageDigest
@@ -102,10 +84,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
             return new CAdESCoSignerEnveloped().coSigner(
                  csp,
                  sign,
-                 policyIdentifier,
-                 policyIdentifierHash,
-                 policyIdentifierHashAlgorithm,
-                 extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
+                 new AdESPolicy(extraParams),
                  signingCertificateV2,
                  keyEntry,
                  messageDigest
@@ -151,22 +130,6 @@ public class AOCAdESCoSigner implements AOCoSigner {
             }
         }
 
-        // Politica de firma
-        String policyIdentifier = null;
-        // Nos puede venir como URN o como OID
-        try {
-            policyIdentifier =
-                    extraParams.getProperty("policyIdentifier").replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-        }
-        catch (final Exception e) {
-            // Se ignora, podemos no tener politica
-        }
-        final String policyIdentifierHash = extraParams.getProperty("policyIdentifierHash"); //$NON-NLS-1$
-        String policyIdentifierHashAlgorithm = null;
-        if (policyIdentifier != null && policyIdentifierHash != null && policyIdentifierHash != "0") { //$NON-NLS-1$
-            
-        }
-
         // Si la firma que nos introducen es SignedData
         //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
         final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
@@ -175,10 +138,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
                 return new CAdESCoSigner().coSigner(typeAlgorithm,
                                                     aCertificados,
                                                     new ByteArrayInputStream(sign),
-                                                    policyIdentifier,
-                                                    policyIdentifierHash,
-                                                    policyIdentifierHashAlgorithm,
-                                                    extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
+                                                    new AdESPolicy(extraParams),
                                                     signingCertificateV2,
                                                     keyEntry,
                                                     null // null porque no nos pueden dar un hash
@@ -196,10 +156,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
             return new CAdESCoSignerEnveloped().coSigner(typeAlgorithm,
                                                          aCertificados,
                                                          new ByteArrayInputStream(sign),
-                                                         policyIdentifier,
-                                                         policyIdentifierHash,
-                                                         policyIdentifierHashAlgorithm,
-                                                         extraParams.getProperty("policyQualifier"), //$NON-NLS-1$
+                                                         new AdESPolicy(extraParams),
                                                          signingCertificateV2,
                                                          keyEntry,
                                                          null // null porque no nos pueden dar un hash en este

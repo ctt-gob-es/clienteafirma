@@ -47,6 +47,7 @@ import org.bouncycastle.asn1.x509.X509CertificateStructure;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESUtils;
 import es.gob.afirma.signers.cades.PKCS1ExternalizableSigner;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
@@ -122,14 +123,7 @@ final class CAdESCoSignerEnveloped {
      *        archivo a firmar como los datos del firmante.
      * @param sign
      *        Archivo que contiene las firmas.
-     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
-     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
-     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
-     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
-     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
-     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
-     *                                      <code>0</code>
-     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
+     * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
@@ -152,10 +146,7 @@ final class CAdESCoSignerEnveloped {
      *         firma. */
     byte[] coSigner(final P7ContentSignerParameters parameters,
                            final byte[] sign,
-                           final String policyIdentifier,
-                           final String policyIdentifierHash,
-                           final String policyIdentifierHashAlgorithm,
-                           final String policyQualifier,
+                           final AdESPolicy policy,
                            final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            final byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
@@ -198,23 +189,9 @@ final class CAdESCoSignerEnveloped {
         }
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
-        AlgorithmIdentifier digAlgId;
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
-        String digestAlgorithm = null;
-        String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
-        if (with > 0) {
-            digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
-            if (and > 0) {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-            }
-            else {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4);
-            }
-        }
-
-        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
         final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
@@ -229,10 +206,7 @@ final class CAdESCoSignerEnveloped {
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                      digestAlgorithm,
                      parameters.getContent(),
-                     policyIdentifier,
-                     policyIdentifierHash,
-                     policyIdentifierHashAlgorithm,
-                     policyQualifier,
+                     policy,
                      signingCertificateV2,
                      null,
                      new Date()
@@ -246,10 +220,7 @@ final class CAdESCoSignerEnveloped {
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                      digestAlgorithm,
                      null,
-                     policyIdentifier,
-                     policyIdentifierHash,
-                     policyIdentifierHashAlgorithm,
-                     policyQualifier,
+                     policy,
                      signingCertificateV2,
                      messageDigest,
                      new Date()
@@ -259,7 +230,7 @@ final class CAdESCoSignerEnveloped {
         }
 
         // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -307,14 +278,7 @@ final class CAdESCoSignerEnveloped {
      *        de firma.
      * @param data
      *        Archivo que contiene las firmas.
-     * @param policyIdentifier Identificador de la pol&iacute;tica de firma (OID, directo o como URN)
-     * @param policyIdentifierHash Huella digital de la pol&iacute;tica de firma en formato ASN.1 procesable identificado por
-     *                             el OID indicado en <code>policyIdentifier</code>. Puede ser nulo
-     * @param policyIdentifierHashAlgorithm Algoritmo de huella digital usado para el c&aacute;lculo del valor indicado
-     *                                      en <code>policyIdentifierHashAlgorithm</code>. Es obligatorio si el valor
-     *                                      indicado en <code>policyIdentifierHashAlgorithm</code> no es ni nulo ni
-     *                                      <code>0</code>
-     * @param policyQualifier URL que apunta a una descripci&oacute;n legible de la pol&iacute;tica (normalmente un PDF)
+     * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
@@ -338,10 +302,7 @@ final class CAdESCoSignerEnveloped {
     byte[] coSigner(final String signatureAlgorithm,
                            final X509Certificate[] signerCertificateChain,
                            final InputStream data,
-                           final String policyIdentifier,
-                           final String policyIdentifierHash,
-                           final String policyIdentifierHashAlgorithm,
-                           final String policyQualifier,
+                           final AdESPolicy policy,
                            final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
                            byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
@@ -382,21 +343,8 @@ final class CAdESCoSignerEnveloped {
         }
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
-        AlgorithmIdentifier digAlgId;
-        String digestAlgorithm = null;
-        String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
-        if (with > 0) {
-            digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
-            if (and > 0) {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-            }
-            else {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4);
-            }
-        }
-        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // Identificador del firmante ISSUER AND SERIAL-NUMBER
         final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(signerCertificateChain[0].getTBSCertificate()));
@@ -404,7 +352,7 @@ final class CAdESCoSignerEnveloped {
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
         // digEncryptionAlgorithm
-        AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
+        AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // 5. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -443,10 +391,7 @@ final class CAdESCoSignerEnveloped {
                 CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                      digestAlgorithm,
                      null,
-                     policyIdentifier,
-                     policyIdentifierHash,
-                     policyIdentifierHashAlgorithm,
-                     policyQualifier,
+                     policy,
                      signingCertificateV2,
                      messageDigest,
                      new Date()
