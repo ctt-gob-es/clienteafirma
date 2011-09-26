@@ -21,9 +21,19 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner.PdfPreSignResult;
 
+/** Implementaci&oaute;n de referencia del servicio servidor de firma trif&aacute;sica PAdES. */
 @Path("pades")
 public class PAdESTriPhaseService
 {
+    /** Prefirma.
+     * @param base64Data Datos a prefirmar codificados en Base64
+     * @param algorithm Algoritmo de firma
+     * @param base64CertificateChain Cadena de certificados del firmante codificada en Base64
+     * @param extraParamsNames Nombres de las opciones adicionales de prefirma
+     * @param extraParamsValues Valores de las opciones adicionales de prefirma
+     * @return Prefirma PAdES
+     * @throws Exception en caso de cualquier error
+     */
     @POST
     @Path("pre")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -47,6 +57,18 @@ public class PAdESTriPhaseService
         return new PreSignatureResult(preSignature.getPreSign(), preSignature.getFileID());
     }
 
+    /** Postfirma.
+     * @param base64Data Datos a prefirmar codificados en Base64
+     * @param algorithm Algoritmo de firma
+     * @param base64CertificateChain Cadena de certificados del firmante codificada en Base64
+     * @param extraParamsNames Nombres de las opciones adicionales de prefirma
+     * @param extraParamsValues Valores de las opciones adicionales de prefirma
+     * @param base64Signature Firma PKCS#1 v1.5 codificada en Base64
+     * @param base64PreSignData Atributos firmados CAdES de la prefirma, codificados en Base64
+     * @param fileID FileID del PDF prefirmado
+     * @return PDF firmado
+     * @throws Exception en caso de cualquier problema
+     */
     @POST
     @Path("post")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -79,7 +101,7 @@ public class PAdESTriPhaseService
     {
         List<X509Certificate> certChain = new ArrayList<X509Certificate>();
 
-        CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509");
+        CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
         for (String base64Certificate : base64CertificateChain)
         {
@@ -91,6 +113,11 @@ public class PAdESTriPhaseService
         return certChain;
     }
     
+    /** Genera un <code>Properties</code> en base a listas separadas de nombres de propiedad y valores. Ambas listas deben ser del mismo tama&ntilde;o
+     * @param names Nombres de las propiedades
+     * @param values Valores de las propiedades
+     * @return Fichero de propiedades
+     */
     public static Properties namesAndValuesListToProperties(List<String> names, List<String> values)
     {
         Properties p = new Properties();

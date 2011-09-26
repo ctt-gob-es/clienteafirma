@@ -27,6 +27,7 @@ import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF.
@@ -75,7 +76,7 @@ public class PAdESTriPhaseSigner {
      * @param inPDF PDF a firmar
      * @param signerCertificateChain Cadena de certificados del firmante
      * @param rubricJpegImage R&uacute;brica (JPEG binario) a insertar en el PDF
-     * @param extraParams Opciones adicionales para la firma
+     * @param xParams Opciones adicionales para la firma
      * @return Prefirma CAdES/PAdES (atributos CAdES a firmar)
      * @throws IOException
      * @throws AOException
@@ -84,15 +85,9 @@ public class PAdESTriPhaseSigner {
                    final byte[] inPDF, 
                    final X509Certificate[] signerCertificateChain,
                    final byte[] rubricJpegImage,
-                   Properties extraParams) throws IOException, AOException {
+                   final Properties xParams) throws IOException, AOException {
         
-        // Lectura de parametros adicionales
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
-        
-        final String policyIdentifier = extraParams.getProperty("policyIdentifier"); //$NON-NLS-1$
-        final String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
         
         final PdfTriPhaseSession ptps = getSessionData(inPDF, signerCertificateChain, rubricJpegImage, extraParams);
         
@@ -115,8 +110,7 @@ public class PAdESTriPhaseSigner {
                 digestAlgorithmName, 
                 null, 
                 signerCertificateChain, 
-                policyIdentifier, 
-                (policyQualifier != null) ? policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "") : null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$, 
+                new AdESPolicy(extraParams),
                 true, 
                 md.digest(),
                 cal.getTime()

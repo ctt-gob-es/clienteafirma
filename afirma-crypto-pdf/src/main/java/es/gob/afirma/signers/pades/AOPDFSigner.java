@@ -51,6 +51,7 @@ import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.beans.AOSignInfo;
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
+import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -105,7 +106,7 @@ public final class AOPDFSigner implements AOSigner {
     /** Mimetype asignado a los ficheros PDF. */
     private static final String MIMETYPE_PDF = "application/pdf"; //$NON-NLS-1$
 
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         String signAlgorithm = algorithm;
 
@@ -118,9 +119,8 @@ public final class AOPDFSigner implements AOSigner {
             signAlgorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
         }
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
         try {
             return signPDF(keyEntry, data, extraParams, signAlgorithm);
         }
@@ -311,8 +311,6 @@ public final class AOPDFSigner implements AOSigner {
         final String signField = extraParams.getProperty("signField"); //$NON-NLS-1$
         final String signatureProductionCity = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
         final String signerContact = extraParams.getProperty("signerContact"); //$NON-NLS-1$
-        final String policyIdentifier = extraParams.getProperty("policyIdentifier"); //$NON-NLS-1$
-        final String policyQualifier = extraParams.getProperty("policyQualifier"); //$NON-NLS-1$
         int page = 1;
         try {
             page = Integer.parseInt(extraParams.getProperty("signaturePage")); //$NON-NLS-1$
@@ -609,8 +607,7 @@ public final class AOPDFSigner implements AOSigner {
                 new GenCAdESEPESSignedData().generateSignedData(
                     new P7ContentSignerParameters(inPDF, algorithm, xCerts), 
                     true, // omitContent
-                    policyIdentifier,
-                    (policyQualifier != null) ? policyQualifier.replace("urn:oid:", "").replace("URN:oid:", "").replace("Urn:oid:", "") : null, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+                    new AdESPolicy(extraParams),
                     true, // true -> isSigningCertificateV2, false -> isSigningCertificateV1
                     ke,
                     MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())));
