@@ -298,7 +298,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				eliminarActionPerformed(comboRepositorios, eliminar, anadir);
 			}
 		});
-		eliminar.getAccessibleContext().setAccessibleDescription(Messages.getString("wizard.sobres.eliminar.remitente"));
+
 		Utils.remarcar(eliminar);
         Utils.setContrastColor(eliminar);
 		Utils.setFontBold(eliminar);
