@@ -141,7 +141,7 @@ public class AOCMSMultiEnveloper {
         try {
             // El parametro omitContent no tiene sentido en un signed and
             // envelopedData.
-            return new CoSignerEnveloped().coSigner(csp, sign, dataTypeOID, keyEntry, atrib, uatrib, messageDigest);
+            return new CoSignerEnveloped().coSigner(csp, sign, this.dataTypeOID, keyEntry, this.atrib, this.uatrib, messageDigest);
         }
         catch (final Exception e) {
             throw new AOException("Error generando la Cofirma PKCS#7", e);
@@ -187,7 +187,7 @@ public class AOCMSMultiEnveloper {
 
         // Cofirma de la firma usando unicamente el fichero de firmas.
         try {
-            return new CoSignerEnveloped().coSigner(typeAlgorithm, aCertificados, sign, dataTypeOID, keyEntry, atrib, uatrib, null);
+            return new CoSignerEnveloped().coSigner(typeAlgorithm, aCertificados, sign, this.dataTypeOID, keyEntry, this.atrib, this.uatrib, null);
         }
         catch (final Exception e) {
             throw new AOException("Error generando la Cofirma PKCS#7", e);
@@ -231,7 +231,7 @@ public class AOCMSMultiEnveloper {
      * @param value
      *        Valor asignado */
     void addSignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
-        attrib.put(oid, value);
+        this.attrib.put(oid, value);
     }
 
     /** Configura un atributo no firmado para agregarlo a un envoltorio.
@@ -240,7 +240,7 @@ public class AOCMSMultiEnveloper {
      * @param value
      *        Valor asignado */
     void addUnsignedAttribute(final org.ietf.jgss.Oid oid, final byte[] value) {
-        uattrib.put(oid, value);
+        this.uattrib.put(oid, value);
     }
 
     /** Crea un envoltorio CMS de tipo Data.
@@ -285,7 +285,7 @@ public class AOCMSMultiEnveloper {
      *         soportado.
      */
     byte[] createCMSEncryptedData(final byte[] content, final AOCipherConfig cipherConfig, final Key key) throws NoSuchAlgorithmException {
-        return new CMSEncryptedData().genEncryptedData(content, signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, uattrib);
+        return new CMSEncryptedData().genEncryptedData(content, this.signatureAlgorithm, cipherConfig, key, DATA_TYPE_OID, this.uattrib);
     }
 
     /** Crea un envoltorio CMS de tipo EnvelopedData.
@@ -315,15 +315,15 @@ public class AOCMSMultiEnveloper {
 
         // Si se establecion un remitente
         if (ke != null) {
-            return new CMSEnvelopedData().genEnvelopedData(this.createContentSignerParementers(content, ke, signatureAlgorithm),
+            return new CMSEnvelopedData().genEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm),
                                                            cipherConfig,
                                                            recipientsCerts,
                                                            DATA_TYPE_OID,
-                                                           uattrib);
+                                                           this.uattrib);
         }
 
         // Si no se establecio remitente
-        return new CMSEnvelopedData().genEnvelopedData(content, signatureAlgorithm, cipherConfig, recipientsCerts, DATA_TYPE_OID, uattrib);
+        return new CMSEnvelopedData().genEnvelopedData(content, this.signatureAlgorithm, cipherConfig, recipientsCerts, DATA_TYPE_OID, this.uattrib);
     }
 
     /** Crea un envoltorio CMS de tipo SignedAndEnvelopedData.
@@ -350,13 +350,13 @@ public class AOCMSMultiEnveloper {
                                                   final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                           NoSuchAlgorithmException,
                                                                                           IOException {
-        return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(this.createContentSignerParementers(content, ke, signatureAlgorithm),
+        return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm),
                                                                          cipherConfig,
                                                                          recipientsCerts,
                                                                          DATA_TYPE_OID,
                                                                          ke,
-                                                                         attrib,
-                                                                         uattrib);
+                                                                         this.attrib,
+                                                                         this.uattrib);
     }
 
     /** Crea un envoltorio CMS de tipo AuthenticatedData.
@@ -379,14 +379,14 @@ public class AOCMSMultiEnveloper {
     byte[] createCMSAuthenticatedData(final byte[] content, final PrivateKeyEntry ke, final AOCipherConfig cipherConfig, final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                                                                          NoSuchAlgorithmException,
                                                                                                                                          IOException {
-        return new CMSAuthenticatedData().genAuthenticatedData(this.createContentSignerParementers(content, ke, signatureAlgorithm), // ContentSignerParameters
+        return new CMSAuthenticatedData().genAuthenticatedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                                                                null, // Algoritmo de autenticacion (usamos el por defecto)
                                                                cipherConfig, // Configuracion del cipher
                                                                recipientsCerts, // certificados destino
                                                                DATA_TYPE_OID, // dataType
                                                                true, // applySigningTime,
-                                                               attrib, // atributos firmados
-                                                               uattrib // atributos no firmados
+                                                               this.attrib, // atributos firmados
+                                                               this.uattrib // atributos no firmados
         );
     }
 
@@ -413,15 +413,15 @@ public class AOCMSMultiEnveloper {
                                                       final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                         NoSuchAlgorithmException,
                                                                                         IOException {
-        return new CMSAuthenticatedEnvelopedData().genAuthenticatedEnvelopedData(this.createContentSignerParementers(content, ke, signatureAlgorithm), // ContentSignerParameters
+        return new CMSAuthenticatedEnvelopedData().genAuthenticatedEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                                                                                  null, // Algoritmo de autenticacion (usamos el por
                                                                                        // defecto)
                                                                                  cipherConfig, // Configuracion del cipher
                                                                                  recipientsCerts, // certificados destino
                                                                                  DATA_TYPE_OID, // dataType
                                                                                  true, // applySigningTime,
-                                                                                 attrib, // atributos firmados
-                                                                                 uattrib // atributos no firmados
+                                                                                 this.attrib, // atributos firmados
+                                                                                 this.uattrib // atributos no firmados
         );
     }
 
@@ -569,13 +569,13 @@ public class AOCMSMultiEnveloper {
      * digital se tomar&aacute; de este.
      * @return Cadena de texto identificativa para el algoritmo de firma */
     String getSignatureAlgorithm() {
-        return signatureAlgorithm;
+        return this.signatureAlgorithm;
     }
 
     /** Recupera la clave privada del remitente del envoltorio.
      * @return Clave del remitente. */
     PrivateKeyEntry getOriginatorKe() {
-        return configuredKe;
+        return this.configuredKe;
     }
 
     /** Recupera la clave o contrascontrase&ntilde;a para la encriptaci&oacute;n
@@ -620,7 +620,9 @@ public class AOCMSMultiEnveloper {
             try {
                 is.close();
             }
-            catch (final Exception e) {}
+            catch (final Exception e) {
+             // Ignoramos los errores en el cierre
+            }
         }
 
         final Enumeration<?> objects = dsq.getObjects();
@@ -630,12 +632,12 @@ public class AOCMSMultiEnveloper {
 
         byte[] datos;
         if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
-            Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$
+            Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
             datos = null;
             // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
         }
         else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
-            Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");
+            Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");  //$NON-NLS-1$//$NON-NLS-2$
             datos = null;
             // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
         }
@@ -643,22 +645,22 @@ public class AOCMSMultiEnveloper {
             datos = this.recoverCMSCompressedData(cmsEnvelop);
         }
         else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.encryptedData)) {
-            datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
+            datos = this.recoverCMSEncryptedData(cmsEnvelop, this.cipherKey);
         }
         else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.envelopedData)) {
-            datos = this.recoverCMSEnvelopedData(cmsEnvelop, configuredKe);
+            datos = this.recoverCMSEnvelopedData(cmsEnvelop, this.configuredKe);
         }
         else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authEnvelopedData)) {
-            datos = this.recoverCMSAuthenticatedEnvelopedData(cmsEnvelop, configuredKe);
+            datos = this.recoverCMSAuthenticatedEnvelopedData(cmsEnvelop, this.configuredKe);
         }
         else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.authenticatedData)) {
-            datos = this.recoverCMSAuthenticatedData(cmsEnvelop, configuredKe);
+            datos = this.recoverCMSAuthenticatedData(cmsEnvelop, this.configuredKe);
         }
         else if (doi.equals(org.bouncycastle.asn1.cms.CMSObjectIdentifiers.signedAndEnvelopedData)) {
-            datos = this.recoverCMSSignedEnvelopedData(cmsEnvelop, configuredKe);
+            datos = this.recoverCMSSignedEnvelopedData(cmsEnvelop, this.configuredKe);
         }
         else {
-            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado");
+            throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un tipo de objeto CMS soportado"); //$NON-NLS-1$
         }
 
         return datos;

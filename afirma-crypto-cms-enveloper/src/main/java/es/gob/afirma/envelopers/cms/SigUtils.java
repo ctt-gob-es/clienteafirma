@@ -123,13 +123,13 @@ final class SigUtils {
             sig = Signature.getInstance(algorithm);
         }
         catch (final Exception e) {
-            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + algorithm, e);
+            throw new AOException("Error obteniendo la clase de firma para el algoritmo " + algorithm, e); //$NON-NLS-1$
         }
         try {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
         final BufferedInputStream bufin = new BufferedInputStream(file);
         final byte[] buffer = new byte[1024];
@@ -144,13 +144,13 @@ final class SigUtils {
             }
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("Error al leer los datos a firmar: " + e);
+            Logger.getLogger("es.gob.afirma").severe("Error al leer los datos a firmar: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         try {
             bufin.close();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("Error al cerrar el fichero de datos, el proceso de firma continuara: " + e);
+            // Ignoramos los errores en el cierre
         }
         byte[] realSig;
         try {

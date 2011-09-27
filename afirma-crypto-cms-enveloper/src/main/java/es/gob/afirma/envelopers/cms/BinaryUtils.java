@@ -49,7 +49,9 @@ final class BinaryUtils {
         try {
             bos.close();
         }
-        catch (final IOException e) {}
+        catch (final IOException e) {
+         // Ignoramos los errores en el cierre
+        }
 
         // Get the compressed data
         final byte[] compressedData = bos.toByteArray();
@@ -78,7 +80,7 @@ final class BinaryUtils {
                 bos.write(buf, 0, count);
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").severe("Error descomprimiendo los datos: " + e);
+                Logger.getLogger("es.gob.afirma").severe("Error descomprimiendo los datos: " + e); //$NON-NLS-1$ //$NON-NLS-2$
                 break;
             }
         }
@@ -86,7 +88,7 @@ final class BinaryUtils {
             bos.close();
         }
         catch (final IOException e) {
-            Logger.getLogger("es.gob.afirma").warning("Error cerrando el flujo binario: " + e);
+            Logger.getLogger("es.gob.afirma").warning("Error cerrando el flujo binario: " + e); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // Get the decompressed data

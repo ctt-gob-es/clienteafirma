@@ -147,10 +147,10 @@ final class Utils {
      *        Certificado
      * @return Clave secreta
      * @throws NullPointerException */
-    public static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest) throws NullPointerException {
+    public static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest) {
         // Comprobamos que el archivo a tratar no sea nulo.
         if (certDest == null || certDest.length == 0) {
-            throw new IllegalArgumentException("No se pueden envolver datos sin certificados destino.");
+            throw new IllegalArgumentException("No se pueden envolver datos sin certificados destino"); //$NON-NLS-1$
         }
 
         // Asignamos la clave de cifrado
@@ -158,7 +158,7 @@ final class Utils {
             return assignKey(config);
         }
         catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de asignado de clave: " + ex);
+            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de asignado de clave, se devolvera null: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return null;
@@ -930,7 +930,7 @@ final class Utils {
      *         si ocurre cualquier error durante la firma */
     public static ASN1OctetString firma(final String signatureAlgorithm, final PrivateKeyEntry keyEntry, final ASN1Set signedAttr2) throws AOException {
 
-        Signature sig = null;
+        final Signature sig;
         try {
             sig = Signature.getInstance(signatureAlgorithm);
         }
@@ -938,13 +938,13 @@ final class Utils {
             throw new AOException("Error obteniendo la clase de firma para el algoritmo " + signatureAlgorithm, e);
         }
 
-        byte[] tmp = null;
+        final byte[] tmp;
 
         try {
             tmp = signedAttr2.getEncoded(ASN1Encodable.DER);
         }
         catch (final IOException ex) {
-            Logger.getLogger("No se han podido codificar en ASN.1 los atributos firmados: " + ex);
+            throw new AOException("No se han podido codificar en ASN.1 los atributos firmados", ex); //$NON-NLS-1$
         }
 
         // Indicar clave privada para la firma
@@ -952,7 +952,7 @@ final class Utils {
             sig.initSign(keyEntry.getPrivateKey());
         }
         catch (final Exception e) {
-            throw new AOException("Error al inicializar la firma con la clave privada", e);
+            throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
         }
 
         // Actualizamos la configuracion de firma
@@ -962,21 +962,20 @@ final class Utils {
             }
         }
         catch (final SignatureException e) {
-            throw new AOException("Error al configurar la informacion de firma", e);
+            throw new AOException("Error al configurar la informacion de firma", e); //$NON-NLS-1$
         }
 
         // firmamos.
-        byte[] realSig = null;
+        final byte[] realSig;
         try {
             realSig = sig.sign();
         }
         catch (final Exception e) {
-            throw new AOException("Error durante el proceso de firma", e);
+            throw new AOException("Error durante el proceso de firma", e); //$NON-NLS-1$
         }
 
-        final ASN1OctetString encDigest = new DEROctetString(realSig);
+        return new DEROctetString(realSig);
 
-        return encDigest;
     }
 
     /** Obtiene la informaci&oacute;n de diferentes tipos de formatos.

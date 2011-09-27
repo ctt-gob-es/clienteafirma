@@ -153,10 +153,10 @@ public final class CMSAuthenticatedData {
         }
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
 
         // 3. MACALGORITHM
-        AlgorithmIdentifier macAlgorithm = null;
+        final AlgorithmIdentifier macAlgorithm;
         try {
             macAlgorithm = SigUtils.makeAlgId(config.getAlgorithm().getOid(), null);
         }
@@ -207,7 +207,7 @@ public final class CMSAuthenticatedData {
 
         byte[] mac = null;
         try {
-            mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), cipherKey);
+            mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), this.cipherKey);
         }
         catch (final Exception e) {
             throw new IOException("Error de codificacion: " + e);
