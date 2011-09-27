@@ -33,8 +33,8 @@ public final class AfirmaBootLoader extends JApplet {
     @Override
     public void init() {
         LOGGER.info("BootLoader de @firma iniciado"); //$NON-NLS-1$
-        LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch()); //$NON-NLS-1$
-        LOGGER.info("Arquitectura del sistema operativo: " + Platform.getOsArch()); //$NON-NLS-1$
+        LOGGER.info("Arquitectura del JRE: " + BootPlatform.getJavaArch()); //$NON-NLS-1$
+        LOGGER.info("Arquitectura del sistema operativo: " + BootPlatform.getOsArch()); //$NON-NLS-1$
         
         if (DEBUG) {
             LOGGER.warning("Modo de depuracion activado"); //$NON-NLS-1$

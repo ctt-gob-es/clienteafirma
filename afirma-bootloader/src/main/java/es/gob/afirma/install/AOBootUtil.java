@@ -50,14 +50,14 @@ final class AOBootUtil {
      * @return URI (<code>file://</code>) del fichero local o URL
      * @throws URISyntaxException 
      * @throws URISyntaxException cuando ocurre cualquier problema creando la URI */
-    static URI createURI(String filename) throws URISyntaxException {
+    static URI createURI(final String file) throws URISyntaxException {
 
-        if (filename == null) {
+        if (file == null) {
             throw new IllegalArgumentException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
         }
 
         // Cambiamos los caracteres Windows
-        filename = filename.replace('\\', '/');
+        String filename = file.replace('\\', '/');
 
         // Cambiamos los espacios por %20
         filename = filename.replace(" ", "%20"); //$NON-NLS-1$ //$NON-NLS-2$

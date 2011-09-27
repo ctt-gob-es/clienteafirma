@@ -9,7 +9,7 @@
  */
 package es.gob.afirma.install;
 
-import static es.gob.afirma.install.Platform.getEndorsedDir;
+import static es.gob.afirma.install.BootPlatform.getEndorsedDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +17,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Logger;
 
-import es.gob.afirma.install.Platform.JREVER;
-import es.gob.afirma.install.Platform.OS;
+import es.gob.afirma.install.BootPlatform.JREVER;
+import es.gob.afirma.install.BootPlatform.OS;
 
 /** Clase para la comprobaci&oacute;n e instalaci&oacute;n de las dependencias de
  * entorno del Cliente @firma. */
@@ -68,15 +68,15 @@ final class CheckAndInstallMissingParts {
     void installEndorsedJava5AFirmaDependencies() throws IOException, URISyntaxException {
         try {
             AOInstallUtils.copyFileFromURL(AOBootUtil.createURLFile(this.installFilesCodeBase, AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX),
-                                           new File(Platform.getEndorsedDir(), AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX));
-            AOInstallUtils.unpack(Platform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
+                                           new File(BootPlatform.getEndorsedDir(), AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX));
+            AOInstallUtils.unpack(BootPlatform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
         }
         catch (final Exception e) {
             LOGGER.warning(
                "No se ha podido instalar el paquete de compatibilidad con Java 5 en formato PACK200, se intentara en formato JAR: " + e //$NON-NLS-1$
             );
             // Borramos el Pack200 si se llego a copiar
-            final File compPack200File = new File(Platform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
+            final File compPack200File = new File(BootPlatform.getEndorsedDir() + File.separator + AFIRMA_JAVA5_JAR + AOInstallUtils.PACK200_SUFIX);
             if (compPack200File.exists()) {
                 try {
                     compPack200File.delete();
@@ -86,7 +86,7 @@ final class CheckAndInstallMissingParts {
                 }
             }
             // Copiamos el JAR normal
-            AOInstallUtils.copyFileFromURL(AOBootUtil.createURLFile(this.installFilesCodeBase, AFIRMA_JAVA5_JAR), new File(Platform.getEndorsedDir()));
+            AOInstallUtils.copyFileFromURL(AOBootUtil.createURLFile(this.installFilesCodeBase, AFIRMA_JAVA5_JAR), new File(BootPlatform.getEndorsedDir()));
         }
     }
 
@@ -97,14 +97,14 @@ final class CheckAndInstallMissingParts {
     void installSunMSCAPI() throws IOException, URISyntaxException {
         // Copiamos el JAR de SunMSCAPI en el directorio de extensiones del JRE
         AOInstallUtils.installFile(AOBootUtil.createURLFile(this.installFilesCodeBase, "sunmscapi.jar"), //$NON-NLS-1$
-                                   new File(Platform.getJavaHome() + File.separator
+                                   new File(BootPlatform.getJavaHome() + File.separator
                                             + "lib" + File.separator + "ext" + File.separator + "sunmscapi.jar"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                             SigningCert.SUN);
 
         // Descomprimimos las DLL de SunMSCAPI en el directorio de binarios del JRE
         AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase,
-                                                           "mscapi_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        ), new File(Platform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
+                                                           "mscapi_" + BootPlatform.getOsArch() + "_JRE" + BootPlatform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        ), new File(BootPlatform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
         SigningCert.INTEGRATOR);
     }
 
@@ -115,15 +115,15 @@ final class CheckAndInstallMissingParts {
     void installSunPKCS11() throws IOException, URISyntaxException {
         // Copiamos el JAR de SunPKCS11 en el directorio de extensiones del JRE
         AOInstallUtils.installFile(AOBootUtil.createURLFile(this.installFilesCodeBase, "sunpkcs11.jar"), //$NON-NLS-1$
-                                   new File(Platform.getJavaHome() + File.separator
+                                   new File(BootPlatform.getJavaHome() + File.separator
                                             + "lib" + File.separator + "ext" + File.separator + "sunpkcs11.jar"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                                             SigningCert.SUN);
 
         // Descomprimimos las DLL de SunPKCS11 en el directorio de binarios del JRE
         AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase,
-                                                           this.os.toString() + "_pkcs11lib_" + Platform.getOsArch() + "_JRE" + Platform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                                                           this.os.toString() + "_pkcs11lib_" + BootPlatform.getOsArch() + "_JRE" + BootPlatform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         ),
-        new File(Platform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
+        new File(BootPlatform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
         SigningCert.INTEGRATOR);
     }
 
@@ -145,7 +145,7 @@ final class CheckAndInstallMissingParts {
                 filename = file.getName();
                 if (filename.endsWith(".pack.gz")) { //$NON-NLS-1$
                     AOInstallUtils.unpack(file.getAbsolutePath(),
-                                          Platform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz"))); //$NON-NLS-1$
+                                          BootPlatform.getEndorsedDir() + File.separator + filename.substring(0, filename.lastIndexOf(".pack.gz"))); //$NON-NLS-1$
                 }
             }
         }

@@ -47,7 +47,7 @@ final class Installer {
 
         // Manejador para la comprobacion e instalacion de las dependencias del cliente
         // propias del entorno (Manejadores de repositorios, bibliotecas de terceros,...)
-        this.enviromentInstaller = new CheckAndInstallMissingParts(Platform.getOS(), Platform.getJavaVersion(), build, codeBase);
+        this.enviromentInstaller = new CheckAndInstallMissingParts(BootPlatform.getOS(), BootPlatform.getJavaVersion(), build, codeBase);
 
     }
 

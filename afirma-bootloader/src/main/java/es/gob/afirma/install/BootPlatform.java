@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 /** Clase para la identificaci&oacute;n de la plataforma Cliente y
  * extracci&oacute;n de datos relativos a la misma. */
-final class Platform {
+final class BootPlatform {
 
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
@@ -68,7 +68,7 @@ final class Platform {
     private static String userHome;
 
     /** Constructor bloqueado. */
-    private Platform() {
+    private BootPlatform() {
         // No permitimos la instanciacion
     }
 
@@ -133,7 +133,7 @@ final class Platform {
 
     /** Recupera el sistema operativo de ejecuci&oacute;n.
      * @return Sistema operativo actual. */
-    static Platform.OS getOS() {
+    static BootPlatform.OS getOS() {
         return os;
     }
 
