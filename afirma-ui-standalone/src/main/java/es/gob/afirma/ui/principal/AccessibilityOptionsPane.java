@@ -1,5 +1,6 @@
 package es.gob.afirma.ui.principal;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,13 +9,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Properties;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -66,7 +70,7 @@ public class AccessibilityOptionsPane {
 	private JCheckBox checkCursorSize;
 	
 	/**	Estado de las opciones de accesibilidad. */
-	private Boolean[] optionState;
+	private Boolean[] optionState;	
 	
 	public AccessibilityOptionsPane(){
 		panel = new JPanel(new GridBagLayout());
@@ -230,10 +234,9 @@ public class AccessibilityOptionsPane {
         //Definicion de botones
         final JButton valores = new JButton();
         final JButton guardar = new JButton();
-        final JButton cargar = new JButton();
         
         //Boton Valores por defecto
-        valores.setText("Valores por defecto");
+        valores.setText(Messages.getString("Opciones.accesibilidad.valores"));
         valores.addActionListener(new ActionListener() {
 			
 			@Override
@@ -250,20 +253,20 @@ public class AccessibilityOptionsPane {
         buttonPanel.add(valores);
         
         //Boton guardar
-        guardar.setText("Guardar");
+        guardar.setText(Messages.getString("Opciones.accesibilidad.guardar"));
         guardar.setMnemonic(KeyEvent.VK_U);
+        guardar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				save();
+				
+			}
+		});
         Utils.remarcar(guardar);
         Utils.setContrastColor(guardar);
         Utils.setFontBold(guardar);
         buttonPanel.add(guardar);
-        
-        //Boton cancelar
-        cargar.setText("Cargar");
-        cargar.setMnemonic(KeyEvent.VK_R);
-        Utils.remarcar(cargar);
-        Utils.setContrastColor(cargar);
-        Utils.setFontBold(cargar);
-        buttonPanel.add(cargar);
 
         panel.add(buttonPanel, c);
         // Rellenamos el hueco libre con un panel vacio
@@ -323,6 +326,35 @@ public class AccessibilityOptionsPane {
 			} else if (panel.getComponent(i) instanceof JPanel){
 				JPanel interiorPanel = (JPanel)panel.getComponent(i);
 				restore(interiorPanel);
+			}
+		}
+	}
+	
+	/**
+	 * Guarda en el preferences la configuracion del usuario.
+	 */
+	private void save(){
+		// TODO avisar si el perfil ya existe
+		String name = JOptionPane.showInputDialog("Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración:");
+		if (name!=null){
+			if (name.trim().length()!=0){
+				if (Main.preferences.get("users","0").equals("0")){
+					Main.preferences.put("users","1");
+				} else {
+					int user;
+					user = Integer.parseInt(Main.preferences.get("users", "0"));
+					user++;
+					Main.preferences.put("users", String.valueOf(user));
+				}
+				Main.preferences.put("user"+Main.preferences.get("users", "0"), name.trim());
+				Main.preferences.put(name.trim()+".accesibility.fontBig",String.valueOf(checkFontSize.isSelected()));
+				Main.preferences.put(name.trim()+".accesibility.fontStyle",String.valueOf(checkFontStyle.isSelected()));
+				Main.preferences.put(name.trim()+".accesibility.highContrast",String.valueOf(checkHighContrast.isSelected()));
+				Main.preferences.put(name.trim()+".accesibility.focus",String.valueOf(checkFocusVisible.isSelected()));
+				Main.preferences.put(name.trim()+".accesibility.maximized",String.valueOf(checkWindowSize.isSelected()));
+				Main.preferences.put(name.trim()+".accesibility.cursor",String.valueOf(checkCursorSize.isSelected()));
+			} else {
+				JOptionPane.showMessageDialog(panel,"Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

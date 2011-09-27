@@ -57,7 +57,7 @@ public class Opciones extends JAccessibilityDialog {
     private AccessibilityOptionsPane accessibilityOptions;
     
     /** Indica si alguna accion del usuario necesita de un refresco de pantalla. */
-    private static Boolean update;
+    private static Boolean update = false;
     
     public Opciones(PrincipalGUI mainGUI) {
     	this.mainGui = mainGUI;

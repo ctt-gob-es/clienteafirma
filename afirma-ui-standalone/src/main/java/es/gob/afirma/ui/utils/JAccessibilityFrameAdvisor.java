@@ -1,4 +1,5 @@
 package es.gob.afirma.ui.utils;
+
 import java.awt.Component;
 
 import javax.swing.JFrame;
@@ -9,15 +10,15 @@ import javax.swing.JFrame;
  * @author inteco
  *
  */
-public abstract class JAccessibilityFrame extends JFrame {
+public abstract class JAccessibilityFrameAdvisor extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
 	private ResizingAdaptor resizingAdaptor;
 	
-	public JAccessibilityFrame(){
+	public JAccessibilityFrameAdvisor(){
 		super();
-		this.resizingAdaptor = new ResizingAdaptor(this, null, null,null);
+		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this);
 		this.addComponentListener(this.resizingAdaptor);
 	}
 	

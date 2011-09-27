@@ -20,7 +20,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	
 	public JAccessibilityDialogWizard(){
 		super();
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this);
+		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this,null);
 		this.addComponentListener(adaptador);
 		if (GeneralConfig.isMaximized()){
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

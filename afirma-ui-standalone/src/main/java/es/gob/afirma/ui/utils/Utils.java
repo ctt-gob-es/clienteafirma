@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -44,7 +45,7 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
  * Clase con utilidades varias
  */
 public class Utils {
-
+	
 	/**
 	 * Abre un fichero en la aplicaci\u00F3n predefinida por el sistema operativo actual.
 	 * @param filepath Ruta completa al fichero.
@@ -310,5 +311,23 @@ public class Utils {
 		}
 	}
 
+	 /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
+     * @param key
+     *        Clave de la preferencia.
+     * @param defaultValue
+     *        Valor por defecto.
+     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
+    public static String getPreference(final String key, final String defaultValue, Preferences preferences) {
+        return preferences.get(key, defaultValue);
+    }
+
+    /** Establece una preferencia para la aplicaci&oacute;n.
+     * @param key
+     *        Clave de la preferencia.
+     * @param value
+     *        Valor asignado. */
+    public static void setPreference(final String key, final String value, Preferences preferences) {
+        preferences.put(key, value);
+    }
 		
 }

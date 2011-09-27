@@ -31,12 +31,12 @@ public class Constants {
     /**
      * Width inicial de la pantalla de seleccion de usuario
      */
-    public static final int INIT_WINDOW_INITIAL_WIDTH = 325;
+    public static final int INIT_WINDOW_INITIAL_WIDTH = 500;
     
     /**
      * Height inicial de la pantalla de seleccion de usuario
      */
-    public static final int INIT_WINDOW_INITIAL_HEIGHT = 185;
+    public static final int INIT_WINDOW_INITIAL_HEIGHT = 360;
     
     /**
      * Width inicial de los JDialog de la aplicacion.
@@ -62,5 +62,15 @@ public class Constants {
      * Factor de redimensionado para las imagenes    
      */
     public static final double RESIZING_IMAGES_FACTOR = 0.0015;
+    
+    /**
+     * Nombre del nodo en el que se guardan las Preferences
+     */
+    public static String ourNodeName = "es.gob.afirma";
+    
+    /**
+     * Nombre del usuario por defecto
+     */
+    public static String defaultUser = "Por defecto";
 }
 

@@ -11,10 +11,12 @@ package es.gob.afirma.ui.principal;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import javax.swing.UIManager;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.utils.Constants;
 
 /**
  *	Entrada de la aplicacion
@@ -24,7 +26,10 @@ public class Main {
 	/** Versi&oacute;n de la interfaz gr&aacute;fica de escritorio. */
 	public static final String VERSION = "1.3"; //$NON-NLS-1$
 	
-	static Logger logger = Logger.getLogger(Main.class.getName());	
+	static Logger logger = Logger.getLogger(Main.class.getName());
+	
+	/** Preferencias generales establecidas para el aplicativo. */
+    public static Preferences preferences = Preferences.userRoot().node(Constants.ourNodeName);
 	
     /**
      * Arranca la interfaz de escritorio del Cliente @firma.
@@ -40,7 +45,13 @@ public class Main {
         	logger.log(Level.SEVERE, null, ex);
         }
         
-        new PrincipalGUI().main();
+        if (preferences.get("users", "0").equals("0")){
+        	UserProfile.currentUser=Constants.defaultUser;
+        	new PrincipalGUI().main();
+        } else {
+        	new UserProfile().main();
+        	
+        }
     }
 
 }
