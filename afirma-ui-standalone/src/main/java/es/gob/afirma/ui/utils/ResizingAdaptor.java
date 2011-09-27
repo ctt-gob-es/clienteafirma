@@ -37,6 +37,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	private final JAccessibilityDialog theDialog;
 	private final JAccessibilityDialogWizard theDialogWizard;
 	private final JAccessibilityFrameAdvisor theWindowAdvisor;
+	private final JAccessibilityFrameAbout theWindowAbout;
 
 	/**
 	 * Constructor
@@ -44,11 +45,12 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param window
 	 *            ventana a redimensionar
 	 */
-	public ResizingAdaptor(JAccessibilityFrame window, JAccessibilityDialog dialog, JAccessibilityDialogWizard dialogWizard,JAccessibilityFrameAdvisor windowAdvisor) {
+	public ResizingAdaptor(JAccessibilityFrame window, JAccessibilityDialog dialog, JAccessibilityDialogWizard dialogWizard,JAccessibilityFrameAdvisor windowAdvisor,JAccessibilityFrameAbout windowAbout) {
 		this.theWindow = window;
 		this.theDialog = dialog;
 		this.theDialogWizard = dialogWizard;
 		this.theWindowAdvisor = windowAdvisor;
+		this.theWindowAbout = windowAbout;
 	}
 
 	@Override
@@ -62,8 +64,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 				this.adjustFontSize(this.theDialog.getComponents());
 			} else if (this.theDialogWizard != null){
 				this.adjustFontSize(this.theDialogWizard.getComponents());
-			} else {
+			} else if (this.theWindowAdvisor != null){
 				this.adjustFontSize(this.theWindowAdvisor.getComponents());
+			} else {
+				this.adjustFontSize(this.theWindowAbout.getComponents());
 			}
 	}
 
@@ -77,8 +81,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 			this.adjustFontSize(theDialog.getComponents());
 		} else if (theDialogWizard != null){
 			this.adjustFontSize(theDialogWizard.getComponents());
-		} else {
+		} else if (theWindowAdvisor != null){
 			this.adjustFontSize(theWindowAdvisor.getComponents());
+		} else {
+			this.adjustFontSize(theWindowAbout.getComponents());
 		}
 	}
 
@@ -104,10 +110,14 @@ public class ResizingAdaptor extends ComponentAdapter {
 			relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH;
 			relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
-		} else {
+		} else if (theWindowAdvisor != null){
 			relWidth = theWindowAdvisor.getSize().getWidth() / Constants.INIT_WINDOW_INITIAL_WIDTH;
 			relHeight = theWindowAdvisor.getSize().getHeight() / Constants.INIT_WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theWindowAdvisor.getMinimumRelation());
+		} else {
+			relWidth = theWindowAbout.getSize().getWidth() / Constants.ABOUT_WINDOW_INITIAL_WIDTH;
+			relHeight = theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT;
+			relation = Math.round(relWidth * relHeight * theWindowAbout.getMinimumRelation());
 		}
 
 		for (int i = 0; i < components.length; i++) {
@@ -120,11 +130,14 @@ public class ResizingAdaptor extends ComponentAdapter {
 					} else if (theDialog != null){
 						float resizeFactor = Math.round(relation / getResizingFactorDialog());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					} else  if (theDialogWizard != null){
+					} else if (theDialogWizard != null){
 						float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					} else {
+					} else if (theWindowAdvisor != null){
 						float resizeFactor = Math.round(relation / getResizingFactorFrameAdvisor());
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+					} else {
+						float resizeFactor = Math.round(relation / getResizingFactorFrameAbout());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					}
 				} else {
@@ -133,6 +146,8 @@ public class ResizingAdaptor extends ComponentAdapter {
 					} else if (theDialog != null){
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else if (theDialogWizard != null){
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
+					} else if (theWindowAdvisor != null){
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else {
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
@@ -186,8 +201,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 						resizeFactor = (float) (theDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else if (theDialogWizard != null){
 						resizeFactor = (float) (theDialogWizard.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else{
+					} else if (theWindowAdvisor != null){
 						resizeFactor = (float) (theWindowAdvisor.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else {
+						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}
 					resizeImage(resizeFactor, actualComponent, w, h, multiplicando);
 				}
@@ -203,8 +220,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 						resizeFactor = (float) (theDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else if (theDialogWizard != null){
 						resizeFactor = (float) (theDialogWizard.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else {
+					} else if (theWindowAdvisor != null){
 						resizeFactor = (float) (theWindowAdvisor.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else {
+						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}
 					resizeImageButton(resizeFactor, actualComponent);
 				}
@@ -330,10 +349,18 @@ public class ResizingAdaptor extends ComponentAdapter {
 	}
 	
 	/**
-	 * Indica el factor de redimensionado que se aplicara en los componentes de un JDialogWizard. Este metodo es util para aplicar factores distintos a distinto componentes.
+	 * Indica el factor de redimensionado que se aplicara en los componentes de un JFrame. Este metodo es util para aplicar factores distintos a distinto componentes.
 	 * @return Float con el factor a aplicar.
 	 */
 	private float getResizingFactorFrameAdvisor(){
+		return 3f;
+	}
+	
+	/**
+	 * Indica el factor de redimensionado que se aplicara en los componentes de un JFrame. Este metodo es util para aplicar factores distintos a distinto componentes.
+	 * @return Float con el factor a aplicar.
+	 */
+	private float getResizingFactorFrameAbout(){
 		return 3f;
 	}
 }

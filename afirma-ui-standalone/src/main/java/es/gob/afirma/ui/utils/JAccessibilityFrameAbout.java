@@ -9,15 +9,15 @@ import javax.swing.JFrame;
  * @author inteco
  *
  */
-public abstract class JAccessibilityFrame extends JFrame {
+public abstract class JAccessibilityFrameAbout extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
 	private ResizingAdaptor resizingAdaptor;
 	
-	public JAccessibilityFrame(){
+	public JAccessibilityFrameAbout(){
 		super();
-		this.resizingAdaptor = new ResizingAdaptor(this, null, null,null,null);
+		this.resizingAdaptor = new ResizingAdaptor(null, null, null,null,this);
 		this.addComponentListener(this.resizingAdaptor);
 	}
 	
@@ -37,18 +37,18 @@ public abstract class JAccessibilityFrame extends JFrame {
 	 * @param component El componente.
 	 * @return El JAccessibilityFrame buscado.
 	 */
-	public static JAccessibilityFrame getJAccessibilityFrame(Component component)
+	public static JAccessibilityFrameAbout getJAccessibilityFrameAbout(Component component)
 	{
-		JAccessibilityFrame  resultingJAccessibilityFrame = null;
-		while (component != null && resultingJAccessibilityFrame == null)
+		JAccessibilityFrameAbout  resultingJAccessibilityFrameAbout = null;
+		while (component != null && resultingJAccessibilityFrameAbout == null)
 		{
-	        if (component instanceof JAccessibilityFrame){
-	        	resultingJAccessibilityFrame = (JAccessibilityFrame)component;
+	        if (component instanceof JAccessibilityFrameAbout){
+	        	resultingJAccessibilityFrameAbout = (JAccessibilityFrameAbout)component;
 	        }
 	        else{
 	        	component = component.getParent();
 	        }
 		 }
-		 return resultingJAccessibilityFrame;
+		 return resultingJAccessibilityFrameAbout;
 	 }
 }

@@ -132,7 +132,11 @@ public class Utils {
 							button.setBorder(BorderFactory.createEmptyBorder());
 						}		
 						public void focusGained(FocusEvent e) {
-							button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+							if (GeneralConfig.isHighContrast()){
+								button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+							} else {
+								button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+							}
 						}
 					});
 				}
@@ -155,7 +159,11 @@ public class Utils {
 						textField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 					}
 					public void focusGained(FocusEvent e) {
-						textField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						if (GeneralConfig.isHighContrast()){
+							textField.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							textField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}
@@ -167,7 +175,11 @@ public class Utils {
 					}
 					
 					public void focusGained(FocusEvent e) {
-						comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						if (GeneralConfig.isHighContrast()){
+							comboBox.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							comboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}
@@ -189,7 +201,11 @@ public class Utils {
 						label.setBorder(BorderFactory.createEmptyBorder());
 					}
 					public void focusGained(FocusEvent e) {
-						label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						if (GeneralConfig.isHighContrast()){
+							label.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}
@@ -211,7 +227,11 @@ public class Utils {
 						textPane.setBorder(BorderFactory.createEmptyBorder());
 					}
 					public void focusGained(FocusEvent e) {
-						textPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						if (GeneralConfig.isHighContrast()){
+							textPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							textPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}
@@ -222,7 +242,11 @@ public class Utils {
 						tree.setBorder(BorderFactory.createEmptyBorder());
 					}
 					public void focusGained(FocusEvent e) {
-						tree.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						if (GeneralConfig.isHighContrast()){
+							tree.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							tree.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}
@@ -233,7 +257,11 @@ public class Utils {
 						list.setBorder(BorderFactory.createEmptyBorder());
 					}
 					public void focusGained(FocusEvent e) {
-						list.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						if (GeneralConfig.isHighContrast()){
+							list.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							list.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}

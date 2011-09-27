@@ -39,6 +39,16 @@ public class Constants {
     public static final int INIT_WINDOW_INITIAL_HEIGHT = 360;
     
     /**
+     * Width inicial de la pantalla Acerca de
+     */
+    public static final int ABOUT_WINDOW_INITIAL_WIDTH = 490;
+    
+    /**
+     * Height inicial de la pantalla de Acerca de
+     */
+    public static final int ABOUT_WINDOW_INITIAL_HEIGHT = 430;
+    
+    /**
      * Width inicial de los JDialog de la aplicacion.
      */
     public static final int OPTION_INITIAL_WIDTH = 525;

@@ -18,7 +18,7 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	
 	public JAccessibilityFrameAdvisor(){
 		super();
-		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this);
+		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null);
 		this.addComponentListener(this.resizingAdaptor);
 	}
 	
@@ -34,22 +34,22 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	}
 	
 	/**
-	 * Busca el JAccessibilityFrame padre de un componente.
+	 * Busca el JAccessibilityFrameAdvisor padre de un componente.
 	 * @param component El componente.
-	 * @return El JAccessibilityFrame buscado.
+	 * @return El JAccessibilityFrameAdvisor buscado.
 	 */
-	public static JAccessibilityFrame getJAccessibilityFrame(Component component)
+	public static JAccessibilityFrameAdvisor getJAccessibilityFrameAdvisor(Component component)
 	{
-		JAccessibilityFrame  resultingJAccessibilityFrame = null;
-		while (component != null && resultingJAccessibilityFrame == null)
+		JAccessibilityFrameAdvisor  resultingJAccessibilityFrameAdvisor = null;
+		while (component != null && resultingJAccessibilityFrameAdvisor == null)
 		{
-	        if (component instanceof JAccessibilityFrame){
-	        	resultingJAccessibilityFrame = (JAccessibilityFrame)component;
+	        if (component instanceof JAccessibilityFrameAdvisor){
+	        	resultingJAccessibilityFrameAdvisor = (JAccessibilityFrameAdvisor)component;
 	        }
 	        else{
 	        	component = component.getParent();
 	        }
 		 }
-		 return resultingJAccessibilityFrame;
+		 return resultingJAccessibilityFrameAdvisor;
 	 }
 }

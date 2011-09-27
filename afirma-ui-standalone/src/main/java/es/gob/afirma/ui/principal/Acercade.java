@@ -28,6 +28,8 @@ import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.InfoLabel;
+import es.gob.afirma.ui.utils.JAccessibilityFrame;
+import es.gob.afirma.ui.utils.JAccessibilityFrameAbout;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardcifradocontrasenia.PanelContrasenia;
@@ -35,10 +37,16 @@ import es.gob.afirma.ui.wizardcifradocontrasenia.PanelContrasenia;
 /**
  * Muestra el panel de acerca de
  */
-public class Acercade extends JFrame {
+public class Acercade extends JAccessibilityFrameAbout {
 
 	private static final long serialVersionUID = 1L;	
 
+	@Override
+	public int getMinimumRelation() {
+		// TODO Auto-generated method stub
+		return 9;
+	}
+	
 	public Acercade() {
 		initComponents();
 	}
@@ -50,9 +58,9 @@ public class Acercade extends JFrame {
 		// Dimensiones de la pestana
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX))
-			setBounds((screenSize.width - 420) / 2, (screenSize.height-360) / 2, 420, 360);
+			setBounds((screenSize.width - 420) / 2, (screenSize.height-360) / 2, 490, 430);
 		else
-			setBounds((screenSize.width - 380) / 2, (screenSize.height-320) / 2, 380, 320);			
+			setBounds((screenSize.width - 380) / 2, (screenSize.height-320) / 2, 450, 390);			
 		
 		// Icono de @firma
 		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
@@ -60,7 +68,8 @@ public class Acercade extends JFrame {
 		// Configuracion de la ventana Acerca de
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle(Messages.getString("ayuda.contenido")); // NOI18N
-		setResizable(false);
+		setResizable(true);
+		setMinimumSize(getSize());
 		getContentPane().setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();
