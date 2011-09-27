@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.wizardUtils;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.ImageIcon;
@@ -56,9 +57,11 @@ public class ImagenLateral extends JPanel {
 		// Configuracion panel
 		setLayout(new BorderLayout());
 		setPreferredSize(dimensiones);
+		setBackground(Color.WHITE); //El fondo se pone a blanco
 		
 		JLabel etiqueta = new JLabel();
 		etiqueta.setIcon(new ImageIcon(getClass().getResource(rutaImagen))); // NOI18N
+		
         add(etiqueta, BorderLayout.CENTER);
     }
 }
