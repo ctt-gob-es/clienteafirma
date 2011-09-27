@@ -19,9 +19,8 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 
-import es.gob.afirma.ui.utils.GeneralConfig;
+import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
@@ -112,16 +111,9 @@ public class CabeceraAsistente extends JPanel {
     	
     	c.insets = new Insets(0, 15, 0, 10);
     	c.weighty = 1.0;
-		
-    	if (this.bloqueTexto == false) {
-	    	// Etiqueta con la descripcion de la ventana
-	    	JLabel etiquetaDescripcion = new JLabel();
-	    	etiquetaDescripcion.setText(Messages.getString(this.MessagesDescripcion));
-	        add(etiquetaDescripcion, c);
-    	}
-    	else {
-    		JTextPane textoPanel = PanelesTexto.generarPanelTexto(this.MessagesDescripcion, true);
-	        add(textoPanel, c);
-    	}
+ 
+    	// Etiqueta HTML con la descripcion de la ventana
+    	InfoLabel etiquetaDescripcion = new InfoLabel(Messages.getString(this.MessagesDescripcion), false);
+    	add(etiquetaDescripcion, c);
     }
 }
