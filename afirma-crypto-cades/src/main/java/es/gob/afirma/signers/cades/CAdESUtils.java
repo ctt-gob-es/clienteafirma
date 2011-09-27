@@ -66,14 +66,7 @@ public class CAdESUtils {
         //TODO: Incorporar la politica segun la nueva interpretacion 
         
         // ALGORITMO DE HUELLA DIGITAL
-        final AlgorithmIdentifier digestAlgorithmOID;
-        try {
-            digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
-        }
-        catch (final Exception e) {
-            throw new IOException("Error obteniendo el OID en ASN.1 del algoritmo de huella digital: " + e); //$NON-NLS-1$
-        }
-
+        final AlgorithmIdentifier digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
         
         // // ATRIBUTOS
 
@@ -86,17 +79,16 @@ public class CAdESUtils {
 
         if (signingCertificateV2) {
 
-            /********************************************/
-            /* La Nueva operatividad esta comentada */
-            /********************************************/
+            //********************************************/
+            //***** La Nueva operatividad esta comentada */
+            //********************************************/
             // INICIO SINGING CERTIFICATE-V2
 
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
              * CertificateSerialNumber */
 
             final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-            final GeneralName gn = new GeneralName(tbs.getIssuer());
-            final GeneralNames gns = new GeneralNames(gn);
+            final GeneralNames gns = new GeneralNames(new GeneralName(tbs.getIssuer()));
 
             final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
 
@@ -167,8 +159,7 @@ public class CAdESUtils {
             /** ESSCertID ::= SEQUENCE { certHash Hash, issuerSerial IssuerSerial
              * OPTIONAL }
              * Hash ::= OCTET STRING -- SHA1 hash of entire certificate */
-            final MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
-            final byte[] certHash = md.digest(cert.getEncoded());
+            final byte[] certHash = MessageDigest.getInstance(digestAlgorithmName).digest(cert.getEncoded());
             final ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
 
             /** PolicyInformation ::= SEQUENCE { policyIdentifier CertPolicyId,
