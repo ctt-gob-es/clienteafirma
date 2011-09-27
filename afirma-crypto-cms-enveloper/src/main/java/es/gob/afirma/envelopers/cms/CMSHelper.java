@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 
 /** Utilidades para la firma CMS. */
-public final class CMSHelper {
+final class CMSHelper {
 
     /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
      * Se realiza la verificaci&ocute;n sobre los los siguientes tipos de PKCS#7
@@ -31,7 +31,7 @@ public final class CMSHelper {
      * @param data
      *        Fichero (como array de octetos) que deseamos comprobar.
      * @return La validez del archivo cumpliendo la estructura. */
-    public static boolean isCMSValid(final byte[] data) {
+    static boolean isCMSValid(final byte[] data) {
         // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
         // siempre sera nulo
         if (data == null) {
@@ -90,7 +90,7 @@ public final class CMSHelper {
      *        Tipo de dato que queremos.
      * @return Indica si el fichero es una envoltura CMS con el tipo de
      *         contenido indicado. */
-    public static boolean isCMSValid(final byte[] data, final String type) {
+    static boolean isCMSValid(final byte[] data, final String type) {
         if (type.equals(AOCMSEnveloper.CMS_CONTENTTYPE_DATA)) {
             return new ValidateCMS().isCMSData(data);
         }

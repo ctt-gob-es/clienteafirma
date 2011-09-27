@@ -27,7 +27,7 @@ import es.gob.afirma.core.AOException;
 /** Clase que descifra el contenido de un fichero en formato EnvelopedData. de
  * CMS.
  * Se usa para ello una clave del usuario. */
-public final class CMSDecipherEnvelopData {
+final class CMSDecipherEnvelopData {
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS EnvelopedData.
      * @param cmsData
@@ -51,7 +51,7 @@ public final class CMSDecipherEnvelopData {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public byte[] dechiperEnvelopData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
+    byte[] dechiperEnvelopData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                CertificateEncodingException,
                                                                                AOException,
                                                                                AOInvalidRecipientException,

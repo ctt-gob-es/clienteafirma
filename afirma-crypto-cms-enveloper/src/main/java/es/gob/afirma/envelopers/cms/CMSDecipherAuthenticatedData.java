@@ -19,7 +19,6 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 
 import javax.crypto.Cipher;
-import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
@@ -35,12 +34,12 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 
 /** Clase que extrae el contenido de un fichero en formato AuthenticatedData. de
  * CMS. */
-public final class CMSDecipherAuthenticatedData {
+final class CMSDecipherAuthenticatedData {
 
     /** Clave de cifrado. La almacenamos internamente porque no hay forma de
      * mostrarla directamente al usuario. */
     private SecretKey cipherKey;
-    private AOCipherAlgorithm claveMac;
+    private AOCipherAlgorithm macAlgorithmConfig;
 
     /** @param cmsData
      *        Datos del tipo EnvelopedData.
@@ -61,12 +60,16 @@ public final class CMSDecipherAuthenticatedData {
      *         Cuando se indica un certificado que no est&aacute; entre los
      *         destinatarios del sobre.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public byte[] decipherAuthenticatedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. 
+     * @throws NoSuchAlgorithmException
+     *         Cuando no se reconozca el algoritmo utilizado para generar el
+     *         c&oacute;digo de autenticaci&oacute;n.
+     */
+    byte[] decipherAuthenticatedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                      CertificateEncodingException,
                                                                                      AOException,
                                                                                      AOInvalidRecipientException,
-                                                                                     InvalidKeyException {
+                                                                                     InvalidKeyException, NoSuchAlgorithmException {
         byte[] contenido = new byte[0];
 
         AuthenticatedData authenticated = null;
@@ -79,7 +82,7 @@ public final class CMSDecipherAuthenticatedData {
             elementRecipient = authenticated.getRecipientInfos().getObjects();
         }
         catch (final Exception ex) {
-            throw new AOException("El fichero no contiene un tipo EnvelopedData", ex);
+            throw new AOException("El fichero no contiene un tipo EnvelopedData", ex); //$NON-NLS-1$
         }
 
         final X509Certificate userCert = (X509Certificate) keyEntry.getCertificate();
@@ -88,20 +91,10 @@ public final class CMSDecipherAuthenticatedData {
         // Asignamos la clave de descifrado del contenido.
         assignKey(encryptedKeyDatas.getEncryptedKey(), keyEntry, encryptedKeyDatas.getAlgEncryptedKey());
 
-        final String macAlg = authenticated.getMacAlgorithm().getAlgorithm().toString();
         final ASN1Set authAttr = authenticated.getAuthAttrs();
 
-        byte[] macGenerada = null;
-        try {
-            macGenerada = genMac(macAlg, authAttr.getDEREncoded(), this.cipherKey);
-        }
-        catch (final InvalidKeyException e) {
-            throw e;
-        }
-        catch (final Exception e) {
-            throw new AOException("Error de codificacion", e);
-        }
-
+        byte[] macGenerada = Utils.genMac(this.macAlgorithmConfig.getName(), authAttr.getDEREncoded(), this.cipherKey);
+        
         final byte[] macObtenida = authenticated.getMac().getOctets();
 
         if (java.util.Arrays.equals(macGenerada, macObtenida)) {
@@ -109,14 +102,6 @@ public final class CMSDecipherAuthenticatedData {
         }
 
         return contenido;
-    }
-
-    private byte[] genMac(final String encryptionAlg, final byte[] content, final SecretKey ciphKey) throws Exception {
-        // KeyGenerator kg = KeyGenerator.getInstance("HmacSHA512");
-        // SecretKey sk = kg.generateKey();
-        final Mac mac = Mac.getInstance(claveMac.getName());
-        mac.init(ciphKey);
-        return mac.doFinal(content);
     }
 
     /** Asigna la clave para firmar el contenido del fichero que queremos
@@ -133,34 +118,31 @@ public final class CMSDecipherAuthenticatedData {
      *         usuario. */
     private void assignKey(final byte[] passCiphered, final PrivateKeyEntry keyEntry, final AlgorithmIdentifier algClave) throws AOException {
 
-        AOCipherAlgorithm algorithm = null;
+        AOCipherAlgorithm algorithmConfig = null;
 
         // obtenemos el algoritmo usado para cifrar la pass
-        for (final AOCipherAlgorithm algo : AOCipherAlgorithm.values()) {
-            if (algo.getOid().equals(algClave.getAlgorithm().toString())) {
-                algorithm = algo;
+        for (final AOCipherAlgorithm config : AOCipherAlgorithm.values()) {
+            if (config.getOid().equals(algClave.getAlgorithm().toString())) {
+                algorithmConfig = config;
                 break;
             }
         }
 
-        if (algorithm == null) {
-            throw new AOException("No se ha podido obtener el algoritmo para cifrar la contrasena");
+        if (algorithmConfig == null) {
+            throw new AOException("No se ha podido obtener el algoritmo para cifrar la contrasena"); //$NON-NLS-1$
         }
 
-        claveMac = algorithm;
+        this.macAlgorithmConfig = algorithmConfig;
 
         // Desembolvemos la clave usada para cifrar el contenido
         // a partir de la clave privada del certificado del usuario.
         try {
-            final byte[] encrypted = passCiphered;
-            // final Cipher cipher2 =
-            // Cipher.getInstance("RSA/ECB/PKCS1Padding");
             final Cipher cipher = createCipher(keyEntry.getPrivateKey().getAlgorithm());
             cipher.init(Cipher.UNWRAP_MODE, keyEntry.getPrivateKey());
-            this.cipherKey = (SecretKey) cipher.unwrap(encrypted, algorithm.getName(), Cipher.SECRET_KEY);
+            this.cipherKey = (SecretKey) cipher.unwrap(passCiphered, algorithmConfig.getName(), Cipher.SECRET_KEY);
         }
         catch (final Exception e) {
-            throw new AOException("Error al recuperar la clave de cifrado del sobre autenticado", e);
+            throw new AOException("Error al recuperar la clave de cifrado del sobre autenticado", e); //$NON-NLS-1$
         }
     }
 

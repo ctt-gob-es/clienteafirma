@@ -12,7 +12,6 @@ package es.gob.afirma.envelopers.cms;
 
 import java.security.InvalidKeyException;
 import java.util.Enumeration;
-import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -30,7 +29,7 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 /** Clase que descifra el contenido de un fichero en formato EncryptedData de
  * CMS.
  * Se usa para ello una clave del usuario. */
-public final class CMSDecipherEncryptedData {
+final class CMSDecipherEncryptedData {
 
     /** Clave de cifrado. La almacenamos internamente porque no hay forma de
      * mostrarla directamente al usuario. */
@@ -50,7 +49,8 @@ public final class CMSDecipherEncryptedData {
      * @throws InvalidKeyException
      *         Cuando se proporciona una clave incorrecta para el
      *         descifrado. */
-    public byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException, InvalidKeyException {
+    @SuppressWarnings("unused")
+    byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException, InvalidKeyException {
 
         AlgorithmIdentifier alg = null;
         EncryptedContentInfo eci = null;
@@ -78,7 +78,7 @@ public final class CMSDecipherEncryptedData {
             new EncryptedData(eci);
         }
         catch (final Exception ex) {
-            throw new AOException("El fichero no contiene un tipo EncryptedData", ex);
+            throw new AOException("El fichero no contiene un tipo EncryptedData", ex); //$NON-NLS-1$
         }
 
         // asignamos la clave de descifrado a partir del algoritmo.
@@ -89,14 +89,13 @@ public final class CMSDecipherEncryptedData {
 
         // Desciframos.
         try {
-            deciphered = Utils.deCipherContent(contCifrado, config, cipherKey);
+            deciphered = Utils.deCipherContent(contCifrado, this.config, this.cipherKey);
         }
         catch (final InvalidKeyException ex) {
             throw ex;
         }
         catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo EncryptedData:  " + ex);
-            throw new AOException("Error al descifrar los contenidos encriptados", ex);
+            throw new AOException("El fichero no contiene un tipo EncryptedData", ex); //$NON-NLS-1$
         }
 
         return deciphered;
@@ -129,27 +128,26 @@ public final class CMSDecipherEncryptedData {
             }
         }
         // Creamos una configuraci&oacute;n partir del algoritmo.
-        config = new AOCipherConfig(algorithm, null, null);
+        this.config = new AOCipherConfig(algorithm, null, null);
 
         // Generamos la clave necesaria para el cifrado
-        if ((config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES)) || (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE))
-            || (config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40))) {
+        if ((this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHMD5ANDDES)) || (this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDDESEDE))
+            || (this.config.getAlgorithm().equals(AOCipherAlgorithm.PBEWITHSHA1ANDRC2_40))) {
             try {
-                this.cipherKey = Utils.loadCipherKey(config, key);
+                this.cipherKey = Utils.loadCipherKey(this.config, key);
             }
             catch (final Exception ex) {
-                throw new AOException("Error durante el proceso de asignacion de la clave (a partir de password)", ex);
+                throw new AOException("Error durante el proceso de asignacion de la clave (a partir de password)", ex); //$NON-NLS-1$
             }
         }
         else {
             try {
-                this.cipherKey = new SecretKeySpec(Base64.decode(key), config.getAlgorithm().getName());
+                this.cipherKey = new SecretKeySpec(Base64.decode(key), this.config.getAlgorithm().getName());
             }
             catch (final Exception ex) {
-                throw new AOException("Error durante el proceso de asignacion de la clave (a partir de key)", ex);
+                throw new AOException("Error durante el proceso de asignacion de la clave (a partir de key)", ex); //$NON-NLS-1$
             }
         }
-
     }
 
 }

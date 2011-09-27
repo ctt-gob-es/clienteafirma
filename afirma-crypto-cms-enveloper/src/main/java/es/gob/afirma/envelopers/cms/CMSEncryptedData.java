@@ -47,7 +47,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
  * para crear un mensaje EncryptedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
-public final class CMSEncryptedData {
+final class CMSEncryptedData {
 
     /** M&eacute;todo principal que genera la firma de tipo EncryptedData.
      * @param data
@@ -66,7 +66,7 @@ public final class CMSEncryptedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    public byte[] genEncryptedData(final byte[] data, final String digAlg, final AOCipherConfig config, final Key cipherKey, final Oid dataType, final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
+    byte[] genEncryptedData(final byte[] data, final String digAlg, final AOCipherConfig config, final Key cipherKey, final Oid dataType, final Map<Oid, byte[]> uatrib) throws NoSuchAlgorithmException {
 
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digAlg);
@@ -78,7 +78,7 @@ public final class CMSEncryptedData {
             encInfo = Utils.getEncryptedContentInfo(data, cipherKey, config);
         }
         catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso cifrado: " + ex);
+            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso cifrado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         // 4. ATRIBUTOS

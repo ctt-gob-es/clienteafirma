@@ -26,7 +26,6 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
@@ -43,10 +42,10 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.ietf.jgss.Oid;
 
-import sun.security.x509.AlgorithmId;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.GenSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
@@ -75,7 +74,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje SignedAndEnvelopedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-public final class CMSSignedAndEnvelopedData {
+final class CMSSignedAndEnvelopedData {
 
     /** Clave de cifrado. La almacenamos internamente. */
     private SecretKey cipherKey;
@@ -106,14 +105,17 @@ public final class CMSSignedAndEnvelopedData {
      *         firma.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital */
-    public byte[] genSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
+     *         digital 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
+    byte[] genSignedAndEnvelopedData(final P7ContentSignerParameters parameters,
                                             final AOCipherConfig config,
                                             final X509Certificate[] certDest,
                                             final Oid dataType,
                                             final PrivateKeyEntry keyEntry,
                                             final Map<Oid, byte[]> atrib,
-                                            final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+                                            final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
 
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
@@ -124,31 +126,19 @@ public final class CMSSignedAndEnvelopedData {
         // 2. DIGESTALGORITM
         // buscamos que timo de algoritmo es y lo codificamos con su OID
 
-        String signatureAlgorithm = null;
-        String digestAlgorithm = null;
-        AlgorithmId digestAlgorithmId = null;
+        final String signatureAlgorithm = parameters.getSignatureAlgorithm();
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        
         final ASN1EncodableVector digestAlgs = new ASN1EncodableVector();
-        String keyAlgorithm = null;
-
-        try {
-            signatureAlgorithm = parameters.getSignatureAlgorithm();
-            digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-            keyAlgorithm = Utils.getKeyAlgorithm(signatureAlgorithm, digestAlgorithmId);
-
-            final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
-            digestAlgs.add(digAlgId);
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
-        }
-
+        digestAlgs.add(digAlgId);
+        
         // LISTA DE CERTIFICADOS: obtenemos la lista de certificados
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         final ASN1Set certificates = Utils.fetchCertificatesList(signerCertificateChain);
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
 
         // 4. SIGNERINFO
         // raiz de la secuencia de SignerInfo
@@ -160,9 +150,6 @@ public final class CMSSignedAndEnvelopedData {
 
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
-        // AlgorithmIdentifier
-        final AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(digestAlgorithmId.getOID().toString()), new DERNull());
-
         // // ATRIBUTOS
         final ASN1Set signedAttr = generateSignerInfo(signerCertificateChain[0], digestAlgorithm, parameters.getContent(), dataType, atrib);
 
@@ -170,25 +157,17 @@ public final class CMSSignedAndEnvelopedData {
         unSignedAttr = generateUnsignerInfo(uatrib);
 
         // digEncryptionAlgorithm
-        final AlgorithmId digestAlgorithmIdEnc = AlgorithmId.get(keyAlgorithm);
-        AlgorithmIdentifier encAlgId;
-        try {
-            encAlgId = SigUtils.makeAlgId(digestAlgorithmIdEnc.getOID().toString(), digestAlgorithmIdEnc.getEncodedParams());
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
-        }
+        AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         ASN1OctetString sign2 = null;
         try {
-            sign2 = Utils.firma(signatureAlgorithm, keyEntry, signedAttr2);
+            sign2 = Utils.firma(signatureAlgorithm, keyEntry, this.signedAttr2);
         }
         catch (final AOException ex) {
             Logger.getLogger(GenSignedData.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr// null //unsignedAttr
-        ));
+        signerInfos.add(new SignerInfo(identifier, digAlgId, signedAttr, encAlgId, sign2, unSignedAttr));
 
         final ASN1Set certrevlist = null;
 
@@ -232,14 +211,14 @@ public final class CMSSignedAndEnvelopedData {
             while (it.hasNext()) {
                 final Map.Entry<Oid, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
-                // el oid
-                                                  new DERObjectIdentifier((e.getKey()).toString()),
-                                                  // el array de bytes en formato string
-                                                  new DERSet(new DERPrintableString(e.getValue()))));
+                        // el oid
+                        new DERObjectIdentifier((e.getKey()).toString()),
+                        // el array de bytes en formato string
+                        new DERSet(new DERPrintableString(e.getValue()))));
             }
         }
 
-        signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
 
         return SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
     }

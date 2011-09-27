@@ -54,8 +54,11 @@ import org.bouncycastle.cms.CMSProcessable;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.ietf.jgss.Oid;
 
-import sun.security.x509.AlgorithmId;
+
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
+import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Clase que implementa firma digital PKCS#7/CMS AuthenticatedData. La
@@ -95,7 +98,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * para crear un mensaje AuthenticatedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
-public final class CMSAuthenticatedData {
+ final class CMSAuthenticatedData {
 
     /** Clave de cifrado. La almacenamos internamente porque no hay forma de
      * mostrarla directamente al usuario. */
@@ -126,15 +129,18 @@ public final class CMSAuthenticatedData {
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma.
      * @throws NoSuchAlgorithmException
-     *         Si no se encuentra un algoritmo v&aacute;lido. */
-    public byte[] genAuthenticatedData(final P7ContentSignerParameters parameters,
+     *         Si no se encuentra un algoritmo v&aacute;lido.
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
+    byte[] genAuthenticatedData(final P7ContentSignerParameters parameters,
                                        final String autenticationAlgorithm,
                                        final AOCipherConfig config,
                                        final X509Certificate[] certDest,
                                        final Oid dataType,
                                        final boolean applyTimestamp,
                                        final Map<Oid, byte[]> atrib,
-                                       final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+                                       final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // 1. ORIGINATORINFO
@@ -156,31 +162,12 @@ public final class CMSAuthenticatedData {
         final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
 
         // 3. MACALGORITHM
-        final AlgorithmIdentifier macAlgorithm;
-        try {
-            macAlgorithm = SigUtils.makeAlgId(config.getAlgorithm().getOid(), null);
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
-        }
-
+        final AlgorithmIdentifier macAlgorithm = SigUtils.makeAlgId(config.getAlgorithm().getOid());
+        
         // 4. DIGESTALGORITMIDENTIFIER
-        AlgorithmIdentifier digAlgId;
-        final String signatureAlgorithm = parameters.getSignatureAlgorithm();
-        String digestAlgorithm = null;
-
-        final int with = signatureAlgorithm.indexOf("with");
-        if (with > 0) {
-            digestAlgorithm = signatureAlgorithm.substring(0, with);
-        }
-
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(digestAlgorithm);
-        try {
-            digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
-        }
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(parameters.getSignatureAlgorithm());
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        
 
         // 5. ENCAPSULATEDCONTENTINFO
 
@@ -195,7 +182,7 @@ public final class CMSAuthenticatedData {
             msg.write(bOut);
         }
         catch (final Exception ex) {
-            throw new IOException("Error en la escritura del procesable CMS: " + ex);
+            throw new IOException("Error en la escritura del procesable CMS: " + ex); //$NON-NLS-1$
         }
         encInfo = new ContentInfo(contentTypeOID, new BERConstructedOctetString(bOut.toByteArray()));
 
@@ -204,15 +191,8 @@ public final class CMSAuthenticatedData {
         authAttr = generateSignedAtt(signerCertificateChain[0], digestAlgorithm, parameters.getContent(), dataType, applyTimestamp, atrib);
 
         // 7. MAC
-
-        byte[] mac = null;
-        try {
-            mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), this.cipherKey);
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
-        }
-
+        byte[] mac = Utils.genMac(autenticationAlgorithm, authAttr.getDEREncoded(), this.cipherKey);
+        
         // 8. ATRIBUTOS NO FIRMADOS.
 
         ASN1Set unAuthAttr = null;
@@ -269,19 +249,8 @@ public final class CMSAuthenticatedData {
             ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
         }
 
-        // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equals("SHA512")) {
-            digestAlgorithm = "SHA-512";
-        }
-        else if (digestAlgorithm.equals("SHA384")) {
-            digestAlgorithm = "SHA-384";
-        }
-        else if (digestAlgorithm.equals("SHA256")) {
-            digestAlgorithm = "SHA-256";
-        }
-
         // Si nos viene el hash de fuera no lo calculamos
-        final byte[] md = MessageDigest.getInstance(digestAlgorithm).digest(datos);
+        final byte[] md = MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(digestAlgorithm)).digest(datos);
 
         // MessageDigest
         ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(md.clone()))));
@@ -328,7 +297,7 @@ public final class CMSAuthenticatedData {
      * @return La nueva firma AuthenticatedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
      *         nueva. */
-    public byte[] addOriginatorInfo(final InputStream data, final X509Certificate[] signerCertificateChain) {
+    byte[] addOriginatorInfo(final InputStream data, final X509Certificate[] signerCertificateChain) {
         // boolean isValid = false;
         byte[] retorno = null;
 
@@ -355,7 +324,10 @@ public final class CMSAuthenticatedData {
                     certs = origInfo.getCertificates();
                 }
 
-                origInfo = Utils.checkCertificates(signerCertificateChain, origInfo, certs);
+                OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
+                if (origInfoChecked != null) {
+                    origInfo = origInfoChecked;
+                }
 
                 // Se crea un nuevo AuthenticatedData a partir de los datos
                 // anteriores con los nuevos originantes.
@@ -373,7 +345,7 @@ public final class CMSAuthenticatedData {
             }
         }
         catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de insercion: " + ex);
+            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de insercion: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return retorno;

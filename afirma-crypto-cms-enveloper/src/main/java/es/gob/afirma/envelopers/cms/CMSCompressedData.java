@@ -42,16 +42,16 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje Compressed Data de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-public final class CMSCompressedData {
+final class CMSCompressedData {
 
     /** OID de ZLIB * */
-    public static final String ZLIB = "1.2.840.113549.1.9.16.3.8";
+    static final String ZLIB = "1.2.840.113549.1.9.16.3.8"; //$NON-NLS-1$
 
     /** Obtiene un tipo CompressedData.
      * @param data
      *        Datos a comprimir
      * @return Tipo CompressedData. */
-    public byte[] genCompressedData(final byte[] data) {
+    byte[] genCompressedData(final byte[] data) {
 
         // Algoritmo de compresion
         final AlgorithmIdentifier comAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(ZLIB));
@@ -74,7 +74,7 @@ public final class CMSCompressedData {
      * @return El contenido del envoltorio.
      * @throws IOException
      *         Se produce cuando hay un error de lectura de datos. */
-    public byte[] getContentCompressedData(final byte[] data) throws IOException {
+    byte[] getContentCompressedData(final byte[] data) throws IOException {
         final ASN1Sequence contentEnvelopedData = Utils.fetchWrappedData(data);
         final CompressedData compressed = CompressedData.getInstance(contentEnvelopedData);
         final DEROctetString dos = (DEROctetString) compressed.getEncapContentInfo().getContent();

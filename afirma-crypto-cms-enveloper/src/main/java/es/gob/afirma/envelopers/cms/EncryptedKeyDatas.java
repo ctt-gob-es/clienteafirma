@@ -17,19 +17,19 @@ final class EncryptedKeyDatas {
     private byte[] encryptedKey = null;
     private AlgorithmIdentifier algEncryptedKey = null;
 
-    public byte[] getEncryptedKey() {
-        return encryptedKey;
+    byte[] getEncryptedKey() {
+        return this.encryptedKey;
     }
 
-    public void setEncryptedKey(final byte[] encryptedKey) {
+    void setEncryptedKey(final byte[] encryptedKey) {
         this.encryptedKey = encryptedKey;
     }
 
-    public AlgorithmIdentifier getAlgEncryptedKey() {
-        return algEncryptedKey;
+    AlgorithmIdentifier getAlgEncryptedKey() {
+        return this.algEncryptedKey;
     }
 
-    public void setAlgEncryptedKey(final AlgorithmIdentifier algEncryptedKey) {
+    void setAlgEncryptedKey(final AlgorithmIdentifier algEncryptedKey) {
         this.algEncryptedKey = algEncryptedKey;
     }
 }

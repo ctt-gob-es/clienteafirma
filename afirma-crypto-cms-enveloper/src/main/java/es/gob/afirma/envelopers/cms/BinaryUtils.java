@@ -24,7 +24,7 @@ final class BinaryUtils {
      * @param input
      *        Entrada a comrpimir.
      * @return Entrada comprimida. */
-    static public byte[] compress(final byte[] input) {
+    static byte[] compress(final byte[] input) {
 
         // Create the compressor with highest level of compression
         final Deflater compressor = new Deflater();
@@ -63,7 +63,7 @@ final class BinaryUtils {
      * @param compressedData
      *        Entrada a descomprimir.
      * @return Entrada descomprimida. */
-    static public byte[] uncompress(final byte[] compressedData) {
+    static byte[] uncompress(final byte[] compressedData) {
 
         // Create the decompressor and give it the data to compress
         final Inflater decompressor = new Inflater();

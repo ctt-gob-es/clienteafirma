@@ -115,8 +115,8 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-            // + ex);
+            // Logger.getLogger("es.gob.afirma").severe(
+            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
         return isValid;
@@ -135,7 +135,7 @@ final class ValidateCMS {
         Attribute atribute;
         while (isSignerValid && e.hasMoreElements()) {
             atribute = new Attribute((ASN1Sequence) e.nextElement());
-            // si tiene la pol&iacute;tica es CADES.
+            // si tiene la politica es CADES.
             if (atribute.getAttrType().equals(PKCSObjectIdentifiers.id_aa_ets_sigPolicyId)) {
                 isSignerValid = false;
                 Logger.getLogger("es.gob.afirma").warning("El signerInfo no es del tipo CMS, es del tipo CADES"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -173,8 +173,8 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-            // + ex);
+            // Logger.getLogger("es.gob.afirma").severe(
+            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
 
@@ -210,8 +210,8 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-            // + ex);
+            // Logger.getLogger("es.gob.afirma").severe(
+            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
 
@@ -246,8 +246,8 @@ final class ValidateCMS {
 
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-            // + ex);
+            // Logger.getLogger("es.gob.afirma").severe(
+            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
 
@@ -285,8 +285,8 @@ final class ValidateCMS {
 
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de conversion "
-            // + ex);
+            // Logger.getLogger("es.gob.afirma").severe(
+            //      "Error durante el proceso de conversion " + ex);
             isValid = false;
         }
         return isValid;
@@ -318,8 +318,8 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo AuthenticatedData:  "
-            // + ex);
+            // Logger.getLogger("es.gob.afirma").severe(
+            //      "El fichero no contiene un tipo AuthenticatedData: " + ex);
             isValid = false;
         }
         return isValid;
@@ -353,8 +353,8 @@ final class ValidateCMS {
 
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo AuthenticatedEnvelopedData:  "
-            // + ex);
+            // Logger.getLogger("es.gob.afirma").severe(
+            //      "El fichero no contiene un tipo AuthenticatedEnvelopedData: " + ex);
             isValid = false;
         }
         return isValid;
@@ -385,8 +385,8 @@ final class ValidateCMS {
             }
         }
         catch (final Exception ex) {
-            // Logger.getLogger("es.gob.afirma").severe("El fichero no contiene un tipo CompressedData:  "
-            // + ex);
+            // Logger.getLogger("es.gob.afirma").severe(
+            //      "El fichero no contiene un tipo CompressedData: " + ex);
             isValid = false;
         }
         return isValid;

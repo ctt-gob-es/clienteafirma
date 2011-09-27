@@ -27,7 +27,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 
 /** Clase que descifra el contenido de un fichero en formato
  * SignedAndEnvelopedData. de CMS. */
-public final class CMSDecipherSignedAndEnvelopedData {
+final class CMSDecipherSignedAndEnvelopedData {
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
      * SignedAndEnvelopData.
@@ -52,7 +52,7 @@ public final class CMSDecipherSignedAndEnvelopedData {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public byte[] dechiperSignedAndEnvelopData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
+    byte[] dechiperSignedAndEnvelopData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                         CertificateEncodingException,
                                                                                         AOException,
                                                                                         AOInvalidRecipientException,
@@ -70,7 +70,7 @@ public final class CMSDecipherSignedAndEnvelopedData {
             elementRecipient = sigAndEnveloped.getRecipientInfos().getObjects();
         }
         catch (final Exception ex) {
-            throw new AOException("El fichero no contiene un tipo SignedAndEnvelopedData", ex);
+            throw new AOException("El fichero no contiene un tipo SignedAndEnvelopedData", ex); //$NON-NLS-1$
         }
 
         final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas((X509Certificate) keyEntry.getCertificate(), elementRecipient);
@@ -94,7 +94,7 @@ public final class CMSDecipherSignedAndEnvelopedData {
             throw ex;
         }
         catch (final Exception ex) {
-            throw new AOException("Error al descifrar los contenidos del sobre digital", ex);
+            throw new AOException("Error al descifrar los contenidos del sobre digital", ex); //$NON-NLS-1$
         }
         return deciphered;
     }

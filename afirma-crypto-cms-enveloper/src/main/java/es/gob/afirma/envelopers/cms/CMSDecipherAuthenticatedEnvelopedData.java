@@ -28,7 +28,7 @@ import es.gob.afirma.core.AOException;
 /** Clase que descifra el contenido de un fichero en formato
  * AuthenticatedEnvelopedData. de CMS.
  * Se usa para ello una clave del usuario. */
-public final class CMSDecipherAuthenticatedEnvelopedData {
+final class CMSDecipherAuthenticatedEnvelopedData {
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
      * AuthenticatedEnvelopedData.
@@ -53,7 +53,7 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    public byte[] dechiperAuthenticatedEnvelopedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
+    byte[] dechiperAuthenticatedEnvelopedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                               CertificateEncodingException,
                                                                                               AOException,
                                                                                               AOInvalidRecipientException,
@@ -70,7 +70,7 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
             elementRecipient = authEnvelopedData.getRecipientInfos().getObjects();
         }
         catch (final Exception ex) {
-            throw new AOException("El fichero no contiene un tipo AuthenticatedEnvelopedData", ex);
+            throw new AOException("El fichero no contiene un tipo AuthenticatedEnvelopedData", ex); //$NON-NLS-1$
         }
 
         final EncryptedKeyDatas encryptedKeyDatas = Utils.fetchEncryptedKeyDatas((X509Certificate) keyEntry.getCertificate(), elementRecipient);
@@ -94,7 +94,7 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
             throw ex;
         }
         catch (final Exception ex) {
-            throw new AOException("Error al descifrar los contenidos del sobre digital", ex);
+            throw new AOException("Error al descifrar los contenidos del sobre digital", ex); //$NON-NLS-1$
         }
         return deciphered;
     }

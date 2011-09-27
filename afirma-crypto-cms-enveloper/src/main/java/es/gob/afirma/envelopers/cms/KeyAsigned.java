@@ -24,19 +24,19 @@ final class KeyAsigned {
 
     private AOCipherConfig config;
 
-    public SecretKey getCipherKey() {
-        return cipherKey;
+    SecretKey getCipherKey() {
+        return this.cipherKey;
     }
 
-    public void setCipherKey(final SecretKey cipherKey) {
+    void setCipherKey(final SecretKey cipherKey) {
         this.cipherKey = cipherKey;
     }
 
-    public AOCipherConfig getConfig() {
-        return config;
+    AOCipherConfig getConfig() {
+        return this.config;
     }
 
-    public void setConfig(final AOCipherConfig config) {
+    void setConfig(final AOCipherConfig config) {
         this.config = config;
     }
 }

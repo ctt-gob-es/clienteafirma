@@ -36,7 +36,6 @@ import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BERSet;
 import org.bouncycastle.asn1.DEREncodable;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
@@ -919,28 +918,17 @@ final class CounterSignerEnveloped {
         // authenticatedAttributes
         final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
-        // Las Contrafirmas CMS no tienen ContentType
-        // //tipo de contenido
-        // ContexExpecific.add(new Attribute(CMSAttributes.contentType, new
-        // DERSet(new DERObjectIdentifier(actualOid))));
-
-        // fecha de firma
+        // Fecha de firma
         ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
-        // Los DigestAlgorithms con SHA-2 tienen un guion:
-        if (digestAlgorithm.equalsIgnoreCase("SHA512")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-512"; //$NON-NLS-1$
-        }
-        else if (digestAlgorithm.equalsIgnoreCase("SHA384")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-384"; //$NON-NLS-1$
-        }
-        else if (digestAlgorithm.equalsIgnoreCase("SHA256")) { //$NON-NLS-1$
-            digestAlgorithm = "SHA-256"; //$NON-NLS-1$
-        }
-
         // MessageDigest
-        ContexExpecific.add(new Attribute(CMSAttributes.messageDigest,
-                                          new DERSet(new DEROctetString(MessageDigest.getInstance(digestAlgorithm.toString()).digest(datos)))));
+        ContexExpecific.add(
+                new Attribute(
+                        CMSAttributes.messageDigest,
+                        new DERSet(new DEROctetString(
+                                MessageDigest.getInstance(
+                                        AOSignConstants.getDigestAlgorithmName(digestAlgorithm)).digest(datos))))
+        );
 
         // Serial Number
         ContexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
@@ -951,10 +939,10 @@ final class CounterSignerEnveloped {
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 ContexExpecific.add(new Attribute(
-                // el oid
-                                                  new DERObjectIdentifier((e.getKey()).toString()),
-                                                  // el array de bytes en formato string
-                                                  new DERSet(new DERPrintableString(e.getValue()))));
+                        // el oid
+                        new DERObjectIdentifier((e.getKey()).toString()),
+                        // el array de bytes en formato string
+                        new DERSet(new DERPrintableString(e.getValue()))));
             }
         }
 
@@ -1051,27 +1039,12 @@ final class CounterSignerEnveloped {
 
         // buscamos que timo de algoritmo es y lo codificamos con su OID
 
-        AlgorithmIdentifier digAlgId;
+        
         final String signatureAlgorithm = parameters.getSignatureAlgorithm();
-        String digestAlgorithm = null;
-        String keyAlgorithm = null;
-        final int with = signatureAlgorithm.indexOf("with"); //$NON-NLS-1$
-        if (with > 0) {
-            digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
-            final int and = signatureAlgorithm.indexOf("and", with + 4); //$NON-NLS-1$
-            if (and > 0) {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4, and);
-            }
-            else {
-                keyAlgorithm = signatureAlgorithm.substring(with + 4);
-            }
-        }
-
-        digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
+        final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(signatureAlgorithm);
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithm));
 
         // ATRIBUTOS FINALES
-        // ByteArrayInputStream signerToDigest = new
-        // ByteArrayInputStream(si.getEncryptedDigest().getOctets());
         signedAttr = generateSignerInfo(cert, digestAlgorithm, si.getEncryptedDigest().getOctets());
         unsignedAttr = generateUnsignerInfo();
 
@@ -1081,22 +1054,12 @@ final class CounterSignerEnveloped {
         final IssuerAndSerialNumber encSid = new IssuerAndSerialNumber(X500Name.getInstance(tbs.getIssuer()), tbs.getSerialNumber().getValue());
         final SignerIdentifier identifier = new SignerIdentifier(encSid);
 
-        // AlgorithmIdentifier
-        digAlgId = new AlgorithmIdentifier(new DERObjectIdentifier(AOAlgorithmID.getOID(digestAlgorithm)), new DERNull());
-
         // // FIN ATRIBUTOS
 
         // digEncryptionAlgorithm
-        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID(keyAlgorithm));
+        final AlgorithmIdentifier encAlgId = SigUtils.makeAlgId(AOAlgorithmID.getOID("RSA")); //$NON-NLS-1$
 
         // Firma del SignerInfo
-
-        // ByteArrayInputStream signerToDigest = new
-        // ByteArrayInputStream(si.getEncryptedDigest().getOctets());
-
-        // byte[] signedInfo = signData(signerToDigest, signatureAlgorithm,
-        // keyEntry);
-
         final ASN1OctetString sign2;
         try {
             sign2 = firma(signatureAlgorithm, keyEntry);

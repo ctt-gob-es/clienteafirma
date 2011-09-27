@@ -119,7 +119,6 @@ public class AOCMSEnveloper implements AOEnveloper {
     //TODO
     /** Cifra un contenido (t&iacute;picamente un fichero) usando para ello una
      * contrase&ntilde;a.<br/>
-     * Los algoritmos y modos de firma disponibles se declaran en {@link AOConstants}.<br/>
      * Se usar&aacute; por defecto el algoritmo de cifrado "AES".
      * La clave usada para cifrar el contenido puede ser tanto un password como
      * una clave privada del usuario codificada.
@@ -149,7 +148,6 @@ public class AOCMSEnveloper implements AOEnveloper {
         }
 
         return null;
-
     }
     
     
@@ -264,13 +262,16 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. */
+     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
     public byte[] createCMSEnvelopedData(final byte[] content,
                                          final PrivateKeyEntry ke,
                                          final AOCipherConfig cipherConfig,
                                          final X509Certificate[] recipientsCerts) throws NoSuchAlgorithmException,
                                                                                  CertificateEncodingException,
-                                                                                 IOException {
+                                                                                 IOException, AOException {
 
         // Si se establecion un remitente
         if (ke != null) {
@@ -302,13 +303,15 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
      *         Cuando el certificado del remitente no es v&aacute;lido.
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
     public byte[] createCMSSignedAndEnvelopedData(final byte[] content,
                                                   final PrivateKeyEntry ke,
                                                   final AOCipherConfig cipherConfig,
                                                   final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                           NoSuchAlgorithmException,
-                                                                                          IOException {
+                                                                                          IOException, AOException {
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm),
                                                                          cipherConfig,
                                                                          recipientsCerts,
@@ -334,10 +337,13 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. */
+     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
     byte[] createCMSAuthenticatedData(final byte[] content, final PrivateKeyEntry ke, final AOCipherConfig cipherConfig, final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                                                                          NoSuchAlgorithmException,
-                                                                                                                                         IOException {
+                                                                                                                                         IOException, AOException {
         return new CMSAuthenticatedData().genAuthenticatedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                                                                null, // Algoritmo de autenticacion (usamos el por defecto)
                                                                cipherConfig, // Configuracion del cipher
@@ -365,13 +371,16 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. */
+     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
     public byte[] createCMSAuthenticatedEnvelopedData(final byte[] content,
                                                       final PrivateKeyEntry ke,
                                                       final AOCipherConfig cipherConfig,
                                                       final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                         NoSuchAlgorithmException,
-                                                                                        IOException {
+                                                                                        IOException, AOException {
         return new CMSAuthenticatedEnvelopedData().genAuthenticatedEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                                                                                  null, // Algoritmo de autenticacion (usamos el por
                                                                                        // defecto)
@@ -560,13 +569,14 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws AOInvalidFormatException
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
-     *         Cuando se produce un error durante al desenvolver los datos. */
+     *         Cuando se produce un error durante al desenvolver los datos. 
+     * @throws NoSuchAlgorithmException */
     byte[] recoverData(final byte[] cmsEnvelop) throws AOInvalidRecipientException,
                                          InvalidKeyException,
                                          CertificateEncodingException,
                                          IOException,
                                          AOInvalidFormatException,
-                                         AOException {
+                                         AOException, NoSuchAlgorithmException {
 
         final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
 
@@ -723,11 +733,13 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando ocurre un error durante el proceso de
      *         extracci&oacute;n.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. 
+     * @throws NoSuchAlgorithmException
+     */
     byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData, final PrivateKeyEntry ke) throws IOException,
                                                                                                 CertificateEncodingException,
                                                                                                 AOException,
-                                                                                                InvalidKeyException {
+                                                                                                InvalidKeyException, NoSuchAlgorithmException {
         return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(authenticatedData, ke);
     }
 

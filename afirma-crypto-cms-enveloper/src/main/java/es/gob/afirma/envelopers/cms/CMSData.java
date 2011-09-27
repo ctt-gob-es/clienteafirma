@@ -32,13 +32,13 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * para crear un mensaje Data de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
-public final class CMSData {
+final class CMSData {
 
     /** M&eacute;odo que genera una estructura CMS de tipo Data.
      * @param content
      *        Datos que se desean envolver.
      * @return El envoltorio de tipo data. */
-    public byte[] genData(final byte[] content) {
+    byte[] genData(final byte[] content) {
         return new ContentInfo(PKCSObjectIdentifiers.data, new DEROctetString(content)).getDEREncoded();
     }
 

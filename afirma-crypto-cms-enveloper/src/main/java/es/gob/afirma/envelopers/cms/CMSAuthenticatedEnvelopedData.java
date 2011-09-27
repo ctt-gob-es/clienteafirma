@@ -43,6 +43,7 @@ import org.bouncycastle.asn1.cms.OriginatorInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.ietf.jgss.Oid;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
@@ -82,7 +83,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * para crear un mensaje AuthenticatedEnvelopedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
-public final class CMSAuthenticatedEnvelopedData {
+final class CMSAuthenticatedEnvelopedData {
 
     /** @param parameters
      *        Par&aacute;metros necesarios que contienen tanto la firma del
@@ -109,15 +110,18 @@ public final class CMSAuthenticatedEnvelopedData {
      *         Si se produce alguna excepci&oacute;n con los certificados de
      *         firma.
      * @throws NoSuchAlgorithmException
-     *         Si no se encuentra un algoritmo v&aacute;lido. */
-    public byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
+     *         Si no se encuentra un algoritmo v&aacute;lido. 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
+    byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
                                                 final String autenticationAlgorithm,
                                                 final AOCipherConfig config,
                                                 final X509Certificate[] certDest,
                                                 final Oid dataType,
                                                 final boolean applySigningTime,
                                                 final Map<Oid, byte[]> atrib,
-                                                final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+                                                final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
         final SecretKey cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // 1. ORIGINATORINFO
@@ -226,7 +230,7 @@ public final class CMSAuthenticatedEnvelopedData {
      * @return La nueva firma AuthenticatedEnvelopedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
      *         nueva. */
-    public byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
+    byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
 
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -250,8 +254,12 @@ public final class CMSAuthenticatedEnvelopedData {
                     certs = origInfo.getCertificates();
                 }
 
-                origInfo = Utils.checkCertificates(signerCertificateChain, origInfo, certs);
-
+                OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
+                if (origInfoChecked != null) {
+                    origInfo = origInfoChecked;
+                }
+                
+                
                 // Se crea un nuevo AuthenticatedEnvelopedData a partir de los
                 // datos anteriores con los nuevos originantes.
                 return new ContentInfo(PKCSObjectIdentifiers.id_ct_authEnvelopedData, new AuthEnvelopedData(origInfo, // OriginatorInfo

@@ -22,7 +22,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
-import es.gob.afirma.core.envelopers.AOEnveloper;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -31,7 +30,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 /** Funcionalidad de sobres digitales con CAdES. */
 public class AOCMSMultiEnveloper {
     
-
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
+    
     private String dataTypeOID = null;
     private final Map<String, byte[]> atrib = new HashMap<String, byte[]>();
     private final Map<String, byte[]> uatrib = new HashMap<String, byte[]>();
@@ -55,8 +55,8 @@ public class AOCMSMultiEnveloper {
      * al usuario destinatario.
      * Nota: El par&aacute;metro algorithm no es el agoritmo de cifrado, es para
      * el digestAlgorithm usado en los "Unsigned Attributes".
-     * @param file
-     *        Flujo de lectura de los datos a firmar.
+     * @param cmsData
+     *        Envoltorio que queremos cofirmar.
      * @param digestAlgorithm
      *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
      * @param type
@@ -68,6 +68,7 @@ public class AOCMSMultiEnveloper {
      *        digital.
      * @param cipherAlgorithm 
      *        Algoritmo utilizado para cifrar
+     * @param dataType Tipo de datos
      * @param extraParams
      *        Par&aacute;metros adicionales
      * @return Envoltorio CADES.
@@ -87,20 +88,11 @@ public class AOCMSMultiEnveloper {
         return null;
     }
     
-  public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
-
-      if (algorithm.equalsIgnoreCase("RSA")) {
-          algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-      }
-      else if (algorithm.equalsIgnoreCase("DSA")) {
-          algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-      }
+  public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
       
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm");
+        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
 
         byte[] messageDigest = null;
         if (precalculatedDigest != null) {
@@ -125,17 +117,8 @@ public class AOCMSMultiEnveloper {
 
         // tipos de datos a firmar.
         if (this.dataTypeOID == null) {
-            try {
-                this.dataTypeOID = PKCSObjectIdentifiers.data.getId();
-            }
-            catch (final Exception ex) {
-                Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto: " + ex);
-            }
+            this.dataTypeOID = PKCSObjectIdentifiers.data.getId();
         }
-
-        final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE);
-
-        final boolean omitContent = mode.equals(AOSignConstants.SIGN_MODE_EXPLICIT) || precalculatedDigest != null;
 
         // Si la firma que nos introducen es SignedAndEnvelopedData
         try {
@@ -144,31 +127,16 @@ public class AOCMSMultiEnveloper {
             return new CoSignerEnveloped().coSigner(csp, sign, this.dataTypeOID, keyEntry, this.atrib, this.uatrib, messageDigest);
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma PKCS#7", e);
+            throw new AOException("Error generando la Cofirma del sobre", e); //$NON-NLS-1$
         }
     }
 
     public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
-        if (algorithm.equalsIgnoreCase("RSA")) {
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) {
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
-
         // tipos de datos a firmar.
         if (this.dataTypeOID == null) {
-            try {
-                this.dataTypeOID = PKCSObjectIdentifiers.data.getId();
-            }
-            catch (final Exception ex) {
-                Logger.getLogger("es.gob.afirma").severe("Error al asignar el OID por defecto: " + ex);
-            }
+            this.dataTypeOID = PKCSObjectIdentifiers.data.getId();
         }
-
-        // Algoritmo de firma.
-        final String typeAlgorithm = algorithm;
 
         // Array de certificados
         X509Certificate[] aCertificados = new X509Certificate[0];
@@ -187,10 +155,10 @@ public class AOCMSMultiEnveloper {
 
         // Cofirma de la firma usando unicamente el fichero de firmas.
         try {
-            return new CoSignerEnveloped().coSigner(typeAlgorithm, aCertificados, sign, this.dataTypeOID, keyEntry, this.atrib, this.uatrib, null);
+            return new CoSignerEnveloped().coSigner(algorithm, aCertificados, sign, this.dataTypeOID, keyEntry, this.atrib, this.uatrib, null);
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la Cofirma PKCS#7", e);
+            throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
         }
     }
 
@@ -305,13 +273,16 @@ public class AOCMSMultiEnveloper {
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. */
+     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
     public byte[] createCMSEnvelopedData(final byte[] content,
                                          final PrivateKeyEntry ke,
                                          final AOCipherConfig cipherConfig,
                                          final X509Certificate[] recipientsCerts) throws NoSuchAlgorithmException,
                                                                                  CertificateEncodingException,
-                                                                                 IOException {
+                                                                                 IOException, AOException {
 
         // Si se establecion un remitente
         if (ke != null) {
@@ -343,13 +314,15 @@ public class AOCMSMultiEnveloper {
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
      *         Cuando el certificado del remitente no es v&aacute;lido.
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
     public byte[] createCMSSignedAndEnvelopedData(final byte[] content,
                                                   final PrivateKeyEntry ke,
                                                   final AOCipherConfig cipherConfig,
                                                   final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                           NoSuchAlgorithmException,
-                                                                                          IOException {
+                                                                                          IOException, AOException {
         return new CMSSignedAndEnvelopedData().genSignedAndEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm),
                                                                          cipherConfig,
                                                                          recipientsCerts,
@@ -375,10 +348,13 @@ public class AOCMSMultiEnveloper {
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. */
+     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
     byte[] createCMSAuthenticatedData(final byte[] content, final PrivateKeyEntry ke, final AOCipherConfig cipherConfig, final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                                                                          NoSuchAlgorithmException,
-                                                                                                                                         IOException {
+                                                                                                                                         IOException, AOException {
         return new CMSAuthenticatedData().genAuthenticatedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                                                                null, // Algoritmo de autenticacion (usamos el por defecto)
                                                                cipherConfig, // Configuracion del cipher
@@ -406,13 +382,16 @@ public class AOCMSMultiEnveloper {
      * @throws IOException
      *         Error en la escritura de datos.
      * @throws CertificateEncodingException
-     *         Cuando el certificado del remitente no es v&aacute;lido. */
+     *         Cuando el certificado del remitente no es v&aacute;lido. 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
     public byte[] createCMSAuthenticatedEnvelopedData(final byte[] content,
                                                       final PrivateKeyEntry ke,
                                                       final AOCipherConfig cipherConfig,
                                                       final X509Certificate[] recipientsCerts) throws CertificateEncodingException,
                                                                                         NoSuchAlgorithmException,
-                                                                                        IOException {
+                                                                                        IOException, AOException {
         return new CMSAuthenticatedEnvelopedData().genAuthenticatedEnvelopedData(this.createContentSignerParementers(content, ke, this.signatureAlgorithm), // ContentSignerParameters
                                                                                  null, // Algoritmo de autenticacion (usamos el por
                                                                                        // defecto)
@@ -474,7 +453,7 @@ public class AOCMSMultiEnveloper {
             contentInfo = AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
         }
         else {
-            throw new AOInvalidFormatException("Los datos proporcionado no son un envoltorio que soporte multiples remitentes");
+            throw new AOInvalidFormatException("Los datos proporcionado no son un envoltorio que soporte multiples remitentes"); //$NON-NLS-1$
         }
         return addOriginator(envelop, contentInfo, ke);
     }
@@ -532,11 +511,11 @@ public class AOCMSMultiEnveloper {
 
         }
         else {
-            throw new IllegalArgumentException("La estructura para el ContentInfo indicado no esta soportada o " + "no admite multiples remitentes");
+            throw new IllegalArgumentException("La estructura para el ContentInfo indicado no esta soportada o no admite multiples remitentes"); //$NON-NLS-1$
         }
 
         if (newEnvelop == null) {
-            throw new AOException("Error al agregar el nuevo remitente al envoltorio");
+            throw new AOException("Error al agregar el nuevo remitente al envoltorio"); //$NON-NLS-1$
         }
 
         return newEnvelop;
@@ -601,13 +580,14 @@ public class AOCMSMultiEnveloper {
      * @throws AOInvalidFormatException
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
-     *         Cuando se produce un error durante al desenvolver los datos. */
+     *         Cuando se produce un error durante al desenvolver los datos. 
+     * @throws NoSuchAlgorithmException */
     byte[] recoverData(final byte[] cmsEnvelop) throws AOInvalidRecipientException,
                                          InvalidKeyException,
                                          CertificateEncodingException,
                                          IOException,
                                          AOInvalidFormatException,
-                                         AOException {
+                                         AOException, NoSuchAlgorithmException {
 
         final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
 
@@ -632,12 +612,12 @@ public class AOCMSMultiEnveloper {
 
         byte[] datos;
         if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.data)) {
-            Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$ //$NON-NLS-2$
+            LOGGER.warning("La extraccion de datos de los envoltorios CMS Data no esta implementada"); //$NON-NLS-1$
             datos = null;
             // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
         }
         else if (doi.equals(org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers.digestedData)) {
-            Logger.getLogger("es.gob.afirma").warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");  //$NON-NLS-1$//$NON-NLS-2$
+            LOGGER.warning("La extraccion de datos de los envoltorios CMS DigestedData no esta implementada");  //$NON-NLS-1$
             datos = null;
             // datos = this.recoverCMSEncryptedData(cmsEnvelop, cipherKey);
         }
@@ -764,11 +744,12 @@ public class AOCMSMultiEnveloper {
      *         Cuando ocurre un error durante el proceso de
      *         extracci&oacute;n.
      * @throws InvalidKeyException
-     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
+     *         Cuando la clave almacenada en el sobre no es v&aacute;lida. 
+     * @throws NoSuchAlgorithmException */
     byte[] recoverCMSAuthenticatedData(final byte[] authenticatedData, final PrivateKeyEntry ke) throws IOException,
                                                                                                 CertificateEncodingException,
                                                                                                 AOException,
-                                                                                                InvalidKeyException {
+                                                                                                InvalidKeyException, NoSuchAlgorithmException {
         return new CMSDecipherAuthenticatedData().decipherAuthenticatedData(authenticatedData, ke);
     }
 

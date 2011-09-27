@@ -16,7 +16,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.crypto.SecretKey;
 
@@ -32,6 +31,7 @@ import org.bouncycastle.asn1.cms.OriginatorInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.ietf.jgss.Oid;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -57,7 +57,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * para crear un mensaje Data de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
-public final class CMSEnvelopedData {
+final class CMSEnvelopedData {
 
     /** Clave de cifrado. La almacenamos internamente porque no hay forma de
      * mostrarla directamente al usuario. */
@@ -84,12 +84,15 @@ public final class CMSEnvelopedData {
      *         firma.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital */
-    public byte[] genEnvelopedData(final P7ContentSignerParameters parameters,
+     *         digital 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
+    byte[] genEnvelopedData(final P7ContentSignerParameters parameters,
                                    final AOCipherConfig config,
                                    final X509Certificate[] certDest,
                                    final Oid dataType,
-                                   final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+                                   final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
 
         // Datos previos &uacute;tiles
@@ -107,7 +110,7 @@ public final class CMSEnvelopedData {
         }
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(parameters.getContent(), config, certDest, this.cipherKey);
 
         // 4. ATRIBUTOS
         final ASN1Set unprotectedAttrs = Utils.generateSignerInfo(digestAlgorithm, parameters.getContent(), dataType, uatrib);
@@ -135,13 +138,16 @@ public final class CMSEnvelopedData {
      * @return la firma de tipo EnvelopedData.
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateEncodingException
-     * @throws java.security.NoSuchAlgorithmException */
-    public byte[] genEnvelopedData(final byte[] data,
+     * @throws java.security.NoSuchAlgorithmException 
+     * @throws AOException
+     *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
+     */
+    byte[] genEnvelopedData(final byte[] data,
                                    final String digestAlg,
                                    final AOCipherConfig config,
                                    final X509Certificate[] certDest,
                                    final Oid dataType,
-                                   final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+                                   final Map<Oid, byte[]> uatrib) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
 
         // Comprobamos que el archivo a tratar no sea nulo.
         this.cipherKey = Utils.initEnvelopedData(config, certDest);
@@ -153,7 +159,7 @@ public final class CMSEnvelopedData {
         final OriginatorInfo origInfo = null;
 
         // 2. RECIPIENTINFOS
-        final Info infos = Utils.initVariables(data, config, certDest, cipherKey);
+        final Info infos = Utils.initVariables(data, config, certDest, this.cipherKey);
 
         // 4. ATRIBUTOS
         final ASN1Set unprotectedAttrs = Utils.generateSignerInfo(digestAlgorithm, data, dataType, uatrib);
@@ -173,9 +179,11 @@ public final class CMSEnvelopedData {
      * @param signerCertificateChain
      *        Cadena de certificados a agregar.
      * @return La nueva firma enveloped con los remitentes que ten&iacute;a (si
-     *         los tuviera) con la cadena de certificados nueva. */
-    public byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
-        // boolean isValid = false;
+     *         los tuviera) con la cadena de certificados nueva. 
+     * @throws AOException
+     *         Cuando ocurra un error al insertar el nuevo destinatario en el envoltorio. 
+     */
+    byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws AOException {
         byte[] retorno = null;
 
         try {
@@ -199,8 +207,11 @@ public final class CMSEnvelopedData {
                 }
 
                 // Si no hay certificados, se deja como esta.
-                origInfo = Utils.checkCertificates(signerCertificateChain, origInfo, certs);
-
+                OriginatorInfo origInfoChecked = Utils.checkCertificates(signerCertificateChain, certs);
+                if (origInfoChecked != null) {
+                    origInfo = origInfoChecked;
+                }
+                
                 // Se crea un nuevo EnvelopedData a partir de los datos
                 // anteriores con los nuevos originantes.
                 retorno =
@@ -211,7 +222,7 @@ public final class CMSEnvelopedData {
             }
         }
         catch (final Exception ex) {
-            Logger.getLogger("es.gob.afirma").severe("Error durante el proceso de insercion: " + ex);
+            throw new AOException("Error durante el proceso de insercion", ex); //$NON-NLS-1$
         }
 
         return retorno;

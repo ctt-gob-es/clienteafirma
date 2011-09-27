@@ -18,10 +18,12 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.ietf.jgss.Oid;
 
-import sun.security.x509.AlgorithmId;
+
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.DigestedData;
 
 /** Clase base para la implementaci&oacute;n del tipo DigestedData La Estructura
@@ -42,7 +44,7 @@ import es.gob.afirma.signers.pkcs7.DigestedData;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje DigestedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-public final class CMSDigestedData {
+final class CMSDigestedData {
 
     /** Genera una estructura de tipo digestedData.
      * @param content
@@ -58,19 +60,13 @@ public final class CMSDigestedData {
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
      *         datos */
-    public byte[] genDigestedData(final byte[] content, final String digestAlgorithm, final Oid dataType) throws NoSuchAlgorithmException,
+    byte[] genDigestedData(final byte[] content, final String digestAlgorithm, final Oid dataType) throws NoSuchAlgorithmException,
                                                                                                          IOException {
 
         // Obtenemos el algoritmo para hacer el digest
-        final AlgorithmId digestAlgorithmId = AlgorithmId.get(AOSignConstants.getDigestAlgorithmName(digestAlgorithm));
-        org.bouncycastle.asn1.x509.AlgorithmIdentifier digAlgId;
-        try {
-            digAlgId = SigUtils.makeAlgId(digestAlgorithmId.getOID().toString(), digestAlgorithmId.getEncodedParams());
-        }
-        catch (final Exception e) {
-            throw new IOException("Error de codificacion: " + e);
-        }
-
+        final AlgorithmIdentifier digAlgId = SigUtils.makeAlgId(
+                AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName(digestAlgorithm)));
+        
         // indicamos el tipo de contenido
         final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
         final ContentInfo encInfo = new ContentInfo(contentTypeOID, null);
