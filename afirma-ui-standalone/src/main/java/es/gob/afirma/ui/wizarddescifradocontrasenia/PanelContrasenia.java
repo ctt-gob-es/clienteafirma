@@ -141,7 +141,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		
         // Caja de texto donde se guarda la contraseña
 		 this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
-		 campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + "ALT + O.");
+		 campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + campoContrasenia.getToolTipText() + "ALT + O.");
 	     campoContrasenia.getAccessibleContext().setAccessibleDescription(campoContrasenia.getToolTipText());
 	     this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
 	     if (GeneralConfig.isBigCaret()) {

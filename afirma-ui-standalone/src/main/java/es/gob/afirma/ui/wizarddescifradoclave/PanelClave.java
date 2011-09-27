@@ -142,8 +142,8 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		
         // Caja de texto donde se guarda la clave
         campoClave.setToolTipText(Messages.getString("WizardDescifrado.clave.contrasenia.description")); // NOI18N
-        campoClave.getAccessibleContext().setAccessibleName(keyLabel.getText() + " " + "ALT + L.");
-	    campoClave.getAccessibleContext().setAccessibleDescription(keyLabel.getToolTipText());
+        campoClave.getAccessibleContext().setAccessibleName(keyLabel.getText() + " " + campoClave.getToolTipText() + "ALT + L.");
+	    campoClave.getAccessibleContext().setAccessibleDescription(campoClave.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoClave.setCaret(caret);
