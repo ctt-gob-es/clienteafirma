@@ -163,8 +163,32 @@ public class DescifradoAccessibilityTest {
 	 * no esté vacío. 
 	 */
 	@Test
-	public void testNotEmptyAccessibleName() {
-		logger.info("testNotEmptyAccessibleName");
+	public void testNotEmptyAccessibleName_SimpleMode() {
+		logger.info("testNotEmptyAccessibleName_SimpleMode");
+		//Instancia del panel que se va a analizar
+		Descifrado descifrado = new Descifrado();
+		//Se llama al método que comprueba que el nombre no sea vacío
+		assertTrue(checkAccessibleName(descifrado));
+	}
+	
+	/**
+	 * Comprobación de que el campo nombre accesible para botones, radiobuttons, combos y checks
+	 * no esté vacío. 
+	 */
+	@Test
+	public void testNotEmptyAccessibleName_AdvancedMode() {
+		logger.info("testNotEmptyAccessibleName_AdvancedMode");
+		
+		//Se obtiene la cofiguración general
+		//Se añade el perfil por defecto
+		UserProfile.currentUser=Constants.defaultUser;
+		GeneralConfig.loadConfig(GeneralConfig.getConfig());
+		Properties config = GeneralConfig.getConfig();
+		//Se cambia al modo avanzado
+		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true");
+		//Se asigna
+		GeneralConfig.loadConfig(config);
+
 		//Instancia del panel que se va a analizar
 		Descifrado descifrado = new Descifrado();
 		//Se llama al método que comprueba que el nombre no sea vacío
