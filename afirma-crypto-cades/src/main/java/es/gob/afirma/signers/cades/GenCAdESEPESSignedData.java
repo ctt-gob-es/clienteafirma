@@ -104,7 +104,15 @@ public final class GenCAdESEPESSignedData {
         
         final byte[] content = (omitContent) ? null : parameters.getContent();
         
+        final byte[] md = (messageDigest == null && parameters.getContent() != null) ?
+                              MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
+                                  messageDigest;
+        
+        System.out.println("content:" + content + ", ms:" + md.length);
+                              
         final Date signDate = new Date();
+        
+        if (content == null && md == null) System.out.println("AMBOS NULOS (1)");
         
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
@@ -112,7 +120,7 @@ public final class GenCAdESEPESSignedData {
             signerCertificateChain, 
             policy, 
             signingCertificateV2, 
-            (messageDigest == null && parameters.getContent() != null) ? MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) : messageDigest,
+            md,
             signDate
         );
         

@@ -1,5 +1,8 @@
 package es.gob.afirma.test.cades;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
@@ -99,9 +102,12 @@ public final class TestCAdES {
                 
                 byte[] result = signer.sign(DATA, algo, pke, extraParams);
 
-//                java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/cades"+algo+extraParams.getProperty("mode")+".csig");
-//                fos.write(result);
-//                try { fos.close(); } catch (Exception e) { }
+                final File saveFile = File.createTempFile(algo + "-", ".csig"); //$NON-NLS-1$ //$NON-NLS-2$
+                final OutputStream os = new FileOutputStream(saveFile);
+                os.write(result);
+                os.flush();
+                os.close();
+                System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));

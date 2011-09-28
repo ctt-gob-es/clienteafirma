@@ -50,7 +50,7 @@ public class CAdESTriPhaseSigner {
      * @param signerCertificateChain Cadena de certificados del firmante
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
-     * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>
+     * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>)
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
      * @throws AOException
@@ -65,7 +65,9 @@ public class CAdESTriPhaseSigner {
         
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
-        }
+        } 
+        
+        if (content == null && messageDigest == null) System.out.println("AMBOS NULOS (2)");
         
         // Atributos firmados
         final ASN1Set signedAttributes;
