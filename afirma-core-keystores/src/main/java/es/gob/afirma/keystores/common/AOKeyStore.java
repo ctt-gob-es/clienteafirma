@@ -28,10 +28,11 @@ public enum AOKeyStore {
      * libreta de direcciones). */
     WINADDRESSBOOK("Windows / Internet Explorer (otras personas / libreta de direcciones)", 11, "Windows-ADDRESSBOOK"),  //$NON-NLS-1$//$NON-NLS-2$
     /** Windows / Internet Explorer (CAPI, certificados CA intermedias). */
-    WINCA("Windows / Internet Explorer (CA intermedias)", 12, "Windows-CA") //$NON-NLS-1$ //$NON-NLS-2$
+    WINCA("Windows / Internet Explorer (CA intermedias)", 12, "Windows-CA"), //$NON-NLS-1$ //$NON-NLS-2$
+    /** DNIe, en cualquier plataforma soportada. */
+    DNIE("DNI Electronico", 13, "PKCS11") //$NON-NLS-1$ //$NON-NLS-2$
     // /** Windows (MY) con proveedor alternativo (JRE Deploy). */
-    // WINDEPLOY("Windows / Internet Explorer (despliegue)", 13,
-    // "WIExplorerMy")
+    // WINDEPLOY("Windows / Internet Explorer (despliegue)", 14, "WIExplorerMy")
     ;
 
     private AOKeyStore(final String d, final int o, final String n) {

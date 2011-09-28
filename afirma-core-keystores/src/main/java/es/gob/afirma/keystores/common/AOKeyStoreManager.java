@@ -32,6 +32,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 
 /** Clase gestora de claves y certificados. B&aacute;sicamente se encarga de
  * crear KeyStores de distintos tipos, utilizando el proveedor JCA apropiado
@@ -60,6 +61,96 @@ public class AOKeyStoreManager {
     public AOKeyStore getType() {
         return this.ksType;
     }
+    
+    private Vector<KeyStore> initPKCS11(final PasswordCallback pssCallBack, final Object[] params) throws AOException {
+        
+        // En el "params" debemos traer los parametros:
+        // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
+        // [1] -desc: Descripcion del token PKCS#11 (opcional)
+        // [2] -slot: Numero de lector de tarjeta (Sistema Operativo) [OPCIONAL]
+
+        // Anadimos el proveedor PKCS11 de Sun
+        if (params == null || params.length < 2) {
+            throw new AOException("No se puede acceder al KeyStore PKCS#11 si no se especifica la biblioteca"); //$NON-NLS-1$
+        }
+        final String p11lib;
+        if (params[0] != null) {
+            p11lib = params[0].toString();
+        }
+        else {
+            throw new IllegalArgumentException("No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula"); //$NON-NLS-1$
+        }
+
+        // Numero de lector
+        Integer slot = null;
+        if (params.length >= 3) {
+            if (params[2] instanceof Integer) {
+                slot = (Integer) params[2];
+            }
+        }
+
+        // Agregamos un nombre a cada PKCS#11 para asegurarnos de no se
+        // agregan mas de una vez como provider.
+        // Si ya se cargo el PKCS#11 anteriormente, se volvera a instanciar.
+        final String p11ProviderName = new File(p11lib).getName().replace('.', '_').replace(' ', '_');
+        Provider p11Provider = Security.getProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
+
+        if (p11Provider == null) {
+
+            Constructor<?> sunPKCS11Contructor;
+            try {
+                sunPKCS11Contructor = AOUtil.classForName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
+            }
+            catch (final Exception e) {
+                throw new AOKeyStoreManagerException("No se ha podido obtener el constructor del proveedor SunPKCS11", e); //$NON-NLS-1$
+            }
+
+            final byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
+            try {
+                p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
+            }
+            catch (final Exception e) {
+                // El PKCS#11 del DNIe a veces falla a la primera pero va
+                // correctamente a la segunda
+                // asi que reintentamos una vez mas
+                try {
+                    p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
+                }
+                catch (final Exception ex) {
+                    throw new AOException("No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca " + p11lib, ex); //$NON-NLS-1$
+                }
+            }
+            Security.addProvider(p11Provider);
+        }
+        else {
+            LOGGER.info("El proveedor SunPKCS11 solicitado ya estaba instanciado, se reutilizara esa instancia: " + p11Provider.getName()); //$NON-NLS-1$
+        }
+
+        try {
+            this.ks = KeyStore.getInstance(this.ksType.getName(), p11Provider);
+        }
+        catch (final Exception e) {
+            Security.removeProvider(p11Provider.getName());
+            p11Provider = null;
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11", e); //$NON-NLS-1$
+        }
+
+        try {
+            this.ks.load(null, (pssCallBack != null) ? pssCallBack.getPassword() : null);
+        }
+        catch (final AOCancelledOperationException e) {
+            throw e;
+        }
+        catch (final Exception e) {
+            Security.removeProvider(p11Provider.getName());
+            p11Provider = null;
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado", e); //$NON-NLS-1$
+        }
+        final Vector<KeyStore> ret = new Vector<KeyStore>(1);
+        ret.add(this.ks);
+        return ret;
+        
+    }
 
     /** Obtiene un almac&eacute;n de claves ya inicializado. Se encarga
      * tambi&eacute;n de a&ntilde;adir o retirar los <i>Provider</i> necesarios
@@ -73,7 +164,7 @@ public class AOKeyStoreManager {
      *        CallBack encargado de recuperar la contrase¬ntilde;a del
      *        Keystore
      * @param params
-     *        Par&aacute;metros adicionales
+     *        Par&aacute;metros adicionales (dependen del tipo de almac&eacute;n)
      * @return Almac&eacute;n de claves solicitado (<b>ya inicializado</b>,
      *         pueden ser varios en el caso de Mozilla, el interno y los
      *         externos)
@@ -261,7 +352,7 @@ public class AOKeyStoreManager {
         else if (this.ksType.equals(AOKeyStore.WINCA) || this.ksType.equals(AOKeyStore.WINADDRESSBOOK)) {
 
             if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
-                throw new AOKeyStoreManagerException("No se puede obtener el KeyStore ADDRESSBOOK de Windows en un sistema no Windows:" + Platform.getOS()); //$NON-NLS-1$
+                throw new AOKeyStoreManagerException("No se puede obtener un KeyStore de Windows en un sistema no Windows:" + Platform.getOS()); //$NON-NLS-1$
             }
 
             // Nos aseguramos de que SunMSCAPI este cargado, para que la DLL
@@ -305,95 +396,13 @@ public class AOKeyStoreManager {
 
         else if (this.ksType.equals(AOKeyStore.PKCS11)) {
             // En el "params" debemos traer los parametros:
-            // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows)
-            // o en el
-            // LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
+            // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
             // [1] -desc: Descripcion del token PKCS#11 (opcional)
-            // [2] -slot: Numero de lector de tarjeta (Sistema Operativo)
-            // [OPCIONAL]
-
-            // Anadimos el proveedor PKCS11 de Sun
-            if (params == null || params.length < 2) {
-                throw new AOException("No se puede acceder al KeyStore PKCS#11 si no se especifica la biblioteca"); //$NON-NLS-1$
-            }
-            final String p11lib;
-            if (params[0] != null) {
-                p11lib = params[0].toString();
-            }
-            else {
-                throw new IllegalArgumentException("No se puede acceder al KeyStore PKCS#11 si se especifica una biblioteca nula"); //$NON-NLS-1$
-            }
-
-            // Numero de lector
-            Integer slot = null;
-            if (params.length >= 3) {
-                if (params[2] instanceof Integer) {
-                    slot = (Integer) params[2];
-                }
-            }
-
-            // Agregamos un nombre a cada PKCS#11 para asegurarnos de no se
-            // agregan mas de una vez como provider.
-            // Si ya se cargo el PKCS#11 anteriormente, se volvera a instanciar.
-            final String p11ProviderName = new File(p11lib).getName().replace('.', '_').replace(' ', '_');
-            Provider p11Provider = Security.getProvider("SunPKCS11-" + p11ProviderName); //$NON-NLS-1$
-
-            if (p11Provider == null) {
-
-                Constructor<?> sunPKCS11Contructor;
-                try {
-                    sunPKCS11Contructor = AOUtil.classForName("sun.security.pkcs11.SunPKCS11").getConstructor(InputStream.class); //$NON-NLS-1$
-                }
-                catch (final Exception e) {
-                    throw new AOKeyStoreManagerException("No se ha podido obtener el constructor del proveedor SunPKCS11", e); //$NON-NLS-1$
-                }
-
-                final byte[] config = KeyStoreUtilities.createPKCS11ConfigFile(p11lib, p11ProviderName, slot).getBytes();
-                try {
-                    p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
-                }
-                catch (final Exception e) {
-                    // El PKCS#11 del DNIe a veces falla a la primera pero va
-                    // correctamente a la segunda
-                    // asi que reintentamos una vez mas
-                    try {
-                        p11Provider = (Provider) sunPKCS11Contructor.newInstance(new ByteArrayInputStream(config));
-                    }
-                    catch (final Exception ex) {
-                        throw new AOException("No se ha podido instanciar el proveedor SunPKCS11 para la la biblioteca " + p11lib, ex); //$NON-NLS-1$
-                    }
-                }
-                Security.addProvider(p11Provider);
-            }
-            else {
-                LOGGER.info("El proveedor SunPKCS11 solicitado ya estaba instanciado, se reutilizara esa instancia: " + p11Provider.getName()); //$NON-NLS-1$
-            }
-
-            try {
-                this.ks = KeyStore.getInstance(this.ksType.getName(), p11Provider);
-            }
-            catch (final Exception e) {
-                Security.removeProvider(p11Provider.getName());
-                p11Provider = null;
-                throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11", e); //$NON-NLS-1$
-            }
-
-            try {
-                this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
-            }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final Exception e) {
-                Security.removeProvider(p11Provider.getName());
-                p11Provider = null;
-                throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado", e); //$NON-NLS-1$
-            }
-            ret.add(this.ks);
-            return ret;
+            // [2] -slot: Numero de lector de tarjeta (Sistema Operativo) [OPCIONAL]
+            return initPKCS11(pssCallBack, params);
         }
 
-        else if (this.ksType.equals(AOKeyStore.APPLE)) {
+        else if (this.ksType.equals(AOKeyStore.APPLE)) { // Por ahora no anadimos soporte a llaveros en ficheros sueltos
 
             // Anadimos el proveedor de Apple
             try {
@@ -424,6 +433,10 @@ public class AOKeyStoreManager {
             return ret;
         }
 
+        else if (this.ksType.equals(AOKeyStore.DNIE)) {
+            return initPKCS11((pssCallBack != null) ? pssCallBack : new UIPasswordCallback(KeyStoreMessages.getString("AOKeyStoreManager.0"), null), new String[] { KeyStoreUtilities.getPKCS11DNIeLib(), "DNIe-Afirma" });  //$NON-NLS-1$//$NON-NLS-2$
+        }
+        
         throw new UnsupportedOperationException("Tipo de almacen no soportado"); //$NON-NLS-1$
     }
 
