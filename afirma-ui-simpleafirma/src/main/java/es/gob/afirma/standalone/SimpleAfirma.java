@@ -65,6 +65,8 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     public static final boolean DEBUG = true;
 
     private static final long serialVersionUID = 9146759318663175997L;
+    
+    private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Preferencias generales establecidas para el aplicativo. */
     private Preferences preferences;
@@ -87,7 +89,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 com.apple.eawt.Application.getApplication().setDefaultMenuBar(this.mainMenu);
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.warning("No se ha podido establecer el menu de Mac OS X, se usara una barra de menu convencional: " + e); //$NON-NLS-1$ 
                 this.window.setJMenuBar(this.mainMenu);
             }
         }
@@ -105,7 +107,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
 
     synchronized void setKeyStoreManager(final AOKeyStoreManager ksm) {
-        Logger.getLogger("es.gob.afirma").info("Establecido KeyStoreManager: " + ksm); //$NON-NLS-1$ //$NON-NLS-2$
+        LOGGER.info("Establecido KeyStoreManager: " + ksm); //$NON-NLS-1$ 
         if (ksm != null) {
             this.ksManager = ksm;
             if (this.currentPanel instanceof SignPanel) {
@@ -129,7 +131,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             dniManager = new DNIeManager(this);
         }
         catch (final DNIeManagerException e) {
-            Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
+            LOGGER.warning( 
             "Se omite la pantalla de insercion de DNIe: " + e //$NON-NLS-1$
             );
             showDNIeScreen = false;
@@ -158,7 +160,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
             new SimpleKeyStoreManagerWorker(this, null, false).execute();
         }
         catch (final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+            LOGGER.severe( 
             "No se pudo abrir el almacen por defecto del entorno operativo: " + e //$NON-NLS-1$
             );
             UIUtils.showErrorMessage(
@@ -179,7 +181,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         if (DNIeManager.BLOWN_DNI_INSERTED.equals(evt.getPropertyName())) {
             if (DEBUG)
              {
-                System.out.println("Recibido evento de BLOWN DNI INSERTED");  //$NON-NLS-1$
+                LOGGER.info("Recibido evento de BLOWN DNI INSERTED");  //$NON-NLS-1$
             }
             loadDefaultKeyStore();
             loadMainApp(true);
@@ -194,7 +196,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         else if (DNIeManager.CARD_EXCEPTION.equals(evt.getPropertyName())) {
             if (DEBUG)
              {
-                System.out.println("Recibido evento de CARD EXCEPTION"); //$NON-NLS-1$
+                LOGGER.info("Recibido evento de CARD EXCEPTION"); //$NON-NLS-1$
             }
             UIUtils.showErrorMessage(
                     this.container,
@@ -207,7 +209,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         else if (DNIeManager.NOT_DNI_INSERTED.equals(evt.getPropertyName())) {
             if (DEBUG)
              {
-                System.out.println("Recibido evento de NOT DNI INSERTED"); //$NON-NLS-1$
+                LOGGER.info("Recibido evento de NOT DNI INSERTED"); //$NON-NLS-1$
             }
             UIUtils.showErrorMessage(
                     this.container,
@@ -220,14 +222,14 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         else if (DNIeManager.DNI_INSERTED.equals(evt.getPropertyName())) {
             if (DEBUG)
              {
-                System.out.println("Recibido evento de DNI INSERTED"); //$NON-NLS-1$
+                LOGGER.info("Recibido evento de DNI INSERTED"); //$NON-NLS-1$
             }
             this.container.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             try {
                 new SimpleKeyStoreManagerWorker(this, null, true).execute();
             }
             catch (final Exception e) {
-                Logger.getLogger("es.gob.afirma").severe( //$NON-NLS-1$
+                LOGGER.severe( 
                 "Fallo la inicializacion del DNIe, se intentara el almacen por defecto del sistema: " + e //$NON-NLS-1$
                 );
                 loadDefaultKeyStore();
@@ -281,7 +283,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
         else {
             if (ke!=null) {
-                System.out.println("Tecla pulsada: " + ke.getKeyCode()); //$NON-NLS-1$
+                LOGGER.info("Tecla pulsada: " + ke.getKeyCode()); //$NON-NLS-1$
             }
         }
     }
@@ -450,7 +452,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 return;
             }
             catch(final Exception e) {
-                Logger.getLogger("es.gob.afirma").warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.warning("La ayuda Windows Help no se ha podido cargar, se mostrara JavaHelp: " + e); //$NON-NLS-1$ 
             }
         }
         else if (MacHelpHooker.isMacHelpAvailable()) {
@@ -524,7 +526,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
                 new VisorFirma(new File(args[0]), true).initialize(false, null);
             }
             else {
-                System.out.println(Messages.getString("SimpleAfirma.2")); //$NON-NLS-1$
+                LOGGER.info(Messages.getString("SimpleAfirma.2")); //$NON-NLS-1$
             }
         }
         else {
