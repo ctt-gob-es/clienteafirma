@@ -111,8 +111,7 @@ public final class ValidateBinarySignature {
     private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
 
         final CMSSignedData s = new CMSSignedData(sign);
-        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$
-        System.out.println(s.getCertificates().getClass().toString()); 
+        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$ 
         final SignerInformationStore signers = s.getSignerInfos();
         final Iterator<?> it = signers.getSigners().iterator();
 
@@ -168,12 +167,4 @@ public final class ValidateBinarySignature {
         }
     }
 
-//  public static void main(String[] args) throws Exception {
-//  ValidateBinarySignature.verifySignatures(
-//          AOUtil.getDataFromInputStream(AOUtil.loadFile(
-//                  AOUtil.createURI("C:\\Users\\A122466\\Desktop\\borrar\\evisor.properties.csig2.csig"), null, false)),
-//          null);
-//
-//  System.out.println("OK");
-//}
 }
