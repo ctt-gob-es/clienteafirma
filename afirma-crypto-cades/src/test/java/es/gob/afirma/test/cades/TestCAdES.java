@@ -49,13 +49,21 @@ public final class TestCAdES {
         final Properties p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
         p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-
+        
         final Properties p2 = new Properties();
         p2.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
-        p2.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
+        p2.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
+        p2.setProperty("policyIdentifier", "1.2.3.4"); //$NON-NLS-1$ //$NON-NLS-2$
+        p2.setProperty("policyIdentifierHash", "AAAAAAA="); //$NON-NLS-1$ //$NON-NLS-2$
+        p2.setProperty("policyIdentifierHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
+        p2.setProperty("policyQualifier", "http://www.google.com"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        final Properties p3 = new Properties();
+        p3.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
+        p3.setProperty("mode", AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
 
         CADES_MODES = new Properties[] {
-                p1, p2
+                p1, p2, p3
         };
     }
     
@@ -96,6 +104,8 @@ public final class TestCAdES {
                 extraParams.getProperty("mode") +  //$NON-NLS-1$
                 "' con el algoritmo ': " + //$NON-NLS-1$
                 algo +
+                "' y politica '" + //$NON-NLS-1$
+                extraParams.getProperty("policyIdentifier") + //$NON-NLS-1$
                 "'"; //$NON-NLS-1$
                 
                 System.out.println(prueba);

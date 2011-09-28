@@ -66,11 +66,7 @@ public class CAdESUtils {
                                                   final byte[] messageDigest,
                                                   final Date signDate) throws NoSuchAlgorithmException,
                                                                                      IOException,
-                                                                                     CertificateEncodingException {
-        
-        if (datos == null && messageDigest == null) System.out.println("AMBOS NULOS");
-        
-        //TODO: Incorporar la politica segun la nueva interpretacion 
+                                                                                     CertificateEncodingException { 
         
         // ALGORITMO DE HUELLA DIGITAL
         final AlgorithmIdentifier digestAlgorithmOID = SigUtils.makeAlgId(AOAlgorithmID.getOID(digestAlgorithmName));
@@ -104,8 +100,7 @@ public class CAdESUtils {
              * IssuerSerial OPTIONAL }
              * Hash ::= OCTET STRING */
 
-            final MessageDigest md = MessageDigest.getInstance(digestAlgorithmName);
-            final byte[] certHash = md.digest(cert.getEncoded());
+            final byte[] certHash = MessageDigest.getInstance(digestAlgorithmName).digest(cert.getEncoded());
             final ESSCertIDv2[] essCertIDv2 = {
                 new ESSCertIDv2(digestAlgorithmOID, certHash, isuerSerial)
             };
@@ -117,8 +112,8 @@ public class CAdESUtils {
              * PolicyQualifierInfo ::= SEQUENCE { policyQualifierId
              * PolicyQualifierId, qualifier ANY DEFINED BY policyQualifierId } */
 
-            SigningCertificateV2 scv2 = null;
-            if(policy.getPolicyIdentifier()!=null){                                                
+            final SigningCertificateV2 scv2;
+            if(policy.getPolicyIdentifier() != null) {                                                
 
                 /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
                  * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL
@@ -162,7 +157,7 @@ public class CAdESUtils {
              * PolicyQualifierInfo ::= SEQUENCE { policyQualifierId
              * PolicyQualifierId, qualifier ANY DEFINED BY policyQualifierId } */
 
-            SigningCertificate scv = null;
+            final SigningCertificate scv;
             if (policy.getPolicyIdentifier() != null) {
 
                 /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
@@ -206,7 +201,7 @@ public class CAdESUtils {
             
 
             // Algoritmo para el hash
-            AlgorithmIdentifier hashid = null;
+            final AlgorithmIdentifier hashid;
             // si tenemos algoritmo de cálculo de hash, lo ponemos
             if(policy.getPolicyIdentifierHashAlgorithm()!=null){
             	hashid = SigUtils.makeAlgId(
@@ -230,7 +225,7 @@ public class CAdESUtils {
             	hashed = new byte[]{0};
             }
             
-            DigestInfo OtherHashAlgAndValue = new DigestInfo(hashid, hashed);
+            final DigestInfo OtherHashAlgAndValue = new DigestInfo(hashid, hashed);
             
 	        /*
 	         *   SigPolicyQualifierInfo ::= SEQUENCE {
@@ -239,7 +234,7 @@ public class CAdESUtils {
 	         */
             SigPolicyQualifierInfo spqInfo = null;
             if(policy.getPolicyQualifier()!=null){
-            	spqInfo = new SigPolicyQualifierInfo(policy.getPolicyQualifier().getPath());
+            	spqInfo = new SigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
             }
             
             /*
@@ -256,8 +251,9 @@ public class CAdESUtils {
             // sigPolicyHash
             v.add(OtherHashAlgAndValue.toASN1Object()); // como sequence
             // sigPolicyQualifiers
-            if(spqInfo!=null)
-            v.add(spqInfo.toASN1Object());
+            if(spqInfo!=null) {
+                v.add(spqInfo.toASN1Object());
+            }
 
             final DERSequence ds = new DERSequence(v);
 
@@ -269,17 +265,8 @@ public class CAdESUtils {
         return contexExpecific;
     }
     
-    /** Inicializa el context
-     * @param digestAlgorithm
-     * @param datos
-     * @param dataType
-     * @param messageDigest
-     * @return ASN1EncodableVector
-     * @throws NoSuchAlgorithmException */
+    /** Inicializa el contexto. */
     static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest, final Date signDate) throws NoSuchAlgorithmException {
-        
-        if (datos == null && messageDigest == null) System.out.println("AMBOS NULOS");
-        
         // authenticatedAttributes
         final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
 
@@ -298,27 +285,77 @@ public class CAdESUtils {
     }    
     
     /**
-     * Método que permite obtener un PolicyInformation a partir de los datos de la política.
-     * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tienen que llevar algunos
-     * datos de la política.
+     * Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
+     * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
+     * datos de la pol&iacute;tica.
      * 
-     * @param policy 	Política de la firma.
-     * @return			Estructura con la política preparada para insertarla en la firma.
+     * PolicyInformation ::= SEQUENCE {
+       policyIdentifier   CertPolicyId,
+       policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+                                PolicyQualifierInfo OPTIONAL }							
+								
+								
+	   CertPolicyId ::= OBJECT IDENTIFIER
+	
+	   PolicyQualifierInfo ::= SEQUENCE {
+	        policyQualifierId  PolicyQualifierId,
+	        qualifier          ANY DEFINED BY policyQualifierId }
+	
+	   -- policyQualifierIds for Internet policy qualifiers
+	
+	   id-qt          OBJECT IDENTIFIER ::=  { id-pkix 2 }
+	   id-qt-cps      OBJECT IDENTIFIER ::=  { id-qt 1 }
+	   id-qt-unotice  OBJECT IDENTIFIER ::=  { id-qt 2 }
+	
+	   PolicyQualifierId ::=
+	        OBJECT IDENTIFIER ( id-qt-cps | id-qt-unotice )
+	
+	   Qualifier ::= CHOICE {
+	        cPSuri           CPSuri,
+	        userNotice       UserNotice }
+	
+	   CPSuri ::= IA5String
+	
+	   UserNotice ::= SEQUENCE {
+	        noticeRef        NoticeReference OPTIONAL,
+	        explicitText     DisplayText OPTIONAL}
+	
+	   NoticeReference ::= SEQUENCE {
+	        organization     DisplayText,
+	        noticeNumbers    SEQUENCE OF INTEGER }
+	
+	   DisplayText ::= CHOICE {
+	        ia5String        IA5String      (SIZE (1..200)),
+	        visibleString    VisibleString  (SIZE (1..200)),
+	        bmpString        BMPString      (SIZE (1..200)),
+	        utf8String       UTF8String     (SIZE (1..200)) }
+
+     * 
+     * @param policy 	Pol&iacute;tica de la firma.
+     * @return			Estructura con la pol&iacute;tica preparada para insertarla en la firma.
      */
     private static PolicyInformation[] getPolicyInformation(final AdESPolicy policy){
     	
-    	PolicyQualifierInfo pqi;
+    	if (policy == null) {
+    	    throw new IllegalArgumentException("La politica de firma no puede ser nula en este punto"); //$NON-NLS-1$
+    	}
+        
+    	/*
+    	 * PolicyQualifierInfo ::= SEQUENCE {
+		 *	        policyQualifierId  PolicyQualifierId,
+		 *          qualifier          ANY DEFINED BY policyQualifierId } 
+    	 */
     	
     	final PolicyQualifierId pqid = PolicyQualifierId.id_qt_cps;
-    	
     	DERIA5String uri = null;
-    	if(policy!=null){
-    		if (policy.getPolicyQualifier()!=null && !policy.getPolicyQualifier().equals("")) { //$NON-NLS-1$
-    			uri = new DERIA5String(policy.getPolicyQualifier().getPath());
-    		}
-    	}
-    	ASN1EncodableVector v = new ASN1EncodableVector();
-    	if(uri!=null){
+
+		if (policy.getPolicyQualifier()!=null && !policy.getPolicyQualifier().equals("")){ //$NON-NLS-1$
+			uri = new DERIA5String(policy.getPolicyQualifier().toString());
+		}
+
+    	final ASN1EncodableVector v = new ASN1EncodableVector();
+    	final PolicyQualifierInfo pqi;
+    	if(uri != null){
     		v.add(pqid);
     		v.add(uri);
     		pqi = new PolicyQualifierInfo(new DERSequence(v));
@@ -329,20 +366,23 @@ public class CAdESUtils {
     	}
     	
     	
-    	final PolicyInformation[] pI;
+    	/*
+    	 * PolicyInformation ::= SEQUENCE {
+		       policyIdentifier   CertPolicyId,
+		       policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+                                	PolicyQualifierInfo OPTIONAL }
+    	 */
     	
     	if (policy.getPolicyQualifier()==null) {
-            pI = new PolicyInformation[] {
+            return new PolicyInformation[] {
                 new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier()))
             };
         }
-        else {
-            pI = new PolicyInformation[] {
-                new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier()), new DERSequence(pqi))
-            };
-        }
+
+        return new PolicyInformation[] {
+            new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier()), new DERSequence(pqi))
+        };
     	
-    	return pI;
     }
     
 }

@@ -67,8 +67,6 @@ public class CAdESTriPhaseSigner {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
         } 
         
-        if (content == null && messageDigest == null) System.out.println("AMBOS NULOS (2)");
-        
         // Atributos firmados
         final ASN1Set signedAttributes;
         try {

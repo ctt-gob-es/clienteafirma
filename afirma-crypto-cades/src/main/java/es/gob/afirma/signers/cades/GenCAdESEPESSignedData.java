@@ -102,25 +102,17 @@ public final class GenCAdESEPESSignedData {
 
         final X509Certificate[] signerCertificateChain = parameters.getSignerCertificateChain();
         
-        final byte[] content = (omitContent) ? null : parameters.getContent();
-        
-        final byte[] md = (messageDigest == null && parameters.getContent() != null) ?
-                              MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
-                                  messageDigest;
-        
-        System.out.println("content:" + content + ", ms:" + md.length);
-                              
         final Date signDate = new Date();
-        
-        if (content == null && md == null) System.out.println("AMBOS NULOS (1)");
         
         final byte[] preSignature = CAdESTriPhaseSigner.preSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
-            content, 
+            (omitContent) ? null : parameters.getContent(), 
             signerCertificateChain, 
             policy, 
             signingCertificateV2, 
-            md,
+            (messageDigest == null && parameters.getContent() != null) ?
+                MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
+                    messageDigest,
             signDate
         );
         
@@ -128,18 +120,20 @@ public final class GenCAdESEPESSignedData {
         
         return CAdESTriPhaseSigner.postSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),
-            content, 
+            (omitContent) ? null : parameters.getContent(), 
             signerCertificateChain,  
             signature,
             // Volvemos a crear la prefirma simulando una firma trifasica en la que la postfirma no cuenta con el
             // resultado de la prefirma
             CAdESTriPhaseSigner.preSign(
                 AOSignConstants.getDigestAlgorithmName(signatureAlgorithm), 
-                content, 
+                (omitContent) ? null : parameters.getContent(), 
                 signerCertificateChain, 
                 policy, 
                 signingCertificateV2, 
-                messageDigest,
+                (messageDigest == null && parameters.getContent() != null) ?
+                    MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
+                        messageDigest,
                 signDate
             )
         );
