@@ -12,8 +12,6 @@ package es.gob.afirma.core.ui;
 
 import java.io.File;
 
-import javax.swing.filechooser.FileFilter;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 
 /** Gestor de componentes de interfaz gr&aacute;fico
@@ -176,5 +174,5 @@ public interface AOUIManager {
      * @return Fichero guardado.
      * @throws NullPointerException
      *         No se introdujeron los datos que se desean almacenar. */
-    File saveDataToFile(final byte[] data, final File selectedFile, final FileFilter fileFilter, final Object parent);
+    File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent);
 }

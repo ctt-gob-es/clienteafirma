@@ -2,8 +2,6 @@ package es.gob.afirma.core.ui;
 
 import java.io.File;
 
-import javax.swing.filechooser.FileFilter;
-
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -182,7 +180,7 @@ public class AOUIFactory {
      *        Componente padre (para la modalidad)
      * @return Fichero en el qeu se almacenan los datos.
      */
-    public static File getSaveDataToFile(final byte[] data, final File selectedFile, final FileFilter fileFilter, final Object parent) {
+    public static File getSaveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
         return uiManager.saveDataToFile(data, selectedFile, fileFilter, parent);
     }
 }
