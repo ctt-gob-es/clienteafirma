@@ -218,6 +218,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	 * Muestra la ventana de la aplicaci�n
 	 */
 	public void main() {	
+		System.out.println("UserProfile.main");
 		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) {
 			JOptionPane.showMessageDialog(
 					null,
@@ -228,12 +229,12 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 					JOptionPane.ERROR_MESSAGE);
 			System.exit(-5);
 		}
+
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				setVisible(true);
 			}
-		});
-		
+		});	
 	}
 	
 //    /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
@@ -266,7 +267,8 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
     	}
     	GeneralConfig.loadConfig(GeneralConfig.getConfig());
     	new PrincipalGUI().main();
-		dispose();
+    	dispose();
+		
     }
     
     /**

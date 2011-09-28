@@ -36,6 +36,7 @@ public class Main {
      * @param args Par&aacute;metros de entrada.
      */
     public static void main(String[] args) {
+    	System.out.println("Main.main");
         try {
         	if (Platform.getOS().equals(Platform.OS.LINUX))
         		UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());

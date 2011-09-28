@@ -128,6 +128,11 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		    	resized(e);
 		    }
 		});
+//		if (Main.preferences.get("users", "0").equals("0")){
+//			UserProfile.currentUser=Constants.defaultUser;
+//		} else {
+//			UserProfile.main();
+//    	}
 	}
 
 	/**
@@ -197,6 +202,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		
 
 		crearPaneles();
+		
+		
 	}
 
 	/**
@@ -691,7 +698,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	/**
 	 * Muestra la ventana de la aplicaci�n
 	 */
-	public void main() {	
+	public void main() {
+		System.out.println("PrincipalGUI.main");
 		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) {
 			JOptionPane.showMessageDialog(
 					null,
