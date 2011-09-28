@@ -42,7 +42,7 @@ public class PreSignatureResult {
     /** Obtiene el FileID del PDF prefirmado.
      * @param fileID FileID del PDF prefirmado
      */
-    public void setFileID(String fileID) {
+    public void setFileID(final String fileID) {
         this.fileID = fileID;
     }
 }

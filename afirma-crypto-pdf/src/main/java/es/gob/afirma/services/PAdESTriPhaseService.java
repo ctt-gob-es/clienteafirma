@@ -38,21 +38,24 @@ public class PAdESTriPhaseService
     @Path("pre")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_XML)
-    public PreSignatureResult pre(@FormParam("base64Data") String base64Data,
-            @FormParam("algorithm") String algorithm,
-            @FormParam("base64CertificateChain") List<String> base64CertificateChain,
-            @FormParam("extraParamsNames") List<String> extraParamsNames,
-            @FormParam("extraParamsValues") List<String> extraParamsValues) throws Exception
+    public PreSignatureResult pre(@FormParam("base64Data")             final String base64Data,
+                                  @FormParam("algorithm")              final String algorithm,
+                                  @FormParam("base64CertificateChain") final List<String> base64CertificateChain,
+                                  @FormParam("extraParamsNames")       final List<String> extraParamsNames,
+                                  @FormParam("extraParamsValues")      final List<String> extraParamsValues) throws Exception
     {
-        byte[] data = Base64.decode(base64Data);
-        List<X509Certificate> certChain = buildCertificateChain(base64CertificateChain);
-        Properties extraParamsProperties = namesAndValuesListToProperties(extraParamsNames,
-                extraParamsValues);
+        final byte[] data = Base64.decode(base64Data);
+        final List<X509Certificate> certChain = buildCertificateChain(base64CertificateChain);
+        final Properties extraParamsProperties = namesAndValuesListToProperties(extraParamsNames, extraParamsValues);
 
-        PAdESTriPhaseSigner padesTri = new PAdESTriPhaseSigner();
-        PdfPreSignResult preSignature = padesTri.preSign(
-                AOSignConstants.getDigestAlgorithmName(algorithm), data,
-                certChain.toArray(new X509Certificate[] {}), null, extraParamsProperties);
+        final PAdESTriPhaseSigner padesTri = new PAdESTriPhaseSigner();
+        final PdfPreSignResult preSignature = padesTri.preSign(
+                AOSignConstants.getDigestAlgorithmName(algorithm), 
+                data,
+                certChain.toArray(new X509Certificate[] {}), 
+                null, 
+                extraParamsProperties
+        );
 
         return new PreSignatureResult(preSignature.getPreSign(), preSignature.getFileID());
     }
@@ -73,42 +76,36 @@ public class PAdESTriPhaseService
     @Path("post")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public String post(@FormParam("base64Data") String base64Data,
-            @FormParam("algorithm") String algorithm,
-            @FormParam("base64CertificateChain") List<String> base64CertificateChain,
-            @FormParam("extraParamsNames") List<String> extraParamsNames,
-            @FormParam("extraParamsValues") List<String> extraParamsValues,
-            @FormParam("base64Signature") String base64Signature,
-            @FormParam("base64PreSignData") String base64PreSignData,
-            @FormParam("fileID") String fileID) throws Exception
-    {
-        byte[] data = Base64.decode(base64Data);
-        List<X509Certificate> certChain = buildCertificateChain(base64CertificateChain);
-        Properties extraParamsProperties = namesAndValuesListToProperties(extraParamsNames,
-                extraParamsValues);
+    public String post(@FormParam("base64Data")             final String base64Data,
+                       @FormParam("algorithm")              final String algorithm,
+                       @FormParam("base64CertificateChain") final List<String> base64CertificateChain,
+                       @FormParam("extraParamsNames")       final List<String> extraParamsNames,
+                       @FormParam("extraParamsValues")      final List<String> extraParamsValues,
+                       @FormParam("base64Signature")        final String base64Signature,
+                       @FormParam("base64PreSignData")      final String base64PreSignData,
+                       @FormParam("fileID") String fileID) throws Exception {
+        
+        final byte[] data = Base64.decode(base64Data);
+        final List<X509Certificate> certChain = buildCertificateChain(base64CertificateChain);
+        final Properties extraParamsProperties = namesAndValuesListToProperties(extraParamsNames, extraParamsValues);
 
-        PAdESTriPhaseSigner padesTri = new PAdESTriPhaseSigner();
-        byte[] finalSignature = padesTri.postSign(
-                AOSignConstants.getDigestAlgorithmName(algorithm), data,
-                certChain.toArray(new X509Certificate[] {}), null, extraParamsProperties,
-                Base64.decode(base64Signature), Base64.decode(base64PreSignData), fileID);
+        final PAdESTriPhaseSigner padesTri = new PAdESTriPhaseSigner();
+        final byte[] finalSignature = padesTri.postSign(
+            AOSignConstants.getDigestAlgorithmName(algorithm), data,
+            certChain.toArray(new X509Certificate[] {}), null, extraParamsProperties,
+            Base64.decode(base64Signature), Base64.decode(base64PreSignData), fileID
+        );
 
         return Base64.encodeBytes(finalSignature);
     }
 
-    private List<X509Certificate> buildCertificateChain(List<String> base64CertificateChain)
-            throws CertificateException
-    {
-        List<X509Certificate> certChain = new ArrayList<X509Certificate>();
+    private List<X509Certificate> buildCertificateChain(final List<String> base64CertificateChain) throws CertificateException {
+        final List<X509Certificate> certChain = new ArrayList<X509Certificate>();
+        final CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
 
-        CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
-
-        for (String base64Certificate : base64CertificateChain)
-        {
-            byte[] certificateData = Base64.decode(base64Certificate);
-            X509Certificate certificate = (X509Certificate) cf
-                    .generateCertificate(new ByteArrayInputStream(certificateData));
-            certChain.add(certificate);
+        for (final String base64Certificate : base64CertificateChain) {
+            final byte[] certificateData = Base64.decode(base64Certificate);
+            certChain.add((X509Certificate) cf.generateCertificate(new ByteArrayInputStream(certificateData)));
         }
         return certChain;
     }
@@ -118,15 +115,12 @@ public class PAdESTriPhaseService
      * @param values Valores de las propiedades
      * @return Fichero de propiedades
      */
-    public static Properties namesAndValuesListToProperties(List<String> names, List<String> values)
-    {
-        Properties p = new Properties();
-
-        for (int i = 0; i < names.size(); i++)
-        {
+    private static Properties namesAndValuesListToProperties(final List<String> names, final List<String> values) {
+        final Properties p = new Properties();
+        for (int i = 0; i < names.size(); i++) {
             p.put(names.get(i), values.get(i));
         }
-
         return p;
-    }    
+    }
+    
 }

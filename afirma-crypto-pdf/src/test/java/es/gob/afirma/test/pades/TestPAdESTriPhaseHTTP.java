@@ -38,8 +38,8 @@ import es.gob.afirma.signers.cades.PKCS1ExternalizableSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 
 /** Conjunto de pruebas de las firmas trif&aacute;sicas PAdES. */
-public class TestPAdESTriPhaseHTTP extends JerseyTest
-{
+public class TestPAdESTriPhaseHTTP extends JerseyTest {
+    
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
@@ -49,8 +49,7 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest
     private WebResource resource;
 
     /** Pruabas de las firmas trif&aacute;sicas PAdES usando comunicaci&oacute;n HTTP. Necesita un iText modificado */
-    public TestPAdESTriPhaseHTTP()
-    {
+    public TestPAdESTriPhaseHTTP() {
         super(new WebAppDescriptor.Builder("es.gob.afirma.services") //$NON-NLS-1$
                 .contextParam("webAppRootKey", "afirma-services.root") //$NON-NLS-1$ //$NON-NLS-2$
                 .servletClass(ServletContainer.class)
@@ -61,8 +60,8 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest
     }
 
     private final static Properties p1;
-    static
-    {
+    
+    static {
         p1 = new Properties();
         p1.setProperty("format", AOSignConstants.SIGN_FORMAT_PDF); //$NON-NLS-1$
         p1.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
@@ -75,33 +74,34 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest
 
     /** Algoritmos de firma a probar. */
     private final static String[] ALGOS = new String[] {
-            AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
-            AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA, };
+        AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
+        AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA,
+        AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA,
+        AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA, 
+    };
 
-    private byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry,
-            Properties extraParams) throws Exception
-    {
-        X509Certificate[] certChain = (X509Certificate[]) keyEntry.getCertificateChain();
+    private byte[] sign(final byte[] data, 
+                        final String algorithm, 
+                        final PrivateKeyEntry keyEntry,
+                        final Properties extraParams) throws Exception {
+        
+        final X509Certificate[] certChain = (X509Certificate[]) keyEntry.getCertificateChain();
+        
+        final PreSignatureResult preSignatureResult = preSignature(data, algorithm, extraParams, certChain);
 
-        PreSignatureResult preSignatureResult = preSignature(data, algorithm, extraParams,
-                certChain);
-
-        final byte[] signature = PKCS1ExternalizableSigner.sign(algorithm, keyEntry,
-                preSignatureResult.getPreSignData());
+        final byte[] signature = PKCS1ExternalizableSigner.sign(algorithm, keyEntry, preSignatureResult.getPreSignData());
 
         return postSignature(data, algorithm, extraParams, certChain, preSignatureResult, signature);
     }
 
-    private PreSignatureResult preSignature(final byte[] data, final String algorithm,
-            Properties extraParams, X509Certificate[] certChain)
-            throws CertificateEncodingException
-    {
-        MultivaluedMap<String, String> params = convertParamsToMultivalueMap(data, algorithm,
-                extraParams, certChain);
+    private PreSignatureResult preSignature(final byte[] data, 
+                                            final String algorithm,
+                                            final Properties extraParams, 
+                                            final X509Certificate[] certChain) throws CertificateEncodingException {
+        
+        final MultivaluedMap<String, String> params = convertParamsToMultivalueMap(data, algorithm, extraParams, certChain);
 
-        ClientResponse response = this.resource.path("pades/pre") //$NON-NLS-1$
+        final ClientResponse response = this.resource.path("pades/pre") //$NON-NLS-1$
                 .type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, params);
 
         Assert.assertEquals(200, response.getStatus());
@@ -109,16 +109,15 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest
         return response.getEntity(PreSignatureResult.class);
     }
 
-    private byte[] postSignature(final byte[] data, final String algorithm, Properties extraParams,
-            X509Certificate[] certChain, PreSignatureResult preSignatureResult,
-            final byte[] signature) throws CertificateEncodingException
-    {
-        MultivaluedMap<String, String> params;
-        ClientResponse response;
-        params = convertParamsToMultivalueMap(data, algorithm, extraParams, certChain, signature,
-                preSignatureResult);
-
-        response = this.resource.path("pades/post").type(MediaType.APPLICATION_FORM_URLENCODED) //$NON-NLS-1$
+    private byte[] postSignature(final byte[] data, 
+                                 final String algorithm, 
+                                 final Properties extraParams,
+                                 final X509Certificate[] certChain, 
+                                 final PreSignatureResult preSignatureResult,
+                                 final byte[] signature) throws CertificateEncodingException {
+        
+        final MultivaluedMap<String, String> params = convertParamsToMultivalueMap(data, algorithm, extraParams, certChain, signature, preSignatureResult);
+        final ClientResponse response = this.resource.path("pades/post").type(MediaType.APPLICATION_FORM_URLENCODED) //$NON-NLS-1$
                 .post(ClientResponse.class, params);
 
         Assert.assertEquals(200, response.getStatus());
@@ -126,13 +125,14 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest
         return Base64.decode(response.getEntity(String.class));
     }
 
-    private MultivaluedMap<String, String> convertParamsToMultivalueMap(byte[] data,
-            String algorithm, Properties extraParams, X509Certificate[] certChain,
-            byte[] signature, PreSignatureResult preSignatureResult)
-            throws CertificateEncodingException
-    {
-        MultivaluedMap<String, String> params = convertParamsToMultivalueMap(data, algorithm,
-                extraParams, certChain);
+    private MultivaluedMap<String, String> convertParamsToMultivalueMap(final byte[] data,
+                                                                        final String algorithm, 
+                                                                        final Properties extraParams, 
+                                                                        final X509Certificate[] certChain,
+                                                                        final byte[] signature, 
+                                                                        final PreSignatureResult preSignatureResult) throws CertificateEncodingException {
+        
+        final MultivaluedMap<String, String> params = convertParamsToMultivalueMap(data, algorithm, extraParams, certChain);
 
         params.add("base64Signature", Base64.encodeBytes(signature)); //$NON-NLS-1$
         params.add("base64PreSignData", Base64.encodeBytes(preSignatureResult.getPreSignData())); //$NON-NLS-1$
@@ -142,20 +142,19 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest
     }
 
     private MultivaluedMap<String, String> convertParamsToMultivalueMap(final byte[] data,
-            final String algorithm, Properties extraParams, X509Certificate[] certChain)
-            throws CertificateEncodingException
-    {
-        MultivaluedMap<String, String> params = new MultivaluedMapImpl();
+                                                                        final String algorithm, 
+                                                                        final Properties extraParams, 
+                                                                        final X509Certificate[] certChain) throws CertificateEncodingException {
+        
+        final MultivaluedMap<String, String> params = new MultivaluedMapImpl();
         params.add("base64Data", Base64.encodeBytes(data)); //$NON-NLS-1$
         params.add("algorithm", algorithm); //$NON-NLS-1$
 
-        for (X509Certificate certificate : certChain)
-        {
+        for (final X509Certificate certificate : certChain) {
             params.add("base64CertificateChain", Base64.encodeBytes(certificate.getEncoded())); //$NON-NLS-1$
         }
 
-        for (Entry<Object, Object> entry : extraParams.entrySet())
-        {
+        for (final Entry<Object, Object> entry : extraParams.entrySet()) {
             params.add("extraParamsNames", (String) entry.getKey()); //$NON-NLS-1$
             params.add("extraParamsValues", (String) entry.getValue()); //$NON-NLS-1$
         }
@@ -166,17 +165,16 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest
     /** Pruabas de las firmas trif&aacute;sicas PAdES usando llamadas locales. Necesita un iText modificado 
      * @throws Exception en caso de cualquier error*/
     @Test
-    public void testTriPhaseSignature() throws Exception
-    {
+    public void testTriPhaseSignature() throws Exception {
         Assert.assertEquals("file.signed.pdf", AOPDFSigner.getSignedName("file.pdf")); //$NON-NLS-1$ //$NON-NLS-2$
 
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
-        final PrivateKeyEntry pke;
+        
         final X509Certificate cert;
 
         KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
-        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS,
+        final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS,
                 new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
         cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
 
