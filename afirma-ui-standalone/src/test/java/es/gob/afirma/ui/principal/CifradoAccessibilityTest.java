@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 
 /**
@@ -79,6 +80,9 @@ public class CifradoAccessibilityTest {
 		logger.info("testNotDuplicatedLabelForProperty_AdvancedMode");
 		
 		//Se obtiene la cofiguración general
+		//Se añade el perfil por defecto
+		UserProfile.currentUser=Constants.defaultUser;
+		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
 		//Se cambia al modo avanzado
 		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true");
@@ -125,6 +129,9 @@ public class CifradoAccessibilityTest {
 		logger.info("testNotDuplicatedDisplayedMnemonic_AdvancedMode");
 		
 		//Se obtiene la cofiguración general
+		//Se añade el perfil por defecto
+		UserProfile.currentUser=Constants.defaultUser;
+		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
 		//Se cambia al modo avanzado
 		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true");
