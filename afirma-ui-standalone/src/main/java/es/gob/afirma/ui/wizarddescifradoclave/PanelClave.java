@@ -45,6 +45,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -290,71 +291,69 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	if (clave == null || clave.equals("")) {
     		JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
-    	} else {
-    		byte[] fileContent = null;
-    		try {
-    			fileContent = this.getFileContent();
-    		} catch (NullPointerException ex) {
-    			logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-    			ex.printStackTrace();
-    			JOptionPane.showMessageDialog(
-    					this,
-    					Messages.getString("Descifrado.msg.fichero"),
-    					Messages.getString("Descifrado.btndescifrar"),
-    					JOptionPane.WARNING_MESSAGE
-    			);
-    			dispose();
-    			return false;
-    		} catch (FileNotFoundException ex) {
-    			logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
-    			ex.printStackTrace();
-    			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"),
-    					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    			dispose();
-    			return false;
-    		} catch (Exception ex) {
-    			logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-    			ex.printStackTrace();
-    			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
-    					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    			dispose();
-    			return false;
-    		}
+    	}
+    	byte[] fileContent = null;
+    	try {
+    	    fileContent = this.getFileContent();
+    	} catch (NullPointerException ex) {
+    	    logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+    	    ex.printStackTrace();
+    	    JOptionPane.showMessageDialog(
+    	            this,
+    	            Messages.getString("Descifrado.msg.fichero"),
+    	            Messages.getString("Descifrado.btndescifrar"),
+    	            JOptionPane.WARNING_MESSAGE
+    	    );
+    	    dispose();
+    	    return false;
+    	} catch (FileNotFoundException ex) {
+    	    logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
+    	    ex.printStackTrace();
+    	    JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"),
+    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    	    dispose();
+    	    return false;
+    	} catch (Exception ex) {
+    	    logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+    	    ex.printStackTrace();
+    	    JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
+    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    	    dispose();
+    	    return false;
+    	}
 
-    		byte[] result = null;
-    		try {
-    			Key tmpKey = cipherConfig.getCipher().decodeKey(clave, cipherConfig.getConfig(), null);
-    			result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
-    		} catch (InvalidKeyException e) {
-    			logger.severe("Clave no valida: " + e);
-    			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.clave"), 
-    					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    			return false;
-    		} catch (AOException ex) {
-    			logger.severe("Error al descifrar, compruebe que el fichero esta cifrado con el algoritmo seleccionado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-    			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.malcifrado"), 
-    					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    			dispose();
-    			return false;
-    		} catch (Exception ex) {
-    			logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-    			ex.printStackTrace();
-    			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.operacion"), 
-    					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    	byte[] result = null;
+    	try {
+    	    Key tmpKey = cipherConfig.getCipher().decodeKey(clave, cipherConfig.getConfig(), null);
+    	    result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
+    	} catch (InvalidKeyException e) {
+    	    logger.severe("Clave no valida: " + e);
+    	    JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.clave"), 
+    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    	    return false;
+    	} catch (AOException ex) {
+    	    logger.severe("Error al descifrar, compruebe que el fichero esta cifrado con el algoritmo seleccionado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+    	    JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.malcifrado"), 
+    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    	    dispose();
+    	    return false;
+    	} catch (Exception ex) {
+    	    logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+    	    ex.printStackTrace();
+    	    JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.operacion"), 
+    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 
-    			// Si el error se dio en el proceso de descifrado y es distinto
-    			// a una clave incorrecta, entonces abortamos la operacion
-    			// cerrando el panel del Wizard
-    			dispose();
-    			return false;
-    		}
+    	    // Si el error se dio en el proceso de descifrado y es distinto
+    	    // a una clave incorrecta, entonces abortamos la operacion
+    	    // cerrando el panel del Wizard
+    	    dispose();
+    	    return false;
+    	}
 
-    		// Almacenamos el fichero de salida de la operacion
-    		final File savedFile = AOUIFactory.getSaveDataToFile(result,
-    		        new File(new File(rutaFichero).getParentFile(), "fichero"), null, this);
-    		if (savedFile == null) {
-				return false;
-			}
+    	// Almacenamos el fichero de salida de la operacion
+    	final File savedFile = SelectionDialog.saveDataToFile(result, "fichero", null, this);
+    	if (savedFile == null) {
+    	    return false;
     	}
 
     	return true;

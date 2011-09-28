@@ -60,6 +60,7 @@ import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -525,8 +526,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		}
 
     		// Guardamos el sobre generado
-    		final File savedFile = AOUIFactory.getSaveDataToFile(envelopedData,
-    		        new File(rutafichero), null, this);
+    		final File savedFile = SelectionDialog.saveDataToFile(envelopedData,
+    		        new File(rutafichero).getName(), null, this);
     		// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 			if (savedFile == null) {
 				return false;

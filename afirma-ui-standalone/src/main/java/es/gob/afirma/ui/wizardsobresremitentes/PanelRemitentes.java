@@ -60,6 +60,7 @@ import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.SignFileUtils;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
@@ -443,8 +444,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		envelopedData = doCoEnvelopOperation(envelopedData, contentType, privateKey);
 
     		// Guardamos el sobre generado
-    		File savedFile = AOUIFactory.getSaveDataToFile(envelopedData,
-    		        new File(this.rutafichero + ".csig"), //$NON-NLS-1$
+    		File savedFile = SelectionDialog.saveDataToFile(envelopedData,
+    		        new File(this.rutafichero + ".csig").getName(), //$NON-NLS-1$
     		        SignFileUtils.getOutFileFilter(AOSignConstants.SIGN_FORMAT_CMS),
     		        this);
     		// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
@@ -452,7 +453,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				return false;
 			}
     		
-    		try { 
+    		try {
     			dataFis.close(); 
     		} catch (Exception e) { 
     			logger.warning("No se pudo cerrar el fichero de datos"); 

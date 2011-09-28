@@ -41,6 +41,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -265,8 +266,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 
 		// Almacenamos el fichero de salida de la operacion
 	      
-		final File savedFile = AOUIFactory.getSaveDataToFile(result,
-		        new File(new File(rutaFichero).getParentFile(), "fichero"), null, this);
+		final File savedFile = SelectionDialog.saveDataToFile(result, "fichero", null, this); //$NON-NLS-1$
 
 		// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 		if (savedFile == null) {

@@ -504,8 +504,8 @@ public class Firma extends JPanel {
 				}
 
 				// Guardamos la firma en fichero
-				final File savedFile = AOUIFactory.getSaveDataToFile(signedData,
-                        new File(SignedFileManager.getOutFileName(this.getFilename(campoFichero.getText()), formato)),
+				final File savedFile = SelectionDialog.saveDataToFile(signedData,
+                        SignedFileManager.getOutFileName(this.getFilename(campoFichero.getText()), formato),
                         SignedFileManager.getOutFileFilter(formato),
                         this);
 				

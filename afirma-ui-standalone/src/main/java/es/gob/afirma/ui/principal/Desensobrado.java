@@ -375,7 +375,7 @@ public class Desensobrado extends JPanel {
     		}
 
     		// Salvamos los datos
-    		File file = AOUIFactory.getSaveDataToFile(recoveredData, new File(name), null, this);
+    		File file = SelectionDialog.saveDataToFile(recoveredData, name, null, this);
     		if (file != null && checkIniciar.isSelected()){
     			Utils.openFile(file);
     		}

@@ -291,8 +291,8 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		
 		if (signedData != null) {
 			// Salvamos el fichero de datos
-			final File savedFile = AOUIFactory.getSaveDataToFile(signedData,
-		            new File(aoSigner.getSignedName(dataFilepath, ".signed")), //$NON-NLS-1$
+			final File savedFile = SelectionDialog.saveDataToFile(signedData,
+		            aoSigner.getSignedName(dataFilepath, ".signed"), //$NON-NLS-1$
 		            SignFileUtils.getOutFileFilter(formato), this);
 			// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 			if (savedFile == null) {

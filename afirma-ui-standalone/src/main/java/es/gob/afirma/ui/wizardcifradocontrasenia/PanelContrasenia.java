@@ -42,6 +42,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -307,8 +308,8 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
                 JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             else {
                 // Almacenamos el fichero de salida de la operacion
-            	final File savedFile = AOUIFactory.getSaveDataToFile(result,
-                        new File(new File(rutaFichero).getParentFile(), "cifrado"), null, this);
+            	final File savedFile = SelectionDialog.saveDataToFile(result,
+                        "cifrado", null, this); //$NON-NLS-1$
                 if (savedFile == null) {
 					return false;
 				}

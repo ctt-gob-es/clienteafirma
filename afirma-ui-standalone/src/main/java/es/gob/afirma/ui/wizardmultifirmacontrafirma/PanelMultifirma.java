@@ -63,6 +63,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -449,8 +450,8 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				return false;
 
 			// Salvamos el fichero de datos
-			final File savedFile = AOUIFactory.getSaveDataToFile(signedData,
-                    new File(signer.getSignedName(rutaFichero, intText)), null, this);
+			final File savedFile = SelectionDialog.saveDataToFile(signedData,
+                    signer.getSignedName(rutaFichero, intText), null, this);
 			// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 			if (savedFile == null) {
 				return false;

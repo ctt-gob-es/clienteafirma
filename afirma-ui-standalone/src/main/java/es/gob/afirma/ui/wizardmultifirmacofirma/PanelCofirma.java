@@ -351,8 +351,8 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 					return false;
 				}
 				
-				final File savedFile = AOUIFactory.getSaveDataToFile(coSignedData,
-				        new File(signer.getSignedName(ficheroDatos, intText)), null, this);
+				final File savedFile = SelectionDialog.saveDataToFile(coSignedData,
+				        signer.getSignedName(ficheroDatos, intText), null, this);
 				// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 				if (savedFile == null) {
 					return false;

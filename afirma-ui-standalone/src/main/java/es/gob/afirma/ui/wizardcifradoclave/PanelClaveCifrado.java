@@ -53,6 +53,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -375,81 +376,80 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	 */
 	private Boolean cifrarFichero() {
 
-		// Comprobamos si se ha generado alguna clave
-		if (campoClave.getText() == null || campoClave.getText().equals("")){
-			JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-			return false;
-		} else {
-			// Generamos la clave necesaria para el cifrado
-			try {
-				cipherKey = cipherConfig.getCipher().decodeKey(campoClave.getText(), cipherConfig.getConfig(), null);
-			} catch (Exception ex) {
-				logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex);
-				JOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.cifrado"), 
-						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-				return false;
-			}
-			
-			// Leemos el fichero de datos
-			byte[] fileContent = null;
-			try {
-				fileContent = getFileContent();
-			} catch (NullPointerException ex) {
-				logger.warning("No se ha indicado un fichero de datos: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-				dispose();
-				return false;
-			} catch (FileNotFoundException ex) {
-				logger.warning("No se encuentra el fichero: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-				dispose();
-				return false;
-			} catch (Exception ex) {
-				logger.warning("Ocurrio un error al leer el fichero: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-				dispose();
-				return false;
-			}                
+	    // Comprobamos si se ha generado alguna clave
+	    if (campoClave.getText() == null || campoClave.getText().equals("")){
+	        JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+	        return false;
+	    }
+	    // Generamos la clave necesaria para el cifrado
+	    try {
+	        cipherKey = cipherConfig.getCipher().decodeKey(campoClave.getText(), cipherConfig.getConfig(), null);
+	    } catch (Exception ex) {
+	        logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex);
+	        JOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.cifrado"), 
+	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+	        return false;
+	    }
 
-			// Ciframos los datos
-			byte[] result = null;
-			try {
-				result = cipherConfig.getCipher().cipher(fileContent, cipherConfig.getConfig(), cipherKey);
-			} catch (InvalidKeyException e) {
-				logger.severe("Clave no valida: " + e);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clave"), 
-						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-				return false;
-			} catch (Exception ex) {
-				logger.warning("Error al cifrar: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.operacion"), 
-						Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+	    // Leemos el fichero de datos
+	    byte[] fileContent = null;
+	    try {
+	        fileContent = getFileContent();
+	    } catch (NullPointerException ex) {
+	        logger.warning("No se ha indicado un fichero de datos: " + ex);
+	        JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+	        dispose();
+	        return false;
+	    } catch (FileNotFoundException ex) {
+	        logger.warning("No se encuentra el fichero: " + ex);
+	        JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+	        dispose();
+	        return false;
+	    } catch (Exception ex) {
+	        logger.warning("Ocurrio un error al leer el fichero: " + ex);
+	        JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+	        dispose();
+	        return false;
+	    }                
 
-				// Si el error se dio en el proceso de cifrado y es distinto
-				// a una clave incorrecta, entonces abortamos la operacion
-				// cerrando el panel del Wizard
-				dispose();
-				return false;
-			}
+	    // Ciframos los datos
+	    byte[] result = null;
+	    try {
+	        result = cipherConfig.getCipher().cipher(fileContent, cipherConfig.getConfig(), cipherKey);
+	    } catch (InvalidKeyException e) {
+	        logger.severe("Clave no valida: " + e);
+	        JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clave"), 
+	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+	        return false;
+	    } catch (Exception ex) {
+	        logger.warning("Error al cifrar: " + ex);
+	        JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.operacion"), 
+	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 
-			// Guardamos los datos
-			if (result == null) {
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
-				return false;
-			} else {
-				// Almacenamos el fichero de salida de la operacion
-				 final File savedFile = AOUIFactory.getSaveDataToFile(result, new File(new File(rutaFichero).getParentFile(), "cifrado"), null, this); //$NON-NLS-1$
-				 if (savedFile == null) {
-					return false;
-				}
+	        // Si el error se dio en el proceso de cifrado y es distinto
+	        // a una clave incorrecta, entonces abortamos la operacion
+	        // cerrando el panel del Wizard
+	        dispose();
+	        return false;
+	    }
 
-				// Guardamos la clave de cifrado si se solicito 
-				if (checkGuardar.isSelected()) {
-					guardarClaveCifrado();
-				}
-			}
-		}
-		return true;
+	    // Guardamos los datos
+	    if (result == null) {
+	        JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
+	        return false;
+	    }
+	    // Almacenamos el fichero de salida de la operacion
+	    final File savedFile = SelectionDialog.saveDataToFile(result, "cifrado", null, this); //$NON-NLS-1$
+	    if (savedFile == null) {
+	        return false;
+	    }
+
+	    // Guardamos la clave de cifrado si se solicito 
+	    if (checkGuardar.isSelected()) {
+	        guardarClaveCifrado();
+	    }
+
+	    return true;
 	}
 	
 	/**
