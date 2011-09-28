@@ -296,15 +296,15 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
     }
 
-    @Override public void keyTyped(final KeyEvent ke) {}
-    @Override public void keyReleased(final KeyEvent ke) {}
+    @Override public void keyTyped(final KeyEvent ke) { /* No implementado */ }
+    @Override public void keyReleased(final KeyEvent ke) { /* No implementado */ }
 
-    @Override public void windowOpened(final WindowEvent we) {}
-    @Override public void windowClosed(final WindowEvent we) {}
-    @Override public void windowActivated(final WindowEvent we) {}
-    @Override public void windowIconified(final WindowEvent we) {}
-    @Override public void windowDeiconified(final WindowEvent we) {}
-    @Override public void windowDeactivated(final WindowEvent we) {}
+    @Override public void windowOpened(final WindowEvent we) { /* No implementado */ }
+    @Override public void windowClosed(final WindowEvent we) { /* No implementado */ }
+    @Override public void windowActivated(final WindowEvent we) { /* No implementado */ }
+    @Override public void windowIconified(final WindowEvent we) { /* No implementado */ }
+    @Override public void windowDeiconified(final WindowEvent we) { /* No implementado */ }
+    @Override public void windowDeactivated(final WindowEvent we) { /* No implementado */ }
 
     /** Cierra la aplicaci&oacute;n.
      * @param exitCode
@@ -487,7 +487,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     // ***** APLICACION COMO APPLET ******************
     // ***********************************************
 
-    private void createUI() {
+    void createUI() {
         if (!LookAndFeelManager.HIGH_CONTRAST) {
             this.setBackground(LookAndFeelManager.WINDOW_COLOR);
         }

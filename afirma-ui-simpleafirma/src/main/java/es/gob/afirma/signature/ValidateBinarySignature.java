@@ -17,12 +17,12 @@ import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import sun.security.x509.AlgorithmId;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 
 /**
  * Validador de firmas Adobe PDF.
@@ -132,23 +132,23 @@ public final class ValidateBinarySignature {
 
                 String mdAlgorithm;
                 final String mdAlgorithmOID = signer.getDigestAlgorithmID().getAlgorithm().toString();
-                if (AlgorithmId.MD2_oid.toString().equals(mdAlgorithmOID)) {
+                if (AOAlgorithmID.getOID("MD2").equals(mdAlgorithmOID)) { //$NON-NLS-1$
                     mdAlgorithm = "MD2"; //$NON-NLS-1$
                 }
-                else if (AlgorithmId.MD5_oid.toString().equals(mdAlgorithmOID)) {
+                else if (AOAlgorithmID.getOID("MD5").equals(mdAlgorithmOID)) { //$NON-NLS-1$
                     mdAlgorithm = "MD5"; //$NON-NLS-1$
                 }
-                else if (AlgorithmId.SHA_oid.toString().equals(mdAlgorithmOID)) {
+                else if (AOAlgorithmID.getOID("SHA1").equals(mdAlgorithmOID)) { //$NON-NLS-1$
                     mdAlgorithm = "SHA1"; //$NON-NLS-1$
                 }
-                else if (AlgorithmId.SHA256_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "SHA256"; //$NON-NLS-1$
+                else if (AOAlgorithmID.getOID("SHA-256").equals(mdAlgorithmOID)) { //$NON-NLS-1$
+                    mdAlgorithm = "SHA-256"; //$NON-NLS-1$
                 }
-                else if (AlgorithmId.SHA384_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "SHA384"; //$NON-NLS-1$
+                else if (AOAlgorithmID.getOID("SHA-384").equals(mdAlgorithmOID)) { //$NON-NLS-1$
+                    mdAlgorithm = "SHA-384"; //$NON-NLS-1$
                 }
-                else if (AlgorithmId.SHA512_oid.toString().equals(mdAlgorithmOID)) {
-                    mdAlgorithm = "SHA512"; //$NON-NLS-1$
+                else if (AOAlgorithmID.getOID("SHA-512").equals(mdAlgorithmOID)) { //$NON-NLS-1$
+                    mdAlgorithm = "SHA-512"; //$NON-NLS-1$
                 } else {
                     throw new NoSuchAlgorithmException("Algoritmo de huella digital no reconocido"); //$NON-NLS-1$
                 }

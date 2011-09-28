@@ -21,7 +21,7 @@ public class Messages {
 
     private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault());
 
-    private Messages() {}
+    private Messages() { /* No permitimos la instanciacion */ }
 
     /** Obtiene un mensaje.
      * @param key Clave del mensaje

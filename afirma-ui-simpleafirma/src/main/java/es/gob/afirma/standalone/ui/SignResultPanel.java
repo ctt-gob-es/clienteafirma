@@ -40,7 +40,7 @@ final class SignResultPanel extends JPanel {
         });
     }
 
-    private void createUI(final SignValidity validity) {
+    void createUI(final SignValidity validity) {
 
         // Para que se detecten apropiadamente los hipervinculos hay que establecer
         // el tipo de contenido antes que el contenido

@@ -86,7 +86,7 @@ public final class DNIeManager {
     /** Comprueba si el ATR proporcionado corresponde a un DNIe.
      * @param atr ATR que se dese comprobar si pertenece a un DNIe
      * @return <code>true</code> si el ATR proporcionado es de un DNIe, <code>false</code> si no lo es */
-    private static boolean itsDNIe(final byte[] atr) throws BlownDNIeException {
+    static boolean itsDNIe(final byte[] atr) throws BlownDNIeException {
 
         if (atr == null) {
             return false;
@@ -158,7 +158,7 @@ public final class DNIeManager {
                         try {
                             this.cardTerminal.waitForCardAbsent(0);
                         }
-                        catch (final CardException ce) { }
+                        catch (final CardException ce) { /* Ignoramos los errores */ }
                         //return;
                     }
                 } while (!validCard);

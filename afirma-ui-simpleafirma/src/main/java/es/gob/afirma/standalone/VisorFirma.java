@@ -140,12 +140,12 @@ public class VisorFirma extends JApplet implements WindowListener {
         closeApplication(0);
     }
     
-    @Override public void windowOpened(final WindowEvent e) { }
-    @Override public void windowClosed(final WindowEvent e) { }
-    @Override public void windowIconified(final WindowEvent e) { }
-    @Override public void windowDeiconified(final WindowEvent e) { }
-    @Override public void windowActivated(final WindowEvent e) { }
-    @Override public void windowDeactivated(final WindowEvent e) { }
+    @Override public void windowOpened(final WindowEvent e) { /* No implementado */ }
+    @Override public void windowClosed(final WindowEvent e) { /* No implementado */ }
+    @Override public void windowIconified(final WindowEvent e) { /* No implementado */ }
+    @Override public void windowDeiconified(final WindowEvent e) { /* No implementado */ }
+    @Override public void windowActivated(final WindowEvent e) {  /* No implementado */ }
+    @Override public void windowDeactivated(final WindowEvent e) { /* No implementado */ }
 
     /** Cierra la aplicaci&oacute;n.
      * @param exitCode

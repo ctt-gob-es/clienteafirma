@@ -31,7 +31,7 @@ import es.gob.afirma.standalone.ui.DNIePasswordCallback;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 final class SimpleKeyStoreManager {
 
-    private SimpleKeyStoreManager() {}
+    private SimpleKeyStoreManager() { /* No permitimos la instanciacion */ }
 
     private static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
@@ -99,8 +99,8 @@ final class SimpleKeyStoreManager {
                      parent
                  );
             }
-            catch(final AOCancelledOperationException e) {}
-            catch(final AOKeystoreAlternativeException e) {}
+            catch(final AOCancelledOperationException e) { /* Operacion cancelada por el usuario */ }
+            catch(final AOKeystoreAlternativeException e) { /* No tratamos un almacen alternativo */ }
             catch(final Exception e) {
                 Logger.getLogger("es.gob.afirma").warning("No se ha podido inicializar el controlador PKCS#11 del DNIe (" + lib + "): " + e);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
             }

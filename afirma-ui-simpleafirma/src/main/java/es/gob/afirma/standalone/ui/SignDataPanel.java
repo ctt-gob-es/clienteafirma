@@ -71,7 +71,7 @@ final class SignDataPanel extends JPanel {
         });
     }
 
-    private void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
+    void createUI(final File signFile, final byte[] sign, final JComponent fileTypeIcon, final X509Certificate cert) {
 
         // Texto con la ruta del fichero
         final JTextField filePath = new JTextField();
@@ -296,16 +296,16 @@ final class SignDataPanel extends JPanel {
         this.add(detailPanel, c);
     }
 
-    private void openCertificate(final X509Certificate cert) {
+    void openCertificate(final X509Certificate cert) {
         try {
             final File tmp = File.createTempFile("afirma", ".cer");  //$NON-NLS-1$//$NON-NLS-2$
             tmp.deleteOnExit();
             final OutputStream fos = new FileOutputStream(tmp);
             final OutputStream bos = new BufferedOutputStream(fos);
             bos.write(cert.getEncoded());
-            try { bos.flush(); } catch(final Exception e) {}
-            try { bos.close(); } catch(final Exception e) {}
-            try { fos.close(); } catch(final Exception e) {}
+            try { bos.flush(); } catch(final Exception e) { /* Ignoramos los errores */ }
+            try { bos.close(); } catch(final Exception e) { /* Ignoramos los errores */ }
+            try { fos.close(); } catch(final Exception e) { /* Ignoramos los errores */ }
             Desktop.getDesktop().open(tmp);
         }
         catch(final Exception e) {

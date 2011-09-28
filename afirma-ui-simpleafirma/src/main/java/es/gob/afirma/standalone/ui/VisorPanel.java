@@ -45,7 +45,7 @@ public final class VisorPanel extends JPanel {
     /** Version ID */
     private static final long serialVersionUID = 8309157734617505338L;
     
-    private final VisorFirma visorFirma;
+    final VisorFirma visorFirma;
 
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
@@ -73,19 +73,21 @@ public final class VisorPanel extends JPanel {
         openSign(signFile, sign, addReloadButton);
     }
 
-    private void openSign(final File signFile, byte[] sign, final boolean addRealoadButton) {
+    private void openSign(final File signFile, final byte[] signature, final boolean addRealoadButton) {
 
-        if (signFile == null && sign == null) {
+        if (signFile == null && signature == null) {
             Logger.getLogger("es.gob.afirma").warning("Se ha intentado abrir una firma nula");  //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
+        
+        byte[] sign = (signature != null) ?  signature.clone() : null;
 
         if (sign == null) {
             if (signFile != null) {
                 try {
                     final FileInputStream fis = new FileInputStream(signFile);
                     sign = AOUtil.getDataFromInputStream(fis);
-                    try { fis.close(); } catch (final Exception e) { }
+                    try { fis.close(); } catch (final Exception e) { /* Ignoramos los errores */ }
                 }
                 catch (final Exception e) {
                     Logger.getLogger("es.gob.afirma").warning("No se ha podido cargar el fichero de firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$

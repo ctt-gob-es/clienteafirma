@@ -44,15 +44,12 @@ public final class UIUtils {
         );
     }
     
-    static boolean hasAssociatedApplication(String extension) {
+    static boolean hasAssociatedApplication(final String extension) {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             if (extension == null || "".equals(extension)) { //$NON-NLS-1$
                 return false;
-            }
-            if (!extension.startsWith(".")) { //$NON-NLS-1$
-                extension = "." + extension; //$NON-NLS-1$
-            }       
-            final Object o = WinRegistryWrapper.get(WinRegistryWrapper.HKEY_CLASSES_ROOT, extension, ""); //$NON-NLS-1$
+            }     
+            final Object o = WinRegistryWrapper.get(WinRegistryWrapper.HKEY_CLASSES_ROOT, (extension.startsWith(".")) ? extension : ("." + extension), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             if (o == null) {
                 return false;
             }

@@ -214,10 +214,10 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         }
     }
 
-    @Override public void componentMoved(ComponentEvent e) { }
+    @Override public void componentMoved(ComponentEvent e) { /* No implementado */ }
 
-    @Override public void componentHidden(ComponentEvent e) { }
+    @Override public void componentHidden(ComponentEvent e) { /* No implementado */ }
     
-    @Override public void componentShown(ComponentEvent e) { }
+    @Override public void componentShown(ComponentEvent e) { /* No implementado */ }
 
 }

@@ -16,7 +16,7 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 
 	private static final long serialVersionUID = 1750985678317829383L;
 
-	private final JTextComponent textComponent;
+	final JTextComponent textComponent;
 
 	private void createUI(final String text) {
 		final JMenuItem copyItem = new JMenuItem(text);
@@ -39,6 +39,8 @@ final class CopyMenuItem extends JPopupMenu implements ClipboardOwner {
 	}
 
 	@Override
-	public void lostOwnership(final Clipboard clipboard, final Transferable contents) {}
+	public void lostOwnership(final Clipboard clipboard, final Transferable contents) {
+	    // No implementado
+	}
 
 }

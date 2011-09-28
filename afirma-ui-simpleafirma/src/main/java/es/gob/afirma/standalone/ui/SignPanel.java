@@ -52,7 +52,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.smartcardio.TerminalFactory;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -106,27 +105,27 @@ public final class SignPanel extends JPanel {
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_SIGN = "/resources/icon_sign.svg"; //$NON-NLS-1$
 
-    private AOSigner signer;
-    private byte[] dataToSign = null;
+    AOSigner signer;
+    byte[] dataToSign = null;
 
-    private JPanel filePanel;
+    JPanel filePanel;
     private JPanel lowerPanel;
 
-    private DropTarget dropTarget;
+    DropTarget dropTarget;
 
-    private final JFrame window;
+    final JFrame window;
 
-    private final JButton signButton = new JButton();
-    private final JButton selectButton = new JButton();
+    final JButton signButton = new JButton();
+    final JButton selectButton = new JButton();
 
-    private final SimpleAfirma saf;
+    final SimpleAfirma saf;
     
-    private ProgressMonitor pm = new ProgressMonitor(SignPanel.this, Messages.getString("SignPanel.15"), "", 0, 1000);  //$NON-NLS-1$//$NON-NLS-2$
+    ProgressMonitor pm = new ProgressMonitor(SignPanel.this, Messages.getString("SignPanel.15"), "", 0, 1000);  //$NON-NLS-1$//$NON-NLS-2$
 
     /** Indica si la operaci&oacute;n a realizar es una cofirma. */
-    private boolean cosign = false;
+    boolean cosign = false;
 
-    private File currentFile = null;
+    File currentFile = null;
 
     private boolean isXML(final byte[] data) {
         try {
@@ -178,7 +177,7 @@ public final class SignPanel extends JPanel {
         try {
             fis.close();
         }
-        catch (final Exception e) {}
+        catch (final Exception e) { /* Ignoramos los errores */ }
 
         String fileDescription;
         String iconPath;
@@ -277,13 +276,13 @@ public final class SignPanel extends JPanel {
         this.dropTarget = new DropTarget(this.filePanel, DnDConstants.ACTION_COPY, new DropTargetListener() {
 
             @Override
-            public void dropActionChanged(final DropTargetDragEvent dtde) {}
+            public void dropActionChanged(final DropTargetDragEvent dtde) { /* No implementado */}
 
             @Override
-            public void dragOver(final DropTargetDragEvent dtde) {}
+            public void dragOver(final DropTargetDragEvent dtde) { /* No implementado */ }
 
             @Override
-            public void dragExit(final DropTargetEvent dte) {}
+            public void dragExit(final DropTargetEvent dte) { /* No implementado */ }
 
             @Override
             public void drop(final DropTargetDropEvent dtde) {
@@ -389,7 +388,7 @@ public final class SignPanel extends JPanel {
 
         private static final long serialVersionUID = 533243192995645135L;
 
-        private UpperPanel(final ActionListener al, final boolean firstTime) {
+        UpperPanel(final ActionListener al, final boolean firstTime) {
             super(true);
             createUI(al, firstTime);
         }
@@ -465,7 +464,7 @@ public final class SignPanel extends JPanel {
             String intro = Messages.getString("SignPanel.40"); //$NON-NLS-1$
             
             try {
-                int nReaders = TerminalFactory.getDefault().terminals().list().size();
+                int nReaders = javax.smartcardio.TerminalFactory.getDefault().terminals().list().size();
                 if (nReaders == 1) {
                     intro = intro + Messages.getString("SignPanel.2"); //$NON-NLS-1$
                 }
@@ -473,7 +472,7 @@ public final class SignPanel extends JPanel {
                     intro = intro + Messages.getString("SignPanel.4"); //$NON-NLS-1$
                 }
             }
-            catch(Exception e) {}
+            catch(Exception e) { /* Ignoramos los errores */ }
             
             final JLabel introText = new JLabel(intro);
             introText.setLabelFor(SignPanel.this.selectButton);
@@ -502,7 +501,7 @@ public final class SignPanel extends JPanel {
 
         private static final long serialVersionUID = 533243192995645135L;
 
-        private LowerPanel(final ActionListener al) {
+        LowerPanel(final ActionListener al) {
             super(true);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
@@ -512,7 +511,7 @@ public final class SignPanel extends JPanel {
             });
         }
 
-        private void createUI(final ActionListener al) {
+        void createUI(final ActionListener al) {
             this.setLayout(new BorderLayout(5, 5));
             this.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
@@ -562,7 +561,7 @@ public final class SignPanel extends JPanel {
 
         private static final long serialVersionUID = -8648491975442788750L;
 
-        private FilePanel(final Component icon,
+        FilePanel(final Component icon,
                           final String fileSize,
                           final String filePath,
                           final String fileDescription,
@@ -576,7 +575,7 @@ public final class SignPanel extends JPanel {
             });
         }
 
-        private void createUI(final Component icon,
+        void createUI(final Component icon,
                               final String fileSize,
                               final String filePath,
                               final String fileDescription,
@@ -684,7 +683,7 @@ public final class SignPanel extends JPanel {
         }
     }
 
-    private void setSignCommandEnabled(final boolean e) {
+    void setSignCommandEnabled(final boolean e) {
         if (e) {
             this.signButton.setIcon(null);
             if (!this.cosign) {
@@ -700,6 +699,11 @@ public final class SignPanel extends JPanel {
     }
     
     private final class SignTask extends SwingWorker<Void, Void> {
+        
+        public SignTask() {
+            super();
+        }
+
         @Override
         public Void doInBackground() {
             
@@ -716,7 +720,7 @@ public final class SignPanel extends JPanel {
                     alias = DNIE_SIGNATURE_ALIAS;
                 }
             }
-            catch(final Exception e) {}
+            catch(final Exception e) { /* Ignoramos los errores */ }
 
             if (alias == null) {
                 try {
@@ -760,7 +764,7 @@ public final class SignPanel extends JPanel {
                 dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 ((JOptionPane)dialog.getContentPane().getComponent(0)).setOptions(new Object[]{});
             }
-            catch(final Exception e) {}
+            catch(final Exception e) { /* Ignoramos los errores */ }
             
             try {
                 final Field jProgressBarField = ProgressMonitor.class.getDeclaredField("myBar"); //$NON-NLS-1$
@@ -781,7 +785,7 @@ public final class SignPanel extends JPanel {
                         "No se ha podido mostrar la barra de progreso indeterminado: " + e); //$NON-NLS-1$
             }
             
-            try { Thread.sleep(5000); } catch(Exception e) {}
+            try { Thread.sleep(5000); } catch(Exception e) { /* Ignoramos los errores */ }
 
             final byte[] signResult;
             try {
@@ -951,25 +955,25 @@ public final class SignPanel extends JPanel {
                         bos.flush();
                     }
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) { /* Ignoramos los errores */ }
                 try {
                     if (fos != null) {
                         fos.flush();
                     }
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) { /* Ignoramos los errores */ }
                 try {
                     if (bos != null) {
                         bos.close();
                     }
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) { /* Ignoramos los errores */ }
                 try {
                     if (fos != null) {
                         fos.close();
                     }
                 }
-                catch (final Exception e) {}
+                catch (final Exception e) { /* Ignoramos los errores */ }
             }
             SignPanel.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             SignPanel.this.saf.loadResultsPanel(signResult, newFileName, ksm.getCertificate(alias));

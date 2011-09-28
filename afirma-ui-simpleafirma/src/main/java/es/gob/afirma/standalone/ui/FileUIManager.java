@@ -135,16 +135,16 @@ public final class FileUIManager {
         finally {
             try { if (bos != null) {
                 bos.flush();
-            } } catch (final Exception e) {}
+            } } catch (final Exception e) { /* Ignoramos los errores */ }
             try { if (fos != null) {
                 fos.flush();
-            } } catch (final Exception e) {}
+            } } catch (final Exception e) { /* Ignoramos los errores */ }
             try { if (bos != null) {
                 bos.close();
-            } } catch (final Exception e) {}
+            } } catch (final Exception e) { /* Ignoramos los errores */ }
             try { if (fos != null) {
                 fos.close();
-            } } catch (final Exception e) {}
+            } } catch (final Exception e) { /* Ignoramos los errores */ }
         }
 
         return outputFile;
@@ -155,15 +155,13 @@ public final class FileUIManager {
      * Muestra un di&aacute;logo para la apertura de un fichero.
      * @param parent Componente padre, para la modalidad
      * @param exts Posibles extensiones que asignar al fichero.
-     * @param currentDir Directorio actual.
+     * @param actualDir Directorio actual.
      * @param title T&iacute;tulo del di&aacute;logo de apertura
      * @return Fichero seleccionado desde el di&aacute;logo
      */
-    public static File openFile(final Frame parent, File currentDir, final String[] exts, final String title) {
+    public static File openFile(final Frame parent, final File actualDir, final String[] exts, final String title) {
 
-        if (currentDir == null) {
-            currentDir = new File("."); //$NON-NLS-1$
-        }
+        final File currentDir = (actualDir != null) ? actualDir : new File("."); //$NON-NLS-1$
 
         FilenameFilter filter = null;
         if (exts != null) {

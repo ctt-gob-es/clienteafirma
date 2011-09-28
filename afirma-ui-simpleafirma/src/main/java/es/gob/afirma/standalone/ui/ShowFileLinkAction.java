@@ -42,9 +42,9 @@ final class ShowFileLinkAction {
                 final OutputStream fos = new FileOutputStream(tmp);
                 final OutputStream bos = new BufferedOutputStream(fos);
                 bos.write(this.data);
-                try { bos.flush(); } catch(final Exception e) {}
-                try { bos.close(); } catch(final Exception e) {}
-                try { fos.close(); } catch(final Exception e) {}
+                try { bos.flush(); } catch(final Exception e) { /* Ignoramos los errores */ }
+                try { bos.close(); } catch(final Exception e) { /* Ignoramos los errores */ }
+                try { fos.close(); } catch(final Exception e) { /* Ignoramos los errores */ }
                 Desktop.getDesktop().open(tmp);
             }
             catch(final Exception e) {

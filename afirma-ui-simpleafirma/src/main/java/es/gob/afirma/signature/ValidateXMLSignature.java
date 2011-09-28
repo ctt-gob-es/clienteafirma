@@ -83,7 +83,7 @@ public final class ValidateXMLSignature {
      * NOTE: If the key algorithm doesn't match signature algorithm,
      * then the public key will be ignored.
      */
-    private static final class KeyValueKeySelector extends KeySelector {
+    static final class KeyValueKeySelector extends KeySelector {
         @Override
 		public KeySelectorResult select(final KeyInfo keyInfo,
                 final KeySelector.Purpose purpose,

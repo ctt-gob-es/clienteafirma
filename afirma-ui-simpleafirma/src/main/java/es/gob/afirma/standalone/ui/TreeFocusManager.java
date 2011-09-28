@@ -48,7 +48,7 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
     }
 
     @Override
-    public void mouseDragged(final MouseEvent e) {}
+    public void mouseDragged(final MouseEvent e) { /* No imlementado */}
 
     @Override
     public void mouseMoved(final MouseEvent e) {
@@ -83,10 +83,10 @@ class TreeFocusManager extends KeyAdapter implements FocusListener, MouseMotionL
         }
     }
 
-    @Override public void mouseEntered(final MouseEvent e) {}
-    @Override public void mouseExited(final MouseEvent e) {}
-    @Override public void mousePressed(final MouseEvent e) {}
-    @Override public void mouseReleased(final MouseEvent e) {}
+    @Override public void mouseEntered(final MouseEvent e) { /* No implementado */}
+    @Override public void mouseExited(final MouseEvent e) { /* No implementado */ }
+    @Override public void mousePressed(final MouseEvent e) { /* No implementado */ }
+    @Override public void mouseReleased(final MouseEvent e) { /* No implementado */ }
     
     @Override
     public void keyPressed(final KeyEvent e) {

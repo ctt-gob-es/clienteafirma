@@ -51,7 +51,7 @@ public final class MainMenu extends JMenuBar {
     private final JMenuItem ayudaMenuItem = new JMenuItem();
 
     private final Component parent;
-    private final SimpleAfirma saf;
+    final SimpleAfirma saf;
 
     /** Construye la barra de men&uacute; de la aplicaci&oacute;n.
      * @param p Componente padre para la modalidad
@@ -319,14 +319,14 @@ public final class MainMenu extends JMenuBar {
         }
     }
 
-    private void showAbout() {
+    void showAbout() {
         // EL texto del "Acerca de" no se externaliza
         JOptionPane.showMessageDialog((this.parent == null) ? MainMenu.this : this.parent, "<html><p align=\"center\">\"Firma f\u00E1cil con @firma\" 1.0 Beta<br/>&copy; 2011 Gobierno de Espa&ntilde;a</p><br/><p>@firma es Software Libre bajo licencia GPLv2<br/> y puede distribuirse y modificarse libremente<br/>siguiendo los t&eacute;rminos de esta licencia.</html>", //$NON-NLS-1$
                                       Messages.getString("MainMenu.15"), //$NON-NLS-1$
                                       JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private boolean exitApplication() {
+    boolean exitApplication() {
         if (JOptionPane.showConfirmDialog(this.parent, Messages.getString("MainMenu.26"), //$NON-NLS-1$
                                           Messages.getString("MainMenu.27"), //$NON-NLS-1$
                                           JOptionPane.YES_NO_OPTION,

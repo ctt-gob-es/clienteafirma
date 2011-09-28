@@ -67,12 +67,14 @@ public final class SignDetailPanel extends JPanel {
     }
 
     /** Agrega el contenido gr&aacute;fico al panel. */
-    private void createUI(byte[] sig,
+    private void createUI(final byte[] signature,
                           final String sigPath,
                           final X509Certificate signingCert,
                           final SignValidity signValidity,
                           final JComponent fileTypeIcon) {
 
+        byte[] sig = (signature != null) ? signature.clone() : null;
+        
         // Cargamos los datos de firma si no nos los proporcionaron en el constructor
         if (sig == null && sigPath != null) {
             final File signFile = new File(sigPath);
@@ -99,13 +101,13 @@ public final class SignDetailPanel extends JPanel {
                             fis.close();
                         }
                     }
-                    catch (final Exception e) {}
+                    catch (final Exception e) { /* Ignoramos los errores */ }
                     try {
                         if (bis != null) {
                             bis.close();
                         }
                     }
-                    catch (final Exception e) {}
+                    catch (final Exception e) { /* Ignoramos los errores */ }
                 }
             }
         }
@@ -151,7 +153,7 @@ public final class SignDetailPanel extends JPanel {
     }
 
     /** Vuelve a la pantalla de selecci&oacute;n de fichero para la firma. */
-    private void goToBack() {
+    void goToBack() {
         this.saf.loadMainApp(false);
     }
 }
