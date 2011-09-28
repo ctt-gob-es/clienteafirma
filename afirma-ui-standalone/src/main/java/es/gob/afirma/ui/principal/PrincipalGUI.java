@@ -12,6 +12,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,7 +39,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
-import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -48,6 +48,8 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.MetalTheme;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
+import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
@@ -70,6 +72,12 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 	private static final String DEFAULT_LOCALE = "es_ES"; //$NON-NLS-1$
 	
+    /** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
+    private static final String ICON_DIR_PATH = "/resources/images/";  //$NON-NLS-1$
+    
+    /** Ruta del JAR en donde se almacenan las im&aacute;agnees de la aplicaci&oacute;n. */
+    private static final String IMAGE_DIR_PATH = "/resources/images/";  //$NON-NLS-1$
+    
 	private int actualPositionX = -1;
 	
 	private int actualPositionY = -1;
@@ -109,9 +117,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
 		if (Platform.getOS().equals(Platform.OS.MACOSX)){
 			return (screenSize.height - 340) / 2;
-		}else{
-			return (screenSize.height - 320) / 2;
 		}
+		return (screenSize.height - 320) / 2;
 	}
 		
 	public PrincipalGUI() {
@@ -119,20 +126,17 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		initComponents();
 		iniciarProveedores();
 		this.addComponentListener(new ComponentAdapter() {
+            @Override
 		    public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
+            @Override
 		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
 		});
-//		if (Main.preferences.get("users", "0").equals("0")){
-//			UserProfile.currentUser=Constants.defaultUser;
-//		} else {
-//			UserProfile.main();
-//    	}
 	}
 
 	/**
@@ -144,12 +148,12 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		
 		// Parametros ventana
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
-		setTitle("Firma"); // NOI18N
+		setTitle("Firma"); //$NON-NLS-1$
 		getContentPane().setLayout(new BorderLayout(11, 7));
 		setMinimumSize(getSize());
 
 		// Icono de @firma
-		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
+        setIconImage(this.loadIcon("afirma_ico.png").getImage()); //$NON-NLS-1$
 
 		
 		
@@ -157,15 +161,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		this.htPanel = new HorizontalTabbedPanel();
 		getContentPane().add(this.htPanel, BorderLayout.CENTER);
 		
-//		panelPest = new JTabbedPane();
-//		panelPest.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-//		panelPest.addChangeListener(new ChangeListener() {
-//			public void stateChanged(ChangeEvent evt) {
-//				panelPestStateChanged();
-//			}
-//		});
-//		getContentPane().add(panelPest, BorderLayout.CENTER);
-
 		// Menu
 		menu = new JMenuBar();
 		// Menu de herramientas
@@ -195,15 +190,12 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 		// Barra de estado
 		bar.setLabelWidth((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth());
-		bar.setStatus("");
+		bar.setStatus(""); //$NON-NLS-1$
 		bar.setLeftMargin(3);
 		
 		getContentPane().add(bar, BorderLayout.SOUTH);
-		
 
 		crearPaneles();
-		
-		
 	}
 
 	/**
@@ -215,18 +207,19 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Opcion del menu principal - Herramientas
 		JMenu herramientas = new JMenu();
 		herramientas.setMnemonic(KeyEvent.VK_S);
-		herramientas.setText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
-		herramientas.setToolTipText(Messages.getString("PrincipalGUI.herramientas.text")); // NOI18N
-		Utils.setContrastColor(herramientas);
+		herramientas.setText(Messages.getString("PrincipalGUI.herramientas.text")); //$NON-NLS-1$
+        herramientas.setToolTipText(Messages.getString("PrincipalGUI.herramientas.text")); //$NON-NLS-1$
+        Utils.setContrastColor(herramientas);
 		Utils.setFontBold(herramientas);
 		Utils.remarcar(herramientas);
 		menu.add(herramientas);
 		
 		// Subopcion menu Herramientas - Opciones
 		JMenuItem opciones = new JMenuItem();
-		opciones.setText(Messages.getString("Opciones.opciones")); // NOI18N
+		opciones.setText(Messages.getString("Opciones.opciones")); //$NON-NLS-1$
 		opciones.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al menú
 		opciones.addActionListener(new ActionListener() {
+            @Override
 			public void actionPerformed(ActionEvent evt) {
 				opcionesActionPerformed();
 			}
@@ -234,9 +227,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		Utils.setContrastColor(opciones);
 		Utils.setFontBold(opciones);
 		herramientas.add(opciones);
+		
 		// Subopcion menu Herramientas - Idiomas
 		JMenu menuIdioma = new JMenu();
-		menuIdioma.setText(Messages.getString("Opciones.general.idioma")); // NOI18N
+		menuIdioma.setText(Messages.getString("Opciones.general.idioma")); //$NON-NLS-1$
 		menuIdioma.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al menú
 		
 		// Obtenemos ruta donde se encuentra la aplicaciï¿½n
@@ -248,7 +242,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			File fileDirectory =  new File(baseDirectory.toURI());
 			if (fileDirectory.isFile())
 				fileDirectory = fileDirectory.getParentFile();
-			languagesDirectory  = new File (fileDirectory, "languages");
+			languagesDirectory  = new File (fileDirectory, "languages"); //$NON-NLS-1$
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}        	
@@ -270,7 +264,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			}
 		}
 		
-		//Lista de mnemónicos usados para los radio buttons de lenguajes
+		//Lista de mnemonicos usados para los radio buttons de lenguajes
 		List<Character> mnemonicList = new ArrayList<Character>();
 		
 		// Generamos las opciones del menu idiomas
@@ -372,13 +366,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		return ayuda;
 	}
 
-//	/**
-//	 * Panel cambiar estado: Reinicia el estado de la barra de estado
-//	 */
-//	private void panelPestStateChanged() {
-//		setNuevoEstado("");
-//	}
-
 	/**
 	 * Seleccion menu opciones: Muestra la ventana modal con las opciones
 	 */
@@ -452,178 +439,137 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		}
 	    Utils.setContrastColor(bar);
 	    
+	    Icon baseIcon = this.loadIcon("boton_transparente.png"); //$NON-NLS-1$
+	    
 	    // Panel de firma
-	    JToggleButton buttonFirma = this.createToggleButton(
-	            Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), //$NON-NLS-1$
-              new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")), //$NON-NLS-1$
-              new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")));  //$NON-NLS-1$
-	    buttonFirma.setMnemonic(KeyEvent.VK_F);
-	    JPanel panelFirma = new Firma();
-	    buttonFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
-	    this.htPanel.addTab(buttonFirma, panelFirma);
+	    ToggleImageButton buttonFirma = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma")); //$NON-NLS-1$
+        buttonFirma.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
+        buttonFirma.setToggledIcon(this.loadIcon("boton_firma_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonFirma.setSelectedToggledIcon(this.loadIcon("boton_firma_sel_ico.png"), baseIcon); //$NON-NLS-1$
+        
+        buttonFirma.setMnemonic(KeyEvent.VK_F);
+        buttonFirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.botonpricipal.status"))); //$NON-NLS-1$
+        buttonFirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.botonpricipal.status"))); //$NON-NLS-1$
+        buttonFirma.getAccessibleContext().setAccessibleName(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
+        JPanel panelFirma = new Firma();
+        this.htPanel.addTab(buttonFirma, panelFirma);
 	    
         // Panel de multifirma
-	       JToggleButton buttonMultifirma = this.createToggleButton(
-	                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma"), //$NON-NLS-1$
-	              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")), //$NON-NLS-1$
-	              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")));  //$NON-NLS-1$
-	       buttonMultifirma.setMnemonic(KeyEvent.VK_M);
+        ToggleImageButton buttonMultifirma = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma")); //$NON-NLS-1$
+        buttonMultifirma.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
+        buttonMultifirma.setToggledIcon(this.loadIcon("boton_multifirma_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonMultifirma.setSelectedToggledIcon(this.loadIcon("boton_multifirma_sel_ico.png"), baseIcon); //$NON-NLS-1$
+
+        buttonMultifirma.setMnemonic(KeyEvent.VK_M);
+        buttonMultifirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Multifirma.botonpricipal.status"))); //$NON-NLS-1$
+        buttonMultifirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Multifirma.botonpricipal.status"))); //$NON-NLS-1$
+        buttonMultifirma.getAccessibleContext().setAccessibleName(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         JPanel panelMultifirmaSimple = new MultifirmaSimple();
-        buttonMultifirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma")+ " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonMultifirma, panelMultifirmaSimple);
 	    
         // Panel de multifirma masiva
-        JToggleButton buttonMultifirmaMasiva = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"), //$NON-NLS-1$
-              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")), //$NON-NLS-1$
-              new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")));  //$NON-NLS-1$
+        ToggleImageButton buttonMultifirmaMasiva = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva")); //$NON-NLS-1$
+        buttonMultifirmaMasiva.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
+        buttonMultifirmaMasiva.setToggledIcon(this.loadIcon("boton_masiva_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonMultifirmaMasiva.setSelectedToggledIcon(this.loadIcon("boton_masiva_sel_ico.png"), baseIcon); //$NON-NLS-1$
+
         buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
+        buttonMultifirmaMasiva.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
+        buttonMultifirmaMasiva.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
+        buttonMultifirmaMasiva.getAccessibleContext().setAccessibleName(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         JPanel panelMultifirmaMasiva =  new MultifirmaMasiva();
-        buttonMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonMultifirmaMasiva, panelMultifirmaMasiva);
 
         // Panel de validacion y extraccion de documentos
-        JToggleButton buttonValidacion = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion"), //$NON-NLS-1$
-              new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")), //$NON-NLS-1$
-              new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")));  //$NON-NLS-1$
+        ToggleImageButton buttonValidacion = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion")); //$NON-NLS-1$
+        buttonValidacion.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
+        buttonValidacion.setToggledIcon(this.loadIcon("boton_validacion_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonValidacion.setSelectedToggledIcon(this.loadIcon("boton_validacion_sel_ico.png"), baseIcon); //$NON-NLS-1$
+
         buttonValidacion.setMnemonic(KeyEvent.VK_V);
+        buttonValidacion.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Validacion.botonpricipal.status"))); //$NON-NLS-1$
+        buttonValidacion.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Validacion.botonpricipal.status"))); //$NON-NLS-1$
+        buttonValidacion.getAccessibleContext().setAccessibleName(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
         JPanel panelValidacion = new Validacion();
-        buttonValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonValidacion, panelValidacion);
 
         // Panel de cifrado simetrico
-        JToggleButton buttonCifrado = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado"), //$NON-NLS-1$
-                new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png")), //$NON-NLS-1$
-                new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png"))); //$NON-NLS-1$
+        ToggleImageButton buttonCifrado = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado")); //$NON-NLS-1$
+        buttonCifrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
+        buttonCifrado.setToggledIcon(this.loadIcon("boton_cifrado_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonCifrado.setSelectedToggledIcon(this.loadIcon("boton_cifrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
+
         buttonCifrado.setMnemonic(KeyEvent.VK_C);
+        buttonCifrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonCifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonCifrado.getAccessibleContext().setAccessibleName(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " +  //$NON-NLS-1$  //$NON-NLS-2$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
         JPanel panelCifrado = new Cifrado();
-        buttonCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonCifrado, panelCifrado);
 
         // Panel de Descifrado
-        JToggleButton buttonDescifrado = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado"), //$NON-NLS-1$
-                new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png")), //$NON-NLS-1$
-                new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png"))); //$NON-NLS-1$
+        ToggleImageButton buttonDescifrado = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado")); //$NON-NLS-1$
+        buttonDescifrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
+        buttonDescifrado.setToggledIcon(this.loadIcon("boton_descifrado_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonDescifrado.setSelectedToggledIcon(this.loadIcon("boton_descifrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
+
         buttonDescifrado.setMnemonic(KeyEvent.VK_D);
+        buttonDescifrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonDescifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonDescifrado.getAccessibleContext().setAccessibleName(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
         JPanel panelDescifrado = new Descifrado();
-        buttonDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonDescifrado, panelDescifrado);
 
         // Panel de Ensobrado
-        JToggleButton buttonEnsobrado = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"), //$NON-NLS-1$
-                new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png")), //$NON-NLS-1$
-                new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png"))); //$NON-NLS-1$
+        ToggleImageButton buttonEnsobrado = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado")); //$NON-NLS-1$
+        buttonEnsobrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
+        buttonEnsobrado.setToggledIcon(this.loadIcon("boton_ensobrado_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonEnsobrado.setSelectedToggledIcon(this.loadIcon("boton_ensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
+
         buttonEnsobrado.setMnemonic(KeyEvent.VK_S);
+        System.out.println("Introducimos");
+        buttonEnsobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonEnsobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonEnsobrado.getAccessibleContext().setAccessibleName(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
         JPanel panelEnsobrado = new Ensobrado();
-        buttonEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonEnsobrado, panelEnsobrado);
 
         // Panel de Desensobrado
-        JToggleButton buttonDesensobrado = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"), //$NON-NLS-1$
-                new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png")), //$NON-NLS-1$
-                new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png"))); //$NON-NLS-1$
+        ToggleImageButton buttonDesensobrado = this.createToggleButton(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado")); //$NON-NLS-1$
+        buttonDesensobrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
+        buttonDesensobrado.setToggledIcon(this.loadIcon("boton_desensobrado_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonDesensobrado.setSelectedToggledIcon(this.loadIcon("boton_desensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
+
         buttonDesensobrado.setMnemonic(KeyEvent.VK_N);
+        buttonDesensobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonDesensobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonDesensobrado.getAccessibleContext().setAccessibleName(
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description")); //$NON-NLS-1$
         JPanel panelDesensobrado = new Desensobrado();
-        buttonDesensobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado") + " " +Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description")); //$NON-NLS-1$
         this.htPanel.addTab(buttonDesensobrado, panelDesensobrado);
         
-        
-              
-//		// Eliminamos los paneles que haya actualmente antes de insertar los nuevos
-//		panelPest.removeAll();
-//		if (GeneralConfig.isMaximized()){
-//			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-//			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-//		} else {
-//			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-//				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
-//			}
-//		}
-//		// Insertar la pestana de firma
-//		JPanel panelFirma = new Firma();
-//		panelFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
-//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"),
-//				new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")),
-//				panelFirma,
-//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description"));
-//
-//		// Insertar la pestana de multifirma
-//		JPanel panelMultifirmaSimple = new MultifirmaSimple();
-//		panelMultifirmaSimple.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
-//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma"),
-//				new ImageIcon(getClass().getResource("/resources/images/firma_mini_ico.png")),
-//				panelMultifirmaSimple,
-//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
-//
-//
-//		// Insertar la pestana de multifirma masiva (solo en la vista avanzada)
-//		JPanel panelMultifirmaMasiva = null;
-//		if(GeneralConfig.isAvanzados()) {
-//			panelMultifirmaMasiva =  new MultifirmaMasiva();
-//			panelMultifirmaMasiva.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description"));
-//			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"),
-//					new ImageIcon(getClass().getResource("/resources/images/multi_mini_ico.png")),
-//					panelMultifirmaMasiva,
-//					Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description"));
-//		}
-//
-//		// Insertar la pestana de validaciï¿½n
-//		JPanel panelValidacion = new Validacion();
-//		panelValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
-//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion"),
-//				new ImageIcon(getClass().getResource("/resources/images/validate_mini_ico.png")),
-//				panelValidacion,
-//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description"));
-//
-//		// Insertar la pestana de Cifrado
-//		JPanel panelCifrado = new Cifrado();
-//		panelCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description"));
-//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado"),
-//				new ImageIcon(getClass().getResource("/resources/images/cifrado_mini_ico.png")),
-//				panelCifrado,
-//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description"));
-//
-//		// Insertar la pestana de Descifrado
-//		JPanel panelDescifrado = new Descifrado();
-//		panelDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description"));
-//		panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado"),
-//				new ImageIcon(getClass().getResource("/resources/images/descifrado_mini_ico.png")),
-//				panelDescifrado,
-//				Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description"));
-//
-//		// Insertar la pestana de Ensobrado  (solo en la vista avanzada)
-//		JPanel panelEnsobrado = null;
-//		if(GeneralConfig.isAvanzados()) {
-//			panelEnsobrado = new Ensobrado();
-//			panelEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description"));
-//			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"),
-//					new ImageIcon(getClass().getResource("/resources/images/sobre_mini_ico.png")),
-//					panelEnsobrado,
-//					Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description"));
-//		}
-//
-//		// Insertar la pestana de Desensobrado  (solo en la vista avanzada)
-//		JPanel panelDesensobrado = null;
-//		if(GeneralConfig.isAvanzados()) {
-//			panelDesensobrado = new Desensobrado();
-//			panelDesensobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description"));
-//			panelPest.addTab(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"),
-//					new ImageIcon(getClass().getResource("/resources/images/desensobrado_mini_ico.png")),
-//					panelDesensobrado,
-//					Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description"));
-//		}
-
-//		panelPest.addMouseMotionListener(new MouseMotionAdapter() {
-//			public void mouseMoved(MouseEvent evt) {
-//				panelPestMouseMoved(evt);
-//			}
-//		});
-
 		HelpUtils.enableHelpKey(panelFirma, "firma"); //$NON-NLS-1$
 		HelpUtils.enableHelpKey(panelMultifirmaSimple, "multifirma"); //$NON-NLS-1$
 		HelpUtils.enableHelpKey(panelMultifirmaMasiva, "firma.masiva"); //$NON-NLS-1$
@@ -633,41 +579,49 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		HelpUtils.enableHelpKey(panelEnsobrado, "ensobrado"); //$NON-NLS-1$
 		HelpUtils.enableHelpKey(panelDesensobrado, "desensobrado"); //$NON-NLS-1$
 		
-		
 		//Al repintar la pantalla principal para quitar o poner las opciones avanzadas hay que ajustar 
 		//la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
 		this.callResize();
-		
-		
 	}
 
 	/**
-	 * Crea un bot&oacute;n que se queda pulsado tras hacer clic en &eacute;l. Al volver a
-	 * hacer clic sobre &eacute;l vuelve a su posici&oacute;n original.
-	 * @param text Texto del bot&oacute;n.
-	 * @param icon Icono por defecto.
-	 * @param selectedIcon Icono en el estado seleccionado.
-	 * @return Bot&oacute;n creado.
-	 */
-	private JToggleButton createToggleButton(final String text, final Icon icon,
-	        final Icon selectedIcon) {
-	    
-	        JToggleButton tButton = new JToggleButton(text, icon);
-	        tButton.setHorizontalAlignment(SwingConstants.LEFT);
-	        tButton.setSelectedIcon(selectedIcon);
-	        Utils.remarcar(tButton);
-	        Utils.setContrastColor(tButton);
-	        Utils.setFontBold(tButton);
-	        return tButton;
-	}
+     * Crea un bot&oacute;n que se queda pulsado tras hacer clic en &eacute;l. Al volver a
+     * hacer clic sobre &eacute;l vuelve a su posici&oacute;n original.
+     * @param text Texto del bot&oacute;n.
+     * @return Bot&oacute;n creado.
+     */
+    private ToggleImageButton createToggleButton(final String text) {
+
+        ToggleImageButton tButton = new ToggleImageButton();
+        tButton.setHorizontalAlignment(SwingConstants.LEFT);
+        tButton.setButtonText(text);
+        
+        if (GeneralConfig.isRemarked()){
+            Utils.remarcar(tButton);
+        }
+        Utils.setContrastColor(tButton);
+        Utils.setFontBold(tButton);
+        return tButton;
+    }
 	
-//	private void panelPestMouseMoved(MouseEvent evt){
-//		Object src = evt.getSource();
-//		if (src instanceof JTabbedPane){
-//			JTabbedPane panel = (JTabbedPane) src;
-//			setNuevoEstado(panel.getToolTipText(evt));
-//		}
-//	}
+    /**
+     * Carga un icono contenido en el directorio de iconos del proyecto.
+     * @param filename Nombre del icono.
+     * @return Icono.
+     */
+    private ImageIcon loadIcon(final String filename) {
+        return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
+    }
+    
+    /**
+     * Carga una imagen contenido en el directorio de imagenes del proyecto.
+     * @param filename Nombre del fichero de imagen.
+     * @return Imagen.
+     */
+    private Image loadImage(final String filename) {
+        return Toolkit.getDefaultToolkit().createImage(
+                this.getClass().getResource(IMAGE_DIR_PATH + filename));
+    }
 
 	/**
 	 * Inicia los proveedores
