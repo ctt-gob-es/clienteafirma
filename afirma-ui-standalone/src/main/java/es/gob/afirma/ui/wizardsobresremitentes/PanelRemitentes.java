@@ -490,7 +490,14 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		
 		if (contentType.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
 			CMSEnvelopedData enveloper = new CMSEnvelopedData();
-			envelop = enveloper.addOriginatorInfo(data, originatorCertChain);
+			try {
+			    envelop = enveloper.addOriginatorInfo(data, originatorCertChain);
+			} catch (AOException e) {
+			    logger.warning("Ocurrio al agregar el nuevo remitente al sobre electronico: " + e); //$NON-NLS-1$
+			    JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),  //$NON-NLS-1$
+			            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+			    return null;
+			}
 		} else if (contentType.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
 		    AOCMSMultiEnveloper coEnveloper = new AOCMSMultiEnveloper();
 			try {
@@ -500,7 +507,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 						privateKey,
 						null);
 			} catch (AOException e) {
-				logger.warning("Ocurrio un error durante el proceso de a�adir un nuevo remitente: "+e); //$NON-NLS-1$
+				logger.warning("Ocurrio un error durante el proceso de agregar un nuevo remitente: "+e); //$NON-NLS-1$
 	    		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),  //$NON-NLS-1$
 	    				Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 	    		return null;
