@@ -63,14 +63,11 @@ public class ProgressDialog {
         this.ltexto.setBounds(20, 15, 250, 20);
         panel.add(this.progressBar);
         this.progressBar.setBounds(20, 35, 260, 19);
-        this.ltexto.setFocusable(true);
-        this.progressBar.setFocusable(true);
 
         this.dialog = new JDialog(this.parent, Messages.getString("Wizard.multifirma.progress.titulo"), false); //$NON-NLS-1$
         this.dialog.setBounds(this.parent.getX()+(this.parent.getWidth()-300)/2, this.parent.getY()+(this.parent.getHeight()-100)/2, 300, 100);
         this.dialog.setResizable(false);
         this.dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        this.dialog.add(panel); //Se añade el panel al diálogo
         this.dialog.setVisible(true);
     }
     
