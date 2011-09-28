@@ -57,7 +57,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * para crear un mensaje Data de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
-final class CMSEnvelopedData {
+public final class CMSEnvelopedData {
 
     /** Clave de cifrado. La almacenamos internamente porque no hay forma de
      * mostrarla directamente al usuario. */
@@ -183,7 +183,7 @@ final class CMSEnvelopedData {
      * @throws AOException
      *         Cuando ocurra un error al insertar el nuevo destinatario en el envoltorio. 
      */
-    byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws AOException {
+    public byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) throws AOException {
         byte[] retorno = null;
 
         try {

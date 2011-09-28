@@ -83,7 +83,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * para crear un mensaje AuthenticatedEnvelopedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 
-final class CMSAuthenticatedEnvelopedData {
+public final class CMSAuthenticatedEnvelopedData {
 
     /** @param parameters
      *        Par&aacute;metros necesarios que contienen tanto la firma del
@@ -114,7 +114,7 @@ final class CMSAuthenticatedEnvelopedData {
      * @throws AOException
      *         Cuando ocurre un error al generar el n&uacute;cleo del envoltorio.
      */
-    byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
+    public byte[] genAuthenticatedEnvelopedData(final P7ContentSignerParameters parameters,
                                                 final String autenticationAlgorithm,
                                                 final AOCipherConfig config,
                                                 final X509Certificate[] certDest,
@@ -230,7 +230,7 @@ final class CMSAuthenticatedEnvelopedData {
      * @return La nueva firma AuthenticatedEnvelopedData con los remitentes que
      *         ten&iacute;a (si los tuviera) con la cadena de certificados
      *         nueva. */
-    byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
+    public byte[] addOriginatorInfo(final byte[] data, final X509Certificate[] signerCertificateChain) {
 
         try {
             final ASN1InputStream is = new ASN1InputStream(data);

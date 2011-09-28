@@ -27,7 +27,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 
 /** Clase que descifra el contenido de un fichero en formato
  * SignedAndEnvelopedData. de CMS. */
-final class CMSDecipherSignedAndEnvelopedData {
+public final class CMSDecipherSignedAndEnvelopedData {
 
     /** &Eacute;ste m&eacute;todo descifra el contenido de un CMS
      * SignedAndEnvelopData.
@@ -52,7 +52,7 @@ final class CMSDecipherSignedAndEnvelopedData {
      *         destinatarios del sobre.
      * @throws InvalidKeyException
      *         Cuando la clave almacenada en el sobre no es v&aacute;lida. */
-    byte[] dechiperSignedAndEnvelopData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
+    public byte[] dechiperSignedAndEnvelopData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                         CertificateEncodingException,
                                                                                         AOException,
                                                                                         AOInvalidRecipientException,
