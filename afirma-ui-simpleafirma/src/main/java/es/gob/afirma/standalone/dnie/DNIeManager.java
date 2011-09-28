@@ -25,6 +25,7 @@ import es.gob.afirma.standalone.SimpleAfirma;
 
 /** Gestor de almac&eacute;n (<code>KeyStore</code>) DNIe v&iacute;a PKCS#11 y JSR-268.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+@SuppressWarnings("restriction")
 public final class DNIeManager {
 
     /** Evento que indica que se ha insertado un DNIe. */

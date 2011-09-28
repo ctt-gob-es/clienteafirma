@@ -31,6 +31,7 @@ import es.gob.afirma.signature.SignValidity.VALIDITY_ERROR;
 /**
  * Validador de firmas XML. Basado en la documentaci&oacute;n y los ejemplo de la JSR 105.
  */
+@SuppressWarnings("restriction")
 public final class ValidateXMLSignature {
 
     /**

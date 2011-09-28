@@ -93,6 +93,7 @@ import es.gob.afirma.util.signers.AOSignerFactory;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
+@SuppressWarnings("restriction")
 public final class SignPanel extends JPanel {
 
     private static final long serialVersionUID = -4828575650695534417L;
