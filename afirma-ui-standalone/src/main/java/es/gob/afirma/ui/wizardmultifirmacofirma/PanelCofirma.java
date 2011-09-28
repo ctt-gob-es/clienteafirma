@@ -118,110 +118,111 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		c.weightx = 1.0;
 		c.gridx = 0;
 		
-		// Etiqueta "Fichero de datos:"
-		JLabel etiquetaDatos = new JLabel();
-		etiquetaDatos.setText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos"));
-		Utils.setContrastColor(etiquetaDatos);
-		Utils.setFontBold(etiquetaDatos);
-		panelCentral.add(etiquetaDatos, c);
+	    // Etiqueta "Fichero de firma:"
+        JLabel etiquetaFirma = new JLabel();
+        etiquetaFirma.setText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma"));
+        Utils.setContrastColor(etiquetaFirma);
+        Utils.setFontBold(etiquetaFirma);
+        panelCentral.add(etiquetaFirma, c);
+		
 
 		c.insets = new Insets(0, 20, 0, 0);
 		c.gridwidth = 1;
 		c.gridy	= 1;
 		
-		// Caja de texto donde se guarda el nombre del archivo de datos
-		campoDatos.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description"));
-		campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " " + campoDatos.getToolTipText() + " " + "ALT + F.");
-		campoDatos.getAccessibleContext().setAccessibleDescription(campoDatos.getToolTipText());
-	     
-		 if (GeneralConfig.isBigCaret()) {
-			Caret caret = new ConfigureCaret();
-			campoDatos.setCaret(caret);
-		}
-		Utils.remarcar(campoDatos);
-	    Utils.setContrastColor(campoDatos);
-		Utils.setFontBold(campoDatos);
-		panelCentral.add(campoDatos, c);
-		
-		//Relación entre etiqueta y campo de texto
-		etiquetaDatos.setLabelFor(campoDatos);
-		//Asignación de mnemónico
-		etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_F);
+	      // Caja de texto donde se guarda el nombre del archivo de la firma
+        campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma.description")); // NOI18N
+        campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoFirma.getToolTipText() + " " + "ALT + I.");
+        campoFirma.getAccessibleContext().setAccessibleDescription(campoFirma.getToolTipText());
+         if (GeneralConfig.isBigCaret()) {
+            Caret caret = new ConfigureCaret();
+            campoFirma.setCaret(caret);
+        }
+        Utils.remarcar(campoFirma);
+        Utils.setContrastColor(campoFirma);
+        Utils.setFontBold(campoFirma);
+        panelCentral.add(campoFirma, c);
+        
+        //Relacion entre etiqueta y campo de texto
+        etiquetaFirma.setLabelFor(campoFirma);
+        //Asignacion de mnemónico
+        etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_I);
 
 		c.insets = new Insets(0, 10, 0, 20);
 		c.weightx = 0.0;
 		c.gridx = 1;
 		
-		// Boton examinar (fichero datos)
-		JButton	examinarDatos = new JButton();
-		examinarDatos.setMnemonic(KeyEvent.VK_E);
-		examinarDatos.setText(Messages.getString("PrincipalGUI.Examinar"));
-		examinarDatos.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
-		examinarDatos.getAccessibleContext().setAccessibleName(examinarDatos.getText() + " " + examinarDatos.getToolTipText());
-		examinarDatos.getAccessibleContext().setAccessibleDescription(examinarDatos.getToolTipText());
-		examinarDatos.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				examinarDatosActionPerformed();
-			}
-		});
-		Utils.remarcar(examinarDatos);
-        Utils.setContrastColor(examinarDatos);
-		Utils.setFontBold(examinarDatos);
-		panelCentral.add(examinarDatos, c);
-
+		// Boton examinar (fichero firma)
+        JButton examinarFirma = new JButton();
+        examinarFirma.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico diferente al botï¿½n "Examinar" anterior
+        examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar"));
+        examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
+        examinarFirma.getAccessibleContext().setAccessibleDescription(examinarFirma.getToolTipText());
+        examinarFirma.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                examinarFirmaActionPerformed();
+            }
+        });
+        Utils.remarcar(examinarFirma);
+        Utils.setContrastColor(examinarFirma);
+        Utils.setFontBold(examinarFirma);
+        panelCentral.add(examinarFirma, c);
+		
 		c.insets = new Insets(20, 20, 0, 20);
 		c.gridwidth = 2;
 		c.gridy	= 2;
 		c.gridx = 0;
 		
-		// Etiqueta "Fichero de firma:"
-		JLabel etiquetaFirma = new JLabel();
-		etiquetaFirma.setText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma"));
-		Utils.setContrastColor(etiquetaFirma);
-		Utils.setFontBold(etiquetaFirma);
-		panelCentral.add(etiquetaFirma, c);
+        // Etiqueta "Fichero de datos:"
+        JLabel etiquetaDatos = new JLabel();
+        etiquetaDatos.setText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos"));
+        Utils.setContrastColor(etiquetaDatos);
+        Utils.setFontBold(etiquetaDatos);
+        panelCentral.add(etiquetaDatos, c);
 
 		c.insets = new Insets(0, 20, 0, 0);
 		c.gridwidth = 1;
 		c.gridy	= 3;
 		
-		// Caja de texto donde se guarda el nombre del archivo de la firma
-		campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma.description")); // NOI18N
-		campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoFirma.getToolTipText() + " " + "ALT + I.");
-		campoFirma.getAccessibleContext().setAccessibleDescription(campoFirma.getToolTipText());
-		 if (GeneralConfig.isBigCaret()) {
-			Caret caret = new ConfigureCaret();
-			campoFirma.setCaret(caret);
-		}
-		Utils.remarcar(campoFirma);
-	    Utils.setContrastColor(campoFirma);
-		Utils.setFontBold(campoFirma);
-		panelCentral.add(campoFirma, c);
-		
-		//Relación entre etiqueta y campo de texto
-		etiquetaFirma.setLabelFor(campoFirma);
-		//Asignación de mnemónico
-		etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_I);
+		// Caja de texto donde se guarda el nombre del archivo de datos
+        campoDatos.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description"));
+        campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " " + campoDatos.getToolTipText() + " " + "ALT + F.");
+        campoDatos.getAccessibleContext().setAccessibleDescription(campoDatos.getToolTipText());
+         
+         if (GeneralConfig.isBigCaret()) {
+            Caret caret = new ConfigureCaret();
+            campoDatos.setCaret(caret);
+        }
+        Utils.remarcar(campoDatos);
+        Utils.setContrastColor(campoDatos);
+        Utils.setFontBold(campoDatos);
+        panelCentral.add(campoDatos, c);
+        
+        //Relacion entre etiqueta y campo de texto
+        etiquetaDatos.setLabelFor(campoDatos);
+        //Asignacion de mnemónico
+        etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_F);
 
 		c.insets = new Insets(0, 10, 0, 20);
 		c.gridx = 1;
 		
-		// Boton examinar (fichero firma)
-		JButton examinarFirma = new JButton();
-		examinarFirma.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico diferente al botï¿½n "Examinar" anterior
-		examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar"));
-		examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
-		examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
-		examinarFirma.getAccessibleContext().setAccessibleDescription(examinarFirma.getToolTipText());
-		examinarFirma.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				examinarFirmaActionPerformed();
-			}
-		});
-		Utils.remarcar(examinarFirma);
-        Utils.setContrastColor(examinarFirma);
-		Utils.setFontBold(examinarFirma);
-		panelCentral.add(examinarFirma, c);
+		// Boton examinar (fichero datos)
+        JButton examinarDatos = new JButton();
+        examinarDatos.setMnemonic(KeyEvent.VK_E);
+        examinarDatos.setText(Messages.getString("PrincipalGUI.Examinar"));
+        examinarDatos.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        examinarDatos.getAccessibleContext().setAccessibleName(examinarDatos.getText() + " " + examinarDatos.getToolTipText());
+        examinarDatos.getAccessibleContext().setAccessibleDescription(examinarDatos.getToolTipText());
+        examinarDatos.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                examinarDatosActionPerformed();
+            }
+        });
+        Utils.remarcar(examinarDatos);
+        Utils.setContrastColor(examinarDatos);
+        Utils.setFontBold(examinarDatos);
+        panelCentral.add(examinarDatos, c);
 		
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(20, 20, 0, 20);
@@ -242,6 +243,17 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		HelpUtils.enableHelpKey(campoFirma, "multifirma.wizard.ficherofirma");
 	}
 
+
+    /**
+     * Examina si el archivo seleccionado es un archivo de firma y guarda el nombre en su caja
+     */
+    private void examinarFirmaActionPerformed() {
+        File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Wizard.multifirma.simple.chooserFirm.tittle"));
+        if (selectedFile != null) {
+            campoFirma.setText(selectedFile.getAbsolutePath());
+        }  
+    }
+	
 	/**
 	 * Examina si se ha seleccionado un archivo correcto y guarda el nombre en su caja
 	 */
@@ -250,16 +262,6 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		if (selectedFile != null) {
 			campoDatos.setText(selectedFile.getAbsolutePath());
 		}
-	}
-
-	/**
-	 * Examina si el archivo seleccionado es un archivo de firma y guarda el nombre en su caja
-	 */
-	private void examinarFirmaActionPerformed() {
-		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Wizard.multifirma.simple.chooserFirm.tittle"));
-		if (selectedFile != null) {
-			campoFirma.setText(selectedFile.getAbsolutePath());
-		}  
 	}
 
 	/**
@@ -290,86 +292,105 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 	 * @return	true o false indicando si se ha cofirmado correctamente
 	 */
 	public Boolean cofirmaFichero() {
-		//comprobaciï¿½n de la ruta de fichero de entrada.
+		//comprobacion de la ruta de fichero de entrada.
 		String ficheroDatos = campoDatos.getText();
 		String ficheroFirma = campoFirma.getText();
 
-		if (ficheroDatos == null || ficheroDatos.equals("")){
-			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-			return false;
+		if (ficheroFirma == null || ficheroFirma.equals("")){
+            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        else if (!new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){
+            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+		
+		
+		InputStream signIs = null;
+		InputStream dataIs = null;
+		byte[] sign;
+		byte[] data;
+		
+		try {
+		    signIs = new FileInputStream(ficheroFirma);
+		    sign = AOUtil.getDataFromInputStream(signIs);
+		} catch (Exception e) {
+		    JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+		
+		final AOSigner signer = AOSignerFactory.getSigner(sign);
+        if (signer == null) {
+            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.manejador"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+		try {
+		    data = signer.getData(sign);
+		} catch (Exception e) {
+		    Logger.getLogger("es.gob.afirma").warning("No se ha podido leer los datos contenidos en la firma, se tomaran los del fichero indicado: " + e);  //$NON-NLS-1$//$NON-NLS-2$
+		    data = null;
+        }
+		
+		if (data == null) {
+		    if (ficheroDatos == null || ficheroDatos.equals("")){
+		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
+		    else if (!new File(ficheroDatos).exists() && !new File(ficheroDatos).isFile()) {
+		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
 		}
-		else if (!new File(ficheroDatos).exists() && !new File(ficheroDatos).isFile()) {
-			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		else if (ficheroFirma == null || ficheroFirma.equals("")){
-			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		else if (!new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){
-			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		else {
-			InputStream dataIs = null;
-			InputStream signIs = null;
-			try {
-				String intText = ".cosign";
-				byte[] coSignedData = null;
-				byte[] data = null;
-				byte[] sign = null;
-				MultisignUtils msUtils = new MultisignUtils();
-				AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(kssc,this);
+		
+		try {
+		    String intText = ".cosign";
+		    byte[] coSignedData = null;
+		    
+		    MultisignUtils msUtils = new MultisignUtils();
+		    AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(kssc,this);
 
-				// Recuperamos la clave del certificado
-				PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(kssc, keyStoreManager, this);
+		    // Recuperamos la clave del certificado
+		    PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(kssc, keyStoreManager, this);
 
-				dataIs = new FileInputStream(ficheroDatos);
-				data = AOUtil.getDataFromInputStream(dataIs);
-				
-				signIs = new FileInputStream(ficheroFirma);
-				sign = AOUtil.getDataFromInputStream(signIs);
-				
-				AOSigner signer = AOSignerFactory.getSigner(sign);
-				if (signer == null) {
-					JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.manejador"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				if (!signer.isValidDataFile(data)) {
-					JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				if (!signer.isSign(sign)) {
-					JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.soportado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				try {
-					coSignedData = cosignOperation(signer, data, sign, keyEntry, ficheroDatos);
-				} catch (AOException e) {
-					logger.severe(e.toString());
-					JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.cofirma.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-				
-				final File savedFile = SelectionDialog.saveDataToFile(coSignedData,
-				        signer.getSignedName(ficheroDatos, intText), null, this);
-				// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
-				if (savedFile == null) {
-					return false;
-				}
-				
-			} catch (Exception e) {
-				logger.severe(e.toString());
-				JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-				return false;
-			} finally {
-				if (dataIs != null) {
-					try { dataIs.close(); } catch (Exception e) {}
-				}
-				if (signIs != null) {
-					try { signIs.close(); } catch (Exception e) {}
-				}
-			}
+		    if (data == null) {
+		        dataIs = new FileInputStream(ficheroDatos);
+		        data = AOUtil.getDataFromInputStream(dataIs);
+		    }
+		    
+		    if (!signer.isValidDataFile(data)) {
+		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
+		    if (!signer.isSign(sign)) {
+		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.soportado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
+		    try {
+		        coSignedData = cosignOperation(signer, data, sign, keyEntry, ficheroDatos);
+		    } catch (AOException e) {
+		        logger.severe(e.toString());
+		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.cofirma.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
+
+		    final File savedFile = SelectionDialog.saveDataToFile(coSignedData,
+		            signer.getSignedName(ficheroDatos, intText), null, this);
+		    // Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
+		    if (savedFile == null) {
+		        return false;
+		    }
+
+		} catch (Exception e) {
+		    logger.severe(e.toString());
+		    JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		    return false;
+		} finally {
+		    if (dataIs != null) {
+		        try { dataIs.close(); } catch (Exception e) {}
+		    }
+		    if (signIs != null) {
+		        try { signIs.close(); } catch (Exception e) {}
+		    }
 		}
 
 		return true;
