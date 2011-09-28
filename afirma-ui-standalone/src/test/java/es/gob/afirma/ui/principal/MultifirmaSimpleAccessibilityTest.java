@@ -11,13 +11,17 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 
 /**
@@ -91,7 +95,7 @@ public class MultifirmaSimpleAccessibilityTest {
 		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
-	
+
 	/**
 	 * Comprobación de que el campo Mnemocic de las etiquetas, botones y botones de radio
 	 *  no esté duplicado. Modo Avanzado.
@@ -101,9 +105,14 @@ public class MultifirmaSimpleAccessibilityTest {
 		logger.info("testNotDuplicatedDisplayedMnemonic_AdvancedMode");
 
 		//Se obtiene la cofiguración general
+		//Se añade el perfil por defecto
+		UserProfile.currentUser=Constants.defaultUser;
+		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
+		
 		//Se cambia al modo avanzado
 		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true");
+
 		//Se asigna
 		GeneralConfig.loadConfig(config);
 				
@@ -122,6 +131,92 @@ public class MultifirmaSimpleAccessibilityTest {
 		keyCodesSet = new HashSet<Integer>(keyCodes);
 		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
+	}
+	
+	/**
+	 * Comprobación de que el campo nombre accesible para botones, combos y checks
+	 * no esté vacío. 
+	 */
+	@Test
+	public void testNotEmptyAccessibleName_SimpleMode() {
+		logger.info("testNotEmptyAccessibleName_SimpleMode()");
+		//Instancia del panel que se va a analizar
+		MultifirmaSimple multifirmaSimplePanel = new MultifirmaSimple();
+		//Se llama al método que comprueba que el nombre no sea vacío
+		assertTrue(checkAccessibleName(multifirmaSimplePanel));
+	}
+	
+	/**
+	 * Comprobación de que el campo nombre accesible para botones, radioButtons, combos y checks
+	 * no esté vacío. 
+	 */
+	@Test
+	public void testNotEmptyAccessibleName_AdvancedMode() {
+		logger.info("testNotEmptyAccessibleName_AdvancedMode()");
+		//Se obtiene la cofiguración general
+		//Se añade el perfil por defecto
+		UserProfile.currentUser=Constants.defaultUser;
+		GeneralConfig.loadConfig(GeneralConfig.getConfig());
+		Properties config = GeneralConfig.getConfig();
+		
+		//Se cambia al modo avanzado
+		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "true");
+				
+		//Instancia del panel que se va a analizar
+		MultifirmaSimple multifirmaSimplePanel = new MultifirmaSimple();
+		//Se llama al método que comprueba que el nombre no sea vacío
+		assertTrue(checkAccessibleName(multifirmaSimplePanel));
+	}
+	
+	/**
+	 * Recorre el panel comprobando que todos sus componentes (botones, radioButtons, checks y combos)
+	 * tienen un nombre accesible asignado.
+	 * @param panel panel
+	 * @return verdadero -> si los componentes tienen un nombre accesible asignado
+	 * 		   falso -> si algún componente no tiene un nombre accesible asignado
+	 */
+	@Ignore
+	private boolean checkAccessibleName(JPanel panel) {
+		boolean result = true;
+		//Array de componentes del panel
+		Component[] components = panel.getComponents();
+		for (int i = 0; i < components.length; i++) {
+			//Se obtiene el componente
+			Component component = panel.getComponent(i);
+			if (!(component instanceof JPanel)) {
+				if (component instanceof JButton) { //Se comprueba si es un botón
+					JButton button = (JButton) component;
+					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+						return false; //Si no tiene asignado un nombre accesible se sale del método
+					}
+				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkBox
+					JCheckBox checkBox = (JCheckBox) component;
+					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+						return false; //Si no tiene asignado un nombre accesible se sale del método
+					}
+				} else if (component instanceof JComboBox) { //Se comprueba si es un combo
+					JComboBox comboBox = (JComboBox) component;
+					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+						return false; //Si no tiene asignado un nombre accesible se sale del método
+					}
+				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
+					JRadioButton radioButton = (JRadioButton) component;
+					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+						return false; //Si no tiene asignado un nombre accesible se sale del método
+					}
+				} else if (component instanceof JTextField) { //Se comprueba si es un campo de texto
+					JTextField textField = (JTextField) component;
+					if (textField.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
+						return false; //Si no tiene asignado un nombre accesible se sale del método
+					}
+				}
+				
+			} else {
+				//Si es un panel se vuelve a llamar recursivamente al método
+				result = checkAccessibleName((JPanel)component);
+			}
+		} //for
+		return result;
 	}
 
 	/**
