@@ -181,7 +181,7 @@ public class ToggleImageButton extends JToggleButton {
     
     @Override
     protected void paintComponent(Graphics g) {
-        if (this.mouseOver && !this.isSelected()) {
+        if ((this.mouseOver || this.isFocusOwner()) && !this.isSelected()) {
             super.paintComponent(g);
         }
     }
