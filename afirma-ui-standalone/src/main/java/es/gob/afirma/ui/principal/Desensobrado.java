@@ -359,11 +359,13 @@ public class Desensobrado extends JPanel {
     		    }
     		} catch (AOException e) {
     			logger.severe("Ocurrio un error al abrir el sobre digital: "+e); //$NON-NLS-1$
-    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre.abrir"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+    			//El pop-up muestra el mensaje de la excepción
+    			JOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     			return;
     		} catch (Exception e) {
     			logger.severe("Ocurrio un error al abrir el sobre digital: "+e); //$NON-NLS-1$
-    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre.abrir"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
+    			//El pop-up muestra el mensaje de la excepción
+    			JOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
     			return;
     		}
 
