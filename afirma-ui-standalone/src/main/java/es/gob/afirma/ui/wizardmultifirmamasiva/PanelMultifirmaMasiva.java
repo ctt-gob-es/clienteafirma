@@ -509,12 +509,14 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	}
         } catch(AOException e){
         	logger.severe(e.toString());
-        	JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.grave"), 
-        			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); 
+        	//El pop-up muestra el mensaje de la excepción
+        	JOptionPane.showMessageDialog(this, e.getMessage(), 
+        			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE);
         	return false;
         } catch(Exception e){
         	logger.severe(e.toString());
-        	JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.grave"), 
+        	//El pop-up muestra el mensaje de la excepción
+        	JOptionPane.showMessageDialog(this, e.getMessage(), 
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); 
         	e.printStackTrace();
         	return false;
