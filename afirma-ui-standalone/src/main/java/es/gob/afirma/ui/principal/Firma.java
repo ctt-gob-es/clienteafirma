@@ -127,7 +127,6 @@ public class Firma extends JPanel {
 		// Campo donde se guarda el nombre del fichero a firmar
 		final JTextField campoFichero = new JTextField();
 		campoFichero.setToolTipText(Messages.getString("Firma.buscar.caja.description")); // NOI18N
-		campoFichero.setMinimumSize(new Dimension(6, 18));
 		campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
 		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
 		campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" "+"ALT + G.");
@@ -156,7 +155,6 @@ public class Firma extends JPanel {
 		examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
-		examinar.setMinimumSize(examinar.getSize());
 		examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
 		examinar.addActionListener(new ActionListener() {
 			@Override

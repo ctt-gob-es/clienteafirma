@@ -457,7 +457,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         JPanel panelFirma = new Firma();
         this.htPanel.addTab(buttonFirma, panelFirma);
 	    
-        // Panel de multifirma
+     // Panel de multifirma
         ToggleImageButton buttonMultifirma = this.createToggleButton(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma")); //$NON-NLS-1$
         buttonMultifirma.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
@@ -582,6 +582,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		//Al repintar la pantalla principal para quitar o poner las opciones avanzadas hay que ajustar 
 		//la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
 		this.callResize();
+		
 	}
 
 	/**
@@ -595,10 +596,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
         ToggleImageButton tButton = new ToggleImageButton();
         tButton.setHorizontalAlignment(SwingConstants.LEFT);
         tButton.setButtonText(text);
-        
-        if (GeneralConfig.isRemarked()){
-            Utils.remarcar(tButton);
-        }
+       
+        Utils.remarcar(tButton);
         Utils.setContrastColor(tButton);
         Utils.setFontBold(tButton);
         return tButton;
