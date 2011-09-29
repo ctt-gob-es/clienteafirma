@@ -439,7 +439,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	        return false;
 	    }
 	    // Almacenamos el fichero de salida de la operacion
-	    final File savedFile = SelectionDialog.saveDataToFile(result, "cifrado", null, this); //$NON-NLS-1$
+	    final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.clave.filechooser.save.title"), result, "cifrado", null, this); //$NON-NLS-1$
 	    if (savedFile == null) {
 	        return false;
 	    }

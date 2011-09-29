@@ -33,7 +33,6 @@ import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -308,7 +307,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
                 JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             else {
                 // Almacenamos el fichero de salida de la operacion
-            	final File savedFile = SelectionDialog.saveDataToFile(result,
+            	final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.contrasenia.filechooser.save.title"), result,
                         "cifrado", null, this); //$NON-NLS-1$
                 if (savedFile == null) {
 					return false;

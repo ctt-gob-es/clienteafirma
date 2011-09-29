@@ -39,7 +39,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -291,7 +290,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		
 		if (signedData != null) {
 			// Salvamos el fichero de datos
-			final File savedFile = SelectionDialog.saveDataToFile(signedData,
+			final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("Wizard.multifirma.simple.contrafirma.filechooser.save.title"), signedData,
 		            aoSigner.getSignedName(dataFilepath, ".signed"), //$NON-NLS-1$
 		            SignFileUtils.getOutFileFilter(formato), this);
 			// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla

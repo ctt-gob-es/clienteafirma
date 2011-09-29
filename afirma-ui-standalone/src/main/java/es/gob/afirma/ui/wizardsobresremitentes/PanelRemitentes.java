@@ -444,7 +444,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		envelopedData = doCoEnvelopOperation(envelopedData, contentType, privateKey);
 
     		// Guardamos el sobre generado
-    		File savedFile = SelectionDialog.saveDataToFile(envelopedData,
+    		File savedFile = SelectionDialog.saveDataToFile(Messages.getString("wizard.sobres.remitentes.filechooser.save.title"), envelopedData,
     		        new File(this.rutafichero + ".csig").getName(), //$NON-NLS-1$
     		        SignFileUtils.getOutFileFilter(AOSignConstants.SIGN_FORMAT_CMS),
     		        this);

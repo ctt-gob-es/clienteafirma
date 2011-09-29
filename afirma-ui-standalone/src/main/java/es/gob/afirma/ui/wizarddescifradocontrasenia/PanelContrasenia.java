@@ -32,7 +32,6 @@ import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.jse.JSEUIManager;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -266,7 +265,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 
 		// Almacenamos el fichero de salida de la operacion
 	      
-		final File savedFile = SelectionDialog.saveDataToFile(result, "fichero", null, this); //$NON-NLS-1$
+		final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("WizardDescifrado.contrasenia.filechooser.save.title"), result, "fichero", null, this); //$NON-NLS-1$
 
 		// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 		if (savedFile == null) {

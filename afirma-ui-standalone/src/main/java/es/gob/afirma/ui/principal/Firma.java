@@ -48,7 +48,6 @@ import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
@@ -504,7 +503,7 @@ public class Firma extends JPanel {
 				}
 
 				// Guardamos la firma en fichero
-				final File savedFile = SelectionDialog.saveDataToFile(signedData,
+				final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("Firma.filechooser.save.title"), signedData,
                         SignedFileManager.getOutFileName(this.getFilename(campoFichero.getText()), formato),
                         SignedFileManager.getOutFileFilter(formato),
                         this);

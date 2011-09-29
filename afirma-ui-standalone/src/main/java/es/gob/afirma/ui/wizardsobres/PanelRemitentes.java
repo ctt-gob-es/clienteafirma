@@ -45,7 +45,6 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
@@ -526,7 +525,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		}
 
     		// Guardamos el sobre generado
-    		final File savedFile = SelectionDialog.saveDataToFile(envelopedData,
+    		final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("wizard.sobres.filechooser.save.title"), envelopedData,
     		        new File(rutafichero).getName(), null, this);
     		// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 			if (savedFile == null) {

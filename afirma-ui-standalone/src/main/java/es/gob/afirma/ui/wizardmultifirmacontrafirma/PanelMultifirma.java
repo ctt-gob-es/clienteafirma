@@ -53,7 +53,6 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.jse.JSEUtils;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
@@ -450,7 +449,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				return false;
 
 			// Salvamos el fichero de datos
-			final File savedFile = SelectionDialog.saveDataToFile(signedData,
+			final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("Wizard.multifirma.simple.contrafirma.filechooser.save.title"), signedData,
                     signer.getSignedName(rutaFichero, intText), null, this);
 			// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 			if (savedFile == null) {

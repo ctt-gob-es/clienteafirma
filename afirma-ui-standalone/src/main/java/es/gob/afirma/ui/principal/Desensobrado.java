@@ -37,7 +37,6 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 import es.gob.afirma.envelopers.cms.CMSDecipherAuthenticatedEnvelopedData;
 import es.gob.afirma.envelopers.cms.CMSDecipherEnvelopData;
@@ -375,7 +374,7 @@ public class Desensobrado extends JPanel {
     		}
 
     		// Salvamos los datos
-    		File file = SelectionDialog.saveDataToFile(recoveredData, name, null, this);
+    		File file = SelectionDialog.saveDataToFile(Messages.getString("Desensobrado.filechooser.save.title"), recoveredData, name, null, this);
     		if (file != null && checkIniciar.isSelected()){
     			Utils.openFile(file);
     		}

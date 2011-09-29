@@ -351,7 +351,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	}
 
     	// Almacenamos el fichero de salida de la operacion
-    	final File savedFile = SelectionDialog.saveDataToFile(result, "fichero", null, this);
+    	final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("WizardDescifrado.clave.filechooser.save.title"), result, "fichero", null, this);
     	if (savedFile == null) {
     	    return false;
     	}
