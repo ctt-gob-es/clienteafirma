@@ -81,6 +81,9 @@ public class SelectionDialog {
      * usuario si desea sobreescribirlo. En caso de cancelar la operaci&oacute;n
      * se devolvera null, si la operaci&oacute;n finaliza correctamente se
      * devolver&aacute; el path completo del fichero.
+     * 
+     * @param dialogTitle
+     *        Título de la ventana de guardado.
      * @param data
      *        Datos que se desean almacenar.
      * @param defaultName
@@ -93,7 +96,7 @@ public class SelectionDialog {
      * @return Fichero guardado.
      * @throws NullPointerException
      *         No se introdujeron los datos que se desean almacenar. */
-    public static File saveDataToFile(final byte[] data, final String defaultName, final FileFilter fileFilter, final Object parent) {
+    public static File saveDataToFile(final String dialogTitle, final byte[] data, final String defaultName, final FileFilter fileFilter, final Object parent) {
 
         if (data == null) {
             Logger.getLogger("es.gob.afirma").warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -110,6 +113,8 @@ public class SelectionDialog {
         if (currentDir != null) {
             fileChooser.setCurrentDirectory(new File(currentDir));
         }
+        
+        fileChooser.setDialogTitle(dialogTitle); //Se le asigna un título al diálogo
         
         File resultFile = null;
         boolean tryAgain = true;
