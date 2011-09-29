@@ -108,7 +108,8 @@ public class SelectionDialog {
             parentComponent = (Component) parent;
         }
         
-        final JFileChooser fileChooser = new JFileChooser();
+        //Instancia del diálogo de guardado accesible
+        final JAccessibilityFileChooserToSave fileChooser = new JAccessibilityFileChooserToSave();
         String currentDir = Main.preferences.get("dialog.save.dir", null); //$NON-NLS-1$
         if (currentDir != null) {
             fileChooser.setCurrentDirectory(new File(currentDir));
