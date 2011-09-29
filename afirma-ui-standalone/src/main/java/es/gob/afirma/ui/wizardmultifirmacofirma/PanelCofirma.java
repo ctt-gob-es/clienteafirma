@@ -381,7 +381,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 
 		} catch (Exception e) {
 		    logger.severe(e.toString());
-		    JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		    JOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 		    return false;
 		} finally {
 		    if (dataIs != null) {
