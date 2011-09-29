@@ -190,7 +190,7 @@ public class CAdESUtils {
             /*
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
-            final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier());
+            final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 
             /*
              *   OtherHashAlgAndValue ::= SEQUENCE {
@@ -204,18 +204,18 @@ public class CAdESUtils {
             final AlgorithmIdentifier hashid;
             // si tenemos algoritmo de cálculo de hash, lo ponemos
             if(policy.getPolicyIdentifierHashAlgorithm()!=null){
-            	hashid = SigUtils.makeAlgId(
-            						AOAlgorithmID.getOID(
-            						AOSignConstants.getDigestAlgorithmName(
-            								policy.getPolicyIdentifierHashAlgorithm())));
+                hashid = SigUtils.makeAlgId(
+                                    AOAlgorithmID.getOID(
+                                    AOSignConstants.getDigestAlgorithmName(
+                                       policy.getPolicyIdentifierHashAlgorithm())));
             }
             // si no tenemos, ponemos el algoritmo de firma.
             else{
-            	hashid= digestAlgorithmOID;
+                hashid= digestAlgorithmOID;
             }
             // hash del documento, descifrado en b64
-            final byte[] hashed;            	
-            if(policy.getPolicyIdentifierHash()!=null){            
+            final byte[] hashed;
+            if(policy.getPolicyIdentifierHash()!=null) {
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 new Base64Encoder().decode(policy.getPolicyIdentifierHash(), baos);
                 hashed = baos.toByteArray();
@@ -264,6 +264,102 @@ public class CAdESUtils {
         return contexExpecific;
     }
     
+    /**
+     * Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
+     * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
+     * datos de la pol&iacute;tica.
+     * <pre>
+     * PolicyInformation ::= SEQUENCE {
+     * policyIdentifier   CertPolicyId,
+     * policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+     *                          PolicyQualifierInfo OPTIONAL }                          
+     *                          
+     *                          
+     * CertPolicyId ::= OBJECT IDENTIFIER
+     *
+     * PolicyQualifierInfo ::= SEQUENCE {
+     *      policyQualifierId  PolicyQualifierId,
+     *      qualifier          ANY DEFINED BY policyQualifierId }
+     *
+     * -- policyQualifierIds for Internet policy qualifiers
+     *
+     * id-qt          OBJECT IDENTIFIER ::=  { id-pkix 2 }
+     * id-qt-cps      OBJECT IDENTIFIER ::=  { id-qt 1 }
+     * id-qt-unotice  OBJECT IDENTIFIER ::=  { id-qt 2 }
+     *
+     * PolicyQualifierId ::=
+     *      OBJECT IDENTIFIER ( id-qt-cps | id-qt-unotice )
+     *
+     * Qualifier ::= CHOICE {
+     *      cPSuri           CPSuri,
+     *      userNotice       UserNotice }
+     *
+     * CPSuri ::= IA5String
+     *
+     * UserNotice ::= SEQUENCE {
+     *      noticeRef        NoticeReference OPTIONAL,
+     *      explicitText     DisplayText OPTIONAL}
+     *
+     * NoticeReference ::= SEQUENCE {
+     *      organization     DisplayText,
+     *      noticeNumbers    SEQUENCE OF INTEGER }
+     *
+     * DisplayText ::= CHOICE {
+     *      ia5String        IA5String      (SIZE (1..200)),
+     *      visibleString    VisibleString  (SIZE (1..200)),
+     *      bmpString        BMPString      (SIZE (1..200)),
+     *      utf8String       UTF8String     (SIZE (1..200)) }
+     * </pre>
+     * 
+     * @param policy    Pol&iacute;tica de la firma.
+     * @return          Estructura con la pol&iacute;tica preparada para insertarla en la firma.
+     */
+    private static PolicyInformation[] getPolicyInformation(final AdESPolicy policy){
+        
+        if (policy == null) {
+            throw new IllegalArgumentException("La politica de firma no puede ser nula en este punto"); //$NON-NLS-1$
+        }
+        
+        /*
+         * PolicyQualifierInfo ::= SEQUENCE {
+         *          policyQualifierId  PolicyQualifierId,
+         *          qualifier          ANY DEFINED BY policyQualifierId } 
+         */
+        
+        final PolicyQualifierId pqid = PolicyQualifierId.id_qt_cps;
+        DERIA5String uri = null;
+
+        if (policy.getPolicyQualifier()!=null && !policy.getPolicyQualifier().equals("")){ //$NON-NLS-1$
+            uri = new DERIA5String(policy.getPolicyQualifier().toString());
+        }
+
+        final ASN1EncodableVector v = new ASN1EncodableVector();
+        PolicyQualifierInfo pqi = null;
+        if(uri != null){
+            v.add(pqid);
+            v.add(uri);
+            pqi = new PolicyQualifierInfo(new DERSequence(v));
+        }
+        
+        /*
+         * PolicyInformation ::= SEQUENCE {
+         *     policyIdentifier   CertPolicyId,
+         *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+         *                          PolicyQualifierInfo OPTIONAL }
+         */
+        
+        if (policy.getPolicyQualifier()==null || pqi == null) {
+            return new PolicyInformation[] {
+                new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
+            };
+        }
+
+        return new PolicyInformation[] {
+            new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
+        };
+        
+    }
+    
     /** Inicializa el contexto. */
     static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest, final Date signDate) throws NoSuchAlgorithmException {
         // authenticatedAttributes
@@ -282,106 +378,5 @@ public class CAdESUtils {
 
         return ContexExpecific;
     }
-    
-    /**
-     * Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
-     * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
-     * datos de la pol&iacute;tica.
-     * 
-     * PolicyInformation ::= SEQUENCE {
-       policyIdentifier   CertPolicyId,
-       policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-                                PolicyQualifierInfo OPTIONAL }							
-								
-								
-	   CertPolicyId ::= OBJECT IDENTIFIER
-	
-	   PolicyQualifierInfo ::= SEQUENCE {
-	        policyQualifierId  PolicyQualifierId,
-	        qualifier          ANY DEFINED BY policyQualifierId }
-	
-	   -- policyQualifierIds for Internet policy qualifiers
-	
-	   id-qt          OBJECT IDENTIFIER ::=  { id-pkix 2 }
-	   id-qt-cps      OBJECT IDENTIFIER ::=  { id-qt 1 }
-	   id-qt-unotice  OBJECT IDENTIFIER ::=  { id-qt 2 }
-	
-	   PolicyQualifierId ::=
-	        OBJECT IDENTIFIER ( id-qt-cps | id-qt-unotice )
-	
-	   Qualifier ::= CHOICE {
-	        cPSuri           CPSuri,
-	        userNotice       UserNotice }
-	
-	   CPSuri ::= IA5String
-	
-	   UserNotice ::= SEQUENCE {
-	        noticeRef        NoticeReference OPTIONAL,
-	        explicitText     DisplayText OPTIONAL}
-	
-	   NoticeReference ::= SEQUENCE {
-	        organization     DisplayText,
-	        noticeNumbers    SEQUENCE OF INTEGER }
-	
-	   DisplayText ::= CHOICE {
-	        ia5String        IA5String      (SIZE (1..200)),
-	        visibleString    VisibleString  (SIZE (1..200)),
-	        bmpString        BMPString      (SIZE (1..200)),
-	        utf8String       UTF8String     (SIZE (1..200)) }
 
-     * 
-     * @param policy 	Pol&iacute;tica de la firma.
-     * @return			Estructura con la pol&iacute;tica preparada para insertarla en la firma.
-     */
-    private static PolicyInformation[] getPolicyInformation(final AdESPolicy policy){
-    	
-    	if (policy == null) {
-    	    throw new IllegalArgumentException("La politica de firma no puede ser nula en este punto"); //$NON-NLS-1$
-    	}
-        
-    	/*
-    	 * PolicyQualifierInfo ::= SEQUENCE {
-		 *	        policyQualifierId  PolicyQualifierId,
-		 *          qualifier          ANY DEFINED BY policyQualifierId } 
-    	 */
-    	
-    	final PolicyQualifierId pqid = PolicyQualifierId.id_qt_cps;
-    	DERIA5String uri = null;
-
-		if (policy.getPolicyQualifier()!=null && !policy.getPolicyQualifier().equals("")){ //$NON-NLS-1$
-			uri = new DERIA5String(policy.getPolicyQualifier().toString());
-		}
-
-    	final ASN1EncodableVector v = new ASN1EncodableVector();
-    	final PolicyQualifierInfo pqi;
-    	if(uri != null){
-    		v.add(pqid);
-    		v.add(uri);
-    		pqi = new PolicyQualifierInfo(new DERSequence(v));
-    	}    		
-    	else{
-    		v.add(pqid);
-    		pqi = new PolicyQualifierInfo(new DERSequence(v));	
-    	}
-    	
-    	
-    	/*
-    	 * PolicyInformation ::= SEQUENCE {
-		       policyIdentifier   CertPolicyId,
-		       policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-                                	PolicyQualifierInfo OPTIONAL }
-    	 */
-    	
-    	if (policy.getPolicyQualifier()==null) {
-            return new PolicyInformation[] {
-                new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier()))
-            };
-        }
-
-        return new PolicyInformation[] {
-            new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier()), new DERSequence(pqi))
-        };
-    	
-    }
-    
 }

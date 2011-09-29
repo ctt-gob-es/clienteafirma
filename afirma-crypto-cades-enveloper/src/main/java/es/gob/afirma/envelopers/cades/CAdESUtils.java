@@ -476,7 +476,7 @@ class CAdESUtils {
             /*
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
-            final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier());
+            final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 
             /*
              *   OtherHashAlgAndValue ::= SEQUENCE {
@@ -493,18 +493,17 @@ class CAdESUtils {
                 hashid = SigUtils.makeAlgId(
                                     AOAlgorithmID.getOID(
                                     AOSignConstants.getDigestAlgorithmName(
-                                            policy.getPolicyIdentifierHashAlgorithm())));
+                                       policy.getPolicyIdentifierHashAlgorithm())));
             }
             // si no tenemos, ponemos el algoritmo de firma.
             else{
                 hashid= digestAlgorithmOID;
             }
             // hash del documento, descifrado en b64
-            final byte[] hashed;                
-            if(policy.getPolicyIdentifierHash()!=null){
-                final Base64Encoder decoder= new Base64Encoder();            
+            final byte[] hashed;
+            if(policy.getPolicyIdentifierHash()!=null) {
                 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                decoder.decode(policy.getPolicyIdentifierHash(),baos);
+                new Base64Encoder().decode(policy.getPolicyIdentifierHash(), baos);
                 hashed = baos.toByteArray();
             }
             else{
@@ -555,48 +554,48 @@ class CAdESUtils {
      * Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
      * Sirve para los datos de SigningCertificate y SigningCertificateV2. Tiene que llevar algunos
      * datos de la pol&iacute;tica.
-     * 
+     * <pre>
      * PolicyInformation ::= SEQUENCE {
-       policyIdentifier   CertPolicyId,
-       policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-                                PolicyQualifierInfo OPTIONAL }                          
-                                
-                                
-       CertPolicyId ::= OBJECT IDENTIFIER
-    
-       PolicyQualifierInfo ::= SEQUENCE {
-            policyQualifierId  PolicyQualifierId,
-            qualifier          ANY DEFINED BY policyQualifierId }
-    
-       -- policyQualifierIds for Internet policy qualifiers
-    
-       id-qt          OBJECT IDENTIFIER ::=  { id-pkix 2 }
-       id-qt-cps      OBJECT IDENTIFIER ::=  { id-qt 1 }
-       id-qt-unotice  OBJECT IDENTIFIER ::=  { id-qt 2 }
-    
-       PolicyQualifierId ::=
-            OBJECT IDENTIFIER ( id-qt-cps | id-qt-unotice )
-    
-       Qualifier ::= CHOICE {
-            cPSuri           CPSuri,
-            userNotice       UserNotice }
-    
-       CPSuri ::= IA5String
-    
-       UserNotice ::= SEQUENCE {
-            noticeRef        NoticeReference OPTIONAL,
-            explicitText     DisplayText OPTIONAL}
-    
-       NoticeReference ::= SEQUENCE {
-            organization     DisplayText,
-            noticeNumbers    SEQUENCE OF INTEGER }
-    
-       DisplayText ::= CHOICE {
-            ia5String        IA5String      (SIZE (1..200)),
-            visibleString    VisibleString  (SIZE (1..200)),
-            bmpString        BMPString      (SIZE (1..200)),
-            utf8String       UTF8String     (SIZE (1..200)) }
-
+     * policyIdentifier   CertPolicyId,
+     * policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+     *                          PolicyQualifierInfo OPTIONAL }                          
+     *                          
+     *                          
+     * CertPolicyId ::= OBJECT IDENTIFIER
+     *
+     * PolicyQualifierInfo ::= SEQUENCE {
+     *      policyQualifierId  PolicyQualifierId,
+     *      qualifier          ANY DEFINED BY policyQualifierId }
+     *
+     * -- policyQualifierIds for Internet policy qualifiers
+     *
+     * id-qt          OBJECT IDENTIFIER ::=  { id-pkix 2 }
+     * id-qt-cps      OBJECT IDENTIFIER ::=  { id-qt 1 }
+     * id-qt-unotice  OBJECT IDENTIFIER ::=  { id-qt 2 }
+     *
+     * PolicyQualifierId ::=
+     *      OBJECT IDENTIFIER ( id-qt-cps | id-qt-unotice )
+     *
+     * Qualifier ::= CHOICE {
+     *      cPSuri           CPSuri,
+     *      userNotice       UserNotice }
+     *
+     * CPSuri ::= IA5String
+     *
+     * UserNotice ::= SEQUENCE {
+     *      noticeRef        NoticeReference OPTIONAL,
+     *      explicitText     DisplayText OPTIONAL}
+     *
+     * NoticeReference ::= SEQUENCE {
+     *      organization     DisplayText,
+     *      noticeNumbers    SEQUENCE OF INTEGER }
+     *
+     * DisplayText ::= CHOICE {
+     *      ia5String        IA5String      (SIZE (1..200)),
+     *      visibleString    VisibleString  (SIZE (1..200)),
+     *      bmpString        BMPString      (SIZE (1..200)),
+     *      utf8String       UTF8String     (SIZE (1..200)) }
+     * </pre>
      * 
      * @param policy    Pol&iacute;tica de la firma.
      * @return          Estructura con la pol&iacute;tica preparada para insertarla en la firma.
@@ -621,33 +620,28 @@ class CAdESUtils {
         }
 
         final ASN1EncodableVector v = new ASN1EncodableVector();
-        final PolicyQualifierInfo pqi;
+        PolicyQualifierInfo pqi = null;
         if(uri != null){
             v.add(pqid);
             v.add(uri);
             pqi = new PolicyQualifierInfo(new DERSequence(v));
-        }           
-        else{
-            v.add(pqid);
-            pqi = new PolicyQualifierInfo(new DERSequence(v));  
         }
-        
         
         /*
          * PolicyInformation ::= SEQUENCE {
-               policyIdentifier   CertPolicyId,
-               policyQualifiers   SEQUENCE SIZE (1..MAX) OF
-                                    PolicyQualifierInfo OPTIONAL }
+         *     policyIdentifier   CertPolicyId,
+         *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF
+         *                          PolicyQualifierInfo OPTIONAL }
          */
         
-        if (policy.getPolicyQualifier()==null) {
+        if (policy.getPolicyQualifier()==null || pqi == null) {
             return new PolicyInformation[] {
-                new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier()))
+                new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", ""))) //$NON-NLS-1$ //$NON-NLS-2$
             };
         }
 
         return new PolicyInformation[] {
-            new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier()), new DERSequence(pqi))
+            new PolicyInformation(new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")), new DERSequence(pqi)) //$NON-NLS-1$ //$NON-NLS-2$
         };
         
     }
