@@ -195,11 +195,9 @@ final class CAdESEPESSignedAndEnvelopedData {
         final ASN1EncodableVector contextExpecific =
             CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                          digestAlgorithm,
-                                         digAlgId,
                                          parameters.getContent(),
                                          policy,
                                          signingCertificateV2,
-                                         dataType,
                                          null);
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
         final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -299,7 +297,6 @@ final class CAdESEPESSignedAndEnvelopedData {
     byte[] addOriginatorInfo(final InputStream data,
                                     final P7ContentSignerParameters parameters,
                                     final PrivateKeyEntry keyEntry,
-                                    final String dataType,
                                     final AdESPolicy policy,
                                     final boolean signingCertificateV2) {
         // boolean isValid = false;
@@ -364,11 +361,9 @@ final class CAdESEPESSignedAndEnvelopedData {
                     final ASN1EncodableVector contextExpecific =
                         CAdESUtils.generateSignerInfo(signerCertificateChain[0],
                                                      digestAlgorithm,
-                                                     digAlgId,
                                                      parameters.getContent(),
                                                      policy,
                                                      signingCertificateV2,
-                                                     dataType,
                                                      null);
                     this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
                     final ASN1Set signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));

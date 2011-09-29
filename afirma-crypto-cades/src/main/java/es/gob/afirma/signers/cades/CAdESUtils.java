@@ -46,9 +46,9 @@ public class CAdESUtils {
     
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param cert Certificado de firma.
+     * @param cert Certificado del firmante
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
-     * @param datos Datos firmados.
+     * @param datos Datos firmados
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      * @param dataType Tipo del contenido a firmar.
@@ -185,7 +185,7 @@ public class CAdESUtils {
         }
 
         // INICIO SIGPOLICYID ATTRIBUTE
-        
+
         if (policy.getPolicyIdentifier() != null) {
             /*
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
@@ -193,11 +193,11 @@ public class CAdESUtils {
             final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier());
 
             /*
-	         *   OtherHashAlgAndValue ::= SEQUENCE {
-	         *     hashAlgorithm    AlgorithmIdentifier,
-	         *     hashValue        OCTET STRING }
-	         *
-	         */
+             *   OtherHashAlgAndValue ::= SEQUENCE {
+             *     hashAlgorithm    AlgorithmIdentifier,
+             *     hashValue        OCTET STRING }
+             *
+             */
             
 
             // Algoritmo para el hash
@@ -215,36 +215,35 @@ public class CAdESUtils {
             }
             // hash del documento, descifrado en b64
             final byte[] hashed;            	
-            if(policy.getPolicyIdentifierHash()!=null){
-            	Base64Encoder decoder= new Base64Encoder();            
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                decoder.decode(policy.getPolicyIdentifierHash(),baos);
+            if(policy.getPolicyIdentifierHash()!=null){            
+                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                new Base64Encoder().decode(policy.getPolicyIdentifierHash(), baos);
                 hashed = baos.toByteArray();
             }
             else{
-            	hashed = new byte[]{0};
+                hashed = new byte[]{0};
             }
             
             final DigestInfo OtherHashAlgAndValue = new DigestInfo(hashid, hashed);
             
-	        /*
-	         *   SigPolicyQualifierInfo ::= SEQUENCE {
-	         *       SigPolicyQualifierId  SigPolicyQualifierId,
-	         *       SigQualifier          ANY DEFINED BY policyQualifierId }
-	         */
+            /*
+             *   SigPolicyQualifierInfo ::= SEQUENCE {
+             *       SigPolicyQualifierId  SigPolicyQualifierId,
+             *       SigQualifier          ANY DEFINED BY policyQualifierId }
+             */
             SigPolicyQualifierInfo spqInfo = null;
             if(policy.getPolicyQualifier()!=null){
-            	spqInfo = new SigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
+                spqInfo = new SigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
             }
             
             /*
-	         * SignaturePolicyId ::= SEQUENCE {
-	         *  sigPolicyId           SigPolicyId,
-	         *  sigPolicyHash         SigPolicyHash,
-	         *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
-	         *                          SigPolicyQualifierInfo OPTIONAL}
-	         *
-	         */
+             * SignaturePolicyId ::= SEQUENCE {
+             *  sigPolicyId           SigPolicyId,
+             *  sigPolicyHash         SigPolicyHash,
+             *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
+             *                          SigPolicyQualifierInfo OPTIONAL}
+             *
+             */
             final ASN1EncodableVector v = new ASN1EncodableVector();
             // sigPolicyId
             v.add(DOISigPolicyId);
@@ -282,7 +281,7 @@ public class CAdESUtils {
         ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString((messageDigest != null) ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
 
         return ContexExpecific;
-    }    
+    }
     
     /**
      * Obtiene un PolicyInformation a partir de los datos de la pol&iacute;tica.
