@@ -1,6 +1,8 @@
 package es.gob.afirma.test.xades;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
@@ -9,10 +11,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -22,6 +27,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 //import es.gob.afirma.platform.ws.TestSignVerifier;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
+import es.gob.afirma.signers.xml.Utils;
 
 
 
@@ -99,6 +105,7 @@ public final class TestXAdES {
             AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA
     };
     
+    // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
     private static final String[] TEST_FILES_SIGN = new String[] {
             "ANF_PF_Activo.pfx", //$NON-NLS-1$
             "sample-class-attributes.xml", //$NON-NLS-1$
@@ -141,9 +148,16 @@ public final class TestXAdES {
         for (final Properties extraParams : XADES_MODES) {
             for (final String algo : ALGOS) {
                 for (final String filename : TEST_FILES_SIGN) {
+                    
+                    // Omitimos la firma de binarios en modo enveloped
+                    if ("XAdES Enveloped".equals(extraParams.getProperty("format")) && !filename.toLowerCase().endsWith(".xml")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        break;
+                    }
                 
                     prueba = "Firma XAdES en modo '" +  //$NON-NLS-1$
                     extraParams.getProperty("mode") +  //$NON-NLS-1$
+                    ", formato '" + //$NON-NLS-1$
+                    extraParams.getProperty("format") +  //$NON-NLS-1$
                     "' con el algoritmo ': " + //$NON-NLS-1$
                     algo +
                     "' y el fichero '" + //$NON-NLS-1$
@@ -167,6 +181,8 @@ public final class TestXAdES {
 //                    if (verifier != null) {
 //                        Assert.assertTrue("Fallo al validar " + filename, verifier.verifyXML(result)); //$NON-NLS-1$
 //                    }
+                    
+                    Assert.assertTrue(isValidUnsignedProperties(new ByteArrayInputStream(result),null));
 
                     Assert.assertNotNull(prueba, result);
                     Assert.assertTrue(signer.isSign(result));
@@ -187,6 +203,45 @@ public final class TestXAdES {
         }
 
     }
+        
+    /**
+     * Comprueba que el nodo UnsignedSignatureProperties (en caso de aparecer)
+     * de la firma XAdES contiene atributos. Busca el nodo con el namespace
+     * indicado.
+     * @param sign Firma.
+     * @param namespace Espacio de nombres a utilizar.
+     * @return {@code false} si se encuentra el nodo UnsignedSignatureProperties
+     * vac&iacute;o, {@code true} en caso contrario.
+     */
+    private boolean isValidUnsignedProperties(final InputStream sign, final String namespace) {
+        
+        final Document document;
+        try {
+            document = DocumentBuilderFactory.newInstance().
+            newDocumentBuilder().parse(sign);
+        } 
+        catch (final Exception e) {
+            System.out.println("No es una firma valida"); //$NON-NLS-1$
+            return false;
+        }
+        
+        final String xadesNamespace = (namespace != null) ? namespace : Utils.guessXAdESNamespaceURL(document.getFirstChild());
+        
+        NodeList upNodes = document.getElementsByTagName(xadesNamespace + ":UnsignedProperties"); //$NON-NLS-1$
+        for (int i = 0; i < upNodes.getLength(); i++) {
+            NodeList uspNodes = upNodes.item(i).getChildNodes();
+            for (int j = 0; j < uspNodes.getLength(); j++) {
+                if (uspNodes.item(i).getNodeName().equals(xadesNamespace + ":UnsignedSignatureProperties")) { //$NON-NLS-1$
+                    if (uspNodes.item(i).getChildNodes().getLength() == 0) {
+                        return false;
+                    }
+                    break;
+                }
+            }
+        }
     
+        return true;
+    }
+
         
 }
