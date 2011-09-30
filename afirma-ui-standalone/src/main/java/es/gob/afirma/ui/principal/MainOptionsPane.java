@@ -103,7 +103,7 @@ public class MainOptionsPane {
         checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         checkHabilitar.setSelected(GeneralConfig.isAvanzados()); 
         checkHabilitar.setBounds(12, 20, 340, 23);
-        checkHabilitar.setMnemonic(KeyEvent.VK_H); // Asignación de mnemónico al checkbox
+        checkHabilitar.setMnemonic(KeyEvent.VK_B); // Asignación de mnemónico al checkbox
         
         Utils.remarcar(checkHabilitar);
 
