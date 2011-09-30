@@ -20,6 +20,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.platform.ws.TestSignVerifier;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 
@@ -53,10 +54,10 @@ public final class TestCAdES {
         final Properties p2 = new Properties();
         p2.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
         p2.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
-        p2.setProperty("policyIdentifier", "1.2.3.4"); //$NON-NLS-1$ //$NON-NLS-2$
-        p2.setProperty("policyIdentifierHash", "AAAAAAA="); //$NON-NLS-1$ //$NON-NLS-2$
-        p2.setProperty("policyIdentifierHashAlgorithm", "SHA-512"); //$NON-NLS-1$ //$NON-NLS-2$
-        p2.setProperty("policyQualifier", "http://www.google.com"); //$NON-NLS-1$ //$NON-NLS-2$
+        p2.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8"); //$NON-NLS-1$ //$NON-NLS-2$
+        p2.setProperty("policyIdentifierHash", "tSbjbefbEoLcD06K/IR8FtuhhVE="); //$NON-NLS-1$ //$NON-NLS-2$
+        p2.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+        //p2.setProperty("policyQualifier", "http://www.google.com"); //$NON-NLS-1$ //$NON-NLS-2$
 
         final Properties p3 = new Properties();
         p3.setProperty("format", AOSignConstants.SIGN_FORMAT_CADES); //$NON-NLS-1$
@@ -83,6 +84,14 @@ public final class TestCAdES {
      */
     @Test
     public void testSignature() throws Exception {
+        
+      TestSignVerifier verifier = null;
+      try {
+          verifier = new TestSignVerifier();
+      } 
+      catch (Exception e) {
+          System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
+      }
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
@@ -119,6 +128,11 @@ public final class TestCAdES {
                 os.close();
                 System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
+              // Enviamos a validar a AFirma
+              if (verifier != null) {
+                  Assert.assertTrue("Fallo al validar " + saveFile.getAbsolutePath(), verifier.verifyBin(result)); //$NON-NLS-1$
+              }
+                
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));
                 Assert.assertTrue(AOCAdESSigner.isCADESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
