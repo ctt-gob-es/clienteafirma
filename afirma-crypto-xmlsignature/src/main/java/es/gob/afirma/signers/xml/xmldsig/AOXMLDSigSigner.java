@@ -437,7 +437,6 @@ public final class AOXMLDSigSigner implements AOSigner {
                     }
 
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
 
                     // Si es base 64, lo firmamos indicando como contenido el
                     // dato pero, ya que puede
@@ -445,8 +444,8 @@ public final class AOXMLDSigSigner implements AOSigner {
                     // extranos para el XML,
                     // realizamos una decodificacion y recodificacion para asi
                     // homogenizar el formato.
-                    if (AOUtil.isBase64(data)) {
-                        LOGGER.info("El documento se considera Base64, se insertara como tal en el XML"); //$NON-NLS-1$
+                    if (AOUtil.isBase64(data) && (XMLConstants.BASE64_ENCODING.equals(encoding) || ((encoding != null) ? encoding : "").toLowerCase().equals("base64"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                        LOGGER.info("El documento se ha indicado como Base64, se insertara como tal en el XML"); //$NON-NLS-1$
 
                         // Adicionalmente, si es un base 64 intentamos obtener
                         // el tipo del contenido
@@ -459,15 +458,20 @@ public final class AOXMLDSigSigner implements AOSigner {
                         dataElement.setTextContent(Base64.encode(decodedData));
                     }
                     else {
-                        LOGGER
-                              .info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
-
+                        if (XMLConstants.BASE64_ENCODING.equals(encoding)) {
+                            LOGGER.info("El documento se ha indicado como Base64, pero no es un Base64 valido. Se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
+                        }
+                        else {
+                            LOGGER.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
+                        }
                         // Usamos el MimeType identificado
                         dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
                         dataElement.setTextContent(Base64.encode(data));
                         wasEncodedToBase64 = true;
                     }
                     isBase64 = true;
+                    encoding = XMLConstants.BASE64_ENCODING;
+                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
                 }
                 catch (final Exception ex) {
                     throw new AOException("Error al convertir los datos a base64", ex); //$NON-NLS-1$

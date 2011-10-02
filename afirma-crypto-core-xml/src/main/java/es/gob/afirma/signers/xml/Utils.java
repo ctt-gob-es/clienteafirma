@@ -122,8 +122,8 @@ public final class Utils {
      *         Si el objeto dereferenciado no puede transformarse en un
      *         Documento DOM */
     public static Document dereferenceStyleSheet(final String id, final boolean headLess) throws CannotDereferenceException,
-                                                                                         IsInnerlException,
-                                                                                         ReferenceIsNotXMLException {
+                                                                                                 IsInnerlException,
+                                                                                                 ReferenceIsNotXMLException {
         if (id == null || "".equals(id)) { //$NON-NLS-1$
             throw new CannotDereferenceException("La hoja de estilo era nula o vacia"); //$NON-NLS-1$ 
         }
@@ -155,7 +155,8 @@ public final class Utils {
             }
             else if (id.startsWith("file://")) { //$NON-NLS-1$
                 // Preguntamos al usuario para la dereferenciacion
-                if (AOUIFactory.showConfirmDialog(null, XMLMessages.getString("Utils.5"), //$NON-NLS-1$
+                if (AOUIFactory.showConfirmDialog(null, 
+                                                  XMLMessages.getString("Utils.5"), //$NON-NLS-1$
                                                   XMLMessages.getString("Utils.6"), //$NON-NLS-1$
                                                   AOUIFactory.OK_CANCEL_OPTION,
                                                   AOUIFactory.INFORMATION_MESSAGE) == AOUIFactory.OK_OPTION) {

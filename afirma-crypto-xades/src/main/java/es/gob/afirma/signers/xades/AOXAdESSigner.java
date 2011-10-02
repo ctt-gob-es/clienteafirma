@@ -13,7 +13,6 @@ package es.gob.afirma.signers.xades;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
-import java.security.AccessController;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -77,7 +76,6 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
@@ -170,21 +168,21 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * <p>
  * Tratamiento de las hojas de estilo en firmas XML:
  * <ul>
- * <li>Firmas XML Enveloped</li>
- * <ul>
- * <li>Hoja de estilo con ruta relativa</li>
- * <ul>
- * <li>No se firma.</li>
- * </ul>
- * <li>Hola de estilo remota con ruta absoluta</li>
- * <ul>
- * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
- * <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- * </ul>
- * <li>Hoja de estilo empotrada</li>
- * <ul>
- * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
- * </ul>
+ *  <li>Firmas XML Enveloped</li>
+ *  <ul>
+ *   <li>Hoja de estilo con ruta relativa</li>
+ *  <ul>
+ *   <li>No se firma.</li>
+ *  </ul>
+ *   <li>Hola de estilo remota con ruta absoluta</li>
+ *  <ul>
+ *   <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+ *   <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+ *  </ul>
+ *   <li>Hoja de estilo empotrada</li>
+ *  <ul>
+ *   <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+ *  </ul>
  * </ul>
  * <li>Firmas XML Externally Detached</li>
  * <ul>
@@ -260,19 +258,14 @@ public final class AOXAdESSigner implements AOSigner {
     private Document doc;
 
     static {
-        AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-            public Void run() {
-                if (Platform.getJavaVersion().equals(Platform.JREVER.J5)) {
-                    try {
-                        Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
-                    }
-                    catch (final Exception e) {
-                        LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
-                    }
-                }
-                return null;
+        if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
+            try {
+                Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
             }
-        });
+            catch (final Exception e) {
+                LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
+            }
+        }
     }
 
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
@@ -345,7 +338,7 @@ public final class AOXAdESSigner implements AOSigner {
 
                 // Obtenemos la hoja de estilo del XML
                 try {
-                    Properties p;
+                    final Properties p;
                     if (!ignoreStyleSheets) {
                         p = Utils.getStyleSheetHeader(new String(data));
                     }
@@ -363,13 +356,15 @@ public final class AOXAdESSigner implements AOSigner {
 
                         try {
                             final Document tmpDoc =
-                                    Utils.dereferenceStyleSheet(TransformerFactory.newInstance()
-                                                                                  .getAssociatedStylesheet(new StreamSource(new ByteArrayInputStream(data)),
-                                                                                                           null,
-                                                                                                           null,
-                                                                                                           null)
-                                                                                  .getSystemId(),
-                                                                headLess);
+                                    Utils.dereferenceStyleSheet(
+                                        TransformerFactory.newInstance().getAssociatedStylesheet(
+                                             new StreamSource(new ByteArrayInputStream(data)),
+                                             null,
+                                             null,
+                                             null
+                                        ).getSystemId(),
+                                        headLess
+                                    );
 
                             // Cuidado!! Solo rellenamos el Elemento DOM si no
                             // es HTTP o HTTPS, porque si es accesible
@@ -476,13 +471,11 @@ public final class AOXAdESSigner implements AOSigner {
                     final Document docFile = dbf.newDocumentBuilder().newDocument();
                     dataElement = docFile.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     uri = null;
-                    encoding = XMLConstants.BASE64_ENCODING;
                     if (mimeType == null) {
                         mimeType = XMLConstants.DEFAULT_MIMETYPE;
                     }
 
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
 
                     // Si es base 64, lo firmamos indicando como contenido el
                     // dato pero, ya que puede
@@ -490,8 +483,8 @@ public final class AOXAdESSigner implements AOSigner {
                     // extranos para el XML,
                     // realizamos una decodificacion y recodificacion para asi
                     // homogenizar el formato.
-                    if (AOUtil.isBase64(data)) {
-                        LOGGER.info("El documento se considera Base64, se insertara como tal en el XML"); //$NON-NLS-1$
+                    if (AOUtil.isBase64(data) && (XMLConstants.BASE64_ENCODING.equals(encoding) || ((encoding != null) ? encoding : "").toLowerCase().equals("base64"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                        LOGGER.info("El documento se ha indicado como Base64, se insertara como tal en el XML"); //$NON-NLS-1$
 
                         // Adicionalmente, si es un base 64 intentamos obtener
                         // el tipo del contenido
@@ -504,14 +497,20 @@ public final class AOXAdESSigner implements AOSigner {
                         dataElement.setTextContent(Base64.encodeBytes(decodedData));
                     }
                     else {
-                        LOGGER.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
-
+                        if (XMLConstants.BASE64_ENCODING.equals(encoding)) {
+                            LOGGER.info("El documento se ha indicado como Base64, pero no es un Base64 valido. Se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
+                        }
+                        else {
+                            LOGGER.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
+                        }
                         // Usamos el MimeType identificado
                         dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
                         dataElement.setTextContent(Base64.encodeBytes(data));
                         wasEncodedToBase64 = true;
                     }
                     isBase64 = true;
+                    encoding = XMLConstants.BASE64_ENCODING;
+                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
                 }
                 catch (final Exception ex) {
                     throw new AOException("Error al convertir los datos a base64", ex); //$NON-NLS-1$
@@ -1160,6 +1159,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // si el documento es binario se deshace la codificacion en
                 // Base64
                 else {
+                    //TODO: Deshacer solo el Base64 si existe la transformacion Base64 
                     return Base64.decode(firstChild.getTextContent());
                 }
             }
@@ -1197,6 +1197,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // si el documento es binario se deshace la codificacion en
                 // Base64
                 else {
+                  //TODO: Deshacer solo el Base64 si existe la transformacion Base64
                     return Base64.decode(object.getTextContent());
                 }
             }
