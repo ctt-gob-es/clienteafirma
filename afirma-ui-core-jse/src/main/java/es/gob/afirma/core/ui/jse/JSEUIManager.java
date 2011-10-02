@@ -37,19 +37,6 @@ import es.gob.afirma.core.ui.AOUIManager;
  * @version 0.4 */
 public final class JSEUIManager implements AOUIManager {
 
-
-    /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
-     * @param extensions
-     *        Extensiones de fichero permitidas
-     * @param description
-     *        Descripci&oacute;n del tipo de fichero correspondiente a
-     *        las extensiones
-     * @return Filtro apto para su uso en un <code>JFileChooser</code>
-     */
-    public static FileFilter getFileFilter(final String[] extensions, String description) {
-        return new ExtFilter(extensions, description);
-    }
-
     /** Pregunta al usuario por una contrase&ntilde;a.
      * @param text
      *        Texto que se muestra en el di&aacute;logo para pedir la
@@ -322,7 +309,7 @@ public final class JSEUIManager implements AOUIManager {
      * @return Fichero guardado.
      * @throws NullPointerException
      *         No se introdujeron los datos que se desean almacenar. */
-    public File saveDataToFile(final byte[] data, final File selectedFile, final FileFilter fileFilter, final Object parent) {
+    public File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
 
         if (data == null) {
             Logger.getLogger("es.gob.afirma").warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -354,8 +341,8 @@ public final class JSEUIManager implements AOUIManager {
 
             // Solo aplicamos el filtro cuando este definido para evitar que el
             // desplegable de la ventana de guardado nos aparecezca vacio
-            if (fileFilter != null) {
-                fileChooser.setFileFilter(fileFilter);
+            if (fileFilter != null && (fileFilter instanceof FileFilter)) {
+                fileChooser.setFileFilter((FileFilter)fileFilter);
             }
 
             int selectedOption = JOptionPane.YES_OPTION;
