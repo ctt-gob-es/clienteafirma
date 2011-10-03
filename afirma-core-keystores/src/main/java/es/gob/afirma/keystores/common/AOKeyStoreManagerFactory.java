@@ -110,6 +110,9 @@ public final class AOKeyStoreManagerFactory {
                 is = new FileInputStream(storeFilename);
                 ksm.init(store, is, pssCallback, null);
             }
+            catch (final AOCancelledOperationException e) {
+                throw e;
+            }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
                                                          "No se ha podido abrir el almacen de tipo " + store.getDescription(), //$NON-NLS-1$
@@ -148,6 +151,9 @@ public final class AOKeyStoreManagerFactory {
                         p11Lib, description
                 });
             }
+            catch (final AOCancelledOperationException e) {
+                throw e;
+            }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el modulo PKCS#11", e); //$NON-NLS-1$
             }
@@ -157,19 +163,14 @@ public final class AOKeyStoreManagerFactory {
         // Internet Explorer en Windows (descartamos Internet Explorer en
         // Solaris, HP-UX o Mac OS X)
         // o Google Chrome en Windows, que tambien usa el almacen de CAPI
-        else if (Platform.getOS().equals(Platform.OS.WINDOWS) && (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
-                                                                  || store == AOKeyStore.WINADDRESSBOOK || store == AOKeyStore.WINCA /*
-                                                                                                                                                              * ||
-                                                                                                                                                              * store
-                                                                                                                                                              * ==
-                                                                                                                                                              * AOConstants
-                                                                                                                                                              * .
-                                                                                                                                                              * AOKeyStore
-                                                                                                                                                              * .
-                                                                                                                                                              * WINDEPLOY
-                                                                                                                                                              */)) {
+        else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
+                (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
+                        || store == AOKeyStore.WINADDRESSBOOK || store == AOKeyStore.WINCA)) {
             try {
                 ksm.init(store, null, new NullPasswordCallback(), null);
+            }
+            catch (final AOCancelledOperationException e) {
+                throw e;
             }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
@@ -195,6 +196,9 @@ public final class AOKeyStoreManagerFactory {
             try {
                 ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, null);
             }
+            catch (final AOCancelledOperationException e) {
+                throw e;
+            }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
                         "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
@@ -210,6 +214,9 @@ public final class AOKeyStoreManagerFactory {
         else if (Platform.getOS().equals(Platform.OS.MACOSX) && store == AOKeyStore.APPLE) {
             try {
                 ksm.init(store, null, new NullPasswordCallback(), null);
+            }
+            catch (final AOCancelledOperationException e) {
+                throw e;
             }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
