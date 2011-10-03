@@ -1,12 +1,12 @@
-/*
+/*******************************************************************************
  * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde www.ctt.map.es.
+ * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
- */
+ ******************************************************************************/
 
 package es.gob.afirma.keystores.mozilla;
 
@@ -74,7 +74,7 @@ final class AOSecMod {
 
     /** Obtiene los m&oacute;dulos de seguridad PKCS#11 instalados en la base de
      * datos <i>secmod.db</i>.
-     * @param profileDir
+     * @param dir
      *        Directorio del perfil del usuario activo de Mozilla / Firefox
      * @return Vector con los m&oacute;dulos encontrados, el vector
      *         estar&aacute; vac&iacute;o si se encuentra alg&uacute;n problema
