@@ -18,8 +18,8 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -239,7 +239,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		try {
 			Key tmpKey = cipherConfig.getCipher().decodePassphrase(contrasenia, cipherConfig.getConfig(), null);
 			result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
-		} catch (InvalidKeyException e) {
+		} catch (KeyException e) {
 			logger.severe("Contrasena no valida: " + e);
 			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.contrasenia"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
