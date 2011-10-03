@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import es.gob.afirma.ui.utils.GeneralConfig;
+import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -270,6 +271,16 @@ public class AccessibilityOptionsPane {
         c.gridy = c.gridy + 1;
         c.weighty = 1.0;
         panel.add(new JPanel(), c);
+        
+        //Accesos rapidos al menu de ayuda
+        HelpUtils.enableHelpKey(checkFontSize, "accesibilidad.texto");
+        HelpUtils.enableHelpKey(checkFontStyle, "accesibilidad.texto");
+        HelpUtils.enableHelpKey(checkHighContrast, "accesibilidad.color");
+        HelpUtils.enableHelpKey(checkFocusVisible, "accesibilidad.foco");
+        HelpUtils.enableHelpKey(checkWindowSize, "accesibilidad.ventana");
+        HelpUtils.enableHelpKey(checkCursorSize, "accesibilidad.cursor");
+        HelpUtils.enableHelpKey(valores, "accesibilidad.defecto");
+        HelpUtils.enableHelpKey(guardar, "accesibilidad.guardar");
 	}
 	
 	public JPanel getConfigurationPanel() {

@@ -2,12 +2,14 @@ package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Panel;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,12 +26,14 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
+import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogAdvisor;
 import es.gob.afirma.ui.utils.Messages;
@@ -136,10 +140,10 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		c.gridy = c.gridy + 1;
 		
         // Etiqueta de la lista de usuarios
-		InfoLabel label = new InfoLabel(Messages.getString("UserProfile.list.label"), false);
+		JLabel label = new JLabel();
+		label.setText(Messages.getString("UserProfile.list.label")); // NOI18N
 		label.setDisplayedMnemonic(KeyEvent.VK_P);
 		label.setLabelFor(list);
-		config(label);
 		
 		add(label,c);
 		c.gridy = c.gridy + 1;
@@ -177,11 +181,43 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		add(list,c);
 		
 		c.gridy = c.gridy + 1;
-		c.insets = new Insets(5, 150, 5, 150);
+		add(createButtonsPanel(), c);
+		
+        //Accesos rapidos al menu de ayuda
+        HelpUtils.enableHelpKey(list, "perfil.cargar");
+		
+	}
+	
+	private Component createButtonsPanel() {
+    	// Panel inferior
+        JPanel bottomPanel = new JPanel(new GridBagLayout());
+        
+		GridBagConstraints cons = new GridBagConstraints();
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.ipadx = 15;
+		cons.gridx = 0;
+		cons.insets = new Insets(5, 0, 5, 0);
+		
+		// Etiqueta para rellenar a la izquierda
+		JLabel label = new JLabel();
+		bottomPanel.add(label, cons);
+        
+		//Boton maximizar ventana
+		JButton maximizar = new JButton();
+		maximizar.setText(Messages.getString("Wizard.maximizar"));
+	    maximizar.setName("maximizar");
+	    maximizar.setMnemonic(KeyEvent.VK_M);
+	    maximizar.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		maximizarActionPerformed();
+			}
+		});
+	    config(maximizar);
 		
 		// Boton aceptar
 		JButton aceptar = new JButton();
 		aceptar.setText("Aceptar");
+		aceptar.setMnemonic(KeyEvent.VK_A);
 		aceptar.addActionListener(new ActionListener() {
 			
 			@Override
@@ -191,9 +227,37 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		});
 		config(aceptar);
 		
-		add(aceptar,c);
-		c.gridy = c.gridy + 1;
-	}
+	    //Espacio entre botones
+		Panel panelVacio = new Panel();
+		panelVacio.setPreferredSize(new Dimension(30, 10));
+        
+        // Panel en donde se insertan los botones maximizar y aceptar
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(maximizar, BorderLayout.CENTER);
+        buttonPanel.add(panelVacio, BorderLayout.CENTER);
+        buttonPanel.add(aceptar, BorderLayout.CENTER);
+		
+        cons.ipadx = 0;
+		cons.weightx = 1.0;
+		cons.gridx = 1;
+		
+		bottomPanel.add(buttonPanel, cons);
+        
+		// Boton ayuda
+		JButton botonAyuda = HelpUtils.helpButton("perfiles.usuario");
+		config(botonAyuda);
+		
+        cons.ipadx = 15;
+		cons.weightx = 0.02;
+		cons.gridx = 2;
+        
+        bottomPanel.add(botonAyuda, cons);
+        
+      //Accesos rapidos al menu de ayuda
+        HelpUtils.enableHelpKey(aceptar, "perfil.aceptar");
+        
+        return bottomPanel;
+    }
 	
 	/**
 	 * Evento de redimensionado. Almacena los valores actuales de posicion y 
@@ -276,7 +340,27 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
 				}
 			});
+			if (button.getIcon() != null) {			
+				button.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						button.setBorder(BorderFactory.createEmptyBorder());
+					}		
+					public void focusGained(FocusEvent e) {
+						button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+					}
+				});
+			}
 		}
     }
+    
+    /**
+	 * Cambia el tamaño de la ventana al tamaño máximo de pantalla menos el tamaño de la barra de tareas de windows
+	 */
+	public void maximizarActionPerformed(){
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		JAccessibilityDialogAdvisor j = getJAccessibilityDialogAdvisor(this);
+		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		
+	}
 	
 }
