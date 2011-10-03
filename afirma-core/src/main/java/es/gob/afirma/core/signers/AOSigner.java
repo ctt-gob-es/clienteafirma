@@ -42,7 +42,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * electr&oacute;nica. Cada uno de los nodos de firma est&aacute;
      * representado por el alias del certificado con el que se realizo firma.<br/>
      * Los nodos del &aacute;rbol ser&aacute;n cadena de texto con el CommonName
-     * del certificado u objetos de tipo {@link es.gob.afirma.signers.beans.AOSimpleSignInfo} con la
+     * del certificado u objetos de tipo AOSimpleSignInfo con la
      * informaci&oacute;n b&aacute;sica de las firmas individuales, seg&uacute;n
      * el valor del par&aacute;metro <code>asSimpleSignInfo</code>. Los nodos se
      * mostrar&aacute;n en el mismo orden y con la misma estructura con el que
@@ -55,7 +55,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * @param asSimpleSignInfo
      *        Si es <code>true</code> se devuelve un &aacute;rbol con la
      *        informaci&oacute;n b&aacute;sica de cada firma individual
-     *        mediante objetos {@link es.gob.afirma.signers.beans.AOSimpleSignInfo}, si es <code>false</code> un &aacute;rbol con los nombres de los
+     *        mediante objetos AOSimpleSignInfo, si es <code>false</code> un &aacute;rbol con los nombres de los
      *        certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de
      *         error. */

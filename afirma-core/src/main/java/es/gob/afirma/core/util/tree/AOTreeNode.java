@@ -274,8 +274,6 @@ public final class AOTreeNode {
      * parent. (Note that a node is considered an ancestor of itself.) If <code>anotherNode</code> is null, this method returns false. This
      * operation is at worst O(h) where h is the distance from the root to this
      * node.
-     * @see #isNodeDescendant
-     * @see #getSharedAncestor
      * @param anotherNode
      *        node to test as an ancestor of this node
      * @return true if this node is a descendant of <code>anotherNode</code> */

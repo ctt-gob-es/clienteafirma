@@ -267,7 +267,7 @@ public final class OfficeXMLAnalizer {
 
     /** Recupera la extensi&oacute;n apropiada para un documento ODF. Si el
      * fichero no era un documento ODF soportado, se devolver&aacute; <code>null</code>.
-     * @param file
+     * @param contentTypeIs
      *        Fichero del que deseamos obtener la extensi&oacute;n.
      * @return Extensi&oacute;n del documento. */
     private static String getODFMimeType(final InputStream contentTypeIs) {

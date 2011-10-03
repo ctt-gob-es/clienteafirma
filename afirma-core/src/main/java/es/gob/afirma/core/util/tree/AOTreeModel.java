@@ -33,10 +33,7 @@ public final class AOTreeModel {
      * present.) That lets you distinguish between <i>folder</i> nodes and
      * <i>file</i> nodes in a file system, for example.
      * <p>
-     * If this value is false, then any node which has no children is a leaf node, and any node may acquire children.
-     * @see AOTreeNode#getAllowsChildren
-     * @see AOTreeModel#isLeaf
-     * @see #setAsksAllowsChildren */
+     * If this value is false, then any node which has no children is a leaf node, and any node may acquire children */
     private final boolean asksAllowsChildren;
 
     /** Creates a tree in which any node can have children.

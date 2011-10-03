@@ -63,8 +63,7 @@ final class AOTreePath {
      *        element in the path
      * @return the Object at that index location
      * @throws IllegalArgumentException
-     *         if the index is beyond the length of the path
-     * @see #TreePath(Object[]) */
+     *         if the index is beyond the length of the path */
     private Object getPathComponent(final int element) {
         final int pathLength = getPathCount();
 
