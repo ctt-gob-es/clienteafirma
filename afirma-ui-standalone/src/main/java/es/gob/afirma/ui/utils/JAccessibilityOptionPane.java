@@ -2,6 +2,7 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 /**
@@ -27,6 +28,7 @@ public class JAccessibilityOptionPane extends JOptionPane {
 		
 		//Etiqueta con el texto que se desea mostrar en el diálogo
 		InfoLabel infoLabel = new InfoLabel(message, false);
+		infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 		//Foco a la etiqueta
 		infoLabel.addAncestorListener(new RequestFocusListener());
 		//Se muestra el diálogo
@@ -45,6 +47,7 @@ public class JAccessibilityOptionPane extends JOptionPane {
 		
 		//Etiqueta con el texto que se desea mostrar en el diálogo
 		InfoLabel infoLabel = new InfoLabel(message, false);
+		infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 		//Foco a la etiqueta
 		infoLabel.addAncestorListener(new RequestFocusListener());
 		//Se muestra el diálogo
