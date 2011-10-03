@@ -59,7 +59,7 @@ public final class AOCipherKeyStoreHelper {
             throw new AOException("Error almacenando la clave en el almacen", e); //$NON-NLS-1$
         }
         try {
-            this.ks.store(new BufferedOutputStream(new FileOutputStream(new File(getCipherKeystore()))), this.pss);
+            this.ks.store(new BufferedOutputStream(new FileOutputStream(getCipherKeystore())), this.pss);
         }
         catch (final Exception e) {
             throw new AOException("Error guardando el almacen de claves", e); //$NON-NLS-1$
@@ -98,7 +98,7 @@ public final class AOCipherKeyStoreHelper {
                 throw new AOException("Error obteniendo una instancia de KeyStore JCE", e); //$NON-NLS-1$
             }
         }
-        if (new File(getCipherKeystore()).exists()) {
+        if (storeExists()) {
             throw new AOException("Se ha pedido crear un almacen de claves, pero ya existia uno (" + getCipherKeystore() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         try {
@@ -108,12 +108,12 @@ public final class AOCipherKeyStoreHelper {
             throw new AOException("Error creando un KeyStore vacio", e); //$NON-NLS-1$
         }
         try {
-            this.ks.store(new FileOutputStream(new File(getCipherKeystore())), this.pss);
+            this.ks.store(new FileOutputStream(getCipherKeystore()), this.pss);
         }
         catch (final Exception e) {
             throw new AOException("Error guardando en disco el KeyStore vacio", e); //$NON-NLS-1$
         }
-        if (!new File(getCipherKeystore()).exists()) {
+        if (!storeExists()) {
             throw new AOException("Se creo el KeyStore sin errores, pero este no aparece en el disco"); //$NON-NLS-1$
         }
     }
@@ -132,19 +132,22 @@ public final class AOCipherKeyStoreHelper {
                 throw new AOException("Error al instalanciar un almacen de claves JCEKS", e); //$NON-NLS-1$
             }
         }
-        if (!new File(getCipherKeystore()).exists()) {
+        if (!storeExists()) {
             LOGGER.warning("El almacen no existe, se creara uno nuevo"); //$NON-NLS-1$
             createCipherKeyStore();
         }
         final InputStream ksIs;
         try {
-            ksIs = new FileInputStream(new File(getCipherKeystore()));
+            ksIs = new FileInputStream(getCipherKeystore());
         }
         catch (final IOException e) {
             throw new AOException("Error al cargar el almacen de claves de cifrado", e); //$NON-NLS-1$
         }
         try {
             this.ks.load(new BufferedInputStream(ksIs), this.pss);
+        }
+        catch (final IOException e) {
+            throw e;
         }
         catch (final Exception e) {
             throw new AOException("Error al cargar el almacen de claves de cifrado", e); //$NON-NLS-1$
