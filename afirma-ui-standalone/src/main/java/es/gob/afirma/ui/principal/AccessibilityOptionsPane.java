@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.principal;
 
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,17 +8,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Properties;
-import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
@@ -354,7 +351,7 @@ public class AccessibilityOptionsPane {
 				Main.preferences.put(name.trim()+".accesibility.maximized",String.valueOf(checkWindowSize.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.cursor",String.valueOf(checkCursorSize.isSelected()));
 			} else {
-				JOptionPane.showMessageDialog(panel,"Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
+				JAccessibilityOptionPane.showMessageDialog(panel,"Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
