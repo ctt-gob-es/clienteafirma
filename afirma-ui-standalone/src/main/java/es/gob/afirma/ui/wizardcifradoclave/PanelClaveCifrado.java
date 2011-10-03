@@ -129,7 +129,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         
     	GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(20, 20, 0, 20);
+		c.insets = new Insets(5, 20, 0, 20);
 		c.weightx = 1.0;
 		c.gridwidth = 3;
 		c.gridx = 0;
@@ -140,11 +140,19 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 		InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto1"), false);
 		panelCentral.add(insertLabel, c);
 
-		
-		c.gridx = 0;
+		c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(0, 20, 0, 20);
 		c.gridy = 1;
+		c.weighty = 1;
+        
+		 // Etiqueta que contiene el texto "Adicionalmente, puede almacenar..."
+        InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto5"), false);
+		panelCentral.add(lostLabel, c);
+		
+		c.gridy = 2;
 		c.gridwidth = 1;
-		c.insets = new Insets(20, 20, 0, 20);
+		c.weighty = 0;
+		c.insets = new Insets(0, 20, 0, 20);
     	
     	//Etiqueta con el texto Clave de cifrado
     	JLabel encodeKeyLabel = new JLabel (Messages.getString("WizardCifrado.claveCifrado"));
@@ -153,8 +161,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	panelCentral.add(encodeKeyLabel, c);
         
     	 c.gridx = 0;
-    	 c.gridy = 2;
-    	 c.gridwidth = 1;
+    	 c.gridy = 3;
     	 c.insets = new Insets(0, 20, 0, 0);
     	
         // Caja de texto donde se escribe la clave
@@ -225,7 +232,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 		c.insets = new Insets(10, 20, 0, 20);
 		c.weightx = 1.0;
 		c.gridwidth = 3;
-		c.gridy = 3;
+		c.gridy = 4;
 		c.gridx = 0;
 		
 		// Checkbox para guardar en el almacen
@@ -237,16 +244,10 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         Utils.setContrastColor(checkGuardar);
         Utils.setFontBold(checkGuardar);
         panelCentral.add(checkGuardar, c);
-
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(20, 20, 0, 20);
-		c.gridy = 4;
-		c.weighty = 1.0;
         
-		 // Etiqueta que contiene el texto "Adicionalmente, puede almacenar..."
-        InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto5"), false);
-		panelCentral.add(lostLabel, c);
-
+        c.gridy = c.gridy + 1;
+        c.weighty = 1.0;
+        panelCentral.add(new JPanel(), c);
         
         getContentPane().add(panelCentral, BorderLayout.CENTER);
 
