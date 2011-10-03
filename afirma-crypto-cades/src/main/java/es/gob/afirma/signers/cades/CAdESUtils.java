@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Este fichero forma parte del Cliente @firma.
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ ******************************************************************************/
+
 package es.gob.afirma.signers.cades;
 
 import java.io.ByteArrayOutputStream;
@@ -51,7 +61,6 @@ public class CAdESUtils {
      * @param datos Datos firmados
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
-     * @param dataType Tipo del contenido a firmar.
      * @param messageDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
      * @return Los datos necesarios para generar la firma referente a los datos del usuario.
