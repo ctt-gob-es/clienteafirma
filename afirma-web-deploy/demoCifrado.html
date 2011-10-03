@@ -1,0 +1,435 @@
+<!--
+ Este fichero forma parte del Cliente @firma. 
+ El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ y descargado desde www.ctt.map.es.
+ Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
+ fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+		<script type="text/javascript" src="common-js/deployJava.js"></script>
+		<script type="text/javascript" src="common-js/instalador.js"></script>
+		<script type="text/javascript" language="javascript" src="common-js/cripto.js"></script>
+		<script type="text/javascript" language="javascript" src="constantes.js"></script>
+		<script type="text/javascript" src="common-js/instalador.js"></script>
+
+<script type="text/javascript">
+	
+	var cipherAlgorithm="AES";
+	var key;
+	var keyMode="GENERATEKEY";
+	var txtPlano;
+	var txtCifrado;
+	var origen;
+	var destino;
+
+
+			function cifrar() {
+
+				initialize();
+
+				// Configurar cifrado
+				configurarCifrado();
+
+				// Comprobamos que esten establecidos los datos necesarios
+				if(!comprobarOperacion())
+					return;
+
+				if(origen == 'texto')
+					alert("Se va a cifrar el texto:\n" + txtPlano);
+				else 	if(origen == 'archivo')
+					alert("Se va a cifrar el fichero: " + archivo);
+
+				// Ciframos
+				var ok = clienteFirma.cipherData();
+
+				// Recuperamos
+				if (ok) {
+					res='Ok';
+					if(destino=='texto'){
+						txtCifrado=clienteFirma.getCipherData();
+						alert("El texto cifrado es:\n" + txtCifrado);
+						document.getElementById('textoProcesado').value = txtCifrado;
+					} else if (destino=='archivo'){
+						archivo = document.getElementById('archivoProcesado').value;
+						alert("El texto cifrado se almacenara en:\n" + archivo);
+						clienteFirma.saveCipherDataToFile(archivo);
+					} else {
+						return;
+					}
+					
+					if(keyMode == "GENERATEKEY") {
+						document.getElementById('claveActual').value=obtenerKey();
+					}
+				} else {
+					res='Error';
+					/* Solo mostramos el error via JavaScript si se ha configurado que no lo muestre el propio cliente */
+					if (!showErrors) {
+						alert(clienteFirma.getErrorMessage());
+					}
+				}
+
+				actualizaInfo("Cifrado", res, clienteFirma.getCipherAlgorithm(), keyMode, obtenerKey());
+			}
+			
+
+			function configurarClave() {
+				if(keyMode == "GENERATEKEY" || keyMode == "USERINPUT") {
+					var key = document.getElementById('claveActual').value;
+					if(key != undefined && key != null && key != '')
+						clienteFirma.setKey(key);
+				}
+			}
+
+			function configurarContrasena() {
+				if(keyMode == "PASSWORD") {
+					var pass = document.getElementById('claveActual').value;
+					if(pass != undefined && pass != null && pass != '')
+					clienteFirma.setPassword(pass);
+				}
+			}
+
+			function actualizaInfo(operacion,resultado,algoritmo,keymode,key){
+				document.getElementById('operacionInfo').innerHTML=operacion;
+				document.getElementById('resultadoInfo').innerHTML=resultado;
+				document.getElementById('keyModeActualInfo').innerHTML=keymode;
+				document.getElementById('algoritmoActualInfo').innerHTML=algoritmo;
+				document.getElementById('claveInfo').innerHTML=key;
+			}
+			
+			function descifrar(){
+
+				initialize();
+
+				// Configurar descifrado
+				configurarDescifrado();
+
+				// Comprobamos que esten establecidos los datos necesarios
+				if(!comprobarOperacion())
+					return;
+
+				if(origen == 'texto')
+					alert("Se va a descifrar el texto:\n" + txtCifrado);
+				else 	if(origen == 'archivo')
+					alert("Se va a descifrar el fichero: " + archivo);
+
+
+				// Desciframos
+				var ok = clienteFirma.decipherData();
+
+				// Recuperamos
+				if (ok) {
+					res='Ok';
+					if(destino=='texto'){
+						txtPlano=clienteFirma.getPlainData();
+						alert("El texto descifrado es:\n" + txtPlano);
+						document.getElementById('textoProcesado').value = txtPlano;
+					} else if (destino=='archivo'){
+						archivo = document.getElementById('archivoProcesado').value;
+						alert("El texto descifrado se almacenara en:\n" + archivo);
+						clienteFirma.savePlainDataToFile(archivo);
+					} else {
+						return;
+					}
+				} else {
+					res='Error'
+					/* Solo mostramos el error via JavaScript si se ha configurado que no lo muestre el propio cliente */
+					if (!showErrors) {
+						alert(clienteFirma.getErrorMessage());
+					}
+				}
+
+				actualizaInfo("Descifrado", res, clienteFirma.getCipherAlgorithm(), keyMode, obtenerKey());
+			}
+
+		
+			function comprobarOperacion(){
+				if(origen == 'texto'){
+					if(document.getElementById('textoOriginal').value == '') {
+						alert("El texto de origen no puede estar vacio");
+						return false;
+					}
+				}
+				else if (origen=='archivo'){
+					if(document.getElementById('archivoOriginal').value == '') {
+						alert("Debe establecer un fichero con los datos de origen");
+						return false;
+					}
+				}
+				if (destino=='archivo'){
+					if(document.getElementById('archivoProcesado').value == '') {
+						alert("Debe establecer un fichero para almacenar los datos");
+						return false;
+					}
+				}
+				return true;
+			}
+
+			
+			function configurarCifrado(){
+
+				// Tomamos el modo de clave
+				clienteFirma.setKeyMode(keyMode);
+
+				// Configuramos si debemos utilizar o no el alamacen de claves
+				clienteFirma.setUseCipherKeyStore(document.getElementById('usarAlmacen').checked);
+				
+				// Algoritmo de cifrado
+				clienteFirma.setCipherAlgorithm(cipherAlgorithm);
+
+				// Establecemos la clave o contrasena segun corresponda (en el caso de seleccionar el modo autogenerar no afectara)
+				if(keyMode == "PASSWORD")	configurarContrasena();
+				else configurarClave();
+
+				// Configuracion de los datos para el cifrado
+				var selectorFuente=document.getElementsByName('rbOriginal');
+				for(var i=0; i<selectorFuente.length; i++) {
+					if(selectorFuente[i].checked) {
+						origen = selectorFuente[i].value;
+						break;
+					}
+				}
+				if(origen == 'texto'){
+					txtPlano=document.getElementById('textoOriginal').value;
+					clienteFirma.setPlainData(txtPlano);
+				} else if (origen=='archivo'){
+					archivo=document.getElementById('archivoOriginal').value;
+					if(archivo != undefined && archivo != null && trim(archivo) != "") {
+						clienteFirma.setFileuri(archivo);
+					}
+				} else {
+					return;
+				}
+
+				// Proceso de los datos de salida
+				var selectorDestino=document.getElementsByName('rbProcesado');
+				for(var i=0; i<selectorDestino.length; i++) {
+					if(selectorDestino[i].checked) {
+						destino = selectorDestino[i].value;
+						break;
+					}
+				}
+			}
+
+
+
+			function configurarDescifrado(){
+
+				// Tomamos el modo de clave
+				clienteFirma.setKeyMode(keyMode);
+
+				// Algoritmo de cifrado
+				clienteFirma.setCipherAlgorithm(cipherAlgorithm);
+
+				// Establecemos la clave o contrasena segun corresponda (en el caso de seleccionar el modo autogenerar no afectara)
+				if(keyMode == "PASSWORD")	configurarContrasena();
+				else configurarClave();
+
+				// Configuracion de los datos para el descifrado
+				var selectorFuente=document.getElementsByName('rbOriginal');
+				for(var i=0; i<selectorFuente.length; i++) {
+					if(selectorFuente[i].checked) {
+						origen = selectorFuente[i].value;
+						break;
+					}
+				}
+				if(origen == 'texto'){
+					txtCifrado=document.getElementById('textoOriginal').value;
+					clienteFirma.setCipherData(txtCifrado);
+				} else if (origen=='archivo'){
+					archivo=document.getElementById('archivoOriginal').value;
+					if(archivo != undefined && archivo != null && trim(archivo) != "") {
+						clienteFirma.setFileuri(archivo);
+					}
+				} else {
+					return;
+				}
+
+				// Proceso de los datos de salida
+				var selectorDestino=document.getElementsByName('rbProcesado');
+				for(var i=0; i<selectorDestino.length; i++) {
+					if(selectorDestino[i].checked) {
+						destino = selectorDestino[i].value;
+						break;
+					}
+				}
+			}
+
+
+			function actualizarKeyMode(mode) {
+
+				keyMode = mode;
+
+				// Actualizamos la lista de algoritmos y habilitamos desabilitamos el campo de clave si procede
+				var algorithmList = document.getElementById("algoritmo");
+				
+				// Eliminamos la lista de elementos de cifrado existentes
+				var tabla=document.getElementById("tablaAlgoritmo");
+ 				while(tabla.rows.length!=0){
+					tabla.deleteRow(-1);
+				}
+
+				// Liberamos la opcion del almacen de claves de cifrado cuando se selecciona 'Generarar clave'
+				if(keyMode == "GENERATEKEY" || keyMode == "USERINPUT") {
+					document.getElementById('usarAlmacen').disabled = '';
+				} else {
+					document.getElementById('usarAlmacen').disabled = 'disabled';
+				}
+ 				
+				// Agregamos los nuevos elementos segun corresponda
+				if(keyMode == "PASSWORD") {
+
+					// Insertamos el elemento con la lista de algoritmos de cifrado con clave
+					document.getElementById('panelAlgClave').style.display = 'none';
+					document.getElementById('panelAlgContrasena').style.display = 'block';
+
+					cambiaAlgoritmo(document.getElementById('algoritmoContrasena').value);
+
+				} else {
+					// Insertamos el elemento con la lista de algoritmos de cifrado con clave
+					document.getElementById('panelAlgContrasena').style.display = 'none';
+					document.getElementById('panelAlgClave').style.display = 'block';
+
+					cambiaAlgoritmo(document.getElementById('algoritmoClave').value);
+				}
+			}
+
+			function mostrarAlgoritmo(){
+				alert(cipherAlgorithm);
+			}
+			
+			function obtenerKey(){
+				return clienteFirma.getKey();
+			}
+
+			function cambiaAlgoritmo(alg){
+				cipherAlgorithm = alg;
+			}
+			
+		function cambiaEnable(valor){
+			if(valor.id == 'rbOriginal'){
+				if (valor.value == 'texto'){
+					document.getElementById('textoOriginal').disabled = '';
+					document.getElementById('archivoOriginal').disabled = 'disabled';
+				}else{
+					document.getElementById('textoOriginal').disabled = 'disabled';
+					document.getElementById('archivoOriginal').disabled = '';
+				}
+			}else{
+				if (valor.value == 'texto'){
+					document.getElementById('textoProcesado').disabled = '';
+					document.getElementById('archivoProcesado').disabled = 'disabled';
+				}else{
+					document.getElementById('textoProcesado').disabled = 'disabled';
+					document.getElementById('archivoProcesado').disabled = '';
+				}
+			}
+		}
+
+		function trim(cad)
+		{
+			return cad.replace(/^(\s|\t|\r|\n)*|(\s|\t|\r|\n)*$/g,"");
+		}
+		
+	</script>
+	<title>Cliente firma - Ejemplo de cifrado</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8">
+</head>
+<body>
+	<script type="text/javascript">
+		cargarAppletFirma();
+	</script>
+	<p style="font-weight:bold;font-size:16pt;" align="center">Demostraci&oacute;n de cifrado de datos</p>
+	<form>
+		<table align="center" width="40%">
+			<tr>
+				<td>
+					<fieldset><legend>Datos originales</legend>
+						<input type="radio" id="rbOriginal" name="rbOriginal" value="texto" checked="checked" onclick="cambiaEnable(this)">Texto
+							<textarea id="textoOriginal" name="textoOriginal" cols="50" rows="5">Esto es una prueba</textarea>
+						<input type="radio" id="rbOriginal" name="rbOriginal" value="archivo" onclick="cambiaEnable(this)">Fichero
+							<input type="text" id="archivoOriginal" disabled="disabled" value="">
+					</fieldset>
+					<fieldset><legend>Datos procesados</legend>
+						<input type="radio" id="rbProcesado" name="rbProcesado" value="texto" checked="checked" onclick="cambiaEnable(this)">Texto
+							<textarea id="textoProcesado" name="textoProcesado" cols="50" rows="5"></textarea>
+						<input type="radio" id="rbProcesado" name="rbProcesado" value="archivo" onclick="cambiaEnable(this)">Fichero
+							<input type="text" id="archivoProcesado" disabled="disabled" value="">
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fieldset id="fsClaves">
+						<div id="dRadios">
+							<label for="claveActual">Clave/Contrase&ntilde;a:</label><input type="text" value="" id="claveActual"><br>
+							<label for="algoritmo">Algoritmo:</label><br>
+							<table id="tablaAlgoritmo">
+								<div id="panelAlgClave">
+									<select id="algoritmoClave" name="algoritmoClave" onChange="cambiaAlgoritmo(this.value);">
+									<option selected value="AES">AES</option>
+									<option value="ARCFOUR">Alleged RC4</option>
+									<option value="Blowfish">Blowfish</option>
+									<option value="DES">DES</option>
+									<option value="DESede">Triple DES</option>
+									<option value="RC2">RC2</option>
+									</select>
+								</div>
+								<div id="panelAlgContrasena" style="display: none;">
+									<select id="algoritmoContrasena" name="algoritmoContrasena" onChange="cambiaAlgoritmo(this.value);">
+									<option selected value="PBEWITHSHA1ANDDESEDE">SHA1 con TripleDES</option>
+									<option value="PBEWithSHA1AndRC2_40">SHA1 con RC2</option>
+									<option value="PBEWITHMD5ANDDES">MD5 con DES</option>
+									</select>
+								</div>
+							</table>
+							<br>
+							<input type="radio" id="modoClave" name="modoClave" value="GENERATEKEY" checked onclick="actualizarKeyMode(this.value);">AutoGenerar Clave<br>
+							<input type="radio" id="modoClave" name="modoClave" value="USERINPUT" onclick="actualizarKeyMode(this.value);">Clave Manual en Base64<br>
+							<input type="radio" id="modoClave" name="modoClave" value="PASSWORD" onclick="actualizarKeyMode(this.value);">Contrase&ntilde;a<br><br>
+							<input type="checkbox" id="usarAlmacen" name="usarAlmacen" checked>Usar almac&eacute;n de claves de cifrado		
+						</div>
+						<div id="dBotones">
+							<input type="button" id="botonCifrar" value="Cifrar" onClick="cifrar();">
+							<input type="button" id="botonDescifrar" value="Descifrar" onClick="descifrar();">
+							<input type="button" id="botonAlgoritmo" value="Algoritmo actual" onClick="mostrarAlgoritmo()">
+						</div>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<fieldset><legend>Información del criptosistema actual</legend>
+						<table width="100%" align="center">
+							<tr>
+								<td>Operaci&oacute;n:</td>
+								<td id='operacionInfo'></td>
+							</tr>
+							<tr>
+								<td>Resultado:</td>
+								<td id='resultadoInfo'></td>
+							</tr>
+							<tr>
+								<td>Modo de clave:</td>
+								<td id='keyModeActualInfo'></td>
+							</tr>
+							<tr>
+								<td>Algoritmo:</td>
+								<td id='algoritmoActualInfo'></td>
+							</tr>
+							<tr>
+								<td>Clave:</td>
+								<td id='claveInfo'></td>
+							</tr>
+						</table>
+					</fieldset>
+				</td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>

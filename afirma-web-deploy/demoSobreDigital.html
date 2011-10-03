@@ -1,0 +1,421 @@
+<!--
+ Este fichero forma parte del Cliente @firma. 
+ El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
+ y descargado desde www.ctt.map.es.
+ Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
+ Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
+ condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
+ fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<script type="text/javascript" language="javascript" src="common-js/deployJava.js"></script>
+<script type="text/javascript" language="javascript" src="common-js/instalador.js"></script>
+<script type="text/javascript" language="javascript" src="constantes.js"></script>
+<script>
+
+		var keyMode = "GENERATEKEY";
+		
+			function crearCMSEncrypted(){
+
+				clienteFirma.initialize();
+
+				clienteFirma.setCipherAlgorithm(document.getElementById('algoritmo').value);
+				clienteFirma.setKeyMode(keyMode);
+				if(keyMode == "USERINPUT") {
+					clienteFirma.setKey(document.getElementById('claveActual').value);
+				} else if(keyMode == "PASSWORD") {
+					clienteFirma.setPassword(document.getElementById('claveActual').value);
+				}
+
+				// Configurar entrada de datos
+				configurarEntrada();
+
+				var res=clienteFirma.buildCMSEncrypted();
+				if (res){
+					if(keyMode == "GENERATEKEY") {
+						document.getElementById('claveActual').value=clienteFirma.getKey();
+					}
+
+					// Guardamos el resultado segun la configuracion de la pagina (en el cuadro de texto o en fichero)
+					guardar();
+				}
+			}
+			
+			function crearCMSEnveloped(){
+
+				clienteFirma.initialize();
+
+				// Configuramos el formato, los destinatarios y la entrada de datos
+				configurarEnvoltorio();
+
+				var res=clienteFirma.buildCMSEnveloped();
+
+				// Si funciona, guardamos el resultado segun la configuracion de la pagina (en el cuadro de texto o en fichero)
+				if (res){	
+					guardar();
+				}
+			}
+			
+			function crearCMSSignAndPacket(){
+
+				clienteFirma.initialize();
+
+				// Configuramos el formato, los destinatarios y la entrada de datos
+				configurarEnvoltorio();
+
+				var res=clienteFirma.signAndPackData();
+
+
+				// Si funciona, guardamos el resultado segun la configuracion de la pagina (en el cuadro de texto o en fichero)
+				if (res){
+					guardar();
+				}
+			}
+
+			function crearCMSAuthenticated(){
+
+				clienteFirma.initialize();
+
+				// Configuramos el formato, los destinatarios y la entrada de datos
+				configurarEnvoltorio();
+
+				var res=clienteFirma.buildCMSAuthenticated();
+
+
+				// Si funciona, guardamos el resultado segun la configuracion de la pagina (en el cuadro de texto o en fichero)
+				if (res){
+					guardar();
+				}
+			}
+
+			function configurarEnvoltorio() {
+
+				// Configuramos formato
+				clienteFirma.setCipherAlgorithm(document.getElementById('algoritmo').value);
+
+				// Configuramos clave
+				clienteFirma.setKeyMode(keyMode);
+				if(keyMode == "USERINPUT") {
+					clienteFirma.setKey(document.getElementById('claveActual').value);
+				} else if(keyMode == "PASSWORD") {
+					clienteFirma.setPassword(document.getElementById('claveActual').value);
+				}
+				
+				// Configuramos destinatarios
+				var recepts=document.getElementById('rutas').value;
+				if(recepts == undefined || recepts == null || recepts == "") {
+					alert("No se ha especificado ning\u00FAn certificado de destinatario");
+					return;
+				}
+				clienteFirma.setRecipientsToCMS(recepts);
+
+				// Configurar entrada de datos
+				configurarEntrada();
+			}
+
+			function configurarEntrada() {
+				if (document.getElementById('tipoEntrada').value=='campo'){
+					var txt=document.getElementById('campoTxt1').value;
+					
+					// Introducimos los datos que deseamos ensobrar en base 64
+					// (CAMBIO CON RESPECTO AL CLIENTE 2.4)
+
+					clienteFirma.setData(clienteFirma.getBase64FromText(txt));
+				}else{
+					var file=document.getElementById('archivoEntrada').value;
+					clienteFirma.setFileuri(file);
+				}
+			}
+
+			function recuperarCMS(){
+
+				clienteFirma.initialize();
+
+				clienteFirma.setCipherAlgorithm(document.getElementById('algoritmo').value);
+				clienteFirma.setKeyMode(keyMode);
+
+				if (document.getElementById('tipoSalida').value=='campo') {
+					clienteFirma.setData(document.getElementById('campoTxt2').value);
+				} else {
+					var file=document.getElementById('archivoSalida').value;
+					if (file==undefined||file=="") {
+						clienteFirma.setFileuri(null);
+						clienteFirma.setData(null);
+
+						// Mostramos la URI del fichero seleccionado en el campo de fichero de salida (esto es util si el usuario
+						// no la selecciono) desde la interfaz
+						document.getElementById("archivoSalida").value = clienteFirma.getFileUsedPath();
+					} else {
+						clienteFirma.setFileuri(document.getElementById("archivoSalida").value);
+					}
+				}
+
+				if(keyMode == "USERINPUT" || keyMode == "GENERATEKEY") {
+					clienteFirma.setKey(document.getElementById('claveActual').value);
+				} else if(keyMode == "PASSWORD") {
+					clienteFirma.setPassword(document.getElementById('claveActual').value);
+				}
+
+				if(clienteFirma.recoverCMS() == true){
+					var o=clienteFirma.getData();
+
+					// ===================================
+					// En el caso de querer trabajar con ficheros binarios en lugar de ficheros de texto, conviene descomentar esta linea
+					// para permitir al usuario guardar en fichero los datos desenvueltos.
+					// ===================================
+
+					//clienteFirma.saveDataToFile();
+
+					var w=window.open("","1");
+					w.document.write("<b>TEXTO RECUPERADO: </b>"+o);
+				}else{
+					alert(clienteFirma.getErrorMessage());
+				}
+			}
+
+			function guardar(){
+
+				if (document.getElementById('tipoSalida').value=='campo'){
+					document.getElementById('campoTxt2').value=clienteFirma.getB64Data();
+				} else {
+					var file=document.getElementById('archivoSalida').value;
+					if (file==undefined||file==""){
+						clienteFirma.saveDataToFile();
+						document.getElementById('archivoSalida').value = clienteFirma.getFilePath();
+					}else{
+						clienteFirma.saveDataToFile(file);
+					}
+				}
+			}
+			
+
+			function addCert(uri){
+				var ext=uri.substring(uri.lastIndexOf('.'),uri.length);
+				if (ext==".cer" || ext==".der" || ext==".CER" || ext==".DER"){
+					var x=document.getElementById("rutas");
+					x.value=x.value+uri+"\n";
+					document.getElementById('botonCarga2').disabled='';
+					document.getElementById('botonCarga3').disabled='';
+				}else{
+					alert("No se ha elegido un CER o DER válido.");
+				}
+			}
+			
+
+			function cambiaEntrada(campo){
+				document.getElementById('tipoEntrada').value=campo;
+				if (campo=='campo'){
+					document.getElementById('campoTxt1').disabled='';
+					document.getElementById('archivoEntrada').disabled='disabled';
+				}else{
+					document.getElementById('campoTxt1').disabled='disabled';
+					document.getElementById('archivoEntrada').disabled='';				
+				}
+			}
+			
+			function cambiaSalida(campo) {
+				document.getElementById('tipoSalida').value=campo;
+				if (campo=='campo'){
+					document.getElementById('campoTxt2').disabled='';
+					document.getElementById('archivoSalida').disabled='disabled';
+				} else {
+					document.getElementById('campoTxt2').disabled='disabled';
+					document.getElementById('archivoSalida').disabled='';				
+				}
+			}
+
+			function actualizarKeyMode(mode) {
+
+				keyMode = mode;
+
+				// Actualizamos la lista de algoritmos y habilitamos desabilitamos el campo de clave si procede
+				var algorithmList = document.getElementById("algoritmoDiv");
+				if(keyMode == "PASSWORD") {
+
+					algorithmList.innerHTML =
+						"<label for='algoritmo'>Algoritmo:</label>" +
+						"<select id='algoritmo' name='algoritmo' onChange='cambiaAlgoritmo(this.value);'>" +
+						"<option selected value='PBEWITHSHA1ANDDESEDE'>SHA1 con TripleDES</option>" +
+						"<option value='PBEWithSHA1AndRC2_40'>SHA1 con RC2</option>" +
+						"<option value='PBEWITHMD5ANDDES'>MD5 con DES</option>" +
+						"</select>";
+					cambiaAlgoritmo(algorithmList.value);
+				} else {
+					algorithmList.innerHTML =
+						"<label for='algoritmo'>Algoritmo:</label>" +
+						"<select id='algoritmo' name='algoritmo' onChange='cambiaAlgoritmo(this.value);'>" +
+						"<option selected value='AES'>AES</option>" +
+						"<option value='ARCFOUR'>Alleged RC4</option>" +
+						"<option value='Blowfish'>Blowfish</option>" +
+						"<option value='DES'>DES</option>" +
+						"<option value='DESede'>Triple DES</option>" +
+						"<option value='RC2'>RC2</option>" +
+						"</select>";
+					cambiaAlgoritmo(algorithmList.value);
+				}
+			}
+
+			function cambiaAlgoritmo(alg){
+				cipherAlgorithm = alg;
+			}
+
+
+		</script>
+</head>
+
+<body>
+	<script type="text/javascript">
+		cargarAppletFirma("LITE", true);
+	</script>
+
+<p style="font-weight:bold;font-size:16pt;" align="center">Demostración de sobre digital</p>
+<form><input type="hidden" name="receipts" id="idReceipts" value="">
+<input type="hidden" id="tipoEntrada" value="campo"/>
+<input type="hidden" id="tipoSalida" value="campo"/>
+<table align="center" width="40%">
+	<tr>
+		<td align="center">
+			
+		<fieldset>
+		<table align="center">
+			<tr>
+				<td>
+				<fieldset><legend>Datos Originales</legend>
+				<table>
+					<tr>
+						<td>
+						<input type="radio" name="entrada" value="campo" checked="checked" onClick="cambiaEntrada(this.value);" /> Texto Plano<br />
+						<textarea id="campoTxt1" name="contenido" cols="50" rows="5">Esto es una prueba</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><input type="radio" name="entrada" value="archivo" onClick="cambiaEntrada(this.value);"/>Archivo 
+						<input type="text" id="archivoEntrada" disabled="disabled" size="50"/></td>
+					</tr>
+				</table>
+				</fieldset>
+				<br />
+				
+				<fieldset><legend>Configuraci&oacute;n<br/></legend>
+				<table>
+					<tr>
+						<td>
+							<label for="claveActual">Clave:</label><input type="text" id='claveActual' /><br />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<table>
+							<tr>
+								<td style="width:300px">
+								<div id="dRadios">
+								<label for="modo">Modo de clave:</label>
+								<input type="radio" name="modoClave" value="GENERATEKEY" checked onclick="actualizarKeyMode(this.value);">AutoGenerar Clave</input><br />
+								<input type="radio" name="modoClave" value="USERINPUT" onclick="actualizarKeyMode(this.value);">Clave Manual</input><br />
+								<input type="radio" name="modoClave" value="PASSWORD" onclick="actualizarKeyMode(this.value);">Contrase&ntilde;a</input>		
+								</div>
+								</td>
+								<td>
+								<div id="algoritmoDiv">
+								<label for="algoritmo">Algoritmo:</label>
+								<select id="algoritmo" name="algoritmo" onChange="cambiaAlgoritmo(this.value);">
+								<option selected value="AES">AES</option>
+								<option value="ARCFOUR">Alleged RC4</option>
+								<option value="Blowfish">Blowfish</option>
+								<option value="DES">DES</option>
+								<option value="DESede">Triple DES</option>
+								<option value="RC2">RC2</option>
+								</select>
+								</div></td>
+							</tr>
+							</table>							
+						</td>
+					</tr>
+					<tr>
+						<td>
+						<table width="100%">
+							<tr>
+								<td>
+								<table>
+									<tr>
+										<td colspan="2">
+										<table valign="top" align="center">
+											<tr>
+												<td align="center"><input type="button" id="botonCarga1"
+													value="CMS encriptado" onClick="crearCMSEncrypted();"></td>
+												<td align="center"><input type="button"
+													id="botonCarga2" value="CMS envuelto"
+													onClick="crearCMSEnveloped();"></td>
+												<td align="center"><input type="button"
+													id="botonCarga3" value="'CMS envuelto y firmado'"
+													onClick="crearCMSSignAndPacket();"></td>
+												<td align="center"><input type="button"
+													id="botonCarga4" value="'CMS autenticado'"
+													onClick="crearCMSAuthenticated();"></td>
+											</tr>
+										</table>
+										</td>
+									</tr>
+								</table>
+								</td>
+								<td valign="top" height="100%">
+								</td>
+							</tr>
+						</table>
+						</td>
+					</tr>
+				</table>
+				</fieldset>
+				<br />
+				<fieldset><legend>Sobre Digital<br/></legend>
+				<table>
+					<tr>
+						<td>
+						<input type="radio" name="salida" value="campo" checked="checked" onClick="cambiaSalida(this.value);" /> Contenido envuelto<br />
+						<textarea id="campoTxt2" name="textoCMS" cols="50" rows="5"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><input type="radio" name="salida" value="archivo" onClick="cambiaSalida(this.value);"/>Archivo 
+						<input type="text" id="archivoSalida" disabled="disabled" size="50"/></td>
+					</tr>
+					<tr>
+						<td align="center"><input type="button" id="botonRecuperar" value="Recuperar CMS" onClick="recuperarCMS();"/></td>
+					</tr>
+				</table>
+				</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<table width="100%">
+					<tr>
+						<td>
+						<fieldset><legend>Receptores (archivos .cer o .der)</legend>
+						<table weight="100%" id="fileSelector">
+							<tr>
+								<td weight="100%"><input accept="application/pkix-cert,application/x-x509-ca-cert" type="text" id="file_1" size="32" name="ficheroCert">
+								<input type="button" id="addCertificado" onClick="addCert(document.getElementById('file_1').value);" value="Añadir ruta"></td>
+							</tr>
+							<tr>
+								<td><textarea id="rutas" readonly cols="50" rows="5" wrap="off"></textarea>
+								</td>
+							</tr>
+						</table>
+						</fieldset>
+						</td>
+					</tr>
+				</table>
+				</td>
+			</tr>
+		</table>
+		</fieldset>
+		</td>
+	</tr>
+</table>
+</form>
+</body>
+</html>
