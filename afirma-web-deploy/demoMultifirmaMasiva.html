@@ -1,12 +1,13 @@
 <!--
  Este fichero forma parte del Cliente @firma. 
- El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
- y descargado desde www.ctt.map.es.
- Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ El Cliente @firma es una aplicacion de libre distribucion cuyo codigo fuente puede ser consultado
+ y descargado desde http://forja-ctt.administracionelectronica.gob.es/
+ Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de Espana
+ Este fichero se distribuye bajo licencia GPL version 2  segun las
+ condiciones que figuran en el fichero 'licence' que se acompana.  Si se   distribuyera este 
+ fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
 -->
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
@@ -178,7 +179,7 @@
 				var panel = document.getElementById("logPosition");
 				panel.innerHTML = "<fieldset><legend>Resultado de la operaci&oacute;n:</legend>" +
 					"<textarea id='logger' readonly cols='50' rows='5' wrap='off'" +
-					"></textarea><br/>" +
+					"></textarea><br>" +
 					"<input type='button' onClick='guardarLog();' value='Guardar'>" +
 					"</fieldset>";
 
@@ -192,14 +193,16 @@
 				clienteFirma.saveMassiveSignatureLog();
 			}
 		</script>
+		<title>Cliente firma - Ejemplo de multifirma masiva</title>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8">
 	</head>
 	<body>
 		<script type="text/javascript">
 			cargarAppletFirma('COMPLETA');
 		</script>
 		<form name="prueba" id="prueba">
-			<input type="hidden" value="Firma" id="operacion" />
-			<input type="hidden" value="datos" id="tipoDatos" />
+			<input type="hidden" value="Firma" id="operacion" >
+			<input type="hidden" value="datos" id="tipoDatos" >
 
 			<table align="center">
 			<tr>
@@ -243,7 +246,7 @@
 						</tr>
 						<tr>
 							<td colspan="3">
-								<input id="ckOriginalFormat" type="checkbox" checked="checked"/>
+								<input id="ckOriginalFormat" type="checkbox" checked="checked">
 								Respetar el formato original (S&oacute;lo cofirma y contrafirma)
 							</td>
 						</tr>
@@ -258,28 +261,28 @@
 						<tr>
 							<td>
 								<input type="radio" name="operacion" value="Firma"
-								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" checked="checked" />
+								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" checked="checked" >
 									Firmar
 							</td>
 						</tr>
 						<tr>
 							<td>
 								<input type="radio" name="operacion" value="Cofirma"
-								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" />
+								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" >
 									Co-firmar
 							</td>
 						</tr>
 						<tr>
 							<td>
 								<input type="radio" name="operacion" value="Contrafirma completa"
-								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" />
+								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" >
 									Contra-firmar &aacute;rbol de firma
 							</td>
 						</tr>
 						<tr>
 							<td>
 								<input type="radio" name="operacion" value="Contrafirma de hojas"
-								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" />
+								onchange="operacionChanged(this.value)" onclick="operacionChanged(this.value)" >
 									Contra-firmar nodos hoja
 							</td>
 						</tr>
@@ -294,21 +297,21 @@
 						<tr>
 							<td>
 								<input type="radio" name="dataType" value="datos"
-								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" checked="checked" />
+								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" checked="checked" >
 									Datos
 							</td>
 						</tr>
 						<tr>
 							<td>
 								<input type="radio" name="dataType" value="fichero"
-								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" />
+								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" >
 									Fichero
 							</td>
 						</tr>
 						<tr>
 							<td>
 								<input type="radio" name="dataType" value="hash"
-								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" />
+								onchange="dataChanged(this.value)" onclick="dataChanged(this.value)" >
 									Hash
 							</td>
 						</tr>
@@ -333,7 +336,7 @@
 			</tr>
 			<tr>
 				<td align="center">
-					<br/><input name="btnFirma" type="button" title="Ejecutar operaci&oacute;n masiva" value="Firmar" onclick="realizarOperacion();"/>
+					<br><input name="btnFirma" type="button" title="Ejecutar operaci&oacute;n masiva" value="Firmar" onclick="realizarOperacion();">
 				</td>
 			</tr>
 

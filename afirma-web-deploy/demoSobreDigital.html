@@ -1,12 +1,13 @@
 <!--
  Este fichero forma parte del Cliente @firma. 
- El Cliente @firma es un applet de libre distribución cuyo código fuente puede ser consultado
- y descargado desde www.ctt.map.es.
- Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de España (opcional: correo de contacto)
- Este fichero se distribuye bajo las licencias EUPL versión 1.1  y GPL versión 3  según las
- condiciones que figuran en el fichero 'licence' que se acompaña.  Si se   distribuyera este 
- fichero individualmente, deben incluirse aquí las condiciones expresadas allí.
+ El Cliente @firma es una aplicacion de libre distribucion cuyo codigo fuente puede ser consultado
+ y descargado desde http://forja-ctt.administracionelectronica.gob.es/
+ Copyright 2009,2010 Ministerio de la Presidencia, Gobierno de Espana
+ Este fichero se distribuye bajo licencia GPL version 2  segun las
+ condiciones que figuran en el fichero 'licence' que se acompana.  Si se   distribuyera este 
+ fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
 -->
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -14,7 +15,7 @@
 <script type="text/javascript" language="javascript" src="common-js/deployJava.js"></script>
 <script type="text/javascript" language="javascript" src="common-js/instalador.js"></script>
 <script type="text/javascript" language="javascript" src="constantes.js"></script>
-<script>
+<script type="text/javascript"><!--
 
 		var keyMode = "GENERATEKEY";
 		
@@ -263,7 +264,9 @@
 			}
 
 
-		</script>
+		--></script>
+		<title>Cliente firma - Ejemplo de sobre digital</title>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8">
 </head>
 
 <body>
@@ -273,8 +276,8 @@
 
 <p style="font-weight:bold;font-size:16pt;" align="center">Demostración de sobre digital</p>
 <form><input type="hidden" name="receipts" id="idReceipts" value="">
-<input type="hidden" id="tipoEntrada" value="campo"/>
-<input type="hidden" id="tipoSalida" value="campo"/>
+<input type="hidden" id="tipoEntrada" value="campo">
+<input type="hidden" id="tipoSalida" value="campo">
 <table align="center" width="40%">
 	<tr>
 		<td align="center">
@@ -287,23 +290,23 @@
 				<table>
 					<tr>
 						<td>
-						<input type="radio" name="entrada" value="campo" checked="checked" onClick="cambiaEntrada(this.value);" /> Texto Plano<br />
+						<input type="radio" name="entrada" value="campo" checked="checked" onClick="cambiaEntrada(this.value);" > Texto Plano<br>
 						<textarea id="campoTxt1" name="contenido" cols="50" rows="5">Esto es una prueba</textarea>
 						</td>
 					</tr>
 					<tr>
-						<td><input type="radio" name="entrada" value="archivo" onClick="cambiaEntrada(this.value);"/>Archivo 
-						<input type="text" id="archivoEntrada" disabled="disabled" size="50"/></td>
+						<td><input type="radio" name="entrada" value="archivo" onClick="cambiaEntrada(this.value);">Archivo 
+						<input type="text" id="archivoEntrada" disabled="disabled" size="50"></td>
 					</tr>
 				</table>
 				</fieldset>
-				<br />
+				<br>
 				
-				<fieldset><legend>Configuraci&oacute;n<br/></legend>
+				<fieldset><legend>Configuraci&oacute;n<br></legend>
 				<table>
 					<tr>
 						<td>
-							<label for="claveActual">Clave:</label><input type="text" id='claveActual' /><br />
+							<label for="claveActual">Clave:</label><input type="text" id="claveActual"><br>
 						</td>
 					</tr>
 					<tr>
@@ -313,8 +316,8 @@
 								<td style="width:300px">
 								<div id="dRadios">
 								<label for="modo">Modo de clave:</label>
-								<input type="radio" name="modoClave" value="GENERATEKEY" checked onclick="actualizarKeyMode(this.value);">AutoGenerar Clave</input><br />
-								<input type="radio" name="modoClave" value="USERINPUT" onclick="actualizarKeyMode(this.value);">Clave Manual</input><br />
+								<input type="radio" name="modoClave" value="GENERATEKEY" checked onclick="actualizarKeyMode(this.value);">AutoGenerar Clave</input><br>
+								<input type="radio" name="modoClave" value="USERINPUT" onclick="actualizarKeyMode(this.value);">Clave Manual</input><br>
 								<input type="radio" name="modoClave" value="PASSWORD" onclick="actualizarKeyMode(this.value);">Contrase&ntilde;a</input>		
 								</div>
 								</td>
@@ -350,10 +353,10 @@
 													id="botonCarga2" value="CMS envuelto"
 													onClick="crearCMSEnveloped();"></td>
 												<td align="center"><input type="button"
-													id="botonCarga3" value="'CMS envuelto y firmado'"
+													id="botonCarga3" value="CMS envuelto y firmado"
 													onClick="crearCMSSignAndPacket();"></td>
 												<td align="center"><input type="button"
-													id="botonCarga4" value="'CMS autenticado'"
+													id="botonCarga4" value="CMS autenticado"
 													onClick="crearCMSAuthenticated();"></td>
 											</tr>
 										</table>
@@ -369,21 +372,21 @@
 					</tr>
 				</table>
 				</fieldset>
-				<br />
-				<fieldset><legend>Sobre Digital<br/></legend>
+				<br>
+				<fieldset><legend>Sobre Digital<br></legend>
 				<table>
 					<tr>
 						<td>
-						<input type="radio" name="salida" value="campo" checked="checked" onClick="cambiaSalida(this.value);" /> Contenido envuelto<br />
+						<input type="radio" name="salida" value="campo" checked="checked" onClick="cambiaSalida(this.value);"> Contenido envuelto<br>
 						<textarea id="campoTxt2" name="textoCMS" cols="50" rows="5"></textarea>
 						</td>
 					</tr>
 					<tr>
-						<td><input type="radio" name="salida" value="archivo" onClick="cambiaSalida(this.value);"/>Archivo 
-						<input type="text" id="archivoSalida" disabled="disabled" size="50"/></td>
+						<td><input type="radio" name="salida" value="archivo" onClick="cambiaSalida(this.value);">Archivo 
+						<input type="text" id="archivoSalida" disabled="disabled" size="50"></td>
 					</tr>
 					<tr>
-						<td align="center"><input type="button" id="botonRecuperar" value="Recuperar CMS" onClick="recuperarCMS();"/></td>
+						<td align="center"><input type="button" id="botonRecuperar" value="Recuperar CMS" onClick="recuperarCMS();"></td>
 					</tr>
 				</table>
 				</fieldset>
