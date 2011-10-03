@@ -1,12 +1,13 @@
-/*
+/*******************************************************************************
  * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde www.ctt.map.es.
+ * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
- */
+ ******************************************************************************/
+
 package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
@@ -155,9 +156,7 @@ final class Utils {
     /** Asigna la clave para firmar el contenido del fichero que queremos
      * envolver y qeu m&aacute;s tarde ser&aacute; cifrada con la clave
      * p&uacute;blica del usuario que hace la firma.
-     * @param config
-     *        configuraci&oacute;n necesaria para crear la clave.
-     * @return */
+     * @param config configuraci&oacute;n necesaria para crear la clave */
     private static SecretKey assignKey(final AOCipherConfig config) throws NoSuchAlgorithmException {
         final SecureRandom rand = new SecureRandom();
 
@@ -344,18 +343,10 @@ final class Utils {
     }
 
     /** Obtiene el contenido de un archivo encriptado
-     * @param file
-     *        Archivo con los datos
-     * @param config
-     *        Configuracion de cifrado
-     * @param params
-     *        Parametros
-     * @param cipher
-     *        Encriptador
-     * @return
-     * @throws IOException 
-     * @throws BadPaddingException 
-     * @throws IllegalBlockSizeException */
+     * @param file Archivo con los datos
+     * @param config Configuracion de cifrado
+     * @param params Parametros
+     * @param cipher Encriptador */
     private static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final AlgorithmParameterSpec params, final Cipher cipher) throws IOException, IllegalBlockSizeException, BadPaddingException {
 
         DEREncodable asn1Params;
@@ -379,8 +370,6 @@ final class Utils {
      * para cifrar dicho fichero.
      * @param algName
      *        algoritmo utilizado para cifrar.
-     * @param provider
-     *        Proveedor que se utiliza para cifrar.
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException */
     private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {

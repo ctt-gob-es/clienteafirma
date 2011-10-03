@@ -1,12 +1,12 @@
-/*
+/*******************************************************************************
  * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde www.ctt.map.es.
+ * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
- */
+ ******************************************************************************/
 
 package es.gob.afirma.envelopers.cms;
 
@@ -170,12 +170,6 @@ public final class CMSAuthenticatedEnvelopedData {
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param cert
-     *        Certificado necesario para la firma.
-     * @param digestAlgorithm
-     *        Algoritmo Firmado.
-     * @param datos
-     *        Datos firmados.
      * @param datatype
      *        Identifica el tipo del contenido a firmar.
      * @param signingTime
