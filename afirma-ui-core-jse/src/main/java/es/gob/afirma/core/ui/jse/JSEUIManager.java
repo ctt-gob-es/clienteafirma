@@ -1,12 +1,12 @@
-/*
+/*******************************************************************************
  * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde www.ctt.map.es.
+ * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
- */
+ ******************************************************************************/
 
 package es.gob.afirma.core.ui.jse;
 
@@ -265,7 +265,7 @@ public final class JSEUIManager implements AOUIManager {
      * @param description
      *        Descripci&oacute;n del tipo de fichero correspondiente con las
      *        extensiones
-     * @param parentComponent
+     * @param parent
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     public String getLoadFileName(final String dialogTitle,
@@ -467,7 +467,7 @@ public final class JSEUIManager implements AOUIManager {
      * @param description
      *        Descripci&oacute;n del tipo de fichero correspondiente con las
      *        extensiones
-     * @param parentComponent
+     * @param parent
      *        Componente padre (para la modalidad, debe ser de tipo <code>java.awt.Component</code>)
      * @return Fichero seleccionado por el usuario */
     public File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
