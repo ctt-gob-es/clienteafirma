@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.Icon;
 import javax.swing.JToggleButton;
+import javax.swing.plaf.basic.BasicGraphicsUtils;
 
 /**
  * ToggleButton cuyo aspecto viene dado por una imagen. La imagen puede cambiar seg&uacute;n
@@ -104,9 +105,13 @@ public class ToggleImageButton extends JToggleButton {
         // Introduimos un texto compuesto por espacios en blancos para usarlo
         // para la medida del boton pero que no se sobreescriba sobre nuestro texto.
         // Como los espacios en blanco ocupan algo menos que los caracteres, agregamos
-        // alcunos adicionales
-        super.setText(new String("                                 ".substring(0, 8 + //$NON-NLS-1$
-                (this.buttonText.length() > 25 ? 25 : this.buttonText.length()))));
+        // algunos adicionales
+        
+        //Texto que se va a mostrar
+        String text = new String("                                 ".substring(0, 8 + //$NON-NLS-1$
+                (this.buttonText.length() > 25 ? 25 : this.buttonText.length())));
+        
+        super.setText(text);
     }
 
     @Override
@@ -143,7 +148,8 @@ public class ToggleImageButton extends JToggleButton {
         }
         
         if (this.getButtonText() != null) {
-            g.drawString(this.getButtonText(), 48, (this.getHeight() + g.getFontMetrics().getAscent() - 4) / 2);
+        	//Se pinta el texto con el mnemónico correspondiente
+        	BasicGraphicsUtils.drawString(g, this.getButtonText(),  this.getMnemonic(), 48, (this.getHeight() + g.getFontMetrics().getAscent() - 4) / 2);
         }
 
         if (this.isSelected()) {
