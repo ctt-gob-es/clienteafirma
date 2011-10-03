@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Este fichero forma parte del Cliente @firma.
+ * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
+ * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
+ * Copyright 2009,2010,2011 Gobierno de Espana
+ * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
+ * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
+ * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
+ ******************************************************************************/
+
 package es.gob.afirma.envelopers.cades;
 
 import java.io.ByteArrayOutputStream;
@@ -263,16 +273,10 @@ class CAdESUtils {
     }
 
     /** Obtiene el contenido de un archivo encriptado
-     * @param file
-     *        Archivo con los datos
-     * @param config
-     *        Configuracion de cifrado
-     * @param params
-     *        Parametros
-     * @param cipher
-     *        Encriptador
-     * @return
-     * @throws IOException */
+     * @param file Archivo con los datos
+     * @param config Configuracion de cifrado
+     * @param params Parametros
+     * @param cipher Encriptador */
     private static EncryptedContentInfo getEncryptedContentInfo(final byte[] file, final AOCipherConfig config, final AlgorithmParameterSpec params, final Cipher cipher) throws IOException {
         final byte[] ciphered;
         try {
@@ -304,8 +308,6 @@ class CAdESUtils {
      * para cifrar dicho fichero.
      * @param algName
      *        algoritmo utilizado para cifrar.
-     * @param provider
-     *        Proveedor que se utiliza para cifrar.
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException */
     private static Cipher createCipher(final String algName) throws NoSuchAlgorithmException, NoSuchPaddingException {
@@ -316,8 +318,8 @@ class CAdESUtils {
      * configuracion concreta de cifrado. Si no es necesario ning&uacute;n
      * par&aacute;metro especial, devolvemos <code>null</code>.
      * @param algorithmConfig
-     *        Configuracion de cifrado que debemos parametrizar.
-     * @return Par&aacute;metros para operar. */
+     *        Configuracion de cifrado que debemos parametrizar
+     * @return Par&aacute;metros para operar */
     private static AlgorithmParameterSpec getParams(final AOCipherConfig algorithmConfig) {
 
         AlgorithmParameterSpec params = null;
@@ -338,7 +340,6 @@ class CAdESUtils {
      * @param cert Certificado del firmante
      * @param datos Datos firmados
      * @param policy Pol&iacute;tica de firma
-     * @param dataType Identifica el tipo del contenido a firmar
      * @param messageDigest
      * @return Los datos necesarios para generar la firma referente a los datos
      *         del usuario.
@@ -665,17 +666,7 @@ class CAdESUtils {
         return ContexExpecific;
     }
 
-    /** Firma y envuelve
-     * @param keyEntry
-     * @param signatureAlgorithm
-     * @param digAlgId
-     * @param identifier
-     * @param signedAttr
-     * @param unSignedAttr
-     * @param digestAlgorithmIdEnc
-     * @param signedAttr2
-     * @return SignerInfo
-     * @throws IOException */
+    /** Firma y envuelve */
     static SignerInfo signAndEnvelope(final PrivateKeyEntry keyEntry,
                                              final String signatureAlgorithm,
                                              final AlgorithmIdentifier digAlgId,
@@ -808,9 +799,7 @@ class CAdESUtils {
     /** Asigna la clave para firmar el contenido del fichero que queremos
      * envolver y qeu m&aacute;s tarde ser&aacute; cifrada con la clave
      * p&uacute;blica del usuario que hace la firma.
-     * @param config
-     *        configuraci&oacute;n necesaria para crear la clave.
-     * @return */
+     * @param config configuraci&oacute;n necesaria para crear la clave */
     private static SecretKey assignKey(final AOCipherConfig config) throws NoSuchAlgorithmException {
         final KeyGenerator kg = KeyGenerator.getInstance(config.getAlgorithm().getName());
         kg.init(new SecureRandom());
