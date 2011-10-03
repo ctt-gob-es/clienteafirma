@@ -33,8 +33,6 @@ public final class SigUtils {
     /** M&eacute;todo que devuelve el Identificador del algoritmo.
      * @param oid
      *        OID del algoritmo a idenfiticar
-     * @param params
-     *        par&aacute;metros que identifican el algoritmo en si
      * @return El identificador del algoritmo formateado y listo para introducir
      *         en el cms.
      * @throws java.io.IOException */
