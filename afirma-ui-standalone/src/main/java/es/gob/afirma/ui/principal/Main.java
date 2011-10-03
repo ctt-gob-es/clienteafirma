@@ -18,6 +18,7 @@ import javax.swing.UIManager;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 
 /**
@@ -39,10 +40,10 @@ public class Main {
      */
     public static void main(String[] args) {
 		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) {
-				JOptionPane.showMessageDialog(
+				JAccessibilityOptionPane.showMessageDialog(
 					null,
 					Messages.getString("main.requerido")+
-					System.getProperty("java.version")+
+					System.getProperty("java.version")+".<br>"+
 					Messages.getString("main.porfavor"),
 					Messages.getString("main.cliente"),
 				JOptionPane.ERROR_MESSAGE);
