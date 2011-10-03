@@ -1,12 +1,12 @@
-/*
+/*******************************************************************************
  * Este fichero forma parte del Cliente @firma.
  * El Cliente @firma es un aplicativo de libre distribucion cuyo codigo fuente puede ser consultado
- * y descargado desde www.ctt.map.es.
+ * y descargado desde http://forja-ctt.administracionelectronica.gob.es/
  * Copyright 2009,2010,2011 Gobierno de Espana
  * Este fichero se distribuye bajo  bajo licencia GPL version 2  segun las
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
- */
+ ******************************************************************************/
 
 package es.gob.afirma.signers.cades.multi;
 
@@ -113,8 +113,6 @@ final class CAdESCounterSignerEnveloped {
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
      *        usar la versi&oacute;n 1
-     * @param dataType
-     *        Identifica el tipo del contenido a firmar.
      * @return El archivo de firmas con la nueva firma.
      * @throws java.io.IOException
      *         Excepci&oacute;n cuando se produce algun error con lectura
