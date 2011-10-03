@@ -164,7 +164,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		c.gridx = 1;
         
         // Boton para examinar el almacen
-        JButton examinar = new JButton();
+        JButton examinar = new JButton(); 
         examinar.setMnemonic(KeyEvent.VK_E);
         examinar.setToolTipText(Messages.getString("WizardDescifrado.clave.boton.description")); // NOI18N
         examinar.setText(Messages.getString("WizardDescifrado.clave.boton")); // NOI18N

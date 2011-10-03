@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.principal;
 
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -12,14 +11,10 @@ import java.util.Enumeration;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 import es.gob.afirma.ui.utils.JAccessibilityFrame;
-import es.gob.afirma.ui.utils.Utils;
 
 /**
  * Panel que contiene un listado de botones seleccionables y un espacio para la

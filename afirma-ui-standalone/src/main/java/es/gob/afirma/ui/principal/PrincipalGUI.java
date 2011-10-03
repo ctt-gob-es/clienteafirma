@@ -35,7 +35,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
@@ -137,6 +136,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		    	resized(e);
 		    }
 		});
+		
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Menu de herramientas
 		generarMenuHerramientas();
 		// Menu de ayuda
-		generarMenuAyuda();		
+		generarMenuAyuda();	
 		
 		setJMenuBar(menu);
 		
@@ -410,7 +410,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	private void ayudaHTMLActionPerformed() {
 		HelpUtils.visualize();
 	}
-
+	
 	/**
 	 * Construye el panel principal de la aplicaci&oacute;n con las pesta&ntilde;as de
 	 * las distintas funcionalidades.
@@ -545,7 +545,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonEnsobrado.setSelectedToggledIcon(this.loadIcon("boton_ensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
 
         buttonEnsobrado.setMnemonic(KeyEvent.VK_S);
-        System.out.println("Introducimos");
         buttonEnsobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonEnsobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonEnsobrado.getAccessibleContext().setAccessibleName(
@@ -652,18 +651,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Muestra la ventana de la aplicaci�n
 	 */
 	public void main() {
-		System.out.println("PrincipalGUI.main");
-		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) {
-			JOptionPane.showMessageDialog(
-					null,
-					Messages.getString("main.requerido")+
-					System.getProperty("java.version")+
-					Messages.getString("main.porfavor"),
-					Messages.getString("main.cliente"),
-					JOptionPane.ERROR_MESSAGE);
-			System.exit(-5);
-		}
-
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				setVisible(true);

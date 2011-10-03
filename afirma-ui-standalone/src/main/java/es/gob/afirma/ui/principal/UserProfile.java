@@ -16,7 +16,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.util.prefs.Preferences;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -25,7 +24,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
@@ -33,11 +31,10 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.InfoLabel;
-import es.gob.afirma.ui.utils.JAccessibilityFrame;
-import es.gob.afirma.ui.utils.JAccessibilityFrameAdvisor;
+import es.gob.afirma.ui.utils.JAccessibilityDialogAdvisor;
 import es.gob.afirma.ui.utils.Messages;
 
-public class UserProfile extends JAccessibilityFrameAdvisor {
+public class UserProfile extends JAccessibilityDialogAdvisor {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -106,7 +103,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		setBounds(this.getInitialX(), this.getInitialY(), Constants.INIT_WINDOW_INITIAL_WIDTH, Constants.INIT_WINDOW_INITIAL_HEIGHT);
 		
 		// Parametros ventana
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); // NOI18N
 		setTitle(Messages.getString("UserProfile.title")); // NOI18N
 		getContentPane().setLayout(new BorderLayout(11, 7));
 		setMinimumSize(getSize());
@@ -196,7 +193,6 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		
 		add(aceptar,c);
 		c.gridy = c.gridy + 1;
-		setVisible(true);
 	}
 	
 	/**
@@ -218,43 +214,12 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	 * Muestra la ventana de la aplicaci�n
 	 */
 	public void main() {	
-		System.out.println("UserProfile.main");
-		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) {
-			JOptionPane.showMessageDialog(
-					null,
-					Messages.getString("main.requerido")+
-					System.getProperty("java.version")+
-					Messages.getString("main.porfavor"),
-					Messages.getString("main.cliente"),
-					JOptionPane.ERROR_MESSAGE);
-			System.exit(-5);
-		}
-
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				setVisible(true);
 			}
 		});	
 	}
-	
-//    /** Recupera una de las preferencias establecidas para la aplicaci&oacute;n.
-//     * @param key
-//     *        Clave de la preferencia.
-//     * @param defaultValue
-//     *        Valor por defecto.
-//     * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
-//    public String getPreference(final String key, final String defaultValue) {
-//        return this.preferences.get(key, defaultValue);
-//    }
-//
-//    /** Establece una preferencia para la aplicaci&oacute;n.
-//     * @param key
-//     *        Clave de la preferencia.
-//     * @param value
-//     *        Valor asignado. */
-//    public void setPreference(final String key, final String value) {
-//        this.preferences.put(key, value);
-//    }
     
     /**
      * 
@@ -268,6 +233,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
     	GeneralConfig.loadConfig(GeneralConfig.getConfig());
     	new PrincipalGUI().main();
     	dispose();
+    	
 		
     }
     

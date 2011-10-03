@@ -2,7 +2,7 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 
 /**
  * Clase para generar un JFrame con la posibilidad de redimension.
@@ -10,13 +10,13 @@ import javax.swing.JFrame;
  * @author inteco
  *
  */
-public abstract class JAccessibilityFrameAdvisor extends JFrame {
+public abstract class JAccessibilityDialogAdvisor extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	
 	private ResizingAdaptor resizingAdaptor;
 	
-	public JAccessibilityFrameAdvisor(){
+	public JAccessibilityDialogAdvisor(){
 		super();
 		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null);
 		this.addComponentListener(this.resizingAdaptor);
@@ -38,18 +38,18 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	 * @param component El componente.
 	 * @return El JAccessibilityFrameAdvisor buscado.
 	 */
-	public static JAccessibilityFrameAdvisor getJAccessibilityFrameAdvisor(Component component)
+	public static JAccessibilityDialogAdvisor getJAccessibilityDialogAdvisor(Component component)
 	{
-		JAccessibilityFrameAdvisor  resultingJAccessibilityFrameAdvisor = null;
-		while (component != null && resultingJAccessibilityFrameAdvisor == null)
+		JAccessibilityDialogAdvisor  resultingJAccessibilityDialogAdvisor = null;
+		while (component != null && resultingJAccessibilityDialogAdvisor == null)
 		{
-	        if (component instanceof JAccessibilityFrameAdvisor){
-	        	resultingJAccessibilityFrameAdvisor = (JAccessibilityFrameAdvisor)component;
+	        if (component instanceof JAccessibilityDialogAdvisor){
+	        	resultingJAccessibilityDialogAdvisor = (JAccessibilityDialogAdvisor)component;
 	        }
 	        else{
 	        	component = component.getParent();
 	        }
 		 }
-		 return resultingJAccessibilityFrameAdvisor;
+		 return resultingJAccessibilityDialogAdvisor;
 	 }
 }

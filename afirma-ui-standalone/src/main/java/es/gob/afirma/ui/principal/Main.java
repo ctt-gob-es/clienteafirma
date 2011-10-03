@@ -13,10 +13,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
+import es.gob.afirma.ui.utils.Messages;
 
 /**
  *	Entrada de la aplicacion
@@ -36,8 +38,17 @@ public class Main {
      * @param args Par&aacute;metros de entrada.
      */
     public static void main(String[] args) {
-    	System.out.println("Main.main");
-        try {
+		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) {
+				JOptionPane.showMessageDialog(
+					null,
+					Messages.getString("main.requerido")+
+					System.getProperty("java.version")+
+					Messages.getString("main.porfavor"),
+					Messages.getString("main.cliente"),
+				JOptionPane.ERROR_MESSAGE);
+			System.exit(-5);
+		}
+    	try {
         	if (Platform.getOS().equals(Platform.OS.LINUX))
         		UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         	else
@@ -51,7 +62,6 @@ public class Main {
         	new PrincipalGUI().main();
         } else {
         	new UserProfile().main();
-        	
         }
     }
 
