@@ -321,21 +321,20 @@ public class Desensobrado extends JPanel {
     			return;
     		}
 
-    		AOKeyStoreManager keyStoreManager = null;
     		PrivateKeyEntry privateKeyEntry = null;
     		try {
-    			keyStoreManager = getKeyStoreManager((KeyStoreConfiguration) comboAlmacen.getSelectedItem());
+    		    AOKeyStoreManager keyStoreManager = getKeyStoreManager((KeyStoreConfiguration) comboAlmacen.getSelectedItem());
     			privateKeyEntry = getPrivateKeyEntry(keyStoreManager, comboAlmacen);
     		} catch (AOCancelledOperationException e) {
     			logger.severe("Operacion cancelada por el usuario");
     			return;
     		} catch (AOException e) {
     			logger.severe("Ocurrio un error al abrir el almacen de claves del usuario: "+e);
-    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen"), "Error", JOptionPane.ERROR_MESSAGE);
+    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("rror"), JOptionPane.ERROR_MESSAGE);
     			return;
     		} catch (Exception e) {
     			logger.severe("Ocurrio un error al recuperar el certificado del usuario: "+e);
-    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), "Error", JOptionPane.ERROR_MESSAGE);
+    			JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("Error"), JOptionPane.ERROR_MESSAGE);
     			return;
     		}
 
@@ -399,6 +398,9 @@ public class Desensobrado extends JPanel {
 	    			this
 	    	);
     	}
+        catch(final AOCancelledOperationException e) {
+            throw e;
+        }
     	catch(final Exception e) {
     		throw new AOException("Error al inicializar el almacen", e);
     	}

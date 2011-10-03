@@ -61,6 +61,9 @@ public class MultisignUtils {
 	            padre
 	        );
         }
+        catch(final AOCancelledOperationException e) {
+            throw e;
+        }
         catch(final Exception e) {
         	throw new AOException("Error inicializando el almacen", e); //$NON-NLS-1$
         }

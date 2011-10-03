@@ -214,8 +214,8 @@ public class PanelClave extends JAccessibilityDialogWizard {
     		campoClave.setText(getKeyFromCipherKeyStore());
     	} catch (AOCancelledOperationException e) {
     		logger.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen.");
-    	} catch (AOException e) {
-    		JOptionPane.showMessageDialog(this, Messages.getString("WizardDescifrado.msg.error.clave"), 
+    	} catch (IOException e) {
+    		JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.contrasenia"), 
     				Messages.getString("WizardDescifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
     	} catch (Exception e) {
     		JOptionPane.showMessageDialog(this, Messages.getString("WizardDescifrado.msg.error.clave"), 
@@ -228,9 +228,10 @@ public class PanelClave extends JAccessibilityDialogWizard {
      * Se pedira al usuario que inserte la contrase&ntilde;a del almac&eacute;n de claves
      * y seleccione la clave que desea recuperar del mismo.
      * @return Clave en base 64.
-     * @throws AOException Ocurri&oacute; un error durate el proceso de configuraci&oacute;n. 
+     * @throws AOException Ocurri&oacute; un error durate el proceso de configuraci&oacute;n.
+     * @throws IOException Cuando no se indique la contrase&ntilde;a correcta del almacen. 
      */
-    private String getKeyFromCipherKeyStore() throws AOException {
+    private String getKeyFromCipherKeyStore() throws AOException, IOException {
     	// Abrimos el Almacen de claves de cifrado preguntandole al usuario la clave si no
     	// la indico
     	AOCipherKeyStoreHelper cKs = null;
@@ -240,7 +241,9 @@ public class PanelClave extends JAccessibilityDialogWizard {
     		);
     	} catch (AOCancelledOperationException e) {
     		throw e;
-    	} catch (Exception e) {
+    	} catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
     		throw new AOException("Error al abrir el repositorio de claves del usuario", e); //$NON-NLS-1$
     	}
 

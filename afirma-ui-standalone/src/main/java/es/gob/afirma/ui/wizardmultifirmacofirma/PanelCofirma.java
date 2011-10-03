@@ -34,6 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.Caret;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
@@ -278,10 +279,10 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 
-			Boolean continuar = true;
+			boolean continuar = true;
 			continuar = cofirmaFichero();
 
-			if (continuar.equals(true))
+			if (continuar)
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
 		}
 	}
@@ -290,10 +291,10 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 	 * Cofirma un fichero dado
 	 * @return	true o false indicando si se ha cofirmado correctamente
 	 */
-	public Boolean cofirmaFichero() {
+	public boolean cofirmaFichero() {
 		//comprobacion de la ruta de fichero de entrada.
-		String ficheroDatos = campoDatos.getText();
-		String ficheroFirma = campoFirma.getText();
+		String ficheroDatos = this.campoDatos.getText();
+		String ficheroFirma = this.campoFirma.getText();
 
 		if (ficheroFirma == null || ficheroFirma.equals("")){
             JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -346,10 +347,17 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		    byte[] coSignedData = null;
 		    
 		    MultisignUtils msUtils = new MultisignUtils();
-		    AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(kssc,this);
+		    
+		    PrivateKeyEntry keyEntry;
 
 		    // Recuperamos la clave del certificado
-		    PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(kssc, keyStoreManager, this);
+		    try {
+		        AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(this.kssc,this);
+		        keyEntry = msUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
+		    } catch (AOException e) {
+		        JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+		        return false;
+		    }
 
 		    if (data == null) {
 		        dataIs = new FileInputStream(ficheroDatos);
@@ -379,7 +387,12 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		        return false;
 		    }
 
-		} catch (Exception e) {
+		}
+		catch (final AOCancelledOperationException e) {
+            logger.severe(e.toString());
+            return false;
+        } 
+		catch (final Exception e) {
 		    logger.severe(e.toString());
 		    JOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 		    return false;
