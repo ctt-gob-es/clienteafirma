@@ -544,7 +544,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonEnsobrado.setToggledIcon(this.loadIcon("boton_ensobrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonEnsobrado.setSelectedToggledIcon(this.loadIcon("boton_ensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
 
-        buttonEnsobrado.setMnemonic(KeyEvent.VK_S);
+        buttonEnsobrado.setMnemonic(KeyEvent.VK_B);
         buttonEnsobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonEnsobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonEnsobrado.getAccessibleContext().setAccessibleName(
