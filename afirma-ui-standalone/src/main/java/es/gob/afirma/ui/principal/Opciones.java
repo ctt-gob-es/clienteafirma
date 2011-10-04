@@ -43,6 +43,15 @@ public class Opciones extends JAccessibilityDialog {
 
 	private static final long serialVersionUID = 1L;
 
+	/** &Iacute;ndice de la pesta&ntilde;a de opciones generales. */
+    private static final int GENERAL_OPTIONS_IDX = 0;
+    
+    /** &Iacute;ndice de la pesta&ntilde;a de opciones de accesibilidad. */
+    private static final int ACCESIBILITY_OPTIONS_IDX = 1;
+    
+    /** &Iacute;ndice de la pesta&ntilde;a de opciones del formato de firma PDF. */
+    private static final int PDF_OPTIONS_IDX = 2;
+	
     /** Pantalla principal de la aplicaci&oacute;n. */
     private PrincipalGUI mainGui;
     
@@ -57,6 +66,9 @@ public class Opciones extends JAccessibilityDialog {
     
     /** Indica si alguna accion del usuario necesita de un refresco de pantalla. */
     private static Boolean update = false;
+    
+    /** Panel con las pesta&ntilde;as de opciones. */
+    private JTabbedPane mainPanel;
     
     public Opciones(PrincipalGUI mainGUI) {
     	this.mainGui = mainGUI;
@@ -121,7 +133,7 @@ public class Opciones extends JAccessibilityDialog {
         c.gridy = 0;
                 
         // Panel superior con las opciones de configuracion
-        JTabbedPane mainPanel = new JTabbedPane();
+        mainPanel = new JTabbedPane();
         
         mainOptions =  new MainOptionsPane();
         mainPanel.addTab(Messages.getString("Opciones.general"),
@@ -150,7 +162,7 @@ public class Opciones extends JAccessibilityDialog {
         accessibilityOptions.loadConfig(GeneralConfig.getConfig());
         Utils.setContrastColor(mainPanel);
         
-        // Definicion de mnem�nicos.
+        // Definicion de mnemonicos.
         int tabNum = 0;
         mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pesta�a
         mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pesta�a
@@ -250,6 +262,13 @@ public class Opciones extends JAccessibilityDialog {
         
         // Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("opciones.configuracion");
+		
+		// Sustituimos el listener por defecto por otro que abrir la ventana de ayuda
+		// correspondiente a la pestana seleccionada
+		for (ActionListener listener : botonAyuda.getActionListeners()) {
+		    botonAyuda.removeActionListener(listener);
+		}
+		botonAyuda.addActionListener(new OpenHelpActionListener(this.mainPanel));
 		
         cons.ipadx = 15;
 		cons.weightx = 0.02;
@@ -450,5 +469,32 @@ public class Opciones extends JAccessibilityDialog {
 		JAccessibilityDialog j = getJAccessibilityDialog(this);
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 		
+	}
+	
+	private class OpenHelpActionListener implements ActionListener {
+
+	    private JTabbedPane tabbedPane;
+	    
+	    public OpenHelpActionListener(JTabbedPane tabbedpane) {
+	        this.tabbedPane = tabbedpane;
+        }
+	    
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
+            switch (this.tabbedPane.getSelectedIndex()) {
+            case ACCESIBILITY_OPTIONS_IDX:
+                HelpUtils.showHelp("");
+                break;
+            case PDF_OPTIONS_IDX:
+                HelpUtils.showHelp("");
+                break;
+            case GENERAL_OPTIONS_IDX:
+            default:
+                HelpUtils.showHelp("opciones.configuracion");
+                break;
+            }
+        }
+	    
 	}
 }
