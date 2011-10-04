@@ -37,6 +37,7 @@ import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
@@ -287,7 +288,7 @@ public class Ensobrado extends JPanel {
      */
     private void generarActionPerformed (JTextField campoFichero) {
     	if(campoFichero.getText() == null || campoFichero.getText().equals(""))
-			JOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.fichero"), Messages.getString("Ensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
         else {
         	if (checkAnadir.isSelected()) 
         		// Se muestra el asistente de anadir nuevos remitentes
