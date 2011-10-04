@@ -39,6 +39,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
@@ -204,7 +205,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		char[] contrasenia = campoContrasenia.getPassword();
 		
 		if (contrasenia == null || new String(contrasenia).trim().equals("")){
-			JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 
@@ -215,21 +216,21 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		catch (NullPointerException ex) {
 			logger.warning("No se ha indicado un fichero de datos: " + ex);
 			ex.printStackTrace();
-			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero"),
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero"),
 					Messages.getString("Descifrado.btndescifrar"),JOptionPane.WARNING_MESSAGE);
 			dispose();
 			return false;
 		} catch (FileNotFoundException ex) {
 			logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 			ex.printStackTrace();
-			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			dispose();
 			return false;
 		} catch (Exception ex) {
 			logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 			ex.printStackTrace();
-			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			dispose();
 			return false;
@@ -241,13 +242,13 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
 		} catch (KeyException e) {
 			logger.severe("Contrasena no valida: " + e);
-			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.contrasenia"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.contrasenia"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		} catch (Exception ex) {
 			logger.severe("Error al descifrar: " + ex);
 			ex.printStackTrace();
-			JOptionPane.showMessageDialog(this,
+			JAccessibilityOptionPane.showMessageDialog(this,
 					Messages.getString("Descifrado.msg.error.operacion"), Messages.getString("error"),
 					JOptionPane.ERROR_MESSAGE);
 
@@ -259,7 +260,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		}
 
 		if (result == null) {
-			JOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 
