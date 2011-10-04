@@ -1,0 +1,24 @@
+<html>
+<head>
+	<title>PKCS#7 / CMS</title>
+</head>
+<body>
+<h5>PKCS#7 / CMS</h5>
+
+<p>CMS es un formato est&aacute;ndar de firma binaria est&aacute;ndar definido en la RFC 3852 del Internet Engineering Task Force (IETF). Este 
+est&aacute;ndar define una sintaxis de encapsulaci&oacute;n capaz de contener diversos tipos de contenidos, entre los que se encuentran los 
+datos firmados (SignedData). El est&aacute;ndar CMS deriva de la especificaci&oacute;n PKCS#7, define en la RFC 2315.</p>
+
+<p>La versi&oacute;n de CMS generada por el Cliente @firma mantiene la compatibilidad con las firmas generadas a partir de la 
+especificaci&oacute;n PKCS#7.</p>
+
+<p>La especificaci&oacute;n de CMS / PKCS#7 define que los datos firmados son un atributo opcional dentro de los objetos de firma y no 
+es necesario mantener una referencia a ellos. Esto da lugar a las firmas en modo impl&iacute;cito (firmas con los datos incrustados) y 
+expl&iacute;cito (firmas sin los datos firmados). Que la firma no contenga los datos firmados no implica que no se pueda comprobar que 
+la firma se realiz&oacute; sobre unos datos concretos que se especifican de forma externa.</p>
+
+<p>La Interfaz de Escritorio del Cliente @firma no permite generar firmas en este formato. Como alternativa, s&iacute; permite generarlas 
+en el formato de firma avanzada CAdES.</p>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<html>
+<head>
+	<title>Sobres digitales</title>
+</head>
+<body>
+<h2><a name="_Toc275937498">Sobres digitales</a></h2>
+
+<p>Los sobres digitales son un modelo de empaquetado digital dise&ntilde;ado para el env&iacute;o de informaci&oacute;n entre distintas
+entidades de tal forma que quede asegurada su integridad y confidencialidad. El sobre permite que el remitente de 
+los datos se identifique y tambi&eacute;n asegura que s&oacute;lo los destinatarios son capaces de acceder a su contenido.</p>
+
+<p>B&aacute;sicamente, el sobre digital funciona como una carta tradicional. Nos permite introducir en &eacute;l un mensaje, definir
+los destinatarios del mismo y, opcionalmente, qui&eacute;n es el remitente. Adem&aacute;s, s&oacute;lo podr&aacute;n abrir el sobre las personas 
+a las que va dirigido.</p>
+
+<p>A nivel t&eacute;cnico, el sobre digital se construye mediante el uso simult&aacute;neo del cifrado sim&eacute;trico y asim&eacute;trico. Los
+datos que se desean introducir en el sobre se cifran con una clave generada aleatoriamente (cifrado sim&eacute;trico) y 
+seguidamente se cifra esa clave con las claves p&uacute;blicas de cada uno de los destinatarios (si hay 'n' destinatarios, se
+obtendr&aacute;n 'n' copias cifradas de la clave). De esta forma se toma lo mejor de cada sistema de cifrado, ya que los datos 
+se cifran sim&eacute;tricamente, que es m&aacute;s r&aacute;pido, y asim&eacute;tricamente s&oacute;lo se cifra la clave de cifrado generada, que es muy
+peque&ntilde;a. Como s&oacute;lo los destinatarios pueden descifrar la clave sim&eacute;trica, s&oacute;lo ellos podr&aacute;n descifrar los datos. 
+El sobre engloba toda esta informaci&oacute;n como un &uacute;nico fichero.</p>
+
+<p>Los est&aacute;ndares PKCS#7 y CMS definen varios tipos de contenido que se ajustan al modelo de sobre electr&oacute;nico. 
+Los tipos definidos en los est&aacute;ndares y soportados por el Cliente @firma son:</p>
+
+<ul>
+	<li><b>EnvelopedData:</b> Sobre simple. En estos sobres electr&oacute;nicos simplemente se cifran los datos con
+    las claves p&uacute;blicas de los destinatarios. No es necesario incluir la informaci&oacute;n del remitente y, en caso de incluirla, esta se adhiere al
+    sobre sin ning&uacute;n tipo de protecci&oacute;n.</li>
+	<li><b>SignedAndEnvelopedData:</b> Sobre firmado. En estos sobres digitales se incluyen los destinatarios y la firma del remitente. 
+	La firma se realiza sobre el propio sobre y se empaqueta con el mismo, lo que hace posible autenticar al remitente. Sin embargo, al
+    realizarse la firma simplemente del sobre con los datos, una persona malintencionada podr&iacute;a eliminar esta firma y sustituirla por la suya
+    propia. De esta forma, no podr&iacute;a acceder al contenido del sobre pero s&iacute; podr&iacute;a hacerse pasar como el remitente de cada a los destinatarios.</li>
+	<li><b>AuthEnvelopedData:</b> Sobre autenticado. En estos sobres digitales se incluye un c&oacute;digo de autenticaci&oacute;n para la detecci&oacute;n de 
+	modificaciones en el sobre electr&oacute;nico. Un usuario malintencionado no podr&iacute;a modificar el contenido del sobre sin hacer fallar el proceso 
+	de autenticaci&oacute;n y no puede sustituir la clave de autenticaci&oacute;n por otra sin conocer el contenido cifrado del sobre.</li>
+</ul>
+
+</body>
+</html>

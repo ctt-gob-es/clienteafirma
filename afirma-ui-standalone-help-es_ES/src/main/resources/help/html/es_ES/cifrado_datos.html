@@ -1,0 +1,40 @@
+<html>
+<head>
+	<title>Cifrado de datos</title>
+</head>
+<body>
+<h2><a name="_Toc275937494">Cifrado de datos</a></h2>
+
+<p>El cifrado es la operaci&oacute;n de transformaci&oacute;n de unos datos entendibles en otros ininteligibles. Denominamos
+al resultado de esta operaci&oacute;n "datos cifrados".</p>
+
+<p>El cifrado de datos debe poder invertirse, de tal forma que sea posible volver a obtener los datos originales a trav&eacute;s de
+los datos cifrados. Esta operaci&oacute;n se denomina descifrado de datos.</p>
+
+<p>La utilidad del cifrado de datos radica en que s&oacute;lo la persona que cifr&oacute; los datos (y cualquier otra con la que
+comparta el secreto) sabe c&oacute;mo descifrarlos, con lo cual los datos s&oacute;lo son accesibles para este.</p>
+
+<p>El proceso de cifrado se realiza mediante la aplicaci&oacute;n de un algoritmo matem&aacute;tico que recibe los datos originales y
+devuelve los datos cifrados. Por lo general, este algoritmo se configura mediante una clave de cifrado, de tal forma que 
+un mismo algoritmo aplicado sobre los mismos datos dar&aacute; siempre el mismo resultado cuando se use la misma clave y otro 
+resultado distinto cuando se utilice otra clave diferente.</p>
+
+<p>Entorno al concepto de algoritmos de cifrado que utilizan claves, podemos distinguir entre:</p>
+
+<ul>
+	<li>Algoritmos sim&eacute;tricos: Cuando la misma clave utilizada para cifrar los datos tambi&eacute;n permite ejecutar la operaci&oacute;n 
+	contraria y descifrarlos.</li>
+	<ul type="circle">
+		<li>Son algoritmos sim&eacute;tricos los que utiliza el Cliente @firma para cifrar mediante sus funciones de cifrado digital.</li>
+	</ul>
+	<li>Algoritmos asim&eacute;tricos: Cuando las claves de cifrado y descifrado son distintas, pero est&aacute;n relacionadas de tal forma 
+	que los datos que cifra una s&oacute;lo lo puede descifrar la otra y viceversa.</li>
+	<ul type="circle">
+		<li>Son algoritmos asim&eacute;tricos los que utiliza el Cliente @firma para cerrar los sobres electr&oacute;nicos.</li>
+	</ul>
+</ul>
+
+<p>Por regla general, los algoritmos de cifrado sim&eacute;trico son mucho m&aacute;s r&aacute;pidos que los algoritmos de cifrado asim&eacute;trico.</p>
+
+</body>
+</html>
