@@ -47,10 +47,10 @@ public class Opciones extends JAccessibilityDialog {
     private static final int GENERAL_OPTIONS_IDX = 0;
     
     /** &Iacute;ndice de la pesta&ntilde;a de opciones de accesibilidad. */
-    private static final int ACCESIBILITY_OPTIONS_IDX = 1;
+    private static final int ACCESIBILITY_OPTIONS_IDX = 2;
     
     /** &Iacute;ndice de la pesta&ntilde;a de opciones del formato de firma PDF. */
-    private static final int PDF_OPTIONS_IDX = 2;
+    private static final int PDF_OPTIONS_IDX = 1;
 	
     /** Pantalla principal de la aplicaci&oacute;n. */
     private PrincipalGUI mainGui;
@@ -484,7 +484,7 @@ public class Opciones extends JAccessibilityDialog {
             
             switch (this.tabbedPane.getSelectedIndex()) {
             case ACCESIBILITY_OPTIONS_IDX:
-                HelpUtils.showHelp("");
+                HelpUtils.showHelp("opciones.accesibilidad");
                 break;
             case PDF_OPTIONS_IDX:
                 HelpUtils.showHelp("");
