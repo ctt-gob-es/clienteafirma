@@ -144,7 +144,7 @@ public class SelectionDialog {
                 file = fileChooser.getSelectedFile();
                 if (file.exists()) {
                     selectedOption =
-                        JOptionPane.showConfirmDialog(parentComponent,
+                    		JAccessibilityOptionPane.showConfirmDialog(parentComponent,
                                 Messages.getString("SelectionDialog.saveDialog.overwrite.adv", file.getAbsolutePath()), Messages.getString("SelectionDialog.saveDialog.title"), JOptionPane.YES_NO_CANCEL_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
                     if (selectedOption == JOptionPane.CANCEL_OPTION) {
                         Logger.getLogger("es.gob.afirma").info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$ //$NON-NLS-2$
@@ -163,7 +163,7 @@ public class SelectionDialog {
                     }
                     catch (final Exception ex) {
                         Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-                        JOptionPane.showMessageDialog(parentComponent,
+                        JAccessibilityOptionPane.showMessageDialog(parentComponent,
                                 Messages.getString("SelectionDialog.saveDialog.error.msg"), Messages.getString("SelectionDialog.saveDialog.error.title"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                         fos = null;
                         // Volvemos a intentar guardar
