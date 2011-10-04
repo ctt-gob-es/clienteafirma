@@ -57,6 +57,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -337,7 +338,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			return;
 		} catch (Exception e) {
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
-			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.almacen"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.almacen"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -367,7 +368,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else
-				JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario"), 
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
 		}
 		
@@ -377,7 +378,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(),kconf);
 			} catch(AOException e){
 	    		logger.warning("Error al obtener la clave del certificado: "+e);
-	    		JOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.clave"), 
+	    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.clave"), 
 	    				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	    		
 	    		clearWizard(comboRepositorios, eliminar, anadir);
@@ -491,7 +492,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		if (tipo.equals(SOBRE_AUTENTICADO) || tipo.equals(SOBRE_FIRMADO)) {
             DefaultListModel listModel = (DefaultListModel) listaRemitentes.getModel();
             if (listModel.isEmpty()) {
-                JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.remitente"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.remitente"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }
@@ -534,22 +535,22 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		
     	} catch(AOCancelledOperationException e) {
     		logger.warning("La operaci&oacute;n ha sido cancelada por el usuario: "+e);
-    		JOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.generacion"), 
+    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.generacion"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
 		} catch (FileNotFoundException e) {
 			logger.warning("No se puede encontrar el fichero seleccionado: "+e);
-    		JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.encontrar.fichero"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.encontrar.fichero"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
 		} catch (IOException e) {
 			logger.warning("No ha sido posible leer el fichero indicado: "+e);
-    		JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura.generico"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura.generico"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	}  catch(Exception e){
     		logger.warning("Ocurrio un error durante la desenvoltura: "+e);
-    		JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.desenvoltura"), 
+    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.desenvoltura"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	}

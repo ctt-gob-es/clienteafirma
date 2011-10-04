@@ -45,6 +45,7 @@ import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -297,11 +298,11 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		String ficheroFirma = this.campoFirma.getText();
 
 		if (ficheroFirma == null || ficheroFirma.equals("")){
-            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
         else if (!new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){
-            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+        	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
 		
@@ -315,13 +316,13 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		    signIs = new FileInputStream(ficheroFirma);
 		    sign = AOUtil.getDataFromInputStream(signIs);
 		} catch (Exception e) {
-		    JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
 		
 		final AOSigner signer = AOSignerFactory.getSigner(sign);
         if (signer == null) {
-            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.manejador"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+        	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.manejador"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
 		try {
@@ -333,11 +334,11 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		
 		if (data == null) {
 		    if (ficheroDatos == null || ficheroDatos.equals("")){
-		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos.vacio"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 		        return false;
 		    }
 		    else if (!new File(ficheroDatos).exists() && !new File(ficheroDatos).isFile()) {
-		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 		        return false;
 		    }
 		}
@@ -355,7 +356,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		        AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(this.kssc,this);
 		        keyEntry = msUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
 		    } catch (AOException e) {
-		        JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+		    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 		        return false;
 		    }
 
@@ -365,18 +366,18 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		    }
 		    
 		    if (!signer.isValidDataFile(data)) {
-		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 		        return false;
 		    }
 		    if (!signer.isSign(sign)) {
-		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.soportado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.soportado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 		        return false;
 		    }
 		    try {
 		        coSignedData = cosignOperation(signer, data, sign, keyEntry, ficheroDatos);
 		    } catch (AOException e) {
 		        logger.severe(e.toString());
-		        JOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.cofirma.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.cofirma.error"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 		        return false;
 		    }
 
@@ -394,7 +395,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         } 
 		catch (final Exception e) {
 		    logger.severe(e.toString());
-		    JOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		    JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 		    return false;
 		} finally {
 		    if (dataIs != null) {

@@ -58,6 +58,7 @@ import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -322,7 +323,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			return;
 		} catch (Exception e) {
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
-			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.almacen"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.almacen"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -352,7 +353,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else
-				JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario"), 
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
@@ -460,17 +461,17 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		} 
     	} catch(AOCancelledOperationException e) {
     		logger.warning("La operaci&oacute;n ha sido cancelada por el usuario: "+e);
-    		JOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.generacion"), 
+    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.generacion"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	} catch(FileNotFoundException e){
     		logger.warning("No ha sido posible leer el fichero indicado: "+e);
-    		JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura.generico"), 
+    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura.generico"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	} catch(Exception e){
     		logger.warning("Ocurrio un error durante el proceso de aï¿½adir un nuevo remitente: "+e);
-    		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), 
+    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	}
@@ -495,7 +496,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			    envelop = enveloper.addOriginatorInfo(data, originatorCertChain);
 			} catch (AOException e) {
 			    logger.warning("Ocurrio al agregar el nuevo remitente al sobre electronico: " + e); //$NON-NLS-1$
-			    JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),  //$NON-NLS-1$
+			    JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),  //$NON-NLS-1$
 			            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			    return null;
 			}
@@ -509,7 +510,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 						null);
 			} catch (AOException e) {
 				logger.warning("Ocurrio un error durante el proceso de agregar un nuevo remitente: "+e); //$NON-NLS-1$
-	    		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),  //$NON-NLS-1$
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),  //$NON-NLS-1$
 	    				Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 	    		return null;
 			}
@@ -517,7 +518,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			CMSAuthenticatedEnvelopedData enveloper = new CMSAuthenticatedEnvelopedData();
 			envelop = enveloper.addOriginatorInfo(data, originatorCertChain);
 		} else {
-    		JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.certificado.soportado"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.certificado.soportado"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return null;
 		}
@@ -542,7 +543,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			tipo = AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA;
 		} 
 		else {
-			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.sobre.soportado"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.sobre.soportado"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		}

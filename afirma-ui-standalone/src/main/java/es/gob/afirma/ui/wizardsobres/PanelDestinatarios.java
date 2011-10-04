@@ -43,6 +43,7 @@ import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -277,7 +278,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		} catch (Exception e) {
 		    e.printStackTrace();
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
-			JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.abrir.almacen"), 
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.abrir.almacen"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -298,7 +299,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else 
-				JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario.existe"), 
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario.existe"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
@@ -377,7 +378,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	public Boolean verificarCertificados() {
 		DefaultListModel listModel = (DefaultListModel) listaDestinatarios.getModel();
 		if (listModel.isEmpty()){
-            JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
 		

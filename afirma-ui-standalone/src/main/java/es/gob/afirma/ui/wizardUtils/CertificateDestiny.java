@@ -21,6 +21,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 
 /**
@@ -86,10 +87,10 @@ public class CertificateDestiny {
 			logger.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
 		} catch (AOException e) {
 			logger.severe(e.getMessage() + ": " + e); //$NON-NLS-1$
-			JOptionPane.showMessageDialog(dialogo, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+			JAccessibilityOptionPane.showMessageDialog(dialogo, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 		} catch (Exception e) {
 			logger.severe("No se ha podido recuperar el certificado seleccionado: " + e); //$NON-NLS-1$
-			JOptionPane.showMessageDialog(dialogo, Messages.getString("Certificado.no.soportado"),  //$NON-NLS-1$
+			JAccessibilityOptionPane.showMessageDialog(dialogo, Messages.getString("Certificado.no.soportado"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 		}
 	}	
