@@ -178,6 +178,21 @@ public class HelpUtils {
 		return botonAyuda;
 	}
 
+	/**
+	 * Muestra la ayuda por la p&aacute;gina indicada. Si no se indica, se
+	 * abrir&aacute;a por la p&aacute;gina principal. 
+	 * @param pagina Identificador de p&aacute;gina.
+	 */
+	public static void showHelp(final String pagina) {
+	    getHelp().setDisplayed(true);
+	    if (pagina != null) {
+	        try {
+	            getHelp().setCurrentID(pagina);
+	        } catch (Exception e) {
+	            /* No hacemos nada para que se abra por la pagina principal */
+	        }
+	    }
+	}
 }
 
 
