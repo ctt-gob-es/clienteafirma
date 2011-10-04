@@ -13,6 +13,7 @@ package es.gob.afirma.signers.pades;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.cert.Certificate;
@@ -56,6 +57,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
+import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Clase para la firma electr&oacute;nica de ficheros Adobe PDF.
@@ -94,6 +96,18 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * <dd>Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados, si no se establece o se establece a <code>false</code> se
  * lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado. <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
  * establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b>
+ * <dt>tsaURL</dt>
+ * <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
+ * <dt>tsaPolicy</dt>
+ * <dd>Pol&iacute;tica de sellado de tiempo (obligatoria si se indica <code>tsaURL</code>).</dd>
+ * <dt>tsaHashAlgorithm</dt>
+ * <dd>Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).</dd>
+ * <dt>tsaRequireCert</dt>
+ * <dd><code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).</dd>
+ * <dt>tsaUsr</dt>
+ * <dd>Nombre de usuario de la TSA.</dd>
+ * <dt>tsaPwd</dt>
+ * <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
  * </dl>
  * </p> */
 public final class AOPDFSigner implements AOSigner {
@@ -603,7 +617,7 @@ public final class AOPDFSigner implements AOSigner {
             }
         }
 
-        final byte[] pk =
+        byte[] pk =
                 new GenCAdESEPESSignedData().generateSignedData(
                     new P7ContentSignerParameters(inPDF, algorithm, xCerts), 
                     true, // omitContent
@@ -612,6 +626,37 @@ public final class AOPDFSigner implements AOSigner {
                     ke,
                     MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())));
 
+        //***************** SELLO DE TIEMPO ****************
+        final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$
+        URL tsaURL;
+        if (tsa != null) {
+            try {
+                tsaURL = new URL(tsa);
+            }
+            catch(final Exception e) {
+                LOGGER.warning("Se ha indicado una URL de TSA invalida (" + tsa + "), no se anadira sello de tiempo: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+                tsaURL = null;
+            }
+            if (tsaURL != null) {
+                final String tsaPolicy = extraParams.getProperty("tsaPolicy"); //$NON-NLS-1$
+                if (tsaPolicy == null) {
+                    LOGGER.warning("Se ha indicado una URL de TSA pero no una politica, no se anadira sello de tiempo"); //$NON-NLS-1$
+                }
+                else {
+                    final String tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm"); //$NON-NLS-1$
+                    pk = new PAdESTimestamper(
+                         !("false").equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$ //$NON-NLS-2$
+                         tsaPolicy, 
+                         tsaURL, 
+                         extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$
+                         extraParams.getProperty("tsaPwd") //$NON-NLS-1$
+                     ).addTimestamp(pk, AOAlgorithmID.getOID(AOSignConstants.getDigestAlgorithmName((tsaHashAlgorithm != null) ? tsaHashAlgorithm : "SHA1"))); //$NON-NLS-1$
+                }
+            }
+            
+        }
+      //************** FIN SELLO DE TIEMPO ****************
+        
 
         // ********************************************************************************
         // *************** FIN CALCULO DEL SIGNED DATA
