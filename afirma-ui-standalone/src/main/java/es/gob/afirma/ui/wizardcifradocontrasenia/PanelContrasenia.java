@@ -40,6 +40,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
@@ -241,11 +242,11 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 				
 		// Comprobamos las dos contrasenias
 		if (contrasenia == null || new String(contrasenia).trim().equals("")) {
-			JOptionPane.showMessageDialog(this,	Messages.getString("WizardCifrado.contrasenia.error2"),
+			JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("WizardCifrado.contrasenia.error2"),
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		} else if (!Arrays.equals(contrasenia, contraseniaRep)) {
-			JOptionPane.showMessageDialog(this,	Messages.getString("WizardCifrado.contrasenia.error"),
+			JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("WizardCifrado.contrasenia.error"),
 					Messages.getString("error"),JOptionPane.ERROR_MESSAGE);
 			return false;
 		} else {
@@ -255,7 +256,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			    .decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
 			} catch (Exception ex) {
 				logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
 						Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 
 		        // Si el error se dio en el proceso de cifrado y es distinto
@@ -270,17 +271,17 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 				fileContent = this.getFileContent();
 			} catch (NullPointerException ex) {
 				logger.warning("No se ha indicado un fichero de datos: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				this.dispose();
 				return false;
 			} catch (FileNotFoundException ex) {
 				logger.warning("No se encuentra el fichero: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				this.dispose();
 				return false;
 			} catch (Exception ex) {
 				logger.warning("Ocurrio un error al leer el fichero: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				this.dispose();
 				return false;
 			}
@@ -290,11 +291,11 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 				result = cipherConfig.getCipher().cipher(fileContent, cipherConfig.getConfig(), cipherKey);
 			} catch (InvalidKeyException ex) {
 				logger.severe("No se cumplen con los requisitos de contrase\u00F1a del algoritmo: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 				return false;
 			} catch (Exception ex) {
 				logger.warning("Error al cifrar: " + ex);
-				JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.operacion"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.operacion"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				
 		        // Si el error se dio en el proceso de cifrado y es distinto
 		        // a una clave incorrecta, entonces abortamos la operacion
@@ -304,7 +305,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			}
 
 			if (result == null) 
-                JOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             else {
                 // Almacenamos el fichero de salida de la operacion
             	final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.contrasenia.filechooser.save.title"), result,
