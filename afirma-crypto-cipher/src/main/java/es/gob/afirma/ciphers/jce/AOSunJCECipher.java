@@ -154,8 +154,8 @@ public final class AOSunJCECipher implements AOCipher {
             cipher.init(Cipher.ENCRYPT_MODE, cipherKey, this.getParams(algorithmConfig));
         }
         catch (final InvalidKeyException e) {
-            throw new KeyException("La clave de cifrado introducida no es valida para el algoritmo '" + algorithmConfig.getAlgorithm() //$NON-NLS-1$
-                                                                                                                                .getName() + "'", e); //$NON-NLS-1$
+            throw new KeyException("La clave de cifrado introducida no es valida para el algoritmo '" + //$NON-NLS-1$
+                    algorithmConfig.getAlgorithm().getName() + "'", e); //$NON-NLS-1$
         }
         catch (final Exception e) {
             throw new AOException("Error al inicializar el cifrador", e); //$NON-NLS-1$
@@ -206,14 +206,14 @@ public final class AOSunJCECipher implements AOCipher {
             return cipher.doFinal(data);
         }
         catch (final BadPaddingException e) {
-            throw new KeyException(e.toString());
+            throw new InvalidKeyException(e.toString());
         }
         catch (final Exception e) {
             throw new AOException("Error descifrando los datos", e); //$NON-NLS-1$
         }
     }
 
-    public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws AOException {
+    public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws KeyException {
         if (base64Key == null || base64Key.length() < 1) {
             throw new IllegalArgumentException("La clave a descodificar no puede ser nula ni vacia"); //$NON-NLS-1$
         }
@@ -225,7 +225,7 @@ public final class AOSunJCECipher implements AOCipher {
             return new SecretKeySpec(new sun.misc.BASE64Decoder().decodeBuffer(base64Key), algorithmConfig.getAlgorithm().getName());
         }
         catch (final Exception e) {
-            throw new AOException("Error creando la clave secreta", e); //$NON-NLS-1$
+            throw new KeyException("Error creando la clave secreta", e); //$NON-NLS-1$
         }
     }
 
@@ -239,12 +239,12 @@ public final class AOSunJCECipher implements AOCipher {
         }
 
         try {
-            return SecretKeyFactory.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER).generateSecret(new PBEKeySpec(passphrase,
-                                                                                                                                  SALT,
-                                                                                                                                  ITERATION_COUNT));
+            return SecretKeyFactory.getInstance(
+                    algorithmConfig.getAlgorithm().getName(), PROVIDER).generateSecret(
+                            new PBEKeySpec(passphrase, SALT, ITERATION_COUNT));
         }
         catch (final Exception e) {
-            throw new AOException("Error generando la clave secreata", e); //$NON-NLS-1$
+            throw new AOException("Error generando la clave secreta", e); //$NON-NLS-1$
         }
     }
 
