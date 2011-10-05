@@ -154,8 +154,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 		// Icono de @firma
         setIconImage(this.loadIcon("afirma_ico.png").getImage()); //$NON-NLS-1$
-
-		
 		
 		// Componentes principales
 		this.htPanel = new HorizontalTabbedPanel();
@@ -479,13 +477,19 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonMultifirmaMasiva.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonMultifirmaMasiva.setToggledIcon(this.loadIcon("boton_masiva_ico.png"), baseIcon); //$NON-NLS-1$
         buttonMultifirmaMasiva.setSelectedToggledIcon(this.loadIcon("boton_masiva_sel_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonMultifirmaMasiva.setDisabledToggledIcon(this.loadIcon("boton_masiva_dis_ico.png"), baseIcon); //$NON-NLS-1$
 
-        buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
         buttonMultifirmaMasiva.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
         buttonMultifirmaMasiva.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
         buttonMultifirmaMasiva.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
+        
+        buttonMultifirmaMasiva.setEnabled(GeneralConfig.isAvanzados());
+        if (buttonMultifirmaMasiva.isEnabled()) {
+            buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
+        }
+        
         JPanel panelMultifirmaMasiva =  new MultifirmaMasiva();
         this.htPanel.addTab(buttonMultifirmaMasiva, panelMultifirmaMasiva);
 
@@ -543,13 +547,19 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonEnsobrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonEnsobrado.setToggledIcon(this.loadIcon("boton_ensobrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonEnsobrado.setSelectedToggledIcon(this.loadIcon("boton_ensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonEnsobrado.setDisabledToggledIcon(this.loadIcon("boton_ensobrado_dis_ico.png"), baseIcon); //$NON-NLS-1$
 
-        buttonEnsobrado.setMnemonic(KeyEvent.VK_B);
         buttonEnsobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonEnsobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonEnsobrado.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
+        
+        buttonEnsobrado.setEnabled(GeneralConfig.isAvanzados());
+        if (buttonEnsobrado.isEnabled()) {
+            buttonEnsobrado.setMnemonic(KeyEvent.VK_B);    
+        }
+        
         JPanel panelEnsobrado = new Ensobrado();
         this.htPanel.addTab(buttonEnsobrado, panelEnsobrado);
 
@@ -559,13 +569,20 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonDesensobrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonDesensobrado.setToggledIcon(this.loadIcon("boton_desensobrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonDesensobrado.setSelectedToggledIcon(this.loadIcon("boton_desensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
+        buttonDesensobrado.setDisabledToggledIcon(this.loadIcon("boton_desensobrado_dis_ico.png"), baseIcon); //$NON-NLS-1$
 
-        buttonDesensobrado.setMnemonic(KeyEvent.VK_N);
+        
         buttonDesensobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonDesensobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonDesensobrado.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description")); //$NON-NLS-1$
+        
+        buttonDesensobrado.setEnabled(GeneralConfig.isAvanzados());
+        if (buttonDesensobrado.isEnabled()) {
+            buttonDesensobrado.setMnemonic(KeyEvent.VK_N);    
+        }
+        
         JPanel panelDesensobrado = new Desensobrado();
         this.htPanel.addTab(buttonDesensobrado, panelDesensobrado);
         

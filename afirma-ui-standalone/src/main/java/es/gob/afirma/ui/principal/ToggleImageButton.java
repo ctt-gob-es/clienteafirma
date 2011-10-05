@@ -24,11 +24,17 @@ public class ToggleImageButton extends JToggleButton {
     /** Imagen que muestra el bot&oacute;n en estado seleccionado. */
     private Image selectedImage = null;
 
+    /** Imagen que muestra el bot&oacute;n en estado desactivado. */
+    private Image disabledImage = null;
+    
     /** Icono que muestra el bot&oacute;n en estado normal. */
     private Icon toggledIcon = null;
     
     /** Icono que muestra el bot&oacute;n en estado seleccionado. */
     private Icon selectedToggledIcon = null;
+    
+    /** Icono que muestra el bot&oacute;n en estado desactivado. */
+    private Icon disabledToggledIcon = null;
     
     /** Texto que muestra el bot&oacute;n. */
     private String buttonText = null;
@@ -50,6 +56,14 @@ public class ToggleImageButton extends JToggleButton {
      */
     public void setSelectedImage(Image selectedImage) {
         this.selectedImage = selectedImage;
+    }
+    
+    /**
+     * Establece la imagen que da aspecto al bot&oacute;n en su estado desactivado.
+     * @param disabledImage Imagen que se mostrar&aacute;.
+     */
+    public void setDisabledImage(Image disabledImage) {
+        this.disabledImage = disabledImage;
     }
     
     /**
@@ -88,6 +102,24 @@ public class ToggleImageButton extends JToggleButton {
         super.setSelectedIcon(baseIcon);
     }
 
+    /**
+     * Recupera el icono del bot&oacute;n para el estado desactivado.
+     * @return Icono del bot&oacute;n para el estado desactivado.
+     */
+    public Icon getDisabledToggledIcon() {
+        return this.disabledToggledIcon;
+    }
+
+    /**
+     * Establece el icono del bot&oacute;n para el estado desactivado.
+     * @param disabledToggledIcon Icono del bot&oacute;n para el estado desactivado.
+     * @param baseIcon Icono transparente a partir del cual se toma la medida.
+     */
+    public void setDisabledToggledIcon(Icon disabledToggledIcon, Icon baseIcon) {
+        this.disabledToggledIcon = disabledToggledIcon;
+        super.setDisabledIcon(baseIcon);
+    }
+    
     /**
      * Recupera el texto definido para el bot&oacute;n.
      * @return Texto del bot&oacute;n.
@@ -136,8 +168,9 @@ public class ToggleImageButton extends JToggleButton {
         
         if (super.isSelected() && this.selectedImage != null) {
             g.drawImage(this.selectedImage, 2, 2, this.getWidth() - 4, this.getHeight() - 4, this.getParent());
-        }
-        else if (this.image != null){
+        } else if (!super.isEnabled() && this.disabledImage != null) {
+            g.drawImage(this.disabledImage, 2, 2, this.getWidth() - 4, this.getHeight() - 4, this.getParent());
+        } else if (this.image != null){
             g.drawImage(this.image, 2, 2, this.getWidth() - 4, this.getHeight() - 4, this.getParent());
         }
         
@@ -145,6 +178,9 @@ public class ToggleImageButton extends JToggleButton {
         if (this.isSelected()) {
             color = g.getColor();
             g.setColor(Color.white);
+        } else if(!this.isEnabled()) {
+            color = g.getColor();
+            g.setColor(Color.gray);
         }
         
         if (this.getButtonText() != null) {
@@ -152,13 +188,17 @@ public class ToggleImageButton extends JToggleButton {
         	BasicGraphicsUtils.drawString(g, this.getButtonText(),  this.getMnemonic(), 48, (this.getHeight() + g.getFontMetrics().getAscent() - 4) / 2);
         }
 
-        if (this.isSelected()) {
+        if (this.isSelected() || !this.isEnabled()) {
             g.setColor(color);
         }
         
         if (this.isSelected()) {
             if (this.getSelectedToggledIcon() != null) {
                 this.getSelectedToggledIcon().paintIcon(this, g, 0, (this.getHeight() - this.getSelectedToggledIcon().getIconHeight()) / 2);
+            }
+        } else if (!this.isEnabled()) {
+            if (this.getDisabledToggledIcon() != null) {
+                this.getDisabledToggledIcon().paintIcon(this, g, 0, (this.getHeight() - this.getSelectedToggledIcon().getIconHeight()) / 2);
             }
         } else {
             if (this.getToggledIcon() != null) {
@@ -187,7 +227,7 @@ public class ToggleImageButton extends JToggleButton {
     
     @Override
     protected void paintComponent(Graphics g) {
-        if ((this.mouseOver || this.isFocusOwner())) {
+        if (this.isEnabled() && (this.mouseOver || this.isFocusOwner())) {
             super.paintComponent(g);
         }
     }
