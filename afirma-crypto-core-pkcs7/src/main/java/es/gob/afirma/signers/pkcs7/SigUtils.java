@@ -80,13 +80,4 @@ public final class SigUtils {
         }
         return new BERSet(v);
     }
-    
-    /** Obtiene la versi&oacute; de BouncyCastle en uso.
-     * @return Versi&oacute; del BouncyCastle encontrado primero en el BootClassPath o en el ClassPath 
-     */
-    public static String getBouncyCastleVersion() {
-        return Double.toString(new BouncyCastleProvider().getVersion());
-        
-    }
-
 }
