@@ -112,6 +112,17 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </p> */
 public final class AOPDFSigner implements AOSigner {
     
+    /** Versi&oacute;n de iText necesaria para el uso de esta clase. */
+    public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
+    
+    /** Construye un firmador PAdES, comprobando que la versi&oacute;n existente de iText sea la adecuada. */
+    public AOPDFSigner() {
+        final String itextVersion = PAdESUtil.getITextVersion();
+        if (!ITEXT_VERSION.equals(itextVersion)) {
+            throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+    }
+    
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
