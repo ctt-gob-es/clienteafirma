@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
 import java.util.List;
@@ -288,7 +289,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
 	 * Descifra un fichero dado
 	 * @return	true o false indicando si se ha descifrado correctamente
 	 */
-    public Boolean descifrarFichero() {
+    public boolean descifrarFichero() {
     	// Recuperamos la clave
     	String clave = campoClave.getText();
 
@@ -308,49 +309,40 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	            Messages.getString("Descifrado.btndescifrar"),
     	            JOptionPane.WARNING_MESSAGE
     	    );
-    	    dispose();
     	    return false;
     	} catch (FileNotFoundException ex) {
     	    logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
     	    ex.printStackTrace();
     	    JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"),
     	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    	    dispose();
     	    return false;
     	} catch (Exception ex) {
     	    logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
     	    ex.printStackTrace();
     	    JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
     	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    	    dispose();
     	    return false;
     	}
 
     	byte[] result = null;
     	try {
-    	    Key tmpKey = cipherConfig.getCipher().decodeKey(clave, cipherConfig.getConfig(), null);
-    	    result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
-    	} catch (KeyException e) {
-    	    logger.severe("Clave no valida: " + e);
-    	    JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.clave"), 
-    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    	    Key tmpKey = this.cipherConfig.getCipher().decodeKey(clave, this.cipherConfig.getConfig(), null);
+    	    result = this.cipherConfig.getCipher().decipher(fileContent, this.cipherConfig.getConfig(), tmpKey);
+    	} catch (InvalidKeyException e) {
+    	    logger.severe("Clave no valida: " + e); //$NON-NLS-1$
+    	    JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.clave"),  //$NON-NLS-1$
+    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
     	    return false;
-    	} catch (AOException ex) {
+    	} catch (KeyException ex) {
     	    logger.severe("Error al descifrar, compruebe que el fichero esta cifrado con el algoritmo seleccionado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-    	    JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.malcifrado"), 
-    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    	    dispose();
+    	    JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.malcifrado"),  //$NON-NLS-1$
+    	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
     	    return false;
     	} catch (Exception ex) {
-    	    logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+    	    logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$
     	    ex.printStackTrace();
     	    JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.operacion"), 
     	            Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-
-    	    // Si el error se dio en el proceso de descifrado y es distinto
-    	    // a una clave incorrecta, entonces abortamos la operacion
-    	    // cerrando el panel del Wizard
-    	    dispose();
     	    return false;
     	}
 

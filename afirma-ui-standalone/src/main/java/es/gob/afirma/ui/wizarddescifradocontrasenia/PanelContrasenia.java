@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
 import java.util.List;
@@ -201,7 +202,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	 * Descifra un fichero dado
 	 * @return	true o false indicando si se ha descifrado correctamente
 	 */
-	public Boolean descifrarFichero() {
+	public boolean descifrarFichero() {
 		char[] contrasenia = campoContrasenia.getPassword();
 		
 		if (contrasenia == null || new String(contrasenia).trim().equals("")){
@@ -218,21 +219,18 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			ex.printStackTrace();
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero"),
 					Messages.getString("Descifrado.btndescifrar"),JOptionPane.WARNING_MESSAGE);
-			dispose();
 			return false;
 		} catch (FileNotFoundException ex) {
 			logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 			ex.printStackTrace();
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-			dispose();
 			return false;
 		} catch (Exception ex) {
 			logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
 			ex.printStackTrace();
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.fichero2"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-			dispose();
 			return false;
 		}
 
@@ -240,7 +238,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		try {
 			Key tmpKey = cipherConfig.getCipher().decodePassphrase(contrasenia, cipherConfig.getConfig(), null);
 			result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
-		} catch (KeyException e) {
+		} catch (InvalidKeyException e) {
 			logger.severe("Contrasena no valida: " + e);
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.contrasenia"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -252,10 +250,6 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 					Messages.getString("Descifrado.msg.error.operacion"), Messages.getString("error"),
 					JOptionPane.ERROR_MESSAGE);
 
-			// Si el error se dio en el proceso de descifrado y es distinto
-			// a una contrasena incorrecta, entonces abortamos la operacion
-			// cerrando el panel del Wizard
-			dispose();
 			return false;
 		}
 

@@ -382,7 +382,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	 * Cifra un fichero dado
 	 * @return	true o false indicando si se ha cifrado correctamente
 	 */
-	private Boolean cifrarFichero() {
+	private boolean cifrarFichero() {
 
 	    // Comprobamos si se ha generado alguna clave
 	    if (campoClave.getText() == null || campoClave.getText().equals("")){
@@ -406,17 +406,14 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	    } catch (NullPointerException ex) {
 	        logger.warning("No se ha indicado un fichero de datos: " + ex);
 	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-	        dispose();
 	        return false;
 	    } catch (FileNotFoundException ex) {
 	        logger.warning("No se encuentra el fichero: " + ex);
 	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-	        dispose();
 	        return false;
 	    } catch (Exception ex) {
 	        logger.warning("Ocurrio un error al leer el fichero: " + ex);
 	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-	        dispose();
 	        return false;
 	    }                
 
@@ -432,12 +429,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	    } catch (Exception ex) {
 	        logger.warning("Error al cifrar: " + ex);
 	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.operacion"), 
-	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 
-	        // Si el error se dio en el proceso de cifrado y es distinto
-	        // a una clave incorrecta, entonces abortamos la operacion
-	        // cerrando el panel del Wizard
-	        dispose();
 	        return false;
 	    }
 

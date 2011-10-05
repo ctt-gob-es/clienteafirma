@@ -273,10 +273,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 				JButton siguiente, JButton finalizar) {
 			
 			if (salto) {
-				Integer indice = 1;
-				
-				//ventanas.get(posicion).dispose();
-				getVentanas().get(indice).setVisibleAndHide(true, getVentanas().get(3));
+			    getVentanas().get(1).setVisibleAndHide(true, getVentanas().get(3));
 			}
 			else
 				super.anteriorActionPerformed(anterior, siguiente, finalizar);
@@ -287,7 +284,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	 * Verifica que los archivos del directorio seleccionado son correctos
 	 * @return	True o false segun la verificacion
 	 */
-	Boolean verificarFicheros() {
+	boolean verificarFicheros() {
 		//comprobaci�n de la ruta de fichero de entrada.
 		String directorio = campoDirectorio.getText();
 		if (directorio == null || directorio.equals("")) {

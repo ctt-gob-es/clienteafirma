@@ -36,7 +36,7 @@ public class BotoneraInferior extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private Dimension dimensiones = new Dimension(603, 47);
 	private List<JDialogWizard> ventanas;
-	private Integer posicion;
+	private int posicion;
 
 	
 	public List<JDialogWizard> getVentanas() {
@@ -100,8 +100,8 @@ public class BotoneraInferior extends JPanel {
 		add(panelVacio);		
 		
     	// Boton anterior
-		 Integer paginas = this.ventanas.size() - 1;
-	     if (this.posicion.equals(0) || paginas.equals(this.posicion))
+		 int paginas = this.ventanas.size() - 1;
+	     if (this.posicion == 0 || paginas == this.posicion)
         	anterior.setEnabled(false);
         else {
         	 anterior.setMnemonic(KeyEvent.VK_A); //Mnem�nico para el bot�n de anterior
@@ -121,7 +121,7 @@ public class BotoneraInferior extends JPanel {
         add(anterior);
         
         // Boton siguiente
-        if (this.ventanas.size() == 1 || paginas.equals(this.posicion))
+        if (this.ventanas.size() == 1 || paginas == this.posicion)
         	siguiente.setVisible(false);
         else {
         	siguiente.setMnemonic(KeyEvent.VK_S); //Mnem�nico para el bot�n de siguiente
@@ -145,7 +145,7 @@ public class BotoneraInferior extends JPanel {
 		add(panelVacio);
         
         // Boton cancelar
-		if (paginas.equals(this.posicion))
+		if (paginas == this.posicion)
 			cancelar.setVisible(false);
         else {
         	cancelar.setMnemonic(KeyEvent.VK_C); //Mnem�nico para el bot�n de cancelar
@@ -164,9 +164,9 @@ public class BotoneraInferior extends JPanel {
         add(cancelar);
 
         // Boton finalizar
-        if (this.ventanas.size() == 1 || paginas.equals(this.posicion)) {
-        	 finalizar.setMnemonic(KeyEvent.VK_F); //Mnem�nico para el bot�n de finalizar
-        	finalizar.setVisible(true);
+        if (this.ventanas.size() == 1 || paginas == this.posicion) {
+            finalizar.setMnemonic(KeyEvent.VK_F); //Mnemonico para el boton de finalizar
+            finalizar.setVisible(true);
         } else 
         	finalizar.setVisible(false);
 
@@ -191,9 +191,9 @@ public class BotoneraInferior extends JPanel {
 	 * @param anterior 	Boton anterior
 	 */
 	protected void siguienteActionPerformed(JButton anterior, JButton siguiente, JButton finalizar) {
-		Integer indice = this.posicion + 1;
+		int indice = this.posicion + 1;
 		
-		//mantenemos el tamaño y posición de la ventana acutual en la ventana siguiente
+		// Mantenemos el tamano y posicion de la ventana acutual en la ventana siguiente
 		this.ventanas.get(this.posicion+1).setBounds(this.ventanas.get(this.posicion).getX(), this.ventanas.get(this.posicion).getY(), this.ventanas.get(this.posicion).getWidth(), this.ventanas.get(this.posicion).getHeight());
 		
 		this.ventanas.get(indice).setVisibleAndHide(true, this.ventanas.get(this.posicion));
@@ -208,10 +208,9 @@ public class BotoneraInferior extends JPanel {
 	protected void anteriorActionPerformed(JButton anterior, JButton siguiente, 
 			JButton finalizar) {
 		// Nos movemos al indice anterior
-		Integer indice = this.posicion - 1;
+		int indice = this.posicion - 1;
 		
-		//ventanas.get(posicion).dispose();
-		//mantenemos el tamaño y posición de la ventana acutual en la ventana anterior
+		// Mantenemos el tamano y posicion de la ventana actual en la ventana anterior
 		this.ventanas.get(this.posicion-1).setBounds(this.ventanas.get(this.posicion).getX(), this.ventanas.get(this.posicion).getY(), this.ventanas.get(this.posicion).getWidth(), this.ventanas.get(this.posicion).getHeight());
 		
 		this.ventanas.get(indice).setVisibleAndHide(true, this.ventanas.get(this.posicion));
