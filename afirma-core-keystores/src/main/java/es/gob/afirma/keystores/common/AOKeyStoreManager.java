@@ -12,6 +12,7 @@ package es.gob.afirma.keystores.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.security.KeyException;
@@ -19,6 +20,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.crypto.BadPaddingException;
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -62,7 +65,18 @@ public class AOKeyStoreManager {
         return this.ksType;
     }
     
-    private Vector<KeyStore> initPKCS11(final PasswordCallback pssCallBack, final Object[] params) throws AOException {
+    /**
+     * Inicializa un almacen PKCS#11.
+     * @param pssCallBack Callback para la recuperaci&oacute;n de la
+     *        contrase&ntilde;a del almac&eacute;n.
+     * @param params Parametros adicionales para la configuraci&oacute;n del
+     *        almac&eacute;n.
+     * @return Array con los almacenes configurados.
+     * @throws AOException Cuando ocurre un error durante la inicializaci&oacute;n.
+     * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
+     *         apertura del almac&eacute;n.
+     */
+    private Vector<KeyStore> initPKCS11(final PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
         
         // En el "params" debemos traer los parametros:
         // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
@@ -141,6 +155,13 @@ public class AOKeyStoreManager {
         catch (final AOCancelledOperationException e) {
             throw e;
         }
+        catch (IOException e) {
+            if (e.getCause() instanceof UnrecoverableKeyException ||
+                    e.getCause() instanceof BadPaddingException) {
+                throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+            }
+            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado", e); //$NON-NLS-1$
+        }
         catch (final Exception e) {
             Security.removeProvider(p11Provider.getName());
             p11Provider = null;
@@ -149,7 +170,6 @@ public class AOKeyStoreManager {
         final Vector<KeyStore> ret = new Vector<KeyStore>(1);
         ret.add(this.ks);
         return ret;
-        
     }
 
     /** Obtiene un almac&eacute;n de claves ya inicializado. Se encarga
@@ -170,9 +190,12 @@ public class AOKeyStoreManager {
      *         externos)
      * @throws AOException
      *         Cuando ocurre cualquier problema durante la
-     *         inicializaci&oacute;n */
-    public Vector<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException {
-
+     *         inicializaci&oacute;n 
+     * @throws IOException
+     *         Se ha insertado una contrase&ntilde;a incorrecta para la apertura del
+     *         almac&eacute;n de certificados.
+     */
+    public Vector<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
 
         final Vector<KeyStore> ret = new Vector<KeyStore>(1);
 
@@ -212,6 +235,13 @@ public class AOKeyStoreManager {
             catch (final AOCancelledOperationException e) {
                 throw e;
             }
+            catch (IOException e) {
+                if (e.getCause() instanceof UnrecoverableKeyException ||
+                        e.getCause() instanceof BadPaddingException) {
+                    throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+                }
+                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+            }
             catch (final Exception e) {
                 throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
             }
@@ -248,6 +278,13 @@ public class AOKeyStoreManager {
             catch (final AOCancelledOperationException e) {
                 throw e;
             }
+            catch (IOException e) {
+                if (e.getCause() instanceof UnrecoverableKeyException ||
+                        e.getCause() instanceof BadPaddingException) {
+                    throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+                }
+                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
+            }
             catch (final Exception e) {
                 throw new AOKeyStoreManagerException("No se ha podido abrir el almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
             }
@@ -282,6 +319,13 @@ public class AOKeyStoreManager {
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
+            }
+            catch (IOException e) {
+                if (e.getCause() instanceof UnrecoverableKeyException ||
+                        e.getCause() instanceof BadPaddingException) {
+                    throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+                }
+                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#12 / PFX solicitado", e); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$

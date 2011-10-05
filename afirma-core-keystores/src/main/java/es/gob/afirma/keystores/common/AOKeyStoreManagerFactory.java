@@ -13,7 +13,9 @@ package es.gob.afirma.keystores.common;
 import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 
 import javax.security.auth.callback.PasswordCallback;
 
@@ -52,13 +54,16 @@ public final class AOKeyStoreManagerFactory {
      *         Cuando el usuario cancela el proceso (por ejemplo, al
      *         introducir la contrase&ntilde;a)
      * @throws AOKeystoreAlternativeException
-     *         Cuando ocurre cualquier otro problema durante el proceso */
+     *         Cuando ocurre cualquier otro problema durante el proceso 
+     * @throws InvalidKeyException
+     *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
+     */
     public static AOKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
                                                          final String lib,
                                                          final String description,
                                                          final PasswordCallback pssCallback,
                                                          final Component parentComponent) throws AOCancelledOperationException,
-                                                                                         AOKeystoreAlternativeException {
+                                                                                         AOKeystoreAlternativeException, InvalidKeyException {
 
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 
@@ -112,6 +117,9 @@ public final class AOKeyStoreManagerFactory {
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
+            }
+            catch (final IOException e) {
+                throw new InvalidKeyException("La contrasena del almacen es incorrecta: " + e); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
