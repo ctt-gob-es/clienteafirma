@@ -37,9 +37,9 @@ import com.lowagie.text.pdf.PdfString;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
-import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF.
  * No firma (aun) PDF cifrados
@@ -83,11 +83,11 @@ public class PAdESTriPhaseSigner {
      * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles
      */
     public PAdESTriPhaseSigner() {
-        final String itextVersion = PAdESUtil.getITextVersion();
+        final String itextVersion = Platform.getITextVersion();
         if (!ITEXT_VERSION.equals(itextVersion)) {
             throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        final String bcVersion = SigUtils.getBouncyCastleVersion();
+        final String bcVersion = Platform.getBouncyCastleVersion();
         if (BC_VERSION.compareTo(bcVersion) > 0) {
             throw new UnsupportedOperationException("Se necesita BouncyCastle version igual o superior a " + BC_VERSION + ", pero se ha encontrado la version: " + bcVersion); //$NON-NLS-1$ //$NON-NLS-2$
         }
