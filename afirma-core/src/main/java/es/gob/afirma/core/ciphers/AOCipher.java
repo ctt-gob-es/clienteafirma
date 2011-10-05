@@ -10,6 +10,7 @@
 
 package es.gob.afirma.core.ciphers;
 
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
@@ -67,10 +68,13 @@ public interface AOCipher {
      * @return Datos descifrados.
      * @throws AOException
      *         Cuando ocurre un error durante la operaci&oacute;n
+     * @throws InvalidKeyException
+     *         Cuando la clave introducida no se corresponda a la utilizada
+     *         para el cifrado de los datos.
      * @throws KeyException
      *         Cuando la clave de cifrado introducida no es compatible con
      *         este algoritmo. */
-    byte[] decipher(byte[] data, AOCipherConfig algorithmConfig, Key decipherKey) throws AOException, KeyException;
+    byte[] decipher(byte[] data, AOCipherConfig algorithmConfig, Key decipherKey) throws AOException, InvalidKeyException, KeyException;
 
     /** Obtiene una clave para el algoritmo seleccionado a partir de su
      * codificaci&oacute;n. Seg&uacute;n el algoritmo puede ser necesario o no
@@ -82,9 +86,9 @@ public interface AOCipher {
      * @param params
      *        Par&aacute;metros adicionales.
      * @return Clave.
-     * @throws AOException
+     * @throws KeyException
      *         Cuando se produce un error al generar la clave. */
-    Key decodeKey(String base64Key, AOCipherConfig algorithmConfig, Object[] params) throws AOException;
+    Key decodeKey(String base64Key, AOCipherConfig algorithmConfig, Object[] params) throws KeyException;
 
     /** Obtiene una clave para el algoritmo seleccionado a partir de la
      * contrase&ntilde;a. Seg&uacute;n el algoritmo puede ser necesario o no el
