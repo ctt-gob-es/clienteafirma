@@ -171,7 +171,6 @@ public class PAdESTimestamper {
             response.validate(request);
         }
         catch (final Exception e) {
-            // TODO Auto-generated catch block
             throw new AOException("Error validando la respuesta de la TSA", e); //$NON-NLS-1$
         }
          final PKIFailureInfo failure = response.getFailInfo();
