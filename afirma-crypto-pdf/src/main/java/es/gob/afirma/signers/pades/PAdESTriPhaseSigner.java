@@ -39,6 +39,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
+import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF.
  * No firma (aun) PDF cifrados
@@ -71,6 +72,26 @@ import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * */
 public class PAdESTriPhaseSigner {
+    
+    /** Versi&oacute;n de iText necesaria para el uso de esta clase. */
+    public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
+    
+    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase. */
+    public static final String BC_VERSION = "1.46"; //$NON-NLS-1$
+    
+    /** Construye un firmador PAdES, comprobando que la versiones existentes de iText y Bouncycastle sean las adecuadas. 
+     * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles
+     */
+    public PAdESTriPhaseSigner() {
+        final String itextVersion = PAdESUtil.getITextVersion();
+        if (!ITEXT_VERSION.equals(itextVersion)) {
+            throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        final String bcVersion = SigUtils.getBouncyCastleVersion();
+        if (BC_VERSION.compareTo(bcVersion) > 0) {
+            throw new UnsupportedOperationException("Se necesita BouncyCastle version igual o superior a " + BC_VERSION + ", pero se ha encontrado la version: " + bcVersion); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+    }
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma");  //$NON-NLS-1$
     

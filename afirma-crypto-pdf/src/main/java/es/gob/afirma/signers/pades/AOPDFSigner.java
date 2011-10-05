@@ -59,6 +59,7 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
+import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Clase para la firma electr&oacute;nica de ficheros Adobe PDF.
  * <p>
@@ -115,11 +116,20 @@ public final class AOPDFSigner implements AOSigner {
     /** Versi&oacute;n de iText necesaria para el uso de esta clase. */
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
     
-    /** Construye un firmador PAdES, comprobando que la versi&oacute;n existente de iText sea la adecuada. */
+    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase. */
+    public static final String BC_VERSION = "1.46"; //$NON-NLS-1$
+    
+    /** Construye un firmador PAdES, comprobando que la versiones existentes de iText y Bouncycastle sean las adecuadas. 
+     * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles
+     */
     public AOPDFSigner() {
         final String itextVersion = PAdESUtil.getITextVersion();
         if (!ITEXT_VERSION.equals(itextVersion)) {
             throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        final String bcVersion = SigUtils.getBouncyCastleVersion();
+        if (BC_VERSION.compareTo(bcVersion) > 0) {
+            throw new UnsupportedOperationException("Se necesita BouncyCastle version igual o superior a " + BC_VERSION + ", pero se ha encontrado la version: " + bcVersion); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
     
