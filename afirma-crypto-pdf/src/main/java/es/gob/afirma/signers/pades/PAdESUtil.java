@@ -18,5 +18,9 @@ class PAdESUtil {
     static String getITextVersion() {
         return Document.getRelease();
     }
+    
+    public static void main(String args[]) throws Exception {
+        System.out.println(new java.io.File("%SystemRoot%").getCanonicalPath());
+    }
 
 }
