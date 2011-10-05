@@ -11,14 +11,17 @@
 package es.gob.afirma.core.misc;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.logging.Logger;
+
+import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 
 /** Clase para la identificaci&oacute;n de la plataforma Cliente y
  * extracci&oacute;n de datos relativos a la misma. */
 public final class Platform {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-    
+
     /** Sistema operativo. */
     public enum OS {
         /** Microsoft Windows. */
@@ -152,9 +155,9 @@ public final class Platform {
             initialized = true;
             final String jreVersion = System.getProperty("java.version"); //$NON-NLS-1$
             if (jreVersion.startsWith("1.0") || jreVersion.startsWith("1.1") //$NON-NLS-1$ //$NON-NLS-2$
-                || jreVersion.startsWith("1.2") //$NON-NLS-1$
-                || jreVersion.startsWith("1.3") //$NON-NLS-1$
-                || jreVersion.startsWith("1.4")) { //$NON-NLS-1$
+                    || jreVersion.startsWith("1.2") //$NON-NLS-1$
+                    || jreVersion.startsWith("1.3") //$NON-NLS-1$
+                    || jreVersion.startsWith("1.4")) { //$NON-NLS-1$
                 javaVersion = JREVER.J4;
             }
             else if (jreVersion.startsWith("1.5")) { //$NON-NLS-1$
@@ -318,5 +321,92 @@ public final class Platform {
         }
 
         return endorsedDir;
+    }
+
+    /**
+     * Obtiene la versi&oacute;n del iText en uso.
+     * @return Identificador de versi&oacute;n o {@code null} si no se pudo identificar.
+     */
+    public static String getITextVersion() {
+        try {
+            Class<?> documentClass = Class.forName("com.lowagie.text.Document"); //$NON-NLS-1$
+            Method getReleaseMethod = documentClass.getDeclaredMethod("getRelease"); //$NON-NLS-1$
+
+            return (String) getReleaseMethod.invoke(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Obtiene el directorio principal del sistema operativo del sistema.
+     * @return Directorio principal del sistema operativo */
+    private final static String getSystemRoot() {
+        if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
+            return File.separator;
+        }
+        String systemRoot = null;
+        final String defaultSystemRoot = "C:\\WINDOWS"; //$NON-NLS-1$
+        try {
+            systemRoot =
+                WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE,
+                        "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", //$NON-NLS-1$
+                "SystemRoot"); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            LOGGER
+            .severe("No se ha podido obtener el directorio principal de Windows accediendo al registro, " + "se probara con 'C:\\WINDOWS': " //$NON-NLS-1$ //$NON-NLS-2$
+                    + e);
+        }
+        if (systemRoot == null) {
+            final File winSys32 = new File(defaultSystemRoot + "\\SYSTEM32"); //$NON-NLS-1$
+            if (winSys32.exists() && winSys32.isDirectory()) {
+                return defaultSystemRoot;
+            }
+        }
+        if (systemRoot == null) {
+            LOGGER
+            .warning("No se ha encontrado el directorio ra&iacute;z del sistema, se devolver&aacute;: " + File.separator); //$NON-NLS-1$
+            systemRoot = File.separator;
+        }
+        return systemRoot;
+    }
+
+    /** Devuelve el directorio principal de bibliotecas del sistema. Importante:
+     * No funciona correctamente en Windows de 64 bits //FIXME
+     * @return Directorio principal de bibliotecas
+     */
+    public final static String getSystemLibDir() {
+        if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+            String systemRoot = getSystemRoot();
+            if (systemRoot == null) {
+                LOGGER
+                .warning("No se ha podido determinar el directorio de Windows accediendo al registro, " + "se establecera 'C:\\WINDOWS\\' por defecto"); //$NON-NLS-1$ //$NON-NLS-2$
+                systemRoot = "c:\\windows\\"; //$NON-NLS-1$
+            }
+            if (!systemRoot.endsWith("\\")) { //$NON-NLS-1$
+                systemRoot += "\\"; //$NON-NLS-1$
+            }
+            return systemRoot + "System32"; //$NON-NLS-1$
+        }
+        return "/usr/lib"; //$NON-NLS-1$
+    }
+
+    /** Obtiene la versi&oacute; de BouncyCastle en uso.
+     * @return Versi&oacute; del BouncyCastle encontrado primero en el BootClassPath
+     * o en el ClassPath. Si no se puede recuperar se devuelve {@code null}. 
+     */
+    public static String getBouncyCastleVersion() {
+
+        try {
+            Class<?> BouncyCastleProviderClass = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
+            Object bouncyCastleProviderObject = BouncyCastleProviderClass.newInstance();
+
+            Class<?> ProviderClass = Class.forName("java.security.Provider"); //$NON-NLS-1$
+            Method getVersionMethod = ProviderClass.getDeclaredMethod("getVersion"); //$NON-NLS-1$
+
+            return ((Double) getVersionMethod.invoke(bouncyCastleProviderObject)).toString();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

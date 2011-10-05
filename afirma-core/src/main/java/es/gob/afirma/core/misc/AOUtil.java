@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 
 /** M&eacute;todos generales de utilidad para toda la aplicaci&oacute;n.
  * @version 0.3 */
@@ -203,57 +202,7 @@ public final class AOUtil {
         return baos.toByteArray();
     }
 
-    /** Obtiene el directorio principal del sistema operativo del sistema.
-     * @return Directorio principal del sistema operativo */
-    private final static String getSystemRoot() {
-        if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
-            return File.separator;
-        }
-        String systemRoot = null;
-        final String defaultSystemRoot = "C:\\WINDOWS"; //$NON-NLS-1$
-        try {
-            systemRoot =
-                    WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_LOCAL_MACHINE,
-                                                 "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", //$NON-NLS-1$
-                                                 "SystemRoot"); //$NON-NLS-1$
-        }
-        catch (final Exception e) {
-            LOGGER
-                  .severe("No se ha podido obtener el directorio principal de Windows accediendo al registro, " + "se probara con 'C:\\WINDOWS': " //$NON-NLS-1$ //$NON-NLS-2$
-                          + e);
-        }
-        if (systemRoot == null) {
-            final File winSys32 = new File(defaultSystemRoot + "\\SYSTEM32"); //$NON-NLS-1$
-            if (winSys32.exists() && winSys32.isDirectory()) {
-                return defaultSystemRoot;
-            }
-        }
-        if (systemRoot == null) {
-            LOGGER
-                  .warning("No se ha encontrado el directorio ra&iacute;z del sistema, se devolver&aacute;: " + File.separator); //$NON-NLS-1$
-            systemRoot = File.separator;
-        }
-        return systemRoot;
-    }
-
-    /** Devuelve el directorio principal de bibliotecas del sistema. Importante:
-     * No funciona correctamente en Windows de 64 bits //FIXME
-     * @return Directorio principal de bibliotecas */
-    public final static String getSystemLibDir() {
-        if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-            String systemRoot = AOUtil.getSystemRoot();
-            if (systemRoot == null) {
-                LOGGER
-                      .warning("No se ha podido determinar el directorio de Windows accediendo al registro, " + "se establecera 'C:\\WINDOWS\\' por defecto"); //$NON-NLS-1$ //$NON-NLS-2$
-                systemRoot = "c:\\windows\\"; //$NON-NLS-1$
-            }
-            if (!systemRoot.endsWith("\\")) { //$NON-NLS-1$
-                systemRoot += "\\"; //$NON-NLS-1$
-            }
-            return systemRoot + "System32"; //$NON-NLS-1$
-        }
-        return "/usr/lib"; //$NON-NLS-1$
-    }
+    
 
     /** Obtiene el nombre com&uacute;n (Common Name, CN) del titular de un
      * certificado X.509. Si no se encuentra el CN, se devuelve la unidad organizativa
