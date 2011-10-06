@@ -69,7 +69,7 @@ public final class KeyStoreUtilities {
         // Si la biblioteca no existe directamente es que viene sin Path
         // Mozilla devuelve las bibliotecas sin Path
         if (!new java.io.File(lib).exists()) {
-            String sysLibDir = AOUtil.getSystemLibDir();
+            String sysLibDir = Platform.getSystemLibDir();
             if (!sysLibDir.endsWith(java.io.File.separator)) {
                 sysLibDir += java.io.File.separator;
             }
@@ -569,7 +569,7 @@ public final class KeyStoreUtilities {
     
     static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final String lib = AOUtil.getSystemLibDir();
+            final String lib = Platform.getSystemLibDir();
             if (new File(lib + "\\UsrPkcs11.dll").exists()) { //$NON-NLS-1$
                 return lib + "\\UsrPkcs11.dll";  //$NON-NLS-1$
             }

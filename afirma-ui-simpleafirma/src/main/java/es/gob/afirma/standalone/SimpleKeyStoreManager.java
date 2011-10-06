@@ -15,7 +15,6 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
@@ -35,7 +34,7 @@ final class SimpleKeyStoreManager {
 
     private static String getPKCS11DNIeLib() throws AOKeyStoreManagerException {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            final String lib = AOUtil.getSystemLibDir();
+            final String lib = Platform.getSystemLibDir();
             if (new File(lib + "\\UsrPkcs11.dll").exists()) { //$NON-NLS-1$
                 return lib + "\\UsrPkcs11.dll";  //$NON-NLS-1$
             }
