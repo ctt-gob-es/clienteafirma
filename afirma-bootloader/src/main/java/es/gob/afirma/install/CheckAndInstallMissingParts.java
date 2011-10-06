@@ -97,16 +97,21 @@ final class CheckAndInstallMissingParts {
      * @throws IOException Si ocurre un error de entrada/salida */
     void installSunMSCAPI() throws IOException, URISyntaxException {
         // Copiamos el JAR de SunMSCAPI en el directorio de extensiones del JRE
-        AOInstallUtils.installFile(AOBootUtil.createURLFile(this.installFilesCodeBase, "sunmscapi.jar"), //$NON-NLS-1$
-                                   new File(BootPlatform.getJavaHome() + File.separator
-                                            + "lib" + File.separator + "ext" + File.separator + "sunmscapi.jar"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                            SigningCert.SUN);
+        AOInstallUtils.installFile(
+           AOBootUtil.createURLFile(this.installFilesCodeBase, "sunmscapi.jar"), //$NON-NLS-1$
+           new File(BootPlatform.getJavaExtDir() + File.separator + "sunmscapi.jar"), //$NON-NLS-1$
+           SigningCert.SUN
+        );
 
         // Descomprimimos las DLL de SunMSCAPI en el directorio de binarios del JRE
-        AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase,
-                                                           "mscapi_" + BootPlatform.getOsArch() + "_JRE" + BootPlatform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        ), new File(BootPlatform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
-        SigningCert.INTEGRATOR);
+        AOInstallUtils.installZip(
+              AOBootUtil.createURLFile(
+                   this.installFilesCodeBase,
+                   "mscapi_" + BootPlatform.getOsArch() + "_JRE" + BootPlatform.getJavaArch() + ".zip" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+              ), 
+              new File(BootPlatform.getJavaHome() + File.separator + "bin"), //$NON-NLS-1$
+              SigningCert.INTEGRATOR
+        );
     }
 
     /** Instala el proveedor de seguridad SunPKCS11.
@@ -115,10 +120,11 @@ final class CheckAndInstallMissingParts {
      * @throws IOException Si ocurre un error de entrada/salida */
     void installSunPKCS11() throws IOException, URISyntaxException {
         // Copiamos el JAR de SunPKCS11 en el directorio de extensiones del JRE
-        AOInstallUtils.installFile(AOBootUtil.createURLFile(this.installFilesCodeBase, "sunpkcs11.jar"), //$NON-NLS-1$
-                                   new File(BootPlatform.getJavaHome() + File.separator
-                                            + "lib" + File.separator + "ext" + File.separator + "sunpkcs11.jar"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                                            SigningCert.SUN);
+        AOInstallUtils.installFile(
+           AOBootUtil.createURLFile(this.installFilesCodeBase, "sunpkcs11.jar"), //$NON-NLS-1$
+           new File(BootPlatform.getJavaExtDir() + File.separator + "sunpkcs11.jar"), //$NON-NLS-1$
+           SigningCert.SUN
+        );
 
         // Descomprimimos las DLL de SunPKCS11 en el directorio de binarios del JRE
         AOInstallUtils.installZip(AOBootUtil.createURLFile(this.installFilesCodeBase,
