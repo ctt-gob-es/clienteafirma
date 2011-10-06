@@ -9,6 +9,8 @@ import javax.swing.Icon;
 import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 
+import es.gob.afirma.ui.utils.GeneralConfig;
+
 /**
  * ToggleButton cuyo aspecto viene dado por una imagen. La imagen puede cambiar seg&uacute;n
  * este seleccionado o no el bot&oacute;n.
@@ -227,7 +229,7 @@ public class ToggleImageButton extends JToggleButton {
     
     @Override
     protected void paintComponent(Graphics g) {
-        if (this.isEnabled() && (this.mouseOver || this.isFocusOwner())) {
+        if ((this.isEnabled() && (this.mouseOver || this.isFocusOwner()))|| GeneralConfig.isHighContrast()) {
             super.paintComponent(g);
         }
     }
