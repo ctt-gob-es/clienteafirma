@@ -235,10 +235,6 @@ public final class AOKeyStoreManagerFactory {
         throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "La plataforma de navegador '" + store.getDescription() //$NON-NLS-1$
                                                                                   + "' mas sistema operativo '" //$NON-NLS-1$
                                                                                   + Platform.getOS()
-                                                                                  + " (" //$NON-NLS-1$
-                                                                                  + Platform.getOsVersion()
-                                                                                  + ")' mas Java '" //$NON-NLS-1$
-                                                                                  + Platform.getJavaVersion()
                                                                                   + "' no esta soportada"); //$NON-NLS-1$
     }
 
