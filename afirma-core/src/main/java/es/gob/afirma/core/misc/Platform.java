@@ -66,202 +66,118 @@ public final class Platform {
         J7
     }
 
-    /** Directorio endorsed de la distribuci&oacute;n Java. */
-    private static String endorsedDir = null;
-
     /** Sistema operativo. */
-    private static OS os;
-
-    /** Versi&oacute;n del sistema operativo. */
-    private static String osVersion;
-
-    /** Versi&oacute;n de la m&eacute;quina virtual de java. */
-    private static JREVER javaVersion;
+    private static OS os = null;
 
     /** Arquitectura de la m&eacute;quina virtual java. */
-    private static String javaArch;
-
-    /** Arquitectura del sistema operativo. */
-    private static String osArch;
+    private static String javaArch = null;
 
     /** Directorio de Java. */
-    private static String javaHome;
+    private static String javaHome = null;
 
     /** Directorio de bibliotecas de Java. */
-    private static String javaLibraryPath;
+    private static String javaLibraryPath = null;
 
     /** Directorio del usuario. */
-    private static String userHome;
-
-    /** Navegador web. */
-    private static BROWSER browser = BROWSER.OTHER;
-
-    /** Indica si est&aacute; inicializada la clase. */
-    private static boolean initialized = false;
+    private static String userHome = null;
 
     /** Constructor bloqueado. */
     private Platform() {
         // No permitimos la instanciacion
     }
 
-    /*
-     * Se realiza una inicializacion automatica con las propiedades de la
-     * plataforma. Si falla la incializacion automatica el usuario debera
-     * reintentarlo manualmente. Esto puede ocurrir, por ejemplo, en applets en
-     * donde no se controlan los priilegios.
-     */
-    static {
-        init();
-    }
+    private static OS recoverOsName() {
+        
+        final String osName = System.getProperty("os.name"); //$NON-NLS-1$
 
-    /** Fuerza la identificaci&oacute;n de la plataforma. Inicializa los valores
-     * que pueden reconocerse sin informacion adicional, como el sistema
-     * operativo y la versi&oacute;n de Java. Se agrupan las inicializaciones
-     * aqu&iacute; para poder llamarlo desde un <code>privilegedAction</code> */
-    public static void init() {
-        try {
-            osVersion = System.getProperty("os.version"); //$NON-NLS-1$
-            userHome = System.getProperty("user.home"); //$NON-NLS-1$
-            javaLibraryPath = System.getProperty("java.library.path"); //$NON-NLS-1$
-            final String osName = System.getProperty("os.name"); //$NON-NLS-1$
-
-            if (osName.contains("indows")) { //$NON-NLS-1$
-                os = OS.WINDOWS;
-            }
-            else if (osName.contains("inux")) { //$NON-NLS-1$
-                if ("Dalvik".equals(System.getProperty("java.vm.name"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    os = OS.ANDROID;
-                }
-                else {
-                    os = OS.LINUX;
-                }
-            }
-            else if (osName.contains("SunOS") || osName.contains("olaris")) { //$NON-NLS-1$ //$NON-NLS-2$
-                os = OS.SOLARIS;
-            }
-            else if (osName.startsWith("Mac OS X")) { //$NON-NLS-1$
-                os = OS.MACOSX;
-            }
-            else {
-                os = OS.OTHER;
-                LOGGER.warning("No se ha podido determinar el sistema operativo"); //$NON-NLS-1$
-            }
-
-            javaArch = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
-            if (javaArch == null) {
-                javaArch = System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
-            }
-            javaHome = recoverJavaHome();
-            initialized = true;
-            final String jreVersion = System.getProperty("java.version"); //$NON-NLS-1$
-            if (jreVersion.startsWith("1.0") || jreVersion.startsWith("1.1") //$NON-NLS-1$ //$NON-NLS-2$
-                    || jreVersion.startsWith("1.2") //$NON-NLS-1$
-                    || jreVersion.startsWith("1.3") //$NON-NLS-1$
-                    || jreVersion.startsWith("1.4")) { //$NON-NLS-1$
-                javaVersion = JREVER.J4;
-            }
-            else if (jreVersion.startsWith("1.5")) { //$NON-NLS-1$
-                javaVersion = JREVER.J5;
-            }
-            else if (jreVersion.startsWith("1.6")) { //$NON-NLS-1$
-                javaVersion = JREVER.J6;
-            }
-            else {
-                javaVersion = JREVER.J7;
-            }
-            osArch = System.getProperty("os.arch"); //$NON-NLS-1$
+        if (osName.contains("indows")) { //$NON-NLS-1$
+            return OS.WINDOWS;
         }
-        catch (final Exception e) {
-            initialized = false;
+        else if (osName.contains("inux")) { //$NON-NLS-1$
+            if ("Dalvik".equals(System.getProperty("java.vm.name"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                return OS.ANDROID;
+            }
+            return OS.LINUX;
         }
+        else if (osName.contains("SunOS") || osName.contains("olaris")) { //$NON-NLS-1$ //$NON-NLS-2$
+            return OS.SOLARIS;
+        }
+        else if (osName.startsWith("Mac OS X")) { //$NON-NLS-1$
+            return OS.MACOSX;
+        }
+        else {
+            LOGGER.warning("No se ha podido determinar el sistema operativo"); //$NON-NLS-1$
+            return OS.OTHER;
+        }
+        
     }
-
-    /** Indica si la instancia est&aacute;tica est&aacute; inicializada.
-     * @return <code>true</code> si si la instancia est&aacute;tica est&aacute;
-     *         inicializada, <code>false</code> en caso contrario */
-    public static boolean isInitialized() {
-        return initialized;
-    }
-
+    
     /** Recupera el navegador web actual.
-     * @return Navegador web desde el que se realiza la ejecuci&oacute;n o {@code null} si no se realiza desde un navegador. */
-    public static BROWSER getBrowser() {
-        return browser;
-    }
-
-    /** Establece el UserAgent del navegador desde el que se carga el applet.
-     * @param userAgent
-     *        UserAgent del aplicativo de acceso. */
-    public static void setUserAgent(final String userAgent) {
-
+     * @param userAgent <i>UserAgent</i> del navegador Web
+     * @return Navegador web correspondiente al UserAgent indicado. */
+    public static BROWSER getBrowser(final String userAgent) {
         if (userAgent == null) {
-            browser = BROWSER.OTHER;
+            return BROWSER.OTHER;
         }
         else if (userAgent.toLowerCase().contains("msie")) { //$NON-NLS-1$
-            browser = BROWSER.INTERNET_EXPLORER;
+            return BROWSER.INTERNET_EXPLORER;
         }
         else if (userAgent.toLowerCase().contains("firefox")) { //$NON-NLS-1$
-            browser = BROWSER.FIREFOX;
+            return BROWSER.FIREFOX;
         }
         else if (userAgent.toLowerCase().contains("chrome")) { //$NON-NLS-1$
-            browser = BROWSER.CHROME;
+            return BROWSER.CHROME;
         }
         else if (userAgent.toLowerCase().contains("safari")) { //$NON-NLS-1$
             // CUIDADO: Chrome incluye la cadena "safari" como parte de su
             // UserAgent
-            browser = BROWSER.SAFARI;
+            return BROWSER.SAFARI;
         }
         else if (userAgent.toLowerCase().contains("opera")) { //$NON-NLS-1$
-            browser = BROWSER.OPERA;
+            return BROWSER.OPERA;
         }
         else { // Cualquier otro navegador
-            browser = BROWSER.OTHER;
+            return BROWSER.OTHER;
         }
     }
 
     /** Recupera el sistema operativo de ejecuci&oacute;n.
      * @return Sistema operativo actual. */
     public static Platform.OS getOS() {
+        if (os == null) {
+            os = recoverOsName();
+        }
         return os;
-    }
-
-    /** Recupera la versi&oacute; del n&uacute;cleo del sistema operativo
-     * seg&uacute;n las propiedades de Java.
-     * @return Versi&oacute;n del sistema operativo actual. */
-    public static String getOsVersion() {
-        return osVersion;
-    }
-
-    /** Recupera la arquitectura del sistema operativo seg&uacute;n las
-     * propiedades de Java.
-     * @return Arquitectura del sistema operativo actual. */
-    public static String getOsArch() {
-        return osArch;
-    }
-
-    /** Recupera la versi&oacute;n de la JVM en ejecuci&oacute;n seg&uacute;n las
-     * propiedades de Java.
-     * @return Versi&oacute;n de la JVM. */
-    public static JREVER getJavaVersion() {
-        return javaVersion;
     }
 
     /** Recupera la arquitectura de la JVM en ejecuci&oacute;n seg&uacute;n las
      * propiedades de Java.
      * @return Arquitectura de la JVM. */
     public static String getJavaArch() {
+        if (javaArch == null) {
+            javaArch = System.getProperty("sun.arch.data.model"); //$NON-NLS-1$
+            if (javaArch == null) {
+                javaArch = System.getProperty("com.ibm.vm.bitmode"); //$NON-NLS-1$
+            }
+        }
         return javaArch;
     }
 
     /** Recupera la ruta del directorio de instalaci&oacute;n de Java.
      * @return Ruta del directorio de instalaci&oacute;n de Java. */
     public static String getJavaHome() {
+        if (javaHome == null) {
+            javaHome = recoverJavaHome();
+        }
         return javaHome;
     }
 
     /** Recupera la propiedad Path de Java.
      * @return Propiedad en el Path de Java. */
     public static String getJavaLibraryPath() {
+        if (javaLibraryPath == null) {
+            javaLibraryPath = System.getProperty("java.library.path"); //$NON-NLS-1$
+        }
         return javaLibraryPath;
     }
 
@@ -269,6 +185,9 @@ public final class Platform {
      * operativo.
      * @return Ruta del directorio del usuario. */
     public static String getUserHome() {
+        if (userHome == null) {
+            userHome = System.getProperty("user.home"); //$NON-NLS-1$
+        }
         return userHome;
     }
 
@@ -298,35 +217,8 @@ public final class Platform {
         return null;
     }
 
-    /** Recupera el directorio "endorsed" de la JRE usada para la
-     * instalaci&oacute;n o <code>null</code> si no se pudo determinar
-     * ning&uacute;n directorio.
-     * @return Directorio "endorsed". */
-    public static String getEndorsedDir() {
-
-        if (endorsedDir != null) {
-            return endorsedDir;
-        }
-
-        final String endorsedDirsString = System.getProperty("java.endorsed.dirs"); //$NON-NLS-1$
-        String[] endorsedDirs;
-        if (endorsedDirsString != null && (endorsedDirs = endorsedDirsString.split(System.getProperty("path.separator"))).length > 0) { //$NON-NLS-1$
-            endorsedDir = endorsedDirs[0];
-        }
-
-        // Si no se ha asignado, acudimos al directorio por defecto
-        // ($JAVA_HOME/lib/endorsed)
-        if (endorsedDir == null) {
-            endorsedDir = getJavaHome() + File.separator + "lib" + File.separator + "endorsed"; //$NON-NLS-1$ //$NON-NLS-2$
-        }
-
-        return endorsedDir;
-    }
-
-    /**
-     * Obtiene la versi&oacute;n del iText en uso.
-     * @return Identificador de versi&oacute;n o {@code null} si no se pudo identificar.
-     */
+    /** Obtiene la versi&oacute;n del iText en uso.
+     * @return Identificador de versi&oacute;n o {@code null} si no se pudo identificar */
     public static String getITextVersion() {
         try {
             Class<?> documentClass = Class.forName("com.lowagie.text.Document"); //$NON-NLS-1$
@@ -379,8 +271,7 @@ public final class Platform {
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             String systemRoot = getSystemRoot();
             if (systemRoot == null) {
-                LOGGER
-                .warning("No se ha podido determinar el directorio de Windows accediendo al registro, " + "se establecera 'C:\\WINDOWS\\' por defecto"); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER .warning("No se ha podido determinar el directorio de Windows accediendo al registro, se usara 'C:\\WINDOWS\\'"); //$NON-NLS-1$ 
                 systemRoot = "c:\\windows\\"; //$NON-NLS-1$
             }
             if (!systemRoot.endsWith("\\")) { //$NON-NLS-1$
@@ -393,8 +284,7 @@ public final class Platform {
 
     /** Obtiene la versi&oacute; de BouncyCastle en uso.
      * @return Versi&oacute; del BouncyCastle encontrado primero en el BootClassPath
-     * o en el ClassPath. Si no se puede recuperar se devuelve {@code null}. 
-     */
+     * o en el ClassPath. Si no se puede recuperar se devuelve {@code null} */
     public static String getBouncyCastleVersion() {
 
         try {
@@ -409,4 +299,43 @@ public final class Platform {
             return null;
         }
     }
+
+    /** Obtiene el directorio de extensiones del entorno de ejecuci&oacute;n de Java en uso.
+     * @return Directorio de extensiones del JRE o {@code null} si no se pudo identificar */
+    public static String getJavaExtDir() {
+        final File extDir = new File(getJavaHome() + (getJavaHome().endsWith(File.separator) ? "" : File.separator) + "lib" + File.separator + "ext"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        if (extDir.exists() && extDir.isDirectory()) {
+            return extDir.getAbsolutePath();
+        }
+        return null;
+    }
+    
+    /** Obtiene el directorio global de extensiones de Java.
+     * @return Directorio de extensiones Java del sistema o {@code null} si no se pudo identificar o no existe */
+    public static String getSystemJavaExtDir() {
+        final File systemExtDir;
+        switch (getOS()) {
+            case WINDOWS:
+                systemExtDir = new File(getSystemRoot() + (getSystemRoot().endsWith(File.separator) ? "" : File.separator) + "Sun\\Java\\lib\\ext"); //$NON-NLS-1$ //$NON-NLS-2$
+                break;
+            case SOLARIS:
+                systemExtDir = new File("/usr/jdk/packages/lib/ext"); //$NON-NLS-1$
+                break;
+            case LINUX:
+                systemExtDir = new File("/usr/java/packages/lib/ext"); //$NON-NLS-1$
+                break;
+            case MACOSX:
+                systemExtDir = new File("/Library/Java/Extensions"); //$NON-NLS-1$
+                break;
+            default:
+                LOGGER.warning("No se soporta el sistema operativo '" + getOS() + "' para la obtencion del directorio blobal de extensiones Java, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
+                return null;
+        }
+        if (systemExtDir.exists() && systemExtDir.isDirectory()) {
+            return systemExtDir.getAbsolutePath();
+        }
+        LOGGER.info("El directorio blobal de extensiones Java no esta creado, se devolvera null"); //$NON-NLS-1$
+        return null;
+    }
+
 }
