@@ -53,6 +53,7 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
@@ -375,8 +376,12 @@ public class Firma extends JPanel {
                         this
                 );
             } catch (InvalidKeyException e) {
+            	//Control de la excepción generada al introducir mal la contraseña para el almacén
                 JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
+            }  catch (AOKeystoreAlternativeException e) {
+            	 JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+                 return;
             }
 
             // Seleccionamos un certificado
@@ -392,7 +397,9 @@ public class Firma extends JPanel {
                 privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, this));
             }
             catch (KeyException e) {
-                throw e;
+            	//Control de la excepción generada al introducir mal la contraseña para el certificado
+                JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+                return;
             }
             catch (AOCancelledOperationException e) {
                 // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
