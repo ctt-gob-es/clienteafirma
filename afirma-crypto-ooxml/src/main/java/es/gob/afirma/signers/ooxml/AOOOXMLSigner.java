@@ -12,7 +12,6 @@ package es.gob.afirma.signers.ooxml;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.security.AccessController;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Security;
 import java.security.cert.Certificate;
@@ -31,7 +30,6 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.OfficeXMLAnalizer;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
@@ -47,22 +45,15 @@ public final class AOOOXMLSigner implements AOSigner {
     
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    // En Java 5 es necesario disponer del proveedor XMLDSigRI para generar
-    // firmas XMLdSig
     static {
-        AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-            public Void run() {
-                if (Platform.getJavaVersion().equals(Platform.JREVER.J5)) {
-                    try {
-                        Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
-                    }
-                    catch (final Exception e) {
-                        LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
-                    }
-                }
-                return null;
+        if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
+            try {
+                Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
             }
-        });
+            catch (final Exception e) {
+                LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
+            }
+        }
     }
 
     public byte[] getData(final byte[] sign) throws AOInvalidFormatException, AOException {
