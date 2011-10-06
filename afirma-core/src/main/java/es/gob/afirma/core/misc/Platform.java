@@ -316,7 +316,7 @@ public final class Platform {
         final File systemExtDir;
         switch (getOS()) {
             case WINDOWS:
-                systemExtDir = new File(getSystemRoot() + (getSystemRoot().endsWith(File.separator) ? "" : File.separator) + "Sun\\Java\\lib\\ext"); //$NON-NLS-1$ //$NON-NLS-2$
+                systemExtDir = new File(getSystemRoot() + (getSystemRoot().endsWith("\\") ? "" : "\\") + "Sun\\Java\\lib\\ext"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
                 break;
             case SOLARIS:
                 systemExtDir = new File("/usr/jdk/packages/lib/ext"); //$NON-NLS-1$
@@ -328,7 +328,7 @@ public final class Platform {
                 systemExtDir = new File("/Library/Java/Extensions"); //$NON-NLS-1$
                 break;
             default:
-                LOGGER.warning("No se soporta el sistema operativo '" + getOS() + "' para la obtencion del directorio blobal de extensiones Java, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
+                LOGGER.warning("No se soporta el sistema operativo '" + getOS() + "' para la obtencion del directorio global de extensiones Java, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
                 return null;
         }
         if (systemExtDir.exists() && systemExtDir.isDirectory()) {
