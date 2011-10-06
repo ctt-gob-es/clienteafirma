@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.security.AccessController;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
@@ -72,7 +71,6 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
@@ -217,19 +215,14 @@ public final class AOXMLDSigSigner implements AOSigner {
     private Document doc;
 
     static {
-        AccessController.doPrivileged(new java.security.PrivilegedAction<Void>() {
-            public Void run() {
-                if (Platform.getJavaVersion().equals(Platform.JREVER.J5)) {
-                    try {
-                        Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
-                    }
-                    catch (final Exception e) {
-                        LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
-                    }
-                }
-                return null;
+        if (Security.getProvider("XMLDSig") == null) { //$NON-NLS-1$
+            try {
+                Security.addProvider(new org.jcp.xml.dsig.internal.dom.XMLDSigRI());
             }
-        });
+            catch (final Exception e) {
+                LOGGER.warning("No se ha podido agregar el proveedor de firma XMLDSig necesario para firmas XML: " + e); //$NON-NLS-1$
+            }
+        }
     }
 
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
