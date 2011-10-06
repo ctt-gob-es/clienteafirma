@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.X509Certificate;
@@ -51,6 +52,7 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.GeneralConfig;
@@ -336,7 +338,15 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		} catch (AOCancelledOperationException e) {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
-		} catch (Exception e) {
+		}catch (InvalidKeyException e) {
+			//Control de la excepción generada al introducir mal la contraseña para el almacén
+            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }  catch (AOKeystoreAlternativeException e) {
+        	//Control de la excepción generada al introducir una contraseña vacía para el almacén
+        	 JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+             return;
+        } catch (Exception e) {
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.almacen"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -376,7 +386,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		if (!listaCertificadosRe.isEmpty())
 			try {
 				privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(),kconf);
-			} catch(AOException e){
+			} 
+	       	catch (KeyException e) {
+	       		//Control de la excepción generada al introducir mal la contraseña para el certificado
+	            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }catch(AOException e){
 	    		logger.warning("Error al obtener la clave del certificado: "+e);
 	    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.clave"), 
 	    				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -567,7 +582,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * @throws AOException
 	 */
 	private PrivateKeyEntry getPrivateKeyEntry(AOKeyStoreManager keyStoreManager, String seleccionado, 
-			KeyStoreConfiguration kconf) throws AOException {
+			KeyStoreConfiguration kconf) throws AOException, KeyException {
 
 		// Comprobamos si se ha cancelado la seleccion
 		if (seleccionado == null) 
@@ -578,7 +593,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		try {
 			privateKeyEntry = keyStoreManager.getKeyEntry(seleccionado, KeyStoreUtilities.getCertificatePC(kconf.getType(), this));
 		} catch (KeyException e) {
-			throw new AOException("Ocurrio un error al extraer la la clave del certificado", e);
+			throw new KeyException("Ocurrio un error al extraer la clave del certificado", e);
 		} catch (AOCancelledOperationException e) {
 			// Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
 			// Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones

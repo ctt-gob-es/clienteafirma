@@ -18,6 +18,7 @@ import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -39,6 +40,7 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
@@ -275,7 +277,15 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		} catch (AOCancelledOperationException e) {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
-		} catch (Exception e) {
+		} catch (InvalidKeyException e) {
+			//Control de la excepción generada al introducir mal la contraseña para el almacén
+            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }  catch (AOKeystoreAlternativeException e) {
+        	//Control de la excepción generada al introducir una contraseña vacía para el almacén
+        	 JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+             return;
+        }catch (Exception e) {
 		    e.printStackTrace();
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.abrir.almacen"), 
