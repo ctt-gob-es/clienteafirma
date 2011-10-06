@@ -215,9 +215,11 @@ final class BootPlatform {
     /** Obtiene el directorio de extensiones del entorno de ejecuci&oacute;n de Java en uso.
      * @return Directorio de extensiones del JRE o {@code null} si no se pudo identificar */
     static String getJavaExtDir() {
-        final File extDir = new File(getJavaHome() + (getJavaHome().endsWith(File.separator) ? "" : File.separator) + "lib" + File.separator + "ext"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        if (extDir.exists() && extDir.isDirectory()) {
-            javaExtDir = extDir.getAbsolutePath();
+        if (javaExtDir == null) {
+            final File extDir = new File(getJavaHome() + (getJavaHome().endsWith(File.separator) ? "" : File.separator) + "lib" + File.separator + "ext"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            if (extDir.exists() && extDir.isDirectory()) {
+                javaExtDir = extDir.getAbsolutePath();
+            }
         }
         return javaExtDir;
     }
