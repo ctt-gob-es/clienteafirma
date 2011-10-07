@@ -161,6 +161,7 @@ public class Opciones extends JAccessibilityDialog {
         
         accessibilityOptions.loadConfig(GeneralConfig.getConfig());
         Utils.setContrastColor(mainPanel);
+        Utils.setFontBold(mainPanel); //Control letra en negrita
         
         // Definicion de mnemonicos.
         int tabNum = 0;
