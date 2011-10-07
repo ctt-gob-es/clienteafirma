@@ -21,14 +21,12 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.InfoLabel;
-import es.gob.afirma.ui.utils.JAccessibilityFrame;
 import es.gob.afirma.ui.utils.JAccessibilityFrameAbout;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -119,6 +117,9 @@ public class Acercade extends JAccessibilityFrameAbout {
 			}
 		});
 		Utils.setContrastColor(aceptar);
+		Utils.setFontBold(aceptar);
+		Utils.remarcar(aceptar);
+		
 		getContentPane().add(aceptar, c);
 	}
 
