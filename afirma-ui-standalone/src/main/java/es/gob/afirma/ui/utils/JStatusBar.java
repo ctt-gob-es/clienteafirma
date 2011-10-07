@@ -11,6 +11,7 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.io.Serializable;
 
 import javax.swing.BorderFactory;
@@ -64,6 +65,14 @@ import javax.swing.JLabel;
 	  */
 	 public void setStatus(String status) {
 		 JLabel lb = (JLabel) getComponent(0);
+		 //Control de texto en negrita para la barra de estado
+		 if (GeneralConfig.isFontBold()) {
+			 //Se pone el texto en negrita
+			 lb.setFont(new Font(lb.getFont().getName(),Font.BOLD , lb.getFont().getSize()));
+		 } else {
+			 //Se pone el texto en estilo normal
+			 lb.setFont(new Font(lb.getFont().getName(),Font.PLAIN, lb.getFont().getSize()));
+		 }
 		 lb.setText(status);
 	 }
 
