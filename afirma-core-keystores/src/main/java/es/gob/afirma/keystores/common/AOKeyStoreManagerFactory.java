@@ -220,8 +220,14 @@ public final class AOKeyStoreManagerFactory {
         // donde se necesitaba)
         // http://developer.apple.com/technotes/tn2002/tn2110.html
         else if (Platform.getOS().equals(Platform.OS.MACOSX) && store == AOKeyStore.APPLE) {
+            // En Mac OS X podemos inicializar un KeyChain en un fichero particular o el "defecto del sistema"
             try {
-                ksm.init(store, null, new NullPasswordCallback(), null);
+                ksm.init(
+                     store, 
+                     (lib == null || "".equals(lib)) ? null : new FileInputStream(lib),  //$NON-NLS-1$
+                     new NullPasswordCallback(), 
+                     null
+                );
             }
             catch (final AOCancelledOperationException e) {
                 throw e;
