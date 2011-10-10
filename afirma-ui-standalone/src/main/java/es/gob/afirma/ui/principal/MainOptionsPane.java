@@ -2,6 +2,7 @@ package es.gob.afirma.ui.principal;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -97,6 +98,8 @@ public class MainOptionsPane {
         c2.weightx = 1.0;
         c2.gridy = 0;
         
+        JPanel panelCheckHabilitar = new JPanel(new GridLayout(1, 1));
+        panelCheckHabilitar.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.general"));
         // Checkbox para habilitar las opciones de configuracion avanzada
         checkHabilitar = new JCheckBox();
         checkHabilitar.setText(Messages.getString("Opciones.general.habilitar")); // NOI18N
@@ -109,7 +112,8 @@ public class MainOptionsPane {
 
         Utils.setContrastColor(checkHabilitar);
         Utils.setFontBold(checkHabilitar);
-        generalPanel.add(checkHabilitar, c2);
+        panelCheckHabilitar.add(checkHabilitar);
+        generalPanel.add(panelCheckHabilitar, c2);
         
         panel.add(generalPanel, c);
         c.gridy = c.gridy + 1;
@@ -159,6 +163,8 @@ public class MainOptionsPane {
         c2.weighty = 0.0;
         c2.fill = GridBagConstraints.HORIZONTAL;
         
+        JPanel panelCheckXML = new JPanel(new GridLayout(1, 1));
+        panelCheckXML.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.criptografia"));
         // Checkbox para utilizar XML
         checkXML = new JCheckBox();
         checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
@@ -169,7 +175,9 @@ public class MainOptionsPane {
 
         Utils.setContrastColor(checkXML);
         Utils.setFontBold(checkXML);
-        criptografiaPanel.add(checkXML, c2);
+        panelCheckXML.add(checkXML);
+        criptografiaPanel.add(panelCheckXML, c2);
+        
         c.weighty = 0.3;
         c.fill = GridBagConstraints.BOTH;
         panel.add(criptografiaPanel, c);
@@ -188,6 +196,8 @@ public class MainOptionsPane {
         c2.weightx = 1.0;
         c2.gridy = 0;
         
+        JPanel panelCheckAddPolicy = new JPanel(new GridLayout(1, 1));
+        panelCheckAddPolicy.getAccessibleContext().setAccessibleName("Pol\u00EDtica de firma");
         // Checkbox para habilitar las opciones de configuracion avanzada
         checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
         checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
@@ -198,7 +208,8 @@ public class MainOptionsPane {
         Utils.setContrastColor(checkAddPolicy);
         Utils.setFontBold(checkAddPolicy);
         
-        policyPanel.add(checkAddPolicy, c2);
+        panelCheckAddPolicy.add(checkAddPolicy);
+        policyPanel.add(panelCheckAddPolicy, c2);
         c2.gridy = c2.gridy + 1; 
         
         final JLabel policyOidLabel = new JLabel("Identificador de la pol\u00EDtica de firma (OID):");

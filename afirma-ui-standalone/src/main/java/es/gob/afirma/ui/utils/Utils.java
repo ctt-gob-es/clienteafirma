@@ -122,42 +122,31 @@ public class Utils {
 				final JButton button = (JButton) component;
 				button.addFocusListener(new FocusListener() {
 					public void focusLost(FocusEvent e) {
-						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
-					}		
+						((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
+					}
+					
 					public void focusGained(FocusEvent e) {
-						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
+						if (GeneralConfig.isHighContrast()){
+							((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
-				if (button.getIcon() != null) {			
-					button.addFocusListener(new FocusListener() {
-						public void focusLost(FocusEvent e) {
-							button.setBorder(BorderFactory.createEmptyBorder());
-						}		
-						public void focusGained(FocusEvent e) {
-							if (GeneralConfig.isHighContrast()){
-								button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
-							} else {
-								button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-							}
-						}
-					});
-				}
 			}
 			if (component instanceof JToggleButton){
 				final JToggleButton button = (JToggleButton) component;
 				button.addFocusListener(new FocusListener() {
 					public void focusLost(FocusEvent e) {
-						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
-					}		
-					public void focusGained(FocusEvent e) {
-						System.out.println(button.getFont().getSize());
-						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
+						((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 					}
-				});
-				button.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
+					
+					public void focusGained(FocusEvent e) {
+						if (GeneralConfig.isHighContrast()){
+							((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}		
@@ -196,10 +185,15 @@ public class Utils {
 				final JRadioButton radioButton = (JRadioButton) component;
 				radioButton.addFocusListener(new FocusListener() {
 					public void focusLost(FocusEvent e) {
-						radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()-5));
+						((JPanel)radioButton.getParent()).setBorder(BorderFactory.createEmptyBorder());
 					}
+					
 					public void focusGained(FocusEvent e) {
-						radioButton.setFont(new Font(radioButton.getFont().getName(), radioButton.getFont().getStyle(), radioButton.getFont().getSize()+5));
+						if (GeneralConfig.isHighContrast()){
+							((JPanel)radioButton.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							((JPanel)radioButton.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}
@@ -222,10 +216,15 @@ public class Utils {
 				final JCheckBox checkBox = (JCheckBox) component;
 				checkBox.addFocusListener(new FocusListener() {
 					public void focusLost(FocusEvent e) {
-						checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()-5));
+						((JPanel)checkBox.getParent()).setBorder(BorderFactory.createEmptyBorder());
 					}
+					
 					public void focusGained(FocusEvent e) {
-						checkBox.setFont(new Font(checkBox.getFont().getName(), checkBox.getFont().getStyle(), checkBox.getFont().getSize()+5));
+						if (GeneralConfig.isHighContrast()){
+							((JPanel)checkBox.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							((JPanel)checkBox.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}

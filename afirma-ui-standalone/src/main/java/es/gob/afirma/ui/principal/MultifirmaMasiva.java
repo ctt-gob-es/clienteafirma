@@ -98,6 +98,7 @@ public class MultifirmaMasiva extends JPanel {
 		Utils.setContrastColor(panelTipos);
 		Utils.setFontBold(panelTipos);
 		
+		JPanel panelAlerta = new JPanel(new GridLayout(1,1));
 		// Checkbox alerta sonora
 		final JCheckBox alerta = new JCheckBox();
 		alerta.setSelected(true);
@@ -111,7 +112,8 @@ public class MultifirmaMasiva extends JPanel {
 		Utils.remarcar(alerta);
 		Utils.setContrastColor(alerta);
 		Utils.setFontBold(alerta);
-		panelTipos.add(alerta);
+		panelAlerta.add(alerta);
+		panelTipos.add(panelAlerta);
 		
 		add(panelTipos, c);
 
@@ -134,6 +136,7 @@ public class MultifirmaMasiva extends JPanel {
 		JLabel label = new JLabel();
 		panelBotones.add(label, cons);
 		
+		JPanel panelFirmar = new JPanel(new GridLayout(1, 1));
 		// Boton firmar
 		JButton firmar = new JButton();
 		firmar.setMnemonic(KeyEvent.VK_R);
@@ -157,17 +160,21 @@ public class MultifirmaMasiva extends JPanel {
 		cons.weightx = 1.0;
 		cons.gridx = 1;
 		
+		panelFirmar.add(firmar);		
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(firmar, BorderLayout.CENTER);
+		buttonPanel.add(panelFirmar, BorderLayout.CENTER);
 		panelBotones.add(buttonPanel, cons);
 
 		cons.ipadx = 15;
 		cons.weightx = 0.0;
 		cons.gridx = 2;
 				
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("firma.masiva");
-		panelBotones.add(botonAyuda, cons);
+		
+		panelAyuda.add(botonAyuda);
+		panelBotones.add(panelAyuda, cons);
 
 		c.gridwidth	= 2;
         c.insets = new Insets(13,13,13,13);

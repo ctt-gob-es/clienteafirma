@@ -14,6 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -134,6 +135,7 @@ public class Validacion extends JPanel {
 		JLabel label = new JLabel();
 		panelBotones.add(label, cons);
 		
+		JPanel panelValide = new JPanel(new GridLayout(1, 1));
 		// Boton valide
 		JButton valide = new JButton();
 		valide.setMnemonic(KeyEvent.VK_L);
@@ -155,18 +157,20 @@ public class Validacion extends JPanel {
 		cons.gridx = 1;
 		cons.weightx = 1.0;
 		
+		panelValide.add(valide);
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(valide, BorderLayout.CENTER);
+		buttonPanel.add(panelValide, BorderLayout.CENTER);
 		panelBotones.add(buttonPanel, cons);
 
 		cons.ipadx = 15;
 		cons.weightx = 0.0;
 		cons.gridx = 2;
 		
-		
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
 		// Boton de ayuda
 		JButton botonAyuda = HelpUtils.helpButton("validacion");
-		panelBotones.add(botonAyuda, cons);
+		panelAyuda.add(botonAyuda);
+		panelBotones.add(panelAyuda, cons);
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridwidth	= 2;

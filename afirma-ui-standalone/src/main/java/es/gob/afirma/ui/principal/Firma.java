@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -150,6 +151,7 @@ public class Firma extends JPanel {
         c.weightx = 0.0;
         c.gridx = 1;
 
+        JPanel panelExaminar = new JPanel(new GridLayout(1, 1));
         // Boton examinar
         JButton examinar = new JButton();
         examinar.setMnemonic(KeyEvent.VK_E);
@@ -167,7 +169,9 @@ public class Firma extends JPanel {
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
-        add(examinar, c);
+        
+        panelExaminar.add(examinar);
+        add(panelExaminar, c);
 
         c.insets = new Insets(13, 13, 0, 13);
         c.weightx = 1.0;
@@ -277,6 +281,7 @@ public class Firma extends JPanel {
         JLabel label = new JLabel();
         panelBotones.add(label, cons);
 
+        JPanel panelFirmar = new JPanel(new GridLayout(1, 1));
         // Boton firmar
         JButton firmar = new JButton();
         firmar.setMnemonic(KeyEvent.VK_R);
@@ -299,17 +304,20 @@ public class Firma extends JPanel {
         cons.gridx = 1;
         cons.weightx = 1.0;
 
+        panelFirmar.add(firmar);
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(firmar, BorderLayout.CENTER);
+        buttonPanel.add(panelFirmar, BorderLayout.CENTER);
         panelBotones.add(buttonPanel, cons);
 
         cons.ipadx = 15;
         cons.weightx = 0.0;
         cons.gridx = 2;
 
+        JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
         // Boton ayuda
         JButton botonAyuda = HelpUtils.helpButton("firma");
-        panelBotones.add(botonAyuda, cons);
+        panelAyuda.add(botonAyuda);
+        panelBotones.add(panelAyuda, cons);
 
         c.gridwidth	= 2;
         c.insets = new Insets(13,13,13,13);

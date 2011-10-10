@@ -98,6 +98,8 @@ public class MultifirmaSimple extends JPanel {
 		Utils.setContrastColor(panelTipos);
 		Utils.setFontBold(panelTipos);
 
+		JPanel panelCofirma = new JPanel(new GridLayout(1, 1));
+        panelCofirma.getAccessibleContext().setAccessibleName(Messages.getString("MultifirmaSimple.opciones"));
 		// Radiobutton cofirma
 		final JRadioButton cofirma = new JRadioButton();
 		cofirma.setSelected(true);
@@ -118,8 +120,10 @@ public class MultifirmaSimple extends JPanel {
 		Utils.remarcar(cofirma);
 		Utils.setContrastColor(cofirma);
 		Utils.setFontBold(cofirma);
-		panelTipos.add(cofirma);
+		panelCofirma.add(cofirma);
+		panelTipos.add(panelCofirma);
 
+		JPanel panelContrafirma = new JPanel(new GridLayout(1, 1));        
 		// Radiobutton contrafirma
 		JRadioButton contrafirma = new JRadioButton();
 		contrafirma.setText(Messages.getString(
@@ -140,7 +144,8 @@ public class MultifirmaSimple extends JPanel {
 		Utils.setContrastColor(contrafirma);
 		Utils.setFontBold(contrafirma);
 
-		panelTipos.add(contrafirma);
+		panelContrafirma.add(contrafirma);
+		panelTipos.add(panelContrafirma);
 		
 		add(panelTipos, c);
 
@@ -168,6 +173,7 @@ public class MultifirmaSimple extends JPanel {
 		JLabel label = new JLabel();
 		panelBotones.add(label, cons);
 		
+		JPanel panelFirmar = new JPanel(new GridLayout(1, 1));
 		// Boton firmar
 		JButton firmar = new JButton();
 		firmar.setMnemonic(KeyEvent.VK_R);
@@ -190,17 +196,21 @@ public class MultifirmaSimple extends JPanel {
 		cons.gridx = 1;
 		cons.weightx = 1.0;
 		
+		panelFirmar.add(firmar);
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(firmar, BorderLayout.CENTER);
+		buttonPanel.add(panelFirmar, BorderLayout.CENTER);
 		panelBotones.add(buttonPanel, cons);
 
 		cons.ipadx = 15;
 		cons.weightx = 0.0;
 		cons.gridx = 2;
 		
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("multifirma");
-		panelBotones.add(botonAyuda, cons);
+		
+		panelAyuda.add(botonAyuda);
+		panelBotones.add(panelAyuda, cons);
 
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.insets = new Insets(13,13,13,13);

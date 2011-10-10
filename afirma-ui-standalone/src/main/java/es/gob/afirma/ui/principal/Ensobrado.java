@@ -12,6 +12,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -106,6 +107,7 @@ public class Ensobrado extends JPanel {
 		c.weightx = 0.0;
 		c.gridx = 1;
         
+		JPanel panelExaminar = new JPanel(new GridLayout(1, 1));
         // Boton examinar
         JButton  examinar = new JButton();   
         examinar.setMnemonic(KeyEvent.VK_E);
@@ -123,7 +125,9 @@ public class Ensobrado extends JPanel {
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
-		add(examinar, c);
+        
+        panelExaminar.add(examinar);
+		add(panelExaminar, c);
 		
 		c.insets = new Insets(5, 13, 0, 13);
 		c.weightx = 1.0;
@@ -205,6 +209,7 @@ public class Ensobrado extends JPanel {
 		JLabel label = new JLabel();
 		panelBotones.add(label, cons);
         		
+		JPanel panelGenerar = new JPanel(new GridLayout(1, 1));
         // Boton generar
         JButton generar = new JButton();
         generar.setMnemonic(KeyEvent.VK_G);
@@ -224,8 +229,9 @@ public class Ensobrado extends JPanel {
         Utils.setContrastColor(generar);
         Utils.setFontBold(generar);
         
+        panelGenerar.add(generar);
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(generar, BorderLayout.CENTER);
+		buttonPanel.add(panelGenerar, BorderLayout.CENTER);
 		
 		cons.ipadx = 0;
 		cons.gridx = 1;
@@ -233,7 +239,7 @@ public class Ensobrado extends JPanel {
         
 		panelBotones.add(buttonPanel, cons);
 
-        
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
         // Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("ensobrado");
         
@@ -241,7 +247,8 @@ public class Ensobrado extends JPanel {
 		cons.weightx = 0.0;
 		cons.gridx = 2;
 		
-		panelBotones.add(botonAyuda, cons);
+		panelAyuda.add(botonAyuda);
+		panelBotones.add(panelAyuda, cons);
 
 		c.gridwidth	= 2;
         c.insets = new Insets(13,13,13,13);

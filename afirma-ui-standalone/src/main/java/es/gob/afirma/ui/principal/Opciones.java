@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.Toolkit;
@@ -192,6 +193,7 @@ public class Opciones extends JAccessibilityDialog {
 		JLabel label = new JLabel();
 		bottomPanel.add(label, cons);
         
+		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
 		//Boton maximizar ventana
 		JButton maximizar = new JButton();
 		maximizar.setText(Messages.getString("Wizard.maximizar"));
@@ -205,11 +207,13 @@ public class Opciones extends JAccessibilityDialog {
 	    Utils.remarcar(maximizar);
         Utils.setContrastColor(maximizar);
 	    Utils.setFontBold(maximizar);
+	    panelMaximizar.add(maximizar);
 		
 	    //Espacio entre botones
 		Panel panelVacio = new Panel();
 		panelVacio.setPreferredSize(new Dimension(30, 10));
 	    
+		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		// Boton aceptar
         JButton aceptar = new JButton();
         aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
@@ -233,7 +237,9 @@ public class Opciones extends JAccessibilityDialog {
         Utils.remarcar(aceptar);
         Utils.setContrastColor(aceptar);
         Utils.setFontBold(aceptar);
+        panelAceptar.add(aceptar);
         
+        JPanel panelCancelar = new JPanel(new GridLayout(1, 1));
         // Boton cancelar
         JButton	cancelar = new JButton();
         cancelar.setText(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
@@ -246,14 +252,15 @@ public class Opciones extends JAccessibilityDialog {
         cancelar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
         Utils.remarcar(cancelar);
         Utils.setContrastColor(cancelar);
-        Utils.setFontBold(cancelar);        
+        Utils.setFontBold(cancelar);
+        panelCancelar.add(cancelar);
         
         // Panel en donde se insertan los botones maximizar, aceptar y cancelar
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(maximizar, BorderLayout.CENTER);
+        buttonPanel.add(panelMaximizar, BorderLayout.CENTER);
         buttonPanel.add(panelVacio, BorderLayout.CENTER);
-		buttonPanel.add(aceptar, BorderLayout.CENTER);
-		buttonPanel.add(cancelar, BorderLayout.CENTER);
+		buttonPanel.add(panelAceptar, BorderLayout.CENTER);
+		buttonPanel.add(panelCancelar, BorderLayout.CENTER);
 		
         cons.ipadx = 0;
 		cons.weightx = 1.0;
@@ -261,6 +268,7 @@ public class Opciones extends JAccessibilityDialog {
 		
 		bottomPanel.add(buttonPanel, cons);
         
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
         // Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("opciones.configuracion");
 		
@@ -274,8 +282,9 @@ public class Opciones extends JAccessibilityDialog {
         cons.ipadx = 15;
 		cons.weightx = 0.02;
 		cons.gridx = 2;
-        
-        bottomPanel.add(botonAyuda, cons);
+		
+		panelAyuda.add(botonAyuda);        
+        bottomPanel.add(panelAyuda, cons);
         
         return bottomPanel;
     }

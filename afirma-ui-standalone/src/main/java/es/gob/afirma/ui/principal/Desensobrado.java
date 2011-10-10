@@ -12,6 +12,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -123,6 +124,7 @@ public class Desensobrado extends JPanel {
 		c.weightx = 0.0;
 		c.gridx = 1;
         
+		JPanel panelExaminar = new JPanel(new GridLayout(1, 1));
         // Boton examinar
         JButton examinar = new JButton();
         examinar.setMnemonic(KeyEvent.VK_E);
@@ -140,7 +142,9 @@ public class Desensobrado extends JPanel {
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
-		add(examinar, c);
+        
+        panelExaminar.add(examinar);
+		add(panelExaminar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.weightx = 1.0;
@@ -194,19 +198,23 @@ public class Desensobrado extends JPanel {
 		c.insets = new Insets(0, 13, 0, 13);
 		c.gridy = 5;
 
+		JPanel panelCheckIniciar = new JPanel(new GridLayout(1, 1));
+        panelCheckIniciar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.opciones"));
         // Checkbox para iniciar el contenido
-        final JCheckBox checkInicar = new JCheckBox();
-        checkInicar.setText(Messages.getString("Desensobrado.check")); // NOI18N
-        checkInicar.setToolTipText(Messages.getString("Desensobrado.check.check.description")); // NOI18N
-        checkInicar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.check.check.description.status")));
-        checkInicar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.check.check.description.status")));
-        checkInicar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check") + " " +Messages.getString("Desensobrado.check.check.description.status")); // NOI18N
-        checkInicar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.check.check.description")); // NOI18N
-        checkInicar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo
-        Utils.remarcar(checkInicar);
-        Utils.setContrastColor(checkInicar);
-        Utils.setFontBold(checkInicar);
-        add(checkInicar, c);
+        final JCheckBox checkIniciar = new JCheckBox();
+        checkIniciar.setText(Messages.getString("Desensobrado.check")); // NOI18N
+        checkIniciar.setToolTipText(Messages.getString("Desensobrado.check.check.description")); // NOI18N
+        checkIniciar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.check.check.description.status")));
+        checkIniciar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.check.check.description.status")));
+        checkIniciar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check") + " " +Messages.getString("Desensobrado.check.check.description.status")); // NOI18N
+        checkIniciar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.check.check.description")); // NOI18N
+        checkIniciar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo
+        Utils.remarcar(checkIniciar);
+        Utils.setContrastColor(checkIniciar);
+        Utils.setFontBold(checkIniciar);
+        
+        panelCheckIniciar.add(checkIniciar);
+        add(panelCheckIniciar, c);
 		
 		c.weighty = 1.0;
 		c.gridy = 6;
@@ -227,6 +235,7 @@ public class Desensobrado extends JPanel {
 		JLabel label = new JLabel();
 		panelBotones.add(label, cons);
 		
+		JPanel panelExtraer = new JPanel(new GridLayout(1, 1));
         // Boton extraer
         JButton extraer = new JButton();
         extraer.setMnemonic(KeyEvent.VK_X);
@@ -236,7 +245,7 @@ public class Desensobrado extends JPanel {
         extraer.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.btnDescifrar.description.status")));
         extraer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-            	extraerActionPerformed(comboAlmacen, campoFichero, checkInicar);
+            	extraerActionPerformed(comboAlmacen, campoFichero, checkIniciar);
             }
         });
         extraer.getAccessibleContext().setAccessibleName(extraer.getText() + " " + Messages.getString("Desensobrado.btnDescifrar.description.status")); // NOI18N
@@ -245,8 +254,9 @@ public class Desensobrado extends JPanel {
         Utils.setContrastColor(extraer);
         Utils.setFontBold(extraer);
         
+        panelExtraer.add(extraer);
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(extraer, BorderLayout.CENTER);
+		buttonPanel.add(panelExtraer, BorderLayout.CENTER);
 		
 		cons.ipadx = 0;
 		cons.gridx = 1;
@@ -254,6 +264,7 @@ public class Desensobrado extends JPanel {
         
 		panelBotones.add(buttonPanel, cons);
 		
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
         // Boton de ayuda
 		JButton botonAyuda = HelpUtils.helpButton("desensobrado");
 		
@@ -261,7 +272,8 @@ public class Desensobrado extends JPanel {
 		cons.weightx = 0.0;
 		cons.gridx = 2;
 		
-		panelBotones.add(botonAyuda, cons);
+		panelAyuda.add(botonAyuda);
+		panelBotones.add(panelAyuda, cons);
 
 		c.gridwidth	= 2;
         c.insets = new Insets(13,13,13,13);
@@ -275,7 +287,7 @@ public class Desensobrado extends JPanel {
         HelpUtils.enableHelpKey(campoFichero,"desensobrado.sobre");
         HelpUtils.enableHelpKey(examinar,"desensobrado.sobre");
         HelpUtils.enableHelpKey(comboAlmacen,"desensobrado.almacen");
-        HelpUtils.enableHelpKey(checkInicar,"desensobrado.iniciar");
+        HelpUtils.enableHelpKey(checkIniciar,"desensobrado.iniciar");
     }
     
     /**

@@ -44,7 +44,7 @@ public class HorizontalTabbedPanel extends Container {
      */
     public HorizontalTabbedPanel() {
         super();
-        
+   
         this.setLayout(new GridBagLayout());
         
         final GridBagConstraints c = new GridBagConstraints();

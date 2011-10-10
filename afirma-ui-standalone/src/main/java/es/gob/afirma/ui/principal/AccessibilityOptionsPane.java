@@ -3,6 +3,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -95,6 +96,8 @@ public class AccessibilityOptionsPane {
         c2.weightx = 1.0;
         c2.gridy = 0;
         
+        JPanel panelFontSize = new JPanel(new GridLayout(1, 1));
+        panelFontSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.texto"));
         // Checkbox para habilitar la opcion de configuracion del tamaño de fuente
         checkFontSize = new JCheckBox();
         checkFontSize.setText(Messages.getString("Opciones.accesibilidad.texto.tamaño")); // NOI18N
@@ -105,8 +108,12 @@ public class AccessibilityOptionsPane {
         Utils.remarcar(checkFontSize);
         Utils.setContrastColor(checkFontSize);
         Utils.setFontBold(checkFontSize);
-        textPanel.add(checkFontSize, c2);
         
+        panelFontSize.add(checkFontSize);
+        textPanel.add(panelFontSize, c2);
+        
+        JPanel panelFontStyle = new JPanel(new GridLayout(1, 1));
+        panelFontStyle.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.texto"));
         //Checkbox para habilitar la opcion de configuracion del estilo de fuente
         checkFontStyle = new JCheckBox();
         checkFontStyle.setText(Messages.getString("Opciones.accesibilidad.texto.estilo")); // NOI18N
@@ -117,7 +124,9 @@ public class AccessibilityOptionsPane {
         Utils.remarcar(checkFontStyle);
         Utils.setContrastColor(checkFontStyle);
         Utils.setFontBold(checkFontStyle);
-        textPanel.add(checkFontStyle, c2);
+        
+        panelFontStyle.add(checkFontStyle);
+        textPanel.add(panelFontStyle, c2);
     	
     	panel.add(textPanel, c);
     	c.gridy = c.gridy + 1;
@@ -133,6 +142,8 @@ public class AccessibilityOptionsPane {
         c2.weightx = 1.0;
         c2.gridy = c2.gridy + 1;
         
+        JPanel panelHighContrast = new JPanel(new GridLayout(1, 1));
+        panelHighContrast.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.color"));
         // Checkbox para habilitar la opcion de configuracion de alto contraste
         checkHighContrast = new JCheckBox();
         checkHighContrast.setText(Messages.getString("Opciones.accesibilidad.color.contraste")); // NOI18N
@@ -143,7 +154,9 @@ public class AccessibilityOptionsPane {
         Utils.remarcar(checkHighContrast);
         Utils.setContrastColor(checkHighContrast);
         Utils.setFontBold(checkHighContrast);
-        colorPanel.add(checkHighContrast, c2);
+        
+        panelHighContrast.add(checkHighContrast);
+        colorPanel.add(panelHighContrast, c2);
         
         panel.add(colorPanel, c);
         c.gridy = c.gridy + 1;
@@ -159,6 +172,8 @@ public class AccessibilityOptionsPane {
         c2.weightx = 1.0;
         c2.gridy = c2.gridy + 1;
         
+        JPanel panelFocusVisible = new JPanel(new GridLayout(1, 1));
+        panelFocusVisible.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.foco"));
         // Checkbox para habilitar la opcion de configuracion de la visibilidad del foco
         checkFocusVisible = new JCheckBox();
         checkFocusVisible.setText(Messages.getString("Opciones.accesibilidad.foco.remarcar")); // NOI18N
@@ -169,7 +184,9 @@ public class AccessibilityOptionsPane {
         Utils.remarcar(checkFocusVisible);
         Utils.setContrastColor(checkFocusVisible);
         Utils.setFontBold(checkFocusVisible);
-        focusPanel.add(checkFocusVisible, c2);
+        
+        panelFocusVisible.add(checkFocusVisible);
+        focusPanel.add(panelFocusVisible, c2);
         
         panel.add(focusPanel, c);
         c.gridy = c.gridy + 1;
@@ -185,6 +202,8 @@ public class AccessibilityOptionsPane {
         c2.weightx = 1.0;
         c2.gridy = c2.gridy + 1;
         
+        JPanel panelWindowSize = new JPanel(new GridLayout(1, 1));
+        panelWindowSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.ventana"));
         // Checkbox para habilitar la opcion de configuracion de ventanas maximizadas
         checkWindowSize = new JCheckBox();
         checkWindowSize.setText(Messages.getString("Opciones.accesibilidad.ventana.tamaño")); // NOI18N
@@ -195,7 +214,9 @@ public class AccessibilityOptionsPane {
         Utils.remarcar(checkWindowSize);
         Utils.setContrastColor(checkWindowSize);
         Utils.setFontBold(checkWindowSize);
-        windowPanel.add(checkWindowSize, c2);
+        
+        panelWindowSize.add(checkWindowSize);
+        windowPanel.add(panelWindowSize, c2);
         
         panel.add(windowPanel, c);   
         c.gridy = c.gridy + 1;
@@ -211,6 +232,8 @@ public class AccessibilityOptionsPane {
         c2.weightx = 1.0;
         c2.gridy = c2.gridy + 1;
         
+        JPanel panelCursorSize = new JPanel(new GridLayout(1, 1));
+        panelCursorSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.cursor"));
         // Checkbox para habilitar la opcion de configuracion del tamaño del cursor
         checkCursorSize = new JCheckBox();
         checkCursorSize.setText(Messages.getString("Opciones.accesibilidad.cursor.tamaño")); // NOI18N
@@ -221,7 +244,8 @@ public class AccessibilityOptionsPane {
         Utils.remarcar(checkCursorSize);
         Utils.setContrastColor(checkCursorSize);
         Utils.setFontBold(checkCursorSize);
-        cursorPanel.add(checkCursorSize, c2);
+        panelCursorSize.add(checkCursorSize);
+        cursorPanel.add(panelCursorSize, c2);
         
         panel.add(cursorPanel, c);
         c.gridy = c.gridy + 1;
@@ -233,6 +257,7 @@ public class AccessibilityOptionsPane {
         final JButton valores = new JButton();
         final JButton guardar = new JButton();
         
+        JPanel panelValores = new JPanel(new GridLayout(1, 1));
         //Boton Valores por defecto
         valores.setText(Messages.getString("Opciones.accesibilidad.valores"));
         valores.addActionListener(new ActionListener() {
@@ -248,8 +273,10 @@ public class AccessibilityOptionsPane {
         Utils.remarcar(valores);
         Utils.setContrastColor(valores);
         Utils.setFontBold(valores);
-        buttonPanel.add(valores);
+        panelValores.add(valores);
+        buttonPanel.add(panelValores);
         
+        JPanel panelGuardar = new JPanel(new GridLayout(1, 1));
         //Boton guardar
         guardar.setText(Messages.getString("Opciones.accesibilidad.guardar"));
         guardar.setMnemonic(KeyEvent.VK_U);
@@ -264,7 +291,9 @@ public class AccessibilityOptionsPane {
         Utils.remarcar(guardar);
         Utils.setContrastColor(guardar);
         Utils.setFontBold(guardar);
-        buttonPanel.add(guardar);
+        
+        panelGuardar.add(guardar);
+        buttonPanel.add(panelGuardar);
 
         panel.add(buttonPanel, c);
         // Rellenamos el hueco libre con un panel vacio

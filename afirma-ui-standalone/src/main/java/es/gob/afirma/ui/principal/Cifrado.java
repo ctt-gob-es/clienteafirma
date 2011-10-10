@@ -12,6 +12,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -136,6 +137,7 @@ public class Cifrado extends JPanel {
 		c.weightx = 0.0;
 		c.gridx = 1;
 		
+		JPanel panelExaminar = new JPanel(new GridLayout(1, 1));
 		// Boton seleccionar
 		JButton examinar = new JButton();
 		examinar.setMnemonic(KeyEvent.VK_E);
@@ -154,7 +156,8 @@ public class Cifrado extends JPanel {
 		Utils.remarcar(examinar);
 		Utils.setContrastColor(examinar);
 		Utils.setFontBold(examinar);
-		add(examinar, c);
+		panelExaminar.add(examinar);
+		add(panelExaminar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.weightx = 1.0;
@@ -276,6 +279,7 @@ public class Cifrado extends JPanel {
 		JLabel label = new JLabel();
 		panelBotones.add(label, cons);
 		
+		JPanel panelCifrar = new JPanel(new GridLayout(1, 1));
 		// Boton cifrar
 		JButton cifrar = new JButton();
 		cifrar.setMnemonic(KeyEvent.VK_R);
@@ -294,9 +298,9 @@ public class Cifrado extends JPanel {
 		Utils.remarcar(cifrar);
 		Utils.setContrastColor(cifrar);
 		Utils.setFontBold(cifrar);
-		
+		panelCifrar.add(cifrar);
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(cifrar, BorderLayout.CENTER);
+		buttonPanel.add(panelCifrar, BorderLayout.CENTER);
 		
 		cons.ipadx = 0;
 		cons.gridx = 1;
@@ -304,14 +308,15 @@ public class Cifrado extends JPanel {
 		
 		panelBotones.add(buttonPanel, cons);
 
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("cifrado");
 		
 		cons.ipadx = 15;
 		cons.weightx = 0.0;
 		cons.gridx = 2;
-		
-		panelBotones.add(botonAyuda, cons);
+		panelAyuda.add(botonAyuda);
+		panelBotones.add(panelAyuda, cons);
 
 		c.gridwidth	= 2;
         c.insets = new Insets(13,13,13,13);

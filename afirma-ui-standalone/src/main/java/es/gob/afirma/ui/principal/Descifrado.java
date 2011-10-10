@@ -12,6 +12,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -117,6 +118,7 @@ public class Descifrado extends JPanel {
 		c.weightx = 0.0;
 		c.gridx = 1;
 
+		JPanel panelExaminar = new JPanel(new GridLayout(1, 1));
         // Boton examinar
         JButton examinar = new JButton();
         examinar.setMnemonic(KeyEvent.VK_X);
@@ -135,7 +137,8 @@ public class Descifrado extends JPanel {
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
-		add(examinar, c);
+        panelExaminar.add(examinar);
+		add(panelExaminar, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.weightx = 1.0;
@@ -257,6 +260,7 @@ public class Descifrado extends JPanel {
 		JLabel label = new JLabel();
 		panelBotones.add(label, cons);
         
+		JPanel panelDescifrar = new JPanel(new GridLayout(1, 1));
         // Boton descifrar
         JButton descifrar = new JButton();
         descifrar.setMnemonic(KeyEvent.VK_R);
@@ -278,8 +282,9 @@ public class Descifrado extends JPanel {
         Utils.setContrastColor(descifrar);
         Utils.setFontBold(descifrar);
         
+        panelDescifrar.add(descifrar);
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(descifrar, BorderLayout.CENTER);
+		buttonPanel.add(panelDescifrar, BorderLayout.CENTER);
 		
 		cons.ipadx = 0;
 		cons.gridx = 1;
@@ -287,14 +292,16 @@ public class Descifrado extends JPanel {
 		
 		panelBotones.add(buttonPanel, cons);
         
-        // Boton ayuda
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
+		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("descifrado");
         
 		cons.ipadx = 15;
 		cons.weightx = 0.0;
 		cons.gridx = 2;
 		
-		panelBotones.add(botonAyuda, cons);
+		panelAyuda.add(botonAyuda);
+		panelBotones.add(panelAyuda, cons);
 
 		c.gridwidth	= 2;
         c.insets = new Insets(13,13,13,13);

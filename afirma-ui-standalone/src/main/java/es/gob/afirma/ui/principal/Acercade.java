@@ -13,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
@@ -106,6 +108,7 @@ public class Acercade extends JAccessibilityFrameAbout {
 		c.gridwidth = 1;
 		c.gridy = 3;
 		
+		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		// Boton aceptar
 		JButton aceptar = new JButton();
 		aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
@@ -120,7 +123,8 @@ public class Acercade extends JAccessibilityFrameAbout {
 		Utils.setFontBold(aceptar);
 		Utils.remarcar(aceptar);
 		
-		getContentPane().add(aceptar, c);
+		panelAceptar.add(aceptar);
+		getContentPane().add(panelAceptar, c);
 	}
 
 	/**

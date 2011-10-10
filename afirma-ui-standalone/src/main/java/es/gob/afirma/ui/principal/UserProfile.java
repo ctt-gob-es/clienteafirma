@@ -8,6 +8,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.Toolkit;
@@ -202,6 +203,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		JLabel label = new JLabel();
 		bottomPanel.add(label, cons);
         
+		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
 		//Boton maximizar ventana
 		JButton maximizar = new JButton();
 		maximizar.setText(Messages.getString("Wizard.maximizar"));
@@ -212,8 +214,10 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	    		maximizarActionPerformed();
 			}
 		});
+	    panelMaximizar.add(maximizar);
 	    config(maximizar);
 		
+	    JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		// Boton aceptar
 		JButton aceptar = new JButton();
 		aceptar.setText("Aceptar");
@@ -225,6 +229,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 				aceptarPerformed();
 			}
 		});
+		panelAceptar.add(aceptar);
 		config(aceptar);
 		
 	    //Espacio entre botones
@@ -233,9 +238,9 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
         
         // Panel en donde se insertan los botones maximizar y aceptar
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(maximizar, BorderLayout.CENTER);
+        buttonPanel.add(panelMaximizar, BorderLayout.CENTER);
         buttonPanel.add(panelVacio, BorderLayout.CENTER);
-        buttonPanel.add(aceptar, BorderLayout.CENTER);
+        buttonPanel.add(panelAceptar, BorderLayout.CENTER);
 		
         cons.ipadx = 0;
 		cons.weightx = 1.0;
@@ -243,6 +248,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		
 		bottomPanel.add(buttonPanel, cons);
         
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("perfiles.usuario");
 		config(botonAyuda);
@@ -250,8 +256,8 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
         cons.ipadx = 15;
 		cons.weightx = 0.02;
 		cons.gridx = 2;
-        
-        bottomPanel.add(botonAyuda, cons);
+        panelAyuda.add(botonAyuda);
+        bottomPanel.add(panelAyuda, cons);
         
       //Accesos rapidos al menu de ayuda
         HelpUtils.enableHelpKey(aceptar, "perfil.aceptar");
@@ -334,22 +340,12 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 			final JButton button = (JButton) component;
 			button.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent e) {
-					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()-5));
+					((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 				}		
 				public void focusGained(FocusEvent e) {
-					button.setFont(new Font(button.getFont().getName(), button.getFont().getStyle(), button.getFont().getSize()+5));
+					((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
 			});
-			if (button.getIcon() != null) {			
-				button.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
-						button.setBorder(BorderFactory.createEmptyBorder());
-					}		
-					public void focusGained(FocusEvent e) {
-						button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-					}
-				});
-			}
 		}
     }
     
