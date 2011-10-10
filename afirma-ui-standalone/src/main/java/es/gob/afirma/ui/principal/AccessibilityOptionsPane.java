@@ -100,7 +100,7 @@ public class AccessibilityOptionsPane {
         panelFontSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.texto"));
         // Checkbox para habilitar la opcion de configuracion del tamaño de fuente
         checkFontSize = new JCheckBox();
-        checkFontSize.setText(Messages.getString("Opciones.accesibilidad.texto.tamaño")); // NOI18N
+        checkFontSize.setText(Messages.getString("Opciones.accesibilidad.texto.tamano")); // NOI18N
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         checkFontSize.setSelected(GeneralConfig.isAvanzados()); 
         checkFontSize.setBounds(12, 20, 340, 23);
@@ -206,7 +206,7 @@ public class AccessibilityOptionsPane {
         panelWindowSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.ventana"));
         // Checkbox para habilitar la opcion de configuracion de ventanas maximizadas
         checkWindowSize = new JCheckBox();
-        checkWindowSize.setText(Messages.getString("Opciones.accesibilidad.ventana.tamaño")); // NOI18N
+        checkWindowSize.setText(Messages.getString("Opciones.accesibilidad.ventana.tamano")); // NOI18N
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         checkWindowSize.setSelected(GeneralConfig.isAvanzados()); 
         checkWindowSize.setBounds(12, 20, 340, 23);
@@ -236,7 +236,7 @@ public class AccessibilityOptionsPane {
         panelCursorSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.cursor"));
         // Checkbox para habilitar la opcion de configuracion del tamaño del cursor
         checkCursorSize = new JCheckBox();
-        checkCursorSize.setText(Messages.getString("Opciones.accesibilidad.cursor.tamaño")); // NOI18N
+        checkCursorSize.setText(Messages.getString("Opciones.accesibilidad.cursor.tamano")); // NOI18N
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         checkCursorSize.setSelected(GeneralConfig.isAvanzados()); 
         checkCursorSize.setBounds(12, 20, 340, 23);
