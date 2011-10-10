@@ -603,26 +603,31 @@ public final class Utils {
     public static String guessXAdESNamespaceURL(final Node el) {
 
         final String latest = "\"http://uri.etsi.org/01903#\""; //$NON-NLS-1$
+        final String xades122 = "\"http://uri.etsi.org/01903/v1.2.2#\""; //$NON-NLS-1$
         final String xades132 = "\"http://uri.etsi.org/01903/v1.3.2#\""; //$NON-NLS-1$
         final String xades141 = "\"http://uri.etsi.org/01903/v1.4.1#\""; //$NON-NLS-1$
 
         final String signatureText = new String(writeXML(el, null, null, null));
 
         final int numLatest = countSubstring(signatureText, latest);
+        final int numXades122 = countSubstring(signatureText, xades122);
         final int numXades132 = countSubstring(signatureText, xades132);
         final int numXades141 = countSubstring(signatureText, xades141);
-
-        // Prioridad: xades132 > latest > xades141
-        if (numXades132 >= numLatest && numXades132 >= numXades141) {
+        
+        // Prioridad: xades132 > latest > xades141 > xades122
+        if (numXades132 >= numLatest && numXades132 >= numXades141 && numXades132 >= numXades122) {
             return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        if (numLatest >= numXades132 && numLatest >= numXades141) {
+        if (numLatest >= numXades132 && numLatest >= numXades141 && numLatest >= numXades122) {
             return latest.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        if (numXades141 >= numLatest && numXades141 >= numXades132) {
+        if (numXades141 >= numLatest && numXades141 >= numXades132 && numXades141 >= numXades122) {
             return xades141.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
-
+        if (numXades122 >= numXades132 && numXades122 >= numLatest && numXades122 >= numXades141) {
+            return xades122.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        
         return xades132.replace("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
