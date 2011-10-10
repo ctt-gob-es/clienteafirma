@@ -130,7 +130,7 @@ public final class TestXAdES {
             "sample-facturae-firmada.xsig.xml" //$NON-NLS-1$
     };
     
-    /** Prueba de cofirma de una factura electr&oacute;nica.
+    /** Pruebas de cofirma.
      * @throws Exception */
     @Test
     public void testCoSign() throws Exception {
