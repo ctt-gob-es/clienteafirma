@@ -122,6 +122,76 @@ public final class TestXAdES {
             "sample-internal-dtd.xml", //$NON-NLS-1$
             "sample-namespace-encoding-us-ascii.xml" //$NON-NLS-1$
     };
+    
+    private static final String[] TEST_FILES_MULTISIGN = new String[] {
+            "sample-factura-firmada-30.xml", //$NON-NLS-1$
+            "sample-factura-firmada-31.xml", //$NON-NLS-1$
+            "sample-factura-firmada-32v1.xsig.xml", //$NON-NLS-1$
+            "sample-facturae-firmada.xsig.xml" //$NON-NLS-1$
+    };
+    
+    /** Prueba de cofirma de una factura electr&oacute;nica.
+     * @throws Exception */
+    @Test
+    public void testCoSign() throws Exception {
+        Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
+        final PrivateKeyEntry pke;
+
+        KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
+        pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
+
+        AOSigner signer = new AOXAdESSigner();
+        
+        final Properties p = new Properties();
+        p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.put("signingCertificateV2", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        p.put("ignoreStyleSheets", "false"); //$NON-NLS-1$ //$NON-NLS-2$
+        
+        String prueba;
+        
+        es.gob.afirma.platform.ws.TestSignVerifier verifier = null;
+        try {
+          verifier = new es.gob.afirma.platform.ws.TestSignVerifier();
+        } 
+        catch (Exception e) {
+          System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
+        }
+        
+        for (final String algo : ALGOS) {
+          for(final String filename : TEST_FILES_MULTISIGN) {
+                                
+            prueba = "Cofirma XAdES con el algoritmo ': " + //$NON-NLS-1$
+            algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+            
+            System.out.println();
+            System.out.println(prueba);
+            
+            final byte[] data = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(filename));
+            
+            final byte[] result = signer.cosign(data, algo, pke, p);
+                
+            File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
+            fos.write(result);
+            try { fos.flush(); fos.close(); } catch (Exception e) { 
+                // Ignoramos los errores
+            }
+            System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
+
+            // Enviamos a validar a AFirma
+            if (verifier != null) {
+                Assert.assertTrue("Fallo al validar " + filename, verifier.verifyXML(result)); //$NON-NLS-1$
+            }
+            
+            Assert.assertTrue(isValidUnsignedProperties(new ByteArrayInputStream(result),null));
+
+            Assert.assertNotNull(prueba, result);
+            Assert.assertTrue("El resultado no se recnoce como firma", signer.isSign(result)); //$NON-NLS-1$
+          }
+        }
+
+    }
 
     /**
      * Prueba con hoja de estilo externa.
