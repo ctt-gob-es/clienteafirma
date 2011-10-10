@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.Toolkit;
@@ -286,6 +287,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         c.weightx = 0.0;
 		c.gridx = 1;
         
+		JPanel panelExaminarDirectorio = new JPanel(new GridLayout(1, 1));
         // Boton examinar directorio firmas
         JButton	examinarDirectorio = new JButton();
         examinarDirectorio.setMnemonic(KeyEvent.VK_E);
@@ -301,13 +303,15 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         Utils.remarcar(examinarDirectorio);
         Utils.setContrastColor(examinarDirectorio);
         Utils.setFontBold(examinarDirectorio);
-        panelCentral.add(examinarDirectorio, c);
+        panelExaminarDirectorio.add(examinarDirectorio);
+        panelCentral.add(panelExaminarDirectorio, c);
         
         c.insets = new Insets(5, 20, 0, 20);
         c.weightx = 1.0;
 		c.gridx = 0;
 		c.gridy = 2;
         
+		JPanel panelCheckSobreescribir = new JPanel(new GridLayout(1, 1));
         // Checkbox con el texto "Sobreescribir ficheros"
         checkSobreescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
         checkSobreescribir.getAccessibleContext().setAccessibleName(checkSobreescribir.getText() + " " +Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
@@ -316,7 +320,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         Utils.remarcar(checkSobreescribir);
         Utils.setContrastColor(checkSobreescribir);
         Utils.setFontBold(checkSobreescribir);
-        panelCentral.add(checkSobreescribir, c);
+        panelCheckSobreescribir.add(checkSobreescribir);
+        panelCentral.add(panelCheckSobreescribir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
 		c.gridy = 3;
@@ -354,6 +359,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         c.weightx = 0.0;
         c.gridx = 1;
         
+        JPanel panelExaminarFichero = new JPanel(new GridLayout(1, 1));
         // Boton examinar fichero log
         examinarFichero = new JButton();
         examinarFichero.setEnabled(false);
@@ -370,7 +376,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         Utils.remarcar(examinarFichero);
         Utils.setContrastColor(examinarFichero);
         Utils.setFontBold(examinarFichero);
-        panelCentral.add(examinarFichero, c);
+        panelExaminarFichero.add(examinarFichero);
+        panelCentral.add(panelExaminarFichero, c);
         
         c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(20, 20, 0, 20);

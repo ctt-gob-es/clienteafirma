@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -199,6 +200,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		c.weighty = 0.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 
+		JPanel panelAnadir = new JPanel(new GridLayout(1, 1));
 		// Boton Anadir
 		final JButton anadir = new JButton();
 		final JButton eliminar = new JButton();
@@ -216,7 +218,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		Utils.remarcar(anadir);
         Utils.setContrastColor(anadir);
 		Utils.setFontBold(anadir);
-		panelCentral.add(anadir, c);
+		panelAnadir.add(anadir);
+		panelCentral.add(panelAnadir, c);
 		
 		c.insets = new Insets(10, 20, 0, 20);
 		c.gridx = 0;
@@ -273,6 +276,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		c.weightx = 0.0;
 		c.gridx = 1;
 		
+		JPanel panelEliminar = new JPanel(new GridLayout(1, 1));
 		// Boton eliminar
 		eliminar.setEnabled(false);
 		eliminar.setToolTipText(Messages.getString("Wizard.sobres.eliminar.remitente.description"));
@@ -288,7 +292,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		Utils.remarcar(eliminar);
         Utils.setContrastColor(eliminar);
 		Utils.setFontBold(eliminar);
-		panelCentral.add(eliminar, c);
+		panelEliminar.add(eliminar);
+		panelCentral.add(panelEliminar, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);
 

@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -153,6 +154,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		c.weightx = 0.0;
 		c.gridx = 1;
 		
+		JPanel panelExaminarFirma = new JPanel(new GridLayout(1, 1));
 		// Boton examinar (fichero firma)
         JButton examinarFirma = new JButton();
         examinarFirma.setMnemonic(KeyEvent.VK_X); //mnem�nico diferente al bot�n "Examinar" anterior
@@ -168,7 +170,8 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         Utils.remarcar(examinarFirma);
         Utils.setContrastColor(examinarFirma);
         Utils.setFontBold(examinarFirma);
-        panelCentral.add(examinarFirma, c);
+        panelExaminarFirma.add(examinarFirma);
+        panelCentral.add(panelExaminarFirma, c);
 		
 		c.insets = new Insets(20, 20, 0, 20);
 		c.gridwidth = 2;
@@ -208,6 +211,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		c.insets = new Insets(0, 10, 0, 20);
 		c.gridx = 1;
 		
+		JPanel panelExaminarDatos = new JPanel(new GridLayout(1, 1));
 		// Boton examinar (fichero datos)
         JButton examinarDatos = new JButton();
         examinarDatos.setMnemonic(KeyEvent.VK_E);
@@ -223,7 +227,8 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         Utils.remarcar(examinarDatos);
         Utils.setContrastColor(examinarDatos);
         Utils.setFontBold(examinarDatos);
-        panelCentral.add(examinarDatos, c);
+        panelExaminarDatos.add(examinarDatos);
+        panelCentral.add(panelExaminarDatos, c);
 		
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(20, 20, 0, 20);

@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -193,6 +194,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 1;
         
+        JPanel panelAutogenerar = new JPanel(new GridLayout(1, 1));
         // Boton autogenerar
         JButton autogenerar = new JButton();
         autogenerar.setMnemonic(KeyEvent.VK_U);
@@ -208,12 +210,14 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         Utils.remarcar(autogenerar);
         Utils.setContrastColor(autogenerar);
         Utils.setFontBold(autogenerar);
-        panelCentral.add(autogenerar, c);
+        panelAutogenerar.add(autogenerar);
+        panelCentral.add(panelAutogenerar, c);
         
         c.insets = new Insets(0, 10, 0, 20);
         c.weightx = 0.0;
         c.gridx = 2;
         
+        JPanel panelAlmacen = new JPanel(new GridLayout(1, 1));
         // Boton cargar clave del almacen
         JButton almacen = new JButton();
         almacen.setMnemonic(KeyEvent.VK_L);
@@ -229,7 +233,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         Utils.remarcar(almacen);
         Utils.setContrastColor(almacen);
         Utils.setFontBold(almacen);
-        panelCentral.add(almacen, c);
+        panelAlmacen.add(almacen);
+        panelCentral.add(panelAlmacen, c);
         
 		c.insets = new Insets(10, 20, 0, 20);
 		c.weightx = 1.0;
@@ -237,6 +242,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 		c.gridy = 4;
 		c.gridx = 0;
 		
+		JPanel panelCheckGuardar = new JPanel(new GridLayout(1, 1));
 		// Checkbox para guardar en el almacen
         checkGuardar.setText(Messages.getString("WizardCifrado.check")); // NOI18N
         checkGuardar.setToolTipText(Messages.getString("WizardCifrado.check.description")); // NOI18N
@@ -245,7 +251,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         Utils.remarcar(checkGuardar);
         Utils.setContrastColor(checkGuardar);
         Utils.setFontBold(checkGuardar);
-        panelCentral.add(checkGuardar, c);
+        panelCheckGuardar.add(checkGuardar);
+        panelCentral.add(panelCheckGuardar, c);
         
         c.gridy = c.gridy + 1;
         c.weighty = 1.0;

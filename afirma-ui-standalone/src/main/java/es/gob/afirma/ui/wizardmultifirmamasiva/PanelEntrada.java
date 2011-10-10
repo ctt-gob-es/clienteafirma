@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -142,6 +143,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		c.weightx = 0.0;
 		c.gridx = 1;
         
+		JPanel panelExaminar = new JPanel(new GridLayout(1, 1));
         // Boton examinar
         JButton examinar = new JButton();
         examinar.setMnemonic(KeyEvent.VK_E);
@@ -157,7 +159,8 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
         Utils.setFontBold(examinar);
-        panelCentral.add(examinar, c);
+        panelExaminar.add(examinar);
+        panelCentral.add(panelExaminar, c);
         
         c.insets = new Insets(5, 20, 0, 20);
         c.gridwidth = 2;
@@ -165,6 +168,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		c.gridx = 0;
 		c.gridy = 2;
         
+		JPanel panelCheckIncluir = new JPanel(new GridLayout(1, 1));
         // Checkbox con el texto "Incluir subdirectorios..."
         checkIncluir.setText(Messages.getString("Wizard.multifirma.ventana3.check.incluir"));
         checkIncluir.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description"));
@@ -174,7 +178,8 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.remarcar(checkIncluir);
         Utils.setContrastColor(checkIncluir);
         Utils.setFontBold(checkIncluir);
-        panelCentral.add(checkIncluir, c);
+        panelCheckIncluir.add(checkIncluir);
+        panelCentral.add(panelCheckIncluir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
 		c.gridy = 3;

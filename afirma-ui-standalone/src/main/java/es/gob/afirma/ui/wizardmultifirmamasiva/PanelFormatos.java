@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -139,6 +140,8 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		cons.insets = new Insets(0, 0, 0, 0);
 		cons.weightx = 1.0;
 		
+		JPanel panelRadioFirma = new JPanel(new GridLayout(1, 1));
+	    panelRadioFirma.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.ventana1.panel.operacion"));
 		// Radio button firma
 		radioFirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.firma"));
 		radioFirma.getAccessibleContext().setAccessibleName(radioFirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.firma.description"));
@@ -150,12 +153,14 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		Utils.remarcar(radioFirma);
         Utils.setContrastColor(radioFirma);
 		Utils.setFontBold(radioFirma);
-		panelOperaciones.add(radioFirma, cons);
+		panelRadioFirma.add(radioFirma);
+		panelOperaciones.add(panelRadioFirma, cons);
 		
 		cons.insets = new Insets(0, 0, 0, 0);
 		cons.weightx = 1.0;
 		cons.gridy = 1;
 		
+		JPanel panelRadioCofirma = new JPanel(new GridLayout(1, 1));
 		// Radio button cofirma
 		radioCofirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.cofirma"));
 		radioCofirma.getAccessibleContext().setAccessibleName(radioCofirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.cofirma.description"));
@@ -166,12 +171,14 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		Utils.remarcar(radioCofirma);
         Utils.setContrastColor(radioCofirma);
 		Utils.setFontBold(radioCofirma);
-		panelOperaciones.add(radioCofirma, cons);
+		panelRadioCofirma.add(radioCofirma);
+		panelOperaciones.add(panelRadioCofirma, cons);
 		
 		cons.insets = new Insets(0, 0, 0, 0);
 		cons.weightx = 1.0;
 		cons.gridy = 2;
 		
+		JPanel panelRadioContrafirma = new JPanel(new GridLayout(1, 1));
 		// Radio button contrafirma
 		radioContrafirma.setText(Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma"));
 		radioContrafirma.getAccessibleContext().setAccessibleName(radioContrafirma.getText() + " " + Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma.description"));
@@ -182,7 +189,8 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		Utils.remarcar(radioContrafirma);
         Utils.setContrastColor(radioContrafirma);
 		Utils.setFontBold(radioContrafirma);
-		panelOperaciones.add(radioContrafirma, cons);
+		panelRadioContrafirma.add(radioContrafirma);
+		panelOperaciones.add(panelRadioContrafirma, cons);
 		
 		// Agrupamos los radiobutton para que solo se pueda marcar uno
 		ButtonGroup radioGrupo = new ButtonGroup();
@@ -234,6 +242,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		c.weighty = 1.0;
 		c.gridy = 4;
 		
+		JPanel panelCheckFormato = new JPanel(new GridLayout(1, 1));
 		// Checkbox con el modo de CADES
 		checkFormato.setSelected(true);
 		checkFormato.setText(Messages.getString("Firma.modo.formato")); // NOI18N
@@ -245,7 +254,8 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		Utils.remarcar(checkFormato);
         Utils.setContrastColor(checkFormato);
 		Utils.setFontBold(checkFormato);
-		panelCentral.add(checkFormato, c);
+		panelCheckFormato.add(checkFormato);
+		panelCentral.add(panelCheckFormato, c);
 		
 		getContentPane().add(panelCentral, BorderLayout.CENTER);
 		

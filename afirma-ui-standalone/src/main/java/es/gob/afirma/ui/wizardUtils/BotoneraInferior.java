@@ -11,6 +11,7 @@ package es.gob.afirma.ui.wizardUtils;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Panel;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -79,6 +80,7 @@ public class BotoneraInferior extends JPanel {
         final JButton cancelar = new JButton();
         final JButton finalizar = new JButton();
         
+        JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
         //Boton maximizar
         maximizar.setText(Messages.getString("Wizard.maximizar"));
         maximizar.setName("maximizar");
@@ -92,13 +94,15 @@ public class BotoneraInferior extends JPanel {
         Utils.setContrastColor(maximizar);
         Utils.setFontBold(maximizar);
         
-        add(maximizar);
+        panelMaximizar.add(maximizar);
+        add(panelMaximizar);
         
         //Espacio entre botones
 		Panel panelVacio = new Panel();
 		panelVacio.setPreferredSize(new Dimension(100, 10));
 		add(panelVacio);		
 		
+		JPanel panelAnterior = new JPanel(new GridLayout(1, 1));
     	// Boton anterior
 		 int paginas = this.ventanas.size() - 1;
 	     if (this.posicion == 0 || paginas == this.posicion)
@@ -118,8 +122,10 @@ public class BotoneraInferior extends JPanel {
         Utils.setContrastColor(anterior);
         Utils.setFontBold(anterior);
        
-        add(anterior);
+        panelAnterior.add(anterior);
+        add(panelAnterior);
         
+        JPanel panelSiguiente = new JPanel(new GridLayout(1, 1));
         // Boton siguiente
         if (this.ventanas.size() == 1 || paginas == this.posicion)
         	siguiente.setVisible(false);
@@ -137,13 +143,16 @@ public class BotoneraInferior extends JPanel {
         Utils.remarcar(siguiente);
         Utils.setContrastColor(siguiente);
         Utils.setFontBold(siguiente);
-        add(siguiente);
+        
+        panelSiguiente.add(siguiente);
+        add(panelSiguiente);
 
         // Espacio entre botones
 		panelVacio = new Panel();
 		panelVacio.setSize(new Dimension(20, 10));
 		add(panelVacio);
         
+		JPanel panelCancelar = new JPanel(new GridLayout(1, 1));
         // Boton cancelar
 		if (paginas == this.posicion)
 			cancelar.setVisible(false);
@@ -161,8 +170,11 @@ public class BotoneraInferior extends JPanel {
         Utils.remarcar(cancelar);
         Utils.setContrastColor(cancelar);
         Utils.setFontBold(cancelar);
-        add(cancelar);
+        
+        panelCancelar.add(cancelar);
+        add(panelCancelar);
 
+        JPanel panelFinalizar = new JPanel(new GridLayout(1, 1));
         // Boton finalizar
         if (this.ventanas.size() == 1 || paginas == this.posicion) {
             finalizar.setMnemonic(KeyEvent.VK_F); //Mnemonico para el boton de finalizar
@@ -181,7 +193,9 @@ public class BotoneraInferior extends JPanel {
         Utils.remarcar(finalizar);
         Utils.setContrastColor(finalizar);
         Utils.setFontBold(finalizar);
-        add(finalizar);
+        
+        panelFinalizar.add(finalizar);
+        add(panelFinalizar);
 	}
 
 	/**

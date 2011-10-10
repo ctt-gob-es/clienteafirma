@@ -14,6 +14,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -153,6 +154,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         c.gridy	= 1;
         c.gridx = 1;
         
+        JPanel panelExaminarFirma = new JPanel(new GridLayout(1, 1));
         // Boton examinar (fichero datos)
         JButton	examinarFirma = new JButton();
         examinarFirma.setMnemonic(KeyEvent.VK_E);
@@ -167,7 +169,8 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.remarcar(examinarFirma);
         Utils.setContrastColor(examinarFirma);
         Utils.setFontBold(examinarFirma);
-        panelCentral.add(examinarFirma, c);
+        panelExaminarFirma.add(examinarFirma);
+        panelCentral.add(panelExaminarFirma, c);
         
         c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(20, 20, 0, 20);
