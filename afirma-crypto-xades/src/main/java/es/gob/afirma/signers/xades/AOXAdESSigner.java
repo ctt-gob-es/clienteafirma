@@ -2202,7 +2202,6 @@ public final class AOXAdESSigner implements AOSigner {
      *         formato. */
     private boolean checkSignNodes(final Node rootNode, final List<Node> signNodes) {
 
-        //final String xadesNamespace = Utils.guessXAdESNamespaceURL(rootNode);
         String xadesNamespace;
         for (final Node signNode : signNodes) {
             xadesNamespace = Utils.guessXAdESNamespaceURL(signNode);
