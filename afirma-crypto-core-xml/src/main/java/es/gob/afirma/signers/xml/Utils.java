@@ -755,7 +755,7 @@ public final class Utils {
 
     /** Escribe un XML como texto.
      * @param node
-     *        Nodo XML que queremos pasar a trexto
+     *        Nodo XML que queremos pasar a texto
      * @param props
      *        Propiedades del XML (<i>version</i>, <i>encoding</i>,
      *        <i>standalone</i>)
