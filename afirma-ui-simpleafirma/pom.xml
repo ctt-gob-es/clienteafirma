@@ -54,6 +54,12 @@
     </dependency>
 
     <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-ui-core-jse</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.apple</groupId>
       <artifactId>applejavaextensions</artifactId>
       <version>1.5.4</version>
