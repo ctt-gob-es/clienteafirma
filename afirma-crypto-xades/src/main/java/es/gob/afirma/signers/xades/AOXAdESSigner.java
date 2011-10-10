@@ -1043,8 +1043,7 @@ public final class AOXAdESSigner implements AOSigner {
         
         // Genera la firma
         try {
-            xmlSignature.sign(certificates, keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null /* TSA */ //$NON-NLS-1$
-            );
+            xmlSignature.sign(certificates, keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null /* TSA */); //$NON-NLS-1$
         }
         catch (final NoSuchAlgorithmException e) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1473,8 +1472,17 @@ public final class AOXAdESSigner implements AOSigner {
                                                      + e);
         }
 
+        // Cadena de certificados
+        Certificate[] rawcerts = keyEntry.getCertificateChain();
+        List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
+        for (Certificate c : rawcerts) {
+            if (c instanceof X509Certificate) {
+                certificates.add((X509Certificate)c);
+            }
+        }
+        
         try {
-            xmlSignature.sign(cert, keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
+            xmlSignature.sign(certificates, keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
         }
         catch (final NoSuchAlgorithmException e) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1956,8 +1964,18 @@ public final class AOXAdESSigner implements AOSigner {
                                                      + "), es posible que el usado en la firma difiera del indicado: " //$NON-NLS-1$
                                                      + e);
         }
+        
+        // Cadena de certificados
+        Certificate[] rawcerts = keyEntry.getCertificateChain();
+        List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
+        for (Certificate c : rawcerts) {
+            if (c instanceof X509Certificate) {
+                certificates.add((X509Certificate)c);
+            }
+        }
+        
         try {
-            xmlSignature.sign(cert, keyEntry.getPrivateKey(), XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList, "Signature-" + UUID.randomUUID() //$NON-NLS-1$
+            xmlSignature.sign(certificates, keyEntry.getPrivateKey(), XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList, "Signature-" + UUID.randomUUID() //$NON-NLS-1$
                                                                                                                                .toString(), null /* TSA */
             );
         }

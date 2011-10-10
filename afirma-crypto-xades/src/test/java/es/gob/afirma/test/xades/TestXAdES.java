@@ -161,7 +161,7 @@ public final class TestXAdES {
         for (final String algo : ALGOS) {
           for(final String filename : TEST_FILES_MULTISIGN) {
                                 
-            prueba = "Cofirma XAdES con el algoritmo ': " + //$NON-NLS-1$
+            prueba = "Cofirma XAdES con el algoritmo '" + //$NON-NLS-1$
             algo + "' y el fichero '" + filename + "'"; //$NON-NLS-1$ //$NON-NLS-2$
             
             System.out.println();
