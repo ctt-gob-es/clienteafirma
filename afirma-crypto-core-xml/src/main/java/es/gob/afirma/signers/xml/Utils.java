@@ -794,11 +794,9 @@ public final class Utils {
         // datos contenidos en la firma. Por motivos estilisticos, volvemos a
         // cargar el XML y a
         // guardarlo mediante DOM para que no aparezcan.
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
         final Document docum;
         try {
-            docum = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
+            docum = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(baos.toByteArray()));
         }
         catch (final Exception e) {
             LOGGER.severe("No se ha podido recargar el XML para insertar los atributos de la cabecera, quizas la codificacion se vea afectada: " + e); //$NON-NLS-1$
