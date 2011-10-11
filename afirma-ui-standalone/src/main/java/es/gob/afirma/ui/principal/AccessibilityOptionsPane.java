@@ -368,22 +368,38 @@ public class AccessibilityOptionsPane {
 	}
 	
 	/**
-	 * Guarda en el preferences la configuracion del usuario.
+	 * Guarda y/o modifica en el preferences la configuracion del usuario.
 	 */
 	private void save(){
-		// TODO avisar si el perfil ya existe
+		int user = 0;
+		boolean exists = false;
 		String name = JOptionPane.showInputDialog("Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración:");
 		if (name!=null){
 			if (name.trim().length()!=0){
 				if (Main.preferences.get("users","0").equals("0")){
+					exists = true;
 					Main.preferences.put("users","1");
+					Main.preferences.put("user"+Main.preferences.get("users", "0"), name.trim());
 				} else {
-					int user;
 					user = Integer.parseInt(Main.preferences.get("users", "0"));
 					user++;
-					Main.preferences.put("users", String.valueOf(user));
+					for (int i =0;i<user;i++){
+						if (Main.preferences.get("user"+i, "0").equals(name.trim())){
+							exists = true;
+							Main.preferences.remove(name.trim()+".accesibility.fontBig");
+							Main.preferences.remove(name.trim()+".accesibility.fontStyle");
+							Main.preferences.remove(name.trim()+".accesibility.highContrast");
+							Main.preferences.remove(name.trim()+".accesibility.focus");
+							Main.preferences.remove(name.trim()+".accesibility.maximized");
+							Main.preferences.remove(name.trim()+".accesibility.cursor");
+						}
+					}
 				}
-				Main.preferences.put("user"+Main.preferences.get("users", "0"), name.trim());
+				if (!exists){
+					exists=false;
+					Main.preferences.put("users", String.valueOf(user));
+					Main.preferences.put("user"+Main.preferences.get("users", "0"), name.trim());
+				}
 				Main.preferences.put(name.trim()+".accesibility.fontBig",String.valueOf(checkFontSize.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.fontStyle",String.valueOf(checkFontStyle.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.highContrast",String.valueOf(checkHighContrast.isSelected()));
