@@ -32,6 +32,10 @@ import es.gob.afirma.core.util.windows.WinRegistryWrapper;
  * de certificados de Mozilla. */
 final class MozillaKeyStoreUtilities {
     
+    private MozillaKeyStoreUtilities() {
+        // No permitimos la instanciacion
+    }
+    
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Directorio con las bibliotecas de NSS necesarias para el acceso al

@@ -61,7 +61,7 @@ final class AOSecMod {
 
             final String trueLibName = searchPathForFile(new String[] {
                 libName
-            }, false);
+            });
 
             if (trueLibName != null) {
                 return new ModuleName(trueLibName, commonName);
@@ -104,7 +104,7 @@ final class AOSecMod {
                 secMod = AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(secmod.getAbsolutePath())));
             }
             catch (final Exception e) {
-                throw new AOException("Error leyendo la base de datos de modulos (secmod.db)"); //$NON-NLS-1$
+                throw new AOException("Error leyendo la base de datos de modulos (secmod.db)", e); //$NON-NLS-1$
             }
 
             // Obtenemos los modulos PKCS#11 asegurandonos de que no aparecen
@@ -179,11 +179,8 @@ final class AOSecMod {
      * de buscar en la primera ocurrencia
      * @param files
      *        Ficheros a buscar en el PATH
-     * @param excludeAFirma
-     *        Excluye el directorio de instalaci&oacute;n de AFirma de la
-     *        b&uacute;squeda
      * @return Ruta completa del fichero encontrado en el PATH o <code>null</code> si no se encontr&oacute; nada */
-    private final static String searchPathForFile(final String[] files, final boolean excludeAFirma) {
+    private final static String searchPathForFile(final String[] files) {
         if (files == null || files.length < 1) {
             return null;
         }

@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 
 import es.gob.afirma.core.misc.AOUtil;
 
-class FirefoxKeyStoreMessages {
+final class FirefoxKeyStoreMessages {
     
     private static final String BUNDLE_NAME = "firefoxmessages"; //$NON-NLS-1$
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
