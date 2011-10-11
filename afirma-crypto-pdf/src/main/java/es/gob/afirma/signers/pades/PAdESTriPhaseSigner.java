@@ -405,7 +405,7 @@ public class PAdESTriPhaseSigner {
 
         PdfObject pdfObject;
         try {
-            Class<?> pdfStamperImpClass = Class.forName("com.lowagie.text.pdf.PdfStamperImp"); //$NON-NLS-1$
+            Class<?> pdfStamperImpClass = AOUtil.classForName("com.lowagie.text.pdf.PdfStamperImp"); //$NON-NLS-1$
             Method getFileIdMethod = pdfStamperImpClass.getMethod("getFileID", (Class[]) null); //$NON-NLS-1$
             pdfObject = (PdfObject) getFileIdMethod.invoke(stp.getWriter(), (Object[]) null);
         } catch (Exception e) {
