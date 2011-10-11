@@ -18,6 +18,8 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
  * el di&aacute;logo de selecci&oacute;n. */
 public class KeyUsageFilter implements CertificateFilter {
     
+    private static final int KEYUSAGE_NBITS = 9;
+    
     /** El KeyUsage m&iacute;nimos que debe cumplir el certificado. */
     private final Boolean[] keyUsageFilter;
 
@@ -25,7 +27,7 @@ public class KeyUsageFilter implements CertificateFilter {
         if (cert == null) {
             return false;
         }
-        if (this.keyUsageFilter.length == 9) {
+        if (this.keyUsageFilter.length == KEYUSAGE_NBITS) {
             final boolean[] certUsage = cert.getKeyUsage();
             if (certUsage != null) {
                 for (int j = 0; j < certUsage.length; j++) {
