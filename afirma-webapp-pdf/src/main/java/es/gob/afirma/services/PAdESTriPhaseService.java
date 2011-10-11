@@ -12,11 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.ServletConfig;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import com.lowagie.text.pdf.codec.Base64;
@@ -30,6 +33,9 @@ import es.gob.afirma.signers.pades.PAdESTriPhaseSigner.PdfPreSignResult;
 @Path("pades")
 public class PAdESTriPhaseService
 {
+	@Context
+	private ServletConfig servletConfig;
+	
     /** Prefirma.
      * @param base64Data Datos a prefirmar codificados en Base64
      * @param algorithm Algoritmo de firma
@@ -59,7 +65,7 @@ public class PAdESTriPhaseService
     @Path("pre/{reference}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_XML)
-    public PreSignatureResult preWithReference(@FormParam("reference") final String reference,
+    public PreSignatureResult preWithReference(@PathParam("reference") final String reference,
                                   @FormParam("algorithm")              final String algorithm,
                                   @FormParam("base64CertificateChain") final List<String> base64CertificateChain,
                                   @FormParam("extraParamsNames")       final List<String> extraParamsNames,
@@ -71,17 +77,17 @@ public class PAdESTriPhaseService
     	{
     		if ("SIMPLE".equals(reference))
     		{
-    			data = inputStreamToByteArray(ClassLoader.getSystemResourceAsStream("TEST_PDF.pdf"));
+    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF.pdf"));
     		}
 
     		if ("CERTIFIED".equals(reference))
     		{
-    			data = inputStreamToByteArray(ClassLoader.getSystemResourceAsStream("TEST_PDF_Certified.pdf"));
+    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Certified.pdf"));
     		}
     		
     		if ("PASSWORD".equals(reference))
     		{
-    			data = inputStreamToByteArray(ClassLoader.getSystemResourceAsStream("TEST_PDF_Password.pdf"));
+    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Password.pdf"));
     		}
     	}
         		
@@ -137,7 +143,56 @@ public class PAdESTriPhaseService
                        @FormParam("fileID") String fileID) throws Exception {
         
         final byte[] data = Base64.decode(base64Data);
-        final List<X509Certificate> certChain = buildCertificateChain(base64CertificateChain);
+        return executePostOperation(algorithm, base64CertificateChain,
+				extraParamsNames, extraParamsValues, base64Signature,
+				base64PreSignData, fileID, data);
+    }
+
+    @POST
+    @Path("post/{reference}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public String postWithReference(@PathParam("reference") final String reference,
+                       @FormParam("algorithm")              final String algorithm,
+                       @FormParam("base64CertificateChain") final List<String> base64CertificateChain,
+                       @FormParam("extraParamsNames")       final List<String> extraParamsNames,
+                       @FormParam("extraParamsValues")      final List<String> extraParamsValues,
+                       @FormParam("base64Signature")        final String base64Signature,
+                       @FormParam("base64PreSignData")      final String base64PreSignData,
+                       @FormParam("fileID") String fileID) throws Exception {
+        
+    	byte[] data = new byte[] {};
+    	
+    	if (reference != null)
+    	{
+    		if ("SIMPLE".equals(reference))
+    		{
+    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF.pdf"));
+    		}
+
+    		if ("CERTIFIED".equals(reference))
+    		{
+    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Certified.pdf"));
+    		}
+    		
+    		if ("PASSWORD".equals(reference))
+    		{
+    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Password.pdf"));
+    		}
+    	}
+
+    	return executePostOperation(algorithm, base64CertificateChain,
+				extraParamsNames, extraParamsValues, base64Signature,
+				base64PreSignData, fileID, data);
+    }
+
+	private String executePostOperation(final String algorithm,
+			final List<String> base64CertificateChain,
+			final List<String> extraParamsNames,
+			final List<String> extraParamsValues, final String base64Signature,
+			final String base64PreSignData, String fileID, byte[] data)
+			throws CertificateException, AOException, IOException {
+		final List<X509Certificate> certChain = buildCertificateChain(base64CertificateChain);
         final Properties extraParamsProperties = namesAndValuesListToProperties(extraParamsNames, extraParamsValues);
 
         final PAdESTriPhaseSigner padesTri = new PAdESTriPhaseSigner();
@@ -148,8 +203,8 @@ public class PAdESTriPhaseService
         );
 
         return Base64.encodeBytes(finalSignature);
-    }
-
+	}
+    
     private List<X509Certificate> buildCertificateChain(final List<String> base64CertificateChain) throws CertificateException {
         final List<X509Certificate> certChain = new ArrayList<X509Certificate>();
         final CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509"); //$NON-NLS-1$

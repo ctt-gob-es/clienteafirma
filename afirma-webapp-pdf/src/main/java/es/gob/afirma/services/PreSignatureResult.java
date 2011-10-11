@@ -9,6 +9,10 @@ public class PreSignatureResult {
     private byte[] preSignData;
     private String fileID;
     
+    public PreSignatureResult()
+    {
+    }
+    
     /** Construye el resultado de una prefirma CAdES.
      * @param preSignData Atributos firmados de CAdES
      * @param fileID FileID del PDF prefirmado
