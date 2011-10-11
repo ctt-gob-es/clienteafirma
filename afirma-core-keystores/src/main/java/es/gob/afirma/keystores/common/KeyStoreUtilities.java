@@ -10,7 +10,6 @@
 
 package es.gob.afirma.keystores.common;
 
-import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.security.AccessController;
@@ -525,13 +524,11 @@ public final class KeyStoreUtilities {
     
     /** Recupera el PasswordCallback que com&uacute;nmente se requiere para el
      * acceso a un almac&eacute;n de claves.
-     * @param kStore
-     *        Almac&eacuten de claves
-     * @param parent
-     *        Componente sobre el que se deben visualizar los
-     *        di&aacute;logos modales.
+     * @param kStore Almac&eacuten de claves
+     * @param parent Componente sobre el que se deben visualizar los
+     *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
      * @return Manejador para la solicitud de la clave. */
-    public static PasswordCallback getPreferredPCB(final AOKeyStore kStore, final Component parent) {
+    public static PasswordCallback getPreferredPCB(final AOKeyStore kStore, final Object parent) {
 
         if (kStore == null) {
             throw new IllegalArgumentException("No se ha indicado el KeyStore del que desea " + //$NON-NLS-1$
@@ -548,13 +545,11 @@ public final class KeyStoreUtilities {
 
     /** Recupera el manejador de claves asociado a un certificado seg&uacute;n el
      * repositorio en el que se aloja.
-     * @param store
-     *        Almace&eacute;n de claves del certificado.
-     * @param parent
-     *        Componente sobre el que se deben visualizar los
-     *        di&aacute;logos modales.
+     * @param store Almace&eacute;n de claves del certificado.
+     * @param parent Componente sobre el que se deben visualizar los
+     *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
      * @return Manejador para la solicitud de la clave. */
-    public static PasswordCallback getCertificatePC(final AOKeyStore store, final Component parent) {
+    public static PasswordCallback getCertificatePC(final AOKeyStore store, final Object parent) {
         if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
             || store == AOKeyStore.WINADDRESSBOOK
             || store == AOKeyStore.WINCA

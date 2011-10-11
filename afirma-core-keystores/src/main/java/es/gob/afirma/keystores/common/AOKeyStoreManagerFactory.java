@@ -10,7 +10,6 @@
 
 package es.gob.afirma.keystores.common;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,7 +46,7 @@ public final class AOKeyStoreManagerFactory {
      *        Callback que solicita la password del repositorio que deseamos
      *        recuperar.
      * @param parentComponent
-     *        Componente padre sobre el que mostrar los di&aacute;logos
+     *        Componente padre sobre el que mostrar los di&aacute;logos (normalmente un <code>java.awt.Comonent</code>)
      *        modales de ser necesario.
      * @return KeyStoreManager del tipo indicado
      * @throws AOCancelledOperationException
@@ -62,7 +61,7 @@ public final class AOKeyStoreManagerFactory {
                                                          final String lib,
                                                          final String description,
                                                          final PasswordCallback pssCallback,
-                                                         final Component parentComponent) throws AOCancelledOperationException,
+                                                         final Object parentComponent) throws AOCancelledOperationException,
                                                                                          AOKeystoreAlternativeException, InvalidKeyException {
 
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
