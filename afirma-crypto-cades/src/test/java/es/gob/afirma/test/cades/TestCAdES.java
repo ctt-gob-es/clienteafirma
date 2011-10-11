@@ -30,7 +30,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.platform.ws.TestSignVerifier;
+//import es.gob.afirma.platform.ws.TestSignVerifier;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 
@@ -94,7 +94,7 @@ public final class TestCAdES {
      */
     @Test
     public void testSignature() throws Exception {
-        
+      /*  
       TestSignVerifier verifier = null;
       try {
           verifier = new TestSignVerifier();
@@ -102,6 +102,7 @@ public final class TestCAdES {
       catch (Exception e) {
           System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
       }
+      */
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
@@ -139,9 +140,9 @@ public final class TestCAdES {
                 System.out.println("Temporal para comprobacion manual: " + saveFile.getAbsolutePath()); //$NON-NLS-1$
 
               // Enviamos a validar a AFirma
-              if (verifier != null) {
-                  Assert.assertTrue("Fallo al validar " + saveFile.getAbsolutePath(), verifier.verifyBin(result)); //$NON-NLS-1$
-              }
+//              if (verifier != null) {
+//                  Assert.assertTrue("Fallo al validar " + saveFile.getAbsolutePath(), verifier.verifyBin(result)); //$NON-NLS-1$
+//              }
                 
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));
