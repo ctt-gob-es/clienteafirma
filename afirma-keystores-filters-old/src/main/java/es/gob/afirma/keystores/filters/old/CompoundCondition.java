@@ -23,8 +23,8 @@ import es.gob.afirma.core.AOException;
 final class CompoundCondition extends AClause implements ConditionConstants {
 
     CompoundCondition(String str) throws AOException {
-        // Matcher simpleConditionMatcher = simpleConditionPattern.matcher(str);
-        Matcher nexusConditionMatcher = nexusConditionPattern.matcher(str);
+        // Matcher simpleConditionMatcher = COMPILED_SIMPLE_CONDITION_PATERN.matcher(str);
+        Matcher nexusConditionMatcher = COMPILED_NEXUS_CONDITION_PATTERN.matcher(str);
 
         Collection<Clause> cClauses = new ArrayList<Clause>();
         Collection<Nexus> cNexus = new ArrayList<Nexus>();

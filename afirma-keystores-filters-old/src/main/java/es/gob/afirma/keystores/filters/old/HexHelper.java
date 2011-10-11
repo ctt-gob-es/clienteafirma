@@ -11,7 +11,7 @@
 package es.gob.afirma.keystores.filters.old;
 
 
-class HexHelper {
+final class HexHelper {
     private static final HexHelper INSTANCE = new HexHelper();
 
     private static final char[] hexChars= new char[]{
@@ -47,7 +47,7 @@ class HexHelper {
         
         if(data.length>0)
         {
-            StringBuffer sb= new StringBuffer(data.length *3);
+            final StringBuffer sb= new StringBuffer(data.length *3);
             
             sb.append(toHex(data[0]));
             for(int i=1; i<data.length; i++)

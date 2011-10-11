@@ -29,8 +29,8 @@ final class ComplexCondition extends AClause implements ConditionConstants {
 	 */
     @Deprecated
 	public ComplexCondition(final String str) throws AOException {
-        Matcher compoundConditionMatcher = compoundConditionPattern.matcher(str);
-        Matcher nexusConditionMatcher = nexusConditionPattern.matcher(str);
+        Matcher compoundConditionMatcher = COMPILED_COMPOUND_CONDITION_PATTERN.matcher(str);
+        Matcher nexusConditionMatcher = COMPILED_NEXUS_CONDITION_PATTERN.matcher(str);
 
         Collection<Clause> cClauses = new ArrayList<Clause>();
         Collection<String> cNexus = new ArrayList<String>();

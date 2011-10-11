@@ -37,9 +37,9 @@ final class SimpleCondition extends AClause implements ConditionConstants {
     private String hashAlg;
 
     SimpleCondition(final String str) throws AOException {
-        Matcher fieldMatcher = fieldConditionPattern.matcher(str);
-        Matcher valueMatcher = valueConditionPattern.matcher(str);
-        Matcher operatorMatcher = operatorPattern.matcher(str);
+        Matcher fieldMatcher = COMPILED_FIELD_CONDITION_PATTERN.matcher(str);
+        Matcher valueMatcher = COMPILED_VALUE_CONDITION_PATTERN.matcher(str);
+        Matcher operatorMatcher = COMPILED_OPERATOR_PATTERN.matcher(str);
 
         int ini, fin;
         if (fieldMatcher.find()) {
@@ -47,7 +47,9 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             fin = fieldMatcher.end();
             this.field = str.substring(ini, fin);
         }
-        else throw new AOException("Error de sintaxis: " + str); //$NON-NLS-1$
+        else {
+            throw new AOException("Error de sintaxis: " + str); //$NON-NLS-1$
+        }
 
         if (operatorMatcher.find()) {
             ini = operatorMatcher.start();
@@ -59,19 +61,25 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             else if (strOperator.equals("#NOT_MATCHES#"))this.operator = Operator.NOT_MATCHES; //$NON-NLS-1$
             else throw new AOException("Operador desconocido: " + str); //$NON-NLS-1$
         }
-        else throw new AOException("Error de sintaxis: " + str); //$NON-NLS-1$
+        else {
+            throw new AOException("Error de sintaxis: " + str); //$NON-NLS-1$
+        }
 
         if (valueMatcher.find()) {
             ini = valueMatcher.start();
             fin = valueMatcher.end();
             this.value = str.substring(ini + 2, fin - 2);
         }
-        else throw new AOException("Error de sintaxis: " + str); //$NON-NLS-1$
+        else {
+            throw new AOException("Error de sintaxis: " + str); //$NON-NLS-1$
+        }
     }
 
     @Override
 	public boolean eval(X509Certificate cert) throws AOException {
-    	if (cert==null) return false;
+    	if (cert==null) {
+    	    return false;
+    	}
         try {
             Object o1=null, o2;
             // Ver java.util.Pattern para lo de "?i"
@@ -82,9 +90,11 @@ final class SimpleCondition extends AClause implements ConditionConstants {
                 o1 = rewriteLdapName(cert.getIssuerDN().getName());
             }
             else if (this.field.equalsIgnoreCase("SUBJECT.SERIALNUMBER")) { //$NON-NLS-1$
-            	if (this.aux == null) this.aux = this.value;
-            	String principal = cert.getSubjectX500Principal().getName();
-            	List<Rdn> rdns = new LdapName(principal).getRdns();
+            	if (this.aux == null) {
+            	    this.aux = this.value;
+            	}
+            	final String principal = cert.getSubjectX500Principal().getName();
+            	final List<Rdn> rdns = new LdapName(principal).getRdns();
         		if (rdns != null && (!rdns.isEmpty())) {
         			for (int j=0; j<rdns.size(); j++) {
         				if (rdns.get(j).toString().startsWith("serialnumber=") || rdns.get(j).toString().startsWith("SERIALNUMBER=")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -94,9 +104,13 @@ final class SimpleCondition extends AClause implements ConditionConstants {
         				    o1 = asciiHexToString(rdns.get(j).toString().substring(8));
         				}
         			}
-        			if (o1==null) return false;
+        			if (o1==null) {
+        			    return false;
+        			}
         		} 
-        		else return false;
+        		else {
+        		    return false;
+        		}
             }
             else if (this.field.equalsIgnoreCase("SUBJECT.DN")) { //$NON-NLS-1$
                 this.aux = this.value;
@@ -108,14 +122,18 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             }
             else if (this.field.toUpperCase().startsWith("SUBJECT.FP(")) { //$NON-NLS-1$
                 if (this.hashAlg == null) {
-                    Matcher matcher = hashAlgPattern.matcher(this.field);
+                    Matcher matcher = COMPILED_HASH_ALG_PATTERN.matcher(this.field);
                     matcher.find();
                     this.hashAlg = this.field.substring(matcher.start(), matcher.end());
                 }
-                if (this.aux == null) this.aux = this.value;
+                if (this.aux == null) {
+                    this.aux = this.value;
+                }
                 o1 = HEX_HELPER.toString(MessageDigest.getInstance(this.hashAlg).digest(cert.getEncoded()));
             }
-            else throw new AOException("Campo desconocido:" + this.field); //$NON-NLS-1$
+            else {
+                throw new AOException("Campo desconocido:" + this.field); //$NON-NLS-1$
+            }
             o2 = this.aux;
             
             LOGGER.info("\nValor extraido del certificado: " + o1+"\nValor patron del filtro: " + o2); //$NON-NLS-1$ //$NON-NLS-2$
@@ -212,8 +230,8 @@ final class SimpleCondition extends AClause implements ConditionConstants {
     
     private String rewriteLdapName(String ln) {
         try {
-            List<Rdn> rdns = new LdapName(ln).getRdns();
-            StringBuilder out = new StringBuilder();
+            final List<Rdn> rdns = new LdapName(ln).getRdns();
+            final StringBuilder out = new StringBuilder();
             if (rdns != null && (!rdns.isEmpty())) {
                 for (int j=rdns.size()-1; j>=0; j--) {
                     String keyValue = rdns.get(j).toString();
@@ -221,13 +239,16 @@ final class SimpleCondition extends AClause implements ConditionConstants {
                         out.append("SERIALNUMBER="); //$NON-NLS-1$
                         out.append(asciiHexToString(keyValue.substring(keyValue.indexOf('=')+1)));
                         out.append(","); //$NON-NLS-1$
-                    } else {
+                    } 
+                    else {
                         out.append(keyValue);     
                         out.append(","); //$NON-NLS-1$
                     }
                 }
                 String outStr = out.toString();
-                if (outStr.endsWith(",")) outStr = outStr.substring(0,outStr.length()-1); //$NON-NLS-1$
+                if (outStr.endsWith(",")) { //$NON-NLS-1$
+                    outStr = outStr.substring(0,outStr.length()-1);
+                }
                 return outStr;
             }
             return ln;
