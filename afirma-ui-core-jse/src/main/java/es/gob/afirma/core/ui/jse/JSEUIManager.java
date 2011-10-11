@@ -36,6 +36,8 @@ import es.gob.afirma.core.ui.AOUIManager;
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
  * @version 0.4 */
 public final class JSEUIManager implements AOUIManager {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Pregunta al usuario por una contrase&ntilde;a.
      * @param text
@@ -312,8 +314,8 @@ public final class JSEUIManager implements AOUIManager {
     public File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
 
         if (data == null) {
-            Logger.getLogger("es.gob.afirma").warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ //$NON-NLS-2$
-            throw new NullPointerException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
+            LOGGER.warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ 
+            throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
         }
 
         Component parentComponent = null;
@@ -353,7 +355,7 @@ public final class JSEUIManager implements AOUIManager {
                         JOptionPane.showConfirmDialog(parentComponent,
                                 JSEUIMessages.getString("AOUIManager.77", file.getAbsolutePath()), JSEUIMessages.getString("AOUIManager.85"), JOptionPane.YES_NO_CANCEL_OPTION); //$NON-NLS-1$ //$NON-NLS-2$
                     if (selectedOption == JOptionPane.CANCEL_OPTION) {
-                        Logger.getLogger("es.gob.afirma").info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$ //$NON-NLS-2$
+                        LOGGER.info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$ 
                         return null;
                     }
                     // Si se ha seleccionado la opcion YES (se desea
@@ -371,7 +373,7 @@ public final class JSEUIManager implements AOUIManager {
                         fos.write(data);
                     }
                     catch (final Exception ex) {
-                        Logger.getLogger("es.gob.afirma").warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
+                        LOGGER.warning("No se pudo guardar la informacion en el fichero indicado: " + ex); //$NON-NLS-1$ 
                         JOptionPane.showMessageDialog(parentComponent,
                                 JSEUIMessages.getString("AOUIManager.88"), JSEUIMessages.getString("AOUIManager.89"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                         fos = null;

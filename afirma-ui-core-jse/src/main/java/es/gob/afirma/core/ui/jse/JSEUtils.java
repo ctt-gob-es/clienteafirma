@@ -22,7 +22,11 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 /**
  * Utilidades gr&aacute;ficas propias de JSE.
  */
-public class JSEUtils {
+public final class JSEUtils {
+    
+    private JSEUtils() {
+        // No permitimos la instanciacion
+    }
     
     /** Transforma un TreeModel de Swing a uno propio
      * @param treeModel
