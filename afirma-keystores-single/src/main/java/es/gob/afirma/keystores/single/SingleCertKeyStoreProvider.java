@@ -18,9 +18,11 @@ import java.security.Provider;
 final class SingleCertKeyStoreProvider extends Provider {
 
     private static final long serialVersionUID = 3525417804439532445L;
+    
+    private static final double PROVIDER_VERSION = 0.1d;
 
     protected SingleCertKeyStoreProvider() {
-        super("PKCS7", 0.1d, "KeyStore for a PKCS7 or X.509 certificate"); //$NON-NLS-1$ //$NON-NLS-2$
+        super("PKCS7", PROVIDER_VERSION, "KeyStore for a PKCS7 or X.509 certificate"); //$NON-NLS-1$ //$NON-NLS-2$
 
         AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
             public Object run() {
