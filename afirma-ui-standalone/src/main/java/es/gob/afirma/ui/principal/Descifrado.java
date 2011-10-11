@@ -40,6 +40,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizarddescifradoclave.AsistenteDescifradoClave;
@@ -99,6 +100,7 @@ public class Descifrado extends JPanel {
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.buscar.caja.description")));
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + E."); // NOI18N
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
+		campoFichero.addAncestorListener(new RequestFocusListener());
      
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();

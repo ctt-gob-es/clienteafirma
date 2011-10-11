@@ -54,12 +54,12 @@ public class Main {
         	logger.log(Level.SEVERE, null, ex);
         }
         
-        if (preferences.get("users", "0").equals("0")){
+        //if (preferences.get("users", "0").equals("0")){
         	UserProfile.currentUser=Constants.defaultUser;
         	new PrincipalGUI().main();
-        } else {
-        	new UserProfile().main();
-        }
+        //} else {
+        	//new UserProfile().main();
+        //}
     }
 
 }

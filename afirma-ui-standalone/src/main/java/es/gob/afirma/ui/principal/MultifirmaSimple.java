@@ -34,6 +34,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardmultifirmacofirma.AsistenteCofirma;
 import es.gob.afirma.ui.wizardmultifirmacontrafirma.AsistenteContrafirmas;
@@ -76,6 +77,7 @@ public class MultifirmaSimple extends JPanel {
 		comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")+" ALT + A."); // NOI18N
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
+		comboAlmacen.addAncestorListener(new RequestFocusListener());
 		Utils.remarcar(comboAlmacen);
 		Utils.setContrastColor(comboAlmacen);
 		Utils.setFontBold(comboAlmacen);

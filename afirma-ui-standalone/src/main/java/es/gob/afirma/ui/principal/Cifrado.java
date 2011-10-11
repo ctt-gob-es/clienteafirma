@@ -42,6 +42,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardcifradoclave.AsistenteCifradoClave;
@@ -126,6 +127,7 @@ public class Cifrado extends JPanel {
 		}
 		Utils.remarcar(campoFichero);
 		Utils.setFontBold(campoFichero);
+		campoFichero.addAncestorListener(new RequestFocusListener());
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto

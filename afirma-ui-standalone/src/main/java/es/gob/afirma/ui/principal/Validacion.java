@@ -36,6 +36,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.Utils;
 
 /**
@@ -85,8 +86,7 @@ public class Validacion extends JPanel {
 		InfoLabel infoLabel1 = new InfoLabel(text1, false);
 		//Se centra el texto
 		infoLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-		//Se pone a negrita
-		Utils.setFontBold(infoLabel1);
+		infoLabel1.addAncestorListener(new RequestFocusListener());
 
 		add(infoLabel1, c);
 

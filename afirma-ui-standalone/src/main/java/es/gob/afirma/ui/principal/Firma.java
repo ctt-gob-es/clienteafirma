@@ -65,6 +65,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.SignedFileManager;
 import es.gob.afirma.ui.utils.Utils;
@@ -134,6 +135,7 @@ public class Firma extends JPanel {
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" "+"ALT + G.");
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N
+        campoFichero.addAncestorListener(new RequestFocusListener());
         Utils.remarcar(campoFichero);
         if (GeneralConfig.isBigCaret()) {
             Caret caret = new ConfigureCaret();
