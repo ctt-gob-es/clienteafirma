@@ -38,6 +38,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.LookAndFeel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -90,9 +91,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	public static JStatusBar bar = new JStatusBar();
 	
 	/**
-	 * Tema por defecto.
+	 * Tema por defecto de tipo Metal.
 	 */
 	private MetalTheme defaultTheme = MetalLookAndFeel.getCurrentTheme();
+	
+	/**
+	 * LookAndFeel por defecto.
+	 */
+	private LookAndFeel defaultLookAndFeel = UIManager.getLookAndFeel();
 	
 //	private JTabbedPane panelPest = null;
 	
@@ -715,23 +721,32 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				MetalTheme theme = new HighContrastTheme();
 				// set the chosen theme
 				MetalLookAndFeel.setCurrentTheme(theme);
+				
+				//set Metal look and feel
+				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 
 				UIManager.put("OptionPane.messageForeground",Color.WHITE);
 				UIManager.put("Button.foreground",Color.WHITE);
 				UIManager.put("ToolTip.foreground",Color.WHITE);
 				UIManager.put("ToolTip.background",Color.BLACK);
+				
 
 			} else {
-				MetalLookAndFeel.setCurrentTheme(this.defaultTheme); //Se asigna el tema por defecto
+				
+				//Se comprueba si el lookAndFeel por defecto es el que se había modificado para el modo
+				//Alto contraste
+				if (defaultLookAndFeel.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+					MetalLookAndFeel.setCurrentTheme(this.defaultTheme); //Se asigna el tema por defecto
+				}
+				
+				//Se asigna el lookAndFeel que había por defecto
+				UIManager.setLookAndFeel(defaultLookAndFeel);
 				
 				UIManager.put("OptionPane.messageForeground",Color.BLACK);
 				UIManager.put("Button.foreground",Color.BLACK);
 				UIManager.put("ToolTip.foreground",Color.BLACK);
 				UIManager.put("ToolTip.background",new Color(255,255,225));
 			}
-
-			//set look and feel
-			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 			
 		} catch (ClassNotFoundException e1) {
 			System.out.println(e1.getMessage());
