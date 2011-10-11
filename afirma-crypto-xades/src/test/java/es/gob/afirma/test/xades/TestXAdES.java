@@ -150,13 +150,13 @@ public final class TestXAdES {
         
         String prueba;
         
-        es.gob.afirma.platform.ws.TestSignVerifier verifier = null;
-        try {
-          verifier = new es.gob.afirma.platform.ws.TestSignVerifier();
-        } 
-        catch (Exception e) {
-          System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
-        }
+//        es.gob.afirma.platform.ws.TestSignVerifier verifier = null;
+//        try {
+//          verifier = new es.gob.afirma.platform.ws.TestSignVerifier();
+//        } 
+//        catch (Exception e) {
+//          System.out.println("No se ha podido inicializar el validador de firmas, no se validaran como parte de las pruebas: " + e); //$NON-NLS-1$
+//        }
         
         for (final String algo : ALGOS) {
           for(final String filename : TEST_FILES_MULTISIGN) {
@@ -180,9 +180,9 @@ public final class TestXAdES {
             System.out.println("Temporal para comprobacion manual: " + f.getAbsolutePath()); //$NON-NLS-1$
 
             // Enviamos a validar a AFirma
-            if (verifier != null) {
-                Assert.assertTrue("Fallo al validar " + filename, verifier.verifyXML(result)); //$NON-NLS-1$
-            }
+//            if (verifier != null) {
+//                Assert.assertTrue("Fallo al validar " + filename, verifier.verifyXML(result)); //$NON-NLS-1$
+//            }
             
             Assert.assertTrue(isValidUnsignedProperties(new ByteArrayInputStream(result),null));
 
