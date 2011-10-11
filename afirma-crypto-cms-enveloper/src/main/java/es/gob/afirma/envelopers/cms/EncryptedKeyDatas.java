@@ -23,7 +23,7 @@ final class EncryptedKeyDatas {
     }
 
     void setEncryptedKey(final byte[] encryptedKey) {
-        this.encryptedKey = encryptedKey;
+        this.encryptedKey = encryptedKey.clone();
     }
 
     AlgorithmIdentifier getAlgEncryptedKey() {
