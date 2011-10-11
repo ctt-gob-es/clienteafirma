@@ -17,7 +17,7 @@ import javax.swing.JDialog;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
- * Clase principal del wizard de cifrado de contraseña. 
+ * Clase principal del wizard de cifrado de contraseÃ±a. 
  */
 public class AsistenteCifradoContrasenia extends JDialog {
 

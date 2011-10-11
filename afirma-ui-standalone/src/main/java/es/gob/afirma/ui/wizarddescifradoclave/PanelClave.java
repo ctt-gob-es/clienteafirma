@@ -157,9 +157,9 @@ public class PanelClave extends JAccessibilityDialogWizard {
         Utils.setFontBold(campoClave);
         panelCentral.add(campoClave, c);
         
-        //Relación entre etiqueta y campo de texto
+        //RelaciÃ³n entre etiqueta y campo de texto
         keyLabel.setLabelFor(campoClave);
-       	//Asignación de mnemónico
+       	//AsignaciÃ³n de mnemÃ³nico
         keyLabel.setDisplayedMnemonic(KeyEvent.VK_L);
         
         c.insets = new Insets(0, 20, 0, 20);

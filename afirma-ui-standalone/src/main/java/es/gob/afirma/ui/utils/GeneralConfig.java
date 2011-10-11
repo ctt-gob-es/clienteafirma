@@ -96,7 +96,7 @@ public class GeneralConfig {
 	}
 	
 	/**
-	 * Indica si el ususario ha activado o desactivado la opcion de tamaño de fuente grande
+	 * Indica si el ususario ha activado o desactivado la opcion de tamaÃ±o de fuente grande
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isBigFontSize() {

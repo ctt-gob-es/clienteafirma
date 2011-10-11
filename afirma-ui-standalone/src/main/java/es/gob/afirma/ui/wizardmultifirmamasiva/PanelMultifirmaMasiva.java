@@ -278,9 +278,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         Utils.setFontBold(campoDirectorio);
         panelCentral.add(campoDirectorio, c);
         
-        //Relaci�n entre etiqueta y campo de texto
+        //Relaciï¿½n entre etiqueta y campo de texto
         etiquetaFirma.setLabelFor(campoDirectorio);
-      	//Asignaci�n de mnem�nico
+      	//Asignaciï¿½n de mnemï¿½nico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_D);
       		
         c.insets = new Insets(0, 10, 0, 20);
@@ -352,7 +352,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         Utils.setFontBold(campoFicheroLog);
         panelCentral.add(campoFicheroLog, c);
         
-        //Relaci�n entre etiqueta y campo de texto
+        //Relaciï¿½n entre etiqueta y campo de texto
         etiquetaFichero.setLabelFor(campoFicheroLog);
         
         c.insets = new Insets(0, 10, 0, 20);
@@ -363,7 +363,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         // Boton examinar fichero log
         examinarFichero = new JButton();
         examinarFichero.setEnabled(false);
-        examinarFichero.setMnemonic(0); //mnem�nico vac�o puesto que por defecto est� deshabilitado
+        examinarFichero.setMnemonic(0); //mnemï¿½nico vacï¿½o puesto que por defecto estï¿½ deshabilitado
         examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar"));
         examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
         examinarFichero.getAccessibleContext().setAccessibleName(examinarFichero.getText() + " " + examinarFichero.getToolTipText());
@@ -410,13 +410,13 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     		campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath());
     	}
 
-      	//Asignaci�n de mnem�nico
+      	//Asignaciï¿½n de mnemï¿½nico
         etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_F);
     	// Activamos el boton de examinar el directorio del log y el campo para introducirlo
     	examinarFichero.setEnabled(true);
-    	examinarFichero.setMnemonic(KeyEvent.VK_X); //mnem�nico asignado puesto que se habilita el bot�n
+    	examinarFichero.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico asignado puesto que se habilita el botï¿½n
     	campoFicheroLog.setEnabled(true);
-    	etiquetaFichero.setFocusable(false); //Ahora el elemento focusable ser� el campo de texto, no la etiqueta
+    	etiquetaFichero.setFocusable(false); //Ahora el elemento focusable será el campo de texto, no la etiqueta
     }
 
     /**
@@ -517,13 +517,13 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	}
         } catch(AOException e){
         	logger.severe(e.toString());
-        	//El pop-up muestra el mensaje de la excepci�n
+        	//El pop-up muestra el mensaje de la excepción
         	JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), 
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE);
         	return false;
         } catch(Exception e){
         	logger.severe(e.toString());
-        	//El pop-up muestra el mensaje de la excepci�n
+        	//El pop-up muestra el mensaje de la excepción
         	JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), 
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); 
         	e.printStackTrace();
@@ -607,7 +607,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 	}
     
     /**
-     * Obtiene el tipo de multifirma que se est� realizando
+     * Obtiene el tipo de multifirma que se estï¿½ realizando
      * @param tipo  tipo de firma
      * @param hojas si se han de firmar las hojas
      * @return tipo de firma a realizar.

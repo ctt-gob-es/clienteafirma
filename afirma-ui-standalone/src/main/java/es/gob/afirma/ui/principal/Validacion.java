@@ -101,7 +101,7 @@ public class Validacion extends JPanel {
 
 		enlace.setForeground(new Color(55, 55, 254));
 		Utils.setFontBold(enlace);
-		//Se añade
+		//Se aÃ±ade
 		add(enlace, c);
 		
 		c.gridy = 3;

@@ -83,7 +83,7 @@ public class SelectionDialog {
      * devolver&aacute; el path completo del fichero.
      * 
      * @param dialogTitle
-     *        TÌtulo de la ventana de guardado.
+     *        T√≠tulo de la ventana de guardado.
      * @param data
      *        Datos que se desean almacenar.
      * @param defaultName
@@ -108,14 +108,14 @@ public class SelectionDialog {
             parentComponent = (Component) parent;
         }
         
-        //Instancia del di·logo de guardado accesible
+        //Instancia del di√°logo de guardado accesible
         final JAccessibilityFileChooserToSave fileChooser = new JAccessibilityFileChooserToSave();
         String currentDir = Main.preferences.get("dialog.save.dir", null); //$NON-NLS-1$
         if (currentDir != null) {
             fileChooser.setCurrentDirectory(new File(currentDir));
         }
         
-        fileChooser.setDialogTitle(dialogTitle); //Se le asigna un tÌtulo al di·logo
+        fileChooser.setDialogTitle(dialogTitle); //Se le asigna un t√≠tulo al di√°logo
         
         File resultFile = null;
         boolean tryAgain = true;

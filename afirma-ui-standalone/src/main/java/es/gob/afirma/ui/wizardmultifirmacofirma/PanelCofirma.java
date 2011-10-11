@@ -147,7 +147,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         
         //Relacion entre etiqueta y campo de texto
         etiquetaFirma.setLabelFor(campoFirma);
-        //Asignacion de mnem�nico
+        //Asignacion de mnemónico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_I);
 
 		c.insets = new Insets(0, 10, 0, 20);
@@ -157,7 +157,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		JPanel panelExaminarFirma = new JPanel(new GridLayout(1, 1));
 		// Boton examinar (fichero firma)
         JButton examinarFirma = new JButton();
-        examinarFirma.setMnemonic(KeyEvent.VK_X); //mnem�nico diferente al bot�n "Examinar" anterior
+        examinarFirma.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico diferente al botï¿½n "Examinar" anterior
         examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar"));
         examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
         examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
@@ -205,7 +205,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         
         //Relacion entre etiqueta y campo de texto
         etiquetaDatos.setLabelFor(campoDatos);
-        //Asignacion de mnem�nico
+        //Asignacion de mnemónico
         etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_F);
 
 		c.insets = new Insets(0, 10, 0, 20);

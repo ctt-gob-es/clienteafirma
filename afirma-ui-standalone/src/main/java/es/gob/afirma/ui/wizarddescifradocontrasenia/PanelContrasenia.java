@@ -129,7 +129,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		 c.gridx = 0;
 		 c.gridy	= 1;
 		 
-		//Etiqueta con el texto Contraseña de descifrado
+		//Etiqueta con el texto ContraseÃ±a de descifrado
     	JLabel passwordLabel = new JLabel (Messages.getString("WizardDescifrado.contrasenia"));
     	Utils.setContrastColor(passwordLabel);
     	Utils.setFontBold(passwordLabel);
@@ -141,7 +141,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		 c.gridy = 2;
        
 		
-        // Caja de texto donde se guarda la contraseña
+        // Caja de texto donde se guarda la contraseÃ±a
 		 this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
 		 campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + campoContrasenia.getToolTipText() + "ALT + O.");
 	     campoContrasenia.getAccessibleContext().setAccessibleDescription(campoContrasenia.getToolTipText());
@@ -155,9 +155,9 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	     Utils.setFontBold(campoContrasenia);
 	     panelCentral.add(this.campoContrasenia, c);
     	
-        //Relación entre etiqueta y campo de texto
+        //RelaciÃ³n entre etiqueta y campo de texto
         passwordLabel.setLabelFor(campoContrasenia);
-      	//Asignación de mnemónico
+      	//AsignaciÃ³n de mnemÃ³nico
         passwordLabel.setDisplayedMnemonic(KeyEvent.VK_O);
         
         c.fill = GridBagConstraints.BOTH;

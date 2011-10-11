@@ -148,9 +148,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		Utils.setFontBold(comboDestinatarios);
 		panelCentral.add(comboDestinatarios, c);
 		
-		//Relaci髇 entre etiqueta y combo
+		//Relaci贸n entre etiqueta y combo
 		etiquetaAnadir.setLabelFor(comboDestinatarios);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
 		
 		c.insets = new Insets(0, 10, 0, 20);
@@ -166,7 +166,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		anadir.setToolTipText(Messages.getString("wizard.aniadir.description"));
 		anadir.setText(Messages.getString("wizard.aniadir"));
 		anadir.setAutoscrolls(true);
-		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot髇
+		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot贸n
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
@@ -217,9 +217,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 
 		panelLista.setViewportView(listaDestinatarios);
 		
-		//Relaci髇 entre etiqueta y lista
+		//Relaci贸n entre etiqueta y lista
 		destLabel.setLabelFor(listaDestinatarios);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		destLabel.setDisplayedMnemonic(KeyEvent.VK_T);
 
 		c.ipady = 0;
@@ -283,11 +283,11 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
 		} catch (InvalidKeyException e) {
-			//Control de la excepci髇 generada al introducir mal la contrase馻 para el almac閚
+			//Control de la excepci贸n generada al introducir mal la contrase帽a para el almac茅n
             JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return;
         }  catch (AOKeystoreAlternativeException e) {
-        	//Control de la excepci髇 generada al introducir una contrase馻 vac韆 para el almac閚
+        	//Control de la excepci贸n generada al introducir una contrase帽a vac铆a para el almac茅n
         	 JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
              return;
         }catch (Exception e) {
@@ -312,7 +312,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 				listaModel.addElement(certDest.getAlias());
 				listaCertificados.add(certDest);
 				eliminar.setEnabled(true);
-				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al bot髇 ya que ha sido habilitado
+				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al bot贸n ya que ha sido habilitado
 			} else 
 				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario.existe"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
@@ -334,7 +334,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 
 		if (listaModel.isEmpty()) {
 			eliminar.setEnabled(false);
-			eliminar.setMnemonic(0); //Se asigna un atajo vac韔 al bot髇 ya que ha sido deshabilitado
+			eliminar.setMnemonic(0); //Se asigna un atajo vac铆o al bot贸n ya que ha sido deshabilitado
 		}
 	}
 

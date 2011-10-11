@@ -86,8 +86,8 @@ public class Opciones extends JAccessibilityDialog {
 	}
 	
     /**
-	 * Posici�n X inicial de la ventana dependiendo de la resoluci�n de pantalla.
-	 * @return int Posici�n X
+	 * Posición X inicial de la ventana dependiendo de la resolución de pantalla.
+	 * @return int Posición X
 	 */
     public int getInitialX() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
@@ -95,9 +95,9 @@ public class Opciones extends JAccessibilityDialog {
 	}
     
     /**
-	 * Posici�n Y inicial de la ventana dependiendo del sistema operativo y de la
-	 * resoluci�n de pantalla.
-	 * @return int Posici�n Y
+	 * Posición Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resolución de pantalla.
+	 * @return int Posición Y
 	 */
 	public int getInitialY() {
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
@@ -170,9 +170,9 @@ public class Opciones extends JAccessibilityDialog {
         
         // Definicion de mnemonicos.
         int tabNum = 0;
-        mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pesta�a
-        mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pesta�a
-        mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pesta�a
+        mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pestaï¿½a
+        mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pestaï¿½a
+        mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestaï¿½a
 
         c.weighty = 0.1;
         c.fill = GridBagConstraints.BOTH;
@@ -237,7 +237,7 @@ public class Opciones extends JAccessibilityDialog {
 		// Boton aceptar
         JButton aceptar = new JButton();
         aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
-        aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al bot�n aceptar
+        aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al botï¿½n aceptar
         aceptar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	
@@ -263,7 +263,7 @@ public class Opciones extends JAccessibilityDialog {
         // Boton cancelar
         JButton	cancelar = new JButton();
         cancelar.setText(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
-        cancelar.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al bot�n cancelar
+        cancelar.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al botï¿½n cancelar
         cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 cancelarActionPerformed();
@@ -342,7 +342,7 @@ public class Opciones extends JAccessibilityDialog {
 //
 //        c.gridy = 1;
 //        
-//        // Panel criptograf�a
+//        // Panel criptografï¿½a
 //        JPanel criptografiaPanel = new JPanel(new GridBagLayout());
 //        criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
 //
@@ -464,7 +464,7 @@ public class Opciones extends JAccessibilityDialog {
 	 */
     private void aceptarActionPerformed(Properties config, Properties signatureConfig) {
 
-    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tama�o de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
+    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tamaño de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
     	Boolean needUpdateGUI = ((GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)))|| (GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) || (GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE)))|| (GeneralConfig.isRemarked() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE)))|| (GeneralConfig.isHighContrast() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST)))|| (GeneralConfig.isBigFontSize() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)))|| (GeneralConfig.isFontBold() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE)))|| update);
     	    	
     	// Guardamos el estado actual de la configuracion de la herramienta
@@ -493,7 +493,7 @@ public class Opciones extends JAccessibilityDialog {
     }
     
     /**
-	 * Cambia el tamaño de la ventana al tamaño máximo de pantalla menos el tamaño de la barra de tareas de windows
+	 * Cambia el tamaÃ±o de la ventana al tamaÃ±o mÃ¡ximo de pantalla menos el tamaÃ±o de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -503,7 +503,7 @@ public class Opciones extends JAccessibilityDialog {
 	}
 	
 	/**
-	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+	 * Restaura el tamaÃ±o de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
 		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);

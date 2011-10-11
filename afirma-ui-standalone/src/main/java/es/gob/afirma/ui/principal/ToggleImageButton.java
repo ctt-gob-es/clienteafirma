@@ -186,7 +186,7 @@ public class ToggleImageButton extends JToggleButton {
         }
         
         if (this.getButtonText() != null) {
-        	//Se pinta el texto con el mnemónico correspondiente
+        	//Se pinta el texto con el mnemÃ³nico correspondiente
         	BasicGraphicsUtils.drawString(g, this.getButtonText(),  this.getMnemonic(), 48, (this.getHeight() + g.getFontMetrics().getAscent() - 4) / 2);
         }
 

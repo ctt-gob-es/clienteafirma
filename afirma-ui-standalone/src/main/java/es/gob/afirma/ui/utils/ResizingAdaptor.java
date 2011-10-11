@@ -89,12 +89,12 @@ public class ResizingAdaptor extends ComponentAdapter {
 	}
 
 	/**
-	 * Ajusta el tamaño de fuente de una ventana
+	 * Ajusta el tamaÃ±o de fuente de una ventana
 	 * 
 	 * @param components
 	 */
 	private void adjustFontSize(Component[] components) {
-		// Se calcula la relación de aspecto para redimensionar el texto
+		// Se calcula la relaciÃ³n de aspecto para redimensionar el texto
 		double relWidth;
 		double relHeight;
 		float relation;
@@ -244,7 +244,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param c Componente de tipo JLabel en el que se encuentra la imagen
 	 * @param w Width inicial de la imagen
 	 * @para h Height inicial de la imagen
-	 * @param multiplicando Valor de multiplicacion para el nuevo tamaño de la imagen. Es mayor cuanto menor sea el tamaño inicial de la imagen
+	 * @param multiplicando Valor de multiplicacion para el nuevo tamaÃ±o de la imagen. Es mayor cuanto menor sea el tamaÃ±o inicial de la imagen
 	 */
 	public final void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
 		if(JAccessibilityDialogWizard.getJAccessibilityDialogWizard(c)==null){
@@ -271,7 +271,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	}
 	
 	/**
-	 * Devuelve el tama�o de la fuente en funci�n de las opciones de accesibilidad
+	 * Devuelve el tamaño de la fuente en función de las opciones de accesibilidad
 	 * @return
 	 */
 	private float getFontSize(){

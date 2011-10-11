@@ -50,9 +50,9 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	}
 	
 	/**
-	 * Relaci髇 m韓ima que se aplica para la redimensi髇 de los componentes.
-	 * Cuanto menor es este n鷐ero menor es la redimensi髇 aplicada.
-	 * @return int Relaci髇 m韓ima
+	 * Relaci贸n m铆nima que se aplica para la redimensi贸n de los componentes.
+	 * Cuanto menor es este n煤mero menor es la redimensi贸n aplicada.
+	 * @return int Relaci贸n m铆nima
 	 */
 	public abstract int getMinimumRelation();
 	
@@ -87,7 +87,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	
 	@Override
 	/**
-	 * Evento de redimensionado. Comprueba el tama帽o de la ventana para habilitar o deshabilitar el boton
+	 * Evento de redimensionado. Comprueba el tama脙卤o de la ventana para habilitar o deshabilitar el boton
 	 *  de Maximizar ventana
 	 */
 	public void componentResized(ComponentEvent e) {
@@ -125,7 +125,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 }
 	
 	/**
-	 * Evento de redimensionado. Almacena el tama駉 y posicion de la ventana para su restauracion.
+	 * Evento de redimensionado. Almacena el tama帽o y posicion de la ventana para su restauracion.
 	 */
 	public void resized(ComponentEvent e) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

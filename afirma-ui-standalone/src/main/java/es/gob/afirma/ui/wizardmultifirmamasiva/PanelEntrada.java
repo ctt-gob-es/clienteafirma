@@ -133,9 +133,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.setFontBold(campoDirectorio);
         panelCentral.add(campoDirectorio, c);
         
-        //Relaci髇 entre etiqueta y campo de texto
+        //Relaci贸n entre etiqueta y campo de texto
         etiquetaFirma.setLabelFor(campoDirectorio);
-  		//Asignaci髇 de mnem髇ico
+  		//Asignaci贸n de mnem贸nico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_D);
         
         c.insets = new Insets(0, 10, 0, 20);
@@ -207,9 +207,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.setFontBold(campoExtensiones);
         panelCentral.add(campoExtensiones, c);
         
-        //Relaci髇 entre etiqueta y campo de texto
+        //Relaci贸n entre etiqueta y campo de texto
         etiquetaAplicar.setLabelFor(campoExtensiones);
-  		//Asignaci髇 de mnem髇ico
+  		//Asignaci贸n de mnem贸nico
         etiquetaAplicar.setDisplayedMnemonic(KeyEvent.VK_P);
     
         c.fill = GridBagConstraints.BOTH;
@@ -290,7 +290,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @return	True o false segun la verificacion
 	 */
 	boolean verificarFicheros() {
-		//comprobaci锟絥 de la ruta de fichero de entrada.
+		//comprobaci茂驴陆n de la ruta de fichero de entrada.
 		String directorio = campoDirectorio.getText();
 		if (directorio == null || directorio.equals("")) {
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.directorio.origen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);

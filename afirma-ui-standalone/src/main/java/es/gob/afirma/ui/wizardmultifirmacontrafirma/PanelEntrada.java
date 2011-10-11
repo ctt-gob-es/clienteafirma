@@ -143,9 +143,9 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.setFontBold(campoFirma);
         panelCentral.add(campoFirma, c);
         
-        //Relaci�n entre etiqueta y campo de texto
+        //Relación entre etiqueta y campo de texto
         etiquetaFirma.setLabelFor(campoFirma);
-  		//Asignaci�n de mnem�nico
+  		//Asignación de mnemónico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_F);
         
         c.insets = new Insets(0, 10, 0, 20);
@@ -247,7 +247,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @return	True o false si se ha podido leer bien el fichero
 	 */
 	public boolean checkFicheroEntrada(String ficheroFirma) {
-		// Comprobaci�n de la ruta de fichero de entrada.
+		// Comprobaciï¿½n de la ruta de fichero de entrada.
 		if (ficheroFirma == null || ficheroFirma.equals("") || !new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;

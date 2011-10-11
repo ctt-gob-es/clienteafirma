@@ -130,9 +130,9 @@ public class Cifrado extends JPanel {
 		campoFichero.addAncestorListener(new RequestFocusListener());
 		add(campoFichero, c);
 		
-		//RelaciÛn entre etiqueta y campo de texto
+		//Relaci√≥n entre etiqueta y campo de texto
 		etiquetaFichero.setLabelFor(campoFichero);
-		//AsignaciÛn de mnemÛnico
+		//Asignaci√≥n de mnem√≥nico
 		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_T);
 
 		c.insets = new Insets(0, 10, 0, 13);
@@ -198,18 +198,18 @@ public class Cifrado extends JPanel {
 		Utils.setFontBold(comboMecanismo);
 		add(comboMecanismo, c);
 		
-		// En la vista simple, no se permitir· configurar el origen de la clave
+		// En la vista simple, no se permitir√° configurar el origen de la clave
 		if(!GeneralConfig.isAvanzados()) {
-			comboMecanismo.setEnabled(false); //Se deshabilita la opciÛn
+			comboMecanismo.setEnabled(false); //Se deshabilita la opci√≥n
 			//Opciones para el lector de pantalla
 			etiquetaMecanismo.setFocusable(true);
 			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")
 			+ Messages.getString("Cifrado.origenL.0") + " "+ Messages.getString("Cifrado.origen.clave.combo.disabled"));
 		} else {
-			//Para la vista avanzada se asigna mnemÛnico puesto que esta opciÛn estar· habilitada
-			//RelaciÛn entre etiqueta y combo
+			//Para la vista avanzada se asigna mnem√≥nico puesto que esta opci√≥n estar√° habilitada
+			//Relaci√≥n entre etiqueta y combo
 			etiquetaMecanismo.setLabelFor(comboMecanismo);
-			//AsignaciÛn de mnemÛnico
+			//Asignaci√≥n de mnem√≥nico
 			etiquetaMecanismo.setDisplayedMnemonic(KeyEvent.VK_A);
 		}
 
@@ -245,18 +245,18 @@ public class Cifrado extends JPanel {
 		Utils.setFontBold(comboAlgoritmo);
 		add(comboAlgoritmo, c);
 		
-		// En la vista simple, no se permitir· configurar el algoritmo de cifrado
+		// En la vista simple, no se permitir√° configurar el algoritmo de cifrado
 		if(!GeneralConfig.isAvanzados()) {
-			comboAlgoritmo.setEnabled(false); //Se deshabilita la opciÛn
+			comboAlgoritmo.setEnabled(false); //Se deshabilita la opci√≥n
 			//Opciones para el lector de pantalla
 			etiquetaAlgoritmo.setFocusable(true);
 			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")
 			+ Messages.getString("Cifrado.origenLc.0")+ " "+ Messages.getString("Cifrado.origen.clave.combo.disabled"));
 		} else {
-			//Para la vista avanzada se asigna mnemÛnico puesto que esta opciÛn estar· habilitada
-			//RelaciÛn entre etiqueta y combo
+			//Para la vista avanzada se asigna mnem√≥nico puesto que esta opci√≥n estar√° habilitada
+			//Relaci√≥n entre etiqueta y combo
 			etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
-			//AsignaciÛn de mnemÛnico
+			//Asignaci√≥n de mnem√≥nico
 			etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_G);
 		}
 

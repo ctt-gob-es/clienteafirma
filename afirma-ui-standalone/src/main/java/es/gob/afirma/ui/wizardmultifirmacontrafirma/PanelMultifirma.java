@@ -269,9 +269,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		Utils.setFontBold(comboFirmas);
 		panelCentral.add(comboFirmas, c);
 		
-		 //Relaci髇 entre etiqueta y combo
+		 //Relaci贸n entre etiqueta y combo
 		etiquetaFirmas.setLabelFor(comboFirmas);
-  		//Asignaci髇 de mnem髇ico
+  		//Asignaci贸n de mnem贸nico
 		etiquetaFirmas.setDisplayedMnemonic(KeyEvent.VK_F);
 
 		c.insets = new Insets(20, 20, 0, 20);
@@ -329,9 +329,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		panelArbol.setViewportView(arbolFirmas);
 		panelCentral.add(panelArbol, c);
 		
-		//Relaci髇 entre etiqueta y arbol
+		//Relaci贸n entre etiqueta y arbol
 		etiqueta.setLabelFor(arbolFirmas);
-  		//Asignaci髇 de mnem髇ico
+  		//Asignaci贸n de mnem贸nico
 		etiqueta.setDisplayedMnemonic(KeyEvent.VK_R);
 
 		/*
@@ -349,9 +349,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		panelLista.setViewportView(listaFirmantes);
 		panelCentral.add(panelLista, c);
 		
-		//Relaci髇 entre etiqueta y lista
+		//Relaci贸n entre etiqueta y lista
 		etiqueta.setLabelFor(listaFirmantes);
-  		//Asignaci髇 de mnem髇ico
+  		//Asignaci贸n de mnem贸nico
 		etiqueta.setDisplayedMnemonic(KeyEvent.VK_R);
 
 		getContentPane().add(panelCentral, BorderLayout.CENTER);
@@ -364,7 +364,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
 	/**
 	 * Modifica el interfaz cambiando el arbol por un listado dependiendo
-	 * de la opci锟絥 seleccionada
+	 * de la opci茂驴陆n seleccionada
 	 * @param etiqueta 		Etiqueta superior al arbol/listado
 	 * @param panelArbol 	Panel del arbol
 	 * @param panelLista	Panel de la lista	

@@ -8,7 +8,7 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.metal.MetalTheme;
 
 /**
- * Clase utilizada para mostrar un tema en Alto Contraste en la interfaz de la aplicación.
+ * Clase utilizada para mostrar un tema en Alto Contraste en la interfaz de la aplicaciÃ³n.
  * 
  * @author INTECO
  */
@@ -58,7 +58,7 @@ public class HighContrastTheme extends MetalTheme {
 	 */
 	private final FontUIResource userFont = new FontUIResource("SansSerif", Font.PLAIN, 10);
 	/**
-	 * Fuente para el tamaño pequeño
+	 * Fuente para el tamaÃ±o pequeÃ±o
 	 */
 	private final FontUIResource smallFont = new FontUIResource("Dialog", Font.PLAIN, 9);
 

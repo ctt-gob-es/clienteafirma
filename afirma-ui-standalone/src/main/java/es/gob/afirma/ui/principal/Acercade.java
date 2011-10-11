@@ -90,7 +90,7 @@ public class Acercade extends JAccessibilityFrameAbout {
 		c.insets = new Insets(10, 20, 0, 20);
 		c.gridy = 1;
 		
-		// Versión del interfaz y Versión de la aplicación
+		// VersiÃ³n del interfaz y VersiÃ³n de la aplicaciÃ³n
 		String version = Messages.getString("version.interfaz") + "  " + Main.VERSION + "<br>"
 		+ Messages.getString("version") + "  " + getVersion();
 		InfoLabel versionInterfaz = new InfoLabel(version, false);

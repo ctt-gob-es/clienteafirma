@@ -106,7 +106,7 @@ public class MainOptionsPane {
         checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         checkHabilitar.setSelected(GeneralConfig.isAvanzados()); 
         checkHabilitar.setBounds(12, 20, 340, 23);
-        checkHabilitar.setMnemonic(KeyEvent.VK_B); // Asignación de mnemónico al checkbox
+        checkHabilitar.setMnemonic(KeyEvent.VK_B); // AsignaciÃ³n de mnemÃ³nico al checkbox
         
         Utils.remarcar(checkHabilitar);
 
@@ -118,7 +118,7 @@ public class MainOptionsPane {
         panel.add(generalPanel, c);
         c.gridy = c.gridy + 1;
         
-        // Panel criptografï¿½a
+        // Panel criptografÃ¯Â¿Â½a
         JPanel criptografiaPanel = new JPanel(new GridBagLayout());
         criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
         Utils.setContrastColor(criptografiaPanel);
@@ -153,9 +153,9 @@ public class MainOptionsPane {
         Utils.setFontBold(comboAlgoritmo);
         criptografiaPanel.add(comboAlgoritmo, c2);
         
-        //Relación entre etiqueta y combo
+        //RelaciÃ³n entre etiqueta y combo
         etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
-  		//Asignación de mnemónico
+  		//AsignaciÃ³n de mnemÃ³nico
         etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_R);
         
         c2.insets = new Insets(5, 13, 0, 13);
@@ -169,7 +169,7 @@ public class MainOptionsPane {
         checkXML = new JCheckBox();
         checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
         checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
-        checkXML.setMnemonic(KeyEvent.VK_U);  // Asignación de mnemónico al checkbox
+        checkXML.setMnemonic(KeyEvent.VK_U);  // AsignaciÃ³n de mnemÃ³nico al checkbox
 
         Utils.remarcar(checkXML);
 
@@ -201,7 +201,7 @@ public class MainOptionsPane {
         // Checkbox para habilitar las opciones de configuracion avanzada
         checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
         checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
-        checkAddPolicy.setMnemonic(KeyEvent.VK_O); // Asignación de mnemónico al checkbox
+        checkAddPolicy.setMnemonic(KeyEvent.VK_O); // AsignaciÃ³n de mnemÃ³nico al checkbox
         
         Utils.remarcar(checkAddPolicy);
 
@@ -216,7 +216,7 @@ public class MainOptionsPane {
 
         //Accesibilidad -- Lectores de pantalla
         policyOidLabel.setFocusable(true);
-        policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText()+". Este cuadro de texto está deshabilitado por defecto.");
+        policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText()+". Este cuadro de texto estÃ¡ deshabilitado por defecto.");
         
         Utils.setContrastColor(policyOidLabel);
         Utils.setFontBold(policyOidLabel);
@@ -231,7 +231,7 @@ public class MainOptionsPane {
         Utils.setContrastColor(textPolicyOid);
         Utils.setFontBold(textPolicyOid);
         
-        //Relación entre etiqueta y campo de texto
+        //RelaciÃ³n entre etiqueta y campo de texto
         policyOidLabel.setLabelFor(textPolicyOid);
         
         policyPanel.add(textPolicyOid, c2);
@@ -241,7 +241,7 @@ public class MainOptionsPane {
 
         //Accesibilidad -- Lectores de pantalla
         policyUrlLabel.setFocusable(true);
-        policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText()+". Este cuadro de texto está deshabilitado por defecto.");
+        policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText()+". Este cuadro de texto estÃ¡ deshabilitado por defecto.");
         
         Utils.setContrastColor(policyUrlLabel);
         Utils.setFontBold(policyUrlLabel);
@@ -256,7 +256,7 @@ public class MainOptionsPane {
         Utils.setContrastColor(textPolicyUrl);
         Utils.setFontBold(textPolicyUrl);
         
-        //Relación entre etiqueta y campo de texto
+        //RelaciÃ³n entre etiqueta y campo de texto
         policyUrlLabel.setLabelFor(textPolicyUrl);
         
         policyPanel.add(textPolicyUrl, c2);
@@ -273,7 +273,7 @@ public class MainOptionsPane {
 				boolean state = (e.getStateChange() == ItemEvent.SELECTED);
 				textPolicyOid.setEnabled(state);
 				textPolicyUrl.setEnabled(state);
-				//Asignación de mnemónicos según el estado
+				//AsignaciÃ³n de mnemÃ³nicos segÃºn el estado
 				if (state) {
 					policyOidLabel.setDisplayedMnemonic(KeyEvent.VK_I);
 					policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText() + "ALT + I.");
@@ -283,11 +283,11 @@ public class MainOptionsPane {
 					policyUrlLabel.setFocusable(false);
 				
 				} else {
-					//Se eliminan los atajos porque los cuadros de texto están deshabilitados
+					//Se eliminan los atajos porque los cuadros de texto estÃ¡n deshabilitados
 					policyOidLabel.setDisplayedMnemonic(0);
-					policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText()+". Este cuadro de texto está deshabilitado por defecto.");
+					policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText()+". Este cuadro de texto estÃ¡ deshabilitado por defecto.");
 					policyUrlLabel.setDisplayedMnemonic(0);
-					policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText()+". Este cuadro de texto está deshabilitado por defecto.");
+					policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText()+". Este cuadro de texto estÃ¡ deshabilitado por defecto.");
 				}
 			}
 		});

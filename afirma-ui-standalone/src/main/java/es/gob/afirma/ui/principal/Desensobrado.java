@@ -117,9 +117,9 @@ public class Desensobrado extends JPanel {
         Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
-		//Relaci髇 entre etiqueta y campo de texto
+		//Relaci贸n entre etiqueta y campo de texto
 		etiquetaFichero.setLabelFor(campoFichero);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_O);
 		
 		c.insets = new Insets(0, 10, 0, 13);
@@ -179,9 +179,9 @@ public class Desensobrado extends JPanel {
         Utils.setFontBold(comboAlmacen);
         add(comboAlmacen, c);
         
-        //Relaci髇 entre etiqueta y combo
+        //Relaci贸n entre etiqueta y combo
         etiquetaAlmacen.setLabelFor(comboAlmacen);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
         etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
         
 		c.insets = new Insets(13, 13, 0, 13);
@@ -294,7 +294,7 @@ public class Desensobrado extends JPanel {
     
     /**
      * Carga el combo almacen respecto al sistema operativo en el que se encuentra 
-     * la aplicaci锟絥
+     * la aplicaci茂驴陆n
      * @param comboAlmacen	Combo donde se cargan los tipos de almacen
      * @return	comboAlmacen cargado
      */
@@ -339,7 +339,7 @@ public class Desensobrado extends JPanel {
     		}
 
     		
-    		//Se carga el almac閚 y el certificado
+    		//Se carga el almac茅n y el certificado
     		PrivateKeyEntry privateKeyEntry = null;
     		try {
     			AOKeyStoreManager keyStoreManager = getKeyStoreManager((KeyStoreConfiguration) comboAlmacen.getSelectedItem());
@@ -348,7 +348,7 @@ public class Desensobrado extends JPanel {
     			logger.severe("Operacion cancelada por el usuario");
     			return;
     		} catch (KeyException e) {
-            	//Control de la excepci髇 generada al introducir mal la contrase馻 para el almac閚
+            	//Control de la excepci贸n generada al introducir mal la contrase帽a para el almac茅n
                 JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             } catch (AOKeystoreAlternativeException e) {
@@ -384,12 +384,12 @@ public class Desensobrado extends JPanel {
     		    }
     		} catch (AOException e) {
     			logger.severe("Ocurrio un error al abrir el sobre digital: "+e); //$NON-NLS-1$
-    			//El pop-up muestra el mensaje de la excepci髇
+    			//El pop-up muestra el mensaje de la excepci贸n
     			JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     			return;
     		} catch (Exception e) {
     			logger.severe("Ocurrio un error al abrir el sobre digital: "+e); //$NON-NLS-1$
-    			//El pop-up muestra el mensaje de la excepci髇
+    			//El pop-up muestra el mensaje de la excepci贸n
     			JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
     			return;
     		}

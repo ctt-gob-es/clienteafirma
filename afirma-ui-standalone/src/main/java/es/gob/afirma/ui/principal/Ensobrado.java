@@ -100,9 +100,9 @@ public class Ensobrado extends JPanel {
         Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
-		//Relaci髇 entre etiqueta y campo de texto
+		//Relaci贸n entre etiqueta y campo de texto
 		etiquetaFichero.setLabelFor(campoFichero);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_O);
 		
 		c.insets = new Insets(0, 10, 0, 13);
@@ -186,9 +186,9 @@ public class Ensobrado extends JPanel {
         Utils.setFontBold(comboTipos);
         add(comboTipos, c);
         
-      //Relaci髇 entre etiqueta y combo
+      //Relaci贸n entre etiqueta y combo
         etiquetaOpciones.setLabelFor(comboTipos);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
         etiquetaOpciones.setDisplayedMnemonic(KeyEvent.VK_T);
         
         c.weighty = 1.0;

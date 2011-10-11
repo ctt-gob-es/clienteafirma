@@ -31,35 +31,35 @@ public class BotoneraInferiorAccessibilityTest {
 
 
 	/**
-	 * ComprobaciÛn de que el campo Mnemocic de los botones no estÈ duplicado. 
+	 * Comprobaci√≥n de que el campo Mnemocic de los botones no est√© duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
 		logger.info("testNotDuplicatedDisplayedMnemonic");
 
 		//Instancia del panel que se va a analizar
-		//Lista de di·logos
+		//Lista de di√°logos
 		List<JDialogWizard> dialogs = new ArrayList<JDialogWizard>();
 		dialogs.add(new JDialogWizard());
 		//Panel botonera inferior
 		BotoneraInferior botoneraInferior = new BotoneraInferior(dialogs, 1);
 		
-		//Lista de mnemÛnicos
+		//Lista de mnem√≥nicos
 		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemÛnicos
+		//Conjunto de mnem√≥nicos
 		Set <Integer> keyCodesSet = null;
 		
-		//Se llama al mÈtodo que obtiene una lista de cÛdigos de atajos asociados a los componentes del panel
+		//Se llama al m√©todo que obtiene una lista de c√≥digos de atajos asociados a los componentes del panel
 		getKeyCodeList (botoneraInferior, keyCodes);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamaÒo de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tama√±o de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 
 	/**
-	 * MÈtodo que obtiene una lista de cÛdigos de atajos a los componentes botones de un panel.
+	 * M√©todo que obtiene una lista de c√≥digos de atajos a los componentes botones de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -72,16 +72,16 @@ public class BotoneraInferiorAccessibilityTest {
 			if (!(component instanceof JPanel)) {
 				if (component instanceof JButton) {
 					JButton button = (JButton) component;
-					//Se obtiene el cÛdigo del atajo asociado
+					//Se obtiene el c√≥digo del atajo asociado
 					keyCode = button.getMnemonic();
-					//Se aÒade a la lista si existe este cÛdigo, es decir, si es distinto de 0
+					//Se a√±ade a la lista si existe este c√≥digo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al mÈtodo
+				//Si es un panel se vuelve a llamar recursivamente al m√©todo
 				getKeyCodeList((JPanel)component, keyCodeList);
 			}
 		} //for

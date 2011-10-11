@@ -46,9 +46,9 @@ public abstract class JAccessibilityDialog extends JDialog {
 	}
 	
 	/**
-	 * Relaci髇 m韓ima que se aplica para la redimensi髇 de los componentes.
-	 * Cuanto menor es este n鷐ero menor es la redimensi髇 aplicada.
-	 * @return int Relaci髇 m韓ima
+	 * Relaci贸n m铆nima que se aplica para la redimensi贸n de los componentes.
+	 * Cuanto menor es este n煤mero menor es la redimensi贸n aplicada.
+	 * @return int Relaci贸n m铆nima
 	 */
 	public abstract int getMinimumRelation();
 	
@@ -82,8 +82,8 @@ public abstract class JAccessibilityDialog extends JDialog {
 	}
 	
 	/**
-	 * Evento de redimensionado. Comprueba el tama帽o de la ventana para habilitar o deshabilitar el boton
-	 *  de Maximizar ventana. Tambien almacena el tama駉 y posicion de la ventana para su restauracion.
+	 * Evento de redimensionado. Comprueba el tama脙卤o de la ventana para habilitar o deshabilitar el boton
+	 *  de Maximizar ventana. Tambien almacena el tama帽o y posicion de la ventana para su restauracion.
 	 */
 	public void resized(ComponentEvent e) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -97,7 +97,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 		    	boton.setEnabled(true);
 		    }
 	    }
-	    // Se almacenan los valores de la posicion y el tama駉 para la restauracion
+	    // Se almacenan los valores de la posicion y el tama帽o para la restauracion
 		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
 			actualPositionX = this.getX();
 			actualPositionY = this.getY();

@@ -63,7 +63,7 @@ public class HelpUtils {
 				helpBroker.initPresentation();
 				WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
 				JFrame helpwindow = (JFrame) wp.getHelpWindow();
-				//La ventana de ayuda no debe ser bloqueada por ninguna ventana de la aplicaci�n
+				//La ventana de ayuda no debe ser bloqueada por ninguna ventana de la aplicaciï¿½n
 				helpwindow.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 				
 				// Introducimos el icono en la ventana
@@ -117,7 +117,7 @@ public class HelpUtils {
 		getHelp().setCurrentID("introduccion");
 	}
 
-	//TODO: el siguiente m�todo se podr�a borrar
+	//TODO: el siguiente mï¿½todo se podrï¿½a borrar
 	/**
 	 * Genera una etiqueta con el icono de ayuda y que apunta a la p&aacute;gina dada.
 	 * @param pagina	P&aacute;gina a mostrar cuando se pulse el bot&oacute;n
@@ -144,9 +144,9 @@ public class HelpUtils {
 	}
 
 	/**
-	 * Genera el bot�n de ayuda que apuntar� a la p�gina dada.
-	 * @param pagina P�gina a mostrar cuando se puelse el bot�n de ayuda.
-	 * @return bot�n de ayuda
+	 * Genera el botï¿½n de ayuda que apuntarï¿½ a la pï¿½gina dada.
+	 * @param pagina Pï¿½gina a mostrar cuando se puelse el botï¿½n de ayuda.
+	 * @return botï¿½n de ayuda
 	 */
 	/**
 	 * @param pagina
@@ -157,16 +157,16 @@ public class HelpUtils {
 		JButton botonAyuda = new JButton(new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")));
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		botonAyuda.setMnemonic(KeyEvent.VK_H); //Se le asigna un mnem�nico al bot�n de ayuda
+		botonAyuda.setMnemonic(KeyEvent.VK_H); //Se le asigna un mnemónico al botón de ayuda
 		botonAyuda.getAccessibleContext().setAccessibleName(botonAyuda.getToolTipText());
-		//Se asigna una dimensi�n al bot�n seg�n su icono
+		//Se asigna una dimensiï¿½n al botï¿½n segï¿½n su icono
 		Dimension dimension = new Dimension(12,27);
 		botonAyuda.setPreferredSize(dimension);
 		
-		botonAyuda.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el bot�n
-		botonAyuda.setContentAreaFilled(false); //�rea del bot�n invisible
+		botonAyuda.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el botï¿½n
+		botonAyuda.setContentAreaFilled(false); //ï¿½rea del botï¿½n invisible
 		
-		//Acci�n para desplegar la pantalla de ayuda
+		//Acción para desplegar la pantalla de ayuda
 		botonAyuda.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				getHelp().setDisplayed(true);

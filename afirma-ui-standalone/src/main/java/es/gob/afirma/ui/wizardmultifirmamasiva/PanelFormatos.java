@@ -149,7 +149,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		radioFirma.addItemListener(this);
 		radioFirma.setName("radioFirma");
 		radioFirma.setSelected(true);
-		radioFirma.setMnemonic(KeyEvent.VK_F); //Se asigna un atajo al bot髇 de radio
+		radioFirma.setMnemonic(KeyEvent.VK_F); //Se asigna un atajo al bot贸n de radio
 		Utils.remarcar(radioFirma);
         Utils.setContrastColor(radioFirma);
 		Utils.setFontBold(radioFirma);
@@ -167,7 +167,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		radioCofirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.cofirma.description"));
 		radioCofirma.addItemListener(this);
 		radioCofirma.setName("radioCofirma");
-		radioCofirma.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al bot髇 de radio
+		radioCofirma.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al bot贸n de radio
 		Utils.remarcar(radioCofirma);
         Utils.setContrastColor(radioCofirma);
 		Utils.setFontBold(radioCofirma);
@@ -185,7 +185,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		radioContrafirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana1.radio.contrafirma.description"));
 		radioContrafirma.addItemListener(this);
 		radioContrafirma.setName("radioContrafirma");
-		radioContrafirma.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al bot髇 de radio
+		radioContrafirma.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al bot贸n de radio
 		Utils.remarcar(radioContrafirma);
         Utils.setContrastColor(radioContrafirma);
 		Utils.setFontBold(radioContrafirma);
@@ -231,9 +231,9 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		Utils.setFontBold(comboFormatos);
 		panelCentral.add(comboFormatos, c);
 		
-		//Relaci髇 entre etiqueta y combo
+		//Relaci贸n entre etiqueta y combo
 		etiquetaFormato.setLabelFor(comboFormatos);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R);
 		
 		c.fill = GridBagConstraints.BOTH;
@@ -360,7 +360,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 				
 				Integer indice = 3;
 				
-				//mantenemos el tama帽o y posici贸n de la ventana acutual en la ventana siguiente
+				//mantenemos el tama脙卤o y posici脙鲁n de la ventana acutual en la ventana siguiente
 				getVentanas().get(indice).setBounds(getVentanas().get(1).getX(), getVentanas().get(1).getY(), getVentanas().get(1).getWidth(), getVentanas().get(1).getHeight());
 				
 				// Nos saltamos la pagina 2

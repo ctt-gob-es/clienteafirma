@@ -84,7 +84,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
         InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         
-        //Se añade la etiqueta al panel
+        //Se aÃ±ade la etiqueta al panel
         panelCentral.add(presentationLabel, c);
         
         getContentPane().add(panelCentral, BorderLayout.CENTER);

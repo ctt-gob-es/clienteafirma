@@ -189,9 +189,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		Utils.setFontBold(comboRepositorios);
 		panelCentral.add(comboRepositorios, c);
 		
-		//Relaci髇 entre etiqueta y combo
+		//Relaci贸n entre etiqueta y combo
 		etiquetaAnadir.setLabelFor(comboRepositorios);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
 		
 		c.insets = new Insets(0, 10, 0, 20);
@@ -207,7 +207,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		anadir.setToolTipText(Messages.getString("Wizard.sobres.aniadir.originante.description"));
 		anadir.setText(Messages.getString("wizard.aniadir")); 
 		anadir.setAutoscrolls(true);
-		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot髇
+		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot贸n
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
@@ -257,9 +257,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		Utils.setFontBold(listaRemitentes);
 		panelLista.setViewportView(listaRemitentes);
 		
-		//Relaci髇 entre etiqueta y lista
+		//Relaci贸n entre etiqueta y lista
 		senderLabel.setLabelFor(listaRemitentes);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		senderLabel.setDisplayedMnemonic(KeyEvent.VK_T);
 		
 		c.ipady = 0;
@@ -311,7 +311,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	}
 
 	/**
-	 * A锟絘de un nuevo remitente desde el repositorio indicado
+	 * A茂驴陆ade un nuevo remitente desde el repositorio indicado
 	 * @param comboRepositorios	combo con el listado de repositorios / almacenes
 	 * @param listModel  		Modelo de la lista de remitentes
 	 * @param eliminar			Boton para eliminar un remitente del listado de repositorios
@@ -352,11 +352,11 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				listaCertificadosRe.add(certDest);
 				anadir.setEnabled(false);
 				comboRepositorios.setEnabled(false);
-				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vac韔 puesto que se ha deshabilitado el combo asociado
+				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vac铆o puesto que se ha deshabilitado el combo asociado
 				etiquetaAnadir.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
 				etiquetaAnadir.setFocusable(true);
 				eliminar.setEnabled(true);
-				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al bot髇 ya que ha sido habilitado
+				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al bot贸n ya que ha sido habilitado
 			} else
 				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
@@ -376,9 +376,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				((DefaultListModel) listaRemitentes.getModel()).remove(listaRemitentes.getSelectedIndex());
 				
 				eliminar.setEnabled(false);
-				eliminar.setMnemonic(0); //Se asigna un atajo vacio al bot髇 ya que ha sido deshabilitado
+				eliminar.setMnemonic(0); //Se asigna un atajo vacio al bot贸n ya que ha sido deshabilitado
 				anadir.setEnabled(true);
-				anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot髇 puesto que se ha habilitado
+				anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot贸n puesto que se ha habilitado
 				comboRepositorios.setEnabled(true);
 				etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
 				etiquetaAnadir.setFocusable(false);
@@ -475,7 +475,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	} catch(Exception e){
-    		logger.warning("Ocurrio un error durante el proceso de a锟絘dir un nuevo remitente: "+e);
+    		logger.warning("Ocurrio un error durante el proceso de a茂驴陆adir un nuevo remitente: "+e);
     		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;

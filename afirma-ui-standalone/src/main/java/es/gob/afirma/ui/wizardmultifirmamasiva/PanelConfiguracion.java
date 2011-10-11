@@ -105,12 +105,12 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 		//Etiqueta con el texto "Respetar el formato..."
 		InfoLabel respectLabel = new InfoLabel(Messages.getString("Wizard.multifirma.ventana2.explicacion1"), false);
 		
-	    //Panel para agregar la etiqueta y así desvincularla del check posterior.
+	    //Panel para agregar la etiqueta y asÃ­ desvincularla del check posterior.
 	    JPanel panel = new JPanel(new GridBagLayout());
 	    panel.add(respectLabel, c);
 	    
 	    c.insets = new Insets(20, 20, 0, 20);
-	    panelCentral.add(panel, c); //Se añade el panel con la etiqueta
+	    panelCentral.add(panel, c); //Se aÃ±ade el panel con la etiqueta
 	   
 		c.gridy = 1;
 		
@@ -148,7 +148,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     	radioTodos.setText(Messages.getString("Wizard.multifirma.ventana2.panel.radio1")); 
         radioTodos.getAccessibleContext().setAccessibleName(radioTodos.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description")); 
         radioTodos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description"));
-        radioTodos.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al botón de radio
+        radioTodos.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al botÃ³n de radio
         radioTodos.setSelected(true);
         Utils.remarcar(radioTodos);
         Utils.setContrastColor(radioTodos);
@@ -161,7 +161,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         radioUltimos.setText(Messages.getString("Wizard.multifirma.ventana2.panel.radio2")); 
         radioUltimos.getAccessibleContext().setAccessibleName(radioUltimos.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description")); 
         radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description"));
-        radioUltimos.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botón de radio
+        radioUltimos.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botÃ³n de radio
         Utils.remarcar(radioUltimos);
         Utils.setContrastColor(radioUltimos);
         Utils.setFontBold(radioUltimos);

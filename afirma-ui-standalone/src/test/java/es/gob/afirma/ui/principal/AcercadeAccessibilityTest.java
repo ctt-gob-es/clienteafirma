@@ -34,7 +34,7 @@ public class AcercadeAccessibilityTest {
 	static Logger logger = Logger.getLogger(AcercadeAccessibilityTest.class.getName());
 
 	/**
-	 * ComprobaciÛn de que el campo Mnemocic de los botones no estÈ duplicado. 
+	 * Comprobaci√≥n de que el campo Mnemocic de los botones no est√© duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedMnemonic() {
@@ -42,9 +42,9 @@ public class AcercadeAccessibilityTest {
 
 		//Instancia del panel que se va a analizar
 		Acercade acercade = new Acercade();
-		//Lista de mnemÛnicos
+		//Lista de mnem√≥nicos
 		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemÛnicos
+		//Conjunto de mnem√≥nicos
 		Set <Integer> keyCodesSet = null;
 		
 		//Componentes del wizard
@@ -63,7 +63,7 @@ public class AcercadeAccessibilityTest {
 					Component componentRootPane = componentsRootPane[j];
 					//Si es un panel se trata
 					if (componentRootPane instanceof JPanel) {
-						//Se llama al mÈtodo que obtiene una lista de cÛdigos de atajos asociados a los componentes del panel
+						//Se llama al m√©todo que obtiene una lista de c√≥digos de atajos asociados a los componentes del panel
 						getKeyCodeList ((JPanel) componentRootPane, keyCodes);
 						
 					} else if (componentRootPane instanceof JLayeredPane) { //Si es un layeredPane se obtienen sus componentes
@@ -74,7 +74,7 @@ public class AcercadeAccessibilityTest {
 							Component componentLayeredPane = componentsLayeredPane[z];
 							//Si es instancia de JPanel se trata
 							if (componentLayeredPane instanceof JPanel) {
-								//Se llama al mÈtodo que obtiene una lista de cÛdigos de atajos asociados a los componentes del panel
+								//Se llama al m√©todo que obtiene una lista de c√≥digos de atajos asociados a los componentes del panel
 								getKeyCodeList ((JPanel) componentLayeredPane, keyCodes);
 							}
 						}
@@ -86,12 +86,12 @@ public class AcercadeAccessibilityTest {
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamaÒo de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tama√±o de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 	
 	/**
-	 * ComprobaciÛn de que los JTextPane no sean editables. 
+	 * Comprobaci√≥n de que los JTextPane no sean editables. 
 	 */
 	@Test
 	public void testEditableTextPane() {
@@ -115,7 +115,7 @@ public class AcercadeAccessibilityTest {
 					Component componentRootPane = componentsRootPane[j];
 					//Si es un panel se trata
 					if (componentRootPane instanceof JPanel) {
-						//Se llama al mÈtodo que indica si hay algun panel de texto editable
+						//Se llama al m√©todo que indica si hay algun panel de texto editable
 						assertFalse(isJTextPaneEditable((JPanel) componentRootPane));
 						
 					} else if (componentRootPane instanceof JLayeredPane) { //Si es un layeredPane se obtienen sus componentes
@@ -126,7 +126,7 @@ public class AcercadeAccessibilityTest {
 							Component componentLayeredPane = componentsLayeredPane[z];
 							//Si es instancia de JPanel se trata
 							if (componentLayeredPane instanceof JPanel) {
-								//Se llama al mÈtodo que indica si hay algun panel de texto editable
+								//Se llama al m√©todo que indica si hay algun panel de texto editable
 								assertFalse(isJTextPaneEditable ((JPanel) componentLayeredPane));
 							}
 						}
@@ -137,8 +137,8 @@ public class AcercadeAccessibilityTest {
 	}
 	
 	/**
-	 * ComprobaciÛn de que el campo nombre accesible para botones, radiobuttons combos y checks
-	 * no estÈ vacÌo. 
+	 * Comprobaci√≥n de que el campo nombre accesible para botones, radiobuttons combos y checks
+	 * no est√© vac√≠o. 
 	 */
 	@Test
 	public void testNotEmptyAccessibleName() {
@@ -161,7 +161,7 @@ public class AcercadeAccessibilityTest {
 					Component componentRootPane = componentsRootPane[j];
 					//Si es un panel se trata
 					if (componentRootPane instanceof JPanel) {
-						//Se llama al mÈtodo que comprueba que el nombre no sea vacÌo
+						//Se llama al m√©todo que comprueba que el nombre no sea vac√≠o
 						assertTrue(checkAccessibleName((JPanel) componentRootPane));
 					} else if (componentRootPane instanceof JLayeredPane) { //Si es un layeredPane se obtienen sus componentes
 						Component[] componentsLayeredPane = ((JLayeredPane) componentRootPane).getComponents();
@@ -171,7 +171,7 @@ public class AcercadeAccessibilityTest {
 							Component componentLayeredPane = componentsLayeredPane[z];
 							//Si es instancia de JPanel se trata
 							if (componentLayeredPane instanceof JPanel) {
-								//Se llama al mÈtodo que comprueba que el nombre no sea vacÌo
+								//Se llama al m√©todo que comprueba que el nombre no sea vac√≠o
 								assertTrue(checkAccessibleName((JPanel) componentLayeredPane));
 							}
 						}
@@ -187,7 +187,7 @@ public class AcercadeAccessibilityTest {
 	 * tienen un nombre accesible asignado.
 	 * @param panel panel
 	 * @return verdadero -> si los componentes tienen un nombre accesible asignado
-	 * 		   falso -> si alg˙n componente no tiene un nombre accesible asignado
+	 * 		   falso -> si alg√∫n componente no tiene un nombre accesible asignado
 	 */
 	@Ignore
 	private boolean checkAccessibleName(JPanel panel) {
@@ -198,30 +198,30 @@ public class AcercadeAccessibilityTest {
 			//Se obtiene el componente
 			Component component = panel.getComponent(i);
 			if (!(component instanceof JPanel)) {
-				if (component instanceof JButton) { //Se comprueba si es un botÛn
+				if (component instanceof JButton) { //Se comprueba si es un bot√≥n
 					JButton button = (JButton) component;
 					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del mÈtodo
+						return false; //Si no tiene asignado un nombre accesible se sale del m√©todo
 					}
 				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkBox
 					JCheckBox checkBox = (JCheckBox) component;
 					if (checkBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del mÈtodo
+						return false; //Si no tiene asignado un nombre accesible se sale del m√©todo
 					}
 				} else if (component instanceof JComboBox) { //Se comprueba si es un combo
 					JComboBox comboBox = (JComboBox) component;
 					if (comboBox.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del mÈtodo
+						return false; //Si no tiene asignado un nombre accesible se sale del m√©todo
 					}
 				} else if (component instanceof JRadioButton) { //Se comprueba si es un radioButton
 					JRadioButton radioButton = (JRadioButton) component;
 					if (radioButton.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
-						return false; //Si no tiene asignado un nombre accesible se sale del mÈtodo
+						return false; //Si no tiene asignado un nombre accesible se sale del m√©todo
 					}
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al mÈtodo
+				//Si es un panel se vuelve a llamar recursivamente al m√©todo
 				result = checkAccessibleName((JPanel)component);
 			}
 		} //for
@@ -229,7 +229,7 @@ public class AcercadeAccessibilityTest {
 	}
 
 	/**
-	 * MÈtodo que obtiene una lista de cÛdigos de atajos a los botones de un panel.
+	 * M√©todo que obtiene una lista de c√≥digos de atajos a los botones de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -242,23 +242,23 @@ public class AcercadeAccessibilityTest {
 			if (!(component instanceof JPanel)) {
 				if (component instanceof JButton) {
 					JButton button = (JButton) component;
-					//Se obtiene el cÛdigo del atajo asociado
+					//Se obtiene el c√≥digo del atajo asociado
 					keyCode = button.getMnemonic();
-					//Se aÒade a la lista si existe este cÛdigo, es decir, si es distinto de 0
+					//Se a√±ade a la lista si existe este c√≥digo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al mÈtodo
+				//Si es un panel se vuelve a llamar recursivamente al m√©todo
 				getKeyCodeList((JPanel) component, keyCodeList);
 			}
 		} //for
 	}//getKeyCodeList
 	
 	/**
-	 * MÈtodo que comprueba si los JTextPane son editables.
+	 * M√©todo que comprueba si los JTextPane son editables.
 	 */
 	@Ignore
 	private boolean isJTextPaneEditable(JPanel panel) {
@@ -280,7 +280,7 @@ public class AcercadeAccessibilityTest {
 				}
 				
 			} else {
-				//Si es un panel se vuelve a llamar recursivamente al mÈtodo
+				//Si es un panel se vuelve a llamar recursivamente al m√©todo
 				isJTextPaneEditable((JPanel) component);
 			}
 		} //for

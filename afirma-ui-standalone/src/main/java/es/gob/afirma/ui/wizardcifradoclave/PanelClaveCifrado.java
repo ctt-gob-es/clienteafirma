@@ -185,9 +185,9 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         Utils.setFontBold(campoClave);
         panelCentral.add(campoClave, c);
         
-        //Relaci髇 entre etiqueta y campo de texto
+        //Relaci贸n entre etiqueta y campo de texto
         encodeKeyLabel.setLabelFor(campoClave);
-      	//Asignaci髇 de mnem髇ico
+      	//Asignaci贸n de mnem贸nico
         encodeKeyLabel.setDisplayedMnemonic(KeyEvent.VK_V);
         
         c.weightx = 0.0;
@@ -315,7 +315,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	} catch (AOCancelledOperationException e) {
     		throw e;
     	} catch (IOException e) {
-	            throw e; //Se lanza el tipo de excepci髇 IO
+	            throw e; //Se lanza el tipo de excepci贸n IO
     	} catch (Exception e) {
     		throw new AOException(Messages.getString("WizardCifrado.almacen.error.abrir"), e); //$NON-NLS-1$
     	}

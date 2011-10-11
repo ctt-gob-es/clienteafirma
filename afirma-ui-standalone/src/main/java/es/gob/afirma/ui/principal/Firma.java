@@ -144,9 +144,9 @@ public class Firma extends JPanel {
         Utils.setFontBold(campoFichero);
         add(campoFichero, c);
 
-        //Relación entre etiqueta y campo de texto
+        //RelaciÃ³n entre etiqueta y campo de texto
         etiquetaFichero.setLabelFor(campoFichero);
-        //Asignación de mnemónico
+        //AsignaciÃ³n de mnemÃ³nico
         etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_G);
 
         c.insets = new Insets(0, 10, 0, 13);
@@ -207,9 +207,9 @@ public class Firma extends JPanel {
         Utils.setFontBold(comboAlmacen);
         add(comboAlmacen, c);
 
-        //Relación entre etiqueta y combo
+        //RelaciÃ³n entre etiqueta y combo
         etiquetaAlmacen.setLabelFor(comboAlmacen);
-        //Asignación de mnemónico
+        //AsignaciÃ³n de mnemÃ³nico
         etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
 
         c.insets = new Insets(13, 13, 0, 13);
@@ -258,9 +258,9 @@ public class Firma extends JPanel {
         Utils.setFontBold(comboFormato);
         add(comboFormato, c);
 
-        //Relación entre etiqueta y combo
+        //RelaciÃ³n entre etiqueta y combo
         etiquetaFormato.setLabelFor(comboFormato);
-        //Asignación de mnemónico
+        //AsignaciÃ³n de mnemÃ³nico
         etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_O);
 
         c.weighty = 1.0;
@@ -386,7 +386,7 @@ public class Firma extends JPanel {
                         this
                 );
             } catch (InvalidKeyException e) {
-            	//Control de la excepción generada al introducir mal la contraseña para el almacén
+            	//Control de la excepciÃ³n generada al introducir mal la contraseÃ±a para el almacÃ©n
                 JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }  catch (AOKeystoreAlternativeException e) {
@@ -407,7 +407,7 @@ public class Firma extends JPanel {
                 privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, this));
             }
             catch (KeyException e) {
-            	//Control de la excepción generada al introducir mal la contraseña para el certificado
+            	//Control de la excepciÃ³n generada al introducir mal la contraseÃ±a para el certificado
                 JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -473,7 +473,7 @@ public class Firma extends JPanel {
             }
 
             // En el caso de firma CAdES, preguntamos al usuario si desea incluir el documento que
-            // se firma en la propia firma. El documento se incluirï¿½ en la firma, salvo que se indique
+            // se firma en la propia firma. El documento se incluirÃ¯Â¿Â½ en la firma, salvo que se indique
             // los contrario
             String modoFirma = AOSignConstants.SIGN_MODE_IMPLICIT;
             if (formato.equals(AOSignConstants.SIGN_FORMAT_CADES)){ 

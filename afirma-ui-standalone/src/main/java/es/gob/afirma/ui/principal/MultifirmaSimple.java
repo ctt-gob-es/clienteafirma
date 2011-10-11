@@ -84,9 +84,9 @@ public class MultifirmaSimple extends JPanel {
 		cargarComboAlmacen(comboAlmacen);
 		add(comboAlmacen, c);
 		
-		//Relación entre etiqueta y combo
+		//RelaciÃ³n entre etiqueta y combo
 		etiquetaAlmacen.setLabelFor(comboAlmacen);
-		//Asignación de mnemónico
+		//AsignaciÃ³n de mnemÃ³nico
 		etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
 		
 		c.insets = new Insets(13, 13, 0, 13);

@@ -57,7 +57,7 @@ public class Descifrado extends JPanel {
     final static List<String> mecanismos = new ArrayList<String>(Arrays.asList("PASSWORD","USERINPUT"));
 
     // Algoritmos para mecanismo contrasena de cifrado
-    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("Contraseña con SHA1 y 3DES","Contraseï¿½a con SHA1 y RC2","Contraseï¿½a con MD5 y DES"));
+    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("ContraseÃ±a con SHA1 y 3DES","ContraseÃ¯Â¿Â½a con SHA1 y RC2","ContraseÃ¯Â¿Â½a con MD5 y DES"));
     final static List<String> algoritmoVc = new ArrayList<String>(Arrays.asList("PBEWithSHA1AndDESede","PBEWithSHA1AndRC2_40","PBEWithMD5AndDES"));
 
     // Algoritmos para mecanismo clave de cifrado
@@ -111,9 +111,9 @@ public class Descifrado extends JPanel {
         Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
-		//Relación entre etiqueta y campo de texto
+		//RelaciÃ³n entre etiqueta y campo de texto
 		etiquetaFichero.setLabelFor(campoFichero);
-		//Asignación de mnemónico
+		//AsignaciÃ³n de mnemÃ³nico
 		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_E);
 		
 		c.insets = new Insets(0, 10, 0, 13);
@@ -180,18 +180,18 @@ public class Descifrado extends JPanel {
         Utils.setFontBold(comboMecanismo);
         add(comboMecanismo, c);
         
-        // En la vista simple, no se permitirá configurar el origen de la clave
+        // En la vista simple, no se permitirÃ¡ configurar el origen de la clave
  		if(!GeneralConfig.isAvanzados()) {
- 			comboMecanismo.setEnabled(false); //Se deshabilita la opción
+ 			comboMecanismo.setEnabled(false); //Se deshabilita la opciÃ³n
  			//Opciones para el lector de pantalla
 			etiquetaMecanismo.setFocusable(true);
 			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") 
 			+ Messages.getString("Cifrado.origenL.0") + " "+ Messages.getString("Cifrado.origen.clave.combo.disabled"));
  		} else {
- 			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
- 			//Relación entre etiqueta y combo
+ 			//Para la vista avanzada se asigna mnemÃ³nico puesto que esta opciÃ³n estarÃ¡ habilitada
+ 			//RelaciÃ³n entre etiqueta y combo
  			etiquetaMecanismo.setLabelFor(comboMecanismo);
- 			//Asignación de mnemónico
+ 			//AsignaciÃ³n de mnemÃ³nico
  			etiquetaMecanismo.setDisplayedMnemonic(KeyEvent.VK_A);
  		}
 		
@@ -227,18 +227,18 @@ public class Descifrado extends JPanel {
         Utils.setFontBold(comboAlgoritmo);
 		add(comboAlgoritmo, c);
 		
-		// En la vista simple, no se permitirá configurar el algoritmo de descifrado
+		// En la vista simple, no se permitirÃ¡ configurar el algoritmo de descifrado
 		if(!GeneralConfig.isAvanzados()) {
-			comboAlgoritmo.setEnabled(false); //Se deshabilita la opción
+			comboAlgoritmo.setEnabled(false); //Se deshabilita la opciÃ³n
 			//Opciones para el lector de pantalla
 			etiquetaAlgoritmo.setFocusable(true);
 			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") 
 			+ Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled"));
 		} else {
-			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
-			//Relación entre etiqueta y combo
+			//Para la vista avanzada se asigna mnemÃ³nico puesto que esta opciÃ³n estarÃ¡ habilitada
+			//RelaciÃ³n entre etiqueta y combo
 			etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
-			//Asignación de mnemónico
+			//AsignaciÃ³n de mnemÃ³nico
 			etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_G);
 		}
         

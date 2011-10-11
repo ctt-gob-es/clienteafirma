@@ -18,39 +18,39 @@ public class JAccessibilityOptionPane extends JOptionPane {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Muestra un diálogo con un mensaje.
+	 * Muestra un diÃ¡logo con un mensaje.
 	 * @param componentParent componente padre
 	 * @param message mensaje a mostrar
-	 * @param title título del diálogo
+	 * @param title tÃ­tulo del diÃ¡logo
 	 * @param messageType tipo de mensaje
 	 */
 	public static void showMessageDialog(Component componentParent, String message, String title, int messageType){
 		
-		//Etiqueta con el texto que se desea mostrar en el diálogo
+		//Etiqueta con el texto que se desea mostrar en el diÃ¡logo
 		InfoLabel infoLabel = new InfoLabel(message, false);
 		infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 		//Foco a la etiqueta
 		infoLabel.addAncestorListener(new RequestFocusListener());
-		//Se muestra el diálogo
+		//Se muestra el diÃ¡logo
 		JOptionPane.showMessageDialog(componentParent, infoLabel, title, messageType);
 	}
 	
 
 	/**
-	 * Muestra un diálogo de confirmación.
+	 * Muestra un diÃ¡logo de confirmaciÃ³n.
 	 * @param componentParent componente padre
 	 * @param message mensaje a mostrar
-	 * @param title título del diálogo
+	 * @param title tÃ­tulo del diÃ¡logo
 	 * @param messageType tipo de mensaje
 	 */
 	public static int showConfirmDialog(Component componentParent, String message, String title, int messageType){
 		
-		//Etiqueta con el texto que se desea mostrar en el diálogo
+		//Etiqueta con el texto que se desea mostrar en el diÃ¡logo
 		InfoLabel infoLabel = new InfoLabel(message, false);
 		infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 		//Foco a la etiqueta
 		infoLabel.addAncestorListener(new RequestFocusListener());
-		//Se muestra el diálogo
+		//Se muestra el diÃ¡logo
 		return JOptionPane.showConfirmDialog(componentParent, infoLabel, title, messageType);
 	}
 }

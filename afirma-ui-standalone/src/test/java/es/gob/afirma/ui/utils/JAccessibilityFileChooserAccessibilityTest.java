@@ -32,7 +32,7 @@ public class JAccessibilityFileChooserAccessibilityTest {
 	
 
 	/*
-	 * Comprobación de que el campo Mnemocic de las etiquetas y botones no esté duplicado. 
+	 * ComprobaciÃ³n de que el campo Mnemocic de las etiquetas y botones no estÃ© duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
@@ -41,22 +41,22 @@ public class JAccessibilityFileChooserAccessibilityTest {
 		//Instancia del contenedor que se va a analizar
 		JAccessibilityFileChooser fileChooser= new JAccessibilityFileChooser(null);
 
-		//Lista de mnemónicos
+		//Lista de mnemÃ³nicos
 		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemónicos
+		//Conjunto de mnemÃ³nicos
 		Set <Integer> keyCodesSet = null;
 		
-		//Se llama al método que obtiene una lista de códigos de atajos asociados a los componentes del panel
+		//Se llama al mÃ©todo que obtiene una lista de cÃ³digos de atajos asociados a los componentes del panel
 		getKeyCodeList (fileChooser, keyCodes);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tamaÃ±o de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 	
 	/**
-	 * Método que obtiene una lista de códigos de atajos a los componentes (Etiqueta, Botón) de un panel.
+	 * MÃ©todo que obtiene una lista de cÃ³digos de atajos a los componentes (Etiqueta, BotÃ³n) de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(Container panel, List <Integer> keyCodeList) {
@@ -69,31 +69,31 @@ public class JAccessibilityFileChooserAccessibilityTest {
 			//Se comprueba si es una etiqueta
 			if (component instanceof JLabel) {
 					JLabel label = (JLabel) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el cÃ³digo del atajo asociado
 					keyCode = label.getDisplayedMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se aÃ±ade a la lista si existe este cÃ³digo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
 			} else if (component instanceof JButton) {
 					JButton button = (JButton) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el cÃ³digo del atajo asociado
 					keyCode = button.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se aÃ±ade a la lista si existe este cÃ³digo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
 			} else if (component instanceof JToggleButton) {
 					JToggleButton toggleButton = (JToggleButton) component;
 
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el cÃ³digo del atajo asociado
 					keyCode = toggleButton.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se aÃ±ade a la lista si existe este cÃ³digo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
 			} else if (component instanceof Container) {
-				//Si es un contenedor se vuelve a llamar recursivamente al método
+				//Si es un contenedor se vuelve a llamar recursivamente al mÃ©todo
 				getKeyCodeList((Container)component, keyCodeList);
 			}
 		} //for

@@ -63,8 +63,8 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	private int actualHeight = -1;
 	
 	/**
-	 * Posici�n X inicial de la ventana dependiendo de la resoluci�n de pantalla.
-	 * @return int Posici�n X
+	 * Posición X inicial de la ventana dependiendo de la resolución de pantalla.
+	 * @return int Posición X
 	 */
 	public int getInitialX() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
@@ -72,9 +72,9 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	}
 	
 	/**
-	 * Posici�n Y inicial de la ventana dependiendo del sistema operativo y de la
-	 * resoluci�n de pantalla.
-	 * @return int Posici�n Y
+	 * Posición Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resolución de pantalla.
+	 * @return int Posición Y
 	 */
 	public int getInitialY() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
@@ -283,7 +283,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	
 	/**
 	 * Evento de redimensionado. Almacena los valores actuales de posicion y 
-	 * tama�o de la ventana.
+	 * tamaño de la ventana.
 	 * 
 	 */
 	public void resized(ComponentEvent e) {
@@ -297,7 +297,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		}
 	}
 	/**
-	 * Muestra la ventana de la aplicaci�n
+	 * Muestra la ventana de la aplicaciï¿½n
 	 */
 	public void main() {	
 		EventQueue.invokeLater(new Runnable() {
@@ -366,7 +366,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
     }
     
     /**
-	 * Cambia el tamaño de la ventana al tamaño máximo de pantalla menos el tamaño de la barra de tareas de windows
+	 * Cambia el tamaÃ±o de la ventana al tamaÃ±o mÃ¡ximo de pantalla menos el tamaÃ±o de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -376,7 +376,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	}
 	
 	/**
-	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+	 * Restaura el tamaÃ±o de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
 		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);

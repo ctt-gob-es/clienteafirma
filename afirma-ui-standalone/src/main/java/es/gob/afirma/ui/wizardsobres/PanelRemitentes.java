@@ -209,9 +209,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		cargarCombo(comboRepositorios);
 		panelCentral.add(comboRepositorios, c);
 		
-		//Relaci髇 entre etiqueta y combo
+		//Relaci贸n entre etiqueta y combo
 		etiquetaAnadir.setLabelFor(comboRepositorios);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
 		
 		c.insets = new Insets(0, 10, 0, 20);
@@ -227,7 +227,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		anadir.setToolTipText(Messages.getString("Wizard.sobres.aniadir.originante.description"));
 		anadir.setText(Messages.getString("wizard.aniadir")); 
 		anadir.setAutoscrolls(true);
-		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot髇
+		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot贸n
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
@@ -276,9 +276,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		Utils.setFontBold(listaRemitentes);
 		panelLista.setViewportView(listaRemitentes);
 		
-		//Relaci髇 entre etiqueta y lista
+		//Relaci贸n entre etiqueta y lista
 		senderLabel.setLabelFor(listaRemitentes);
-		//Asignaci髇 de mnem髇ico
+		//Asignaci贸n de mnem贸nico
 		senderLabel.setDisplayedMnemonic(KeyEvent.VK_T);
 		
 		c.ipady = 0;
@@ -330,7 +330,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	}
 
 	/**
-	 * A锟絘de un nuevo remitente desde el repositorio indicado
+	 * A茂驴陆ade un nuevo remitente desde el repositorio indicado
 	 * @param comboRepositorios	combo con el listado de repositorios / almacenes
 	 * @param listModel  		Modelo de la lista de remitentes
 	 * @param eliminar			Boton para eliminar un remitente del listado de repositorios
@@ -346,11 +346,11 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
 		}catch (InvalidKeyException e) {
-			//Control de la excepci髇 generada al introducir mal la contrase馻 para el almac閚
+			//Control de la excepci贸n generada al introducir mal la contrase帽a para el almac茅n
             JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return;
         }  catch (AOKeystoreAlternativeException e) {
-        	//Control de la excepci髇 generada al introducir una contrase馻 vac韆 para el almac閚
+        	//Control de la excepci贸n generada al introducir una contrase帽a vac铆a para el almac茅n
         	 JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
              return;
         } catch (Exception e) {
@@ -377,25 +377,25 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				listModel.addElement(certDest.getAlias());
 				listaCertificadosRe.add(certDest);
 				anadir.setEnabled(false);
-				anadir.setMnemonic(0); //Se asigna un atajo vac韔 puesto que se ha deshabilitado el bot髇
+				anadir.setMnemonic(0); //Se asigna un atajo vac铆o puesto que se ha deshabilitado el bot贸n
 				comboRepositorios.setEnabled(false);
-				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vac韔 puesto que se ha deshabilitado el combo asociado
+				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vac铆o puesto que se ha deshabilitado el combo asociado
 				etiquetaAnadir.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
 				etiquetaAnadir.setFocusable(true);
 				eliminar.setEnabled(true);
-				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al bot髇 ya que ha sido habilitado
+				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al bot贸n ya que ha sido habilitado
 			} else
 				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
 		}
 		
-		// Preguntamos por la contrase锟絘 del certificado
+		// Preguntamos por la contrase茂驴陆a del certificado
 		if (!listaCertificadosRe.isEmpty())
 			try {
 				privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(),kconf);
 			} 
 	       	catch (KeyException e) {
-	       		//Control de la excepci髇 generada al introducir mal la contrase馻 para el certificado
+	       		//Control de la excepci贸n generada al introducir mal la contrase帽a para el certificado
 	            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	            return;
 	        }catch(AOException e){
@@ -424,12 +424,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 
 		if (listaCertificadosRe.isEmpty()) {
 			anadir.setEnabled(true);
-			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot髇 puesto que se ha habilitado
+			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot贸n puesto que se ha habilitado
 			comboRepositorios.setEnabled(true); 
 			etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
 			etiquetaAnadir.setFocusable(false);
 			eliminar.setEnabled(false);
-			eliminar.setMnemonic(0); //Se asigna un atajo vacio al bot髇 ya que ha sido deshabilitado
+			eliminar.setMnemonic(0); //Se asigna un atajo vacio al bot贸n ya que ha sido deshabilitado
 		}
 	}
 
@@ -449,12 +449,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		
 		if (listaCertificadosRe.isEmpty()) {
 			anadir.setEnabled(true);
-			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot髇 puesto que se ha habilitado
+			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al bot贸n puesto que se ha habilitado
 			comboRepositorios.setEnabled(true);
 			etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
 			etiquetaAnadir.setFocusable(false);
 			eliminar.setEnabled(false);
-			eliminar.setMnemonic(0); //Se asigna un atajo vacio al bot髇 ya que ha sido deshabilitado
+			eliminar.setMnemonic(0); //Se asigna un atajo vacio al bot贸n ya que ha sido deshabilitado
 		}
 		
 		// Borramos las posibles claves del certificado
