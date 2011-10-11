@@ -39,7 +39,7 @@ public class AdESPolicy {
         
         this.policyIdentifier = identifier;
         
-        if (identifierHash != null && (identifierHashAlgorithm == null || "".equals(identifierHashAlgorithm))) { //$NON-NLS-1$
+        if (identifierHash != null && (!"0".equals(identifierHash)) && (identifierHashAlgorithm == null || "".equals(identifierHashAlgorithm))) { //$NON-NLS-1$ //$NON-NLS-2$
             throw new IllegalArgumentException("Si se indica la huella digital del identificador de politica es obligatorio indicar tambien el algoritmo"); //$NON-NLS-1$
         }
         
@@ -53,16 +53,21 @@ public class AdESPolicy {
             }
         }
         else {
-            if (!AOUtil.isBase64(identifierHash.getBytes())) {
-                throw new IllegalArgumentException("La huella digital de la politica debe estar en formato Base64"); //$NON-NLS-1$
+            if ("0".equals(identifierHash)) { //$NON-NLS-1$
+                this.policyIdentifierHash = null;
             }
-            try {
-                this.policyIdentifierHashAlgorithm = AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
+            else {
+                if (!AOUtil.isBase64(identifierHash.getBytes())) {
+                    throw new IllegalArgumentException("La huella digital de la politica debe estar en formato Base64"); //$NON-NLS-1$
+                }
+                try {
+                    this.policyIdentifierHashAlgorithm = AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
+                }
+                catch(final Exception e) {
+                    throw new IllegalArgumentException("El algoritmo de huella digital no esta soportado: " + identifierHashAlgorithm); //$NON-NLS-1$
+                }
+                this.policyIdentifierHash = identifierHash;
             }
-            catch(final Exception e) {
-                throw new IllegalArgumentException("El algoritmo de huella digital no esta sportado: " + identifierHashAlgorithm); //$NON-NLS-1$
-            }
-            this.policyIdentifierHash = identifierHash;
         }
         
         if (qualifier != null && (!"".equals(qualifier))) { //$NON-NLS-1$

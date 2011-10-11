@@ -68,8 +68,9 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest {
         p1.setProperty("signReason", "test"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("signatureProductionCity", "madrid"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("signerContact", "sink@usa.net"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("policyQualifier", "2.16.724.1.3.1.1.2"); //$NON-NLS-1$ //$NON-NLS-2$
-        p1.setProperty("policyIdentifier", "http://google.com/"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("policyQualifier", "http://google.com/"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("policyIdentifier", "2.16.724.1.3.1.1.2"); //$NON-NLS-1$ //$NON-NLS-2$
+        p1.setProperty("policyIdentifierHash", "0"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /** Algoritmos de firma a probar. */
