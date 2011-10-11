@@ -303,22 +303,18 @@ final class CAdESCoSigner {
 
     /** Constructor de la clase. Se crea una cofirma a partir de los datos del
      * firmante y del archivo que contiene las firmas.
-     * @param signatureAlgorithm
-     *        Algoritmo para la firma
-     * @param signerCertificateChain
-     *        Cadena de certificados para la construccion de los parametros
+     * @param signatureAlgorithm Algoritmo para la firma
+     * @param signerCertificateChain Cadena de certificados para la construccion de los parametros
      *        de firma.
-     * @param data
-     *        Archivo que contiene las firmas.
+     * @param data Archivo que contiene las firmas.
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
      *        atributo <i>Signing Certificate</i> <code>false</code> para
      *        usar la versi&oacute;n 1
-     * @param keyEntry
-     *        Clave privada usada para firmar.
-     * @param messageDigest
-     *        Hash espec&iacute;fico para una firma.
+     * @param keyEntry Clave privada usada para firmar.
+     * @param md
+     *        Huella digital espec&iacute;fica para una firma.
      * @return El archivo de firmas con la nueva firma.
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
@@ -336,7 +332,7 @@ final class CAdESCoSigner {
                            final AdESPolicy policy,
                            final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
-                           byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
+                           final byte[] md) throws IOException, NoSuchAlgorithmException, CertificateException {
 
         final ASN1InputStream is = new ASN1InputStream(data);
 
@@ -403,6 +399,8 @@ final class CAdESCoSigner {
         // introducimos los SignerInfos Existentes
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
         // introducimos el nuevo SignerInfo del firmante actual.
+        
+        byte[] messageDigest = md.clone();
 
         for (int i = 0; i < signerInfosSd.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));

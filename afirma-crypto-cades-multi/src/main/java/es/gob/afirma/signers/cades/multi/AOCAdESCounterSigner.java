@@ -17,7 +17,6 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCounterSigner;
-import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.cades.ValidateCADES;
@@ -31,22 +30,15 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
     static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
 
     public byte[] countersign(final byte[] sign,
-                              String algorithm,
+                              final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
-                              Properties extraParams) throws AOException {
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
-        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
+                              final Properties xParams) throws AOException {
+        
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
+        final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
         X509Certificate[] xCerts = new X509Certificate[0];
         final Certificate[] certs = keyEntry.getCertificateChain();

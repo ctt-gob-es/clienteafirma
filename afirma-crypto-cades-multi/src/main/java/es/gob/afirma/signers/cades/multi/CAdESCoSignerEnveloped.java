@@ -283,8 +283,8 @@ final class CAdESCoSignerEnveloped {
      *        usar la versi&oacute;n 1
      * @param keyEntry
      *        Clave privada usada para firmar.
-     * @param messageDigest
-     *        Hash espec&iacute;fico para una firma.
+     * @param md
+     *        Huella digital espec&iacute;fica para una firma.
      * @return El archivo de firmas con la nueva firma.
      * @throws java.io.IOException
      *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
@@ -301,7 +301,7 @@ final class CAdESCoSignerEnveloped {
                            final AdESPolicy policy,
                            final boolean signingCertificateV2,
                            final PrivateKeyEntry keyEntry,
-                           byte[] messageDigest) throws IOException, NoSuchAlgorithmException, CertificateException {
+                           final byte[] md) throws IOException, NoSuchAlgorithmException, CertificateException {
 
         final ASN1InputStream is = new ASN1InputStream(data);
 
@@ -358,6 +358,8 @@ final class CAdESCoSignerEnveloped {
         // introducimos los SignerInfos Existentes
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
         // introducimos el nuevo SignerInfo del firmante actual.
+        
+        byte[] messageDigest = md.clone();
 
         for (int i = 0; i < signerInfosSd.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));

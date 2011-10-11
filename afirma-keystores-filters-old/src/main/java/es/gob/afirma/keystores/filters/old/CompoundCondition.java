@@ -52,7 +52,7 @@ final class CompoundCondition extends AClause implements ConditionConstants {
             cClauses.add(new SimpleCondition(clause));
         }
 
-        this.clauses = cClauses.toArray(new Clause[cClauses.size()]);
-        this.nexus = cNexus.toArray(new Nexus[cNexus.size()]);
+        setClauses(cClauses.toArray(new Clause[cClauses.size()]));
+        setNexus(cNexus.toArray(new Nexus[cNexus.size()]));
     }
 }

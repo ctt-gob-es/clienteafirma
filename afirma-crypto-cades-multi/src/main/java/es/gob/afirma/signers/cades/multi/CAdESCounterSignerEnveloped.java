@@ -897,7 +897,10 @@ final class CAdESCounterSignerEnveloped {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws java.security.cert.CertificateException */
-    private SignerInfo UnsignedAtributte(final P7ContentSignerParameters parameters, final X509Certificate cert, final SignerInfo si, final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
+    private SignerInfo UnsignedAtributte(final P7ContentSignerParameters parameters, 
+                                         final X509Certificate cert, 
+                                         final SignerInfo si, 
+                                         final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException,
                                                                                                                                              IOException,
                                                                                                                                              CertificateException {
         // // UNAUTHENTICATEDATTRIBUTES

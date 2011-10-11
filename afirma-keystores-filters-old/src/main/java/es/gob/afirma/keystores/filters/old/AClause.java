@@ -21,9 +21,17 @@ import es.gob.afirma.core.AOException;
  */
 @Deprecated
 abstract class AClause implements Clause {
-    protected Clause[] clauses;
-
-    protected Nexus[] nexus;
+    
+    private Clause[] clauses;
+    private Nexus[] nexus;
+    
+    protected void setClauses(final Clause[] c) {
+        this.clauses = c;
+    }
+    
+    protected void setNexus(final Nexus[] n) {
+        this.nexus = n;
+    }
 
     public boolean eval(X509Certificate cert) throws AOException {
         boolean eval;

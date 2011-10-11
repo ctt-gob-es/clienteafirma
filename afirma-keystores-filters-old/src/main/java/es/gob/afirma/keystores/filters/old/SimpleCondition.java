@@ -117,7 +117,9 @@ final class SimpleCondition extends AClause implements ConditionConstants {
                 o1 = rewriteLdapName(cert.getSubjectDN().getName());
             }
             else if (this.field.equalsIgnoreCase("SUBJECT.SN")) { //$NON-NLS-1$
-                if (this.aux == null) this.aux = new BigInteger(this.value).toString();
+                if (this.aux == null) {
+                    this.aux = new BigInteger(this.value).toString();
+                }
                 o1 = cert.getSerialNumber().toString();
             }
             else if (this.field.toUpperCase().startsWith("SUBJECT.FP(")) { //$NON-NLS-1$

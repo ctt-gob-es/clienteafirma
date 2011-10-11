@@ -67,12 +67,12 @@ final class ComplexCondition extends AClause implements ConditionConstants {
                     throw new AOException("Error de sintaxis, pos=" + pos + ": " + str); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
-            this.clauses = cClauses.toArray(new Clause[cClauses.size()]);
-            this.nexus = cNexus.toArray(new Nexus[cNexus.size()]);
+            setClauses(cClauses.toArray(new Clause[cClauses.size()]));
+            setNexus(cNexus.toArray(new Nexus[cNexus.size()]));
         }
         else {
-            this.clauses= new Clause[]{new SimpleCondition(str.substring(1, str.length()-1))};
-            this.nexus= new Nexus[0];
+            setClauses(new Clause[]{new SimpleCondition(str.substring(1, str.length()-1))});
+            setNexus(new Nexus[0]);
         }
 
     }

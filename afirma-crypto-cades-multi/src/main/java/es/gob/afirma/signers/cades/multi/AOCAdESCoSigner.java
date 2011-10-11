@@ -32,11 +32,9 @@ public class AOCAdESCoSigner implements AOCoSigner {
     public byte[] cosign(final byte[] data, 
                          final byte[] sign, String algorithm, 
                          final PrivateKeyEntry keyEntry, 
-                         Properties extraParams) throws AOException {
+                         final Properties xParams) throws AOException {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
         if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
             algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
@@ -107,21 +105,13 @@ public class AOCAdESCoSigner implements AOCoSigner {
     }
 
     public byte[] cosign(final byte[] sign, 
-                         String algorithm, 
+                         final String algorithm, 
                          final PrivateKeyEntry keyEntry, 
-                         Properties extraParams) throws AOException {
+                         final Properties xParams) throws AOException {
 
-        if (extraParams == null) {
-            extraParams = new Properties();
-        }
+        final Properties extraParams = (xParams != null) ? xParams : new Properties();
+
         final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
 
         // algoritmo de firma.
         final String typeAlgorithm = algorithm;
