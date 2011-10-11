@@ -2,6 +2,7 @@ package es.gob.afirma.ui.utils;
 
 
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 
@@ -9,6 +10,7 @@ import java.awt.event.KeyEvent;
 
 import java.io.File;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JToggleButton;
@@ -52,45 +54,52 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 
 	
 	/**
-	 * Método que inicializa el componente JFileChooser para que sea accesible.
+	 * Mï¿½todo que inicializa el componente JFileChooser para que sea accesible.
 	 */
 	private void init() {
-		//Asignación de mnemonics
 		
+
+		//Se comprueba si se estÃ¡ en el modo Alto contraste
+		if (GeneralConfig.isHighContrast()){
+			setHighContrast((Container)this);
+		}
+		
+		
+		//Asignaciï¿½n de mnemonics
 		
 		//setLabelMnemonics((Container)this, "FileChooser.saveInLabelText", KeyEvent.VK_U);
 		
 		//Etiqueta Guardar en ...
 		setLabelMnemonics((Container)this, "FileChooser.lookInLabelText", KeyEvent.VK_U);
 		
-		//Botón Cancelar
+		//Botï¿½n Cancelar
 		setButtonMnemonics((Container)this, "FileChooser.cancelButtonText", KeyEvent.VK_C);
 		
-		//Botón Abrir
+		//Botï¿½n Abrir
 		setButtonMnemonics((Container)this, "FileChooser.openButtonText", KeyEvent.VK_A);
 		
 		//Toggle buttons
-		//TODO: Revisar puesto que los botones que se hacen accesibles están predefinidos
+		//TODO: Revisar puesto que los botones que se hacen accesibles estï¿½n predefinidos
 		setToggleButtonMnemonics((Container)this);
 	}
 
 	/**
-	 * Asigna el mnemónico indicado al botón identificado por la clave.
+	 * Asigna el mnemï¿½nico indicado al botï¿½n identificado por la clave.
 	 * @param c contenedor global
-	 * @param key clave del componente al que se le va a asignar el mnemónico.
-	 * @param mnemonic mnemónico que se va a asignar al componente
+	 * @param key clave del componente al que se le va a asignar el mnemï¿½nico.
+	 * @param mnemonic mnemï¿½nico que se va a asignar al componente
 	 */
 	private void setButtonMnemonics( Container c, String key, int mnemonic ) {
-	    int len = c.getComponentCount(); //Número de componentes del contenedor
+	    int len = c.getComponentCount(); //Nï¿½mero de componentes del contenedor
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
 	      Component comp = c.getComponent(i); //Se obtiene un componente
-	      //Se comprueba si es de tipo botón
+	      //Se comprueba si es de tipo botï¿½n
 	      if (comp instanceof JButton) {
 		        JButton button = (JButton)comp;
 		        //Se comprueba si su texto es el indicado por la clave
 		        if (button.getText() ==  UIManager.get(key)) {
-		        	//Se le asigna el mnemónico
+		        	//Se le asigna el mnemï¿½nico
 		        	button.setMnemonic(mnemonic);
 		        	break; //Salir del bucle
 		        }
@@ -102,13 +111,13 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	  }
 	
 	/**
-	 * Asigna el mnemónico indicado a la etiqueta identificada por la clave .
+	 * Asigna el mnemï¿½nico indicado a la etiqueta identificada por la clave .
 	 * @param c contenedor global
-	 * @param key clave del componente al que se le va a asignar el mnemónico.
-	 * @param mnemonic mnemónico que se va a asignar al componente
+	 * @param key clave del componente al que se le va a asignar el mnemï¿½nico.
+	 * @param mnemonic mnemï¿½nico que se va a asignar al componente
 	 */
 	private void setLabelMnemonics( Container c, String key, int mnemonic ) {
-		 //Número de componentes del contenedor
+		 //Nï¿½mero de componentes del contenedor
 	    int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
@@ -118,7 +127,7 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	        JLabel label = (JLabel)comp;
 	        //Se comprueba si su texto es el indicado por la clave
 	        if (label.getText() ==  UIManager.get(key)) {
-	        	//Se le asigna el mnemónico
+	        	//Se le asigna el mnemï¿½nico
 	        	label.setDisplayedMnemonic(mnemonic);
 	        	break; //Salir del bucle
 		    }
@@ -130,11 +139,11 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	  }
 	
 	/**
-	 * Asigna un mnemónico predefinido a ciertos toggleButton contenidos en el componente.
+	 * Asigna un mnemï¿½nico predefinido a ciertos toggleButton contenidos en el componente.
 	 * @param c contenedor global
 	 */
 	private void setToggleButtonMnemonics( Container c) {
-		 //Número de componentes del contenedor
+		 //Nï¿½mero de componentes del contenedor
 	    int len = c.getComponentCount();
 	  //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
@@ -144,42 +153,42 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 		    	JToggleButton toggleButton = (JToggleButton) comp;
 		    	 //Se almacena su texto asociado
 		    	String text = toggleButton.getText();
-		    	//Se comprueba que no esté vacío
+		    	//Se comprueba que no estï¿½ vacï¿½o
 		    	if (text!=null && !text.equalsIgnoreCase("")) {
 		    		
-		    		//Se tratan los botones según su texto
+		    		//Se tratan los botones segï¿½n su texto
 			    	if (text.equalsIgnoreCase("<html><center>Equipo</center></html>")) {
-			    		//Se asigna un mnemónico predefinido
+			    		//Se asigna un mnemï¿½nico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_E);
-			    		//Como el texto del botón contiene código HTML se hace lo siguiente para que se muestre el mnemónico al usuario
+			    		//Como el texto del botï¿½n contiene cï¿½digo HTML se hace lo siguiente para que se muestre el mnemï¿½nico al usuario
 			    		String newText = text.substring(0, 14) +"<u>"+text.charAt(14)+"</u>"+text.substring(15);
 			    		toggleButton.setText(newText);
 			    		
 			    	} else if (text.equalsIgnoreCase("<html><center>Elementos recientes</center></html>")) {
-			    		//Se asigna un mnemónico predefinido
+			    		//Se asigna un mnemï¿½nico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_L);
-			    		//Como el texto del botón contiene código HTML se hace lo siguiente para que se muestre el mnemónico al usuario
+			    		//Como el texto del botï¿½n contiene cï¿½digo HTML se hace lo siguiente para que se muestre el mnemï¿½nico al usuario
 			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
 			    		toggleButton.setText(newText);
 			    		
 			    	} else if (text.equalsIgnoreCase("<html><center>Escritorio</center></html>")) {
-			    		//Se asigna un mnemónico predefinido
+			    		//Se asigna un mnemï¿½nico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_S);
-			    		//Como el texto del botón contiene código HTML se hace lo siguiente para que se muestre el mnemónico al usuario
+			    		//Como el texto del botï¿½n contiene cï¿½digo HTML se hace lo siguiente para que se muestre el mnemï¿½nico al usuario
 			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
 			    		toggleButton.setText(newText);
 			    		
 			    	} else if (text.equalsIgnoreCase("<html><center>Mis documentos</center></html>")) {
-			    		//Se asigna un mnemónico predefinido
+			    		//Se asigna un mnemï¿½nico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_I);
-			    		//Como el texto del botón contiene código HTML se hace lo siguiente para que se muestre el mnemónico al usuario
+			    		//Como el texto del botï¿½n contiene cï¿½digo HTML se hace lo siguiente para que se muestre el mnemï¿½nico al usuario
 			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
 			    		toggleButton.setText(newText);
 
 			    	} else if (text.equalsIgnoreCase("<html><center>Red</center></html>")) {
-			    		//Se asigna un mnemónico predefinido
+			    		//Se asigna un mnemï¿½nico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_R);
-			    		//Como el texto del botón contiene código HTML se hace lo siguiente para que se muestre el mnemónico al usuario
+			    		//Como el texto del botï¿½n contiene cï¿½digo HTML se hace lo siguiente para que se muestre el mnemï¿½nico al usuario
 			    		String newText = text.substring(0, 14) +"<u>"+text.charAt(14)+"</u>"+text.substring(15);
 			    		toggleButton.setText(newText);
 			    	}
@@ -190,5 +199,42 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 		    }
 	    }//for
 	  }
-
+	/**
+	 * Define el modo alto contraste para los componentes de la ventana.
+	 * @param c contenedor global
+	 */
+	public void setHighContrast(Container c) {
+		 //Nï¿½mero de componentes del contenedor
+	    int len = c.getComponentCount();
+	    //Se recorren los elementos que forman el contenedor
+	    for (int i = 0; i < len; i++) {
+	      Component comp = c.getComponent(i);  //Se obtiene un componente
+	      //Se comprueba si es de tipo etiqueta
+	      if (comp instanceof JLabel) {
+	        JLabel label = (JLabel)comp;
+	        if (GeneralConfig.isHighContrast()){
+	        	label.setForeground(Color.WHITE);
+	        } else {
+	        	label.setForeground(Color.BLACK);
+	        }
+	      } else if(comp instanceof JToggleButton){
+	    	  JToggleButton toggleButton = (JToggleButton)comp;
+	    	  if (GeneralConfig.isHighContrast()){
+	    		  toggleButton.setForeground(Color.WHITE);
+	    	  } else {
+	    		  toggleButton.setForeground(Color.BLACK);
+	    	  }
+	      } else if (comp instanceof JComboBox){
+	    	  JComboBox comboBox = (JComboBox)comp;
+	    	  if (GeneralConfig.isHighContrast()){
+	    		  comboBox.setBackground(Color.WHITE);
+	    	  } else {
+	    		  comboBox.setBackground(Color.BLACK);  
+	    	  }
+	      } else if (comp instanceof Container) {
+	    	  	//Llamada recursiva
+	    	  setHighContrast((Container)comp);
+		    }
+	    }//for
+	  }
 }
