@@ -11,8 +11,6 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
@@ -90,25 +88,25 @@ public class Utils {
     }
 	
 	/**
-	 * Método que devuelve un mnemónico válido para el lenguaje que recibe como parámetro.
-	 * @param listMnemonic lista de mnemónicos que ya han sido utilizados para otros lenguajes.
-	 * @param actualLanguage lenguaje para el que se está buscando un mnemónico
-	 * @return mnemónico seleccionado o 0 en el caso de que no se haya encontrado ninguno disponible
+	 * Mï¿½todo que devuelve un mnemï¿½nico vï¿½lido para el lenguaje que recibe como parï¿½metro.
+	 * @param listMnemonic lista de mnemï¿½nicos que ya han sido utilizados para otros lenguajes.
+	 * @param actualLanguage lenguaje para el que se estï¿½ buscando un mnemï¿½nico
+	 * @return mnemï¿½nico seleccionado o 0 en el caso de que no se haya encontrado ninguno disponible
 	 */
 	public static char getLanguageMnemonic(List<Character> mnemonicList, String actualLanguage){
 		//Se recorren las letras del lenguaje actual
 		for (int i=0; i< actualLanguage.length(); i++) {
-			//Se lee el caracter correspondiente al índice i
+			//Se lee el caracter correspondiente al ï¿½ndice i
 			char caracter = actualLanguage.charAt(i);
 			//Se comprueba si se ha utilizado
 			if (!mnemonicList.contains(caracter)) {
-				//se añade a la lista de caracteres utilizados
+				//se aï¿½ade a la lista de caracteres utilizados
 				mnemonicList.add(caracter);
 				//Se devuelve
 				return caracter;
 			}
 		}
-		//TODO: mejorar para que en el caso de que no encuentre mnemónico pueda cambiar alguno de los anteriores
+		//TODO: mejorar para que en el caso de que no encuentre mnemï¿½nico pueda cambiar alguno de los anteriores
 		return 0;
 	}
 	
@@ -333,17 +331,33 @@ public class Utils {
 	 * @param component Componente al que aplicar el estilo de fuente negrita.
 	 */
 	public static void setFontBold(JComponent component){
-		if (GeneralConfig.isFontBold()){
-			if(component instanceof JPanel){
-				if (component.getBorder()!=null){
-					if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){
-						if (((TitledBorder)component.getBorder())!=null){
-							((TitledBorder)component.getBorder()).setTitleFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
+		//Se comprueba si el componente es de tipo panel con borde
+		if(component instanceof JPanel){
+			if (component.getBorder()!=null){
+				if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){
+					TitledBorder titledBorder = (TitledBorder)component.getBorder(); //Se obtiene el borde
+					//Se comprueba que no sea nulo
+					if (titledBorder != null){
+						//Se comprueba si la configuraciÃ³n pide que la fuente estÃ© en negrita
+						if (GeneralConfig.isFontBold()){
+							//Se indica que la fuente es negrita
+							titledBorder.setTitleFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
+						} else {
+							//Se indica que la fuente es texto plano
+							titledBorder.setTitleFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
 						}
 					}
-				}
+				} //ComprobaciÃ³n del tipo de borde
+			} // comprobaciÃ³n de si tiene borde
+		} else {
+			//Se comprueba si la configuraciÃ³n pide que la fuente estÃ© en negrita
+			if (GeneralConfig.isFontBold()){
+				//Se indica que la fuente es negrita
+				component.setFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
+			} else {
+				//Se indica que la fuente es texto plano
+				component.setFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
 			}
-			component.setFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
 		}
 	}
 
