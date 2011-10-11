@@ -30,7 +30,6 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-//import es.gob.afirma.platform.ws.TestSignVerifier;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 
 
@@ -95,7 +94,7 @@ public final class TestCAdES {
     @Test
     public void testSignature() throws Exception {
       /*  
-      TestSignVerifier verifier = null;
+      es.gob.afirma.platform.ws.TestSignVerifier verifier = null;
       try {
           verifier = new TestSignVerifier();
       } 

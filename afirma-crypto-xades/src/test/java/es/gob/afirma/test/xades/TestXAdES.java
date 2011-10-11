@@ -36,7 +36,6 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-//import es.gob.afirma.platform.ws.TestSignVerifier;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xml.Utils;
 
