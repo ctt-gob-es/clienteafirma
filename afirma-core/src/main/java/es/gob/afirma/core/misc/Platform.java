@@ -221,7 +221,7 @@ public final class Platform {
      * @return Identificador de versi&oacute;n o {@code null} si no se pudo identificar */
     public static String getITextVersion() {
         try {
-            Class<?> documentClass = Class.forName("com.lowagie.text.Document"); //$NON-NLS-1$
+            Class<?> documentClass = AOUtil.classForName("com.lowagie.text.Document"); //$NON-NLS-1$
             Method getReleaseMethod = documentClass.getDeclaredMethod("getRelease"); //$NON-NLS-1$
 
             return (String) getReleaseMethod.invoke(null);
@@ -288,10 +288,10 @@ public final class Platform {
     public static String getBouncyCastleVersion() {
 
         try {
-            Class<?> BouncyCastleProviderClass = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
+            Class<?> BouncyCastleProviderClass = AOUtil.classForName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
             Object bouncyCastleProviderObject = BouncyCastleProviderClass.newInstance();
 
-            Class<?> ProviderClass = Class.forName("java.security.Provider"); //$NON-NLS-1$
+            Class<?> ProviderClass = AOUtil.classForName("java.security.Provider"); //$NON-NLS-1$
             Method getVersionMethod = ProviderClass.getDeclaredMethod("getVersion"); //$NON-NLS-1$
 
             return ((Double) getVersionMethod.invoke(bouncyCastleProviderObject)).toString();
