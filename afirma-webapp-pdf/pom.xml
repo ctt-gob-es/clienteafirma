@@ -5,6 +5,7 @@
   <groupId>es.gob.afirma</groupId>
   <artifactId>afirma-webapp-pdf</artifactId>
   <packaging>war</packaging>
+  <name>afirma-webapp-pdf</name>
 
   <parent>
     <groupId>es.gob.afirma</groupId>
