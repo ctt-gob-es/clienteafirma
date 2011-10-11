@@ -41,7 +41,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
         }
     }
 
-    final static class KeyEntry {
+    final class KeyEntry {
         // private Key privateKey;
         final X509Certificate certChain[];
         private String alias;
@@ -185,11 +185,9 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
                 }
                 if (getAlias != null) {
                     try {
-                        if (alias.equals(getAlias.invoke(o, new Object[0]))) {
-                            if (getCertificateChain != null) {
-                                final X509Certificate[] certChain = (X509Certificate[]) getCertificateChain.invoke(o, new Object[0]);
-                                return certChain[0];
-                            }
+                        if (alias.equals(getAlias.invoke(o, new Object[0])) && getCertificateChain != null) {
+                            final X509Certificate[] certChain = (X509Certificate[]) getCertificateChain.invoke(o, new Object[0]);
+                            return certChain[0];
                         }
                     }
                     catch (final Exception e) {
