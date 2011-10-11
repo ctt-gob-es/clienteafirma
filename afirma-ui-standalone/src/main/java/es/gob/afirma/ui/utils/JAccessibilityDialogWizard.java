@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
@@ -18,10 +19,28 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	
 	private static final long serialVersionUID = 1L;
 	
+	public static int actualPositionX = -1;
+	
+	public static int actualPositionY = -1;
+	
+	public static int actualWidth = -1;
+	
+	public static int actualHeight = -1;
+	
 	public JAccessibilityDialogWizard(){
 		super();
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this,null,null);
 		this.addComponentListener(adaptador);
+		this.addComponentListener(new ComponentAdapter() {
+		    public void componentResized(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		    public void componentMoved(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		});
 		if (GeneralConfig.isMaximized()){
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
@@ -104,4 +123,17 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		 }
 		 return resultingJAccessibilityDialogWizard;
 	 }
+	
+	/**
+	 * Evento de redimensionado. Almacena el tamaño y posicion de la ventana para su restauracion.
+	 */
+	public void resized(ComponentEvent e) {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
+			actualPositionX = this.getX();
+			actualPositionY = this.getY();
+			actualWidth = this.getWidth();
+			actualHeight = this.getHeight();
+		}
+	}
 }

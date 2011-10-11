@@ -38,6 +38,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogAdvisor;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 public class UserProfile extends JAccessibilityDialogAdvisor {
 
@@ -195,7 +196,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
         
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
-		cons.ipadx = 15;
+		cons.ipadx = 7;
 		cons.gridx = 0;
 		cons.insets = new Insets(5, 0, 5, 0);
 		
@@ -217,6 +218,20 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	    panelMaximizar.add(maximizar);
 	    config(maximizar);
 		
+	    JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
+	    // Boton restaurar
+	    JButton restaurar = new JButton();
+	    restaurar.setText(Messages.getString("Wizard.restaurar"));
+	    restaurar.setName("restaurar");
+	    restaurar.setMnemonic(KeyEvent.VK_R);
+	    restaurar.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		restaurarActionPerformed();
+			}
+		});
+	    config(restaurar);
+	    panelRestaurar.add(restaurar);
+	    
 	    JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		// Boton aceptar
 		JButton aceptar = new JButton();
@@ -239,6 +254,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
         // Panel en donde se insertan los botones maximizar y aceptar
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(panelMaximizar, BorderLayout.CENTER);
+        buttonPanel.add(panelRestaurar, BorderLayout.CENTER);
         buttonPanel.add(panelVacio, BorderLayout.CENTER);
         buttonPanel.add(panelAceptar, BorderLayout.CENTER);
 		
@@ -356,6 +372,14 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		JAccessibilityDialogAdvisor j = getJAccessibilityDialogAdvisor(this);
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		
+	}
+	
+	/**
+	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+	 */
+	public void restaurarActionPerformed(){
+		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		
 	}
 	

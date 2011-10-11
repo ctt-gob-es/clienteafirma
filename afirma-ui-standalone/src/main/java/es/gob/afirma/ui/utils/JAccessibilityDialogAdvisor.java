@@ -1,12 +1,16 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.JDialog;
 
 /**
- * Clase para generar un JFrame con la posibilidad de redimension.
- * Extiende JFrame.
+ * Clase para generar un JDialog con la posibilidad de redimension.
+ * Extiende JDialog.
  * @author inteco
  *
  */
@@ -14,12 +18,30 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	
+	protected static int actualPositionX = -1;
+	
+	protected static int actualPositionY = -1;
+	
+	protected static int actualWidth = -1;
+	
+	protected static int actualHeight = -1;
+	
 	private ResizingAdaptor resizingAdaptor;
 	
 	public JAccessibilityDialogAdvisor(){
 		super();
 		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null);
 		this.addComponentListener(this.resizingAdaptor);
+		this.addComponentListener(new ComponentAdapter() {
+		    public void componentResized(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		    public void componentMoved(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		});
 	}
 	
 	/**
@@ -52,4 +74,17 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 		 }
 		 return resultingJAccessibilityDialogAdvisor;
 	 }
+	
+	/**
+	 * Evento de redimensionado. Almacena el tamaño y posicion de la ventana para su restauracion.
+	 */
+	public void resized(ComponentEvent e) {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
+			actualPositionX = this.getX();
+			actualPositionY = this.getY();
+			actualWidth = this.getWidth();
+			actualHeight = this.getHeight();
+		}
+	}
 }

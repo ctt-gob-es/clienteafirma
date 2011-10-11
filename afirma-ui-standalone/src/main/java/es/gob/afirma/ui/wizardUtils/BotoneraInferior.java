@@ -97,6 +97,24 @@ public class BotoneraInferior extends JPanel {
         panelMaximizar.add(maximizar);
         add(panelMaximizar);
         
+        JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
+	    // Boton restaurar
+	    JButton restaurar = new JButton();
+	    restaurar.setText(Messages.getString("Wizard.restaurar"));
+	    restaurar.setName("restaurar");
+	    restaurar.setMnemonic(KeyEvent.VK_R);
+	    restaurar.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		restaurarActionPerformed();
+			}
+		});
+	    Utils.remarcar(restaurar);
+        Utils.setContrastColor(restaurar);
+	    Utils.setFontBold(restaurar);
+	    
+	    panelRestaurar.add(restaurar);
+	    add(panelRestaurar);
+        
         //Espacio entre botones
 		Panel panelVacio = new Panel();
 		panelVacio.setPreferredSize(new Dimension(100, 10));
@@ -237,6 +255,15 @@ public class BotoneraInferior extends JPanel {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		
+	}
+	
+	/**
+	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+	 */
+	public void restaurarActionPerformed(){
+		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
+		j.setBounds(j.actualPositionX, j.actualPositionY, j.actualWidth, j.actualHeight);
 		
 	}
 }

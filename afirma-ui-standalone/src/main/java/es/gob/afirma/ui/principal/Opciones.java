@@ -185,7 +185,7 @@ public class Opciones extends JAccessibilityDialog {
         
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
-		cons.ipadx = 15;
+		cons.ipadx = 0;
 		cons.gridx = 0;
 		cons.insets = new Insets(11, 0, 13, 0);
 		
@@ -209,6 +209,22 @@ public class Opciones extends JAccessibilityDialog {
 	    Utils.setFontBold(maximizar);
 	    panelMaximizar.add(maximizar);
 		
+	    JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
+	    // Boton restaurar
+	    JButton restaurar = new JButton();
+	    restaurar.setText(Messages.getString("Wizard.restaurar"));
+	    restaurar.setName("restaurar");
+	    restaurar.setMnemonic(KeyEvent.VK_R);
+	    restaurar.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		restaurarActionPerformed();
+			}
+		});
+	    Utils.remarcar(restaurar);
+        Utils.setContrastColor(restaurar);
+	    Utils.setFontBold(restaurar);
+	    panelRestaurar.add(restaurar);
+	    
 	    //Espacio entre botones
 		Panel panelVacio = new Panel();
 		panelVacio.setPreferredSize(new Dimension(30, 10));
@@ -258,6 +274,7 @@ public class Opciones extends JAccessibilityDialog {
         // Panel en donde se insertan los botones maximizar, aceptar y cancelar
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(panelMaximizar, BorderLayout.CENTER);
+        buttonPanel.add(panelRestaurar, BorderLayout.CENTER);
         buttonPanel.add(panelVacio, BorderLayout.CENTER);
 		buttonPanel.add(panelAceptar, BorderLayout.CENTER);
 		buttonPanel.add(panelCancelar, BorderLayout.CENTER);
@@ -478,6 +495,14 @@ public class Opciones extends JAccessibilityDialog {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		JAccessibilityDialog j = getJAccessibilityDialog(this);
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		
+	}
+	
+	/**
+	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+	 */
+	public void restaurarActionPerformed(){
+		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		
 	}
 	

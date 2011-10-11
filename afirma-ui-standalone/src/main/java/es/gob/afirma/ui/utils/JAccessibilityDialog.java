@@ -20,12 +20,24 @@ public abstract class JAccessibilityDialog extends JDialog {
 	
 	private static final long serialVersionUID = 1L;
 	
+	protected static int actualPositionX = -1;
+	
+	protected static int actualPositionY = -1;
+	
+	protected static int actualWidth = -1;
+	
+	protected static int actualHeight = -1;
+	
 	public JAccessibilityDialog(){
 		super();
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,this,null,null,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -71,7 +83,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	
 	/**
 	 * Evento de redimensionado. Comprueba el tamaÃ±o de la ventana para habilitar o deshabilitar el boton
-	 *  de Maximizar ventana
+	 *  de Maximizar ventana. Tambien almacena el tamaño y posicion de la ventana para su restauracion.
 	 */
 	public void resized(ComponentEvent e) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -85,6 +97,13 @@ public abstract class JAccessibilityDialog extends JDialog {
 		    	boton.setEnabled(true);
 		    }
 	    }
+	    // Se almacenan los valores de la posicion y el tamaño para la restauracion
+		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
+			actualPositionX = this.getX();
+			actualPositionY = this.getY();
+			actualWidth = this.getWidth();
+			actualHeight = this.getHeight();
+		}
 	}
 	
 	/**
