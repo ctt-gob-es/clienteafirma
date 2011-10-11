@@ -6,8 +6,13 @@
   <packaging>jar</packaging>
   <groupId>es.gob.afirma</groupId>
   <artifactId>afirma-keystores-filters-old</artifactId>
-  <version>3.2.0</version>
   <name>afirma-keystores-filters-old</name>
+
+  <parent>
+    <groupId>es.gob.afirma</groupId>
+    <artifactId>afirma-client</artifactId>
+    <version>3.2.0</version>
+  </parent>
 
   <dependencies>
     <dependency>

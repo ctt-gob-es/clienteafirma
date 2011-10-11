@@ -10,6 +10,17 @@
   <packaging>pom</packaging>
   <name>afirma-client</name>
 
+  <properties>
+   <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>uji</id>
+      <url>http://devel.uji.es/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
+
   <modules>
     <module>afirma-core</module>
     <module>afirma-util</module>
