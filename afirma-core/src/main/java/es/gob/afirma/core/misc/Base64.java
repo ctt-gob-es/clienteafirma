@@ -38,10 +38,7 @@ package es.gob.afirma.core.misc;
  *  <li>v2.3.4 - Fixed bug when working with gzipped streams whereby flushing
  *   the Base64.OutputStream closed the Base64 encoding (by padding with equals
  *   signs) too soon. Also added an option to suppress the automatic decoding
- *   of gzipped streams. Also added experimental support for specifying a
- *   class loader when using the
- *   {@link #decodeToObject(java.lang.String, int, java.lang.ClassLoader)}
- *   method.</li>
+ *   of gzipped streams.</li>
  *  <li>v2.3.3 - Changed default char encoding to US-ASCII which reduces the internal Java
  *   footprint with its CharEncoders and so forth. Fixed some javadocs that were
  *   inconsistent. Removed imports and specified things like java.io.IOException
@@ -1279,95 +1276,6 @@ public class Base64
         return bytes;
     }   // end decode
 
-
-
-    /**
-     * Attempts to decode Base64 data and deserialize a Java
-     * Object within. Returns <tt>null</tt> if there was an error.
-     *
-     * @param encodedObject The Base64 data to decode
-     * @return The decoded and deserialized object
-     * @throws NullPointerException if encodedObject is null
-     * @throws java.io.IOException if there is a general error
-     * @throws ClassNotFoundException if the decoded object is of a
-     *         class that cannot be found by the JVM
-     * @since 1.5
-     */
-    public static Object decodeToObject( String encodedObject )
-    throws java.io.IOException, java.lang.ClassNotFoundException {
-        return decodeToObject(encodedObject,NO_OPTIONS,null);
-    }
-    
-
-    /**
-     * Attempts to decode Base64 data and deserialize a Java
-     * Object within. Returns <tt>null</tt> if there was an error.
-     * If <tt>loader</tt> is not null, it will be the class loader
-     * used when deserializing.
-     *
-     * @param encodedObject The Base64 data to decode
-     * @param options Various parameters related to decoding
-     * @param loader Optional class loader to use in deserializing classes.
-     * @return The decoded and deserialized object
-     * @throws NullPointerException if encodedObject is null
-     * @throws java.io.IOException if there is a general error
-     * @throws ClassNotFoundException if the decoded object is of a 
-     *         class that cannot be found by the JVM
-     * @since 2.3.4
-     */
-    public static Object decodeToObject( 
-    String encodedObject, int options, final ClassLoader loader )
-    throws java.io.IOException, java.lang.ClassNotFoundException {
-        
-        // Decode and gunzip if necessary
-        byte[] objBytes = decode( encodedObject, options );
-        
-        java.io.ByteArrayInputStream  bais = null;
-        java.io.ObjectInputStream     ois  = null;
-        Object obj = null;
-        
-        try {
-            bais = new java.io.ByteArrayInputStream( objBytes );
-
-            // If no custom class loader is provided, use Java's builtin OIS.
-            if( loader == null ){
-                ois  = new java.io.ObjectInputStream( bais );
-            }   // end if: no loader provided
-
-            // Else make a customized object input stream that uses
-            // the provided class loader.
-            else {
-                ois = new java.io.ObjectInputStream(bais){
-                    @Override
-                    public Class<?> resolveClass(java.io.ObjectStreamClass streamClass)
-                    throws java.io.IOException, ClassNotFoundException {
-                        Class<?> c = Class.forName(streamClass.getName(), false, loader);
-                        if( c == null ){
-                            return super.resolveClass(streamClass);
-                        }
-                        return c;   // Class loader knows of this class: not null
-                    }   // end resolveClass
-                };  // end ois
-            }   // end else: no custom class loader
-        
-            obj = ois.readObject();
-        }   // end try
-        catch( java.io.IOException e ) {
-            throw e;    // Catch and throw in order to execute finally{}
-        }   // end catch
-        catch( java.lang.ClassNotFoundException e ) {
-            throw e;    // Catch and throw in order to execute finally{}
-        }   // end catch
-        finally {
-            if (bais != null) { try{ bais.close(); } catch( Exception e ){ /* Ignored */} }
-            if (ois != null) { try{ ois.close();  } catch( Exception e ){ /* Ignored */} }
-        }   // end finally
-        
-        return obj;
-    }   // end decodeObject
-    
-    
-    
     /**
      * Convenience method for encoding data to a file.
      *
