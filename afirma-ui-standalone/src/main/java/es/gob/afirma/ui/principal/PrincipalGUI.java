@@ -733,13 +733,13 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 			} else {
 				
-				//Se comprueba si el lookAndFeel por defecto es el que se había modificado para el modo
+				//Se comprueba si el lookAndFeel por defecto es el que se habï¿½a modificado para el modo
 				//Alto contraste
-				if (defaultLookAndFeel.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+				if (defaultLookAndFeel instanceof MetalLookAndFeel) {
 					MetalLookAndFeel.setCurrentTheme(this.defaultTheme); //Se asigna el tema por defecto
 				}
 				
-				//Se asigna el lookAndFeel que había por defecto
+				//Se asigna el lookAndFeel que habï¿½a por defecto
 				UIManager.setLookAndFeel(defaultLookAndFeel);
 				
 				UIManager.put("OptionPane.messageForeground",Color.BLACK);
