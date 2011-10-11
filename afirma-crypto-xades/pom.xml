@@ -9,6 +9,13 @@
   <version>3.2.0</version>
   <name>afirma-crypto-xades</name>
 
+  <repositories>
+    <repository>
+      <id>uji</id>
+      <url>http://devel.uji.es/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>es.gob.afirma</groupId>
@@ -19,7 +26,7 @@
     <dependency>
       <groupId>net.java.xades</groupId>
       <artifactId>jxades</artifactId>
-      <version>0.0.3</version>
+      <version>0.0.4</version>
     </dependency>
 
     <dependency>

@@ -9,6 +9,13 @@
   <version>3.2.0</version>
   <name>afirma-crypto-core-xml</name>
 
+  <repositories>
+    <repository>
+      <id>uji</id>
+      <url>http://devel.uji.es/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>es.gob.afirma</groupId>
