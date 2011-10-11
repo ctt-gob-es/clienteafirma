@@ -89,6 +89,11 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	public static JStatusBar bar = new JStatusBar();
 	
+	/**
+	 * Tema por defecto.
+	 */
+	private MetalTheme defaultTheme = MetalLookAndFeel.getCurrentTheme();
+	
 //	private JTabbedPane panelPest = null;
 	
 	private HorizontalTabbedPanel htPanel;
@@ -99,8 +104,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	}
 	
 	/**
-	 * Posición X inicial de la ventana dependiendo de la resolución de pantalla.
-	 * @return int Posición X
+	 * Posiciï¿½n X inicial de la ventana dependiendo de la resoluciï¿½n de pantalla.
+	 * @return int Posiciï¿½n X
 	 */
 	public int getInitialX() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
@@ -108,9 +113,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	}
 	
 	/**
-	 * Posición Y inicial de la ventana dependiendo del sistema operativo y de la
-	 * resolución de pantalla.
-	 * @return int Posición Y
+	 * Posiciï¿½n Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resoluciï¿½n de pantalla.
+	 * @return int Posiciï¿½n Y
 	 */
 	public int getInitialY() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
@@ -215,7 +220,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Subopcion menu Herramientas - Opciones
 		JMenuItem opciones = new JMenuItem();
 		opciones.setText(Messages.getString("Opciones.opciones")); //$NON-NLS-1$
-		opciones.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al menú
+		opciones.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al menï¿½
 		opciones.addActionListener(new ActionListener() {
             @Override
 			public void actionPerformed(ActionEvent evt) {
@@ -229,7 +234,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Subopcion menu Herramientas - Idiomas
 		JMenu menuIdioma = new JMenu();
 		menuIdioma.setText(Messages.getString("Opciones.general.idioma")); //$NON-NLS-1$
-		menuIdioma.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al menú
+		menuIdioma.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al menï¿½
 		
 		// Obtenemos ruta donde se encuentra la aplicaciï¿½n
 		URL baseDirectory = getClass().getProtectionDomain().getCodeSource().getLocation();
@@ -273,7 +278,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				String languageName = locale.getDisplayLanguage(locale);
 				JRadioButtonMenuItem opcionIdioma = new JRadioButtonMenuItem(languageName.substring(0, 1).toUpperCase() + languageName.substring(1));
 				
-				//Se asigna un mnemónico que no haya sido utilizado
+				//Se asigna un mnemï¿½nico que no haya sido utilizado
 				opcionIdioma.setMnemonic(Utils.getLanguageMnemonic(mnemonicList, languageName.toLowerCase()));
 				
 				Utils.setContrastColor(opcionIdioma);
@@ -305,7 +310,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Subopcion menu Herramientas - Salir
 		JMenuItem salir = new JMenuItem();
 		salir.setText(Messages.getString("PrincipalGUI.salir")); // NOI18N
-		salir.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo al menú
+		salir.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo al menï¿½
 		salir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				salirActionPerformed();
@@ -418,7 +423,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    this.htPanel.reset();
 
 	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
-	    // la ventana principal con el tamaño adecuado
+	    // la ventana principal con el tamaï¿½o adecuado
 	    if (GeneralConfig.isMaximized()){
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
@@ -677,7 +682,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	/**
 	 * Evento de redimensionado. Redimensiona el tamaÃ±o de la barra de estado 
-	 * y de su contenido, también almacena los valores actuales de posicion y tamaño de
+	 * y de su contenido, tambiï¿½n almacena los valores actuales de posicion y tamaï¿½o de
 	 * la ventana.
 	 * 
 	 */
@@ -706,25 +711,28 @@ public class PrincipalGUI extends JAccessibilityFrame {
 //		   System.out.println(claves.nextElement());
 		try {
 			if (highContrast) {
+				//Tema de alto contraste
 				MetalTheme theme = new HighContrastTheme();
 				// set the chosen theme
-
 				MetalLookAndFeel.setCurrentTheme(theme);
 
-				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-				
 				UIManager.put("OptionPane.messageForeground",Color.WHITE);
 				UIManager.put("Button.foreground",Color.WHITE);
 				UIManager.put("ToolTip.foreground",Color.WHITE);
 				UIManager.put("ToolTip.background",Color.BLACK);
 
 			} else {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				MetalLookAndFeel.setCurrentTheme(this.defaultTheme); //Se asigna el tema por defecto
+				
 				UIManager.put("OptionPane.messageForeground",Color.BLACK);
 				UIManager.put("Button.foreground",Color.BLACK);
 				UIManager.put("ToolTip.foreground",Color.BLACK);
 				UIManager.put("ToolTip.background",new Color(255,255,225));
 			}
+
+			//set look and feel
+			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+			
 		} catch (ClassNotFoundException e1) {
 			System.out.println(e1.getMessage());
 		} catch (InstantiationException e1) {
