@@ -25,8 +25,18 @@
     <module>afirma-crypto-pdf-itext</module>
     <module>afirma-crypto-pdf</module>
     <module>afirma-crypto-cipher</module>
-    <module>afirma-crypto-xades</module>
     <module>afirma-crypto-core-xml</module>
+    <module>afirma-crypto-xmlsignature</module>
+    <module>afirma-crypto-xades</module>
+    <module>afirma-crypto-ooxml</module>
+    <module>afirma-crypto-odf</module>
+    <module>afirma-keystores-capiaddressbook</module>
+    <module>afirma-keystores-filters-old</module>
+    <module>afirma-keystores-filters-rfc</module>
+    <module>afirma-keystores-mozilla</module>
+    <module>afirma-keystores-single</module>
+    <module>afirma-ui-standalone-help-en_UK</module>
+    <module>afirma-ui-standalone-help-es_ES</module>
     <module>afirma-ui-core-jse</module>
     <module>afirma-ui-standalone</module>
     <module>afirma-ui-simpleafirma</module>
