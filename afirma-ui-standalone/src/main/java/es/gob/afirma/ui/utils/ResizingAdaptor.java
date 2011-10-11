@@ -103,9 +103,15 @@ public class ResizingAdaptor extends ComponentAdapter {
 			relHeight = theWindow.getSize().getHeight() / Constants.WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theWindow.getMinimumRelation());
 		} else if (theDialog != null) {
-			relWidth = theDialog.getSize().getWidth() / Constants.OPTION_INITIAL_WIDTH;
-			relHeight = theDialog.getSize().getHeight() / Constants.OPTION_INITIAL_HEIGHT;
-			relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
+			if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+				relWidth = theDialog.getSize().getWidth() / (Constants.OPTION_FONT_INITIAL_WIDTH);
+				relHeight = theDialog.getSize().getHeight() / (Constants.OPTION_FONT_INITIAL_HEIGHT);
+				relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
+			} else{
+				relWidth = theDialog.getSize().getWidth() / Constants.OPTION_INITIAL_WIDTH;
+				relHeight = theDialog.getSize().getHeight() / Constants.OPTION_INITIAL_HEIGHT;
+				relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
+			}
 		} else if (theDialogWizard != null){
 			relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH;
 			relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT;

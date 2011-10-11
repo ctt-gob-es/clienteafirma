@@ -59,6 +59,16 @@ public class Constants {
     public static final int OPTION_INITIAL_HEIGHT = 520;
     
     /**
+     * Width inicial de los JDialog de la aplicacion con variacion de fuente.
+     */
+    public static final int OPTION_FONT_INITIAL_WIDTH = 605;
+    
+    /**
+     * Height inicial de los JDialog de la aplicacion con variacion de fuente.
+     */
+    public static final int OPTION_FONT_INITIAL_HEIGHT = 600;
+    
+    /**
      * Width inicial de los JDialogWizard de la aplicacion.
      */
     public static final int WIZARD_INITIAL_WIDTH = 670;

@@ -117,7 +117,11 @@ public class Opciones extends JAccessibilityDialog {
     		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
     	} else {
-    		setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+    		} else {
+    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    		}
     	}
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -227,7 +231,7 @@ public class Opciones extends JAccessibilityDialog {
 	    
 	    //Espacio entre botones
 		Panel panelVacio = new Panel();
-		panelVacio.setPreferredSize(new Dimension(30, 10));
+		panelVacio.setPreferredSize(new Dimension(15, 10));
 	    
 		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		// Boton aceptar
