@@ -382,9 +382,6 @@ final class CAdESUtils {
              * CertificateSerialNumber */
 
             final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-            final GeneralNames gns = new GeneralNames(new GeneralName(tbs.getIssuer()));
-
-            final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
 
             /** ESSCertIDv2 ::= SEQUENCE { hashAlgorithm AlgorithmIdentifier
              * DEFAULT {algorithm id-sha256}, certHash Hash, issuerSerial
@@ -393,7 +390,14 @@ final class CAdESUtils {
 
             final byte[] certHash = MessageDigest.getInstance(digestAlgorithmName).digest(cert.getEncoded());
             final ESSCertIDv2[] essCertIDv2 = {
-                new ESSCertIDv2(digestAlgorithmOID, certHash, isuerSerial)
+                new ESSCertIDv2(
+                    digestAlgorithmOID, 
+                    certHash, 
+                    new IssuerSerial(
+                         new GeneralNames(new GeneralName(tbs.getIssuer())),
+                         tbs.getSerialNumber()
+                     )
+                )
             };
 
             /** PolicyInformation ::= SEQUENCE { policyIdentifier CertPolicyId,
@@ -430,16 +434,13 @@ final class CAdESUtils {
              * CertificateSerialNumber } */
 
             final TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Object.fromByteArray(cert.getTBSCertificate()));
-            final GeneralName gn = new GeneralName(tbs.getIssuer());
-            final GeneralNames gns = new GeneralNames(gn);
 
-            final IssuerSerial isuerSerial = new IssuerSerial(gns, tbs.getSerialNumber());
+            final IssuerSerial isuerSerial = new IssuerSerial(new GeneralNames(new GeneralName(tbs.getIssuer())), tbs.getSerialNumber());
 
             /** ESSCertID ::= SEQUENCE { certHash Hash, issuerSerial IssuerSerial
              * OPTIONAL }
              * Hash ::= OCTET STRING -- SHA1 hash of entire certificate */
-            final byte[] certHash = MessageDigest.getInstance(digestAlgorithmName).digest(cert.getEncoded());
-            final ESSCertID essCertID = new ESSCertID(certHash, isuerSerial);
+            final ESSCertID essCertID = new ESSCertID(MessageDigest.getInstance(digestAlgorithmName).digest(cert.getEncoded()), isuerSerial);
 
             /** PolicyInformation ::= SEQUENCE { policyIdentifier CertPolicyId,
              * policyQualifiers SEQUENCE SIZE (1..MAX) OF PolicyQualifierInfo

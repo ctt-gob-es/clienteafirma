@@ -75,10 +75,10 @@ final class CAdESDigestedData {
         }
 
         // indicamos el tipo de contenido
-        final ContentInfo encInfo = new ContentInfo(new ASN1ObjectIdentifier(dataType.toString()), null);
+        final ContentInfo encInfo = new ContentInfo(new ASN1ObjectIdentifier(dataType), null);
 
         // digest
-        final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm.toString()).digest(parameters.getContent()));
+        final DEROctetString digest = new DEROctetString(MessageDigest.getInstance(digestAlgorithm).digest(parameters.getContent()));
 
         // construimos el digestedData.
         return (new ContentInfo(PKCSObjectIdentifiers.digestedData, new DigestedData(digAlgId, encInfo, digest))).getDEREncoded();
