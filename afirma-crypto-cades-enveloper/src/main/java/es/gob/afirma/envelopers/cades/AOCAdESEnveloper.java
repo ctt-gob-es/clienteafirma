@@ -86,7 +86,7 @@ public class AOCAdESEnveloper implements AOEnveloper {
             throw new IllegalArgumentException("El archivo a tratar no puede ser nulo."); //$NON-NLS-1$
         }
 
-        byte[] plainData;
+        final byte[] plainData;
         try {
             plainData = AOUtil.getDataFromInputStream(file);
         }

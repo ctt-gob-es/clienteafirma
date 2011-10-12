@@ -787,7 +787,7 @@ final class CAdESUtils {
      *        Certificado
      * @return Clave secreta
      * @throws NullPointerException */
-    static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest) throws NullPointerException {
+    static SecretKey initEnvelopedData(final AOCipherConfig config, final X509Certificate[] certDest) {
         // Comprobamos que el archivo a tratar no sea nulo.
         if (certDest == null || certDest.length == 0) {
             throw new IllegalArgumentException("No se pueden envolver datos sin certificados destino."); //$NON-NLS-1$

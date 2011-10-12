@@ -50,10 +50,6 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
 final class CADESEncryptedData {
 
-    /** Clave de cifrado. La almacenamos internamente porque no hay forma de
-     * mostrarla directamente al usuario. */
-    private SecretKey cipherKey;
-
     /** M&eacute;todo principal que genera la firma de tipo EncryptedData.
      * @param file
      *        Archivo espec&iacute;fico a cifrar.
@@ -69,7 +65,13 @@ final class CADESEncryptedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital */
-    byte[] genEncryptedData(final InputStream file, final String digAlg, final AOCipherConfig config, final String pass, final String dataType) throws NoSuchAlgorithmException, AOException {
+    byte[] genEncryptedData(final InputStream file, 
+                            final String digAlg, 
+                            final AOCipherConfig config, 
+                            final String pass, 
+                            final String dataType) throws NoSuchAlgorithmException, AOException {
+        
+        
 
         final byte[] codeFile;
         try {
@@ -80,7 +82,7 @@ final class CADESEncryptedData {
         }
 
         // Asignamos la clave de cifrado
-        this.cipherKey = CAdESUtils.assignKey(config, pass);
+        final SecretKey cipherKey = CAdESUtils.assignKey(config, pass);
 
         // Datos previos &uacute;tiles
         final String digestAlgorithm = AOSignConstants.getDigestAlgorithmName(digAlg);
@@ -89,7 +91,7 @@ final class CADESEncryptedData {
         final EncryptedContentInfo encInfo;
         try {
             // 3. ENCRIPTEDCONTENTINFO
-            encInfo = CAdESUtils.getEncryptedContentInfo(codeFile, config, this.cipherKey);
+            encInfo = CAdESUtils.getEncryptedContentInfo(codeFile, config, cipherKey);
         }
         catch (final Exception ex) {
             throw new AOException("Error durante el proceso de cifrado", ex); //$NON-NLS-1$

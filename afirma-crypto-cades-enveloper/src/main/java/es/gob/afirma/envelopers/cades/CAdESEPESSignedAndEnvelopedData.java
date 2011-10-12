@@ -102,8 +102,6 @@ final class CAdESEPESSignedAndEnvelopedData {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    /** Clave de cifrado. La almacenamos internamente. */
-    private SecretKey cipherKey;
     private ASN1Set signedAttr2;
 
     /** M&eacute;todo que genera la firma de tipo SignedAndEnvelopedData.
@@ -143,7 +141,7 @@ final class CAdESEPESSignedAndEnvelopedData {
                                                                               CertificateEncodingException,
                                                                               NoSuchAlgorithmException {
 
-        this.cipherKey = CAdESUtils.initEnvelopedData(config, certDest);
+        final SecretKey cipherKey = CAdESUtils.initEnvelopedData(config, certDest);
 
         // 1. VERSION
         // la version se mete en el constructor del signedAndEnvelopedData y es
@@ -174,7 +172,7 @@ final class CAdESEPESSignedAndEnvelopedData {
         certificates = CAdESUtils.fetchCertificatesList(signerCertificateChain);
 
         // 2. RECIPIENTINFOS
-        final Info infos = CAdESUtils.getEnvelopeInfo(parameters.getContent(), config, certDest, this.cipherKey);
+        final Info infos = CAdESUtils.getEnvelopeInfo(parameters.getContent(), config, certDest, cipherKey);
 
         // 4. SIGNERINFO
         // raiz de la secuencia de SignerInfo
