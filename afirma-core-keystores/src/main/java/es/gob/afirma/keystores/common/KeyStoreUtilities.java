@@ -57,7 +57,7 @@ public final class KeyStoreUtilities {
      *        a&ntilde;ade el prefijo <i>SunPKCS11-</i>.
      * @return Fichero con las propiedades de configuracion del proveedor
      *         PKCS#11 de Sun para acceder al KeyStore de un token gen&eacute;rico */
-    static final String createPKCS11ConfigFile(final String lib, String name, final Integer slot) {
+    static String createPKCS11ConfigFile(final String lib, String name, final Integer slot) {
 
         final StringBuilder buffer = new StringBuilder("library="); //$NON-NLS-1$
 
@@ -92,7 +92,10 @@ public final class KeyStoreUtilities {
         return buffer.toString();
     }
 
-    static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws Exception {
+    static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws SecurityException, 
+                                                                          NoSuchFieldException, 
+                                                                          IllegalArgumentException, 
+                                                                          IllegalAccessException {
 
         Field field = keyStore.getClass().getDeclaredField("keyStoreSpi"); //$NON-NLS-1$
         field.setAccessible(true);
@@ -125,7 +128,7 @@ public final class KeyStoreUtilities {
 
     }
 
-    private final static int ALIAS_MAX_LENGTH = 120;
+    private static final int ALIAS_MAX_LENGTH = 120;
 
     /** Obtiene una hashtable con las descripciones usuales de los alias de
      * certificados (como claves de estas &uacute;ltimas).
@@ -149,7 +152,7 @@ public final class KeyStoreUtilities {
      * @param certFilters
      *        Filtros a aplicar sobre los certificados
      * @return Alias seleccionado por el usuario */
-    public final static Hashtable<String, String> getAliasesByFriendlyName(final String[] alias,
+    public static Hashtable<String, String> getAliasesByFriendlyName(final String[] alias,
                                                                             final List<KeyStore> kss,
                                                                             final boolean checkPrivateKeys,
                                                                             final boolean checkValidity,
@@ -350,13 +353,12 @@ public final class KeyStoreUtilities {
      *         Si el usuario cancela manualmente la operaci&oacute;n
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
-    public final static String showCertSelectionDialog(final String[] alias,
+    public static String showCertSelectionDialog(final String[] alias,
                                                        final List<KeyStore> kss,
                                                        final Object parentComponent,
                                                        final boolean checkPrivateKeys,
                                                        final boolean checkValidity,
-                                                       final boolean showExpiredCertificates) throws AOCancelledOperationException,
-                                                                                             AOCertificatesNotFoundException {
+                                                       final boolean showExpiredCertificates) throws AOCertificatesNotFoundException {
         return showCertSelectionDialog(alias,
                                        kss,
                                        parentComponent,
@@ -402,15 +404,14 @@ public final class KeyStoreUtilities {
      *         Si el usuario cancela manualmente la operaci&oacute;n
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
-    public final static String showCertSelectionDialog(final String[] alias,
+    public static String showCertSelectionDialog(final String[] alias,
                                                        final List<KeyStore> kss,
                                                        final Object parentComponent,
                                                        final boolean checkPrivateKeys,
                                                        final boolean checkValidity,
                                                        final boolean showExpiredCertificates,
                                                        final List<CertificateFilter> certFilters,
-                                                       final boolean mandatoryCertificate) throws AOCancelledOperationException,
-                                                                                          AOCertificatesNotFoundException {
+                                                       final boolean mandatoryCertificate) throws AOCertificatesNotFoundException {
         if (alias == null || alias.length == 0) {
             throw new AOCertificatesNotFoundException("El almac\u00E9n no conten\u00EDa entradas"); //$NON-NLS-1$
         }

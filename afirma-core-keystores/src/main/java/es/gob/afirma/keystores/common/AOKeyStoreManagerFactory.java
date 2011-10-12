@@ -29,6 +29,10 @@ import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
  * fragmentos de las clases <code>com.sun.deploy.config.UnixConfig</code> y <code>com.sun.deploy.config.WinConfig</code>
  * @version 0.3 */
 public final class AOKeyStoreManagerFactory {
+    
+    private AOKeyStoreManagerFactory() {
+        // No permitimos la instanciacion
+    }
 
     /** Obtiene el <code>KeyStoreManager</code> del tipo indicado.
      * @param store
@@ -61,8 +65,8 @@ public final class AOKeyStoreManagerFactory {
                                                          final String lib,
                                                          final String description,
                                                          final PasswordCallback pssCallback,
-                                                         final Object parentComponent) throws AOCancelledOperationException,
-                                                                                         AOKeystoreAlternativeException, InvalidKeyException {
+                                                         final Object parentComponent) throws AOKeystoreAlternativeException, 
+                                                                                              InvalidKeyException {
 
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 
@@ -193,7 +197,6 @@ public final class AOKeyStoreManagerFactory {
                 ksmUni = (AOKeyStoreManager) AOUtil.classForName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
             }
             catch(final Exception e) {
-                e.printStackTrace();
                 throw new AOKeystoreAlternativeException(
                      getAlternateKeyStoreType(store),
                      "Error al obteniendo dinamicamente el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$

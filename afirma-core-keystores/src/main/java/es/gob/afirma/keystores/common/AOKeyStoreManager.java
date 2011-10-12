@@ -97,10 +97,8 @@ public class AOKeyStoreManager {
 
         // Numero de lector
         Integer slot = null;
-        if (params.length >= 3) {
-            if (params[2] instanceof Integer) {
-                slot = (Integer) params[2];
-            }
+        if (params.length >= 3 && params[2] instanceof Integer) {
+            slot = (Integer) params[2];
         }
 
         // Agregamos un nombre a cada PKCS#11 para asegurarnos de no se
@@ -496,8 +494,7 @@ public class AOKeyStoreManager {
      * @throws KeyException
      *         Cuando ocurren errores obteniendo la clave privada del
      *         certificado */
-    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) throws AOCancelledOperationException,
-                                                                                                 KeyException {
+    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) throws KeyException {
 
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
