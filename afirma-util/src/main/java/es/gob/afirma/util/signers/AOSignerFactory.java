@@ -10,11 +10,11 @@
 
 package es.gob.afirma.util.signers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -29,7 +29,7 @@ public final class AOSignerFactory {
 
     private static AOSignerFactory signerFactory = null;
 
-    private static Vector<String> signersID;
+    private static ArrayList<String> signersID;
 
     private static Map<String, AOSigner> signers;
 
@@ -83,7 +83,7 @@ public final class AOSignerFactory {
 
         // Cargamos
         signerFactory = new AOSignerFactory();
-        signersID = new Vector<String>();
+        signersID = new ArrayList<String>();
         signers = new HashMap<String, AOSigner>();
 
         for (int i = 0; i < ID_SIGNERS.length; i++) {
@@ -189,7 +189,7 @@ public final class AOSignerFactory {
      * aparecer&aacute; &uacute;nica vez.
      * @return Listado de manejadores. */
     public final AOSigner[] getSigners() {
-        final Vector<AOSigner> result = new Vector<AOSigner>(signers.size());
+        final ArrayList<AOSigner> result = new ArrayList<AOSigner>(signers.size());
         final Set<String> classes = new HashSet<String>(signers.size());
 
         // Recorremos los formatos soportados

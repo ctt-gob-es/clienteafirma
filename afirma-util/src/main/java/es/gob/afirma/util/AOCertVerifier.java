@@ -175,10 +175,10 @@ public final class AOCertVerifier {
             server = server.substring(0, server.indexOf(":")); //$NON-NLS-1$
             String tmpRoot = null;
             if (tmpPort.contains("/")) { //$NON-NLS-1$
-                if (tmpPort.indexOf("/") != tmpPort.length() - 1) { //$NON-NLS-1$
-                    tmpRoot = tmpPort.substring(tmpPort.indexOf("/") + 1); //$NON-NLS-1$
+                if (tmpPort.indexOf('/') != tmpPort.length() - 1) { 
+                    tmpRoot = tmpPort.substring(tmpPort.indexOf('/') + 1); 
                 }
-                tmpPort = tmpPort.substring(0, tmpPort.indexOf("/")); //$NON-NLS-1$
+                tmpPort = tmpPort.substring(0, tmpPort.indexOf('/')); 
             }
             try {
                 port = Integer.parseInt(tmpPort);
@@ -192,7 +192,7 @@ public final class AOCertVerifier {
         }
         if (server.contains("/")) //$NON-NLS-1$
          {
-            server = server.substring(0, server.indexOf("/")); //$NON-NLS-1$
+            server = server.substring(0, server.indexOf('/')); 
         }
 
         final CertStore cs;

@@ -18,7 +18,11 @@ import org.apache.commons.codec.binary.StringUtils;
 /**
  * Permite la transformar de cadenas de bytes a Base64 y viceversa. 
  */
-public class AOBase64 {
+public final class AOBase64 {
+    
+    private AOBase64() {
+        // No permitimos la instancacion
+    }
 
     /** Codifica unos datos a base 64. Si ocurre cualquier error durante la
      * lectura de los datos, se devolver&aacute; {@code null}.
