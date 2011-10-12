@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.XMLStructure;
@@ -710,20 +709,17 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // Hojas de estilo para enveloping en Externally Detached
-            if (styleHref != null && styleElement == null) {
-                // Comprobamos si la referencia al estilo es externa
-                if (styleHref.startsWith("http://") || styleHref.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
-                    try {
-                        referenceList.add(fac.newReference(styleHref,
-                                                           digestMethod,
-                                                           Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                      (TransformParameterSpec) null)),
-                                                           null,
-                                                           referenceStyleId));
-                    }
-                    catch (final Exception e) {
-                        LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
-                    }
+            if (styleHref != null && styleElement == null && (styleHref.startsWith("http://") || styleHref.startsWith("https://"))) { //$NON-NLS-1$ //$NON-NLS-2$ // Comprobamos si la referencia al estilo es externa
+                try {
+                    referenceList.add(fac.newReference(styleHref,
+                                                       digestMethod,
+                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
+                                                                                                  (TransformParameterSpec) null)),
+                                                       null,
+                                                       referenceStyleId));
+                }
+                catch (final Exception e) {
+                    LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
                 }
             }
 
@@ -760,20 +756,17 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // Hojas de estilo remotas para detached
-            if (styleHref != null && styleElement == null) {
-                // Comprobamos si la referencia al estilo es externa
-                if (styleHref.startsWith("http://") || styleHref.startsWith("https://")) {  //$NON-NLS-1$//$NON-NLS-2$
-                    try {
-                        referenceList.add(fac.newReference(styleHref,
-                                                           digestMethod,
-                                                           Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                      (TransformParameterSpec) null)),
-                                                           null,
-                                                           referenceStyleId));
-                    }
-                    catch (final Exception e) {
-                        LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
-                    }
+            if (styleHref != null && styleElement == null && (styleHref.startsWith("http://") || styleHref.startsWith("https://"))) {  //$NON-NLS-1$//$NON-NLS-2$ // Comprobamos si la referencia al estilo es externa
+                try {
+                    referenceList.add(fac.newReference(styleHref,
+                                                       digestMethod,
+                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
+                                                                                                  (TransformParameterSpec) null)),
+                                                       null,
+                                                       referenceStyleId));
+                }
+                catch (final Exception e) {
+                    LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
                 }
             }
 
@@ -897,20 +890,17 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // Hojas de estilo remotas para enveloped
-            if (styleHref != null && styleElement == null) {
-                // Comprobamos si la referencia al estilo es externa
-                if (styleHref.startsWith("http://") || styleHref.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
-                    try {
-                        referenceList.add(fac.newReference(styleHref,
-                                                           digestMethod,
-                                                           Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                      (TransformParameterSpec) null)),
-                                                           null,
-                                                           referenceStyleId));
-                    }
-                    catch (final Exception e) {
-                        LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
-                    }
+            if (styleHref != null && styleElement == null && (styleHref.startsWith("http://") || styleHref.startsWith("https://"))) { //$NON-NLS-1$ //$NON-NLS-2$ // Comprobamos si la referencia al estilo es externa
+                try {
+                    referenceList.add(fac.newReference(styleHref,
+                                                       digestMethod,
+                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
+                                                                                                  (TransformParameterSpec) null)),
+                                                       null,
+                                                       referenceStyleId));
+                }
+                catch (final Exception e) {
+                    LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
                 }
             }
 
@@ -1336,7 +1326,7 @@ public final class AOXAdESSigner implements AOSigner {
         // actuales.
         // Buscamos dentro de ese Signature todas las referencias que apunten a
         // datos para firmarlas
-        final Vector<String> referencesIds = new Vector<String>();
+        final List<String> referencesIds = new ArrayList<String>();
         Node currentElement;
         final NodeList nl = ((Element) docSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG).item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
 
@@ -2010,9 +2000,9 @@ public final class AOXAdESSigner implements AOSigner {
         // que referencia cada firma (cadena vacia salvo para las contrafirmas)
         // y los objetos
         // con los que representaremos cada uno de los nodos de firma.
-        final Vector<String> arrayIds = new Vector<String>();
-        final Vector<String> arrayRef = new Vector<String>();
-        final Vector<AOTreeNode> arrayNodes = new Vector<AOTreeNode>();
+        final List<String> arrayIds = new ArrayList<String>();
+        final List<String> arrayRef = new ArrayList<String>();
+        final List<AOTreeNode> arrayNodes = new ArrayList<AOTreeNode>();
 
         // Rellenamos cada las listas con los datos de las firmas del documento
         for (int i = 0; i < signatures.getLength(); i++) {
@@ -2041,7 +2031,7 @@ public final class AOXAdESSigner implements AOSigner {
         // Se crea el arbol componiendo las subrama de cada firma directa de los
         // datos
         for (int i = 0; i < arrayRef.size(); i++) {
-            if (arrayRef.elementAt(i).equals("")) { //$NON-NLS-1$
+            if (arrayRef.get(i).equals("")) { //$NON-NLS-1$
                 treeRoot.add(generateSignsTree(i, signatures.getLength() - 1, arrayNodes, arrayIds, arrayRef)[i]);
             }
         }
@@ -2063,9 +2053,9 @@ public final class AOXAdESSigner implements AOSigner {
      * @return Array de objetos TreeNode */
     private AOTreeNode[] generateSignsTree(final int i,
                                          final int j,
-                                         final Vector<AOTreeNode> arrayNodes,
-                                         final Vector<String> arrayIds,
-                                         final Vector<String> arrayRef) {
+                                         final List<AOTreeNode> arrayNodes,
+                                         final List<String> arrayIds,
+                                         final List<String> arrayRef) {
 
         final int max = arrayIds.size();
 
@@ -2267,7 +2257,7 @@ public final class AOXAdESSigner implements AOSigner {
         return docAfirma;
     }
 
-    public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
