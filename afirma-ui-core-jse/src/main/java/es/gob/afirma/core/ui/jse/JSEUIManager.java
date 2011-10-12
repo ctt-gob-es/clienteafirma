@@ -38,6 +38,9 @@ import es.gob.afirma.core.ui.AOUIManager;
 public final class JSEUIManager implements AOUIManager {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    
+    private static final int ASCII_LOWER_INDEX = 32;
+    private static final int ASCII_HIGHER_INDEX = 126;
 
     /** Pregunta al usuario por una contrase&ntilde;a.
      * @param text
@@ -49,7 +52,7 @@ public final class JSEUIManager implements AOUIManager {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
-    public final char[] getPassword(final String text, final Object c) throws AOCancelledOperationException {
+    public char[] getPassword(final String text, final Object c) {
         return getPassword(text, null, false, c);
     }
     
@@ -68,7 +71,7 @@ public final class JSEUIManager implements AOUIManager {
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
-    public final char[] getPassword(String text, final String charSet, final boolean beep, final Object c) throws AOCancelledOperationException {
+    public char[] getPassword(String text, final String charSet, final boolean beep, final Object c) {
         final JPasswordField pwd = new JPasswordField(10);
         if (charSet != null) {
             pwd.setDocument(new JTextFieldFilter(charSet, beep));
@@ -194,7 +197,7 @@ public final class JSEUIManager implements AOUIManager {
             }
 
             for (int i = 0; i < str.length(); i++) {
-                if (str.charAt(i) < 32 || str.charAt(i) > 126) {
+                if (str.charAt(i) < ASCII_LOWER_INDEX || str.charAt(i) > ASCII_HIGHER_INDEX) {
                     if (this.beep) {
                         Toolkit.getDefaultToolkit().beep();
                     }
@@ -404,7 +407,7 @@ public final class JSEUIManager implements AOUIManager {
      * usamos <code>FileNameExtensionFilter</code> directamente para
      * compatibilizar con Java 1.4
      * @version 0.3 */
-    private final static class ExtFilter extends FileFilter implements java.io.FileFilter {
+    private static final class ExtFilter extends FileFilter implements java.io.FileFilter {
 
         private String[] extensions;
         private String description;
@@ -449,7 +452,7 @@ public final class JSEUIManager implements AOUIManager {
          *        Fichero del cual queremos conocer la extensi&oacute;n
          * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
          *         tiene extensi&oacute;n */
-        private final static String getExtension(final File f) {
+        private static String getExtension(final File f) {
             final String s = f.getName();
             final int i = s.lastIndexOf('.');
             if (i > 0 && i < s.length() - 1) {
