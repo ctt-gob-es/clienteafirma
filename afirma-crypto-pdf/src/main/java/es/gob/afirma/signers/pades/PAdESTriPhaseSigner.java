@@ -222,7 +222,7 @@ public class PAdESTriPhaseSigner {
                 throw new IllegalArgumentException("Es obligatorio proporcionar un MAC y una prefirma"); //$NON-NLS-1$
             }
             this.fileID = fid;
-            this.preSign = pre;
+            this.preSign = pre.clone();
         }
 
         /** Obtiene el FileID (<i>/ID</i>) del diccionario PDF generado.
@@ -286,10 +286,8 @@ public class PAdESTriPhaseSigner {
         final PdfReader pdfReader = new PdfReader(inPDF);
 
         // Comprobaciones de certificacion en el PDF
-        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED) {
-            if (!"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                throw new AOException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
-            }
+        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
         }
 
         // Los derechos van firmados por Adobe, y como desde iText se invalidan

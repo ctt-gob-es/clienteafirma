@@ -379,29 +379,25 @@ public final class AOPDFSigner implements AOSigner {
                 pdfReader = new PdfReader(inPDF, ownerPassword.getBytes());
             }
             catch (final BadPasswordException e2) {
-                throw new AOException("La contrasena proporcionada no es valida para el PDF actual"); //$NON-NLS-1$
+                throw new AOException("La contrasena proporcionada no es valida para el PDF actual", e2); //$NON-NLS-1$
             }
         }
 
-        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED) {
-            if (!"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                if ("false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
-                }
-    
-                if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$//$NON-NLS-2$
-                    throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
-                }
-    
-                if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null, PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
-                                                                           PDFMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
-                                                                           AOUIFactory.YES_NO_OPTION,
-                                                                           AOUIFactory.WARNING_MESSAGE)) {
-                    throw new UnsupportedOperationException("No se ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
-                }
+        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
+            if ("false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
+                throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
             }
 
+            if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$//$NON-NLS-2$
+                throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
+            }
 
+            if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null, PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
+                                                                       PDFMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
+                                                                       AOUIFactory.YES_NO_OPTION,
+                                                                       AOUIFactory.WARNING_MESSAGE)) {
+                throw new UnsupportedOperationException("No se ha permitido la firma de un PDF certificado"); //$NON-NLS-1$
+            }
         }
 
         // ******************************************************************************
@@ -614,7 +610,7 @@ public final class AOPDFSigner implements AOSigner {
 
         final int csize = 8000;
         final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
-        exc.put(PdfName.CONTENTS, new Integer(csize * 2 + 2));
+        exc.put(PdfName.CONTENTS, Integer.valueOf(csize * 2 + 2));
 
         sap.preClose(exc);
 
@@ -706,7 +702,7 @@ public final class AOPDFSigner implements AOSigner {
      * @param rubric
      *        Imagen de la r&uacute;brica (JPEG en binario). */
     public void setRubric(final byte[] rubric) {
-        this.rubric = rubric;
+        this.rubric = (rubric != null) ? rubric.clone() : null;
     }
 
     /** Obtiene el nombre con el que deber&iacute;a guardarse un PDF tras ser
@@ -741,7 +737,7 @@ public final class AOPDFSigner implements AOSigner {
         return sign;
     }
 
-    public AOSignInfo getSignInfo(final byte[] data) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] data) throws AOException {
         if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
