@@ -15,9 +15,9 @@ package es.gob.afirma.keystores.common;
  * claves: tipo, descripci&oacute;n y biblioteca PKCS#11 */
 public final class KeyStoreConfiguration {
 
-    final private AOKeyStore type;
-    final private String description;
-    final private String lib;
+    private final AOKeyStore type;
+    private final String description;
+    private final String lib;
 
     /** Crea una configuraci&oacute;n para un almac&eacute;n de claves.
      * @param t

@@ -23,9 +23,9 @@ import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.crypto.BadPaddingException;
@@ -76,7 +76,7 @@ public class AOKeyStoreManager {
      * @throws IOException Cuando se indique una contrase&ntilde;a incorrecta para la
      *         apertura del almac&eacute;n.
      */
-    private Vector<KeyStore> initPKCS11(final PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
+    private List<KeyStore> initPKCS11(final PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
         
         // En el "params" debemos traer los parametros:
         // [0] - p11lib: Biblioteca PKCS#11, debe estar en el Path (Windows) o en el LD_LIBRARY_PATH (UNIX, Linux, Mac OS X)
@@ -165,7 +165,7 @@ public class AOKeyStoreManager {
             p11Provider = null;
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado", e); //$NON-NLS-1$
         }
-        final Vector<KeyStore> ret = new Vector<KeyStore>(1);
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
         ret.add(this.ks);
         return ret;
     }
@@ -193,9 +193,9 @@ public class AOKeyStoreManager {
      *         Se ha insertado una contrase&ntilde;a incorrecta para la apertura del
      *         almac&eacute;n de certificados.
      */
-    public Vector<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
+    public List<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException, IOException {
 
-        final Vector<KeyStore> ret = new Vector<KeyStore>(1);
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
 
         if (type == null) {
             LOGGER.severe("Se ha solicitado inicializar un AOKeyStore nulo, se intentara inicializar un PKCS#12"); //$NON-NLS-1$
@@ -666,7 +666,7 @@ public class AOKeyStoreManager {
         }
 
         String currAlias;
-        final Vector<String> v = new Vector<String>();
+        final List<String> v = new ArrayList<String>();
 
         LOGGER.info("Componiendo el vector de alias"); //$NON-NLS-1$
 
@@ -682,7 +682,7 @@ public class AOKeyStoreManager {
     /** Devuelve el <code>keyStore</code> en uso.
      * @return Almac&eacute;n de claves (<code>KeyStore</code>) actual */
     public List<KeyStore> getKeyStores() {
-        final List<KeyStore> ret = new Vector<KeyStore>(1);
+        final List<KeyStore> ret = new ArrayList<KeyStore>(1);
         ret.add(this.ks);
         return ret;
     }

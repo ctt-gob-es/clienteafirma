@@ -16,8 +16,10 @@ import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -38,7 +40,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
     private Map<String, KeyStore> storesByAlias;
 
-    private final Vector<KeyStore> kss = new Vector<KeyStore>();
+    private final List<KeyStore> kss = new ArrayList<KeyStore>();
 
     /** Componente padre sobre el que montar los di&aacute;logos modales. */
     private Object parentComponent = null;
@@ -55,7 +57,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
      *         claves, ni el NSS interno, ni ning&uacute;n PKCS#11 externo
      *         definido en SecMod */
     @Override
-    public Vector<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException {
+    public List<KeyStore> init(final AOKeyStore type, final InputStream store, PasswordCallback pssCallBack, final Object[] params) throws AOException {
 
         // Por si el proveedor estubiese ya instalado por una ejecucion anterior
         // intentamos obtenerlo directamente
@@ -265,7 +267,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
     }
 
     @Override
-    public Vector<KeyStore> getKeyStores() {
+    public List<KeyStore> getKeyStores() {
         return this.kss;
     }
 

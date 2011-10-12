@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -92,9 +93,7 @@ public final class KeyStoreUtilities {
         return buffer.toString();
     }
 
-    static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws SecurityException, 
-                                                                          NoSuchFieldException, 
-                                                                          IllegalArgumentException, 
+    static void cleanCAPIDuplicateAliases(final KeyStore keyStore) throws NoSuchFieldException, 
                                                                           IllegalAccessException {
 
         Field field = keyStore.getClass().getDeclaredField("keyStoreSpi"); //$NON-NLS-1$
@@ -152,7 +151,7 @@ public final class KeyStoreUtilities {
      * @param certFilters
      *        Filtros a aplicar sobre los certificados
      * @return Alias seleccionado por el usuario */
-    public static Hashtable<String, String> getAliasesByFriendlyName(final String[] alias,
+    public static Map<String, String> getAliasesByFriendlyName(final String[] alias,
                                                                             final List<KeyStore> kss,
                                                                             final boolean checkPrivateKeys,
                                                                             final boolean checkValidity,
@@ -416,7 +415,7 @@ public final class KeyStoreUtilities {
             throw new AOCertificatesNotFoundException("El almac\u00E9n no conten\u00EDa entradas"); //$NON-NLS-1$
         }
 
-        final Hashtable<String, String> aliassesByFriendlyName =
+        final Map<String, String> aliassesByFriendlyName =
                 KeyStoreUtilities.getAliasesByFriendlyName(alias, kss, checkPrivateKeys, checkValidity, showExpiredCertificates, certFilters);
 
         // Miramos si despues de filtrar las entradas queda alguna o se ha
@@ -427,10 +426,10 @@ public final class KeyStoreUtilities {
 
         // Si se ha pedido que se seleccione automaticamente un certificado, se
         // seleccionara
-        // si hay mas de un ceretificado que se ajuste al filtro, se dara a
+        // si hay mas de un certificado que se ajuste al filtro, se dara a
         // elegir
         if (mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
-            return aliassesByFriendlyName.keys().nextElement();
+            return aliassesByFriendlyName.keySet().toArray()[0].toString();
         }
 
         // Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
