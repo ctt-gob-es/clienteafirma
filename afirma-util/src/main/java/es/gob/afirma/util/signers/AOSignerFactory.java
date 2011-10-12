@@ -13,6 +13,7 @@ package es.gob.afirma.util.signers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -29,7 +30,7 @@ public final class AOSignerFactory {
 
     private static AOSignerFactory signerFactory = null;
 
-    private static ArrayList<String> signersID;
+    private static List<String> signersID;
 
     private static Map<String, AOSigner> signers;
 
@@ -69,7 +70,7 @@ public final class AOSignerFactory {
 
     /** Obtiene una instancia de la factor&iacute;a.
      * @return Instancia de la factor&iacute;a */
-    public static final AOSignerFactory getInstance() {
+    public static AOSignerFactory getInstance() {
         if (signerFactory != null) {
             return signerFactory;
         }
@@ -127,15 +128,13 @@ public final class AOSignerFactory {
         for (int i = 0; i < signersID.size(); i++) {
             // Buscamos el manejador del formato
             for (int j = 0; j < ID_SIGNERS.length; j++) {
-                if (signersID.get(i).equals(ID_SIGNERS[j][0])) {
-                    // Si no lo hemos probado antes, lo intentamos
-                    if (!checkedFormats.contains(ID_SIGNERS[j][1])) {
-                        final AOSigner signer = signers.get(ID_SIGNERS[j][1]);
-                        if (signer.isSign(signData)) {
-                            return signer;
-                        }
-                        checkedFormats.add(ID_SIGNERS[j][1]);
+                // Si no lo hemos probado antes, lo intentamos
+                if (signersID.get(i).equals(ID_SIGNERS[j][0]) && !checkedFormats.contains(ID_SIGNERS[j][1])) {
+                    final AOSigner signer = signers.get(ID_SIGNERS[j][1]);
+                    if (signer.isSign(signData)) {
+                        return signer;
                     }
+                    checkedFormats.add(ID_SIGNERS[j][1]);
                 }
             }
         }
@@ -147,7 +146,7 @@ public final class AOSignerFactory {
      * @param signFormat
      *        Formato de firma para el cual solicitamos el manejador.
      * @return Manejador capaz de firmar en el formato indicado. */
-    public static final AOSigner getSigner(final String signFormat) {
+    public static AOSigner getSigner(final String signFormat) {
 
         // Inicializamos las referencias estaticas
         if (signerFactory == null) {
@@ -169,7 +168,7 @@ public final class AOSignerFactory {
 
     /** Obtiene el manejador del formato de firma por defecto establecido.
      * @return Manejador de firma */
-    public final AOSigner getDefaultSigner() {
+    public AOSigner getDefaultSigner() {
         for (final String[] element : ID_SIGNERS) {
             if (element[0].equals(AOSignConstants.DEFAULT_SIGN_FORMAT)) {
                 final AOSigner signer = signers.get(element[1]);
@@ -188,7 +187,7 @@ public final class AOSignerFactory {
      * manejador soporte m&aacute:s de un formato de firma, s&oacute;lo
      * aparecer&aacute; &uacute;nica vez.
      * @return Listado de manejadores. */
-    public final AOSigner[] getSigners() {
+    public AOSigner[] getSigners() {
         final ArrayList<AOSigner> result = new ArrayList<AOSigner>(signers.size());
         final Set<String> classes = new HashSet<String>(signers.size());
 

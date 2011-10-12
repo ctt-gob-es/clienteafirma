@@ -79,6 +79,8 @@ public final class AOCertVerifier {
     private static final Logger LOGGER = Logger.getLogger("es.atosorigin"); //$NON-NLS-1$
 
     private boolean checkValidity = true;
+    
+    private static final int LDAP_DEFAULT_PORT = 389;
 
     /** Mensaje de error devuelto por la &uacute;ltima operaci&oacute;n de
      * validaci&oacute;n. */
@@ -168,11 +170,11 @@ public final class AOCertVerifier {
          {
             server = server.replace("ldap://", ""); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        int port = 389;
+        int port = LDAP_DEFAULT_PORT;
         if (server.contains(":")) { //$NON-NLS-1$
-            String tmpPort = server.substring(server.indexOf(":") + 1, server.length() //$NON-NLS-1$
+            String tmpPort = server.substring(server.indexOf(':') + 1, server.length() 
             );
-            server = server.substring(0, server.indexOf(":")); //$NON-NLS-1$
+            server = server.substring(0, server.indexOf(':')); 
             String tmpRoot = null;
             if (tmpPort.contains("/")) { //$NON-NLS-1$
                 if (tmpPort.indexOf('/') != tmpPort.length() - 1) { 
