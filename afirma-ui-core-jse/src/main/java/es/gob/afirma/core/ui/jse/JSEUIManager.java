@@ -313,8 +313,7 @@ public final class JSEUIManager implements AOUIManager {
      *         No se introdujeron los datos que se desean almacenar. */
     public File saveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
 
-        if (data == null) {
-            LOGGER.warning("No se han introducido los datos que se desean guardar. Se cancelara la operacion"); //$NON-NLS-1$ 
+        if (data == null) { 
             throw new IllegalArgumentException("No se introdujeron datos que almacenar"); //$NON-NLS-1$
         }
 
