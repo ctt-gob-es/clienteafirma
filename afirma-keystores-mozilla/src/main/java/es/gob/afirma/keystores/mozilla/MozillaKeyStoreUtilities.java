@@ -32,6 +32,17 @@ import es.gob.afirma.core.util.windows.WinRegistryWrapper;
  * de certificados de Mozilla. */
 final class MozillaKeyStoreUtilities {
     
+    private static final String SOFTOKN3_DLL = "softokn3.dll"; //$NON-NLS-1$
+    private static final String PLC4_DLL = "plc4.dll"; //$NON-NLS-1$
+    private static final String PLDS4_DLL = "plds4.dll"; //$NON-NLS-1$
+    private static final String NSPR4_DLL = "nspr4.dll"; //$NON-NLS-1$
+    private static final String MOZSQLITE3_DLL = "mozsqlite3.dll"; //$NON-NLS-1$
+    private static final String MOZCRT19_DLL = "mozcrt19.dll"; //$NON-NLS-1$
+    private static final String NSSUTIL3_DLL = "nssutil3.dll"; //$NON-NLS-1$
+    private static final String FREEBL3_DLL = "freebl3.dll"; //$NON-NLS-1$
+    private static final String NSSDBM3_DLL = "nssdbm3.dll";  //$NON-NLS-1$
+    private static final String SQLITE3_DLL = "sqlite3.dll"; //$NON-NLS-1$
+    
     private MozillaKeyStoreUtilities() {
         // No permitimos la instanciacion
     }
@@ -58,7 +69,7 @@ final class MozillaKeyStoreUtilities {
 
         String softoknLib = "libsoftokn3.so"; //$NON-NLS-1$
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-            softoknLib = "softokn3.dll"; //$NON-NLS-1$
+            softoknLib = SOFTOKN3_DLL; 
         }
         else if (Platform.getOS().equals(Platform.OS.MACOSX)) {
             softoknLib = "libsoftokn3.dylib"; //$NON-NLS-1$
@@ -138,7 +149,7 @@ final class MozillaKeyStoreUtilities {
 
             File tmpFile = new File(dir);
             if (tmpFile.exists() && tmpFile.isDirectory()) {
-                tmpFile = new File(dir + File.separator + "softokn3.dll"); //$NON-NLS-1$
+                tmpFile = new File(dir + File.separator + SOFTOKN3_DLL); 
                 if (tmpFile.exists()) {
                     try {
                         dir = tmpFile.getParentFile().getCanonicalPath();
@@ -198,45 +209,45 @@ final class MozillaKeyStoreUtilities {
 
                             // Las cuatro primeras bibliotecas son comunes para
                             // Firefox 2, 3 y 4
-                            AOUtil.copyFile(new File(dir + File.separator + "softokn3.dll"), new File(dest + "softokn3.dll")); //$NON-NLS-1$ //$NON-NLS-2$
-                            AOUtil.copyFile(new File(dir + File.separator + "plc4.dll"), new File(dest + "plc4.dll")); //$NON-NLS-1$ //$NON-NLS-2$
-                            AOUtil.copyFile(new File(dir + File.separator + "plds4.dll"), new File(dest + "plds4.dll")); //$NON-NLS-1$ //$NON-NLS-2$
-                            AOUtil.copyFile(new File(dir + File.separator + "nspr4.dll"), new File(dest + "nspr4.dll")); //$NON-NLS-1$ //$NON-NLS-2$
+                            AOUtil.copyFile(new File(dir + File.separator + SOFTOKN3_DLL), new File(dest + SOFTOKN3_DLL)); 
+                            AOUtil.copyFile(new File(dir + File.separator + PLC4_DLL), new File(dest + PLC4_DLL)); 
+                            AOUtil.copyFile(new File(dir + File.separator + PLDS4_DLL), new File(dest + PLDS4_DLL)); 
+                            AOUtil.copyFile(new File(dir + File.separator + NSPR4_DLL), new File(dest + NSPR4_DLL)); 
 
                             // A partir de aqui comprobamos exsitencia antes,
                             // porque no estan en Mozilla 2
 
                             // Cuidado, en Firefox 4 sqlite3.dll pasa a llamarse
                             // mozsqlite3.dll
-                            File tmpFile2 = new File(dir + File.separator + "mozsqlite3.dll"); //$NON-NLS-1$
+                            File tmpFile2 = new File(dir + File.separator + MOZSQLITE3_DLL); 
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "mozsqlite3.dll")); //$NON-NLS-1$
+                                AOUtil.copyFile(tmpFile2, new File(dest + MOZSQLITE3_DLL)); 
                             }
                             else {
-                                tmpFile2 = new File(dir + File.separator + "sqlite3.dll"); //$NON-NLS-1$
+                                tmpFile2 = new File(dir + File.separator + SQLITE3_DLL); 
                                 if (tmpFile2.exists()) {
-                                    AOUtil.copyFile(tmpFile2, new File(dest + "sqlite3.dll")); //$NON-NLS-1$
+                                    AOUtil.copyFile(tmpFile2, new File(dest + SQLITE3_DLL)); 
                                 }
                             }
 
-                            tmpFile2 = new File(dir + File.separator + "mozcrt19.dll"); //$NON-NLS-1$
+                            tmpFile2 = new File(dir + File.separator + MOZCRT19_DLL); 
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "mozcrt19.dll")); //$NON-NLS-1$
+                                AOUtil.copyFile(tmpFile2, new File(dest + MOZCRT19_DLL)); 
                             }
 
-                            tmpFile2 = new File(dir + File.separator + "nssutil3.dll"); //$NON-NLS-1$
+                            tmpFile2 = new File(dir + File.separator + NSSUTIL3_DLL); 
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "nssutil3.dll")); //$NON-NLS-1$
+                                AOUtil.copyFile(tmpFile2, new File(dest + NSSUTIL3_DLL)); 
                             }
 
-                            tmpFile2 = new File(dir + File.separator + "freebl3.dll"); //$NON-NLS-1$
+                            tmpFile2 = new File(dir + File.separator + FREEBL3_DLL); 
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "freebl3.dll")); //$NON-NLS-1$
+                                AOUtil.copyFile(tmpFile2, new File(dest + FREEBL3_DLL)); 
                             }
 
-                            tmpFile2 = new File(dir + File.separator + "nssdbm3.dll"); //$NON-NLS-1$
+                            tmpFile2 = new File(dir + File.separator + NSSDBM3_DLL); 
                             if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + "nssdbm3.dll")); //$NON-NLS-1$
+                                AOUtil.copyFile(tmpFile2, new File(dest + NSSDBM3_DLL)); 
                             }
 
                             return tmp.getCanonicalPath();
@@ -604,38 +615,38 @@ final class MozillaKeyStoreUtilities {
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             // Mozilla Firefox 4.0
-            if (new File(nssPath + "mozsqlite3.dll").exists()) { //$NON-NLS-1$
+            if (new File(nssPath + MOZSQLITE3_DLL).exists()) { 
                 LOGGER.info("Detectado NSS de Firefox 4 en Windows"); //$NON-NLS-1$
                 return new String[] {
-                        nssPath + "mozcrt19.dll", //$NON-NLS-1$
-                        nssPath + "nspr4.dll", //$NON-NLS-1$
-                        nssPath + "plds4.dll", //$NON-NLS-1$
-                        nssPath + "plc4.dll", //$NON-NLS-1$
-                        nssPath + "nssutil3.dll", //$NON-NLS-1$
-                        nssPath + "mozsqlite3.dll", //$NON-NLS-1$
-                        nssPath + "nssdbm3.dll", //$NON-NLS-1$
-                        nssPath + "freebl3.dll" //$NON-NLS-1$
+                        nssPath + MOZCRT19_DLL, 
+                        nssPath + NSPR4_DLL, 
+                        nssPath + PLDS4_DLL, 
+                        nssPath + PLC4_DLL, 
+                        nssPath + NSSUTIL3_DLL, 
+                        nssPath + MOZSQLITE3_DLL, 
+                        nssPath + NSSDBM3_DLL, 
+                        nssPath + FREEBL3_DLL 
                 };
             }
             // Mozilla Firefox 3.0
-            else if (new File(nssPath + "mozcrt19.dll").exists()) { //$NON-NLS-1$
+            else if (new File(nssPath + MOZCRT19_DLL).exists()) { 
                 // LOGGER.info("Detectado NSS de Firefox 3");
                 return new String[] {
-                        nssPath + "mozcrt19.dll", //$NON-NLS-1$
-                        nssPath + "nspr4.dll", //$NON-NLS-1$
-                        nssPath + "plds4.dll", //$NON-NLS-1$
-                        nssPath + "plc4.dll", //$NON-NLS-1$
-                        nssPath + "nssutil3.dll", //$NON-NLS-1$
-                        nssPath + "sqlite3.dll", //$NON-NLS-1$
-                        nssPath + "nssdbm3.dll", //$NON-NLS-1$
-                        nssPath + "freebl3.dll" //$NON-NLS-1$
+                        nssPath + MOZCRT19_DLL, 
+                        nssPath + NSPR4_DLL, 
+                        nssPath + PLDS4_DLL, 
+                        nssPath + PLC4_DLL, 
+                        nssPath + NSSUTIL3_DLL, 
+                        nssPath + SQLITE3_DLL, 
+                        nssPath + NSSDBM3_DLL, 
+                        nssPath + FREEBL3_DLL 
                 };
             }
             // Mozilla Firefox 2.0
-            else if (new File(nssPath + "nspr4.dll").exists()) { //$NON-NLS-1$
+            else if (new File(nssPath + NSPR4_DLL).exists()) { 
                 // LOGGER.info("Detectado NSS de Firefox 2");
                 return new String[] {
-                        nssPath + "nspr4.dll", nssPath + "plds4.dll", nssPath + "plc4.dll" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        nssPath + NSPR4_DLL, nssPath + PLDS4_DLL, nssPath + PLC4_DLL 
                 };
             }
         }
