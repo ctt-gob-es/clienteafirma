@@ -72,29 +72,4 @@ public final class ObtainContentSignedData {
         return contenido;
     }
 
-    // /**
-    // * M&eacute;todo principal de pruebas
-    // * @param args
-    // */
-    // public static void main(String[] args) {
-    //
-    // es.gob.afirma.signers.AOCMSSigner signer = new
-    // es.gob.afirma.signers.AOCMSSigner();
-    //
-    // try {
-    // File firma = new File("C:\\firmacms.csig");
-    // FileInputStream fis = new FileInputStream(firma);
-    //
-    // byte[] a = signer.getData(fis);
-    //
-    // System.out.println(new String(a));
-    // FileOutputStream fo = new FileOutputStream("c:\\salida.jpg");
-    // fo.write(a);
-    // fo.close();
-    //
-    // }catch(Exception e){
-    // e.printStackTrace();
-    // }
-    // }
-
 }
