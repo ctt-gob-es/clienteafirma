@@ -12,7 +12,6 @@ package es.gob.afirma.signers.pades;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 
@@ -22,21 +21,7 @@ final class PDFMessages {
 
     private static final String BUNDLE_NAME = "pdfmessages"; //$NON-NLS-1$
 
-    private static ResourceBundle RESOURCE_BUNDLE;
-
-    static {
-        try {
-            RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
-        }
-        catch (final Exception e) {
-            try {
-                RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
-            }
-            catch (final Exception e1) {
-                Logger.getLogger("es.gob.afirma").severe("No ha podido cargarse el fichero de mensajes localizados: " + e1); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-        }
-    }
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());
 
     private PDFMessages() {
         // No se permite la instanciacion

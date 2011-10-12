@@ -392,7 +392,7 @@ public class PAdESTriPhaseSigner {
 
         // Reservamos el espacio necesario en el PDF para insertar la firma
         final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
-        exc.put(PdfName.CONTENTS, new Integer(CSIZE * 2 + 2));
+        exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
         
         try {
             sap.preClose(exc);

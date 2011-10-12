@@ -12,11 +12,14 @@ package es.gob.afirma.signers.pades;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -113,6 +116,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </p> */
 public final class AOPDFSigner implements AOSigner {
     
+    private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
+    
     /** Versi&oacute;n de iText necesaria para el uso de esta clase. */
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
     
@@ -194,10 +199,10 @@ public final class AOPDFSigner implements AOSigner {
         if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
-        if (originalName.toLowerCase().endsWith(".pdf")) { //$NON-NLS-1$
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + ".pdf"; //$NON-NLS-1$
+        if (originalName.toLowerCase().endsWith(PDF_FILE_SUFFIX)) { 
+            return originalName.substring(0, originalName.length() - 4) + inTextInt + PDF_FILE_SUFFIX; 
         }
-        return originalName + inTextInt + ".pdf"; //$NON-NLS-1$
+        return originalName + inTextInt + PDF_FILE_SUFFIX; 
     }
 
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
@@ -261,7 +266,7 @@ public final class AOPDFSigner implements AOSigner {
                     );
                     continue;
                 }
-                if (pkcs1Object != null && pkcs1Object instanceof byte[]) {
+                if (pkcs1Object instanceof byte[]) {
                     ssi.setPkcs1((byte[]) pkcs1Object);
                 }
                 root.add(new AOTreeNode(ssi));
@@ -339,7 +344,14 @@ public final class AOPDFSigner implements AOSigner {
         }
     }
 
-    private byte[] signPDF(final PrivateKeyEntry ke, final byte[] inPDF, Properties extraParams, final String algorithm) throws Exception {
+    private byte[] signPDF(final PrivateKeyEntry ke, 
+                           final byte[] inPDF, 
+                           final Properties extraParams, 
+                           final String algorithm) throws IOException, 
+                                                          AOException, 
+                                                          DocumentException, 
+                                                          NoSuchAlgorithmException, 
+                                                          CertificateException {
 
         final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")); //$NON-NLS-1$ //$NON-NLS-2$
         final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
@@ -717,8 +729,8 @@ public final class AOPDFSigner implements AOSigner {
         if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
-        if (originalName.endsWith(".pdf")) { //$NON-NLS-1${
-            return originalName.replace(".pdf", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (originalName.endsWith(PDF_FILE_SUFFIX)) { //{
+            return originalName.replace(PDF_FILE_SUFFIX, ".signed.pdf"); //$NON-NLS-1$ 
         }
         if (originalName.endsWith(".PDF")) { //$NON-NLS-1$
             return originalName.replace(".PDF", ".signed.pdf"); //$NON-NLS-1$ //$NON-NLS-2$
