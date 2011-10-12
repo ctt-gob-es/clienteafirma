@@ -27,9 +27,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
@@ -40,11 +42,11 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private final Hashtable<String, X509Certificate> certificates = new Hashtable<String, X509Certificate>();
+    private final Map<String, X509Certificate> certificates = new Hashtable<String, X509Certificate>();
 
     @Override
     public Enumeration<String> engineAliases() {
-        return this.certificates.keys();
+        return Collections.enumeration(this.certificates.keySet());
     }
 
     @Override
@@ -134,7 +136,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
         final byte[] certs = AOUtil.getDataFromInputStream(is);
 
         // Probamos con la factoría de Sun
-        Collection<? extends Certificate> tmpColCerts = null;
+        final Collection<? extends Certificate> tmpColCerts;
         try {
             if (this.cf == null) {
                 this.cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
