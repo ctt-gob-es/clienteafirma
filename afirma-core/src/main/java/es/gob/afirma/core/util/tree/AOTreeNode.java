@@ -285,7 +285,7 @@ public final class AOTreeNode {
         AOTreeNode ancestor = this;
 
         do {
-            if (ancestor == anotherNode) {
+            if (ancestor.equals(anotherNode)) {
                 return true;
             }
         } while ((ancestor = ancestor.getParent()) != null);

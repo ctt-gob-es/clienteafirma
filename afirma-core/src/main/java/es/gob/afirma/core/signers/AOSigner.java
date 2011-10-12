@@ -96,17 +96,6 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * @return Nombre apropiado para el fichero de firma. */
     String getSignedName(String originalName, String inText);
 
-//    /** Establece el formato que tienen los datos que se firman.
-//     * @param description
-//     *        Descripci&oacute;n opcional del elemento DataObjectFormat
-//     * @param objectIdentifier
-//     *        Instancia de <code>ObjectIdentifier</code>
-//     * @param mimeType
-//     *        MimeType de los datos. Por defecto <code>application/octet-stream</code>
-//     * @param encoding
-//     *        Codificaci&oacute;n de los datos. Por defecto <code>base64</code> */
-//    void setDataObjectFormat(String description, String objectIdentifier, String mimeType, String encoding);
-
     /** Recupera los datos originalmente firmados de la firma pasada por
      * par&aacute;metro. En caso de no contener la firma los datos firmados, se
      * devuelve <code>null</code>.
@@ -121,7 +110,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      *         datos.
      * @throws NullPointerException
      *         La firma introducida es nula. */
-    byte[] getData(byte[] signData) throws AOInvalidFormatException, AOException;
+    byte[] getData(byte[] signData) throws AOException;
 
     /** Obtiene la informacion general de un objeto de firma. Ya que un objeto de
      * firma puede contener muchas firmas, se considera informaci&oacute;n
@@ -149,7 +138,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      *         datos.
      * @throws NullPointerException
      *         La firma introducida es nula. */
-    AOSignInfo getSignInfo(byte[] signData) throws AOInvalidFormatException, AOException;
+    AOSignInfo getSignInfo(byte[] signData) throws AOException;
 
     /** Obtiene el tipo de datos declarado en una firma mediante su Mime Type. Si
      * no se conoce el tipo de dato se devolver&aacute; <code>null</code>.

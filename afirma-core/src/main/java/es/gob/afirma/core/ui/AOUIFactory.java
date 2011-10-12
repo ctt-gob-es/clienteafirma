@@ -20,7 +20,11 @@ import es.gob.afirma.core.misc.Platform;
  * Factor&iscute;a de elementos de interfaz gr&aacute;fica.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  */
-public class AOUIFactory {
+public final class AOUIFactory {
+    
+    private AOUIFactory() {
+        // No permitimos la instanciacion
+    }
     
     /** JOptionPane.PLAIN_MESSAGE. */
     public static final int PLAIN_MESSAGE;

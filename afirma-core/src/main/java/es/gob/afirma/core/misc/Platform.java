@@ -195,7 +195,7 @@ public final class Platform {
      * ejecuci&oacute;n de Java actualmente en uso. Si no se puede obtener, se
      * devolver&aacute; {@code null}. Copiado de com.sun.deploy.config.Config.
      * @return Directorio del entorno de ejecuci&oacute;n de Java. */
-    private final static String recoverJavaHome() {
+    private static final String recoverJavaHome() {
         String ret = null;
         try {
             ret = System.getProperty("jnlpx.home"); //$NON-NLS-1$
@@ -232,7 +232,7 @@ public final class Platform {
 
     /** Obtiene el directorio principal del sistema operativo del sistema.
      * @return Directorio principal del sistema operativo */
-    private final static String getSystemRoot() {
+    private static final String getSystemRoot() {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return File.separator;
         }
@@ -267,7 +267,7 @@ public final class Platform {
      * No funciona correctamente en Windows de 64 bits //FIXME
      * @return Directorio principal de bibliotecas
      */
-    public final static String getSystemLibDir() {
+    public static final String getSystemLibDir() {
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             String systemRoot = getSystemRoot();
             if (systemRoot == null) {
@@ -288,14 +288,15 @@ public final class Platform {
     public static String getBouncyCastleVersion() {
 
         try {
-            Class<?> BouncyCastleProviderClass = AOUtil.classForName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
-            Object bouncyCastleProviderObject = BouncyCastleProviderClass.newInstance();
+            final Class<?> bouncyCastleProviderClass = AOUtil.classForName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
+            final  Object bouncyCastleProviderObject = bouncyCastleProviderClass.newInstance();
 
-            Class<?> ProviderClass = AOUtil.classForName("java.security.Provider"); //$NON-NLS-1$
-            Method getVersionMethod = ProviderClass.getDeclaredMethod("getVersion"); //$NON-NLS-1$
+            final Class<?> providerClass = AOUtil.classForName("java.security.Provider"); //$NON-NLS-1$
+            final Method getVersionMethod = providerClass.getDeclaredMethod("getVersion"); //$NON-NLS-1$
 
             return ((Double) getVersionMethod.invoke(bouncyCastleProviderObject)).toString();
-        } catch (Exception e) {
+        } 
+        catch (final Exception e) {
             return null;
         }
     }

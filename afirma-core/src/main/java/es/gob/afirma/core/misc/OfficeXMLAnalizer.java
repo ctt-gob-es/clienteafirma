@@ -29,6 +29,10 @@ import org.w3c.dom.NodeList;
 
 /** Clase para el an&aacute;lisis de ficheros OOXML. */
 public final class OfficeXMLAnalizer {
+    
+    private OfficeXMLAnalizer() {
+        // No permitimos la instanciacion
+    }
 
     private static final String ZIP_MIMETYPE = "application/zip"; //$NON-NLS-1$
     

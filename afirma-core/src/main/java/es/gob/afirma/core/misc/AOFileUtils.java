@@ -18,6 +18,10 @@ import java.util.zip.ZipFile;
 
 /** Clase con m&eacute;todos para el trabajo con ficheros. */
 public final class AOFileUtils {
+    
+    private AOFileUtils() {
+        // No permitimos la instanciacion
+    }
 
     /** Crea un fichero ZIP en disco apto para manejarse.
      * @param zipFileData

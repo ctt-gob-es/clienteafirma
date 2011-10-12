@@ -12,7 +12,7 @@ package es.gob.afirma.core.ciphers;
 
 /** Constantes de cifrado (usando JCE).
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class CipherConstants {
+public final class CipherConstants {
     
     private CipherConstants() {
         // No permitimos la instanciacion

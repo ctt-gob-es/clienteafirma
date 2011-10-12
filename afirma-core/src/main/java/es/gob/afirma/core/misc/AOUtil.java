@@ -24,8 +24,8 @@ import java.net.URLClassLoader;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -51,7 +51,7 @@ public final class AOUtil {
      * @return URI (<code>file://</code>) del fichero local o URL
      * @throws AOException
      *         cuando ocurre cualquier problema creando la URI */
-    public final static URI createURI(final String file) throws AOException {
+    public static final URI createURI(final String file) throws AOException {
 
         if (file == null || "".equals(file)) { //$NON-NLS-1$
             throw new AOException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
@@ -126,7 +126,7 @@ public final class AOUtil {
      *         Cuando no se encuentra el fichero indicado
      * @throws AOException
      *         Cuando ocurre cualquier problema obteniendo el flujo */
-    public final static InputStream loadFile(final URI uri) throws FileNotFoundException, AOException {
+    public static final InputStream loadFile(final URI uri) throws FileNotFoundException, AOException {
 
         if (uri == null) {
             throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
@@ -189,7 +189,7 @@ public final class AOUtil {
      * @return Los datos obtenidos del flujo.
      * @throws IOException
      *         Cuando ocurre un problema durante la lectura */
-    public final static byte[] getDataFromInputStream(final InputStream input) throws IOException {
+    public static final byte[] getDataFromInputStream(final InputStream input) throws IOException {
         if (input == null) {
             return new byte[0];
         }
@@ -212,7 +212,7 @@ public final class AOUtil {
      *        com&uacute;n
      * @return Nombre com&uacute;n (Common Name, CN) del titular de un
      *         certificado X.509 */
-    public final static String getCN(final X509Certificate c) {
+    public static final String getCN(final X509Certificate c) {
         if (c == null) {
             return null;
         }
@@ -227,7 +227,7 @@ public final class AOUtil {
      *        com&uacute;n
      * @return Nombre com&uacute;n (Common Name, CN) de un <i>Principal</i>
      *         X.400 */
-    public final static String getCN(final String principal) {
+    public static final String getCN(final String principal) {
         if (principal == null) {
             return null;
         }
@@ -260,7 +260,7 @@ public final class AOUtil {
      * @param principal Principal del que extraer el RDN
      * @return Valor del RDN indicado o {@code null} si no se encuentra.
      */
-    private final static String getRDNvalue(final String rdn, final String principal) {
+    private static final String getRDNvalue(final String rdn, final String principal) {
         
         int offset1 = 0;
         while ((offset1 = principal.toLowerCase().indexOf(rdn.toLowerCase(), offset1)) != -1) {
@@ -335,7 +335,7 @@ public final class AOUtil {
      *         codificaci&oacute;n base64 de un original binario (que no tiene
      *         necesariamente porqu&eacute; serlo), <code>false</code> en caso
      *         contrario */
-    public final static boolean isBase64(final byte[] data) {
+    public static final boolean isBase64(final byte[] data) {
 
         // Comprobamos que la cadena tenga una longitud multiplo de 4 caracteres
         final String b64String = new String(data).trim();
@@ -370,7 +370,7 @@ public final class AOUtil {
      *        Indica si han o no de separarse los octetos con un
      *        gui&oacute;n y en l&iacute;neas de 16
      * @return Representaci&oacute;n textual del vector de octetos de entrada */
-    public final static String hexify(final byte abyte0[], final boolean separator) {
+    public static final String hexify(final byte abyte0[], final boolean separator) {
         if (abyte0 == null) {
             return "null"; //$NON-NLS-1$
         }
@@ -438,7 +438,7 @@ public final class AOUtil {
      * @param is
      *        Datos del properties con la versi&oacute;n.
      * @return Identificador de la versi&oacute;n. */
-    public final static String getVersion(final InputStream is) {
+    public static final String getVersion(final InputStream is) {
         final Properties p = new Properties();
         try {
             p.load(is);
@@ -471,7 +471,7 @@ public final class AOUtil {
      *        Cadena para la identaci&oacute;n de los nodos de firma (por
      *        defecto, tabulador).
      * @return Cadena de texto. */
-    public final static String showTreeAsString(final AOTreeModel tree, String linePrefx, String identationString) {
+    public static final String showTreeAsString(final AOTreeModel tree, String linePrefx, String identationString) {
 
         if (tree == null || tree.getRoot() == null) {
             LOGGER.severe("Se ha proporcionado un arbol de firmas vacio"); //$NON-NLS-1$
@@ -511,7 +511,7 @@ public final class AOUtil {
      *        defecto, tabulador).
      * @param buffer
      *        Buffer en donde se genera la cadena de texto. */
-    private final static void archiveTreeNode(final AOTreeNode node,
+    private static final void archiveTreeNode(final AOTreeNode node,
                                               final int depth,
                                               final String linePrefx,
                                               final String identationString,
@@ -640,7 +640,7 @@ public final class AOUtil {
      *         Cuando alguno de los par&aacute;metros de entrada es {@code null}. */
     public static String[] split(final String text, final String sp) {
 
-        final Vector<String> parts = new Vector<String>();
+        final ArrayList<String> parts = new ArrayList<String>();
         int i = 0;
         int j = 0;
         while (i != text.length() && (j = text.indexOf(sp, i)) != -1) {
@@ -678,7 +678,7 @@ public final class AOUtil {
     public static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOUtil.class.getClassLoader();
         if (classLoader instanceof URLClassLoader) {
-            Vector<URL> urls = new Vector<URL>();
+            ArrayList<URL> urls = new ArrayList<URL>();
             for (URL url : ((URLClassLoader)classLoader).getURLs()) {
                 if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
                     urls.add(url);

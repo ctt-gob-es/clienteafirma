@@ -17,6 +17,10 @@ public final class WinRegistry {
     static {
         initIDs();
     }
+    
+    private WinRegistry() {
+        // No permitimos la instanciacion
+    }
 
     private static final int KEY_READ = 0x20019;
     private static final int KEY_WRITE = 0x20006;
