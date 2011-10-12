@@ -18,6 +18,10 @@ import es.gob.afirma.core.signers.AOSignConstants;
 /** Clase con las constantes comunes compartidas por los distintos formatos de
  * firma XML. */
 public final class XMLConstants {
+    
+    private XMLConstants() {
+        // No permitimos la instanciacion
+    }
 
     /** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
     public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$

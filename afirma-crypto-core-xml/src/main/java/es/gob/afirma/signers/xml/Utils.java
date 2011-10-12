@@ -29,8 +29,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.crypto.dom.DOMStructure;
@@ -71,14 +71,18 @@ import es.gob.afirma.core.ui.AOUIFactory;
 public final class Utils {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    
+    private Utils() {
+        // No permitimos la instanciacion
+    }
 
     /** Hoja de estilo local (rutal local no dereferenciable) a un XML */
-    public final static class IsInnerlException extends Exception {
+    public static final class IsInnerlException extends Exception {
         private static final long serialVersionUID = -8769490831203570286L;
     }
 
     /** No se puede dereferenciar la hoja de estilo. */
-    public final static class CannotDereferenceException extends Exception {
+    public static final class CannotDereferenceException extends Exception {
 
         private static final long serialVersionUID = 5883820163272098664L;
 
@@ -102,7 +106,7 @@ public final class Utils {
     }
 
     /** La referencia de hoja de estilo apunta a un no-XML. */
-    public final static class ReferenceIsNotXMLException extends Exception {
+    public static final class ReferenceIsNotXMLException extends Exception {
         private static final long serialVersionUID = 8076672806350530425L;
     }
 
@@ -385,10 +389,10 @@ public final class Utils {
      * @throws NoSuchAlgorithmException
      *         Cuando se encuentre un algoritmo de transformaci&oacurte;n no
      *         soportado. */
-    public static Vector<Transform> getObjectReferenceTransforms(final Node referenceNode, final String namespacePrefix) throws NoSuchAlgorithmException,
+    public static ArrayList<Transform> getObjectReferenceTransforms(final Node referenceNode, final String namespacePrefix) throws NoSuchAlgorithmException,
                                                                                                                         InvalidAlgorithmParameterException {
 
-        final Vector<Transform> transformList = new Vector<Transform>();
+        final ArrayList<Transform> transformList = new ArrayList<Transform>();
         final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 
         // El nodo de referencia puede contener un nodo "Transforms" que a su
@@ -765,9 +769,9 @@ public final class Utils {
      * @param styleType
      *        Tipo de la hoja de estilo del XML (puede ser nulo)
      * @return Cadena de texto con el XML en forma de array de octetos */
-    public final static byte[] writeXML(final Node node, final Hashtable<String, String> props, final String styleHref, final String styleType) {
+    public static byte[] writeXML(final Node node, final Map<String, String> props, final String styleHref, final String styleType) {
 
-        final Hashtable<String, String> xmlProps = (props != null) ? props : new Hashtable<String, String>(0);
+        final Map<String, String> xmlProps = (props != null) ? props : new Hashtable<String, String>(0);
 
         // La codificacion por defecto sera UTF-8
         final String xmlEncoding = xmlProps.containsKey(OutputKeys.ENCODING) ? xmlProps.get(OutputKeys.ENCODING) : "UTF-8"; //$NON-NLS-1$
@@ -826,7 +830,7 @@ public final class Utils {
         }
     }
 
-    private final static void writeXMLwithXALAN(final Writer writer, final Node node, final String xmlEncoding) {
+    private static void writeXMLwithXALAN(final Writer writer, final Node node, final String xmlEncoding) {
         final LSSerializer serializer = ((DOMImplementationLS) node.getOwnerDocument().getImplementation()).createLSSerializer();
         serializer.getDomConfig().setParameter("namespaces", Boolean.FALSE); //$NON-NLS-1$
         final DOMOutputImpl output = new DOMOutputImpl();
@@ -837,14 +841,17 @@ public final class Utils {
         serializer.write(node, output);
     }
 
-    private final static void writeXMLwithJRE(final Writer writer, final Node node, final boolean indent, final Hashtable<String, String> props) {
+    private static void writeXMLwithJRE(final Writer writer, 
+                                              final Node node, 
+                                              final boolean indent, 
+                                              final Map<String, String> props) {
         try {
             final DOMSource domSource = new DOMSource(node);
             final StreamResult streamResult = new StreamResult(writer);
             final TransformerFactory tf = TransformerFactory.newInstance();
             final Transformer serializer = tf.newTransformer();
 
-            final Hashtable<String, String> properties = (props != null) ? props : new Hashtable<String, String>();
+            final Map<String, String> properties = (props != null) ? props : new Hashtable<String, String>();
 
             // Por defecto, si no hay eclarada una codificacion, se utiliza
             // UTF-8

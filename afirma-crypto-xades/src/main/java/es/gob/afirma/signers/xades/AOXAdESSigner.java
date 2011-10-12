@@ -1359,7 +1359,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // Buscamos las transformaciones declaradas en la Referencia,
                 // para anadirlas
                 // tambien en la nueva
-                final Vector<Transform> currentTransformList;
+                final ArrayList<Transform> currentTransformList;
                 try {
                     currentTransformList = Utils.getObjectReferenceTransforms(currentElement, XML_SIGNATURE_PREFIX);
                 }

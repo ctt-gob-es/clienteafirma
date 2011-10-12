@@ -1200,7 +1200,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // Buscamos las transformaciones declaradas en la Referencia,
                 // para anadirlas
                 // tambien en la nueva
-                Vector<Transform> currentTransformList;
+                ArrayList<Transform> currentTransformList;
                 try {
                     currentTransformList = Utils.getObjectReferenceTransforms(currentElement, XML_SIGNATURE_PREFIX);
                 }
