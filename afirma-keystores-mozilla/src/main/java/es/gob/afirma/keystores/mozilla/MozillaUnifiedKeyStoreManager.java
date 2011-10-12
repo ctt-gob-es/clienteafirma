@@ -18,6 +18,7 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -35,7 +36,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManager;
  * unificada los m&oacute;dulos internos y externos. */
 public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
-    private Hashtable<String, KeyStore> storesByAlias;
+    private Map<String, KeyStore> storesByAlias;
 
     private final Vector<KeyStore> kss = new Vector<KeyStore>();
 
@@ -145,7 +146,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         }
 
         // Vamos ahora con los almacenes externos
-        final Hashtable<String, String> externalStores = MozillaKeyStoreUtilities.getMozillaPKCS11Modules();
+        final Map<String, String> externalStores = MozillaKeyStoreUtilities.getMozillaPKCS11Modules();
 
         if (externalStores.size() > 0) {
             final StringBuilder logStr = new StringBuilder("Encontrados los siguientes modulos PKCS#11 externos instalados en Mozilla / Firefox: "); //$NON-NLS-1$
@@ -161,19 +162,18 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         }
 
         KeyStore tmpStore = null;
-        Object descr;
-        for (final Enumeration<String> e = externalStores.keys(); e.hasMoreElements();) {
-            descr = e.nextElement();
+        for (final String descr : externalStores.keySet()) {
             try {
-                tmpStore =
-                        new AOKeyStoreManager().init(AOKeyStore.PKCS11,
-                                                     null,
-                                                     new UIPasswordCallback(FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + MozillaKeyStoreUtilities.getMozModuleName(descr.toString()), //$NON-NLS-1$ //$NON-NLS-2$
-                                                                            this.parentComponent),
-                                                     new String[] {
-                                                             externalStores.get(descr), descr.toString()
-                                                     })
-                                               .get(0);
+                tmpStore = new AOKeyStoreManager().init(
+                    AOKeyStore.PKCS11,
+                    null,
+                    new UIPasswordCallback(
+                       FirefoxKeyStoreMessages.getString("MozillaUnifiedKeyStoreManager.1") + " " + MozillaKeyStoreUtilities.getMozModuleName(descr.toString()), //$NON-NLS-1$ //$NON-NLS-2$
+                       this.parentComponent
+                    ),
+                    new String[] {
+                       externalStores.get(descr), descr.toString()
+                    }).get(0);
             }
             catch (final AOCancelledOperationException ex) {
                 LOGGER.warning("Se cancelo el acceso al almacen externo  '" + descr + "', se continuara con el siguiente: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -236,15 +236,15 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         }
         final String[] tmpAlias = new String[this.storesByAlias.size()];
         int i = 0;
-        for (final Enumeration<String> e = this.storesByAlias.keys(); e.hasMoreElements();) {
-            tmpAlias[i] = e.nextElement().toString();
+        for (final String al : this.storesByAlias.keySet()) {
+            tmpAlias[i] = al;
             i++;
         }
         return tmpAlias.clone();
     }
 
     @Override
-    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) throws AOCancelledOperationException {
+    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) {
 
         final KeyStore tmpStore = this.storesByAlias.get(alias);
         if (tmpStore == null) {

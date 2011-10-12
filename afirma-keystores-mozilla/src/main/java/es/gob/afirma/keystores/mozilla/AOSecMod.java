@@ -171,7 +171,7 @@ final class AOSecMod {
      *        Desplazamiento desde el origen para el comienzo del par de
      *        octetos
      * @return N&ueacute;mero entero de 16 bits (sin signo) */
-    private final static int getShort(final byte[] src, final int offset) {
+    private static int getShort(final byte[] src, final int offset) {
         return (((src)[offset + 0] << 8) | (src)[offset + 1]);
     }
 
@@ -180,7 +180,7 @@ final class AOSecMod {
      * @param files
      *        Ficheros a buscar en el PATH
      * @return Ruta completa del fichero encontrado en el PATH o <code>null</code> si no se encontr&oacute; nada */
-    private final static String searchPathForFile(final String[] files) {
+    private static String searchPathForFile(final String[] files) {
         if (files == null || files.length < 1) {
             return null;
         }

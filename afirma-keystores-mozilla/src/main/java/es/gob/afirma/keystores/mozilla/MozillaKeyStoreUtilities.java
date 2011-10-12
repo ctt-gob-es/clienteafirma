@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -53,7 +54,7 @@ final class MozillaKeyStoreUtilities {
      * almac&eacute;n de Mozilla. */
     private static String nssLibDir = null;
 
-    private final static String NSS_INSTALL_DIR = ".cafirma"; //$NON-NLS-1$
+    private static final String NSS_INSTALL_DIR = ".cafirma"; //$NON-NLS-1$
 
     /** Crea las l&iacute;neas de configuraci&oacute;n para el uso de las
      * bibliotecas NSS como m&oacute;dulo PKCS#11 por el proveedor de Sun.
@@ -449,9 +450,9 @@ final class MozillaKeyStoreUtilities {
      * Firefox, indexados por su descripci&oacute;n dentro de una <code>Hashtable</code>.
      * @return Nombres de las bibliotecas de los m&oacute;dulos de seguridad de
      *         Mozilla / Firefox */
-    static Hashtable<String, String> getMozillaPKCS11Modules() {
+    static Map<String, String> getMozillaPKCS11Modules() {
         try {
-            final Hashtable<String, String> modsByDesc = new Hashtable<String, String>();
+            final Map<String, String> modsByDesc = new Hashtable<String, String>();
             for (final AOSecMod.ModuleName module : AOSecMod.getModules(getMozillaUserProfileDirectory())) {
                 modsByDesc.put(module.getDescription(), module.getLib());
             }
@@ -494,13 +495,13 @@ final class MozillaKeyStoreUtilities {
      *        Tabla con las descripciones de los m&oacute;dulos pkcs11 y las
      *        librer&iacute;as asociadas.
      * @return Tabla con los m&oacute;dulos eliminados. */
-    private static Hashtable<String, String> purgeStoresTable(final Hashtable<String, String> table) {
+    private static Map<String, String> purgeStoresTable(final Map<String, String> table) {
 
         if (table == null) {
             return new Hashtable<String, String>();
         }
 
-        final Hashtable<String, String> purgedTable = new Hashtable<String, String>();
+        final Map<String, String> purgedTable = new Hashtable<String, String>();
         final Set<String> revisedLibs = new HashSet<String>();
 
         String tmpLib;
@@ -680,7 +681,7 @@ final class MozillaKeyStoreUtilities {
     /** Obtiene el directorio del perfil de usuario de Mozilla / Firefox.
      * @return Ruta completa del directorio del perfil de usuario de Mozilla /
      *         Firefox */
-    final static String getMozillaUserProfileDirectory() {
+    static String getMozillaUserProfileDirectory() {
 
         File regFile;
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
@@ -751,7 +752,7 @@ final class MozillaKeyStoreUtilities {
         return null;
     }
 
-    final static void configureMacNSS(String binDir) throws AOException {
+    static void configureMacNSS(final String binDir) throws AOException {
         
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;
