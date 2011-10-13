@@ -4,8 +4,8 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.gob.afirma</groupId>
-  <artifactId>afirma-client-bootloader</artifactId>
-  <name>afirma-client-bootloader</name>
+  <artifactId>afirma-bootloader</artifactId>
+  <name>afirma-bootloader</name>
 
   <parent>
     <groupId>es.gob.afirma</groupId>

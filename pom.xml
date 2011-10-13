@@ -46,6 +46,7 @@
     <module>afirma-keystores-filters-rfc</module>
     <module>afirma-keystores-mozilla</module>
     <module>afirma-keystores-single</module>
+    <module>afirma-bootloader</module>
     <module>afirma-ui-standalone-help-en_UK</module>
     <module>afirma-ui-standalone-help-es_ES</module>
     <module>afirma-ui-core-jse</module>
