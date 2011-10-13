@@ -266,20 +266,20 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 		c.gridx = 0;
         
         // Caja de texto donde se guarda el nombre del directorio de firmas
-        campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.directorio.description"));
-        campoDirectorio.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoDirectorio.getToolTipText() + "ALT + D");
-        campoDirectorio.getAccessibleContext().setAccessibleDescription(campoDirectorio.getToolTipText());
+        this.campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.directorio.description"));
+        this.campoDirectorio.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + this.campoDirectorio.getToolTipText() + "ALT + D");
+        this.campoDirectorio.getAccessibleContext().setAccessibleDescription(this.campoDirectorio.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoDirectorio.setCaret(caret);
+			this.campoDirectorio.setCaret(caret);
 		}
-        Utils.remarcar(campoDirectorio);
-        Utils.setContrastColor(campoDirectorio);
-        Utils.setFontBold(campoDirectorio);
-        panelCentral.add(campoDirectorio, c);
+        Utils.remarcar(this.campoDirectorio);
+        Utils.setContrastColor(this.campoDirectorio);
+        Utils.setFontBold(this.campoDirectorio);
+        panelCentral.add(this.campoDirectorio, c);
         
         //Relaciï¿½n entre etiqueta y campo de texto
-        etiquetaFirma.setLabelFor(campoDirectorio);
+        etiquetaFirma.setLabelFor(this.campoDirectorio);
       	//Asignaciï¿½n de mnemï¿½nico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_D);
       		
@@ -296,6 +296,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         examinarDirectorio.getAccessibleContext().setAccessibleName(examinarDirectorio.getText() + " " + examinarDirectorio.getToolTipText());
         examinarDirectorio.getAccessibleContext().setAccessibleDescription(examinarDirectorio.getToolTipText());
         examinarDirectorio.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	examinarDirectorioActionPerformed();
             }
@@ -313,47 +314,47 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         
 		JPanel panelCheckSobreescribir = new JPanel(new GridLayout(1, 1));
         // Checkbox con el texto "Sobreescribir ficheros"
-        checkSobreescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
-        checkSobreescribir.getAccessibleContext().setAccessibleName(checkSobreescribir.getText() + " " +Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
-        checkSobreescribir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
-        checkSobreescribir.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al checkbox
-        Utils.remarcar(checkSobreescribir);
-        Utils.setContrastColor(checkSobreescribir);
-        Utils.setFontBold(checkSobreescribir);
-        panelCheckSobreescribir.add(checkSobreescribir);
+        this.checkSobreescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
+        this.checkSobreescribir.getAccessibleContext().setAccessibleName(this.checkSobreescribir.getText() + " " +Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
+        this.checkSobreescribir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
+        this.checkSobreescribir.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al checkbox
+        Utils.remarcar(this.checkSobreescribir);
+        Utils.setContrastColor(this.checkSobreescribir);
+        Utils.setFontBold(this.checkSobreescribir);
+        panelCheckSobreescribir.add(this.checkSobreescribir);
         panelCentral.add(panelCheckSobreescribir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
 		c.gridy = 3;
         
         // Etiqueta con el texto "Fichero de log"
-        etiquetaFichero.setText(Messages.getString("Wizard.multifirma.ventana4.log"));
-        etiquetaFichero.setFocusable(true); //Se hace focusable por temas de accesibilidad
-        etiquetaFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + Messages.getString("Wizard.multifirma.ventana4.log.description") +" " + Messages.getString("Wizard.multifirma.chooserLog.disabled"));
-        Utils.setContrastColor(etiquetaFichero);
-        Utils.setFontBold(etiquetaFichero);
-        panelCentral.add(etiquetaFichero, c);
+        this.etiquetaFichero.setText(Messages.getString("Wizard.multifirma.ventana4.log"));
+        this.etiquetaFichero.setFocusable(true); //Se hace focusable por temas de accesibilidad
+        this.etiquetaFichero.getAccessibleContext().setAccessibleName(this.etiquetaFichero.getText() + Messages.getString("Wizard.multifirma.ventana4.log.description") +" " + Messages.getString("Wizard.multifirma.chooserLog.disabled"));
+        Utils.setContrastColor(this.etiquetaFichero);
+        Utils.setFontBold(this.etiquetaFichero);
+        panelCentral.add(this.etiquetaFichero, c);
         
         c.insets = new Insets(0, 20, 0, 0);
         c.gridwidth	= 1;
 		c.gridy = 4;
         
         // Caja de texto donde se guarda el nombre del fichero log
-        campoFicheroLog.setEnabled(false);
-        campoFicheroLog.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.log.description"));
-        campoFicheroLog.getAccessibleContext().setAccessibleName(etiquetaFichero.getText() + " " + campoFicheroLog.getToolTipText() + "ALT + F");
-        campoFicheroLog.getAccessibleContext().setAccessibleDescription(etiquetaFichero.getToolTipText());
+        this.campoFicheroLog.setEnabled(false);
+        this.campoFicheroLog.setToolTipText(Messages.getString("Wizard.multifirma.ventana4.log.description"));
+        this.campoFicheroLog.getAccessibleContext().setAccessibleName(this.etiquetaFichero.getText() + " " + this.campoFicheroLog.getToolTipText() + "ALT + F");
+        this.campoFicheroLog.getAccessibleContext().setAccessibleDescription(this.etiquetaFichero.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoFicheroLog.setCaret(caret);
+			this.campoFicheroLog.setCaret(caret);
 		}
-        Utils.remarcar(campoFicheroLog);
-        Utils.setContrastColor(campoFicheroLog);
-        Utils.setFontBold(campoFicheroLog);
-        panelCentral.add(campoFicheroLog, c);
+        Utils.remarcar(this.campoFicheroLog);
+        Utils.setContrastColor(this.campoFicheroLog);
+        Utils.setFontBold(this.campoFicheroLog);
+        panelCentral.add(this.campoFicheroLog, c);
         
         //Relaciï¿½n entre etiqueta y campo de texto
-        etiquetaFichero.setLabelFor(campoFicheroLog);
+        this.etiquetaFichero.setLabelFor(this.campoFicheroLog);
         
         c.insets = new Insets(0, 10, 0, 20);
         c.weightx = 0.0;
@@ -361,22 +362,23 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         
         JPanel panelExaminarFichero = new JPanel(new GridLayout(1, 1));
         // Boton examinar fichero log
-        examinarFichero = new JButton();
-        examinarFichero.setEnabled(false);
-        examinarFichero.setMnemonic(0); //mnemï¿½nico vacï¿½o puesto que por defecto estï¿½ deshabilitado
-        examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar"));
-        examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
-        examinarFichero.getAccessibleContext().setAccessibleName(examinarFichero.getText() + " " + examinarFichero.getToolTipText());
-        examinarFichero.getAccessibleContext().setAccessibleDescription(examinarFichero.getToolTipText());
-        examinarFichero.addActionListener(new ActionListener() {
+        this.examinarFichero = new JButton();
+        this.examinarFichero.setEnabled(false);
+        this.examinarFichero.setMnemonic(0); //mnemï¿½nico vacï¿½o puesto que por defecto estï¿½ deshabilitado
+        this.examinarFichero.setText(Messages.getString("PrincipalGUI.Examinar"));
+        this.examinarFichero.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        this.examinarFichero.getAccessibleContext().setAccessibleName(this.examinarFichero.getText() + " " + this.examinarFichero.getToolTipText());
+        this.examinarFichero.getAccessibleContext().setAccessibleDescription(this.examinarFichero.getToolTipText());
+        this.examinarFichero.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarFicheroLogActionPerformed();
             }
         });
-        Utils.remarcar(examinarFichero);
-        Utils.setContrastColor(examinarFichero);
-        Utils.setFontBold(examinarFichero);
-        panelExaminarFichero.add(examinarFichero);
+        Utils.remarcar(this.examinarFichero);
+        Utils.setContrastColor(this.examinarFichero);
+        Utils.setFontBold(this.examinarFichero);
+        panelExaminarFichero.add(this.examinarFichero);
         panelCentral.add(panelExaminarFichero, c);
         
         c.fill = GridBagConstraints.BOTH;
@@ -394,38 +396,38 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoDirectorio,"multifirma.masiva.wizard.firma.directoriofirmas");
-        HelpUtils.enableHelpKey(checkSobreescribir,"multifirma.masiva.wizard.firma.sobreescribir");
-        HelpUtils.enableHelpKey(campoFicheroLog,"multifirma.masiva.wizard.firma.ficheroLog");      
+        HelpUtils.enableHelpKey(this.campoDirectorio,"multifirma.masiva.wizard.firma.directoriofirmas");
+        HelpUtils.enableHelpKey(this.checkSobreescribir,"multifirma.masiva.wizard.firma.sobreescribir");
+        HelpUtils.enableHelpKey(this.campoFicheroLog,"multifirma.masiva.wizard.firma.ficheroLog");      
     }
 
     /**
      * Comprueba que el archivo seleccionado es correcto y guarda su nombre en el campo de texto.
      * Tambien genera el nombre del fichero log y lo guarda en su respectivo campo.
      */
-    private void examinarDirectorioActionPerformed() {
+    void examinarDirectorioActionPerformed() {
     	File selectedFile = new SelectionDialog().showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.outtitle"));
     	if (selectedFile != null) {
-    		campoDirectorio.setText(selectedFile.getAbsolutePath());
-    		campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath());
+    		this.campoDirectorio.setText(selectedFile.getAbsolutePath());
+    		this.campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath());
     	}
 
       	//Asignaciï¿½n de mnemï¿½nico
-        etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_F);
+        this.etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_F);
     	// Activamos el boton de examinar el directorio del log y el campo para introducirlo
-    	examinarFichero.setEnabled(true);
-    	examinarFichero.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico asignado puesto que se habilita el botï¿½n
-    	campoFicheroLog.setEnabled(true);
-    	etiquetaFichero.setFocusable(false); //Ahora el elemento focusable será el campo de texto, no la etiqueta
+    	this.examinarFichero.setEnabled(true);
+    	this.examinarFichero.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico asignado puesto que se habilita el botï¿½n
+    	this.campoFicheroLog.setEnabled(true);
+    	this.etiquetaFichero.setFocusable(false); //Ahora el elemento focusable será el campo de texto, no la etiqueta
     }
 
     /**
      * Comprueba que el archivo log seleccionado es correcto y guarda su nombre en el campo de texto
      */
-    private void examinarFicheroLogActionPerformed() {
+    void examinarFicheroLogActionPerformed() {
     	File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Wizard.multifirma.chooserLog.tittle"));
     	if (selectedFile != null) {
-    		campoFicheroLog.setText(selectedFile.getAbsolutePath());
+    		this.campoFicheroLog.setText(selectedFile.getAbsolutePath());
     	}
     }
     
@@ -444,11 +446,12 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 			
-			Boolean continuar = true;
+			Boolean continuar = Boolean.TRUE;
 			continuar = multifirmarFicheros();
 			
-			if (continuar == true)
+			if (Boolean.TRUE.equals(continuar)) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
+			}
 		}
 	}
 
@@ -458,17 +461,16 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 	 */
 	Boolean multifirmarFicheros() {
 		// Comprobamos rutas de los ficheros
-		String directorio = campoDirectorio.getText();
+		String directorio = this.campoDirectorio.getText();
 		if (directorio == null || directorio.equals("")){
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.directorio.destino"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-			return false;
-		} else {
-			//Comprobacion de las extensiones.
-			String log = campoFicheroLog.getText();
-			if (log == null || log.equals("")){
-				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.fichero.log"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-				return false;
-			}
+			return Boolean.FALSE;
+		}
+		//Comprobacion de las extensiones.
+		String log = this.campoFicheroLog.getText();
+		if (log == null || log.equals("")){
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.fichero.log"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			return Boolean.FALSE;
 		}
 		
 		// Comienza la multifirma
@@ -479,14 +481,14 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         try {
         	PasswordCallback pssCallback;
 
-        	AOKeyStore store = kssc.getType();
+        	AOKeyStore store = this.kssc.getType();
         	if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT ||
         			store == AOKeyStore.SINGLE) 
         		pssCallback = new NullPasswordCallback();
         	else 
         		pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null); 
 
-        	keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, kssc.getLib(), kssc.toString(),
+        	keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, this.kssc.getLib(), this.kssc.toString(),
         			pssCallback, this);
 
         	// Seleccionamos un certificado
@@ -520,43 +522,43 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	//El pop-up muestra el mensaje de la excepción
         	JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), 
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE);
-        	return false;
+        	return Boolean.FALSE;
         } catch(Exception e){
         	logger.severe(e.toString());
         	//El pop-up muestra el mensaje de la excepción
         	JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), 
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); 
         	e.printStackTrace();
-        	return false;
+        	return Boolean.FALSE;
         }
         
         try {
             DirectorySignatureHelperAdv dSigner = new DirectorySignatureHelperAdv(
-            		GeneralConfig.getSignAlgorithm(), algoritmo, AOSignConstants.SIGN_MODE_IMPLICIT, this);
+            		GeneralConfig.getSignAlgorithm(), this.algoritmo, AOSignConstants.SIGN_MODE_IMPLICIT, this);
          
             // Establecemos el filtro de ficheros por extension
-            dSigner.setFileFilter(getExtensionFileFilter(extensiones));
+            dSigner.setFileFilter(getExtensionFileFilter(this.extensiones));
 
             // Indicamos si deseamos sobrescribir ficheros previos de firma que encontremos
-            dSigner.setOverwritePreviuosFileSigns(checkSobreescribir.isSelected());
+            dSigner.setOverwritePreviuosFileSigns(this.checkSobreescribir.isSelected());
 
             Properties config = GeneralConfig.getSignConfig();
-            config.setProperty("mode", modoFormato ? AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
-            config.setProperty("format", algoritmo); //$NON-NLS-1$
+            config.setProperty("mode", this.modoFormato ? AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$
+            config.setProperty("format", this.algoritmo); //$NON-NLS-1$
             config.setProperty("ignoreStyleSheets", "true");  //$NON-NLS-1$//$NON-NLS-2$
             
             // Seleccionamos el tipo de operacion
-            MassiveType operation = this.getMassiveOperationType(tipo, tipoContrafirma);
+            MassiveType operation = this.getMassiveOperationType(this.tipo, this.tipoContrafirma);
 
             // Creamos el archivo de log
-            dSigner.setLogPath(campoFicheroLog.getText());
+            dSigner.setLogPath(this.campoFicheroLog.getText());
             
             // Ejecutamos la operacion masiva
-            resultadoFirma = dSigner.massiveSign(operation, directorioEntrada, incluir, campoDirectorio.getText(),
-            		true, respetar, privateKeyEntry, keyStoreManager.getCertificate(privateKeyEntry), config);
+            resultadoFirma = dSigner.massiveSign(operation, this.directorioEntrada, this.incluir, this.campoDirectorio.getText(),
+            		true, this.respetar, privateKeyEntry, config);
 
             // Hacemos el pitido si es necesario
-            if (beep) {
+            if (this.beep) {
             	Toolkit.getDefaultToolkit().beep();
             }
         } catch(Exception e){
@@ -570,10 +572,10 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         } else {
         	OpenFileMessageDialog.show(this, Messages.getString("Wizard.multifirma.ko"),  //$NON-NLS-1$
       				Messages.getString("Wizard.multifirma.ok.titulo"), //$NON-NLS-1$
-      				new File(campoFicheroLog.getText()));
+      				new File(this.campoFicheroLog.getText()));
         }
 		
-		return true;
+		return Boolean.TRUE;
 	}
 	
 	/**
