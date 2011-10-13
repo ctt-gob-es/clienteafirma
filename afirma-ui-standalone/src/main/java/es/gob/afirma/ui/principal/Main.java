@@ -16,6 +16,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
@@ -48,8 +49,11 @@ public class Main {
 				JOptionPane.ERROR_MESSAGE);
 			System.exit(-5);
 		}
-    	try {
-    		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		try {
+        	if (Platform.getOS().equals(Platform.OS.LINUX))
+        		UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        	else
+        		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
         	logger.log(Level.SEVERE, null, ex);
         }
