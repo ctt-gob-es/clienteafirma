@@ -324,8 +324,10 @@ public class Desensobrado extends JPanel {
     		JCheckBox checkIniciar) {
     	// Obtenemos la ruta del sobre
     	String envelopPath = campoFichero.getText();
-    	if(envelopPath == null || envelopPath.equals("") || !new File(envelopPath).exists() || !new File(envelopPath).isFile()) 
+    	if(envelopPath == null || envelopPath.equals("") || !new File(envelopPath).exists() || !new File(envelopPath).isFile()) { 
     		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+    		campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
+    	}
     	else {
     		byte[] envelopData = null;
     		try{

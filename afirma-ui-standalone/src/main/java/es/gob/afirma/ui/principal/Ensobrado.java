@@ -296,8 +296,10 @@ public class Ensobrado extends JPanel {
      * @param campoFichero	Campo con el nombre del fichero a ensobrar
      */
     private void generarActionPerformed (JTextField campoFichero) {
-    	if(campoFichero.getText() == null || campoFichero.getText().equals(""))
+    	if(campoFichero.getText() == null || campoFichero.getText().equals("")) {
     		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Ensobrado.msg.error.fichero"), Messages.getString("Ensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+    		campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
+    	}
         else {
         	if (checkAnadir.isSelected()) 
         		// Se muestra el asistente de anadir nuevos remitentes

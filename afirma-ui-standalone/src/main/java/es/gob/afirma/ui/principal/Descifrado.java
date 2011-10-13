@@ -360,8 +360,10 @@ public class Descifrado extends JPanel {
             algoritmo = algoritmoVr.get(comboAlgoritmo.getSelectedIndex());
         
         // Sacamos la ruta del archivo
-        if (campoFichero.getText() == null || campoFichero.getText().equals("")) 
+        if (campoFichero.getText() == null || campoFichero.getText().equals("")) {
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.fichero"), Messages.getString("Descifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+        	campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
+        }
         else
         	// Se selecciona el primer elemento del combo
             if (mecanismo.equals("PASSWORD")) 
