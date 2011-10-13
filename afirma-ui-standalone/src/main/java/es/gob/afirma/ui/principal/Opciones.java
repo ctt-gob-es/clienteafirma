@@ -118,7 +118,11 @@ public class Opciones extends JAccessibilityDialog {
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
     	} else {
     		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
-    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+    			if (Platform.getOS().equals(Platform.OS.LINUX)){
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+    			} else {
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+    			}
     		} else {
     			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
     		}
@@ -300,7 +304,7 @@ public class Opciones extends JAccessibilityDialog {
 		}
 		botonAyuda.addActionListener(new OpenHelpActionListener(this.mainPanel));
 		
-        cons.ipadx = 15;
+        cons.ipadx = 0;
 		cons.weightx = 0.02;
 		cons.gridx = 2;
 		

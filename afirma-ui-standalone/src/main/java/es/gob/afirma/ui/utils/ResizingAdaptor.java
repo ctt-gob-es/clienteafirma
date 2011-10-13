@@ -26,6 +26,8 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import es.gob.afirma.core.misc.Platform;
+
 /**
  * Adaptador de componentes para su redimensionamiento
  * 
@@ -104,9 +106,15 @@ public class ResizingAdaptor extends ComponentAdapter {
 			relation = Math.round(relWidth * relHeight * theWindow.getMinimumRelation());
 		} else if (theDialog != null) {
 			if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
-				relWidth = theDialog.getSize().getWidth() / (Constants.OPTION_FONT_INITIAL_WIDTH);
-				relHeight = theDialog.getSize().getHeight() / (Constants.OPTION_FONT_INITIAL_HEIGHT);
-				relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
+				if (Platform.getOS().equals(Platform.OS.LINUX)){
+					relWidth = theDialog.getSize().getWidth() / (Constants.OPTION_FONT_INITIAL_WIDTH_LINUX);
+					relHeight = theDialog.getSize().getHeight() / (Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+					relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
+				} else {
+					relWidth = theDialog.getSize().getWidth() / (Constants.OPTION_FONT_INITIAL_WIDTH);
+					relHeight = theDialog.getSize().getHeight() / (Constants.OPTION_FONT_INITIAL_HEIGHT);
+					relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
+				}
 			} else{
 				relWidth = theDialog.getSize().getWidth() / Constants.OPTION_INITIAL_WIDTH;
 				relHeight = theDialog.getSize().getHeight() / Constants.OPTION_INITIAL_HEIGHT;
