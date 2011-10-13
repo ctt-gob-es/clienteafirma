@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -281,9 +282,9 @@ public final class AOXAdESSigner implements AOSigner {
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
         final String xadesNamespace = extraParams.getProperty("xadesNamespace", XADESNS); //$NON-NLS-1$
-        final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty("ignoreStyleSheets", "true")); //$NON-NLS-1$ //$NON-NLS-2$
-        final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", "false")); //$NON-NLS-1$ //$NON-NLS-2$
-        final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", "true")); //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean ignoreStyleSheets = Boolean.parseBoolean(extraParams.getProperty("ignoreStyleSheets", Boolean.TRUE.toString())); //$NON-NLS-1$ 
+        final boolean avoidBase64Transforms = Boolean.parseBoolean(extraParams.getProperty("avoidBase64Transforms", Boolean.FALSE.toString())); //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean headLess = Boolean.parseBoolean(extraParams.getProperty("headLess", Boolean.TRUE.toString())); //$NON-NLS-1$ 
         final String precalculatedHashAlgorithm = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
         String mimeType = extraParams.getProperty("mimeType"); //$NON-NLS-1$
         String encoding = extraParams.getProperty("encoding"); //$NON-NLS-1$
@@ -309,7 +310,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // Propiedades del documento XML original
-        final Hashtable<String, String> originalXMLProperties = new Hashtable<String, String>();
+        final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
 
         // carga el documento xml
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -960,7 +961,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true"))) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$ 
             xades.setSigningTime(new Date());
         }
 
@@ -1004,21 +1005,19 @@ public final class AOXAdESSigner implements AOSigner {
 
         // Si es enveloped hay que anadir la hoja de estilo dentro de la firma y
         // referenciarla
-        if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
-            if (styleElement != null) {
-                xmlSignature.addStyleSheetEnvelopingOntoSignature(styleElement, styleType, styleEncoding, styleId);
+        if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED) && styleElement != null) {
+            xmlSignature.addStyleSheetEnvelopingOntoSignature(styleElement, styleType, styleEncoding, styleId);
 
-                try {
-                    referenceList.add(fac.newReference(tmpStyleUri,
-                                                       digestMethod,
-                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                  (TransformParameterSpec) null)),
-                                                       null,
-                                                       referenceStyleId));
-                }
-                catch (final Exception e) {
-                    LOGGER.severe("No se ha podido anadir una referencia a la hoja de estilo, esta se incluira dentro de la firma, pero no estara firmada: " + e); //$NON-NLS-1$
-                }
+            try {
+                referenceList.add(fac.newReference(tmpStyleUri,
+                                                   digestMethod,
+                                                   Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
+                                                                                              (TransformParameterSpec) null)),
+                                                   null,
+                                                   referenceStyleId));
+            }
+            catch (final Exception e) {
+                LOGGER.severe("No se ha podido anadir una referencia a la hoja de estilo, esta se incluira dentro de la firma, pero no estara firmada: " + e); //$NON-NLS-1$
             }
         }
 
@@ -1288,7 +1287,7 @@ public final class AOXAdESSigner implements AOSigner {
         dbf.setNamespaceAware(true);
 
         // Propiedades del documento XML original
-        final Hashtable<String, String> originalXMLProperties = new Hashtable<String, String>();
+        final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
 
         // carga el documento XML de firmas y su raiz
         Document docSig;
@@ -1439,7 +1438,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true"))) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$ 
             xades.setSigningTime(new Date());
         }
 
@@ -1565,7 +1564,7 @@ public final class AOXAdESSigner implements AOSigner {
         boolean esFirmaSimple = false;
 
         // se carga el documento XML y su raiz
-        final Hashtable<String, String> originalXMLProperties = new Hashtable<String, String>();
+        final Map<String, String> originalXMLProperties = new Hashtable<String, String>();
         Element root;
         try {
             this.doc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
@@ -1933,7 +1932,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // SigningTime
-        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true"))) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString()))) { //$NON-NLS-1$ 
             xades.setSigningTime(new Date());
         }
 
@@ -2111,7 +2110,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // Si no se encuentran firmas, no es un documento de firma
-            if (signNodes.size() == 0 || !checkSignNodes(rootNode, signNodes)) {
+            if (signNodes.size() == 0 || !checkSignNodes(signNodes)) {
                 return false;
             }
 
@@ -2202,13 +2201,11 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Comprueba que los nodos de firma proporcionados sean firmas en el formato
      * dato.
-     * @param rootNode
-     *        Nodo r&iacute;z del documento de firma.
      * @param signNodes
      *        Listado de nodos de firma.
      * @return Devuelve {@code true} cuando todos los nodos sean firmas en este
      *         formato. */
-    private boolean checkSignNodes(final Node rootNode, final List<Node> signNodes) {
+    private boolean checkSignNodes(final List<Node> signNodes) {
 
         String xadesNamespace;
         for (final Node signNode : signNodes) {
@@ -2369,5 +2366,5 @@ public final class AOXAdESSigner implements AOSigner {
 
         return mType;
     }
-    
+        
 }
