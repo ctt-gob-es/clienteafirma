@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 
 /** <code>KeyStore</code> para el manejo de certificados en disco en formato
  * PKCS#7 o X.509 en Base64. */
@@ -145,7 +146,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
         }
         catch (final Exception e) {
             LOGGER.warning("La factoria no ha podido generar los certificados directamente, se probara con un pretratamiento: " + e); //$NON-NLS-1$
-            getCertificatesFromStream(new ByteArrayInputStream(certs));
+            getCertificatesFromStream(certs);
             return;
         }
         if (tmpColCerts != null) {
@@ -166,7 +167,7 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
         // aun cuando no salto la
         // excepcion...
         else {
-            getCertificatesFromStream(new ByteArrayInputStream(certs));
+            getCertificatesFromStream(certs);
         }
     }
 
@@ -195,8 +196,43 @@ public final class SingleCertKeyStore extends KeyStoreSpi {
         // No soportado, se ignora la llamada
     }
 
-    private void getCertificatesFromStream(final InputStream stream) {
-        final BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(stream)));
+    private void getCertificatesFromStream(final byte[] certs) {
+        
+        // Antes de nada un intento en Base64 directo sin cabeceras y con posibilidad de URLEncoding
+        Collection<? extends Certificate> tmpColCerts = null;
+        try {
+            if (this.cf == null) {
+                this.cf = CertificateFactory.getInstance("X.509"); //$NON-NLS-1$
+            }
+            tmpColCerts = this.cf.generateCertificates(
+                 new ByteArrayInputStream(
+                      Base64.decode(
+                        new String(certs).replace("%0A", "").replace("%2F", "/").replace("%2B", "+").replace("%3D", "=") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+                      )
+                  )
+             );
+        }
+        catch(final Exception e) {
+            // Ignoramos los errores
+        }
+        if (tmpColCerts != null) {
+            for (final Certificate c : tmpColCerts) {
+                if (!(c instanceof X509Certificate)) {
+                    LOGGER.warning("Se ha encontrado un certificado en un formato que no es X.509, se ignorara"); //$NON-NLS-1$
+                    continue;
+                }
+                try {
+                    this.certificates.put(AOUtil.getCN((X509Certificate) c), (X509Certificate) c);
+                }
+                catch (final Exception e) {
+                    LOGGER.warning("Error anadiendo un certificado, se ignorara y se continuara con los siguientes: " + e); //$NON-NLS-1$
+                }
+            }
+            return;
+        }
+        
+        // No es un Base64 directo sin cabeceras, probasmos con cabeceras ASCII
+        final BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new ByteArrayInputStream(certs))));
         String strLine;
         String currentAlias = null;
         StringBuilder currentCertificate = null;
