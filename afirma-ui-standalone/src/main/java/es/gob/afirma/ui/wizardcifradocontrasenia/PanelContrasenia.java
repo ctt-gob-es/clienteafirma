@@ -61,11 +61,22 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
      * Cifrador configurado para un algoritmo dado
      */
     private CipherConfig cipherConfig;
+    
+    /**
+     * Ruta donde se encuentra el archivo a cifrar
+     */
+    private String rutaFichero = "";
 
     /**
      * Clave de cifrado
      */
     private Key cipherKey;
+    
+    // Campo donde se guarda la contrasenia
+    private JPasswordField campoContrasenia = new JPasswordField();
+
+    // Campo donde se guarda la contrasenia repetida
+    private JPasswordField campoContraseniaRep = new JPasswordField();
 
     @Override
     public int getMinimumRelation(){
@@ -81,21 +92,13 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         getContentPane().add(botonera, BorderLayout.PAGE_END);
     }
 
-    /**
-     * Ruta donde se encuentra el archivo a cifrar
-     */
-    private String rutaFichero = "";
-
     public PanelContrasenia(String algoritmo, String rutaFichero) {
         this.cipherConfig = new CipherConfig(algoritmo);
         this.rutaFichero = rutaFichero;
         initComponents();
     }
 
-    // Campo donde se guarda la contrasenia
-    private JPasswordField campoContrasenia = new JPasswordField();
-    // Campo donde se guarda la contrasenia repetida
-    private JPasswordField campoContraseniaRep = new JPasswordField();
+   
 
     /**
      * Inicializacion de componentes
@@ -227,8 +230,13 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
             Boolean continuar = true;
             continuar = cifrarFichero();
 
-            if (continuar.equals(true))
+            if (continuar.equals(true)) {
                 super.siguienteActionPerformed(anterior, siguiente, finalizar);
+            } else {
+				//Si ha ocurrido algun error durante el proceso de cifrado mediante contrasenia
+				//el foco vuelve al campo de insercion de contrasenia
+				getCampoContrasenia().requestFocusInWindow();
+			}
         }
     }
 
@@ -320,4 +328,12 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
             throw new NullPointerException("No se ha indicado un fichero de entrada");
         return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
     }
+
+	/**
+	 * Getter para el campo de contrasenia.
+	 * @return Campo de contrasenia.
+	 */
+	public JPasswordField getCampoContrasenia() {
+		return campoContrasenia;
+	}
 }
