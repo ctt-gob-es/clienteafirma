@@ -373,7 +373,7 @@ public class AccessibilityOptionsPane {
 	private void save(){
 		int user = 0;
 		boolean exists = false;
-		String name = JOptionPane.showInputDialog("Nombre del perfil (debe ser una Ãºnica palabra). Si el nombre ya existe serÃ¡ sobreescrita la configuraciÃ³n:");
+		String name = JOptionPane.showInputDialog("Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración:");
 		if (name!=null){
 			if (name.trim().length()!=0){
 				if (Main.preferences.get("users","0").equals("0")){
