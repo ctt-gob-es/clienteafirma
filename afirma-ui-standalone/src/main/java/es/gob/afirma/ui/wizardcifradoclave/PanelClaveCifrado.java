@@ -86,6 +86,17 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	 * Clave de cifrado
 	 */
 	private Key cipherKey;
+	
+	/**
+	 * Ruta donde se encuentra el archivo a cifrar
+	 */
+	private String rutaFichero = "";
+	
+	   // Campo donde se guarda la clave generada
+    private JTextField campoClave = new JTextField();
+    
+    // Check que indica si se debe guardar la clave en el almacen
+    private JCheckBox checkGuardar = new JCheckBox();
     
     /**
      * Guarda todas las ventanas del asistente para poder controlar la botonera
@@ -95,22 +106,13 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	Botonera botonera = new Botonera(ventanas, 1);
     	getContentPane().add(botonera, BorderLayout.PAGE_END);
     }
-	
-	/**
-	 * Ruta donde se encuentra el archivo a cifrar
-	 */
-	private String rutaFichero = "";
     
     public PanelClaveCifrado(String algoritmo, String rutaFichero) {
     	this.cipherConfig = new CipherConfig(algoritmo);
     	this.rutaFichero = rutaFichero;
         initComponents();
     }
-    
-    // Campo donde se guarda la clave generada
-    private JTextField campoClave = new JTextField();
-    // Check que indica si se debe guardar la clave en el almacen
-    private JCheckBox checkGuardar = new JCheckBox();
+
     
     /**
      * Inicializacion de componentes
@@ -380,8 +382,13 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 			Boolean continuar = true;
 			continuar = cifrarFichero();
 
-			if (continuar.equals(true))
+			if (continuar.equals(true)) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
+			} else {
+				//Si ha ocurrido algun error durante el proceso de cifrado mediante clave
+				//el foco vuelve al campo de insercion de clave
+				getCampoClave().requestFocusInWindow();
+			}
 		}
 	}
 	
@@ -517,5 +524,13 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clavecifrar"),
     				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE );
     	}
+	}
+	
+	/**
+	 * Getter para el campo de la clave.
+	 * @return Campo de la clave.
+	 */
+	public JTextField getCampoClave() {
+		return campoClave;
 	}
 }
