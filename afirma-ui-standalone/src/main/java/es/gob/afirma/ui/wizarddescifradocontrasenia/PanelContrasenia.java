@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -58,15 +57,24 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 
 	static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
 	
-	@Override
-	public int getMinimumRelation(){
-		return 9;
-	}
+	/**
+	 * Ruta donde se encuentra el archivo a cifrar
+	 */
+	private String rutaFichero = "";
 	
 	/**
 	 * Cifrador configurado para un algoritmo dado
 	 */
 	private CipherConfig cipherConfig;
+	
+	// Campo donde se guarda la contrasenia
+    private JPasswordField campoContrasenia = new JPasswordField();
+
+
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
 	
 	/**
      * Guarda todas las ventanas del asistente para poder controlar la botonera
@@ -81,19 +89,11 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         initComponents();
     }
 
-	/**
-	 * Ruta donde se encuentra el archivo a cifrar
-	 */
-	private String rutaFichero = "";
-    
 	public PanelContrasenia(String algoritmo, String rutaFichero) {
 		this.cipherConfig = new CipherConfig(algoritmo);
 		this.rutaFichero = rutaFichero;
         initComponents();
     }
-     
-	// Campo donde se guarda la contrasenia
-    private JPasswordField campoContrasenia = new JPasswordField();
 	
     /**
      * Inicializacion de componentes
@@ -129,7 +129,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		 c.gridx = 0;
 		 c.gridy	= 1;
 		 
-		//Etiqueta con el texto ContraseÃ±a de descifrado
+		//Etiqueta con el texto Contraseña de descifrado
     	JLabel passwordLabel = new JLabel (Messages.getString("WizardDescifrado.contrasenia"));
     	Utils.setContrastColor(passwordLabel);
     	Utils.setFontBold(passwordLabel);
@@ -141,7 +141,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		 c.gridy = 2;
        
 		
-        // Caja de texto donde se guarda la contraseÃ±a
+        // Caja de texto donde se guarda la contraseña
 		 this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
 		 campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + campoContrasenia.getToolTipText() + "ALT + O.");
 	     campoContrasenia.getAccessibleContext().setAccessibleDescription(campoContrasenia.getToolTipText());
@@ -193,8 +193,13 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			Boolean continuar = true;
 			continuar = descifrarFichero();
 
-			if (continuar.equals(true))
+			if (continuar.equals(true)) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
+			} else {
+				//Si ha ocurrido algun error durante el proceso de descifrado mediante contrasenia
+				//el foco vuelve al campo de insercion de contrasenia
+				getCampoContrasenia().requestFocusInWindow();
+			}
 		}
 	}
 
@@ -281,5 +286,13 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		if (rutaFichero == null) 
 			throw new NullPointerException("No se ha indicado un fichero de entrada");
 		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
+	}
+
+	/**
+	 * Getter para el campo de contrasenia.
+	 * @return Campo de contrasenia.
+	 */
+	public JPasswordField getCampoContrasenia() {
+		return campoContrasenia;
 	}
 }
