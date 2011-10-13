@@ -196,7 +196,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
         
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
-		cons.ipadx = 7;
+		cons.ipadx = 0;
 		cons.gridx = 0;
 		cons.insets = new Insets(5, 0, 5, 0);
 		
@@ -249,7 +249,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		
 	    //Espacio entre botones
 		Panel panelVacio = new Panel();
-		panelVacio.setPreferredSize(new Dimension(30, 10));
+		panelVacio.setPreferredSize(new Dimension(15, 10));
         
         // Panel en donde se insertan los botones maximizar y aceptar
         JPanel buttonPanel = new JPanel();
