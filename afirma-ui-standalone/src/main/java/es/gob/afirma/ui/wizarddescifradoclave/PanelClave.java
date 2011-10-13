@@ -65,16 +65,25 @@ public class PanelClave extends JAccessibilityDialogWizard {
 
 	static Logger logger = Logger.getLogger(PanelClave.class.getName());
 	
-	@Override
-	public int getMinimumRelation(){
-		return 9;
-	}
-	
 	/**
 	 * Cifrador configurado para un algoritmo dado
 	 */
 	private CipherConfig cipherConfig;
 	
+	/**
+	 * Ruta donde se encuentra el archivo a cifrar
+	 */
+	private String rutaFichero = "";
+	
+	// Campo donde se guarda la contrasenia
+    private JTextField campoClave = new JTextField();
+
+	
+	@Override
+	public int getMinimumRelation(){
+		return 9;
+	}
+
 	/**
      * Guarda todas las ventanas del asistente para poder controlar la botonera
      * @param ventanas	Listado con todas las paginas del asistente
@@ -83,20 +92,12 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	Botonera botonera = new Botonera(ventanas, 1);
     	getContentPane().add(botonera, BorderLayout.PAGE_END);
     }
-	
-    /**
-	 * Ruta donde se encuentra el archivo a cifrar
-	 */
-	private String rutaFichero = "";
     
 	public PanelClave(String algoritmo, String rutaFichero) {
 		this.cipherConfig = new CipherConfig(algoritmo);
 		this.rutaFichero = rutaFichero;
         initComponents();
     }
-    
-	// Campo donde se guarda la contrasenia
-    private JTextField campoClave = new JTextField();
 	
     /**
      * Inicializacion de componentes
@@ -283,8 +284,13 @@ public class PanelClave extends JAccessibilityDialogWizard {
 			Boolean continuar = true;
 			continuar = descifrarFichero();
 
-			if (continuar.equals(true))
+			if (continuar.equals(true)) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
+			} else {
+				//Si ha ocurrido algun error durante el proceso de cifrado mediante clave
+				//el foco vuelve al campo de insercion de clave
+				getCampoClave().requestFocusInWindow();
+			}
 		}
 	}
 
@@ -370,4 +376,12 @@ public class PanelClave extends JAccessibilityDialogWizard {
     		throw new NullPointerException("No se ha indicado un fichero de entrada");
     	return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
     }
+
+	/**
+	 * Getter para el campo de la clave.
+	 * @return Campo de la clave.
+	 */
+	public JTextField getCampoClave() {
+		return campoClave;
+	}
 }
