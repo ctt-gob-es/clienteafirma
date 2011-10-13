@@ -183,6 +183,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		add(list,c);
 		
 		c.gridy = c.gridy + 1;
+		c.insets = new Insets(0, 0, 0, 0);
 		add(createButtonsPanel(), c);
 		
         //Accesos rapidos al menu de ayuda
