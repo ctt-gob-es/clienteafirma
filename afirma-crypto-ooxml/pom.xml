@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.gob.afirma</groupId>
   <artifactId>afirma-crypto-ooxml</artifactId>
-  <name>afirma-crypto-odf</name>
+  <name>afirma-crypto-ooxml</name>
 
   <parent>
     <groupId>es.gob.afirma</groupId>
