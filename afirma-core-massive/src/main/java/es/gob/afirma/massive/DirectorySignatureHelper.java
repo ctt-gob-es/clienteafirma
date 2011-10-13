@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +53,7 @@ public class DirectorySignatureHelper {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
     /** Fichero de log por defecto. */
-    private final static String DEFAULT_LOG_FILE = "result.log"; //$NON-NLS-1$
+    private static final String DEFAULT_LOG_FILE = "result.log"; //$NON-NLS-1$
 
     /** Algoritmo de firma. */
     private String algorithm = null;
@@ -89,7 +89,7 @@ public class DirectorySignatureHelper {
     private String inDir = null;
 
     /** Listado con el path de los ficheros firmados. */
-    private final Vector<String> signedFilenames = new Vector<String>();
+    private List<String> signedFilenames = new ArrayList<String>();
 
     /** Indica si se debe generar un fichero de log con los resultados de las
      * operaciones. */
@@ -199,8 +199,6 @@ public class DirectorySignatureHelper {
      *        Indica si se debe respetar el formato de firma original.
      * @param keyEntry
      *        Entrada con la clave privada para la firma.
-     * @param cert
-     *        Certificado de firma.
      * @param config
      *        Configuraci&oacute;n de firma.
      * @return Devuelve <code>true</code> si todas las firmas se realizaron
@@ -214,7 +212,6 @@ public class DirectorySignatureHelper {
                                final boolean createOutDir,
                                final boolean originalFormat,
                                final PrivateKeyEntry keyEntry,
-                               final X509Certificate cert,
                                final Properties config) throws AOException {
 
         if (config == null || !config.containsKey("format") || !config.containsKey("mode")) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -233,8 +230,8 @@ public class DirectorySignatureHelper {
         if (!id.canRead()) {
             throw new AOException("No se tienen permisos de lectura para el directorio de entrada"); //$NON-NLS-1$
         }
-        final Vector<String> filenames = new Vector<String>();
-        final Vector<File> files = new Vector<File>();
+        final List<String> filenames = new ArrayList<String>();
+        final List<File> files = new ArrayList<File>();
         for (final File file : id.listFiles()) {
             files.add(file);
         }
@@ -256,7 +253,7 @@ public class DirectorySignatureHelper {
 
         // Solicitamos la firma masiva de los ficheros concretos que se
         // enconrtraron en el directorio
-        return this.massiveSign(type, filenames.toArray(new String[filenames.size()]), outDir, createOutDir, originalFormat, keyEntry, cert, config);
+        return this.massiveSign(type, filenames.toArray(new String[filenames.size()]), outDir, createOutDir, originalFormat, keyEntry, config);
     }
 
     /** Realiza una firma masiva sobre los ficheros de un directorio. El tipo de
@@ -329,8 +326,6 @@ public class DirectorySignatureHelper {
      *        Indica si se debe respetar el formato de firma original.
      * @param keyEntry
      *        Entrada con la clave privada para la firma.
-     * @param cert
-     *        Certificado de firma.
      * @param config
      *        Configuraci&oacute;n de firma.
      * @return Devuelve <code>true</code> si todas las firmas se realizaron
@@ -343,7 +338,6 @@ public class DirectorySignatureHelper {
                                final boolean createOutDir,
                                final boolean originalFormat,
                                final PrivateKeyEntry keyEntry,
-                               final X509Certificate cert,
                                final Properties config) throws AOException {
 
         if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {  //$NON-NLS-1$//$NON-NLS-2$
@@ -365,7 +359,7 @@ public class DirectorySignatureHelper {
         boolean allOK = true;
 
         // Inicializamos el vector de ficheros firmados
-        this.signedFilenames.removeAllElements();
+        this.signedFilenames = new ArrayList<String>();
 
         if (filenames == null || filenames.length == 0) {
             LOGGER.warning("No se han proporcionado ficheros para firmar"); //$NON-NLS-1$
@@ -400,13 +394,13 @@ public class DirectorySignatureHelper {
         final File[] files = this.getFiles(filenames);
         this.prepareOperation(files.clone());
         if (MassiveType.SIGN.equals(type) || type == null) { // Asumimos que null es el por defecto: MassiveType.SIGN
-            allOK = this.massiveSignOperation(files, od, keyEntry, cert, signConfig);
+            allOK = this.massiveSignOperation(files, od, keyEntry, signConfig);
         }
         else if (MassiveType.COSIGN.equals(type)) {
-            allOK = this.massiveCosignOperation(files, od, originalFormat, keyEntry, cert, signConfig);
+            allOK = this.massiveCosignOperation(files, od, originalFormat, keyEntry, signConfig);
         }
         else if (MassiveType.COUNTERSIGN_ALL.equals(type) || MassiveType.COUNTERSIGN_LEAFS.equals(type)) {
-            allOK = this.massiveCounterSignOperation(type, files, od, originalFormat, keyEntry, cert, signConfig);
+            allOK = this.massiveCounterSignOperation(type, files, od, originalFormat, keyEntry, signConfig);
         }
         else {
             LOGGER.severe("Operacion masiva no reconocida");  //$NON-NLS-1$
@@ -424,8 +418,6 @@ public class DirectorySignatureHelper {
      *        Hashes que se desean firmar.
      * @param keyEntry
      *        Referencia a la clave de firma.
-     * @param cert
-     *        Certificado de firma.
      * @param configuredSigner
      *        Configuraci&oacute;n de la operaci&oacute;n de firma.
      * @param showHashes
@@ -438,13 +430,12 @@ public class DirectorySignatureHelper {
      *         Error durante la operacion de firma de hashes. */
     public String[] hashesMassiveSign(final String[] hashes,
                                       final PrivateKeyEntry keyEntry,
-                                      final X509Certificate cert,
                                       final AOSigner configuredSigner,
                                       final boolean showHashes,
                                       final Properties config) throws AOException {
 
-        if (hashes == null || keyEntry == null || cert == null) {
-            throw new IllegalArgumentException("Los hashes a firmar y la clave y el certificado de firma no pueden ser nulos"); //$NON-NLS-1$
+        if (hashes == null || keyEntry == null) {
+            throw new IllegalArgumentException("Las huellas digitales a firmar y la clave privada no pueden ser nulas"); //$NON-NLS-1$
         }
 
         if (config == null || !config.containsKey("format") || !config.containsKey("mode")) {  //$NON-NLS-1$//$NON-NLS-2$
@@ -501,7 +492,7 @@ public class DirectorySignatureHelper {
      * @return Listado de ficheros v&aacute;lidos. */
     private File[] getFiles(final String[] filenames) {
         File tempFile = null;
-        final Vector<File> vFiles = new Vector<File>(filenames.length);
+        final List<File> vFiles = new ArrayList<File>(filenames.length);
         for (final String filename : filenames) {
             tempFile = new File(filename);
             if (!tempFile.exists()) {
@@ -532,15 +523,12 @@ public class DirectorySignatureHelper {
      *        Directorio de salida (creado y con permisos).
      * @param keyEntry
      *        Clave de firma.
-     * @param cert
-     *        Certificado con los datos de la firma.
      * @return Devuelve <code>true</code> si toda la operaci&oacute;n
      *         finaliz&oacute; correctamente, <code>false</code> en caso
      *         contrario. */
     private boolean massiveSignOperation(final File[] files,
                                          final File outDir,
                                          final PrivateKeyEntry keyEntry,
-                                         final X509Certificate cert,
                                          final Properties signConfig) {
 
         boolean allOK = true;
@@ -612,15 +600,16 @@ public class DirectorySignatureHelper {
             try {
                 signData = signer.sign(dataToSign, this.algorithm, keyEntry, signConfig);
             }
+            catch(final UnsupportedOperationException e) {
+                LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
+                this.closeStream(fis);
+                allOK = false;
+                continue;
+            }
             catch (final Exception e) {
-                if (e instanceof UnsupportedOperationException) {
-                    LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
-                    this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
-                }
-                else {
-                    LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
-                    this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file); //$NON-NLS-1$
-                }
+                LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
+                this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file); //$NON-NLS-1$
                 this.closeStream(fis);
                 allOK = false;
                 continue;
@@ -650,8 +639,6 @@ public class DirectorySignatureHelper {
      *        Respectar formato de firma original
      * @param keyEntry
      *        Clave de firma.
-     * @param cert
-     *        Certificado con los datos de la firma.
      * @return Devuelve <code>true</code> si toda la operaci&oacute;n
      *         finaliz&oacute; correctamente, <code>false</code> en caso
      *         contrario. */
@@ -659,7 +646,6 @@ public class DirectorySignatureHelper {
                                            final File outDir,
                                            final boolean originalFormat,
                                            final PrivateKeyEntry keyEntry,
-                                           final X509Certificate cert,
                                            final Properties signConfig) {
 
         boolean allOK = true;
@@ -692,24 +678,24 @@ public class DirectorySignatureHelper {
                 textAux = "cosign"; //$NON-NLS-1$
                 signer = this.defaultSigner;
                 signConfig.setProperty("uri", file.toURI().toASCIIString()); //$NON-NLS-1$
-                signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, cert, signConfig);
+                signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, signConfig);
             }
             else if (originalFormat) {
                 signer = AOSignerFactory.getSigner(originalData);
                 if (signer != null) {
                     textAux = "cosign"; //$NON-NLS-1$
-                    signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, cert, signConfig);
+                    signedData = this.cosign(signer, originalData, this.algorithm, keyEntry, signConfig);
                 }
                 else {
                     textAux = "sign"; //$NON-NLS-1$
                     signer = this.defaultSigner;
-                    signedData = this.sign(signer, originalData, this.algorithm, keyEntry, cert, signConfig);
+                    signedData = this.sign(signer, originalData, this.algorithm, keyEntry, signConfig);
                 }
             }
             else {
                 textAux = "sign"; //$NON-NLS-1$
                 signer = this.defaultSigner;
-                signedData = this.sign(signer, originalData, this.algorithm, keyEntry, cert, signConfig);
+                signedData = this.sign(signer, originalData, this.algorithm, keyEntry, signConfig);
             }
 
             // Comprobamos si la operacion ha finalizado correctamente
@@ -738,8 +724,6 @@ public class DirectorySignatureHelper {
      *        Algoritmo de firma.
      * @param keyEntry
      *        Clave para firmar.
-     * @param cert
-     *        Certificado de firma.
      * @param signConfig
      *        Configurac&oacute;n de firma.
      * @return Cofirma. */
@@ -747,7 +731,6 @@ public class DirectorySignatureHelper {
                           final byte[] signData,
                           final String algo,
                           final PrivateKeyEntry keyEntry,
-                          final X509Certificate cert,
                           final Properties signConfig) {
 
         // Configuramos y ejecutamos la operacion
@@ -772,8 +755,6 @@ public class DirectorySignatureHelper {
      *        Algoritmo de firma.
      * @param keyEntry
      *        Clave para firmar.
-     * @param cert
-     *        Certificado de firma.
      * @param signConfig
      *        Configurac&oacute;n de firma.
      * @return Firma electr&oacute;nica. */
@@ -781,7 +762,6 @@ public class DirectorySignatureHelper {
                         final byte[] data,
                         final String algo,
                         final PrivateKeyEntry keyEntry,
-                        final X509Certificate cert,
                         final Properties signConfig) {
 
         // Deteccion del MIMEType, solo para XAdES y XMLDSig
@@ -823,8 +803,6 @@ public class DirectorySignatureHelper {
      *        Respetar formato de firma original.
      * @param keyEntry
      *        Clave de firma.
-     * @param cert
-     *        Certificado con los datos para la firma.
      * @param signConfig
      *        Configuraci&oacute;n de firma.
      * @return Indica si la operaci&oacute;n finaliz&oacute; correctamente. */
@@ -833,7 +811,6 @@ public class DirectorySignatureHelper {
                                                 final File outDir,
                                                 final boolean originalFormat,
                                                 final PrivateKeyEntry keyEntry,
-                                                final X509Certificate cert,
                                                 final Properties signConfig) {
         boolean allOK = true;
         InputStream fis = null;

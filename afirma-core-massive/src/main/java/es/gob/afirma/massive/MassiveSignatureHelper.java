@@ -16,8 +16,9 @@ import java.net.URI;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
@@ -49,7 +50,7 @@ public final class MassiveSignatureHelper {
     private MassiveSignConfiguration massiveConfiguration = null;
 
     /** Logger de las operaciones de firma masiva. */
-    private Vector<String> log = null;
+    private List<String> log = null;
 
     /** Manejador de firma para el formato configurado por defecto. */
     private AOSigner defaultSigner = null;
@@ -553,7 +554,7 @@ public final class MassiveSignatureHelper {
      *        Entrada del log. */
     private void addLog(final String message) {
         if (this.log == null) {
-            this.log = new Vector<String>();
+            this.log = new ArrayList<String>();
         }
         this.log.add(message);
     }
@@ -592,7 +593,6 @@ public final class MassiveSignatureHelper {
         String mode = AOSignConstants.DEFAULT_SIGN_MODE;
         String defaultFormat = AOSignConstants.DEFAULT_SIGN_FORMAT;
         boolean originalFormat = true;
-        private final String selectedAlias = null;
         Properties extraParams;
 
         /** Crea un <i>JavaBean</i> con los par&aacute;metros necesarios para las
@@ -686,12 +686,6 @@ public final class MassiveSignatureHelper {
          * @return Entrada de la clave de firma. */
         public PrivateKeyEntry getKeyEntry() {
             return this.keyEntry;
-        }
-
-        /** Recupera el alias del certificado de firma.
-         * @return Alias del certficado de firma. */
-        public String getSelectedAlias() {
-            return this.selectedAlias;
         }
 
         /** Establece par&aacute;metros adicionales para la configuraci&oacute;n
