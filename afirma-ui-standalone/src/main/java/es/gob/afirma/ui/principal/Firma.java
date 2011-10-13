@@ -364,6 +364,7 @@ public class Firma extends JPanel {
         // Obtenemos la ruta del fichero a firmar
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) {
             JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            campoFichero.requestFocusInWindow();
             return;
         }
 
@@ -446,6 +447,7 @@ public class Firma extends JPanel {
                 logger.severe("La ruta del fichero de datos no es v\u00E1lida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
                 JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.ruta"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                campoFichero.requestFocusInWindow();
                 return;
             }
 
