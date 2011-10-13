@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 @Deprecated
 interface Operator
 {
-    static Operator EQ = new Operator()
+    Operator EQ = new Operator()
     {
         public boolean eval(Object o1, Object o2)
         {
@@ -24,7 +24,7 @@ interface Operator
         }
     };
 
-    static Operator MATCHES = new Operator()
+    Operator MATCHES = new Operator()
     {
         public boolean eval(Object str, Object pattern)
         {
@@ -34,7 +34,7 @@ interface Operator
         }
     };
 
-    static Operator NOT_MATCHES = new Operator()
+    Operator NOT_MATCHES = new Operator()
     {
         public boolean eval(Object str, Object pattern)
         {
