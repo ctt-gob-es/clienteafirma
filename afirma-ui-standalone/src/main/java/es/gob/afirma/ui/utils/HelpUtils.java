@@ -33,6 +33,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
+import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.principal.PrincipalGUI;
+
 /**
  * Clase con utilidades relacionadas con la ayuda de la aplicacion
  */
@@ -144,9 +148,9 @@ public class HelpUtils {
 	}
 
 	/**
-	 * Genera el botï¿½n de ayuda que apuntarï¿½ a la pï¿½gina dada.
-	 * @param pagina Pï¿½gina a mostrar cuando se puelse el botï¿½n de ayuda.
-	 * @return botï¿½n de ayuda
+	 * Genera el boton de ayuda que apuntara a la pagina dada.
+	 * @param pagina Pagina a mostrar cuando se puelse el boton de ayuda.
+	 * @return boton de ayuda
 	 */
 	/**
 	 * @param pagina
@@ -157,14 +161,16 @@ public class HelpUtils {
 		JButton botonAyuda = new JButton(new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")));
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		botonAyuda.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido")));
+		botonAyuda.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido")));
 		botonAyuda.setMnemonic(KeyEvent.VK_H); //Se le asigna un mnemónico al botón de ayuda
 		botonAyuda.getAccessibleContext().setAccessibleName(botonAyuda.getToolTipText());
-		//Se asigna una dimensiï¿½n al botï¿½n segï¿½n su icono
+		//Se asigna una dimension al boton segun su icono
 		Dimension dimension = new Dimension(12,27);
 		botonAyuda.setPreferredSize(dimension);
 		
-		botonAyuda.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el botï¿½n
-		botonAyuda.setContentAreaFilled(false); //ï¿½rea del botï¿½n invisible
+		botonAyuda.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
+		botonAyuda.setContentAreaFilled(false); //area del boton invisible
 		
 		//Acción para desplegar la pantalla de ayuda
 		botonAyuda.addActionListener(new ActionListener() {
