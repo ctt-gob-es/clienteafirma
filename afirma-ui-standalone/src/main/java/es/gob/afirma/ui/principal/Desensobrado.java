@@ -108,7 +108,7 @@ public class Desensobrado extends JPanel {
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.buscar.caja.description.status")));
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + O."); // NOI18N
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.buscar.caja.description")); // NOI18N
-        campoFichero.addAncestorListener(new RequestFocusListener());
+        campoFichero.addAncestorListener(new RequestFocusListener(false));
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
 			campoFichero.setCaret(caret);

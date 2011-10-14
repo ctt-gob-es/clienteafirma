@@ -135,7 +135,7 @@ public class Firma extends JPanel {
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" "+"ALT + G.");
         campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N
-        campoFichero.addAncestorListener(new RequestFocusListener());
+        campoFichero.addAncestorListener(new RequestFocusListener(false));
         Utils.remarcar(campoFichero);
         if (GeneralConfig.isBigCaret()) {
             Caret caret = new ConfigureCaret();

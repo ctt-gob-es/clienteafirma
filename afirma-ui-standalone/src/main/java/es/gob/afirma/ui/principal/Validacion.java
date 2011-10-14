@@ -86,7 +86,7 @@ public class Validacion extends JPanel {
 		InfoLabel infoLabel1 = new InfoLabel(text1, false);
 		//Se centra el texto
 		infoLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-		infoLabel1.addAncestorListener(new RequestFocusListener());
+		infoLabel1.addAncestorListener(new RequestFocusListener(false));
 
 		add(infoLabel1, c);
 

@@ -127,7 +127,7 @@ public class Cifrado extends JPanel {
 		}
 		Utils.remarcar(campoFichero);
 		Utils.setFontBold(campoFichero);
-		campoFichero.addAncestorListener(new RequestFocusListener());
+		campoFichero.addAncestorListener(new RequestFocusListener(false));
 		add(campoFichero, c);
 		
 		//Relación entre etiqueta y campo de texto

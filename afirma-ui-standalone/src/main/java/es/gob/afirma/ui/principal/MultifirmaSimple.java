@@ -77,7 +77,7 @@ public class MultifirmaSimple extends JPanel {
 		comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")+" ALT + A."); // NOI18N
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
-		comboAlmacen.addAncestorListener(new RequestFocusListener());
+		comboAlmacen.addAncestorListener(new RequestFocusListener(false));
 		Utils.remarcar(comboAlmacen);
 		Utils.setContrastColor(comboAlmacen);
 		Utils.setFontBold(comboAlmacen);

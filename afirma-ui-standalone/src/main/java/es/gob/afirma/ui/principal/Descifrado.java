@@ -100,7 +100,7 @@ public class Descifrado extends JPanel {
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.buscar.caja.description")));
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + E."); // NOI18N
 		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
-		campoFichero.addAncestorListener(new RequestFocusListener());
+		campoFichero.addAncestorListener(new RequestFocusListener(false));
      
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
