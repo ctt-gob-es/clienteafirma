@@ -117,7 +117,7 @@ public class BotoneraInferior extends JPanel {
         
         //Espacio entre botones
 		Panel panelVacio = new Panel();
-		panelVacio.setPreferredSize(new Dimension(100, 10));
+		panelVacio.setPreferredSize(new Dimension(80, 10));
 		add(panelVacio);		
 		
 		JPanel panelAnterior = new JPanel(new GridLayout(1, 1));
