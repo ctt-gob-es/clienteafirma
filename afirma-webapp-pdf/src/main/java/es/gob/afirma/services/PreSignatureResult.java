@@ -15,7 +15,7 @@ public class PreSignatureResult {
      */
     public PreSignatureResult(final byte[] preSignData, final String fileID) {
         this.fileID = fileID;
-        this.preSignData = preSignData;
+        this.preSignData = preSignData.clone();
     }
 
     /** Obtiene los atributos firmados CAdES de la prefirma PAdES.
@@ -29,7 +29,7 @@ public class PreSignatureResult {
      * @param preSignData Atributos firmados CAdES de la prefirma PAdES
      */
     public void setPreSignData(final byte[] preSignData) {
-        this.preSignData = preSignData;
+        this.preSignData = preSignData.clone();
     }
 
     /** Obtiene el FileID del PDF prefirmado.

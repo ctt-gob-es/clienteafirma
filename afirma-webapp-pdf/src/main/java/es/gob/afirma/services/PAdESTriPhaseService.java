@@ -39,7 +39,9 @@ public class PAdESTriPhaseService {
      * @param extraParamsNames Nombres de las opciones adicionales de prefirma
      * @param extraParamsValues Valores de las opciones adicionales de prefirma
      * @return Prefirma PAdES
-     * @throws Exception en caso de cualquier error
+     * @throws AOException 
+     * @throws IOException 
+     * @throws CertificateException 
      */
     @POST
     @Path("pre")
@@ -49,8 +51,7 @@ public class PAdESTriPhaseService {
                                   @FormParam("algorithm")              final String algorithm,
                                   @FormParam("base64CertificateChain") final List<String> base64CertificateChain,
                                   @FormParam("extraParamsNames")       final List<String> extraParamsNames,
-                                  @FormParam("extraParamsValues")      final List<String> extraParamsValues) throws Exception
-    {
+                                  @FormParam("extraParamsValues")      final List<String> extraParamsValues) throws CertificateException, IOException, AOException  {
         final byte[] data = Base64.decode(base64Data);
         
         return executePreOperation(algorithm, base64CertificateChain,
@@ -64,7 +65,9 @@ public class PAdESTriPhaseService {
      * @param extraParamsNames Nombres de los par&aacute;metros adicionales de la firma
      * @param extraParamsValues Valores de los par&aacute;metros adicionales de la firma (correspondientes por posici&oacute;n con los nombres)
      * @return XML con el resultado de la pre-firma
-     * @throws Exception
+     * @throws IOException 
+     * @throws AOException 
+     * @throws CertificateException 
      */
     @POST
     @Path("pre/{reference}")
@@ -74,8 +77,7 @@ public class PAdESTriPhaseService {
                                   @FormParam("algorithm")              final String algorithm,
                                   @FormParam("base64CertificateChain") final List<String> base64CertificateChain,
                                   @FormParam("extraParamsNames")       final List<String> extraParamsNames,
-                                  @FormParam("extraParamsValues")      final List<String> extraParamsValues) throws Exception
-    {
+                                  @FormParam("extraParamsValues")      final List<String> extraParamsValues) throws IOException, CertificateException, AOException {
     	byte[] data = new byte[] {};
     	
     	if (reference != null)
@@ -132,7 +134,9 @@ public class PAdESTriPhaseService {
      * @param base64PreSignData Atributos firmados CAdES de la prefirma, codificados en Base64
      * @param fileID FileID del PDF prefirmado
      * @return PDF firmado
-     * @throws Exception en caso de cualquier problema
+     * @throws IOException 
+     * @throws AOException 
+     * @throws CertificateException 
      */
     @POST
     @Path("post")
@@ -145,7 +149,7 @@ public class PAdESTriPhaseService {
                        @FormParam("extraParamsValues")      final List<String> extraParamsValues,
                        @FormParam("base64Signature")        final String base64Signature,
                        @FormParam("base64PreSignData")      final String base64PreSignData,
-                       @FormParam("fileID") String fileID) throws Exception {
+                       @FormParam("fileID") String fileID) throws CertificateException, AOException, IOException {
         
         final byte[] data = Base64.decode(base64Data);
         return executePostOperation(algorithm, base64CertificateChain,
@@ -163,7 +167,9 @@ public class PAdESTriPhaseService {
      * @param base64PreSignData Prefirma del PDF codificada en Base64
      * @param fileID FILEID del PDF prefirmado
      * @return PDF firmado
-     * @throws Exception
+     * @throws IOException 
+     * @throws AOException 
+     * @throws CertificateException 
      */
     @POST
     @Path("post/{reference}")
@@ -176,7 +182,7 @@ public class PAdESTriPhaseService {
                        @FormParam("extraParamsValues")      final List<String> extraParamsValues,
                        @FormParam("base64Signature")        final String base64Signature,
                        @FormParam("base64PreSignData")      final String base64PreSignData,
-                       @FormParam("fileID") String fileID) throws Exception {
+                       @FormParam("fileID") String fileID) throws IOException, CertificateException, AOException {
         
     	byte[] data = new byte[] {};
     	
