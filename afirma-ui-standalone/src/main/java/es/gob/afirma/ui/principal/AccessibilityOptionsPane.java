@@ -376,7 +376,6 @@ public class AccessibilityOptionsPane {
 		boolean exists = false;
 		String name;
 		if (user > 0){
-			String[] userNames = new String[user-1];
 			String text = "Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración."+"<br>"+"Actualmente existen los siguientes perfiles: "+"<br>";
 			for (int i = 0;i<user;i++){
 				System.out.println(Main.preferences.get("user"+(i+1), "error"));
