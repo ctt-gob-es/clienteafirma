@@ -156,7 +156,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	private void initComponents() {
 		// Dimensiones de la ventana
 		setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
-		
 		// Parametros ventana
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
 		setTitle("Firma"); //$NON-NLS-1$
@@ -431,10 +430,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
 	    // la ventana principal con el tama�o adecuado
 	    if (GeneralConfig.isMaximized()){
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+			this.setExtendedState(this.MAXIMIZED_BOTH);
 		} else {
 			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
+				this.setExtendedState(0);
 				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
 			}
 		}
