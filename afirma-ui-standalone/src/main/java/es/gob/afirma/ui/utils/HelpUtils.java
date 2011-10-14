@@ -161,8 +161,10 @@ public class HelpUtils {
 		JButton botonAyuda = new JButton(new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")));
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		botonAyuda.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido")));
-		botonAyuda.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido")));
+		if (!pagina.equals("perfiles.usuario")){
+			botonAyuda.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido")));
+			botonAyuda.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido")));
+		}
 		botonAyuda.setMnemonic(KeyEvent.VK_H); //Se le asigna un mnemónico al botón de ayuda
 		botonAyuda.getAccessibleContext().setAccessibleName(botonAyuda.getToolTipText());
 		//Se asigna una dimension al boton segun su icono
