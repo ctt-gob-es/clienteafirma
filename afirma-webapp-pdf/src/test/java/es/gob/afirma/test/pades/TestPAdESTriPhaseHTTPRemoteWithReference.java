@@ -26,7 +26,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
@@ -36,23 +35,27 @@ import es.gob.afirma.services.PreSignatureResult;
 import es.gob.afirma.signers.cades.PKCS1ExternalizableSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 
+/** Pruebas de firma PDF en tres fases con comunicaci&oacute;n con servidor de firma v&iacute;a HTTP. 
+ * PDF en servidor referenciado mediante una referencia */
 public class TestPAdESTriPhaseHTTPRemoteWithReference {
 
-	private static final String CERT_PATH = "ANF_PF_Activo.pfx";
-	private static final String CERT_PASS = "12341234";
-	private static final String CERT_ALIAS = "anf usuario activo";
+	private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
+	private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
+	private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
-	private static final String[] TEST_FILES = { "TEST_PDF.pdf" };
+	private static final String[] TEST_FILES = { "TEST_PDF.pdf" }; //$NON-NLS-1$
 
 	private WebResource resource;
 
+	/** Prueba de firma PDF en tres fases con comunicaci&oacute;n con servidor de firma v&iacute;a HTTP. 
+	 * PDF en servidor referenciado mediante una referencia */
 	public TestPAdESTriPhaseHTTPRemoteWithReference() {
 
 		Client client = Client.create();
 		client.addFilter(new LoggingFilter());
 
 		this.resource = client
-				.resource("http://ujiapps.uji.es/afirma-webapp-pdf/rest/");
+				.resource("http://ujiapps.uji.es/afirma-webapp-pdf/rest/"); //$NON-NLS-1$
 	}
 
 	private final static Properties p1;
@@ -100,7 +103,7 @@ public class TestPAdESTriPhaseHTTPRemoteWithReference {
 		final MultivaluedMap<String, String> params = convertParamsToMultivalueMap(
 				reference, algorithm, extraParams, certChain);
 
-		final ClientResponse response = this.resource.path("pades/pre/" + reference)
+		final ClientResponse response = this.resource.path("pades/pre/" + reference) //$NON-NLS-1$
 				.type(MediaType.APPLICATION_FORM_URLENCODED)
 				.post(ClientResponse.class, params);
 
@@ -117,7 +120,7 @@ public class TestPAdESTriPhaseHTTPRemoteWithReference {
 		final MultivaluedMap<String, String> params = convertParamsToMultivalueMap(
 				reference, algorithm, extraParams, certChain, signature,
 				preSignatureResult);
-		final ClientResponse response = this.resource.path("pades/post/" + reference)
+		final ClientResponse response = this.resource.path("pades/post/" + reference) //$NON-NLS-1$
 				.type(MediaType.APPLICATION_FORM_URLENCODED)
 				.post(ClientResponse.class, params);
 
@@ -135,10 +138,10 @@ public class TestPAdESTriPhaseHTTPRemoteWithReference {
 		final MultivaluedMap<String, String> params = convertParamsToMultivalueMap(
 				reference, algorithm, extraParams, certChain);
 
-		params.add("base64Signature", Base64.encodeBytes(signature));
-		params.add("base64PreSignData",
+		params.add("base64Signature", Base64.encodeBytes(signature)); //$NON-NLS-1$
+		params.add("base64PreSignData", //$NON-NLS-1$
 				Base64.encodeBytes(preSignatureResult.getPreSignData()));
-		params.add("fileID", preSignatureResult.getFileID());
+		params.add("fileID", preSignatureResult.getFileID()); //$NON-NLS-1$
 
 		return params;
 	}
@@ -149,17 +152,17 @@ public class TestPAdESTriPhaseHTTPRemoteWithReference {
 			throws CertificateEncodingException {
 
 		final MultivaluedMap<String, String> params = new MultivaluedMapImpl();
-		params.add("reference", reference);
-		params.add("algorithm", algorithm);
+		params.add("reference", reference); //$NON-NLS-1$
+		params.add("algorithm", algorithm); //$NON-NLS-1$
 
 		for (final X509Certificate certificate : certChain) {
-			params.add("base64CertificateChain",
+			params.add("base64CertificateChain", //$NON-NLS-1$
 					Base64.encodeBytes(certificate.getEncoded()));
 		}
 
 		for (final Entry<Object, Object> entry : extraParams.entrySet()) {
-			params.add("extraParamsNames", (String) entry.getKey());
-			params.add("extraParamsValues", (String) entry.getValue());
+			params.add("extraParamsNames", (String) entry.getKey()); //$NON-NLS-1$
+			params.add("extraParamsValues", (String) entry.getValue()); //$NON-NLS-1$
 		}
 
 		return params;
@@ -174,14 +177,14 @@ public class TestPAdESTriPhaseHTTPRemoteWithReference {
 	 */
 	@Test
 	public void testTriPhaseSignature() throws Exception {
-		Assert.assertEquals("file.signed.pdf",
-				AOPDFSigner.getSignedName("file.pdf"));
+		Assert.assertEquals("file.signed.pdf", //$NON-NLS-1$
+				AOPDFSigner.getSignedName("file.pdf")); //$NON-NLS-1$
 
-		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING);
+		Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
 
 		final X509Certificate cert;
 
-		KeyStore ks = KeyStore.getInstance("PKCS12");
+		KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
 		ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH),
 				CERT_PASS.toCharArray());
 		final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS,
@@ -194,12 +197,12 @@ public class TestPAdESTriPhaseHTTPRemoteWithReference {
 
 		for (final String algo : ALGOS) {
 			for (final String file : TEST_FILES) {
-				prueba = "Firma trifasica PAdES con el algoritmo ': " + algo
-						+ "' y el fichero '" + file + "'";
+				prueba = "Firma trifasica PAdES con el algoritmo ': " + algo //$NON-NLS-1$
+						+ "' y el fichero '" + file + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
 				System.out.println(prueba);
 
-				byte[] result = sign("SIMPLE", algo, pke, p1);
+				byte[] result = sign("SIMPLE", algo, pke, p1); //$NON-NLS-1$
 //				byte[] result = sign("CERTIFIED", algo, pke, p1);
 //				byte[] result = sign("PASSWORD", algo, pke, p1);
 
@@ -207,31 +210,31 @@ public class TestPAdESTriPhaseHTTPRemoteWithReference {
 				Assert.assertTrue(signer.isSign(result));
 
 				AOTreeModel tree = signer.getSignersStructure(result, false);
-				Assert.assertEquals("Datos",
+				Assert.assertEquals("Datos", //$NON-NLS-1$
 						((AOTreeNode) tree.getRoot()).getUserObject());
-				Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree
+				Assert.assertEquals("ANF Usuario Activo", ((AOTreeNode) tree //$NON-NLS-1$
 						.getRoot()).getChildAt(0).getUserObject());
 
 				tree = signer.getSignersStructure(result, true);
-				Assert.assertEquals("Datos",
+				Assert.assertEquals("Datos", //$NON-NLS-1$
 						((AOTreeNode) tree.getRoot()).getUserObject());
 				AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree
 						.getRoot()).getChildAt(0).getUserObject();
 
 				Assert.assertNotNull(simpleSignInfo.getSigningTime());
 				Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
-				Assert.assertEquals("application/pdf",
+				Assert.assertEquals("application/pdf", //$NON-NLS-1$
 						signer.getDataMimeType(result));
 				Assert.assertEquals(result, signer.getData(result));
 				Assert.assertEquals(AOSignConstants.SIGN_FORMAT_PDF, signer
 						.getSignInfo(result).getFormat());
 
-				final File saveFile = File.createTempFile(algo + "-", ".pdf");
+				final File saveFile = File.createTempFile(algo + "-", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$
 				final OutputStream os = new FileOutputStream(saveFile);
 				os.write(result);
 				os.flush();
 				os.close();
-				System.out.println("Temporal para comprobacion manual: "
+				System.out.println("Temporal para comprobacion manual: " //$NON-NLS-1$
 						+ saveFile.getAbsolutePath());
 			}
 		}

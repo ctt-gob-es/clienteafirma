@@ -198,7 +198,7 @@ public class TestPAdESTriPhaseHTTPWithReference extends JerseyTest {
 
                 System.out.println(prueba);
 
-                byte[] result = sign("SIMPLE", algo, pke, p1);
+                byte[] result = sign("SIMPLE", algo, pke, p1); //$NON-NLS-1$
 
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));

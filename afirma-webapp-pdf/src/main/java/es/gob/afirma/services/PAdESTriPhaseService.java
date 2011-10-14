@@ -1,10 +1,7 @@
 package es.gob.afirma.services;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -12,29 +9,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.ServletConfig;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import com.lowagie.text.pdf.codec.Base64;
 
 import es.gob.afirma.core.AOException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner;
 import es.gob.afirma.signers.pades.PAdESTriPhaseSigner.PdfPreSignResult;
 
 /** Implementaci&oaute;n de referencia del servicio servidor de firma trif&aacute;sica PAdES. */
 @Path("pades")
-public class PAdESTriPhaseService
-{
-	@Context
-	private ServletConfig servletConfig;
+public class PAdESTriPhaseService {
+    
+//	@javax.ws.rs.core.Context
+//	private javax.servlet.ServletConfig servletConfig;
 	
     /** Prefirma.
      * @param base64Data Datos a prefirmar codificados en Base64
@@ -61,6 +57,15 @@ public class PAdESTriPhaseService
 				extraParamsNames, extraParamsValues, data);
     }
     
+    /** Prefirma un PDF existente en servidor indicado su referencia.
+     * @param reference Referencia del PDF
+     * @param algorithm Algoritmo de firma
+     * @param base64CertificateChain Cadena de certificados del firmante
+     * @param extraParamsNames Nombres de los par&aacute;metros adicionales de la firma
+     * @param extraParamsValues Valores de los par&aacute;metros adicionales de la firma (correspondientes por posici&oacute;n con los nombres)
+     * @return XML con el resultado de la pre-firma
+     * @throws Exception
+     */
     @POST
     @Path("pre/{reference}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -75,19 +80,19 @@ public class PAdESTriPhaseService
     	
     	if (reference != null)
     	{
-    		if ("SIMPLE".equals(reference))
+    		if ("SIMPLE".equals(reference)) //$NON-NLS-1$
     		{
-    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF.pdf"));
+    			data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream("TEST_PDF.pdf")); //$NON-NLS-1$
     		}
 
-    		if ("CERTIFIED".equals(reference))
+    		if ("CERTIFIED".equals(reference)) //$NON-NLS-1$
     		{
-    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Certified.pdf"));
+    			data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Certified.pdf")); //$NON-NLS-1$
     		}
     		
-    		if ("PASSWORD".equals(reference))
+    		if ("PASSWORD".equals(reference)) //$NON-NLS-1$
     		{
-    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Password.pdf"));
+    			data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Password.pdf")); //$NON-NLS-1$
     		}
     	}
         		
@@ -148,6 +153,18 @@ public class PAdESTriPhaseService
 				base64PreSignData, fileID, data);
     }
 
+    /** Postfirma un PDF existente en servidor indicando su referencia.
+     * @param reference Referencia del PDF
+     * @param algorithm Algoritmo de firma
+     * @param base64CertificateChain Cadena de certificados del firmante codificada en Base64
+     * @param extraParamsNames Nombres de las opciones adicionales de prefirma
+     * @param extraParamsValues Valores de las opciones adicionales de prefirma
+     * @param base64Signature Firma PKCS#1 v1.5 codificada en Base64
+     * @param base64PreSignData Prefirma del PDF codificada en Base64
+     * @param fileID FILEID del PDF prefirmado
+     * @return PDF firmado
+     * @throws Exception
+     */
     @POST
     @Path("post/{reference}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -165,19 +182,19 @@ public class PAdESTriPhaseService
     	
     	if (reference != null)
     	{
-    		if ("SIMPLE".equals(reference))
+    		if ("SIMPLE".equals(reference)) //$NON-NLS-1$
     		{
-    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF.pdf"));
+    			data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream("TEST_PDF.pdf")); //$NON-NLS-1$
     		}
 
-    		if ("CERTIFIED".equals(reference))
+    		if ("CERTIFIED".equals(reference)) //$NON-NLS-1$
     		{
-    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Certified.pdf"));
+    			data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Certified.pdf")); //$NON-NLS-1$
     		}
     		
-    		if ("PASSWORD".equals(reference))
+    		if ("PASSWORD".equals(reference)) //$NON-NLS-1$
     		{
-    			data = inputStreamToByteArray(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Password.pdf"));
+    			data = AOUtil.getDataFromInputStream(getClass().getClassLoader().getResourceAsStream("TEST_PDF_Password.pdf")); //$NON-NLS-1$
     		}
     	}
 
@@ -229,17 +246,4 @@ public class PAdESTriPhaseService
         return p;
     }
     
-	public static byte[] inputStreamToByteArray(InputStream in)
-			throws IOException {
-		byte[] buffer = new byte[2048];
-		int length = 0;
-
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		while ((length = in.read(buffer)) >= 0) {
-			baos.write(buffer, 0, length);
-		}
-
-		return baos.toByteArray();
-	}
 }
