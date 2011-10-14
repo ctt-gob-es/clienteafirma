@@ -51,7 +51,7 @@ public final class AOUtil {
      * @return URI (<code>file://</code>) del fichero local o URL
      * @throws AOException
      *         cuando ocurre cualquier problema creando la URI */
-    public static final URI createURI(final String file) throws AOException {
+    public static URI createURI(final String file) throws AOException {
 
         if (file == null || "".equals(file)) { //$NON-NLS-1$
             throw new AOException("No se puede crear una URI a partir de un nulo"); //$NON-NLS-1$
@@ -126,7 +126,7 @@ public final class AOUtil {
      *         Cuando no se encuentra el fichero indicado
      * @throws AOException
      *         Cuando ocurre cualquier problema obteniendo el flujo */
-    public static final InputStream loadFile(final URI uri) throws FileNotFoundException, AOException {
+    public static InputStream loadFile(final URI uri) throws FileNotFoundException, AOException {
 
         if (uri == null) {
             throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
@@ -189,7 +189,7 @@ public final class AOUtil {
      * @return Los datos obtenidos del flujo.
      * @throws IOException
      *         Cuando ocurre un problema durante la lectura */
-    public static final byte[] getDataFromInputStream(final InputStream input) throws IOException {
+    public static byte[] getDataFromInputStream(final InputStream input) throws IOException {
         if (input == null) {
             return new byte[0];
         }
@@ -212,7 +212,7 @@ public final class AOUtil {
      *        com&uacute;n
      * @return Nombre com&uacute;n (Common Name, CN) del titular de un
      *         certificado X.509 */
-    public static final String getCN(final X509Certificate c) {
+    public static String getCN(final X509Certificate c) {
         if (c == null) {
             return null;
         }
@@ -227,7 +227,7 @@ public final class AOUtil {
      *        com&uacute;n
      * @return Nombre com&uacute;n (Common Name, CN) de un <i>Principal</i>
      *         X.400 */
-    public static final String getCN(final String principal) {
+    public static String getCN(final String principal) {
         if (principal == null) {
             return null;
         }
@@ -260,7 +260,7 @@ public final class AOUtil {
      * @param principal Principal del que extraer el RDN
      * @return Valor del RDN indicado o {@code null} si no se encuentra.
      */
-    private static final String getRDNvalue(final String rdn, final String principal) {
+    private static String getRDNvalue(final String rdn, final String principal) {
         
         int offset1 = 0;
         while ((offset1 = principal.toLowerCase().indexOf(rdn.toLowerCase(), offset1)) != -1) {
@@ -301,7 +301,7 @@ public final class AOUtil {
                     return ""; //$NON-NLS-1$
                 }
                 
-                offset2 = principal.indexOf("\"", offset1); //$NON-NLS-1$
+                offset2 = principal.indexOf('"', offset1);
                 if (offset2 == offset1) {
                     return ""; //$NON-NLS-1$
                 } else if (offset2 != -1) {
@@ -311,7 +311,7 @@ public final class AOUtil {
                 }
             } 
             else {
-                offset2 = principal.indexOf(",", offset1); //$NON-NLS-1$
+                offset2 = principal.indexOf(',', offset1);
                 if (offset2 != -1) {
                     return principal.substring(offset1, offset2).trim();
                 } 
@@ -335,7 +335,7 @@ public final class AOUtil {
      *         codificaci&oacute;n base64 de un original binario (que no tiene
      *         necesariamente porqu&eacute; serlo), <code>false</code> en caso
      *         contrario */
-    public static final boolean isBase64(final byte[] data) {
+    public static boolean isBase64(final byte[] data) {
 
         // Comprobamos que la cadena tenga una longitud multiplo de 4 caracteres
         final String b64String = new String(data).trim();
@@ -370,7 +370,7 @@ public final class AOUtil {
      *        Indica si han o no de separarse los octetos con un
      *        gui&oacute;n y en l&iacute;neas de 16
      * @return Representaci&oacute;n textual del vector de octetos de entrada */
-    public static final String hexify(final byte abyte0[], final boolean separator) {
+    public static String hexify(final byte abyte0[], final boolean separator) {
         if (abyte0 == null) {
             return "null"; //$NON-NLS-1$
         }
@@ -403,7 +403,7 @@ public final class AOUtil {
      *        Indica si han o no de separarse los octetos con un
      *        gui&oacute;n y en l&iacute;neas de 16
      * @return Representaci&oacute;n textual del vector de octetos de entrada */
-    public static final String hexify(final byte abyte0[], final String separator) {
+    public static String hexify(final byte abyte0[], final String separator) {
         if (abyte0 == null) {
             return "null"; //$NON-NLS-1$
         }
@@ -438,7 +438,7 @@ public final class AOUtil {
      * @param is
      *        Datos del properties con la versi&oacute;n.
      * @return Identificador de la versi&oacute;n. */
-    public static final String getVersion(final InputStream is) {
+    public static String getVersion(final InputStream is) {
         final Properties p = new Properties();
         try {
             p.load(is);
@@ -471,7 +471,7 @@ public final class AOUtil {
      *        Cadena para la identaci&oacute;n de los nodos de firma (por
      *        defecto, tabulador).
      * @return Cadena de texto. */
-    public static final String showTreeAsString(final AOTreeModel tree, String linePrefx, String identationString) {
+    public static String showTreeAsString(final AOTreeModel tree, String linePrefx, String identationString) {
 
         if (tree == null || tree.getRoot() == null) {
             LOGGER.severe("Se ha proporcionado un arbol de firmas vacio"); //$NON-NLS-1$
@@ -511,7 +511,7 @@ public final class AOUtil {
      *        defecto, tabulador).
      * @param buffer
      *        Buffer en donde se genera la cadena de texto. */
-    private static final void archiveTreeNode(final AOTreeNode node,
+    private static void archiveTreeNode(final AOTreeNode node,
                                               final int depth,
                                               final String linePrefx,
                                               final String identationString,

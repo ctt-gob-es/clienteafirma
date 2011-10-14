@@ -13,7 +13,6 @@ package es.gob.afirma.core.misc;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 /** Clase con m&eacute;todos para el trabajo con ficheros. */
@@ -32,7 +31,7 @@ public final class AOFileUtils {
      * @throws IOException
      *         Cuando ocurre un error al leer los datos o crear el temporal
      *         para abrir el Zip. */
-    public static ZipFile createTempZipFile(final byte[] zipFileData) throws ZipException, IOException {
+    public static ZipFile createTempZipFile(final byte[] zipFileData) throws IOException {
 
         // Creamos un fichero temporal
         final File tempFile = File.createTempFile("afirmazip", null); //$NON-NLS-1$

@@ -22,7 +22,7 @@ public final class AOTreeNode {
 
     /** An enumeration that is always empty. This is used when an enumeration of
      * a leaf node's children is requested. */
-    static private final Enumeration<AOTreeNode> EMPTY_ENUMERATION = new Enumeration<AOTreeNode>() {
+    private static final Enumeration<AOTreeNode> EMPTY_ENUMERATION = new Enumeration<AOTreeNode>() {
         public boolean hasMoreElements() {
             return false;
         }
@@ -39,7 +39,7 @@ public final class AOTreeNode {
     private Vector<AOTreeNode> children;
 
     /** optional user object */
-    transient protected Object userObject;
+    private transient Object userObject;
 
     /** true if the node is able to have children */
     private final boolean allowsChildren;

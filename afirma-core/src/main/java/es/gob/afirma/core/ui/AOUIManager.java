@@ -12,8 +12,6 @@ package es.gob.afirma.core.ui;
 
 import java.io.File;
 
-import es.gob.afirma.core.AOCancelledOperationException;
-
 /** Gestor de componentes de interfaz gr&aacute;fico
  * @version 0.4 */
 public interface AOUIManager {
@@ -28,7 +26,7 @@ public interface AOUIManager {
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
-    char[] getPassword(String text, Object c) throws AOCancelledOperationException;
+    char[] getPassword(String text, Object c);
     
     /** Muestra un di&aacute;logo para pedir una contrase&ntilde;a al usuario.
      * @param text
@@ -45,7 +43,7 @@ public interface AOUIManager {
      * @return Array de caracteres del texto introducido como contrase&ntilde;a
      * @throws AOCancelledOperationException
      *         Cuando el usuario cancela o cierra el di&aacute;logo */
-    char[] getPassword(String text, final String charSet, final boolean beep, final Object c) throws AOCancelledOperationException;
+    char[] getPassword(String text, final String charSet, final boolean beep, final Object c);
     
     /**
      * JOptionPane.showInputDialog().

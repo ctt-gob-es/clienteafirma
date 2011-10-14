@@ -24,7 +24,7 @@ public final class AOTreeModel {
     /** Obtiene el n&uacute;mero de elementos del &aacute;rbol.
      * @return N&uacute;mero de elementos del &aacute;rbol */
     public Integer getCount() {
-        return new Integer(this.count);
+        return Integer.valueOf(this.count);
     }
 
     /** Determines how the <code>isLeaf</code> method figures out if a node is a
