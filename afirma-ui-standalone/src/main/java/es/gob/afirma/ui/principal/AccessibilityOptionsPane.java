@@ -372,8 +372,20 @@ public class AccessibilityOptionsPane {
 	 */
 	private void save(){
 		int user = 0;
+		user = Integer.parseInt(Main.preferences.get("users", "0"));
 		boolean exists = false;
-		String name = JOptionPane.showInputDialog("Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración:");
+		String name;
+		if (user > 0){
+			String[] userNames = new String[user-1];
+			String text = "Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración."+"<br>"+"Actualmente existen los siguientes perfiles: "+"<br>";
+			for (int i = 0;i<user;i++){
+				System.out.println(Main.preferences.get("user"+(i+1), "error"));
+				text += Main.preferences.get("user"+(i+1), "error")+"<br>";
+			}
+			name = JAccessibilityOptionPane.showInputDialog(null, text, "Insercción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+		} else{
+			name = JAccessibilityOptionPane.showInputDialog(null,"Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración:", "Insercción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+		}
 		if (name!=null){
 			if (name.trim().length()!=0){
 				if (Main.preferences.get("users","0").equals("0")){
@@ -381,7 +393,7 @@ public class AccessibilityOptionsPane {
 					Main.preferences.put("users","1");
 					Main.preferences.put("user"+Main.preferences.get("users", "0"), name.trim());
 				} else {
-					user = Integer.parseInt(Main.preferences.get("users", "0"));
+					
 					user++;
 					for (int i =0;i<user;i++){
 						if (Main.preferences.get("user"+i, "0").equals(name.trim())){
@@ -407,7 +419,7 @@ public class AccessibilityOptionsPane {
 				Main.preferences.put(name.trim()+".accesibility.maximized",String.valueOf(checkWindowSize.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.cursor",String.valueOf(checkCursorSize.isSelected()));
 			} else {
-				JAccessibilityOptionPane.showMessageDialog(panel,"Debe introducir un nombre vÃ¡lido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
+				JAccessibilityOptionPane.showMessageDialog(panel,"Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
