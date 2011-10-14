@@ -53,4 +53,22 @@ public class JAccessibilityOptionPane extends JOptionPane {
 		//Se muestra el diálogo
 		return JOptionPane.showConfirmDialog(componentParent, infoLabel, title, messageType);
 	}
+	
+	/**
+	 * Muestra un diálogo de insercción.
+	 * @param componentParent componente padre
+	 * @param message mensaje a mostrar
+	 * @param title título del diálogo
+	 * @param messageType tipo de mensaje
+	 */
+	public static String showInputDialog(Component componentParent, String message, String title, int messageType){
+		
+		//Etiqueta con el texto que se desea mostrar en el diálogo
+		InfoLabel infoLabel = new InfoLabel(message, false);
+		infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
+		//Foco a la etiqueta
+		infoLabel.addAncestorListener(new RequestFocusListener());
+		//Se muestra el diálogo
+		return JOptionPane.showInputDialog(componentParent, infoLabel, title, messageType);
+	}
 }
