@@ -20,6 +20,10 @@ import es.gob.afirma.core.AOException;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class PKCS1ExternalizableSigner {
     
+    private PKCS1ExternalizableSigner() {
+     // No permitimos la instanciacion
+    }
+    
     /** Realiza una firma PKCS#1 v1.5.
      * @param signatureAlgorithm Algoritmo de firma
      * @param keyEntry Puntero a la clave de firma

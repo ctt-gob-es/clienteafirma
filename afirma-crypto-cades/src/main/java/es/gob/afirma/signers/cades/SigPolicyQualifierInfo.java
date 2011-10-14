@@ -23,8 +23,8 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  *
  * <pre>
  *   SigPolicyQualifierInfo ::= SEQUENCE {
- *       SigPolicyQualifierId  SigPolicyQualifierId,
- *       SigQualifier          ANY DEFINED BY policyQualifierId }
+ *       sigPolicyQualifierId  sigPolicyQualifierId,
+ *       sigQualifier          ANY DEFINED BY policyQualifierId }
  * </pre>
  *
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
@@ -33,28 +33,28 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * Policy qualifiers. */
 final class SigPolicyQualifierInfo extends ASN1Encodable {
 
-    private final DERObjectIdentifier SigPolicyQualifierId;
-    private final DEREncodable SigQualifier;
+    private final DERObjectIdentifier sigPolicyQualifierId;
+    private final DEREncodable sigQualifier;
 
     /** Crea un nuevo <code>SigPolicyQualifierInfo</code> con su calificador
      * cPSuri.
      * @param cps
      *        El CPS (certification practice statement) uri como <code>String</code>. */
     SigPolicyQualifierInfo(final String cps) {
-        this.SigPolicyQualifierId = PKCSObjectIdentifiers.id_spq_ets_uri;
-        this.SigQualifier = new DERIA5String(cps);
+        this.sigPolicyQualifierId = PKCSObjectIdentifiers.id_spq_ets_uri;
+        this.sigQualifier = new DERIA5String(cps);
     }
 
     /** Devuelve el identificador de la estancia.
      * @return El identificador. */
     DERObjectIdentifier getSigPolicyQualifierId() {
-        return this.SigPolicyQualifierId;
+        return this.sigPolicyQualifierId;
     }
 
     /** Devuelve el Cualificador de la estancia.
      * @return el Cualificador. */
     DEREncodable getSigQualifier() {
-        return this.SigQualifier;
+        return this.sigQualifier;
     }
 
     /** Devuelve una representaci&oacute;n DER-encodable the esta estancia.
@@ -62,8 +62,8 @@ final class SigPolicyQualifierInfo extends ASN1Encodable {
     @Override
     public DERObject toASN1Object() {
         final ASN1EncodableVector dev = new ASN1EncodableVector();
-        dev.add(this.SigPolicyQualifierId);
-        dev.add(this.SigQualifier);
+        dev.add(this.sigPolicyQualifierId);
+        dev.add(this.sigQualifier);
         return new DERSequence(dev);
     }
 }

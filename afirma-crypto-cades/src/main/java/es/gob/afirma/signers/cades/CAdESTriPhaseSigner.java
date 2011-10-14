@@ -53,6 +53,10 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class CAdESTriPhaseSigner {
     
+    private CAdESTriPhaseSigner() {
+     // No permitimos la instanciacion
+    }
+    
     /**
      * Genera los atributos firmados CAdES (prefirma).
      * @param digestAlgorithmName Algoritmo de huella digital

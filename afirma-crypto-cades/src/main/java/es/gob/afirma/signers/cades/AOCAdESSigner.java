@@ -158,9 +158,8 @@ public final class AOCAdESSigner implements AOSigner {
     }
 
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
-        final ReadNodesTree Rn = new ReadNodesTree();
         try {
-            return Rn.readNodesTree(sign, asSimpleSignInfo);
+            return new ReadNodesTree().readNodesTree(sign, asSimpleSignInfo);
         }
         catch (final Exception ex) {
             LOGGER.severe("No se ha podido obtener el arbol de firmantes de la firma, se devolvera null: " + ex); //$NON-NLS-1$
@@ -308,7 +307,7 @@ public final class AOCAdESSigner implements AOSigner {
         return originalName + (inText != null ? inText : "") + ".csig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }

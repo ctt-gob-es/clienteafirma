@@ -54,6 +54,10 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
 /** Utilidades varias para las firmas CAdES. */
 public class CAdESUtils {
     
+    private CAdESUtils() {
+        // No permitimos la instanciacion
+    }
+    
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
      * @param cert Certificado del firmante
@@ -199,7 +203,7 @@ public class CAdESUtils {
             /*
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
-            final DERObjectIdentifier DOISigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+            final DERObjectIdentifier doiSigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 
             /*
              *   OtherHashAlgAndValue ::= SEQUENCE {
@@ -233,7 +237,7 @@ public class CAdESUtils {
                 hashed = new byte[]{0};
             }
             
-            final DigestInfo OtherHashAlgAndValue = new DigestInfo(hashid, hashed);
+            final DigestInfo otherHashAlgAndValue = new DigestInfo(hashid, hashed);
             
             /*
              *   SigPolicyQualifierInfo ::= SEQUENCE {
@@ -255,9 +259,9 @@ public class CAdESUtils {
              */
             final ASN1EncodableVector v = new ASN1EncodableVector();
             // sigPolicyId
-            v.add(DOISigPolicyId);
+            v.add(doiSigPolicyId);
             // sigPolicyHash
-            v.add(OtherHashAlgAndValue.toASN1Object()); // como sequence
+            v.add(otherHashAlgAndValue.toASN1Object()); // como sequence
             // sigPolicyQualifiers
             if(spqInfo!=null) {
                 v.add(spqInfo.toASN1Object());
@@ -372,20 +376,20 @@ public class CAdESUtils {
     /** Inicializa el contexto. */
     static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest, final Date signDate) throws NoSuchAlgorithmException {
         // authenticatedAttributes
-        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
         if (dataType != null) {
-            ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
+            contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
         }
 
         // fecha de firma
-        ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(signDate))));
+        contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(signDate))));
 
         // MessageDigest
-        ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString((messageDigest != null) ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
+        contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString((messageDigest != null) ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));
 
-        return ContexExpecific;
+        return contexExpecific;
     }
 
 }
