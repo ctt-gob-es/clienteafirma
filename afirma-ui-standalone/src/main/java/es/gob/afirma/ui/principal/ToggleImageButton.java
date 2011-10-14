@@ -207,6 +207,7 @@ public class ToggleImageButton extends JToggleButton {
                 this.getToggledIcon().paintIcon(this, g, 0, (this.getHeight() - this.getToggledIcon().getIconHeight()) / 2);
             }
         }
+        this.getParent().repaint();
     }
     
     @Override
