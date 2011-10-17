@@ -28,7 +28,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
+import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.services.PreSignatureResult;
