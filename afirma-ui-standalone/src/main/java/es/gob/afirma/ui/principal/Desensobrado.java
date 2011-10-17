@@ -135,6 +135,7 @@ public class Desensobrado extends JPanel {
         examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
         examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
         examinar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarActionPerformed(campoFichero);
             }
@@ -246,6 +247,7 @@ public class Desensobrado extends JPanel {
         extraer.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.btnDescifrar.description.status")));
         extraer.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.btnDescifrar.description.status")));
         extraer.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	extraerActionPerformed(comboAlmacen, campoFichero, checkIniciar);
             }
@@ -296,7 +298,6 @@ public class Desensobrado extends JPanel {
      * Carga el combo almacen respecto al sistema operativo en el que se encuentra 
      * la aplicaciï¿½n
      * @param comboAlmacen	Combo donde se cargan los tipos de almacen
-     * @return	comboAlmacen cargado
      */
     private void cargarComboAlmacen(JComboBox comboAlmacen) {
     	comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
@@ -307,7 +308,7 @@ public class Desensobrado extends JPanel {
 	 * Modifica el valor de la caja con el nombre del archivo seleccionado
 	 * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
 	 */
-    private void examinarActionPerformed(JTextField campoFichero) {
+    void examinarActionPerformed(JTextField campoFichero) {
     	File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Seleccione.fichero.desensobrar"));
     	if (selectedFile != null) {
     		campoFichero.setText(selectedFile.getAbsolutePath());
@@ -357,11 +358,11 @@ public class Desensobrado extends JPanel {
            	 	JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
            	 	return;
             } catch (AOException e) {
-    			logger.severe("Ocurrio un error al abrir el almacen de claves del usuario: "+e);
+    			logger.severe("Error al abrir el almacen de claves del usuario: "+e);
     			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     			return;
     		} catch (Exception e) {
-    			logger.severe("Ocurrio un error al recuperar el certificado del usuario: "+e);
+    			logger.severe("Error al recuperar el certificado del usuario: "+e);
     			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     			return;
     		}
@@ -385,12 +386,12 @@ public class Desensobrado extends JPanel {
     		        return;
     		    }
     		} catch (AOException e) {
-    			logger.severe("Ocurrio un error al abrir el sobre digital: "+e); //$NON-NLS-1$
+    			logger.severe("Error al abrir el sobre digital: "+e); //$NON-NLS-1$
     			//El pop-up muestra el mensaje de la excepción
     			JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     			return;
     		} catch (Exception e) {
-    			logger.severe("Ocurrio un error al abrir el sobre digital: "+e); //$NON-NLS-1$
+    			logger.severe("Error al abrir el sobre digital: "+e); //$NON-NLS-1$
     			//El pop-up muestra el mensaje de la excepción
     			JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
     			return;

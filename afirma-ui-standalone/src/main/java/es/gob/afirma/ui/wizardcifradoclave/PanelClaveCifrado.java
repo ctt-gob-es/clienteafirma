@@ -170,25 +170,26 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	 c.insets = new Insets(0, 20, 0, 0);
     	
         // Caja de texto donde se escribe la clave
-        campoClave.setToolTipText(Messages.getString("WizardCifrado.campoClave.description")); // NOI18N
-        campoClave.getAccessibleContext().setAccessibleName(encodeKeyLabel.getText() + " " + "ALT + V.");
-        campoClave.getAccessibleContext().setAccessibleDescription(encodeKeyLabel.getToolTipText());
-        campoClave.addKeyListener(new KeyAdapter() {
-        	public void keyPressed(KeyEvent e) {
-        		checkGuardar.setEnabled(true);
+        this.campoClave.setToolTipText(Messages.getString("WizardCifrado.campoClave.description")); // NOI18N
+        this.campoClave.getAccessibleContext().setAccessibleName(encodeKeyLabel.getText() + " " + "ALT + V.");
+        this.campoClave.getAccessibleContext().setAccessibleDescription(encodeKeyLabel.getToolTipText());
+        this.campoClave.addKeyListener(new KeyAdapter() {
+        	@Override
+            public void keyPressed(KeyEvent e) {
+        		PanelClaveCifrado.this.checkGuardar.setEnabled(true);
         	}
 		});
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoClave.setCaret(caret);
+			this.campoClave.setCaret(caret);
 		}
-        Utils.remarcar(campoClave);
-        Utils.setContrastColor(campoClave);
-        Utils.setFontBold(campoClave);
-        panelCentral.add(campoClave, c);
+        Utils.remarcar(this.campoClave);
+        Utils.setContrastColor(this.campoClave);
+        Utils.setFontBold(this.campoClave);
+        panelCentral.add(this.campoClave, c);
         
         //Relación entre etiqueta y campo de texto
-        encodeKeyLabel.setLabelFor(campoClave);
+        encodeKeyLabel.setLabelFor(this.campoClave);
       	//Asignación de mnemónico
         encodeKeyLabel.setDisplayedMnemonic(KeyEvent.VK_V);
         
@@ -203,6 +204,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         autogenerar.setToolTipText(Messages.getString("WizardCifrado.autogenerar.description")); // NOI18N
         autogenerar.setText(Messages.getString("WizardCifrado.autogenerar")); // NOI18N
         autogenerar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 autogenerarActionPerformed();
             }
@@ -226,6 +228,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         almacen.setToolTipText(Messages.getString("WizardCifrado.almacen.description")); // NOI18N
         almacen.setText(Messages.getString("WizardCifrado.almacen")); // NOI18N
         almacen.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	almacenActionPerformed();
             }
@@ -246,14 +249,14 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 		
 		JPanel panelCheckGuardar = new JPanel(new GridLayout(1, 1));
 		// Checkbox para guardar en el almacen
-        checkGuardar.setText(Messages.getString("WizardCifrado.check")); // NOI18N
-        checkGuardar.setToolTipText(Messages.getString("WizardCifrado.check.description")); // NOI18N
-        checkGuardar.getAccessibleContext().setAccessibleDescription(checkGuardar.getToolTipText()); // NOI18N
-        checkGuardar.setMnemonic(KeyEvent.VK_G);
-        Utils.remarcar(checkGuardar);
-        Utils.setContrastColor(checkGuardar);
-        Utils.setFontBold(checkGuardar);
-        panelCheckGuardar.add(checkGuardar);
+        this.checkGuardar.setText(Messages.getString("WizardCifrado.check")); // NOI18N
+        this.checkGuardar.setToolTipText(Messages.getString("WizardCifrado.check.description")); // NOI18N
+        this.checkGuardar.getAccessibleContext().setAccessibleDescription(this.checkGuardar.getToolTipText()); // NOI18N
+        this.checkGuardar.setMnemonic(KeyEvent.VK_G);
+        Utils.remarcar(this.checkGuardar);
+        Utils.setContrastColor(this.checkGuardar);
+        Utils.setFontBold(this.checkGuardar);
+        panelCheckGuardar.add(this.checkGuardar);
         panelCentral.add(panelCheckGuardar, c);
         
         c.gridy = c.gridy + 1;
@@ -265,16 +268,16 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         // La botonera se carga desde el asistente
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoClave, "cifrado.wizard.autogenerar");  
+        HelpUtils.enableHelpKey(this.campoClave, "cifrado.wizard.autogenerar");  
         HelpUtils.enableHelpKey(autogenerar, "cifrado.wizard.autogenerar");
         HelpUtils.enableHelpKey(almacen, "cifrado.wizard.almacen");
-        HelpUtils.enableHelpKey(checkGuardar, "cifrado.wizard.salvar");
+        HelpUtils.enableHelpKey(this.checkGuardar, "cifrado.wizard.salvar");
     }
 
     /**
      * Obtenemos una clase del almacen/repositorio
      */
-	private void almacenActionPerformed() {
+	void almacenActionPerformed() {
 		// Comprobamos que el almacen exista.
     	if(!AOCipherKeyStoreHelper.storeExists()) {
     		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.almacen.noexiste"), 
@@ -284,8 +287,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 
     	// Mostramos la clave de cifrado recuperada del almacen
     	try {
-    		campoClave.setText(getKeyFromCipherKeyStore());
-    		checkGuardar.setEnabled(false);
+    		this.campoClave.setText(getKeyFromCipherKeyStore());
+    		this.checkGuardar.setEnabled(false);
     	} catch (AOCancelledOperationException e) {
     		logger.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen.");
     	}  catch (IOException e) {
@@ -340,13 +343,13 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
      */
     private void autogenerarActionPerformed() {
         try {
-            generateKey(cipherConfig.getConfig());
+            generateKey(this.cipherConfig.getConfig());
         } catch (Exception ex) {
         	logger.log(Level.SEVERE, null, ex);
         }
         
-        campoClave.setText(AOBase64.encode(cipherKey.getEncoded(), false));
-        checkGuardar.setEnabled(true);
+        this.campoClave.setText(AOBase64.encode(this.cipherKey.getEncoded(), false));
+        this.checkGuardar.setEnabled(true);
     }
 
     /**
@@ -361,7 +364,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	 * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado no esta soportado.
 	 */
 	private void generateKey(AOCipherConfig algorithmConfig) throws InvalidKeyException, AOException, NoSuchAlgorithmException {
-		cipherKey = cipherConfig.getCipher().generateKey(algorithmConfig);
+		this.cipherKey = this.cipherConfig.getCipher().generateKey(algorithmConfig);
 	}
 	
 	/**
@@ -399,13 +402,13 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	private boolean cifrarFichero() {
 
 	    // Comprobamos si se ha generado alguna clave
-	    if (campoClave.getText() == null || campoClave.getText().equals("")){
+	    if (this.campoClave.getText() == null || this.campoClave.getText().equals("")){
 	    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	        return false;
 	    }
 	    // Generamos la clave necesaria para el cifrado
 	    try {
-	        cipherKey = cipherConfig.getCipher().decodeKey(campoClave.getText(), cipherConfig.getConfig(), null);
+	        this.cipherKey = this.cipherConfig.getCipher().decodeKey(this.campoClave.getText(), this.cipherConfig.getConfig(), null);
 	    } catch (Exception ex) {
 	        logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex);
 	        JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.cifrado"), 
@@ -434,7 +437,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	    // Ciframos los datos
 	    byte[] result = null;
 	    try {
-	        result = cipherConfig.getCipher().cipher(fileContent, cipherConfig.getConfig(), cipherKey);
+	        result = this.cipherConfig.getCipher().cipher(fileContent, this.cipherConfig.getConfig(), this.cipherKey);
 	    } catch (KeyException e) {
 	        logger.severe("Clave no valida: " + e);
 	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clave"), 
@@ -460,7 +463,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	    }
 
 	    // Guardamos la clave de cifrado si se solicito 
-	    if (checkGuardar.isSelected()) {
+	    if (this.checkGuardar.isSelected()) {
 	        guardarClaveCifrado();
 	    }
 
@@ -475,9 +478,9 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	 * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto.
 	 */
 	private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
-		if(rutaFichero == null) 
+		if(this.rutaFichero == null) 
 			throw new NullPointerException("No se ha indicado un fichero de entrada");
-		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
+		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
 	}
 	
 	/**
@@ -513,7 +516,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 			} while (!gainedAccess);
     		
     		String alias = JOptionPane.showInputDialog(this, Messages.getString("Cifrado.introducir.alias"), Messages.getString("Cifrado.introducir.alias.titulo"));
-    		cksh.storeKey(alias + " (" + cipherConfig.getConfig().getAlgorithm().getName() + ")", cipherKey);
+    		cksh.storeKey(alias + " (" + this.cipherConfig.getConfig().getAlgorithm().getName() + ")", this.cipherKey);
 		} catch(AOCancelledOperationException e) {
 			JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.cancelar"),
     				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
@@ -531,6 +534,6 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	 * @return Campo de la clave.
 	 */
 	public JTextField getCampoClave() {
-		return campoClave;
+		return this.campoClave;
 	}
 }

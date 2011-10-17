@@ -184,11 +184,11 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         
 		JPanel panelEtiquetaAnadir = new JPanel(new GridLayout(1, 1));
         // Etiqueta con el texto "Anadir remitente desde..."
-        etiquetaAnadir = new JLabel();
-        etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante"));
-        Utils.setContrastColor(etiquetaAnadir);
-        Utils.setFontBold(etiquetaAnadir);
-        panelEtiquetaAnadir.add(etiquetaAnadir);
+        this.etiquetaAnadir = new JLabel();
+        this.etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante"));
+        Utils.setContrastColor(this.etiquetaAnadir);
+        Utils.setFontBold(this.etiquetaAnadir);
+        panelEtiquetaAnadir.add(this.etiquetaAnadir);
 		panelCentral.add(panelEtiquetaAnadir, c);
 		
 		c.insets = new Insets(0, 20, 0, 0);
@@ -201,7 +201,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Combo con los repositorios / almacenes
 		final JComboBox comboRepositorios = new JComboBox();
 		comboRepositorios.setToolTipText(Messages.getString("wizard.comboRepositorios.description"));
-		comboRepositorios.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + comboRepositorios.getToolTipText() + " ALT + D.");
+		comboRepositorios.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " + comboRepositorios.getToolTipText() + " ALT + D.");
 		comboRepositorios.getAccessibleContext().setAccessibleDescription(comboRepositorios.getToolTipText());
 		Utils.remarcar(comboRepositorios);
         Utils.setContrastColor(comboRepositorios);
@@ -210,9 +210,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		panelCentral.add(comboRepositorios, c);
 		
 		//Relación entre etiqueta y combo
-		etiquetaAnadir.setLabelFor(comboRepositorios);
+		this.etiquetaAnadir.setLabelFor(comboRepositorios);
 		//Asignación de mnemónico
-		etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
+		this.etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
 		
 		c.insets = new Insets(0, 10, 0, 20);
 		c.gridx = 1;
@@ -231,7 +231,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboRepositorios, eliminar, anadir);
 			}
 		});
@@ -267,17 +268,17 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		panelCentral.add(panelLista, c);
 		
 		// Listado de remitentes
-		listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description"));
-		listaRemitentes.setModel(new DefaultListModel());
-		listaRemitentes.getAccessibleContext().setAccessibleName(senderLabel.getText() + " "+ listaRemitentes.getToolTipText());
-		listaRemitentes.getAccessibleContext().setAccessibleDescription(listaRemitentes.getToolTipText());
-		Utils.remarcar(listaRemitentes);
-        Utils.setContrastColor(listaRemitentes);
-		Utils.setFontBold(listaRemitentes);
-		panelLista.setViewportView(listaRemitentes);
+		this.listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description"));
+		this.listaRemitentes.setModel(new DefaultListModel());
+		this.listaRemitentes.getAccessibleContext().setAccessibleName(senderLabel.getText() + " "+ this.listaRemitentes.getToolTipText());
+		this.listaRemitentes.getAccessibleContext().setAccessibleDescription(this.listaRemitentes.getToolTipText());
+		Utils.remarcar(this.listaRemitentes);
+        Utils.setContrastColor(this.listaRemitentes);
+		Utils.setFontBold(this.listaRemitentes);
+		panelLista.setViewportView(this.listaRemitentes);
 		
 		//Relación entre etiqueta y lista
-		senderLabel.setLabelFor(listaRemitentes);
+		senderLabel.setLabelFor(this.listaRemitentes);
 		//Asignación de mnemónico
 		senderLabel.setDisplayedMnemonic(KeyEvent.VK_T);
 		
@@ -303,7 +304,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
 		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				eliminarActionPerformed(comboRepositorios, eliminar, anadir);
 			}
 		});
@@ -336,12 +338,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * @param eliminar			Boton para eliminar un remitente del listado de repositorios
 	 * @param anadir			Boton para anadir un remitente al listado de repositorios
 	 */
-	private void anadirActionPerformed(JComboBox comboRepositorios, JButton eliminar, JButton anadir) {
-		kconf = (KeyStoreConfiguration) comboRepositorios.getSelectedItem();
+	void anadirActionPerformed(JComboBox comboRepositorios, JButton eliminar, JButton anadir) {
+		this.kconf = (KeyStoreConfiguration) comboRepositorios.getSelectedItem();
 
 		try {
-			AOKeyStore ao= kconf.getType();
-			keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, null, null, getPreferredPCB(ao), this);
+			AOKeyStore ao= this.kconf.getType();
+			this.keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, null, null, getPreferredPCB(ao), this);
 		} catch (AOCancelledOperationException e) {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
@@ -361,12 +363,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		}
 
 		// Obtenemos el certificado
-		CertificateDestiny certDest = new CertificateDestiny(keyStoreManager, this);
+		CertificateDestiny certDest = new CertificateDestiny(this.keyStoreManager, this);
 		
 		// Comprobamos que el certificado es correcto
 		if (certDest.getAlias() != null && !certDest.equals("")) {	
 			boolean copiar = true;
-			DefaultListModel listModel = (DefaultListModel) listaRemitentes.getModel();
+			DefaultListModel listModel = (DefaultListModel) this.listaRemitentes.getModel();
 			for (int i=0; i < listModel.getSize(); i++){
 				CertificateDestiny c = (CertificateDestiny) listModel.getElementAt(i);
 				if (certDest.getAlias().equals(c.getAlias())){
@@ -375,13 +377,13 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			}
 			if (copiar) {
 				listModel.addElement(certDest.getAlias());
-				listaCertificadosRe.add(certDest);
+				this.listaCertificadosRe.add(certDest);
 				anadir.setEnabled(false);
 				anadir.setMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el botón
 				comboRepositorios.setEnabled(false);
-				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
-				etiquetaAnadir.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
-				etiquetaAnadir.setFocusable(true);
+				this.etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
+				this.etiquetaAnadir.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
+				this.etiquetaAnadir.setFocusable(true);
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else
@@ -390,9 +392,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		}
 		
 		// Preguntamos por la contraseï¿½a del certificado
-		if (!listaCertificadosRe.isEmpty())
+		if (!this.listaCertificadosRe.isEmpty())
 			try {
-				privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(),kconf);
+				this.privateKeyEntry = getPrivateKeyEntry(this.keyStoreManager, certDest.getAlias(),this.kconf);
 			} 
 	       	catch (KeyException e) {
 	       		//Control de la excepción generada al introducir mal la contraseña para el certificado
@@ -419,15 +421,15 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 */
 	private void clearWizard(JComboBox comboRepositorios, JButton eliminar,
 			JButton anadir) {
-		listaCertificadosRe.remove(listaCertificadosRe.get(0));
-		((DefaultListModel) listaRemitentes.getModel()).remove(0);
+		this.listaCertificadosRe.remove(this.listaCertificadosRe.get(0));
+		((DefaultListModel) this.listaRemitentes.getModel()).remove(0);
 
-		if (listaCertificadosRe.isEmpty()) {
+		if (this.listaCertificadosRe.isEmpty()) {
 			anadir.setEnabled(true);
 			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón puesto que se ha habilitado
 			comboRepositorios.setEnabled(true); 
-			etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
-			etiquetaAnadir.setFocusable(false);
+			this.etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
+			this.etiquetaAnadir.setFocusable(false);
 			eliminar.setEnabled(false);
 			eliminar.setMnemonic(0); //Se asigna un atajo vacio al botón ya que ha sido deshabilitado
 		}
@@ -440,25 +442,25 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * @param anadir			Boton para anadir un remitente a la lista
 	 */
 	private void eliminarActionPerformed(JComboBox comboRepositorios, JButton eliminar, JButton anadir) {
-		for (int i=0; i<listaCertificadosRe.size(); i++)
-			if (listaCertificadosRe.get(i).getAlias().equals(listaRemitentes.getSelectedValue())) {
-				listaCertificadosRe.remove(listaCertificadosRe.get(i));
-				((DefaultListModel) listaRemitentes.getModel()).remove(listaRemitentes.getSelectedIndex());
+		for (int i=0; i<this.listaCertificadosRe.size(); i++)
+			if (this.listaCertificadosRe.get(i).getAlias().equals(this.listaRemitentes.getSelectedValue())) {
+				this.listaCertificadosRe.remove(this.listaCertificadosRe.get(i));
+				((DefaultListModel) this.listaRemitentes.getModel()).remove(this.listaRemitentes.getSelectedIndex());
 				break;
 			}
 		
-		if (listaCertificadosRe.isEmpty()) {
+		if (this.listaCertificadosRe.isEmpty()) {
 			anadir.setEnabled(true);
 			anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón puesto que se ha habilitado
 			comboRepositorios.setEnabled(true);
-			etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
-			etiquetaAnadir.setFocusable(false);
+			this.etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
+			this.etiquetaAnadir.setFocusable(false);
 			eliminar.setEnabled(false);
 			eliminar.setMnemonic(0); //Se asigna un atajo vacio al botón ya que ha sido deshabilitado
 		}
 		
 		// Borramos las posibles claves del certificado
-		privateKeyEntry = null;
+		this.privateKeyEntry = null;
 	}
 
 	/**
@@ -511,8 +513,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * @return	True o false si la operacion ha sido satisfactoria
 	 */
 	public Boolean ensobrar() {
-		if (tipo.equals(SOBRE_AUTENTICADO) || tipo.equals(SOBRE_FIRMADO)) {
-            DefaultListModel listModel = (DefaultListModel) listaRemitentes.getModel();
+		if (this.tipo.equals(SOBRE_AUTENTICADO) || this.tipo.equals(SOBRE_FIRMADO)) {
+            DefaultListModel listModel = (DefaultListModel) this.listaRemitentes.getModel();
             if (listModel.isEmpty()) {
             	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.remitente"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return false;
@@ -520,9 +522,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         }
 		
     	try {
-    		X509Certificate[] certs = new X509Certificate[listaCertificados.size()];
-    		for (int i=0; i<listaCertificados.size(); i++) {
-    			certs[i] = (X509Certificate) listaCertificados.get(i).getCertificate();
+    		X509Certificate[] certs = new X509Certificate[this.listaCertificados.size()];
+    		for (int i=0; i<this.listaCertificados.size(); i++) {
+    			certs[i] = (X509Certificate) this.listaCertificados.get(i).getCertificate();
     		}
     		
     		AOCMSEnveloper enveloper = new AOCMSEnveloper();
@@ -532,14 +534,14 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		
     		// por defecto se realizara un sobre envelopedData
     		byte[] envelopedData = null;
-    		byte[] contentData = readFile(rutafichero);
+    		byte[] contentData = readFile(this.rutafichero);
     		try {
-    			if (tipo.equals(SOBRE_AUTENTICADO)) {
-    				envelopedData = enveloper.createCMSAuthenticatedEnvelopedData(contentData, privateKeyEntry, cipherConfig, certs);
-    			} else if (tipo.equals(SOBRE_FIRMADO)) {
-    				envelopedData = enveloper.createCMSSignedAndEnvelopedData(contentData, privateKeyEntry, cipherConfig, certs);
-    			} else if (tipo.equals(SOBRE_SIMPLE)) {
-    				envelopedData = enveloper.createCMSEnvelopedData(contentData, privateKeyEntry, cipherConfig, certs);
+    			if (this.tipo.equals(SOBRE_AUTENTICADO)) {
+    				envelopedData = enveloper.createCMSAuthenticatedEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
+    			} else if (this.tipo.equals(SOBRE_FIRMADO)) {
+    				envelopedData = enveloper.createCMSSignedAndEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
+    			} else if (this.tipo.equals(SOBRE_SIMPLE)) {
+    				envelopedData = enveloper.createCMSEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
     			}
     		} catch (Exception e) {
     			System.err.println("ERROR");
@@ -549,7 +551,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 
     		// Guardamos el sobre generado
     		final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("wizard.sobres.filechooser.save.title"), envelopedData,
-    		        new File(rutafichero).getName(), null, this);
+    		        new File(this.rutafichero).getName(), null, this);
     		// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 			if (savedFile == null) {
 				return false;

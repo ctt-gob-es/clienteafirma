@@ -54,7 +54,7 @@ public class HelpUtils {
 	 * Genera la ayuda
 	 * @return	Ventana con el panel de ayuda
 	 */
-	private static HelpBroker getHelp() {
+	static HelpBroker getHelp() {
 	    
 		if (helpBroker == null) {
 			try {

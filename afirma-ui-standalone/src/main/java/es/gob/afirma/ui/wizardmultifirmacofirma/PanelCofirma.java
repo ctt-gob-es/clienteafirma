@@ -133,20 +133,20 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		c.gridy	= 1;
 		
 	      // Caja de texto donde se guarda el nombre del archivo de la firma
-        campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma.description")); // NOI18N
-        campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoFirma.getToolTipText() + " " + "ALT + I.");
-        campoFirma.getAccessibleContext().setAccessibleDescription(campoFirma.getToolTipText());
+        this.campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.firma.description")); // NOI18N
+        this.campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + this.campoFirma.getToolTipText() + " " + "ALT + I.");
+        this.campoFirma.getAccessibleContext().setAccessibleDescription(this.campoFirma.getToolTipText());
          if (GeneralConfig.isBigCaret()) {
             Caret caret = new ConfigureCaret();
-            campoFirma.setCaret(caret);
+            this.campoFirma.setCaret(caret);
         }
-        Utils.remarcar(campoFirma);
-        Utils.setContrastColor(campoFirma);
-        Utils.setFontBold(campoFirma);
-        panelCentral.add(campoFirma, c);
+        Utils.remarcar(this.campoFirma);
+        Utils.setContrastColor(this.campoFirma);
+        Utils.setFontBold(this.campoFirma);
+        panelCentral.add(this.campoFirma, c);
         
         //Relacion entre etiqueta y campo de texto
-        etiquetaFirma.setLabelFor(campoFirma);
+        etiquetaFirma.setLabelFor(this.campoFirma);
         //Asignacion de mnemónico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_I);
 
@@ -163,6 +163,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
         examinarFirma.getAccessibleContext().setAccessibleDescription(examinarFirma.getToolTipText());
         examinarFirma.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarFirmaActionPerformed();
             }
@@ -190,21 +191,21 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		c.gridy	= 3;
 		
 		// Caja de texto donde se guarda el nombre del archivo de datos
-        campoDatos.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description"));
-        campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " " + campoDatos.getToolTipText() + " " + "ALT + F.");
-        campoDatos.getAccessibleContext().setAccessibleDescription(campoDatos.getToolTipText());
+        this.campoDatos.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description"));
+        this.campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " " + this.campoDatos.getToolTipText() + " " + "ALT + F.");
+        this.campoDatos.getAccessibleContext().setAccessibleDescription(this.campoDatos.getToolTipText());
          
          if (GeneralConfig.isBigCaret()) {
             Caret caret = new ConfigureCaret();
-            campoDatos.setCaret(caret);
+            this.campoDatos.setCaret(caret);
         }
-        Utils.remarcar(campoDatos);
-        Utils.setContrastColor(campoDatos);
-        Utils.setFontBold(campoDatos);
-        panelCentral.add(campoDatos, c);
+        Utils.remarcar(this.campoDatos);
+        Utils.setContrastColor(this.campoDatos);
+        Utils.setFontBold(this.campoDatos);
+        panelCentral.add(this.campoDatos, c);
         
         //Relacion entre etiqueta y campo de texto
-        etiquetaDatos.setLabelFor(campoDatos);
+        etiquetaDatos.setLabelFor(this.campoDatos);
         //Asignacion de mnemónico
         etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_F);
 
@@ -220,6 +221,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         examinarDatos.getAccessibleContext().setAccessibleName(examinarDatos.getText() + " " + examinarDatos.getToolTipText());
         examinarDatos.getAccessibleContext().setAccessibleDescription(examinarDatos.getToolTipText());
         examinarDatos.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarDatosActionPerformed();
             }
@@ -245,28 +247,28 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		getContentPane().add(panelCentral, BorderLayout.CENTER);
 
 		// Accesos rapidos al menu de ayuda
-		HelpUtils.enableHelpKey(campoDatos, "multifirma.wizard.ficherodatos");
-		HelpUtils.enableHelpKey(campoFirma, "multifirma.wizard.ficherofirma");
+		HelpUtils.enableHelpKey(this.campoDatos, "multifirma.wizard.ficherodatos");
+		HelpUtils.enableHelpKey(this.campoFirma, "multifirma.wizard.ficherofirma");
 	}
 
 
     /**
      * Examina si el archivo seleccionado es un archivo de firma y guarda el nombre en su caja
      */
-    private void examinarFirmaActionPerformed() {
+    void examinarFirmaActionPerformed() {
         File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Wizard.multifirma.simple.chooserFirm.tittle"));
         if (selectedFile != null) {
-            campoFirma.setText(selectedFile.getAbsolutePath());
+            this.campoFirma.setText(selectedFile.getAbsolutePath());
         }  
     }
 	
 	/**
 	 * Examina si se ha seleccionado un archivo correcto y guarda el nombre en su caja
 	 */
-	private void examinarDatosActionPerformed() {
+	void examinarDatosActionPerformed() {
 		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
 		if (selectedFile != null) {
-			campoDatos.setText(selectedFile.getAbsolutePath());
+			this.campoDatos.setText(selectedFile.getAbsolutePath());
 		}
 	}
 

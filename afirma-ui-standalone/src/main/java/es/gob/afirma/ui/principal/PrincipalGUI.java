@@ -408,7 +408,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	/**
 	 * Seleccion menu acerca de: Muestra la ventana con la informacion de aFirma
 	 */
-	private void acercaActionPerformed() {
+	void acercaActionPerformed() {
 		Acercade.main();
 	}
 

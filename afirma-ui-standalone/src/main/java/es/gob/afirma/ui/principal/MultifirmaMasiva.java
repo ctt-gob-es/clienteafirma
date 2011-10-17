@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
-import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
@@ -149,7 +148,8 @@ public class MultifirmaMasiva extends JPanel {
 		firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
 		firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
 		firmar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				firmarActionPerformed(comboAlmacen, alerta);
 			}
 		});
@@ -195,7 +195,7 @@ public class MultifirmaMasiva extends JPanel {
 	 * @param comboAlmacen 	Combo con los almacenes / repositorios de certificados
 	 * @param alerta		Checkbox para emitir un pitido al finalizar la operacion
 	 */
-	private void firmarActionPerformed(JComboBox comboAlmacen, JCheckBox alerta) {
+	void firmarActionPerformed(JComboBox comboAlmacen, JCheckBox alerta) {
 		KeyStoreConfiguration kssc = (KeyStoreConfiguration)comboAlmacen.getSelectedItem();
 		
 		// Se muestra el asistente

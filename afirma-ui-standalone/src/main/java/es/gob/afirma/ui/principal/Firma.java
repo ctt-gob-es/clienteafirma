@@ -240,19 +240,19 @@ public class Firma extends JPanel {
 
         if(GeneralConfig.isAvanzados()) {
             // XAdES Enveloping (Solo en la vista avanzada)
-            formatosL.add("XAdES Enveloping");
-            formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
+            this.formatosL.add("XAdES Enveloping");
+            this.formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING);
             // XAdES Enveloped (Solo en la vista avanzada)
-            formatosL.add("XAdES Enveloped");
-            formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
+            this.formatosL.add("XAdES Enveloped");
+            this.formatosV.add(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED);
             // OOXML (Solo en la vista avanzada)
-            formatosL.add("OOXML");
-            formatosV.add(AOSignConstants.SIGN_FORMAT_OOXML);
+            this.formatosL.add("OOXML");
+            this.formatosV.add(AOSignConstants.SIGN_FORMAT_OOXML);
             // ODF (Solo en la vista avanzada)
-            formatosL.add("ODF");
-            formatosV.add(AOSignConstants.SIGN_FORMAT_ODF);
+            this.formatosL.add("ODF");
+            this.formatosV.add(AOSignConstants.SIGN_FORMAT_ODF);
         }
-        comboFormato.setModel(new DefaultComboBoxModel(formatosL.toArray()));
+        comboFormato.setModel(new DefaultComboBoxModel(this.formatosL.toArray()));
         Utils.remarcar(comboFormato);
         Utils.setContrastColor(comboFormato);
         Utils.setFontBold(comboFormato);
@@ -341,7 +341,7 @@ public class Firma extends JPanel {
      * Modifica el valor de la caja con el nombre del archivo seleccionado
      * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
      */
-    private void examinarActionPerformed(JTextField campoFichero) {
+    void examinarActionPerformed(JTextField campoFichero) {
         File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
         if (selectedFile != null) {
             campoFichero.setText(selectedFile.getAbsolutePath());
@@ -356,7 +356,7 @@ public class Firma extends JPanel {
      */
     private void firmarActionPerformed(JComboBox comboAlmacen, JComboBox comboFormato, JTextField campoFichero) {//GEN-FIRST:event_firmarActionPerformed
         // Obtenemos la constante del formato a utilizar
-        String formato = formatosV.get(comboFormato.getSelectedIndex());
+        String formato = this.formatosV.get(comboFormato.getSelectedIndex());
 
         // Keystore
         AOKeyStoreManager keyStoreManager = null;

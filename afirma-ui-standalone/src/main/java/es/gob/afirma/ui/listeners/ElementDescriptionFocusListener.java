@@ -37,12 +37,14 @@ public class ElementDescriptionFocusListener implements FocusListener {
 		this.textDescription = description;
 	}
 
-	public void focusGained(FocusEvent e) {
-		statusBar.setStatus(this.textDescription);
+	@Override
+    public void focusGained(FocusEvent e) {
+		this.statusBar.setStatus(this.textDescription);
 	}
 
-	public void focusLost(FocusEvent e) {
-		statusBar.setStatus("");
+	@Override
+    public void focusLost(FocusEvent e) {
+		this.statusBar.setStatus(""); //$NON-NLS-1$
 	}
 
 }

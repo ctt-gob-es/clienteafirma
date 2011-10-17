@@ -131,20 +131,20 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         c.gridy	= 1;
         
         // Caja de texto donde se guarda el nombre del archivo de firma
-        campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description")); // NOI18N
-        campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoFirma.getToolTipText() + "ALT + F."); // NOI18N
-        campoFirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero.description")); // NOI18N
+        this.campoFirma.setToolTipText(Messages.getString("Wizard.multifirma.simple.ventana1.fichero.datos.description")); // NOI18N
+        this.campoFirma.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + this.campoFirma.getToolTipText() + "ALT + F."); // NOI18N
+        this.campoFirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero.description")); // NOI18N
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoFirma.setCaret(caret);
+			this.campoFirma.setCaret(caret);
 		}
-        Utils.remarcar(campoFirma);
-        Utils.setContrastColor(campoFirma);
-        Utils.setFontBold(campoFirma);
-        panelCentral.add(campoFirma, c);
+        Utils.remarcar(this.campoFirma);
+        Utils.setContrastColor(this.campoFirma);
+        Utils.setFontBold(this.campoFirma);
+        panelCentral.add(this.campoFirma, c);
         
         //Relación entre etiqueta y campo de texto
-        etiquetaFirma.setLabelFor(campoFirma);
+        etiquetaFirma.setLabelFor(this.campoFirma);
   		//Asignación de mnemónico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_F);
         
@@ -162,6 +162,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
         examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
         examinarFirma.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	examinarFirmaActionPerformed();
             }
@@ -187,17 +188,17 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
     	
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoFirma, "multifirma.wizard.ficherocontrafirma");
+        HelpUtils.enableHelpKey(this.campoFirma, "multifirma.wizard.ficherocontrafirma");
 
     }
 
     /**
      * Comprueba si el archivo introducido es correcto y guarda su nombre en el campo de texto
      */
-    private void examinarFirmaActionPerformed() {
+    void examinarFirmaActionPerformed() {
         File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
       	if (selectedFile != null) {
-      		campoFirma.setText(selectedFile.getAbsolutePath());
+      		this.campoFirma.setText(selectedFile.getAbsolutePath());
       	}
     }
     
@@ -216,7 +217,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 			
-			String ficheroFirma = campoFirma.getText();
+			String ficheroFirma = PanelEntrada.this.campoFirma.getText();
 			
 			if (checkFicheroEntrada(ficheroFirma)) {
 				byte[] dataFile = readFile(ficheroFirma);
@@ -262,7 +263,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @param formato	Formato del archivo a firmar
 	 * @param dataFilepath	Ruta del fichero a firmar
 	 */
-	private boolean firmarFichero(byte[] data, String formato, String dataFilepath) {
+	boolean firmarFichero(byte[] data, String formato, String dataFilepath) {
 		AOSigner aoSigner =  AOSignerFactory.getSigner(formato);
 
 		Properties prop = GeneralConfig.getSignConfig();
@@ -271,10 +272,10 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		byte[] signedData = null;
 		try {
 			MultisignUtils msUtils = new MultisignUtils();
-			AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(kssc, this);
+			AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(this.kssc, this);
 			
 			// Recuperamos la clave del certificado
-			PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(kssc, keyStoreManager, this);
+			PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
 			signedData = aoSigner.sign(
 					data,
 					GeneralConfig.getSignAlgorithm(),
@@ -306,7 +307,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		return true;
 	}
 
-	private byte[] readFile(String filepath) {
+	byte[] readFile(String filepath) {
 		byte[] data = null;
 		InputStream fileIn = null;
 		try {
@@ -340,7 +341,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @param sign 	Firma electr&oacute;nica
 	 * @return Formato del archivo
 	 */
-	private static String getFormatPdfOdfOoxml(byte[] sign){
+	static String getFormatPdfOdfOoxml(byte[] sign){
 	    
 	    final String[][] signersClass = {
 	            {"es.gob.afirma.signers.pades.AOPDFSigner", AOSignConstants.SIGN_FORMAT_PDF},//$NON-NLS-1$

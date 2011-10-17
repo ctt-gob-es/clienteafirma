@@ -146,21 +146,21 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		c.gridy	= 2;
 		
         // Caja de texto donde se guarda la clave
-        campoClave.setToolTipText(Messages.getString("WizardDescifrado.clave.contrasenia.description")); // NOI18N
-        campoClave.getAccessibleContext().setAccessibleName(keyLabel.getText() + " " + campoClave.getToolTipText() + "ALT + L.");
-	    campoClave.getAccessibleContext().setAccessibleDescription(campoClave.getToolTipText());
+        this.campoClave.setToolTipText(Messages.getString("WizardDescifrado.clave.contrasenia.description")); // NOI18N
+        this.campoClave.getAccessibleContext().setAccessibleName(keyLabel.getText() + " " + this.campoClave.getToolTipText() + "ALT + L.");
+	    this.campoClave.getAccessibleContext().setAccessibleDescription(this.campoClave.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoClave.setCaret(caret);
+			this.campoClave.setCaret(caret);
 		}
-        Utils.remarcar(campoClave);
-        Utils.setContrastColor(campoClave);
-        Utils.setFontBold(campoClave);
-        panelCentral.add(campoClave, c);
+        Utils.remarcar(this.campoClave);
+        Utils.setContrastColor(this.campoClave);
+        Utils.setFontBold(this.campoClave);
+        panelCentral.add(this.campoClave, c);
         
-        //Relación entre etiqueta y campo de texto
-        keyLabel.setLabelFor(campoClave);
-       	//Asignación de mnemónico
+        //Relacion entre etiqueta y campo de texto
+        keyLabel.setLabelFor(this.campoClave);
+       	//Asignacion de mnemonico
         keyLabel.setDisplayedMnemonic(KeyEvent.VK_L);
         
         c.insets = new Insets(0, 20, 0, 20);
@@ -174,6 +174,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
         examinar.setToolTipText(Messages.getString("WizardDescifrado.clave.boton.description")); // NOI18N
         examinar.setText(Messages.getString("WizardDescifrado.clave.boton")); // NOI18N
         examinar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarActionPerformed();
             }
@@ -201,13 +202,13 @@ public class PanelClave extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoClave, "descifrado.wizard.clave");
+        HelpUtils.enableHelpKey(this.campoClave, "descifrado.wizard.clave");
     }
 
     /**
      * Accede al almacen de claves para obtener una
      */
-    private void examinarActionPerformed() {
+    void examinarActionPerformed() {
     	// Comprobamos que el almacen exista.
     	if(!AOCipherKeyStoreHelper.storeExists()) {
     		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardDescifrado.msg.error.almacen"), 
@@ -217,7 +218,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
 
     	// Mostramos la clave de cifrado recuperada del almacen
     	try {
-    		campoClave.setText(getKeyFromCipherKeyStore());
+    		this.campoClave.setText(getKeyFromCipherKeyStore());
     	} catch (AOCancelledOperationException e) {
     		logger.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen.");
     	} catch (IOException e) {
@@ -300,7 +301,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
 	 */
     public boolean descifrarFichero() {
     	// Recuperamos la clave
-    	String clave = campoClave.getText();
+    	String clave = this.campoClave.getText();
 
     	if (clave == null || clave.equals("")) {
     		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -374,7 +375,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
     private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
     	if (this.rutaFichero == null) 
     		throw new NullPointerException("No se ha indicado un fichero de entrada");
-    	return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
+    	return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
     }
 
 	/**
@@ -382,6 +383,6 @@ public class PanelClave extends JAccessibilityDialogWizard {
 	 * @return Campo de la clave.
 	 */
 	public JTextField getCampoClave() {
-		return campoClave;
+		return this.campoClave;
 	}
 }

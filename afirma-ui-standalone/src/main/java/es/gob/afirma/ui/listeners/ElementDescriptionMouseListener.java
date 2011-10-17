@@ -38,18 +38,29 @@ public class ElementDescriptionMouseListener implements MouseListener {
 		this.textDescription = description;
 	}
 	
-	public void mouseClicked(MouseEvent e) {}
-
-	public void mouseEntered(MouseEvent e) {
-		statusBar.setStatus(this.textDescription);
+	@Override
+    public void mouseClicked(MouseEvent e) {
+	    // Vacio
 	}
 
-	public void mouseExited(MouseEvent e) {
-		statusBar.setStatus("");
+	@Override
+    public void mouseEntered(MouseEvent e) {
+		this.statusBar.setStatus(this.textDescription);
 	}
 
-	public void mousePressed(MouseEvent e) {}
+	@Override
+    public void mouseExited(MouseEvent e) {
+		this.statusBar.setStatus(""); //$NON-NLS-1$
+	}
 
-	public void mouseReleased(MouseEvent e) {}
+	@Override
+    public void mousePressed(MouseEvent e) {
+	 // Vacio
+	}
+
+	@Override
+    public void mouseReleased(MouseEvent e) {
+	 // Vacio
+	}
 
 }

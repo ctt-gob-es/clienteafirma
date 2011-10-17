@@ -160,10 +160,10 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		c.gridwidth = 1;
 		
         // Etiqueta con el texto "Anadir remitente desde..."
-        etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante"));
-        Utils.setContrastColor(etiquetaAnadir);
-        Utils.setFontBold(etiquetaAnadir);
-		panelCentral.add(etiquetaAnadir, c);
+        this.etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante"));
+        Utils.setContrastColor(this.etiquetaAnadir);
+        Utils.setFontBold(this.etiquetaAnadir);
+		panelCentral.add(this.etiquetaAnadir, c);
 		
 		c.insets = new Insets(0, 20, 0, 0);
 		c.gridwidth = 1;
@@ -175,12 +175,13 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Combo con los repositorios / almacenes
 		final JComboBox comboRepositorios = new JComboBox();
 		comboRepositorios.setToolTipText(Messages.getString("wizard.comboRepositorios.description"));
-		comboRepositorios.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + comboRepositorios.getToolTipText() + " ALT + D.");
+		comboRepositorios.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " + comboRepositorios.getToolTipText() + " ALT + D.");
 		comboRepositorios.getAccessibleContext().setAccessibleDescription(comboRepositorios.getToolTipText());
 		comboRepositorios.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				listaCertificadosRe.clear();
-				((DefaultListModel) listaRemitentes.getModel()).removeAllElements();
+			@Override
+            public void actionPerformed(ActionEvent arg0) {
+				PanelRemitentes.this.listaCertificadosRe.clear();
+				((DefaultListModel) PanelRemitentes.this.listaRemitentes.getModel()).removeAllElements();
 			}
 		});
 		cargarCombo(comboRepositorios);
@@ -190,9 +191,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		panelCentral.add(comboRepositorios, c);
 		
 		//Relación entre etiqueta y combo
-		etiquetaAnadir.setLabelFor(comboRepositorios);
+		this.etiquetaAnadir.setLabelFor(comboRepositorios);
 		//Asignación de mnemónico
-		etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
+		this.etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
 		
 		c.insets = new Insets(0, 10, 0, 20);
 		c.gridx = 1;
@@ -211,7 +212,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboRepositorios, eliminar, anadir);
 			}
 		});
@@ -248,17 +250,17 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		panelCentral.add(panelLista, c);
 		
 		// Listado de remitentes
-		listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description"));
-		listaRemitentes.setModel(new DefaultListModel());
-		listaRemitentes.getAccessibleContext().setAccessibleName(senderLabel.getText() + " "+ listaRemitentes.getToolTipText());
-		listaRemitentes.getAccessibleContext().setAccessibleDescription(listaRemitentes.getToolTipText());
-		Utils.remarcar(listaRemitentes);
-        Utils.setContrastColor(listaRemitentes);
-		Utils.setFontBold(listaRemitentes);
-		panelLista.setViewportView(listaRemitentes);
+		this.listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description"));
+		this.listaRemitentes.setModel(new DefaultListModel());
+		this.listaRemitentes.getAccessibleContext().setAccessibleName(senderLabel.getText() + " "+ this.listaRemitentes.getToolTipText());
+		this.listaRemitentes.getAccessibleContext().setAccessibleDescription(this.listaRemitentes.getToolTipText());
+		Utils.remarcar(this.listaRemitentes);
+        Utils.setContrastColor(this.listaRemitentes);
+		Utils.setFontBold(this.listaRemitentes);
+		panelLista.setViewportView(this.listaRemitentes);
 		
 		//Relación entre etiqueta y lista
-		senderLabel.setLabelFor(listaRemitentes);
+		senderLabel.setLabelFor(this.listaRemitentes);
 		//Asignación de mnemónico
 		senderLabel.setDisplayedMnemonic(KeyEvent.VK_T);
 		
@@ -284,7 +286,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
 		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				eliminarActionPerformed(comboRepositorios, eliminar, anadir);
 			}
 		});
@@ -317,12 +320,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * @param eliminar			Boton para eliminar un remitente del listado de repositorios
 	 * @param anadir			Boton para anadir un remitente al listado de repositorios
 	 */
-	private void anadirActionPerformed(JComboBox comboRepositorios, JButton eliminar, JButton anadir) {
-		kconf = (KeyStoreConfiguration) comboRepositorios.getSelectedItem();
+	void anadirActionPerformed(JComboBox comboRepositorios, JButton eliminar, JButton anadir) {
+		this.kconf = (KeyStoreConfiguration) comboRepositorios.getSelectedItem();
 
 		try {
-			AOKeyStore ao= kconf.getType();
-			keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, null, null, getPreferredPCB(ao), this);
+			AOKeyStore ao= this.kconf.getType();
+			this.keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, null, null, getPreferredPCB(ao), this);
 		} catch (AOCancelledOperationException e) {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
@@ -334,11 +337,11 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		}
 
 		// Obtenemos el certificado
-		CertificateDestiny certDest = new CertificateDestiny(keyStoreManager, this);
+		CertificateDestiny certDest = new CertificateDestiny(this.keyStoreManager, this);
 		
 		// Comprobamos que el certificado es correcto
 		if (certDest.getAlias() != null && !certDest.equals("")) { //$NON-NLS-1$
-			DefaultListModel listModel = (DefaultListModel) listaRemitentes.getModel();
+			DefaultListModel listModel = (DefaultListModel) this.listaRemitentes.getModel();
 			
 			boolean copiar = true;
 			for (int i = 0; i < listModel.getSize(); i++)
@@ -349,12 +352,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				
 			if (copiar) {
 				listModel.addElement(certDest.getAlias());
-				listaCertificadosRe.add(certDest);
+				this.listaCertificadosRe.add(certDest);
 				anadir.setEnabled(false);
 				comboRepositorios.setEnabled(false);
-				etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
-				etiquetaAnadir.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
-				etiquetaAnadir.setFocusable(true);
+				this.etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
+				this.etiquetaAnadir.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
+				this.etiquetaAnadir.setFocusable(true);
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else
@@ -370,18 +373,18 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * @param anadir			Boton para anadir un remitente a la lista
 	 */
 	private void eliminarActionPerformed(JComboBox comboRepositorios, JButton eliminar, JButton anadir) {
-		for (int i=0; i<listaCertificadosRe.size(); i++)
-			if (listaCertificadosRe.get(i).getAlias().equals(listaRemitentes.getSelectedValue())) {
-				listaCertificadosRe.remove(listaCertificadosRe.get(i));
-				((DefaultListModel) listaRemitentes.getModel()).remove(listaRemitentes.getSelectedIndex());
+		for (int i=0; i<this.listaCertificadosRe.size(); i++)
+			if (this.listaCertificadosRe.get(i).getAlias().equals(this.listaRemitentes.getSelectedValue())) {
+				this.listaCertificadosRe.remove(this.listaCertificadosRe.get(i));
+				((DefaultListModel) this.listaRemitentes.getModel()).remove(this.listaRemitentes.getSelectedIndex());
 				
 				eliminar.setEnabled(false);
 				eliminar.setMnemonic(0); //Se asigna un atajo vacio al botón ya que ha sido deshabilitado
 				anadir.setEnabled(true);
 				anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón puesto que se ha habilitado
 				comboRepositorios.setEnabled(true);
-				etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
-				etiquetaAnadir.setFocusable(false);
+				this.etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D); //Se asigna un atajo puesto que se ha habilitado el combo asociado
+				this.etiquetaAnadir.setFocusable(false);
 				break;
 			}
 	}
@@ -437,12 +440,12 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 */
 	public Boolean anadirRemitentes() {
     	try {
-    		FileInputStream dataFis = new FileInputStream(rutafichero);
+    		FileInputStream dataFis = new FileInputStream(this.rutafichero);
     		byte[] envelopedData = AOUtil.getDataFromInputStream(dataFis);
     		
     		// Anadimos solo el ultimo
-    		PrivateKeyEntry privateKey = getPrivateKeyEntry(keyStoreManager, 
-    				listaCertificadosRe.get(listaCertificadosRe.size()-1).getAlias(),kconf);
+    		PrivateKeyEntry privateKey = getPrivateKeyEntry(this.keyStoreManager, 
+    				this.listaCertificadosRe.get(this.listaCertificadosRe.size()-1).getAlias(),this.kconf);
     		String contentType = comprobarTipo(envelopedData, privateKey);
     		if (contentType == null)
     			return false;

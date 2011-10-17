@@ -150,7 +150,8 @@ public class Cifrado extends JPanel {
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				examinarActionPerformed(campoFichero);
 			}
 		});       
@@ -186,7 +187,8 @@ public class Cifrado extends JPanel {
 		comboMecanismo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.origen.clave.combo.description.status")));
 		comboMecanismo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.origen.clave.combo.description.status")));
 		comboMecanismo.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent evt) {
+			@Override
+            public void itemStateChanged(ItemEvent evt) {
 				comboMecanismoItemStateChanged(comboMecanismo, comboAlgoritmo);
 			}
 		});
@@ -290,7 +292,8 @@ public class Cifrado extends JPanel {
 		cifrar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.btncifrar.description.status")));
 		cifrar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.btncifrar.description.status")));
 		cifrar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				cifrarActionPerformed(comboMecanismo, comboAlgoritmo, campoFichero);
 				PrincipalGUI.setNuevoEstado(Messages.getString("Cifrado.statusbar.cipher.action"));
 			}
@@ -341,7 +344,7 @@ public class Cifrado extends JPanel {
 	 * @param comboAlgoritmo	Combo con el algoritmo de cifrado
 	 * @param campoFichero 		Campo con el nombre del fichero a cifrar
 	 */
-	private void cifrarActionPerformed(JComboBox comboMecanismo, JComboBox comboAlgoritmo, 
+	void cifrarActionPerformed(JComboBox comboMecanismo, JComboBox comboAlgoritmo, 
 			JTextField campoFichero) {
 		String algoritmo;
 		String mecanismo = mecanismos.get(comboMecanismo.getSelectedIndex());

@@ -43,7 +43,6 @@ public class Acercade extends JAccessibilityFrameAbout {
 
 	@Override
 	public int getMinimumRelation() {
-		// TODO Auto-generated method stub
 		return 9;
 	}
 	
@@ -115,7 +114,8 @@ public class Acercade extends JAccessibilityFrameAbout {
 		aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
 		aceptar.getAccessibleContext().setAccessibleName(aceptar.getText());
 		aceptar.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+			@Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
 				aceptarActionPerformed();
 			}
 		});
@@ -130,7 +130,7 @@ public class Acercade extends JAccessibilityFrameAbout {
 	/**
 	 * Escondemos la ventana
 	 */
-	private void aceptarActionPerformed() {
+	void aceptarActionPerformed() {
 		dispose();
 	}
 
@@ -157,7 +157,8 @@ public class Acercade extends JAccessibilityFrameAbout {
 	
 	public static void main() {
 		EventQueue.invokeLater(new Runnable() {
-			public void run() {
+			@Override
+            public void run() {
 				new Acercade().setVisible(true);
 			}
 		});
