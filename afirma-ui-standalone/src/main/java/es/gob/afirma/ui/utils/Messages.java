@@ -26,7 +26,7 @@ public class Messages {
      * @param text
      *        Texto que se desea insertar.
      * @return Recuerso textual con la subcadena sustituida. */
-    static String getString(final String key, final String text) {
+    public static String getString(final String key, final String text) {
         try {
             return bundle.getString(key).replace("%0", text); //$NON-NLS-1$
         }

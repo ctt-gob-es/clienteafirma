@@ -10,7 +10,6 @@
 package es.gob.afirma.ui.utils;
 
 import java.util.Properties;
-import java.util.prefs.Preferences;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
@@ -96,7 +95,7 @@ public class GeneralConfig {
 	}
 	
 	/**
-	 * Indica si el ususario ha activado o desactivado la opcion de tamaño de fuente grande
+	 * Indica si el ususario ha activado o desactivado la opcion de tama&ntilde;o de fuente grande
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isBigFontSize() {

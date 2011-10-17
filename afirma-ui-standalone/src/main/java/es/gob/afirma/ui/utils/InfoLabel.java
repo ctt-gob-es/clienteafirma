@@ -5,7 +5,7 @@ import javax.swing.JLabel;
 import es.gob.afirma.ui.utils.Utils;
 
 /**
- * Etiquetas de presentación de texto.
+ * Etiquetas de presentaci&oacute;n de texto.
  * @author lmerayo
  *
  */
@@ -21,7 +21,7 @@ public class InfoLabel extends JLabel{
 	 * @param text
 	 *            Texto a mostrar
 	 * @param opaque
-	 *            Indica si el componente será opaco
+	 *            Indica si el componente ser&aacute; opaco
 	 */
 	public InfoLabel(String text, boolean opaque) {
 		super("<HTML>" + text + "</HTML>");

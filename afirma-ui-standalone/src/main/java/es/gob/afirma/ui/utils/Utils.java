@@ -88,25 +88,25 @@ public class Utils {
     }
 	
 	/**
-	 * M�todo que devuelve un mnem�nico v�lido para el lenguaje que recibe como par�metro.
-	 * @param listMnemonic lista de mnem�nicos que ya han sido utilizados para otros lenguajes.
-	 * @param actualLanguage lenguaje para el que se est� buscando un mnem�nico
-	 * @return mnem�nico seleccionado o 0 en el caso de que no se haya encontrado ninguno disponible
+	 * M&eacute;todo que devuelve un mnem&oacute;nico v&aacute;lido para el lenguaje que recibe como par&aacute;metro.
+	 * @param listMnemonic lista de mnem&oacute;nicos que ya han sido utilizados para otros lenguajes.
+	 * @param actualLanguage lenguaje para el que se est&aacute; buscando un mnem&oacute;nico
+	 * @return mnem&oacute;nico seleccionado o 0 en el caso de que no se haya encontrado ninguno disponible
 	 */
 	public static char getLanguageMnemonic(List<Character> mnemonicList, String actualLanguage){
 		//Se recorren las letras del lenguaje actual
 		for (int i=0; i< actualLanguage.length(); i++) {
-			//Se lee el caracter correspondiente al �ndice i
+			//Se lee el caracter correspondiente al indice i
 			char caracter = actualLanguage.charAt(i);
 			//Se comprueba si se ha utilizado
 			if (!mnemonicList.contains(caracter)) {
-				//se a�ade a la lista de caracteres utilizados
+				//se anade a la lista de caracteres utilizados
 				mnemonicList.add(caracter);
 				//Se devuelve
 				return caracter;
 			}
 		}
-		//TODO: mejorar para que en el caso de que no encuentre mnem�nico pueda cambiar alguno de los anteriores
+		//TODO: mejorar para que en el caso de que no encuentre mnemonico pueda cambiar alguno de los anteriores
 		return 0;
 	}
 	
@@ -338,7 +338,7 @@ public class Utils {
 					TitledBorder titledBorder = (TitledBorder)component.getBorder(); //Se obtiene el borde
 					//Se comprueba que no sea nulo
 					if (titledBorder != null){
-						//Se comprueba si la configuración pide que la fuente esté en negrita
+						//Se comprueba si la configuracion pide que la fuente este en negrita
 						if (GeneralConfig.isFontBold()){
 							//Se indica que la fuente es negrita
 							titledBorder.setTitleFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
@@ -347,10 +347,10 @@ public class Utils {
 							titledBorder.setTitleFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
 						}
 					}
-				} //Comprobación del tipo de borde
-			} // comprobación de si tiene borde
+				} //Comprobacion del tipo de borde
+			} // comprobacion de si tiene borde
 		} else {
-			//Se comprueba si la configuración pide que la fuente esté en negrita
+			//Se comprueba si la configuracion pide que la fuente este en negrita
 			if (GeneralConfig.isFontBold()){
 				//Se indica que la fuente es negrita
 				component.setFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
