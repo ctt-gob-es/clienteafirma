@@ -116,23 +116,35 @@ public class Opciones extends JAccessibilityDialog {
     	if (GeneralConfig.isMaximized()){
     		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+    			if (Platform.getOS().equals(Platform.OS.LINUX)){
+    				setMinimumSize(new Dimension(Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX));
+    			} else {
+    				setMinimumSize(new Dimension(Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT));
+    			}
+    		} else {
+    			setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
+    		}
     	} else {
     		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			if (Platform.getOS().equals(Platform.OS.LINUX)){
     				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+    				setMinimumSize(new Dimension(getSize().width, getSize().height));
     			} else {
     				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+    				setMinimumSize(new Dimension(getSize().width, getSize().height));
     			}
     		} else {
     			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
     	}
+    	
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(Messages.getString("Opciones.opciones")); // NOI18N
         setResizable(true);
         getContentPane().setLayout(new GridBagLayout());
-        setMinimumSize(new Dimension(getSize().width, getSize().height));
         
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -510,8 +522,8 @@ public class Opciones extends JAccessibilityDialog {
 	 * Restaura el tamaÃ±o de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
-		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		
+		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);		
 	}
 	
 	private class OpenHelpActionListener implements ActionListener {
