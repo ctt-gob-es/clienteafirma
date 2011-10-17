@@ -13,6 +13,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.visor.ui.VisorPanel;
@@ -62,7 +64,7 @@ public class Validacion extends JPanel {
 		
 		GridBagConstraints c = new GridBagConstraints();
 
-		c.fill = GridBagConstraints.BOTH;
+		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1.0;
 		c.gridwidth = 2;
 		c.insets = new Insets(13, 13, 0, 13);
@@ -85,8 +87,9 @@ public class Validacion extends JPanel {
         signFileField.setToolTipText(Messages.getString("Validacion.buscar.caja.description")); //$NON-NLS-1$
         signFileField.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Validacion.buscar.caja.description.status"))); //$NON-NLS-1$
         signFileField.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Validacion.buscar.caja.description.status"))); //$NON-NLS-1$
-        signFileField.getAccessibleContext().setAccessibleName(browseSignLabel.getText() + " ALT + G."); //$NON-NLS-1$
+        signFileField.getAccessibleContext().setAccessibleName(browseSignLabel.getText() + " ALT + R."); //$NON-NLS-1$
         signFileField.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.buscar.caja.description")); //$NON-NLS-1$
+        signFileField.addAncestorListener(new RequestFocusListener(false));
         
         Utils.remarcar(signFileField);
         if (GeneralConfig.isBigCaret()) {
@@ -99,12 +102,13 @@ public class Validacion extends JPanel {
         //Relacion entre etiqueta y campo de texto
         browseSignLabel.setLabelFor(signFileField);
         //Asignacion de mnemonico
-        browseSignLabel.setDisplayedMnemonic(KeyEvent.VK_G);
+        browseSignLabel.setDisplayedMnemonic(KeyEvent.VK_R);
 
         c.insets = new Insets(0, 10, 0, 13);
         c.weightx = 0.0;
         c.gridx = 1;
 
+        JPanel panelExaminar = new JPanel(new GridLayout(1, 1));
         // Boton examinar
         JButton browseSignButton = new JButton();
         browseSignButton.setMnemonic(KeyEvent.VK_E);
@@ -122,7 +126,8 @@ public class Validacion extends JPanel {
         Utils.remarcar(browseSignButton);
         Utils.setContrastColor(browseSignButton);
         Utils.setFontBold(browseSignButton);
-        add(browseSignButton, c);
+        panelExaminar.add(browseSignButton);
+        add(panelExaminar, c);
    
         
         c.gridwidth = 2;
@@ -152,6 +157,7 @@ public class Validacion extends JPanel {
         Logger.getLogger("es.gob.afirma").warning("Mostramos un mensaje");
         Logger.getLogger("es.gob.afirma").info("-----");
         
+        JPanel panelFirmar = new JPanel(new GridLayout(1, 1));
         // Boton firmar
         JButton checkSignButton = new JButton();
         checkSignButton.setMnemonic(KeyEvent.VK_V);
@@ -180,16 +186,19 @@ public class Validacion extends JPanel {
         cons.weightx = 1.0;
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(checkSignButton, BorderLayout.CENTER);
+        panelFirmar.add(checkSignButton);
+        buttonPanel.add(panelFirmar, BorderLayout.CENTER);
         panelBotones.add(buttonPanel, cons);
 
         cons.ipadx = 15;
         cons.weightx = 0.0;
         cons.gridx = 2;
 
+        JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
         // Boton ayuda
         JButton botonAyuda = HelpUtils.helpButton("validacion"); //$NON-NLS-1$
-        panelBotones.add(botonAyuda, cons);
+        panelAyuda.add(botonAyuda);
+        panelBotones.add(panelAyuda, cons);
 		
         c.insets = new Insets(13,13,13,13);
         c.weighty = 0.0;
