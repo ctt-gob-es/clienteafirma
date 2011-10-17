@@ -320,8 +320,9 @@ public class AOKeyStoreManager {
             }
             catch (IOException e) {
                 if (e.getCause() instanceof UnrecoverableKeyException ||
-                        e.getCause() instanceof BadPaddingException) {
-                    throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
+                    e.getCause() instanceof BadPaddingException ||
+                    e.getCause() instanceof ArithmeticException) { // Caso probable de contrasena nula
+                    	throw new IOException("Contrasena invalida: " + e); //$NON-NLS-1$
                 }
                 throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#12 / PFX solicitado", e); //$NON-NLS-1$
             }
@@ -410,7 +411,7 @@ public class AOKeyStoreManager {
             Provider p = Security.getProvider("SunMSCAPIAddressBook"); //$NON-NLS-1$
             if (p == null) {
                 try {
-                    p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.SunMSCAPIAddressBook").newInstance(); //$NON-NLS-1$
+                    p = (Provider) AOUtil.classForName("es.gob.afirma.keystores.capiaddressbook.SunMSCAPIAddressBook").newInstance(); //$NON-NLS-1$
                 }
                 catch (final Exception e) {
                     throw new AOKeyStoreManagerException("No se ha posido instanciar el proveedor SunMSCAPIAddressBook", e); //$NON-NLS-1$
