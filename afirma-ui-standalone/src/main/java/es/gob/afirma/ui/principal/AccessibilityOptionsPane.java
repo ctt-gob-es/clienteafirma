@@ -29,7 +29,7 @@ import es.gob.afirma.ui.utils.Utils;
  */
 public class AccessibilityOptionsPane {
 	
-	/** Clave para la configuraci&oacute;n de tamaÃ±o de fuente. */
+	/** Clave para la configuraci&oacute;n de tama&ntilde;o de fuente. */
 	public static final String MAIN_FONT_SIZE = "main.fontSize";
 	
 	/** Clave para la configuraci&oacute;n de estilo de fuente. */
@@ -41,16 +41,16 @@ public class AccessibilityOptionsPane {
 	/** Clave para la configuraci&oacute;n de visibilidad del foco. */
 	public static final String MAIN_FOCUS_VISIBLE = "main.focusVisible";
 	
-	/** Clave para la configuraci&oacute;n de tamaÃ±o de ventana. */
+	/** Clave para la configuraci&oacute;n de tama&ntilde;o de ventana. */
 	public static final String MAIN_WINDOWS_SIZE = "main.windowsSize";
 	
-	/** Clave para la configuraci&oacute;n de tamaÃ±o del cursor de texto. */
+	/** Clave para la configuraci&oacute;n de tama&ntilde;o del cursor de texto. */
 	public static final String MAIN_CURSOR_SIZE = "main.cursorSize";
 	
 	/** Panel sobre el que se montan los componentes. */
 	private final JPanel panel;
 	
-	/** Casilla de verificacion de tamaÃ±o de fuente grande. */ 
+	/** Casilla de verificacion de tama&ntilde;o de fuente grande. */ 
 	private JCheckBox checkFontSize;
 	 
 	/** Casilla de verificacion de fuente en negrita. */ 
@@ -62,10 +62,10 @@ public class AccessibilityOptionsPane {
 	/** Casilla de verificacion de la visibilidad del foco. */ 
 	private JCheckBox checkFocusVisible;
 	
-	/** Casilla de verificacion del tamaÃ±o de las ventanas. */ 
+	/** Casilla de verificacion del tama&ntilde;o de las ventanas. */ 
 	private JCheckBox checkWindowSize;
 	
-	/** Casilla de verificacion del tamaÃ±o del cursor de texto. */ 
+	/** Casilla de verificacion del tama&ntilde;o del cursor de texto. */ 
 	private JCheckBox checkCursorSize;
 	
 	/**	Estado de las opciones de accesibilidad. */
@@ -98,7 +98,7 @@ public class AccessibilityOptionsPane {
         
         JPanel panelFontSize = new JPanel(new GridLayout(1, 1));
         panelFontSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.texto"));
-        // Checkbox para habilitar la opcion de configuracion del tamaÃ±o de fuente
+        // Checkbox para habilitar la opcion de configuracion del tama&ntilde;o de fuente
         checkFontSize = new JCheckBox();
         checkFontSize.setText(Messages.getString("Opciones.accesibilidad.texto.tamano")); // NOI18N
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
@@ -234,7 +234,7 @@ public class AccessibilityOptionsPane {
         
         JPanel panelCursorSize = new JPanel(new GridLayout(1, 1));
         panelCursorSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.cursor"));
-        // Checkbox para habilitar la opcion de configuracion del tamaÃ±o del cursor
+        // Checkbox para habilitar la opcion de configuracion del tama&ntilde;o del cursor
         checkCursorSize = new JCheckBox();
         checkCursorSize.setText(Messages.getString("Opciones.accesibilidad.cursor.tamano")); // NOI18N
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
