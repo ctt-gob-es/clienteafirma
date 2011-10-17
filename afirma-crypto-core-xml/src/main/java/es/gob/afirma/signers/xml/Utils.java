@@ -63,7 +63,7 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
+import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.ui.AOUIFactory;
 
 /** Utilidades para las firmas XML. */
