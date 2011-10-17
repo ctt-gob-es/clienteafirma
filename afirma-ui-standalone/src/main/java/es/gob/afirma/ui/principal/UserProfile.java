@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -28,6 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
@@ -38,7 +38,6 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogAdvisor;
 import es.gob.afirma.ui.utils.Messages;
-import es.gob.afirma.ui.utils.Utils;
 
 public class UserProfile extends JAccessibilityDialogAdvisor {
 
@@ -167,6 +166,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	    }
 		users[users.length-1] = Constants.defaultUser;
 		final String[] strings = users;
+
 		list.setModel(new AbstractListModel() {
 			private static final long serialVersionUID = 1L;
 
@@ -180,7 +180,13 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 			});
 		list.setSelectedIndex(strings.length-1);
 		config(list);
-		add(list,c);
+		if (strings.length<4){
+			list.setVisibleRowCount(strings.length);
+		} else {
+			list.setVisibleRowCount(4);
+		}
+		JScrollPane barra = new JScrollPane(list);
+		add(barra, c); 
 		
 		c.gridy = c.gridy + 1;
 		c.insets = new Insets(0, 0, 0, 0);
@@ -188,6 +194,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		
         //Accesos rapidos al menu de ayuda
         HelpUtils.enableHelpKey(list, "perfil.cargar");
+       
 		
 	}
 	
