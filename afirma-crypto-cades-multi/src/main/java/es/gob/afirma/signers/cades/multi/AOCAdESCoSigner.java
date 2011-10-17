@@ -19,7 +19,7 @@ import java.util.Properties;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.beans.AdESPolicy;
+import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.ValidateCADES;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 

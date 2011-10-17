@@ -93,7 +93,7 @@ import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.beans.AdESPolicy;
+import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;

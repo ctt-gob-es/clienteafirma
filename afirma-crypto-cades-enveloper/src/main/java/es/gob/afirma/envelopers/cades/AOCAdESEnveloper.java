@@ -26,7 +26,7 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 import es.gob.afirma.core.envelopers.AOEnveloper;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.beans.AdESPolicy;
+import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Funcionalidad de sobres digitales con CAdES. */

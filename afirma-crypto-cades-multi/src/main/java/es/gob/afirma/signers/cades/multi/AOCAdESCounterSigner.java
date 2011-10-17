@@ -17,8 +17,8 @@ import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCounterSigner;
+import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
-import es.gob.afirma.core.signers.beans.AdESPolicy;
 import es.gob.afirma.signers.cades.ValidateCADES;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;

@@ -47,7 +47,7 @@ import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.util.encoders.Base64Encoder;
 
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.beans.AdESPolicy;
+import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
