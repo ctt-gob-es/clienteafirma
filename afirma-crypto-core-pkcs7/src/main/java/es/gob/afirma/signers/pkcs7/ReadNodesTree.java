@@ -36,7 +36,7 @@ import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.signers.beans.AOSimpleSignInfo;
+import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 

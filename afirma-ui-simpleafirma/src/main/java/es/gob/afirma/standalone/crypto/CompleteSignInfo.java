@@ -10,7 +10,7 @@
 
 package es.gob.afirma.standalone.crypto;
 
-import es.gob.afirma.core.signers.beans.AOSignInfo;
+import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /**
