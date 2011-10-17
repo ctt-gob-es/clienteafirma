@@ -256,7 +256,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
      * Examina si el archivo seleccionado es un archivo de firma y guarda el nombre en su caja
      */
     void examinarFirmaActionPerformed() {
-        File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Wizard.multifirma.simple.chooserFirm.tittle"));
+        File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Wizard.multifirma.simple.chooserFirm.tittle"));
         if (selectedFile != null) {
             this.campoFirma.setText(selectedFile.getAbsolutePath());
         }  
@@ -266,7 +266,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 	 * Examina si se ha seleccionado un archivo correcto y guarda el nombre en su caja
 	 */
 	void examinarDatosActionPerformed() {
-		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
+		File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title"));
 		if (selectedFile != null) {
 			this.campoDatos.setText(selectedFile.getAbsolutePath());
 		}

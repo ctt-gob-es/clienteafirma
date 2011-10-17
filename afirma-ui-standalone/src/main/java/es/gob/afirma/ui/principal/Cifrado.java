@@ -375,7 +375,7 @@ public class Cifrado extends JPanel {
 	 * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
 	 */
 	private void examinarActionPerformed(JTextField campoFichero) {
-		File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Cifrado.browse.data.file"));
+		File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Cifrado.browse.data.file"));
 		if (selectedFile != null) {
 			campoFichero.setText(selectedFile.getAbsolutePath());
 		}

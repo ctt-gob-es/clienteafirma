@@ -326,7 +326,7 @@ public class Descifrado extends JPanel {
      * @param campoFichero	Campo donde se guarda el nombre del fichero seleccionado
      */
     private void examinarActionPerformed(JTextField campoFichero) {
-    	File selectedFile = new SelectionDialog().showFileOpenDialog(this,Messages.getString("Seleccione.fichero.descifrar") );
+    	File selectedFile = SelectionDialog.showFileOpenDialog(this,Messages.getString("Seleccione.fichero.descifrar") );
     	if (selectedFile != null) 
     		campoFichero.setText(selectedFile.getAbsolutePath());
     }

@@ -235,7 +235,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
      * Comprueba que el fichero seleccionado es valido y guarda su nombre en el campo de texto
      */
     private void examinarActionPerformed() {
-    	File selectedFile = new SelectionDialog().showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title"));    	
+    	File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title"));    	
     	if (selectedFile != null) {
     		campoDirectorio.setText(selectedFile.getAbsolutePath());
     	}

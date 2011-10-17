@@ -406,7 +406,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
      * Tambien genera el nombre del fichero log y lo guarda en su respectivo campo.
      */
     void examinarDirectorioActionPerformed() {
-    	File selectedFile = new SelectionDialog().showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.outtitle"));
+    	File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.outtitle"));
     	if (selectedFile != null) {
     		this.campoDirectorio.setText(selectedFile.getAbsolutePath());
     		this.campoFicheroLog.setText(new File(selectedFile.getAbsoluteFile().getParent(), "result.txt").getAbsolutePath());
@@ -425,7 +425,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
      * Comprueba que el archivo log seleccionado es correcto y guarda su nombre en el campo de texto
      */
     void examinarFicheroLogActionPerformed() {
-    	File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Wizard.multifirma.chooserLog.tittle"));
+    	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Wizard.multifirma.chooserLog.tittle"));
     	if (selectedFile != null) {
     		this.campoFicheroLog.setText(selectedFile.getAbsolutePath());
     	}
@@ -590,24 +590,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 		
 		return new ExtensionsFileFilter(extensiones.split(","));
 	}
-    	
-    /**
-     * Descripcion de las extensiones
-     * @param exts  extensiones
-     * @return  extensiones posibles
-     */
-    private String getExtensionFileFilterDescription(String[] exts) {
-		String extFilter = Messages.getString("fichero.firma.masiva"); 
-		if (exts != null && extFilter.length() > 0) {
-			extFilter += " ("+ exts[0]; 
-			for (int i=1; i<exts.length; i++) 
-				extFilter += ", "+exts[i]; 
-			
-			extFilter += ")"; 
-		}
-		return extFilter;
-	}
-    
+
     /**
      * Obtiene el tipo de multifirma que se estï¿½ realizando
      * @param tipo  tipo de firma

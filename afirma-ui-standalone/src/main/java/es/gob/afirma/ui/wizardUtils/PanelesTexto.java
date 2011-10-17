@@ -9,11 +9,8 @@
  */
 package es.gob.afirma.ui.wizardUtils;
 
-import java.awt.Color;
-
 import javax.swing.JTextPane;
 
-import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 

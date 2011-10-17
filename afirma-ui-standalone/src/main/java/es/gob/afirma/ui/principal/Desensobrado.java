@@ -309,7 +309,7 @@ public class Desensobrado extends JPanel {
 	 * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
 	 */
     void examinarActionPerformed(JTextField campoFichero) {
-    	File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Seleccione.fichero.desensobrar"));
+    	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.desensobrar"));
     	if (selectedFile != null) {
     		campoFichero.setText(selectedFile.getAbsolutePath());
     	}

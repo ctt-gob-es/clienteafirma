@@ -430,7 +430,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
 	    // la ventana principal con el tama�o adecuado
 	    if (GeneralConfig.isMaximized()){
-			this.setExtendedState(this.MAXIMIZED_BOTH);
+			this.setExtendedState(MAXIMIZED_BOTH);
 		} else {
 			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
 				this.setExtendedState(0);

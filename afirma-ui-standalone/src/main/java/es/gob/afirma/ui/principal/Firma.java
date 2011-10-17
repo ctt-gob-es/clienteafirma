@@ -342,7 +342,7 @@ public class Firma extends JPanel {
      * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
      */
     void examinarActionPerformed(JTextField campoFichero) {
-        File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
+        File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("PrincipalGUI.chooser.title")); //$NON-NLS-1$
         if (selectedFile != null) {
             campoFichero.setText(selectedFile.getAbsolutePath());
         }

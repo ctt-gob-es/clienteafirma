@@ -285,7 +285,7 @@ public class Ensobrado extends JPanel {
 	 * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
 	 */
     private void examinarActionPerformed(JTextField campoFichero) {  
-    	File selectedFile = new SelectionDialog().showFileOpenDialog(this, Messages.getString("Seleccione.fichero.ensobrar"));
+    	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.ensobrar"));
     	if (selectedFile != null) {
     		campoFichero.setText(selectedFile.getAbsolutePath());
     	}
