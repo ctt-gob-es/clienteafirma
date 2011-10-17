@@ -223,8 +223,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     private JLabel etiquetaFichero = new JLabel();
     // Caja de texto donde se guarda el nombre del fichero log
     private JTextField campoFicheroLog = new JTextField();
-    // Checkbox con el texto "Sobreescribir ficheros"
-    private JCheckBox checkSobreescribir = new JCheckBox();
+    // Checkbox con el texto "Sobrescribir ficheros"
+    private JCheckBox checkSobrescribir = new JCheckBox();
     // Boton para seleccionar el fichero de log
     private JButton	examinarFichero = new JButton();
 
@@ -312,17 +312,17 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 		c.gridx = 0;
 		c.gridy = 2;
         
-		JPanel panelCheckSobreescribir = new JPanel(new GridLayout(1, 1));
-        // Checkbox con el texto "Sobreescribir ficheros"
-        this.checkSobreescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir"));
-        this.checkSobreescribir.getAccessibleContext().setAccessibleName(this.checkSobreescribir.getText() + " " +Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
-        this.checkSobreescribir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobreescribir.description"));
-        this.checkSobreescribir.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al checkbox
-        Utils.remarcar(this.checkSobreescribir);
-        Utils.setContrastColor(this.checkSobreescribir);
-        Utils.setFontBold(this.checkSobreescribir);
-        panelCheckSobreescribir.add(this.checkSobreescribir);
-        panelCentral.add(panelCheckSobreescribir, c);
+		JPanel panelCheckSobrescribir = new JPanel(new GridLayout(1, 1));
+        // Checkbox con el texto "Sobrescribir ficheros"
+        this.checkSobrescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir"));
+        this.checkSobrescribir.getAccessibleContext().setAccessibleName(this.checkSobrescribir.getText() + " " +Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir.description"));
+        this.checkSobrescribir.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir.description"));
+        this.checkSobrescribir.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al checkbox
+        Utils.remarcar(this.checkSobrescribir);
+        Utils.setContrastColor(this.checkSobrescribir);
+        Utils.setFontBold(this.checkSobrescribir);
+        panelCheckSobrescribir.add(this.checkSobrescribir);
+        panelCentral.add(panelCheckSobrescribir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
 		c.gridy = 3;
@@ -397,7 +397,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         
         // Accesos rapidos al menu de ayuda
         HelpUtils.enableHelpKey(this.campoDirectorio,"multifirma.masiva.wizard.firma.directoriofirmas");
-        HelpUtils.enableHelpKey(this.checkSobreescribir,"multifirma.masiva.wizard.firma.sobreescribir");
+        HelpUtils.enableHelpKey(this.checkSobrescribir,"multifirma.masiva.wizard.firma.sobrescribir");
         HelpUtils.enableHelpKey(this.campoFicheroLog,"multifirma.masiva.wizard.firma.ficheroLog");      
     }
 
@@ -540,7 +540,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             dSigner.setFileFilter(getExtensionFileFilter(this.extensiones));
 
             // Indicamos si deseamos sobrescribir ficheros previos de firma que encontremos
-            dSigner.setOverwritePreviuosFileSigns(this.checkSobreescribir.isSelected());
+            dSigner.setOverwritePreviuosFileSigns(this.checkSobrescribir.isSelected());
 
             Properties config = GeneralConfig.getSignConfig();
             config.setProperty("mode", this.modoFormato ? AOSignConstants.SIGN_MODE_IMPLICIT : AOSignConstants.SIGN_MODE_EXPLICIT); //$NON-NLS-1$

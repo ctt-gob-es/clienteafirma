@@ -137,7 +137,7 @@ public class ToggleImageButton extends JToggleButton {
     public void setButtonText(String buttonText) {
         this.buttonText = buttonText;
         // Introduimos un texto compuesto por espacios en blancos para usarlo
-        // para la medida del boton pero que no se sobreescriba sobre nuestro texto.
+        // para la medida del boton pero que no se sobrescriba sobre nuestro texto.
         // Como los espacios en blanco ocupan algo menos que los caracteres, agregamos
         // algunos adicionales
         

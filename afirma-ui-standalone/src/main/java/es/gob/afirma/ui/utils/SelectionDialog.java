@@ -78,7 +78,7 @@ public class SelectionDialog {
 	/** Muestra un di&aacute;logo de guardado para almacenar los datos indicados.
      * Los datos ser&aacute;n almacenados en el directorio y con el nombre que
      * indique el usuario. Si el fichero ya existe se le preguntar&aacute; al
-     * usuario si desea sobreescribirlo. En caso de cancelar la operaci&oacute;n
+     * usuario si desea sobrescribirlo. En caso de cancelar la operaci&oacute;n
      * se devolvera null, si la operaci&oacute;n finaliza correctamente se
      * devolver&aacute; el path completo del fichero.
      * 
@@ -155,7 +155,7 @@ public class SelectionDialog {
                 if (selectedOption == JOptionPane.NO_OPTION) {
                     tryAgain = true;
                 }
-                else { // Hemos seleccionado la opcion de sobreescribir
+                else { // Hemos seleccionado la opcion de sobrescribir
                     FileOutputStream fos = null;
                     try {
                         fos = new FileOutputStream(file);
