@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.core.signers.beans;
+package es.gob.afirma.core.signers;
 
 /** Objeto que contiene la informacion general de un objeto de firma. Ya que un
  * objeto de firma puede contener muchas firmas, se considera informaci&oacute;n

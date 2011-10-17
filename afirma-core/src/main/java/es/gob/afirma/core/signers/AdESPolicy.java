@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.core.signers.beans;
+package es.gob.afirma.core.signers;
 
 import java.net.URL;
 import java.security.MessageDigest;
@@ -16,7 +16,6 @@ import java.util.Properties;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.core.signers.AOSignConstants;
 
 /** Pol&iacute;tica de firma para AdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

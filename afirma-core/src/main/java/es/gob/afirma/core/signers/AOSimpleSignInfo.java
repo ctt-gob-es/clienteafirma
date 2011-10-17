@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.core.signers.beans;
+package es.gob.afirma.core.signers;
 
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
