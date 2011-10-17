@@ -38,7 +38,7 @@ import com.lowagie.text.pdf.PdfString;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.core.signers.beans.AdESPolicy;
+import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF.
