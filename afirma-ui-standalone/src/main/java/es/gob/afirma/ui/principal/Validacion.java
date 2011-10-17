@@ -11,33 +11,32 @@ package es.gob.afirma.ui.principal;
 
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
+import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.JTextField;
+import javax.swing.text.Caret;
 
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
-import es.gob.afirma.ui.utils.InfoLabel;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
-import es.gob.afirma.ui.utils.RequestFocusListener;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
+import es.gob.afirma.ui.visor.ui.VisorPanel;
 
 /**
  *
@@ -47,6 +46,9 @@ public class Validacion extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Construye el panel y todos sus componentes visuales.
+	 */
 	public Validacion() {
 		initComponents();
 	}
@@ -60,161 +62,184 @@ public class Validacion extends JPanel {
 		
 		GridBagConstraints c = new GridBagConstraints();
 
-		
+		c.fill = GridBagConstraints.BOTH;
 		c.weightx = 1.0;
-		c.insets = new Insets(8, 13, 0, 13);
-		c.gridy = 0;
-		c.gridx = 0;
-		//c.anchor = GridBagConstraints.CENTER;
-
-
-		// Etiqueta con el icono de VALIDE
-		JLabel etiquetaValide = new JLabel();
-		etiquetaValide.setIcon(new ImageIcon(getClass().getResource("/resources/images/logo_VALIDe.png"))); // NOI18N
-		etiquetaValide.getAccessibleContext().setAccessibleName("Valide");
-//		etiquetaValide.setBounds(171, 10, 140, 50);
-		add(etiquetaValide, c);
-
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weighty = 1.0;
-		c.insets = new Insets(8, 13, 0, 13);
-		c.gridy = 1;
-		//c.anchor = GridBagConstraints.CENTER;
+		c.gridwidth = 2;
+		c.insets = new Insets(13, 13, 0, 13);
 		
-		// Etiqueta Uno: Puede realizar las validaciones .
-		String text1 = "<p align=\"center\">" + Messages.getString("Validacion.texto.parte1")+"</p>"+"<p align=\"center\">"+Messages.getString("Validacion.texto.parte2")+"</p>";
-		InfoLabel infoLabel1 = new InfoLabel(text1, false);
-		//Se centra el texto
-		infoLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-		infoLabel1.addAncestorListener(new RequestFocusListener(false));
-
-		add(infoLabel1, c);
-
-		c.insets = new Insets(5, 13, 0, 13);
-		c.gridy = 2;
-
-		// Etiqueta Dos: enlace inicioAPP
-	
-		InfoLabel enlace = new InfoLabel(Messages.getString("Validacion.texto.parte4"), false);
-		//se centra el texto
-		enlace.setHorizontalAlignment(SwingConstants.CENTER);
-
-		enlace.setForeground(new Color(55, 55, 254));
-		Utils.setFontBold(enlace);
-		//Se añade
-		add(enlace, c);
+		// Componentes para la seleccion de fichero
+        JLabel browseSignLabel = new JLabel();
+        browseSignLabel.setText(Messages.getString("Validacion.buscar")); //$NON-NLS-1$
+        browseSignLabel.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.buscar.description")); //$NON-NLS-1$
+        Utils.setContrastColor(browseSignLabel);
+        Utils.setFontBold(browseSignLabel);
+        add(browseSignLabel, c);
 		
-		c.gridy = 3;
-		
-		// Etiqueta Tres: Pulse el boton inferior..
-		String text2 = "<p align=\"center\">" +  Messages.getString("Validacion.texto.parte5")+"</p>" + "<p align=\"center\">" + Messages.getString("Validacion.texto.parte6") + "</p>";
-		InfoLabel infoLabel2 = new InfoLabel(text2, false);
-		infoLabel2.setHorizontalAlignment(SwingConstants.CENTER);
-		Utils.setFontBold(infoLabel2);
-		
-		add(infoLabel2, c);
+        c.gridwidth = 1;
+        c.insets = new Insets(0, 13, 0, 0);
+        c.weightx = 1.0;
+        c.gridy = 1;
 
+        // Campo donde se guarda el nombre del fichero a firmar
+        final JTextField signFileField = new JTextField();
+        signFileField.setToolTipText(Messages.getString("Validacion.buscar.caja.description")); //$NON-NLS-1$
+        signFileField.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Validacion.buscar.caja.description.status"))); //$NON-NLS-1$
+        signFileField.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Validacion.buscar.caja.description.status"))); //$NON-NLS-1$
+        signFileField.getAccessibleContext().setAccessibleName(browseSignLabel.getText() + " ALT + G."); //$NON-NLS-1$
+        signFileField.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.buscar.caja.description")); //$NON-NLS-1$
+        
+        Utils.remarcar(signFileField);
+        if (GeneralConfig.isBigCaret()) {
+            Caret caret = new ConfigureCaret();
+            signFileField.setCaret(caret);
+        }
+        Utils.setFontBold(signFileField);
+        add(signFileField, c);
+
+        //Relacion entre etiqueta y campo de texto
+        browseSignLabel.setLabelFor(signFileField);
+        //Asignacion de mnemonico
+        browseSignLabel.setDisplayedMnemonic(KeyEvent.VK_G);
+
+        c.insets = new Insets(0, 10, 0, 13);
+        c.weightx = 0.0;
+        c.gridx = 1;
+
+        // Boton examinar
+        JButton browseSignButton = new JButton();
+        browseSignButton.setMnemonic(KeyEvent.VK_E);
+        browseSignButton.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
+        browseSignButton.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
+        browseSignButton.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
+        browseSignButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
+        browseSignButton.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        browseSignButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                browseSignActionPerformed(signFileField);
+            }
+        });
+        Utils.remarcar(browseSignButton);
+        Utils.setContrastColor(browseSignButton);
+        Utils.setFontBold(browseSignButton);
+        add(browseSignButton, c);
+   
+        
+        c.gridwidth = 2;
 		c.insets = new Insets(0, 13, 0, 13);
 		c.weighty = 1.0;
-		//c.gridy = 6;
-		c.gridy = 5;
+		c.gridx = 0;
+		c.gridy = 2;
 		
+
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
 		JPanel emptyPanel = new JPanel();
 		add(emptyPanel, c);
 		
+		
 		// Panel con los botones
-		JPanel panelBotones = new JPanel(new GridBagLayout());
-		
-		GridBagConstraints cons = new GridBagConstraints();
-		cons.fill = GridBagConstraints.HORIZONTAL;
-		cons.ipadx = 15;
-		cons.gridx = 0;
-		
-		// Etiqueta para rellenar a la izquierda
-		JLabel label = new JLabel();
-		panelBotones.add(label, cons);
-		
-		JPanel panelValide = new JPanel(new GridLayout(1, 1));
-		// Boton valide
-		JButton valide = new JButton();
-		valide.setMnemonic(KeyEvent.VK_L);
-		valide.setText(Messages.getString("Validacion.btnValide")); // NOI18N
-		valide.setToolTipText(Messages.getString("Validacion.btnValide.description")); // NOI18N
-		valide.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Validacion.btnValide.description.status")));
-		valide.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Validacion.btnValide.description.status")));
-		valide.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				valideActionPerformed();
-			}
-		});
-		valide.getAccessibleContext().setAccessibleName(Messages.getString("Validacion.btnValide") + " " + Messages.getString("Validacion.btnValide.description.status")); // NOI18N
-		valide.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.btnValide.description")); // NOI18N
-		Utils.remarcar(valide);
-		Utils.setContrastColor(valide);
-		Utils.setFontBold(valide);
-		cons.ipadx = 0;
-		cons.gridx = 1;
-		cons.weightx = 1.0;
-		
-		panelValide.add(valide);
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(panelValide, BorderLayout.CENTER);
-		panelBotones.add(buttonPanel, cons);
+        JPanel panelBotones = new JPanel(new GridBagLayout());
 
-		cons.ipadx = 15;
-		cons.weightx = 0.0;
-		cons.gridx = 2;
+        GridBagConstraints cons = new GridBagConstraints();
+        cons.fill = GridBagConstraints.HORIZONTAL;
+        cons.ipadx = 15;
+        cons.gridx = 0;
+
+        // Etiqueta para rellenar a la izquierda
+        JLabel label = new JLabel();
+        panelBotones.add(label, cons);
+
+        Logger.getLogger("es.gob.afirma").warning("Mostramos un mensaje");
+        Logger.getLogger("es.gob.afirma").info("-----");
+        
+        // Boton firmar
+        JButton checkSignButton = new JButton();
+        checkSignButton.setMnemonic(KeyEvent.VK_V);
+        checkSignButton.setText(Messages.getString("Validacion.btnValidar")); //$NON-NLS-1$
+        checkSignButton.setToolTipText(Messages.getString("Validacion.btnValidar.description")); //$NON-NLS-1$
+        checkSignButton.getAccessibleContext().setAccessibleName(Messages.getString("Validacion.btnValidar") + " " + Messages.getString("Validacion.btnValidar.description.status"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+        checkSignButton.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Validacion.btnValidar.description.status"))); //$NON-NLS-1$
+        checkSignButton.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Validacion.btnValidar.description.status"))); //$NON-NLS-1$
+        checkSignButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                
+                System.out.println("Llamamos al metodo mostrar informacion de validacion");
+                System.out.println("-----");
+                
+                validateActionPerformance(signFileField.getText());
+            }
+        });
+        checkSignButton.getAccessibleContext().setAccessibleDescription(Messages.getString("Validacion.btnValidar.description")); // NOI18N //$NON-NLS-1$
+        Utils.remarcar(checkSignButton);
+        Utils.setContrastColor(checkSignButton);
+        Utils.setFontBold(checkSignButton);
+
+        cons.ipadx = 0;
+        cons.gridx = 1;
+        cons.weightx = 1.0;
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(checkSignButton, BorderLayout.CENTER);
+        panelBotones.add(buttonPanel, cons);
+
+        cons.ipadx = 15;
+        cons.weightx = 0.0;
+        cons.gridx = 2;
+
+        // Boton ayuda
+        JButton botonAyuda = HelpUtils.helpButton("validacion"); //$NON-NLS-1$
+        panelBotones.add(botonAyuda, cons);
 		
-		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
-		// Boton de ayuda
-		JButton botonAyuda = HelpUtils.helpButton("validacion");
-		panelAyuda.add(botonAyuda);
-		panelBotones.add(panelAyuda, cons);
-		
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridwidth	= 2;
         c.insets = new Insets(13,13,13,13);
         c.weighty = 0.0;
         c.weightx = 1.0;
-        c.gridy = 7;
+        c.gridy = 3;
 		
 		add(panelBotones, c);
 	}
-
-	/**
-	 * Accede a la pagina de VALIDE
-	 */
-	private void valideActionPerformed() {
-		// Obtenemos la url de valide.
-		String url = Messages.getString("Validacion.texto.parte4");
-
-		String os = System.getProperty("os.name").toLowerCase();
-		Runtime rt = Runtime.getRuntime();
-		try {
-			if (os.indexOf( "win" ) >= 0) {
-				String[] cmd = new String[4];
-				cmd[0] = "cmd.exe";
-				cmd[1] = "/C";
-				cmd[2] = "start";
-				cmd[3] = url;
-				rt.exec(cmd);
-			} else if (os.indexOf( "mac" ) >= 0) 
-				rt.exec( "open " + url);
-			else {
-				//prioritized 'guess' of users' preference
-				List<String> browsers = new ArrayList<String>(Arrays.asList("epiphany", "firefox", "mozilla", "konqueror",
-						"netscape","opera","links","lynx"));
-
-				StringBuffer cmd = new StringBuffer();
-				for (String browser : browsers)
-					cmd.append( (browsers.get(0).equals(browser) ? "" : " || " ) + browser +" \"" + url + "\" ");
-
-				rt.exec(new String[] { "sh", "-c", cmd.toString() });
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide"));
-		}
-	}
+	
+    /**
+     * Pulsar boton examinar: Muestra una ventana para seleccinar un archivo.
+     * Modifica el valor de la caja con el nombre del archivo seleccionado
+     * @param campoFichero  Campo en el que se escribe el nombre del fichero seleccionado
+     */
+    private void browseSignActionPerformed(JTextField campoFichero) {
+        File selectedFile = SelectionDialog.showFileOpenDialog(this,
+                Messages.getString("Validacion.chooser.title")); //$NON-NLS-1$
+        if (selectedFile != null) {
+            campoFichero.setText(selectedFile.getAbsolutePath());
+        }
+    }
+    
+    /**
+     * Muestra el di&aacute;logo con la informaci&oacute;n de validaci&oacute;n
+     * de una firma.
+     * @param signPath Ruta del fichero de firma.
+     */
+    private void validateActionPerformance(String signPath) {
+        if (signPath == null || signPath.trim().length() <= 0) {
+            JAccessibilityOptionPane.showMessageDialog(Validacion.this, Messages.getString("Validacion.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return;
+        }
+        
+        File signFile = new File(signPath);
+        if (!signFile.exists() || !signFile.isFile()) {
+            JAccessibilityOptionPane.showMessageDialog(Validacion.this, Messages.getString("Validacion.msg.error.nofichero", signPath), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return;
+        }
+        
+        if (!signFile.canRead()) {
+            JAccessibilityOptionPane.showMessageDialog(Validacion.this, Messages.getString("Validacion.msg.error.noLectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return;
+        }
+        
+        System.out.println("Mostrar la pantalla de visor");
+        System.out.println("-----");
+        
+        VisorPanel visorPanel = new VisorPanel(signFile, null);
+        visorPanel.setTitle(Messages.getString("Visor.window.title")); //$NON-NLS-1$
+        
+        visorPanel.setVisible(true);
+    }
 }
