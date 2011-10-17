@@ -383,7 +383,7 @@ public class AccessibilityOptionsPane {
 			}
 			name = JAccessibilityOptionPane.showInputDialog(null, text, "Insercción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		} else{
-			name = JAccessibilityOptionPane.showInputDialog(null,"Nombre del perfil (debe ser una unica palabra). Si el nombre ya existe sera sobreescrita la configuracion:", "Inserccion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = JAccessibilityOptionPane.showInputDialog(null,"Nombre del perfil (debe ser una unica palabra).", "Inserccion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (name!=null){
 			if (name.trim().length()!=0){
