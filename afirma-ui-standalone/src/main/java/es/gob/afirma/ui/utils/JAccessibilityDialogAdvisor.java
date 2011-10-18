@@ -33,11 +33,13 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null);
 		this.addComponentListener(this.resizingAdaptor);
 		this.addComponentListener(new ComponentAdapter() {
-		    public void componentResized(ComponentEvent e)
+		    @Override
+            public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
-		    public void componentMoved(ComponentEvent e)
+		    @Override
+            public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
@@ -78,7 +80,7 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 	/**
 	 * Evento de redimensionado. Almacena el tamaño y posicion de la ventana para su restauracion.
 	 */
-	public void resized(ComponentEvent e) {
+	public void resized(final ComponentEvent e) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
 			actualPositionX = this.getX();

@@ -19,10 +19,8 @@ import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import es.gob.afirma.signature.SignValidity;
@@ -145,7 +143,8 @@ final class SignResultPanel extends JPanel {
                         Desktop.getDesktop().browse(new URI(Messages.getString("SignResultPanel.23." + linkIndex, "SignResultPanel.23.default"))); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
-                catch (final Exception e) {JAccessibilityOptionPane.showMessageDialog(
+                catch (final Exception e) {
+                    JAccessibilityOptionPane.showMessageDialog(
                         SignResultPanel.this,
                         Messages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
                         Messages.getString("SignResultPanel.1"), //$NON-NLS-1$
@@ -155,17 +154,16 @@ final class SignResultPanel extends JPanel {
             }
         });
         
-        this.descTextLabel.addFocusListener(editorFocusManager);
-        this.descTextLabel.addHyperlinkListener(editorFocusManager);
-        this.descTextLabel.addKeyListener(editorFocusManager);
-        
         this.descTextLabel.setEditable(false);
-        this.descTextLabel.setOpaque(false);
+        this.descTextLabel.setOpaque(false);        
         
         Utils.remarcar(this.descTextLabel);
         //Utils.setContrastColor(this.descTextLabel);
         Utils.setFontBold(this.descTextLabel);
         
+        this.descTextLabel.addFocusListener(editorFocusManager);
+        this.descTextLabel.addHyperlinkListener(editorFocusManager);
+        this.descTextLabel.addKeyListener(editorFocusManager);
         
 //        StyledDocument doc = descTextLabel.getStyledDocument();
 //
@@ -203,11 +201,13 @@ final class SignResultPanel extends JPanel {
 
     class ColorPane extends JTextPane {
 
-    	  public void appendNaive(Color c, String s) {
+        private static final long serialVersionUID = -2913625431184762372L;
+
+        public void appendNaive(Color c, String s) {
     	    SimpleAttributeSet aset = new SimpleAttributeSet();
     	    StyleConstants.setForeground(aset, c);
 
-    	    int len = getText().length();
+    	    //int len = getText().length();
     	    //setCaretPosition(len); 
     	    setCharacterAttributes(aset, false);
     	    replaceSelection(s);

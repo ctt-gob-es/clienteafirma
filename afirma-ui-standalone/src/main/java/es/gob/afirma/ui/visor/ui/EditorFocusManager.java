@@ -10,8 +10,10 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.net.URL;
-import java.util.AbstractList;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.accessibility.AccessibleHyperlink;
 import javax.accessibility.AccessibleHypertext;
@@ -34,7 +36,8 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
     private final Style linkUnfocusedStyle;
     private final Style linkFocusedStyle;
     
-    private final AbstractList<AccessibleHyperlink> hyperLinks;
+    private final List<AccessibleHyperlink> hyperLinks;
+    private final Map<AccessibleHyperlink, URL> hyperLinksTargets;
     
     private int selectedLink = 0;
     
@@ -61,11 +64,13 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         StyleConstants.setForeground(this.linkFocusedStyle, UIManager.getColor("Tree.selectionForeground")); //$NON-NLS-1$
         
         final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();        
-        this.hyperLinks = new Vector<AccessibleHyperlink>(accessibleHypertext.getLinkCount());
+        this.hyperLinks = new ArrayList<AccessibleHyperlink>(accessibleHypertext.getLinkCount());
+        this.hyperLinksTargets = new HashMap<AccessibleHyperlink, URL>(accessibleHypertext.getLinkCount());
         for (int i=0; i<accessibleHypertext.getLinkCount(); i++) {
-            this.hyperLinks.add(accessibleHypertext.getLink(i));
+            final AccessibleHyperlink ahl = accessibleHypertext.getLink(i);
+            this.hyperLinks.add(ahl);
+            this.hyperLinksTargets.put(ahl, (URL) ahl.getAccessibleActionObject(0));
         }
-
     }
     
     @Override
@@ -130,7 +135,12 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
             case KeyEvent.VK_SPACE:
             case KeyEvent.VK_ENTER:
                 if (this.hlAction != null) {
-                    this.hlAction.openHyperLink(new HyperlinkEvent(this, HyperlinkEvent.EventType.ACTIVATED, (URL) this.hyperLinks.get(this.selectedLink).getAccessibleActionObject(0)), this.selectedLink);
+                    this.hlAction.openHyperLink(
+                       new HyperlinkEvent(
+                           this, HyperlinkEvent.EventType.ACTIVATED, this.hyperLinksTargets.get(this.hyperLinks.get(this.selectedLink))
+                       ), 
+                       this.selectedLink
+                    );
                 }
         }
     }
