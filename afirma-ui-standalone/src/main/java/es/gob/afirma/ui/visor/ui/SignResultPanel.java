@@ -1,5 +1,6 @@
 package es.gob.afirma.ui.visor.ui;
 
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,11 +15,20 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import es.gob.afirma.signature.SignValidity;
+import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 final class SignResultPanel extends JPanel {
 
@@ -39,6 +49,10 @@ final class SignResultPanel extends JPanel {
         
         this.resultTextLabel.setFont(this.getFont().deriveFont(Font.PLAIN, 26));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
+
+        Utils.remarcar(this.resultTextLabel);
+        Utils.setContrastColor(this.resultTextLabel);
+        Utils.setFontBold(this.resultTextLabel);
         
         final JLabel resultOperationIcon = new JLabel();
         resultOperationIcon.setFocusable(false);
@@ -131,7 +145,7 @@ final class SignResultPanel extends JPanel {
                         Desktop.getDesktop().browse(new URI(Messages.getString("SignResultPanel.23." + linkIndex, "SignResultPanel.23.default"))); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 }
-                catch (final Exception e) {JOptionPane.showMessageDialog(
+                catch (final Exception e) {JAccessibilityOptionPane.showMessageDialog(
                         SignResultPanel.this,
                         Messages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
                         Messages.getString("SignResultPanel.1"), //$NON-NLS-1$
@@ -147,6 +161,23 @@ final class SignResultPanel extends JPanel {
         
         this.descTextLabel.setEditable(false);
         this.descTextLabel.setOpaque(false);
+        
+        Utils.remarcar(this.descTextLabel);
+        //Utils.setContrastColor(this.descTextLabel);
+        Utils.setFontBold(this.descTextLabel);
+        
+        
+//        StyledDocument doc = descTextLabel.getStyledDocument();
+//
+//	     // Makes text red
+//	     Style style = descTextLabel.addStyle("White", null);
+//	     StyleConstants.setForeground(style, Color.white);
+//	     // Set text in the range [5, 7) red
+//	     doc.setCharacterAttributes(0, descTextLabel.getText().length()-1, descTextLabel.getStyle("White"), true);
+//        
+//        this.descTextLabel.setBackground(Color.black);
+        
+        
         
         this.setLayout(new GridBagLayout());
         
@@ -168,5 +199,27 @@ final class SignResultPanel extends JPanel {
         c.insets = new Insets(0, 6, 5, 11);
         this.add(this.descTextLabel, c);
     }
+}
 
+    class ColorPane extends JTextPane {
+
+    	  public void appendNaive(Color c, String s) {
+    	    SimpleAttributeSet aset = new SimpleAttributeSet();
+    	    StyleConstants.setForeground(aset, c);
+
+    	    int len = getText().length();
+    	    //setCaretPosition(len); 
+    	    setCharacterAttributes(aset, false);
+    	    replaceSelection(s);
+    	  }
+
+    	  public void append(Color c, String s) {
+    	    StyleContext sc = StyleContext.getDefaultStyleContext();
+    	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+
+    	    int len = getDocument().getLength();
+    	    setCaretPosition(len); 
+    	    setCharacterAttributes(aset, false);
+    	    replaceSelection(s); 
+    	  }
 }
