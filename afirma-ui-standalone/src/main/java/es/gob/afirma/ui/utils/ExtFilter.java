@@ -10,7 +10,7 @@ import javax.swing.filechooser.FileFilter;
  * usamos <code>FileNameExtensionFilter</code> directamente para
  * compatibilizar con Java 1.4
  * @version 0.3 */
-final class ExtFilter extends FileFilter implements java.io.FileFilter {
+public final class ExtFilter extends FileFilter implements java.io.FileFilter {
 
     private String[] extensions;
     private String description;
