@@ -9,7 +9,6 @@
  */
 package es.gob.afirma.ui.wizardsobres;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,26 +48,18 @@ public class AsistenteEnsobrar {
     	// Obtenemos todas las paginas
     	// Pagina 1: Panel presentacion
     	PanelPresentacion panelPresentacion = new PanelPresentacion();
-    	panelPresentacion.setSize(630,460);
-    	panelPresentacion.setMinimumSize(new Dimension(630,460));
     	ventanas.add(panelPresentacion);
     	
     	// Pagina 2: Panel seleccion destinatarios
     	PanelDestinatarios panelDestinatarios = new PanelDestinatarios();
-    	panelDestinatarios.setSize(630,460);
-    	panelDestinatarios.setMinimumSize(new Dimension(630,460));
     	ventanas.add(panelDestinatarios);
     	    	
     	// Pagina 3: Panel seleccion remitentes y ensobrado
     	PanelRemitentes panelRemitentes = new PanelRemitentes(rutaFichero, tipo);
-    	panelRemitentes.setSize(630,460);
-    	panelRemitentes.setMinimumSize(new Dimension(630,460));
     	ventanas.add(panelRemitentes);
     	
     	// Pagina 4: 
     	PanelFinalizar panelFinalizar = new PanelFinalizar();
-    	panelFinalizar.setSize(630,460);
-    	panelFinalizar.setMinimumSize(new Dimension(630,460));
     	ventanas.add(panelFinalizar);
     	
     	// Cargamos el listado de ventanas en todas las paginas con controles
