@@ -153,9 +153,6 @@ public class Validacion extends JPanel {
         // Etiqueta para rellenar a la izquierda
         JLabel label = new JLabel();
         panelBotones.add(label, cons);
-
-        Logger.getLogger("es.gob.afirma").warning("Mostramos un mensaje");
-        Logger.getLogger("es.gob.afirma").info("-----");
         
         JPanel panelFirmar = new JPanel(new GridLayout(1, 1));
         // Boton firmar
@@ -169,10 +166,6 @@ public class Validacion extends JPanel {
         checkSignButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                
-                System.out.println("Llamamos al metodo mostrar informacion de validacion");
-                System.out.println("-----");
-                
                 validateActionPerformance(signFileField.getText());
             }
         });
@@ -242,9 +235,6 @@ public class Validacion extends JPanel {
             JAccessibilityOptionPane.showMessageDialog(Validacion.this, Messages.getString("Validacion.msg.error.noLectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
-        
-        System.out.println("Mostrar la pantalla de visor");
-        System.out.println("-----");
         
         VisorPanel visorPanel = new VisorPanel(signFile, null);
         visorPanel.setTitle(Messages.getString("Visor.window.title")); //$NON-NLS-1$
