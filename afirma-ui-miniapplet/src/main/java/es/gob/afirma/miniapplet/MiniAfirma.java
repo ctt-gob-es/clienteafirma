@@ -10,6 +10,12 @@
 
 package es.gob.afirma.miniapplet;
 
+import java.io.IOException;
+
+import javax.jnlp.UnavailableServiceException;
+
+import es.gob.afirma.core.AOCancelledOperationException;
+
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
  * del Mini-Applet del Cliente AFirma.
@@ -105,8 +111,12 @@ public interface MiniAfirma {
      * la operaci&oacute;n se devuelve {@code null}. Se usar&aacute; las funcionalidades
      * de JNLP siempre que sea posible
      * @return El contenido del fichero codificado en Base64.
+     * @throws IOException 
+     * @throws AOCancelledOperationException 
+     * @throws UnavailableServiceException 
+     * @throws Exception 
      */
-    String getFileContent();
+    String getFileContent() throws AOCancelledOperationException, IOException, UnavailableServiceException, Exception;
 
     /** Decodifica un texto en Base64. Si se produce alg&uacute;n error se
      * devuelve {@code null}.

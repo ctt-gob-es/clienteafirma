@@ -11,16 +11,23 @@
 package es.gob.afirma.miniapplet;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.jnlp.FileContents;
 import javax.jnlp.FileOpenService;
 import javax.jnlp.FileSaveService;
 import javax.jnlp.ServiceManager;
+import javax.jnlp.UnavailableServiceException;
 import javax.swing.JApplet;
+import javax.swing.JOptionPane;
 
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.miniapplet.actions.GetFileContentAction;
 
 /** MiniApplet de firma del proyecto Afirma.
  */
@@ -88,8 +95,41 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
-    public String getFileContent() {
-        return null;
+    public String getFileContent() throws AOCancelledOperationException, IOException, UnavailableServiceException, Exception {
+        
+        JOptionPane.showMessageDialog(this, "Entramos en el metodo");
+        
+        try {
+        if (this.fos == null) {
+//            try {
+                this.fos = (FileOpenService) ServiceManager.lookup("javax.jnlp.FileOpenService"); //$NON-NLS-1$
+//            }
+//            catch(final Exception e) {
+//                LOGGER.severe("Error obteniendo el servicio JNLP de salvado de ficheros, no se guardaron los datos: " + e); //$NON-NLS-1$
+//                return null;
+//            }
+        }
+        
+        
+//        try {
+            return new GetFileContentAction(this.fos).getResult();
+//        }
+//        catch (IOException e) {
+//            Logger.getLogger("es.gob.afirma").warning("Error al recuperar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+//            return null;
+//        } 
+//        catch (AOCancelledOperationException e) {
+//            Logger.getLogger("es.gob.afirma").warning("Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
+//            return null;
+//        }
+            
+            
+        } catch (Exception e) {
+            Logger.getLogger("es.gob.afirma").warning("Capturamos la excepcion: " + e);
+            JOptionPane.showMessageDialog(this, "Capturamos la excepcion: " + e);
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
