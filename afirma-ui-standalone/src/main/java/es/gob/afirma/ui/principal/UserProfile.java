@@ -3,6 +3,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -295,8 +296,33 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	 * 
 	 */
 	public void resized(ComponentEvent e) {
-		Dimension screenSize = this.getSize();
-	    screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+	    Dimension actualSize = getJAccessibilityDialogAdvisor(this).getSize();
+	    Component boton = getComponentByName("maximizar", getJAccessibilityDialogAdvisor(this));
+	    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogAdvisor(this));
+	    if(boton != null){
+	    	if (actualSize.equals(fullScreen)){
+				boton.setEnabled(false);
+				if (botonRestaurar != null) {
+	    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
+	    			botonRestaurar.setEnabled(true);
+	    		}
+		    } else {
+		    	boton.setEnabled(true);
+		    	if (botonRestaurar != null) {
+			    	//Se comprueba si la ventana está restaurada
+			    	if ((this.getX() == actualPositionX) && (this.getY() == actualPositionY) 
+			    			&& (this.getWidth() == actualWidth) && (this.getHeight() == actualHeight)) {
+			    		botonRestaurar.setEnabled(false); //Se deshabilita
+			    	} else {
+			    		botonRestaurar.setEnabled(true); //Se habilita
+			    	}
+		    	}
+		    }
+	    }
+	    
 		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
 			actualPositionX = this.getX();
 			actualPositionY = this.getY();
@@ -390,5 +416,35 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		
 	}
+	
+	/**
+	 * Obtiene un componente de un contenedor a traves de su nombre
+	 * @param name Nombre del componente a buscar
+	 * @param container Contenedor donde se encuentra el componente a buscar
+	 * @return
+	 */
+	private Component getComponentByName(String name, Container container){
+		if(name.equals(container.getName())){
+			return container;
+		}
+		else {
+			Component[] componentes = container.getComponents();
+			for(int i = 0; i < componentes.length; i++){
+				if(componentes[i] instanceof Container){
+					Component res = getComponentByName(name, (Container) componentes[i]);
+					if(res != null){
+						return res;
+					}
+				}
+				else{
+					if(componentes[i].getName().equals(name)){
+						return componentes[i];
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
 	
 }

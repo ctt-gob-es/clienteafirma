@@ -90,15 +90,30 @@ public abstract class JAccessibilityDialog extends JDialog {
 	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 	    Dimension actualSize = getJAccessibilityDialog(this).getSize();
 	    Component boton = getComponentByName("maximizar", getJAccessibilityDialog(this));
+	    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialog(this));
 	    if(boton != null){
 	    	if (actualSize.equals(fullScreen)){
 				boton.setEnabled(false);
+				if (botonRestaurar != null) {
+	    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
+	    			botonRestaurar.setEnabled(true);
+	    		}
 		    } else {
 		    	boton.setEnabled(true);
+		    	if (botonRestaurar != null) {
+			    	//Se comprueba si la ventana está restaurada
+			    	if ((this.getX() == actualPositionX) && (this.getY() == actualPositionY) 
+			    			&& (this.getWidth() == actualWidth) && (this.getHeight() == actualHeight)) {
+			    		botonRestaurar.setEnabled(false); //Se deshabilita
+			    	} else {
+			    		botonRestaurar.setEnabled(true); //Se habilita
+			    	}
+		    	}
 		    }
 	    }
 	    // Se almacenan los valores de la posicion y el tamaño para la restauracion
-		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
+	    //si no se han guardado ya previamente
+		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35 && (actualWidth == -1)){
 			actualPositionX = this.getX();
 			actualPositionY = this.getY();
 			actualWidth = this.getWidth();

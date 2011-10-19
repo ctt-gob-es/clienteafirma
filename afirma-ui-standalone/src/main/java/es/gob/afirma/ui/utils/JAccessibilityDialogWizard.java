@@ -94,12 +94,26 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 	    Dimension actualSize = getJAccessibilityDialogWizard(this).getSize();
-	    Component boton = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
-	    if(boton != null){
+	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
+	    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this));
+	    if(botonMaximizar != null){
 	    	if (actualSize.equals(fullScreen)){
-				boton.setEnabled(false);
+	    		botonMaximizar.setEnabled(false);
+	    		if (botonRestaurar != null) {
+	    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
+	    			botonRestaurar.setEnabled(true);
+	    		}
 		    } else {
-		    	boton.setEnabled(true);
+		    	botonMaximizar.setEnabled(true);
+		    	if (botonRestaurar != null) {
+			    	//Se comprueba si la ventana está restaurada
+			    	if ((this.getX() == actualPositionX) && (this.getY() == actualPositionY) 
+			    			&& (this.getWidth() == actualWidth) && (this.getHeight() == actualHeight)) {
+			    		botonRestaurar.setEnabled(false); //Se deshabilita
+			    	} else {
+			    		botonRestaurar.setEnabled(true); //Se habilita
+			    	}
+		    	}
 		    }
 	    }
 	}
@@ -130,6 +144,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	public void resized(ComponentEvent e) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
+
 			actualPositionX = this.getX();
 			actualPositionY = this.getY();
 			actualWidth = this.getWidth();
