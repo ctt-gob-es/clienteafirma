@@ -29,6 +29,8 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.html.HTMLDocument;
 
+import es.gob.afirma.ui.utils.GeneralConfig;
+
 final class EditorFocusManager extends KeyAdapter implements FocusListener, HyperlinkListener, ComponentListener {
     
     private final JEditorPane displayPane;
@@ -56,12 +58,21 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         final StyleContext sc = new StyleContext();
         this.linkUnfocusedStyle = sc.addStyle("linkUnfocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
         StyleConstants.setUnderline(this.linkUnfocusedStyle, true);
-        StyleConstants.setForeground(this.linkUnfocusedStyle, Color.BLUE);
+        if (GeneralConfig.isHighContrast()){
+        	StyleConstants.setForeground(this.linkUnfocusedStyle, new Color(169, 226, 255, 255));
+        } else {
+        	StyleConstants.setForeground(this.linkUnfocusedStyle, Color.BLUE);
+        }
         StyleConstants.setBackground(this.linkUnfocusedStyle, new Color(0, 0, 0, 0));
         
         this.linkFocusedStyle = sc.addStyle("linkFocused", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
-        StyleConstants.setBackground(this.linkFocusedStyle, UIManager.getColor("Tree.selectionBackground")); //$NON-NLS-1$
-        StyleConstants.setForeground(this.linkFocusedStyle, UIManager.getColor("Tree.selectionForeground")); //$NON-NLS-1$
+        if (GeneralConfig.isHighContrast()){
+        	StyleConstants.setBackground(this.linkFocusedStyle, Color.WHITE); //$NON-NLS-1$
+            StyleConstants.setForeground(this.linkFocusedStyle, Color.BLACK); //$NON-NLS-1$
+        } else {
+        	StyleConstants.setBackground(this.linkFocusedStyle, UIManager.getColor("Tree.selectionBackground")); //$NON-NLS-1$
+            StyleConstants.setForeground(this.linkFocusedStyle, UIManager.getColor("Tree.selectionForeground")); //$NON-NLS-1$
+        }
         
         final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();        
         this.hyperLinks = new ArrayList<AccessibleHyperlink>(accessibleHypertext.getLinkCount());

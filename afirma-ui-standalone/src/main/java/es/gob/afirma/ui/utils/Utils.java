@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -241,6 +242,21 @@ public class Utils {
 					}
 				});
 			}
+			if (component instanceof JEditorPane){
+				final JEditorPane editorPane = (JEditorPane) component;
+				editorPane.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						editorPane.setBorder(BorderFactory.createEmptyBorder());
+					}
+					public void focusGained(FocusEvent e) {
+						if (GeneralConfig.isHighContrast()){
+							editorPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							editorPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
+					}
+				});
+			}
 			if (component instanceof JTree){
 				final JTree tree = (JTree) component;
 				tree.addFocusListener(new FocusListener() {
@@ -314,8 +330,10 @@ public class Utils {
 				component.setBackground(Color.BLACK);
 			} else if (component instanceof JStatusBar){
 				((JLabel)component.getComponent(0)).setForeground(Color.WHITE);
-			}			
-			else{
+			} else if (component instanceof JEditorPane){
+				component.setBackground(Color.BLACK);
+			} else{
+				
 				component.setForeground(Color.WHITE);
 				component.setBackground(Color.BLACK);
 			}

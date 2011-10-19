@@ -6,9 +6,13 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedOutputStream;
@@ -75,7 +79,7 @@ final class SignDataPanel extends JPanel {
         filePath.setBorder(BorderFactory.createEmptyBorder());
         
         filePath.setEditable(false);
-        filePath.setFocusable(false);
+        filePath.setFocusable(true);
         filePath.setText(signFile == null ? Messages.getString("SignDataPanel.24") : signFile.getAbsolutePath());  //$NON-NLS-1$
         filePath.addMouseListener(new MouseAdapter() {
             @Override
@@ -86,10 +90,31 @@ final class SignDataPanel extends JPanel {
                 }
             }
         });
+        Utils.remarcar(filePath);
+        Utils.setFontBold(filePath);
+        Utils.setContrastColor(filePath);
+        
+        filePath.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+				filePath.setBorder(BorderFactory.createEmptyBorder());
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 
         // Etiqueta encima del cuadro con la ruta de fichero
         this.filePathText.setText(Messages.getString("SignDataPanel.2")); //$NON-NLS-1$
         this.filePathText.setLabelFor(filePath);
+        this.filePathText.setDisplayedMnemonic(KeyEvent.VK_F);
+        Utils.setContrastColor(this.filePathText);
+        Utils.setFontBold(this.filePathText);
 
         final JPanel filePathPanel = new JPanel();
         filePathPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -119,14 +144,15 @@ final class SignDataPanel extends JPanel {
             filePathPanel.add(iconLabel);
         }
         
+        JPanel panelOpenFileButton = new JPanel(new GridLayout(1, 1));
         // Boton de apertura del fichero firmado
         JButton openFileButton = null;
         if (isPDF && signFile != null && SignDataPanel.hasAssociatedApplication(signFile.getName().substring(signFile.getName().lastIndexOf(".")))) { //$NON-NLS-1$
             openFileButton = new JButton(Messages.getString("SignDataPanel.3")); //$NON-NLS-1$
-            openFileButton.setPreferredSize(new Dimension(150, 24));
-            openFileButton.setMnemonic('v');
+            //openFileButton.setPreferredSize(new Dimension(150, 24));
+            openFileButton.setMnemonic(KeyEvent.VK_E);
             openFileButton.setToolTipText(Messages.getString("SignDataPanel.4")); //$NON-NLS-1$
-            openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.5")); //$NON-NLS-1$
+            openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.3")+ ". " + Messages.getString("SignDataPanel.5")); //$NON-NLS-1$
             openFileButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.6")); //$NON-NLS-1$
             openFileButton.addActionListener(new ActionListener() {
                 @Override
@@ -144,13 +170,16 @@ final class SignDataPanel extends JPanel {
                     }
                 }
             });
+            Utils.setFontBold(openFileButton);
+            Utils.remarcar(openFileButton);
         }
 
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         filePathPanel.add(filePath);
         filePathPanel.add(Box.createRigidArea(new Dimension(11, 0)));
         if (openFileButton != null) {
-            filePathPanel.add(openFileButton);
+        	panelOpenFileButton.add(openFileButton);
+            filePathPanel.add(panelOpenFileButton);
             filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         }
         
@@ -159,6 +188,7 @@ final class SignDataPanel extends JPanel {
 
         // Panel con los datos del certificado
         if (cert != null) {
+        	JPanel panelValidateCertButton = new JPanel(new GridLayout(1, 1));
             final CertificateInfo certInfo = CertAnalyzer.getCertInformation(cert);
 
             if (certInfo != null) {
@@ -187,11 +217,12 @@ final class SignDataPanel extends JPanel {
                 this.certDescription.addKeyListener(editorFocusManager);
 	            this.certDescription.addHyperlinkListener(editorFocusManager);
 	            
+	            
 	            if (certInfo.getCertVerifier() != null) {
 	                this.validateCertButton = new JButton();
-	                this.validateCertButton.setPreferredSize(new Dimension(150, 24));
+	                //this.validateCertButton.setPreferredSize(new Dimension(150, 24));
 	                this.validateCertButton.setText(Messages.getString("SignDataPanel.15")); //$NON-NLS-1$
-	                this.validateCertButton.setMnemonic('c');
+	                this.validateCertButton.setMnemonic(KeyEvent.VK_V);
 	                this.validateCertButton.setToolTipText(Messages.getString("SignDataPanel.16")); //$NON-NLS-1$
 	                this.validateCertButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.17")); //$NON-NLS-1$
 	                this.validateCertButton.getAccessibleContext()
@@ -230,12 +261,14 @@ final class SignDataPanel extends JPanel {
             certDescPanel.add(this.certDescription);
             certDescPanel.add(Box.createRigidArea(new Dimension(11, 0)));
             if (this.validateCertButton != null) {
-                certDescPanel.add(this.validateCertButton);
+            	panelValidateCertButton.add(this.validateCertButton);
+                certDescPanel.add(panelValidateCertButton);
                 certDescPanel.add(Box.createRigidArea(new Dimension(5, 0)));
             }
 
             this.certDescText.setText(Messages.getString("SignDataPanel.21")); //$NON-NLS-1$
             this.certDescText.setLabelFor(this.certDescription);
+            this.certDescText.setDisplayedMnemonic(KeyEvent.VK_U);
         }
 
         // Panel el detalle de la firma
@@ -254,6 +287,9 @@ final class SignDataPanel extends JPanel {
 
         final JLabel detailPanelText = new JLabel(Messages.getString("SignDataPanel.22")); //$NON-NLS-1$
         detailPanelText.setLabelFor(detailPanel);
+        detailPanelText.setDisplayedMnemonic(KeyEvent.VK_D);
+        Utils.setContrastColor(detailPanelText);
+        Utils.setFontBold(detailPanelText);
         
         this.setLayout(new GridBagLayout());
         
@@ -367,6 +403,7 @@ final class SignDataPanel extends JPanel {
 
         final JTree tree = new JTree(root);
         tree.setShowsRootHandles(true);
+        tree.setRowHeight(25);
         tree.setCellRenderer(treeRenderer);
         tree.setRootVisible(false);
         tree.putClientProperty("JTree.lineStyle", "None"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -389,6 +426,9 @@ final class SignDataPanel extends JPanel {
         tree.addFocusListener(treeFocusManager);
         tree.addMouseListener(treeFocusManager);
         tree.addKeyListener(treeFocusManager);
+        Utils.remarcar(tree);
+		Utils.setContrastColor(tree);
+		Utils.setFontBold(tree);
 
         for (int i = 0; i < tree.getRowCount(); i++) {
             tree.expandRow(i);

@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.visor.ui;
 
-import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -15,15 +14,11 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import es.gob.afirma.signature.SignValidity;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -84,12 +79,20 @@ final class SignResultPanel extends JPanel {
         switch (validity.getValidity()) {
             case GENERATED:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.2")); //$NON-NLS-1$
-                this.descTextLabel.setText(Messages.getString("SignResultPanel.3")); //$NON-NLS-1$
+                if (GeneralConfig.isHighContrast()){
+                	this.descTextLabel.setText(Messages.getString("SignResultPanel.25")); //$NON-NLS-1$
+                } else {
+                	this.descTextLabel.setText(Messages.getString("SignResultPanel.3")); //$NON-NLS-1$
+                }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.4"); //$NON-NLS-1$
                 break;
             case OK:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.8")); //$NON-NLS-1$
-                this.descTextLabel.setText(Messages.getString("SignResultPanel.9")); //$NON-NLS-1$
+                if (GeneralConfig.isHighContrast()){
+                	this.descTextLabel.setText(Messages.getString("SignResultPanel.24")); //$NON-NLS-1$
+                } else {
+                	this.descTextLabel.setText(Messages.getString("SignResultPanel.9")); //$NON-NLS-1$
+                }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.10"); //$NON-NLS-1$
                 break;
             case KO:
@@ -110,7 +113,11 @@ final class SignResultPanel extends JPanel {
                 else {
                     errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 }
-                this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                if (GeneralConfig.isHighContrast()){
+                	this.descTextLabel.setText("<html><p style=\"color:#FFFFFF\">" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                } else {
+                	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 break;
             default:
@@ -125,13 +132,38 @@ final class SignResultPanel extends JPanel {
                 else {
                     errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                 }
-                this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                if (GeneralConfig.isHighContrast()){
+                	this.descTextLabel.setText("<html><p style=\"color:#FFFFFF\">" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                } else {
+                	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+                }
                 resultOperationIconTooltip = Messages.getString("SignResultPanel.13"); //$NON-NLS-1$
                 break;
         }
         resultOperationIcon.setPreferredSize(new Dimension(120, 120));
         resultOperationIcon.setToolTipText(resultOperationIconTooltip);
 
+        
+        this.setLayout(new GridBagLayout());
+        
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 0.0;
+        c.weighty = 1.0;
+        c.gridheight = 2;
+        c.insets = new Insets(11, 11, 11, 5);
+        this.add(resultOperationIcon, c);
+        c.weightx = 1.0;
+        c.weighty = 0.0;
+        c.gridx = 1;
+        c.gridheight = 1;
+        c.insets = new Insets(11, 6, 0, 11);
+        this.add(this.resultTextLabel, c);
+        c.weighty = 1.0;
+        c.gridy = 1;
+        c.insets = new Insets(0, 6, 5, 11);
+        this.add(this.descTextLabel, c);
+        
         final EditorFocusManager editorFocusManager = new EditorFocusManager (this.descTextLabel, new EditorFocusManagerAction() {  
             @Override
             public void openHyperLink(final HyperlinkEvent he, int linkIndex) {
@@ -158,68 +190,14 @@ final class SignResultPanel extends JPanel {
         this.descTextLabel.setOpaque(false);        
         
         Utils.remarcar(this.descTextLabel);
-        //Utils.setContrastColor(this.descTextLabel);
+        Utils.setContrastColor(this.descTextLabel);
         Utils.setFontBold(this.descTextLabel);
         
         this.descTextLabel.addFocusListener(editorFocusManager);
         this.descTextLabel.addHyperlinkListener(editorFocusManager);
         this.descTextLabel.addKeyListener(editorFocusManager);
         
-//        StyledDocument doc = descTextLabel.getStyledDocument();
-//
-//	     // Makes text red
-//	     Style style = descTextLabel.addStyle("White", null);
-//	     StyleConstants.setForeground(style, Color.white);
-//	     // Set text in the range [5, 7) red
-//	     doc.setCharacterAttributes(0, descTextLabel.getText().length()-1, descTextLabel.getStyle("White"), true);
-//        
-//        this.descTextLabel.setBackground(Color.black);
         
         
-        
-        this.setLayout(new GridBagLayout());
-        
-        final GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.weightx = 0.0;
-        c.weighty = 1.0;
-        c.gridheight = 2;
-        c.insets = new Insets(11, 11, 11, 5);
-        this.add(resultOperationIcon, c);
-        c.weightx = 1.0;
-        c.weighty = 0.0;
-        c.gridx = 1;
-        c.gridheight = 1;
-        c.insets = new Insets(11, 6, 0, 11);
-        this.add(this.resultTextLabel, c);
-        c.weighty = 1.0;
-        c.gridy = 1;
-        c.insets = new Insets(0, 6, 5, 11);
-        this.add(this.descTextLabel, c);
     }
-}
-
-    class ColorPane extends JTextPane {
-
-        private static final long serialVersionUID = -2913625431184762372L;
-
-        public void appendNaive(Color c, String s) {
-    	    SimpleAttributeSet aset = new SimpleAttributeSet();
-    	    StyleConstants.setForeground(aset, c);
-
-    	    //int len = getText().length();
-    	    //setCaretPosition(len); 
-    	    setCharacterAttributes(aset, false);
-    	    replaceSelection(s);
-    	  }
-
-    	  public void append(Color c, String s) {
-    	    StyleContext sc = StyleContext.getDefaultStyleContext();
-    	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
-
-    	    int len = getDocument().getLength();
-    	    setCaretPosition(len); 
-    	    setCharacterAttributes(aset, false);
-    	    replaceSelection(s); 
-    	  }
 }

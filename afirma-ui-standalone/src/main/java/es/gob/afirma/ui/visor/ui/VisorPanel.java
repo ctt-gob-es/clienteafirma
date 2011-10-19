@@ -10,12 +10,17 @@
 
 package es.gob.afirma.ui.visor.ui;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Panel;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.logging.Logger;
@@ -55,6 +60,11 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         createUI(signFile, sign);
     }
 
+    @Override
+    public int getMinimumRelation() {
+        return 9;
+    }
+    
     private void createUI(final File signFile, final byte[] sign) {
         this.setLayout(new GridBagLayout());
 
@@ -102,11 +112,56 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 
         final JPanel resultPanel = new SignResultPanel(validity);
         final JPanel dataPanel = new SignDataPanel(signFile, sign, null, null);
-
         
+        final JPanel bottonPanel = new JPanel(true);
+        bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
+
+        JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
+        //Boton maximizar
+        JButton maximizar = new JButton();
+        maximizar.setText(Messages.getString("Wizard.maximizar"));
+        maximizar.setName("maximizar");
+        maximizar.setMnemonic(KeyEvent.VK_M);
+        maximizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				maximizarActionPerformed();
+			}
+		});
+        Utils.remarcar(maximizar);
+        Utils.setContrastColor(maximizar);
+        Utils.setFontBold(maximizar);
+        
+        panelMaximizar.add(maximizar);
+        bottonPanel.add(panelMaximizar);
+        
+        JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
+	    // Boton restaurar
+	    JButton restaurar = new JButton();
+	    restaurar.setText(Messages.getString("Wizard.restaurar"));
+	    restaurar.setName("restaurar");
+	    restaurar.setMnemonic(KeyEvent.VK_R);
+	    restaurar.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		restaurarActionPerformed();
+			}
+		});
+	    Utils.remarcar(restaurar);
+        Utils.setContrastColor(restaurar);
+	    Utils.setFontBold(restaurar);
+	    
+	    panelRestaurar.add(restaurar);
+	    bottonPanel.add(panelRestaurar);
+        
+	    //Espacio entre botones
+		Panel panelVacio = new Panel();
+		panelVacio.setPreferredSize(new Dimension(300, 10));
+		bottonPanel.add(panelVacio);
+	    
+        JPanel panelClose = new JPanel(new GridLayout(1, 1));
         final JButton bClose = new JButton(Messages.getString("VisorPanel.1")); //$NON-NLS-1$
+        bClose.setMnemonic(KeyEvent.VK_C);
         bClose.setToolTipText(Messages.getString("VisorPanel.2")); //$NON-NLS-1$
-        bClose.getAccessibleContext().setAccessibleName(Messages.getString("VisorPanel.3"));  //$NON-NLS-1$
+        bClose.getAccessibleContext().setAccessibleName(Messages.getString("VisorPanel.1") + ". " +Messages.getString("VisorPanel.3"));  //$NON-NLS-1$
         
         Utils.remarcar(bClose);
         Utils.setContrastColor(bClose);
@@ -119,9 +174,8 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 			}
 		});
         
-        final JPanel bottonPanel = new JPanel(true);
-        bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
-        bottonPanel.add(bClose);
+        panelClose.add(bClose);
+        bottonPanel.add(panelClose);
         
         setLayout(new GridBagLayout());
 
@@ -161,9 +215,23 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         }
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
     }
-
-    @Override
-    public int getMinimumRelation() {
-        return 0;
-    }
+    
+    /**
+	 * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
+	 */
+	public void maximizarActionPerformed(){
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
+		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		
+	}
+	
+	/**
+	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+	 */
+	public void restaurarActionPerformed(){
+		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
+		j.setBounds(j.actualPositionX, j.actualPositionY, j.actualWidth, j.actualHeight);
+		
+	}
 }

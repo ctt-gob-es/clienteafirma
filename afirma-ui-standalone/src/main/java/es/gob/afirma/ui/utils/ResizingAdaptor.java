@@ -1,5 +1,6 @@
 package es.gob.afirma.ui.utils;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -10,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -24,6 +26,10 @@ import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.html.HTMLDocument;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import es.gob.afirma.core.misc.Platform;
@@ -91,7 +97,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	}
 
 	/**
-	 * Ajusta el tamaÃ±o de fuente de una ventana
+	 * Ajusta el tamaño de fuente de una ventana
 	 * 
 	 * @param components
 	 */
@@ -194,6 +200,18 @@ public class ResizingAdaptor extends ComponentAdapter {
 				} else if(actualComponent instanceof JScrollPane){
 					JScrollPane panel = (JScrollPane) actualComponent;
 					adjustFontSize(panel.getComponents());
+				} else if (actualComponent instanceof JEditorPane){
+					JEditorPane editorPanel = (JEditorPane) actualComponent;
+					// Resize del texto contenido en el EditorPane
+					float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
+					String bodyRule = "body { font-family: " + actualComponent.getFont().getFamily() + "; " + "font-size: " + (7 + resizeFactor) + "pt; }";
+					((HTMLDocument)editorPanel.getDocument()).getStyleSheet().addRule(bodyRule);
+					// Resize del texto del enlace, porque tiene un estilo a nivel de linea entonces es necesario cambiar el tamaño del texto a nivel de linea
+					Style link;
+					StyleContext sc = new StyleContext();
+					link= sc.addStyle("link", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
+			        StyleConstants.setFontSize(link, (7 + (int)resizeFactor));
+					((HTMLDocument) editorPanel.getDocument()).setCharacterAttributes(221, 26, link, false);
 				}
 				else{
 					// Si nos encontramos con un contenedor, redimensionamos sus hijos
@@ -252,7 +270,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param c Componente de tipo JLabel en el que se encuentra la imagen
 	 * @param w Width inicial de la imagen
 	 * @para h Height inicial de la imagen
-	 * @param multiplicando Valor de multiplicacion para el nuevo tamaÃ±o de la imagen. Es mayor cuanto menor sea el tamaÃ±o inicial de la imagen
+	 * @param multiplicando Valor de multiplicacion para el nuevo tamaño de la imagen. Es mayor cuanto menor sea el tamaño inicial de la imagen
 	 */
 	public final void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
 		if(JAccessibilityDialogWizard.getJAccessibilityDialogWizard(c)==null){
@@ -309,6 +327,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @return Boolean que indica si el componente pasado como par&aacute;metro va a ser redimensionado.
 	 */
 	private boolean isResizable(Component a){
+
 		if(a instanceof JButton)
 			return true;
 		else if(a instanceof JToggleButton)
@@ -330,6 +349,8 @@ public class ResizingAdaptor extends ComponentAdapter {
 		else if(a instanceof JCheckBox)
 			return true;
 		else if(a instanceof JTextPane)
+			return true;
+		else if(a instanceof JEditorPane)
 			return true;
 		else if(a instanceof JTree)
 			return true;
