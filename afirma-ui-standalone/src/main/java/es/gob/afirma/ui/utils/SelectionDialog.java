@@ -32,7 +32,19 @@ public class SelectionDialog {
 	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
 	 */
 	public static File showFileOpenDialog(Component parent, String title) {
-		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY);
+		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY, null);
+	}
+	
+	/**
+	 * Muestra un di&aacute;logo para la selecci&oacute;n de un fichero en disco
+	 * mostrando s&oacute;lo aquellos que pasen el filtro indicado.
+	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
+	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
+	 * @param filter Filtro de ficheros.
+	 * @return Fichero seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
+	 */
+	public static File showFileOpenDialog(Component parent, String title, ExtFilter filter) {
+		return showOpenDialog(parent, title, JFileChooser.FILES_ONLY, filter);
 	}
 	
 	/**
@@ -42,7 +54,7 @@ public class SelectionDialog {
 	 * @return Directorio seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
 	 */
 	public static File showDirOpenDialog(Component parent, String title) {
-		return showOpenDialog(parent, title, JFileChooser.DIRECTORIES_ONLY);
+		return showOpenDialog(parent, title, JFileChooser.DIRECTORIES_ONLY, null);
 	}
 
 	/**
@@ -50,9 +62,10 @@ public class SelectionDialog {
 	 * @param parent Component padre sobre el que se mostrar&aacute; el di&aacute;logo.
 	 * @param title T&iacute;tulo del di&aacute;logo de selecci&oacute;n.
 	 * @param selectionMode Modo de selecci&oacute;n de {@link JFileChooser}.
+	 * @param filter Filtro de ficheros.
 	 * @return Archivo seleccionado o {@code null} si no se seleccion&oacute;o ninguno.
 	 */
-	private static File showOpenDialog(Component parent, String title, int selectionMode) {
+	private static File showOpenDialog(Component parent, String title, int selectionMode, ExtFilter filter) {
 	    
         String currentDir = Main.preferences.get("dialog.load.dir", null); //$NON-NLS-1$
         if (currentDir == null) {
@@ -63,6 +76,9 @@ public class SelectionDialog {
 		JAccessibilityFileChooser fc = new JAccessibilityFileChooser(new File(currentDir));
 		fc.setDialogTitle(title);
 		fc.setFileSelectionMode(selectionMode);
+		if (filter != null) {
+			fc.setFileFilter(filter);
+		}
 		
 		File filePath = null;
 		if(fc.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
