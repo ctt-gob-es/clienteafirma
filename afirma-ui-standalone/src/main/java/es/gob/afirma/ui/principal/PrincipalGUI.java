@@ -104,6 +104,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	private HorizontalTabbedPanel htPanel;
 	
+	private boolean maximized = false;
+	
 	@Override
 	public int getMinimumRelation(){
 		return 7;
@@ -430,11 +432,16 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
 	    // la ventana principal con el tama�o adecuado
 	    if (GeneralConfig.isMaximized()){
+	    	maximized = true;
 			this.setExtendedState(MAXIMIZED_BOTH);
 		} else {
 			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
 				this.setExtendedState(0);
 				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
+
+			} else {
+				this.setExtendedState(0);
+				setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
 			}
 		}
 	    	
@@ -696,12 +703,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    bar.setPreferredSize(new Dimension((int) screenSize.getWidth()*10/100,(int) screenSize.getHeight()*5/100));
 	    bar.setLabelSize((int) screenSize.getWidth(),(int) screenSize.getHeight()*4/100);
 	    screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
-			actualPositionX = this.getX();
-			actualPositionY = this.getY();
-			actualWidth = this.getWidth();
-			actualHeight = this.getHeight();
-		}
+	    if (!GeneralConfig.isMaximized()){
+			if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
+				actualPositionX = this.getX();
+				actualPositionY = this.getY();
+				actualWidth = this.getWidth();
+				actualHeight = this.getHeight();
+			}
+	    }
 	}
 	
 	/**
