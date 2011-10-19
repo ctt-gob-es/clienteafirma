@@ -331,7 +331,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		}
 	}
 	/**
-	 * Muestra la ventana de la aplicaciï¿½n
+	 * Muestra la ventana de la aplicaci&oacute;n
 	 */
 	public void main() {	
 		EventQueue.invokeLater(new Runnable() {
@@ -400,9 +400,10 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
     }
     
     /**
-	 * Cambia el tamaÃ±o de la ventana al tamaÃ±o mÃ¡ximo de pantalla menos el tamaÃ±o de la barra de tareas de windows
+	 * Cambia el tamaño de la ventana al tamaño m&aacute;imo de pantalla menos el tamaño de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
+		
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		JAccessibilityDialogAdvisor j = getJAccessibilityDialogAdvisor(this);
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
@@ -410,7 +411,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	}
 	
 	/**
-	 * Restaura el tamaÃ±o de la ventana a la posicion anterior al maximizado
+	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
 		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
