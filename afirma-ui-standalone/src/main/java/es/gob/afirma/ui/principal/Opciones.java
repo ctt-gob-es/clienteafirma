@@ -71,6 +71,12 @@ public class Opciones extends JAccessibilityDialog {
     /** Panel con las pesta&ntilde;as de opciones. */
     private JTabbedPane mainPanel;
     
+    /** Botón para maximizar la ventana */
+    private JButton maximizar = new JButton();
+    
+    /** Botón para restaurar la ventana una vez maximizada */
+    private JButton restaurar = new JButton();
+    
     public Opciones(PrincipalGUI mainGUI) {
     	this.mainGui = mainGUI;
         initComponents();
@@ -215,7 +221,6 @@ public class Opciones extends JAccessibilityDialog {
         
 		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
 		//Boton maximizar ventana
-		JButton maximizar = new JButton();
 		maximizar.setText(Messages.getString("Wizard.maximizar"));
 	    maximizar.setName("maximizar");
 	    maximizar.setMnemonic(KeyEvent.VK_M);
@@ -231,7 +236,6 @@ public class Opciones extends JAccessibilityDialog {
 		
 	    JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
 	    // Boton restaurar
-	    JButton restaurar = new JButton();
 	    restaurar.setText(Messages.getString("Wizard.restaurar"));
 	    restaurar.setName("restaurar");
 	    restaurar.setMnemonic(KeyEvent.VK_R);
@@ -509,21 +513,38 @@ public class Opciones extends JAccessibilityDialog {
     }
     
     /**
-	 * Cambia el tamaÃ±o de la ventana al tamaÃ±o mÃ¡ximo de pantalla menos el tamaÃ±o de la barra de tareas de windows
+	 * Cambia el tamaño de la ventana al tamaño máximo de pantalla menos el tamaño de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		JAccessibilityDialog j = getJAccessibilityDialog(this);
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-		
+		restaurar.setEnabled(true);
+		maximizar.setEnabled(false);
 	}
 	
 	/**
-	 * Restaura el tamaÃ±o de la ventana a la posicion anterior al maximizado
+	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
-		
-		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);		
+		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
+			this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
+		} else {
+			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+    			if (Platform.getOS().equals(Platform.OS.LINUX)){
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+    				setMinimumSize(new Dimension(getSize().width, getSize().height));
+    			} else {
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+    				setMinimumSize(new Dimension(getSize().width, getSize().height));
+    			}
+    		} else {
+    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+    			setMinimumSize(new Dimension(getSize().width, getSize().height));
+    		}
+		}
+		restaurar.setEnabled(false);
+		maximizar.setEnabled(true);
 	}
 	
 	private class OpenHelpActionListener implements ActionListener {
