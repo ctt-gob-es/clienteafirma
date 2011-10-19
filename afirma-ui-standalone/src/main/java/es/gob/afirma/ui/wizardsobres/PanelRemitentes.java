@@ -56,6 +56,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
@@ -109,12 +110,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * Lista con los remitentes
 	 */
 	private List<CertificateDestiny> listaCertificadosRe = new ArrayList<CertificateDestiny>();
-	
-	/**
-	 * Manager del KeyStore
-	 */
-	private AOKeyStoreManager keyStoreManager;
-	
+		
 	/**
 	 * Configuracion del KeyStore
 	 */
@@ -332,7 +328,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	}
 
 	/**
-	 * Aï¿½ade un nuevo remitente desde el repositorio indicado
+	 * A&ntilde;ade un nuevo remitente desde el repositorio indicado
 	 * @param comboRepositorios	combo con el listado de repositorios / almacenes
 	 * @param listModel  		Modelo de la lista de remitentes
 	 * @param eliminar			Boton para eliminar un remitente del listado de repositorios
@@ -341,18 +337,37 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	void anadirActionPerformed(JComboBox comboRepositorios, JButton eliminar, JButton anadir) {
 		this.kconf = (KeyStoreConfiguration) comboRepositorios.getSelectedItem();
 
+		final AOKeyStoreManager keyStoreManager;
 		try {
-			AOKeyStore ao= this.kconf.getType();
-			this.keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, null, null, getPreferredPCB(ao), this);
+			AOKeyStore ao = this.kconf.getType();
+			String lib = null;
+			if (ao == AOKeyStore.PKCS12 || ao == AOKeyStore.SINGLE) {
+				ExtFilter filter;
+				if (ao == AOKeyStore.PKCS12) {
+					filter = new ExtFilter(
+							new String[] { "p12", "pfx" }, //$NON-NLS-1$ //$NON-NLS-2$
+							Messages.getString("Filtro.fichero.pkcs12.descripcion")); //$NON-NLS-1$
+				} else {
+					filter = new ExtFilter(
+							new String[] { "cer", "p7b", "p7s" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							Messages.getString("Filtro.fichero.certificado.descripcion")); //$NON-NLS-1$
+				}
+				File keystorePath = SelectionDialog.showFileOpenDialog(this, Messages.getString("Ensobrado.dialogo.almacen.titulo"), filter); //$NON-NLS-1$
+				if (keystorePath == null) {
+					throw new AOCancelledOperationException();
+				}
+				lib = keystorePath.getAbsolutePath();
+			}
+			keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, lib, null, getPreferredPCB(ao), this);
 		} catch (AOCancelledOperationException e) {
 			logger.severe("Operacion cancelada por el usuario");
 			return;
 		}catch (InvalidKeyException e) {
-			//Control de la excepción generada al introducir mal la contraseña para el almacén
+			//Control de la excepcion generada al introducir mal la contrasena para el almacen
             JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return;
         }  catch (AOKeystoreAlternativeException e) {
-        	//Control de la excepción generada al introducir una contraseña vacía para el almacén
+        	//Control de la excepcion generada al introducir una contraseoa vacia para el almacen
         	 JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
              return;
         } catch (Exception e) {
@@ -363,7 +378,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		}
 
 		// Obtenemos el certificado
-		CertificateDestiny certDest = new CertificateDestiny(this.keyStoreManager, this);
+		CertificateDestiny certDest = new CertificateDestiny(keyStoreManager, this);
 		
 		// Comprobamos que el certificado es correcto
 		if (certDest.getAlias() != null && !certDest.equals("")) {	
@@ -379,25 +394,25 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				listModel.addElement(certDest.getAlias());
 				this.listaCertificadosRe.add(certDest);
 				anadir.setEnabled(false);
-				anadir.setMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el botón
+				anadir.setMnemonic(0); //Se asigna un atajo vacio puesto que se ha deshabilitado el boton
 				comboRepositorios.setEnabled(false);
-				this.etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
+				this.etiquetaAnadir.setDisplayedMnemonic(0); //Se asigna un atajo vacio puesto que se ha deshabilitado el combo asociado
 				this.etiquetaAnadir.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " + Messages.getString("wizard.sobres.etiquetaAnadir"));
 				this.etiquetaAnadir.setFocusable(true);
 				eliminar.setEnabled(true);
-				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
+				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al boton ya que ha sido habilitado
 			} else
 				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
 		}
 		
-		// Preguntamos por la contraseï¿½a del certificado
+		// Preguntamos por la contrasena del certificado
 		if (!this.listaCertificadosRe.isEmpty())
 			try {
-				this.privateKeyEntry = getPrivateKeyEntry(this.keyStoreManager, certDest.getAlias(),this.kconf);
+				this.privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(),this.kconf);
 			} 
 	       	catch (KeyException e) {
-	       		//Control de la excepción generada al introducir mal la contraseña para el certificado
+	       		//Control de la excepcion generada al introducir mal la contrasena para el certificado
 	            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	            return;
 	        }catch(AOException e){

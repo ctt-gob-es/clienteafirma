@@ -19,6 +19,7 @@ import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +43,14 @@ import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
@@ -269,7 +272,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	}
 
 	/**
-	 * Anade un destinatario del origen seleccionado en el combo
+	 * A&ntilde;ade un destinatario del origen seleccionado en el combo
 	 * @param listaModel Modelo de la lista de destinatarios
 	 */
 	private void anadirActionPerformed(JComboBox comboDestinatarios, DefaultListModel listaModel, JButton eliminar) {
@@ -277,8 +280,26 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		KeyStoreConfiguration kc = (KeyStoreConfiguration) comboDestinatarios.getSelectedItem();
 		try {
 			AOKeyStore ao = kc.getType();
-			System.out.println("PasswordCallback: " + getPreferredPCB(ao));
-			keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, null, null, getPreferredPCB(ao), this);
+			String lib = null;
+			if (ao == AOKeyStore.PKCS12 || ao == AOKeyStore.SINGLE) {
+				ExtFilter filter;
+				if (ao == AOKeyStore.PKCS12) {
+					filter = new ExtFilter(
+							new String[] { "p12", "pfx" }, //$NON-NLS-1$ //$NON-NLS-2$
+							Messages.getString("Filtro.fichero.pkcs12.descripcion")); //$NON-NLS-1$
+				} else {
+					filter = new ExtFilter(
+							new String[] { "cer", "p7b", "p7s" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							Messages.getString("Filtro.fichero.certificado.descripcion")); //$NON-NLS-1$
+				}
+				File keystorePath = SelectionDialog.showFileOpenDialog(this, Messages.getString("Ensobrado.dialogo.almacen.titulo"), filter); //$NON-NLS-1$
+				if (keystorePath == null) {
+					throw new AOCancelledOperationException();
+				}
+				lib = keystorePath.getAbsolutePath();
+			}
+			
+			keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, lib, null, getPreferredPCB(ao), this);
 		} catch (AOCancelledOperationException e) {
 			logger.severe("Operacion cancelada por el usuario");
 			return;

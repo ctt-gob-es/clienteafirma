@@ -55,6 +55,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
@@ -313,7 +314,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	}
 
 	/**
-	 * Aï¿½ade un nuevo remitente desde el repositorio indicado
+	 * A&ntilde;ade un nuevo remitente desde el repositorio indicado
 	 * @param comboRepositorios	combo con el listado de repositorios / almacenes
 	 * @param listModel  		Modelo de la lista de remitentes
 	 * @param eliminar			Boton para eliminar un remitente del listado de repositorios
@@ -323,15 +324,33 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		this.kconf = (KeyStoreConfiguration) comboRepositorios.getSelectedItem();
 
 		try {
-			AOKeyStore ao= this.kconf.getType();
-			this.keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, null, null, getPreferredPCB(ao), this);
+			AOKeyStore ao = this.kconf.getType();
+			String lib = null;
+			if (ao == AOKeyStore.PKCS12 || ao == AOKeyStore.SINGLE) {
+				ExtFilter filter;
+				if (ao == AOKeyStore.PKCS12) {
+					filter = new ExtFilter(
+							new String[] { "p12", "pfx" }, //$NON-NLS-1$ //$NON-NLS-2$
+							Messages.getString("Filtro.fichero.pkcs12.descripcion")); //$NON-NLS-1$
+				} else {
+					filter = new ExtFilter(
+							new String[] { "cer", "p7b", "p7s" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							Messages.getString("Filtro.fichero.certificado.descripcion")); //$NON-NLS-1$
+				}
+				File keystorePath = SelectionDialog.showFileOpenDialog(this, Messages.getString("Ensobrado.dialogo.almacen.titulo"), filter); //$NON-NLS-1$
+				if (keystorePath == null) {
+					throw new AOCancelledOperationException();
+				}
+				lib = keystorePath.getAbsolutePath();
+			}
+			this.keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(ao, lib, null, getPreferredPCB(ao), this);
 		} catch (AOCancelledOperationException e) {
-			logger.severe("Operacion cancelada por el usuario");
+			logger.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
 			return;
 		} catch (Exception e) {
-			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.almacen"), 
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			logger.severe("No se ha podido abrir el almacen de certificados: " + e); //$NON-NLS-1$
+			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.almacen"),  //$NON-NLS-1$
+					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return;
 		}
 
