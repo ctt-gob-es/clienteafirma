@@ -25,7 +25,7 @@ public class HighContrastTheme extends MetalTheme {
 	/**
 	 * Color primario 3
 	 */
-	private final ColorUIResource primary3 = new ColorUIResource(Color.DARK_GRAY);
+	private final ColorUIResource primary3 = new ColorUIResource(Color.LIGHT_GRAY);
 
 	/**
 	 * Color secundario 1
@@ -34,7 +34,7 @@ public class HighContrastTheme extends MetalTheme {
 	/**
 	 * Color secundario 2
 	 */
-	private final ColorUIResource secondary2 = new ColorUIResource(Color.DARK_GRAY);
+	private final ColorUIResource secondary2 = new ColorUIResource(Color.LIGHT_GRAY);
 	/**
 	 * Color secundario 3
 	 */
