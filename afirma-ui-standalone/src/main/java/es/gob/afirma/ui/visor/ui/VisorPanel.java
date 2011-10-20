@@ -35,6 +35,7 @@ import es.gob.afirma.signature.ValidateBinarySignature;
 import es.gob.afirma.signature.ValidateXMLSignature;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
+import es.gob.afirma.ui.principal.PrincipalGUI;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -171,6 +172,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         bClose.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				saveSizePosition();
 				VisorPanel.this.dispose();
 			}
 		});
@@ -247,6 +249,16 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 			}
     		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
 		}
-		
+	}
+	
+	/**
+	 * Guarda el tamaño y posicion de la ventana antes de cerrarse
+	 */
+	public void saveSizePosition(){
+		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
+		PrincipalGUI.wizardActualPositionX = j.getX();
+		PrincipalGUI.wizardActualPositionY = j.getY();
+		PrincipalGUI.wizardActualWidth = j.getWidth();
+		PrincipalGUI.wizardActualHeight = j.getHeight();
 	}
 }
