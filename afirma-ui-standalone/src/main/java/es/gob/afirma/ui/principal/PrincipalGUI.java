@@ -112,8 +112,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	}
 	
 	/**
-	 * Posici�n X inicial de la ventana dependiendo de la resoluci�n de pantalla.
-	 * @return int Posici�n X
+	 * Posicion X inicial de la ventana dependiendo de la resolucion de pantalla.
+	 * @return int Posicion X
 	 */
 	public int getInitialX() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
@@ -121,9 +121,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	}
 	
 	/**
-	 * Posici�n Y inicial de la ventana dependiendo del sistema operativo y de la
-	 * resoluci�n de pantalla.
-	 * @return int Posici�n Y
+	 * Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resolucion de pantalla.
+	 * @return int Posicion Y
 	 */
 	public int getInitialY() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
@@ -227,7 +227,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Subopcion menu Herramientas - Opciones
 		JMenuItem opciones = new JMenuItem();
 		opciones.setText(Messages.getString("Opciones.opciones")); //$NON-NLS-1$
-		opciones.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al men�
+		opciones.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al menu
 		opciones.addActionListener(new ActionListener() {
             @Override
 			public void actionPerformed(ActionEvent evt) {
@@ -241,9 +241,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Subopcion menu Herramientas - Idiomas
 		JMenu menuIdioma = new JMenu();
 		menuIdioma.setText(Messages.getString("Opciones.general.idioma")); //$NON-NLS-1$
-		menuIdioma.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al men�
+		menuIdioma.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al menu
 		
-		// Obtenemos ruta donde se encuentra la aplicaci�n
+		// Obtenemos ruta donde se encuentra la aplicacion
 		URL baseDirectory = getClass().getProtectionDomain().getCodeSource().getLocation();
 		File languagesDirectory = null;
 
@@ -285,7 +285,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				String languageName = locale.getDisplayLanguage(locale);
 				JRadioButtonMenuItem opcionIdioma = new JRadioButtonMenuItem(languageName.substring(0, 1).toUpperCase() + languageName.substring(1));
 				
-				//Se asigna un mnem�nico que no haya sido utilizado
+				//Se asigna un mnemonico que no haya sido utilizado
 				opcionIdioma.setMnemonic(Utils.getLanguageMnemonic(mnemonicList, languageName.toLowerCase()));
 				
 				Utils.setContrastColor(opcionIdioma);
@@ -317,7 +317,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Subopcion menu Herramientas - Salir
 		JMenuItem salir = new JMenuItem();
 		salir.setText(Messages.getString("PrincipalGUI.salir")); // NOI18N
-		salir.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo al men�
+		salir.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo al menu
 		salir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				salirActionPerformed();
@@ -430,15 +430,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    this.htPanel.reset();
 
 	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
-	    // la ventana principal con el tama�o adecuado
+	    // la ventana principal con el tamaño adecuado
 	    if (GeneralConfig.isMaximized()){
-	    	maximized = true;
+			maximized = true;
 			this.setExtendedState(MAXIMIZED_BOTH);
 		} else {
 			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
 				this.setExtendedState(0);
 				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
-
 			} else {
 				this.setExtendedState(0);
 				setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
@@ -694,7 +693,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	/**
 	 * Evento de redimensionado. Redimensiona el tamaño de la barra de estado 
-	 * y de su contenido, tambi�n almacena los valores actuales de posicion y tama�o de
+	 * y de su contenido, tambien almacena los valores actuales de posicion y tama�o de
 	 * la ventana.
 	 * 
 	 */
@@ -703,14 +702,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    bar.setPreferredSize(new Dimension((int) screenSize.getWidth()*10/100,(int) screenSize.getHeight()*5/100));
 	    bar.setLabelSize((int) screenSize.getWidth(),(int) screenSize.getHeight()*4/100);
 	    screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	    if (!GeneralConfig.isMaximized()){
+		if (!GeneralConfig.isMaximized()){
 			if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
 				actualPositionX = this.getX();
 				actualPositionY = this.getY();
 				actualWidth = this.getWidth();
 				actualHeight = this.getHeight();
 			}
-	    }
+		}
 	}
 	
 	/**
@@ -741,13 +740,13 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 			} else {
 				
-				//Se comprueba si el lookAndFeel por defecto es el que se hab�a modificado para el modo
+				//Se comprueba si el lookAndFeel por defecto es el que se habia modificado para el modo
 				//Alto contraste
 				if (defaultLookAndFeel instanceof MetalLookAndFeel) {
 					MetalLookAndFeel.setCurrentTheme(this.defaultTheme); //Se asigna el tema por defecto
 				}
 				
-				//Se asigna el lookAndFeel que hab�a por defecto
+				//Se asigna el lookAndFeel que habia por defecto
 				UIManager.setLookAndFeel(defaultLookAndFeel);
 				
 				UIManager.put("OptionPane.messageForeground",Color.BLACK);
