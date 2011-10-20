@@ -271,6 +271,7 @@ public class Desensobrado extends JPanel {
 		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
         // Boton de ayuda
 		JButton botonAyuda = HelpUtils.helpButton("desensobrado");
+		botonAyuda.setName("helpButton");
 		
         cons.ipadx = 15;
 		cons.weightx = 0.0;

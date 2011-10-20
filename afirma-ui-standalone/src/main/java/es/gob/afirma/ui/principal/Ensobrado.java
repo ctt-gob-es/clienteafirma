@@ -244,6 +244,7 @@ public class Ensobrado extends JPanel {
 		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
         // Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("ensobrado");
+		botonAyuda.setName("helpButton");
         
         cons.ipadx = 15;
 		cons.weightx = 0.0;
