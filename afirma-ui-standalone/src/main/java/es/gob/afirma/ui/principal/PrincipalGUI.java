@@ -736,6 +736,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				UIManager.put("Button.foreground",Color.WHITE);
 				UIManager.put("ToolTip.foreground",Color.WHITE);
 				UIManager.put("ToolTip.background",Color.BLACK);
+				UIManager.put("Label.foreground",Color.WHITE);
 				
 
 			} else {
@@ -753,6 +754,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				UIManager.put("Button.foreground",Color.BLACK);
 				UIManager.put("ToolTip.foreground",Color.BLACK);
 				UIManager.put("ToolTip.background",new Color(255,255,225));
+				UIManager.put("Label.foreground",Color.BLACK);
 			}
 			
 		} catch (ClassNotFoundException e1) {
