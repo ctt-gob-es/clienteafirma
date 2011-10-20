@@ -174,6 +174,7 @@ public class MultifirmaMasiva extends JPanel {
 		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("firma.masiva");
+		botonAyuda.setName("helpButton");
 		
 		panelAyuda.add(botonAyuda);
 		panelBotones.add(panelAyuda, cons);

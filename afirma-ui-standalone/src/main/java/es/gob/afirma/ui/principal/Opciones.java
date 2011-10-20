@@ -325,6 +325,7 @@ public class Opciones extends JAccessibilityDialog {
 		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
         // Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("opciones.configuracion");
+		botonAyuda.setName("helpButton");
 		
 		// Sustituimos el listener por defecto por otro que abrir la ventana de ayuda
 		// correspondiente a la pestana seleccionada
