@@ -45,6 +45,10 @@ public class HelpUtils {
 	private static Hashtable<String, Component> components = new Hashtable<String, Component>();
 	private static HelpBroker helpBroker = null;
 	private static HelpSet helpset = null;
+	/**
+	 * Variable que almacena el icono original del botón de ayuda.
+	 */
+	public static final ImageIcon IMAGEICONHELP = new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png"));
  
 	static {
 		getHelp();
@@ -129,7 +133,7 @@ public class HelpUtils {
 	 */
 	public static JLabel fechButton(final String pagina) {
 
-		JLabel botonAyuda = new JLabel(new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")));
+		JLabel botonAyuda = new JLabel(IMAGEICONHELP);
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		botonAyuda.addMouseListener(new MouseListener() {
@@ -158,7 +162,7 @@ public class HelpUtils {
 	 */
 	public static JButton helpButton(final String pagina) {
 
-		JButton botonAyuda = new JButton(new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")));
+		JButton botonAyuda = new JButton(IMAGEICONHELP);
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		if (!pagina.equals("perfiles.usuario")){
