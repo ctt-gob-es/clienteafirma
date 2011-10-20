@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.utils;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -127,9 +126,16 @@ public class ResizingAdaptor extends ComponentAdapter {
 				relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
 			}
 		} else if (theDialogWizard != null){
-			relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH;
-			relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT;
-			relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
+			if (Platform.getOS().equals(Platform.OS.LINUX)){
+				relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH_LINUX;
+				relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT_LINUX;
+				relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
+			} else {
+				relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH;
+				relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT;
+				relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
+			}
+			
 		} else if (theDialogAdvisor != null){
 			relWidth = theDialogAdvisor.getSize().getWidth() / Constants.INIT_WINDOW_INITIAL_WIDTH;
 			relHeight = theDialogAdvisor.getSize().getHeight() / Constants.INIT_WINDOW_INITIAL_HEIGHT;

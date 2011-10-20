@@ -29,12 +29,14 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.signature.ValidateBinarySignature;
 import es.gob.afirma.signature.ValidateXMLSignature;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
+import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -153,7 +155,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 	    bottonPanel.add(panelRestaurar);
         
 	    //Espacio entre botones
-		Panel panelVacio = new Panel();
+		JPanel panelVacio = new JPanel();
 		panelVacio.setPreferredSize(new Dimension(300, 10));
 		bottonPanel.add(panelVacio);
 	    
@@ -220,10 +222,14 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 	 * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		
+		JAccessibilityDialogWizard.actualPositionX = j.getX();
+		JAccessibilityDialogWizard.actualPositionY = j.getY();
+		JAccessibilityDialogWizard.actualWidth = j.getWidth();
+		JAccessibilityDialogWizard.actualHeight = j.getHeight();
+		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);		
 	}
 	
 	/**
@@ -231,7 +237,17 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 	 */
 	public void restaurarActionPerformed(){
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		j.setBounds(j.actualPositionX, j.actualPositionY, j.actualWidth, j.actualHeight);
+		if (JAccessibilityDialogWizard.actualPositionX != -1 && JAccessibilityDialogWizard.actualPositionY != -1 && JAccessibilityDialogWizard.actualWidth != -1 && JAccessibilityDialogWizard.actualHeight != -1){
+			j.setBounds(JAccessibilityDialogWizard.actualPositionX, JAccessibilityDialogWizard.actualPositionY, JAccessibilityDialogWizard.actualWidth, JAccessibilityDialogWizard.actualHeight);
+		} else {
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			if (Platform.getOS().equals(Platform.OS.LINUX)){
+	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
+			} else{
+	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
+			}
+    		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
+		}
 		
 	}
 }

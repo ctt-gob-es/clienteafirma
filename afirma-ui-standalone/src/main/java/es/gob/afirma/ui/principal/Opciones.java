@@ -250,7 +250,7 @@ public class Opciones extends JAccessibilityDialog {
 	    panelRestaurar.add(restaurar);
 	    
 	    //Espacio entre botones
-		Panel panelVacio = new Panel();
+		JPanel panelVacio = new JPanel();
 		panelVacio.setPreferredSize(new Dimension(15, 10));
 	    
 		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
@@ -516,11 +516,13 @@ public class Opciones extends JAccessibilityDialog {
 	 * Cambia el tamaño de la ventana al tamaño máximo de pantalla menos el tamaño de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
+		actualPositionX = this.getX();
+		actualPositionY = this.getY();
+		actualWidth = this.getWidth();
+		actualHeight = this.getHeight();
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		JAccessibilityDialog j = getJAccessibilityDialog(this);
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-		restaurar.setEnabled(true);
-		maximizar.setEnabled(false);
 	}
 	
 	/**
@@ -543,8 +545,6 @@ public class Opciones extends JAccessibilityDialog {
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}
-		restaurar.setEnabled(false);
-		maximizar.setEnabled(true);
 	}
 	
 	private class OpenHelpActionListener implements ActionListener {

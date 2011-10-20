@@ -105,16 +105,6 @@ public abstract class JAccessibilityDialog extends JDialog {
 		    	}
 		    }
 	    }
-	    // Se almacenan los valores de la posicion y el tamaño para la restauracion
-	    //si no se han guardado ya previamente
-	    if (!GeneralConfig.isMaximized()){
-			if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
-				actualPositionX = this.getX();
-				actualPositionY = this.getY();
-				actualWidth = this.getWidth();
-				actualHeight = this.getHeight();
-			}
-	    }
 	}
 	
 	/**

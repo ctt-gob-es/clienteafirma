@@ -257,7 +257,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		config(aceptar);
 		
 	    //Espacio entre botones
-		Panel panelVacio = new Panel();
+		JPanel panelVacio = new JPanel();
 		panelVacio.setPreferredSize(new Dimension(100, 10));
         
         // Panel en donde se insertan los botones maximizar y aceptar

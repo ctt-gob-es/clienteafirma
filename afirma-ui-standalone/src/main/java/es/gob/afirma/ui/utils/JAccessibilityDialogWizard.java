@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
@@ -30,17 +31,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	public JAccessibilityDialogWizard(){
 		super();
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this,null,null);
-		this.addComponentListener(adaptador);
-		this.addComponentListener(new ComponentAdapter() {
-		    public void componentResized(ComponentEvent e)
-		    {
-		    	resized(e);
-		    }
-		    public void componentMoved(ComponentEvent e)
-		    {
-		    	resized(e);
-		    }
-		});
+		this.addComponentListener(adaptador);		
 		if (GeneralConfig.isMaximized()){
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
@@ -106,13 +97,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		    } else {
 		    	botonMaximizar.setEnabled(true);
 		    	if (botonRestaurar != null) {
-			    	//Se comprueba si la ventana está restaurada
-			    	if ((this.getX() == actualPositionX) && (this.getY() == actualPositionY) 
-			    			&& (this.getWidth() == actualWidth) && (this.getHeight() == actualHeight)) {
-			    		botonRestaurar.setEnabled(false); //Se deshabilita
-			    	} else {
-			    		botonRestaurar.setEnabled(true); //Se habilita
-			    	}
+			    	botonRestaurar.setEnabled(false); //Se deshabilita
 		    	}
 		    }
 	    }
@@ -137,18 +122,4 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		 }
 		 return resultingJAccessibilityDialogWizard;
 	 }
-	
-	/**
-	 * Evento de redimensionado. Almacena el tamaño y posicion de la ventana para su restauracion.
-	 */
-	public void resized(ComponentEvent e) {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
-
-			actualPositionX = this.getX();
-			actualPositionY = this.getY();
-			actualWidth = this.getWidth();
-			actualHeight = this.getHeight();
-		}
-	}
 }

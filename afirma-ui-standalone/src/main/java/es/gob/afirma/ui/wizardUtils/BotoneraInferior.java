@@ -23,6 +23,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.principal.Opciones;
+import es.gob.afirma.ui.utils.Constants;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -36,7 +40,6 @@ public class BotoneraInferior extends JPanel {
 	private Dimension dimensiones = new Dimension(603, 47);
 	private List<JDialogWizard> ventanas;
 	private int posicion;
-
 	
 	public List<JDialogWizard> getVentanas() {
 		return this.ventanas;
@@ -114,7 +117,7 @@ public class BotoneraInferior extends JPanel {
 	    add(panelRestaurar);
         
         //Espacio entre botones
-		Panel panelVacio = new Panel();
+		JPanel panelVacio = new JPanel();
 		panelVacio.setPreferredSize(new Dimension(80, 10));
 		add(panelVacio);		
 		
@@ -164,7 +167,7 @@ public class BotoneraInferior extends JPanel {
         add(panelSiguiente);
 
         // Espacio entre botones
-		panelVacio = new Panel();
+		panelVacio = new JPanel();
 		panelVacio.setSize(new Dimension(20, 10));
 		add(panelVacio);
         
@@ -250,10 +253,15 @@ public class BotoneraInferior extends JPanel {
 	 * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		
+		JAccessibilityDialogWizard.actualPositionX = j.getX();
+		JAccessibilityDialogWizard.actualPositionY = j.getY();
+		JAccessibilityDialogWizard.actualWidth = j.getWidth();
+		JAccessibilityDialogWizard.actualHeight = j.getHeight();
+		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		//j.repaint();
 	}
 	
 	/**
@@ -261,7 +269,18 @@ public class BotoneraInferior extends JPanel {
 	 */
 	public void restaurarActionPerformed(){
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		j.setBounds(j.actualPositionX, j.actualPositionY, j.actualWidth, j.actualHeight);
+		if (JAccessibilityDialogWizard.actualPositionX != -1 && JAccessibilityDialogWizard.actualPositionY != -1 && JAccessibilityDialogWizard.actualWidth != -1 && JAccessibilityDialogWizard.actualHeight != -1){
+			j.setBounds(JAccessibilityDialogWizard.actualPositionX, JAccessibilityDialogWizard.actualPositionY, JAccessibilityDialogWizard.actualWidth, JAccessibilityDialogWizard.actualHeight);
+		} else {
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			if (Platform.getOS().equals(Platform.OS.LINUX)){
+	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
+			} else{
+	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
+			}
+    		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
+		}
 		
+		//j.repaint();
 	}
 }

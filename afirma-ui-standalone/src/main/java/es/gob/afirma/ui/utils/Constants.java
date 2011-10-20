@@ -79,6 +79,16 @@ public class Constants {
     public static final int OPTION_FONT_INITIAL_HEIGHT_LINUX = 620;
     
     /**
+     * Width inicial de los JDialogWizard de la aplicacion en LINUX.
+     */
+    public static final int WIZARD_INITIAL_WIDTH_LINUX = 700;
+    
+    /**
+     * Height inicial de los JDialogWizard de la aplicacion en LINUX.
+     */
+    public static final int WIZARD_INITIAL_HEIGHT_LINUX = 440;
+    
+    /**
      * Width inicial de los JDialogWizard de la aplicacion.
      */
     public static final int WIZARD_INITIAL_WIDTH = 670;

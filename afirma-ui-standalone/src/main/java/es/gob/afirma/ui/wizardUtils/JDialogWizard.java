@@ -19,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.utils.Constants;
 
 /**
  * Dialogo configurado con los parametros del asistente
@@ -46,9 +47,9 @@ public class JDialogWizard extends JDialog implements ComponentListener {
         // Dimensiones de la ventana
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         if (Platform.getOS().equals(Platform.OS.LINUX))
-            setBounds((screenSize.width - 700) / 2, (screenSize.height - 440) / 2, 700, 440);
+            setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
         else
-            setBounds((screenSize.width - 630) / 2, (screenSize.height - 440) / 2, 630, 440);
+            setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
     }
 
     /**
