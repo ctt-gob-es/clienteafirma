@@ -19,12 +19,12 @@ public class Constants {
     	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890.,-@";
 	
     /**
-     * Width inicial de los JFrame de la aplicacion.
+     * Width inicial de los JAccessibilityFrame de la aplicacion.
      */
     public static final int WINDOW_INITIAL_WIDTH = 650;
     
     /**
-     * Height inicial de los JFrame de la aplicacion.
+     * Height inicial de los JAccessibilityFrame de la aplicacion.
      */
     public static final int WINDOW_INITIAL_HEIGHT = 370;
     
@@ -39,64 +39,74 @@ public class Constants {
     public static final int INIT_WINDOW_INITIAL_HEIGHT = 360;
     
     /**
-     * Width inicial de la pantalla Acerca de
+     * Width inicial de los JAccessibilityFrameAbout de la aplicacion
      */
-    public static final int ABOUT_WINDOW_INITIAL_WIDTH = 490;
+    public static final int ABOUT_WINDOW_INITIAL_WIDTH = 450;
     
     /**
-     * Height inicial de la pantalla de Acerca de
+     * Height inicial de los JAccessibilityFrameAbout de la aplicacion
      */
-    public static final int ABOUT_WINDOW_INITIAL_HEIGHT = 430;
+    public static final int ABOUT_WINDOW_INITIAL_HEIGHT = 390;
     
     /**
-     * Width inicial de los JDialog de la aplicacion.
+     * Width inicial de los JAccessibilityFrameAbout de la aplicacion en LINUX.
+     */
+    public static final int ABOUT_WINDOW_INITIAL_WIDTH_LINUX = 490;
+    
+    /**
+     * Height inicial de los JAccessibilityFrameAbout de la aplicacion en LINUX.
+     */
+    public static final int ABOUT_WINDOW_INITIAL_HEIGHT_LINUX = 430;
+    
+    /**
+     * Width inicial de los JAccessibilityDialog de la aplicacion.
      */
     public static final int OPTION_INITIAL_WIDTH = 525;
     
     /**
-     * Height inicial de los JDialog de la aplicacion.
+     * Height inicial de los JAccessibilityDialog de la aplicacion.
      */
     public static final int OPTION_INITIAL_HEIGHT = 520;
     
     /**
-     * Width inicial de los JDialog de la aplicacion con variacion de fuente.
+     * Width inicial de los JAccessibilityDialog de la aplicacion con variacion de fuente.
      */
     public static final int OPTION_FONT_INITIAL_WIDTH = 605;
     
     /**
-     * Height inicial de los JDialog de la aplicacion con variacion de fuente.
+     * Height inicial de los JAccessibilityDialog de la aplicacion con variacion de fuente.
      */
     public static final int OPTION_FONT_INITIAL_HEIGHT = 600;
     
     /**
-     * Width inicial de los JDialog de la aplicacion con variacion de fuente en LINUX.
+     * Width inicial de los JAccessibilityDialog de la aplicacion con variacion de fuente en LINUX.
      */
     public static final int OPTION_FONT_INITIAL_WIDTH_LINUX = 625;
     
     /**
-     * Height inicial de los JDialog de la aplicacion con variacion de fuente en LINUX.
+     * Height inicial de los JAccessibilityDialog de la aplicacion con variacion de fuente en LINUX.
      */
     public static final int OPTION_FONT_INITIAL_HEIGHT_LINUX = 620;
     
     /**
-     * Width inicial de los JDialogWizard de la aplicacion en LINUX.
-     */
-    public static final int WIZARD_INITIAL_WIDTH_LINUX = 700;
-    
-    /**
-     * Height inicial de los JDialogWizard de la aplicacion en LINUX.
-     */
-    public static final int WIZARD_INITIAL_HEIGHT_LINUX = 440;
-    
-    /**
-     * Width inicial de los JDialogWizard de la aplicacion.
+     * Width inicial de los JAccessibilityDialogWizard de la aplicacion.
      */
     public static final int WIZARD_INITIAL_WIDTH = 670;
     
     /**
-     * Height inicial de los JDialogWizard de la aplicacion.
+     * Height inicial de los JAccessibilityDialogWizard de la aplicacion.
      */
     public static final int WIZARD_INITIAL_HEIGHT = 520;
+    
+    /**
+     * Width inicial de los JAccessibilityDialogWizard de la aplicacion en LINUX.
+     */
+    public static final int WIZARD_INITIAL_WIDTH_LINUX = 700;
+    
+    /**
+     * Height inicial de los JAccessibilityDialogWizard de la aplicacion en LINUX.
+     */
+    public static final int WIZARD_INITIAL_HEIGHT_LINUX = 440;
     
     /**
      * Factor de redimensionado para las imagenes    
