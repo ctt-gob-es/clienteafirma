@@ -141,9 +141,15 @@ public class ResizingAdaptor extends ComponentAdapter {
 			relHeight = theDialogAdvisor.getSize().getHeight() / Constants.INIT_WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theDialogAdvisor.getMinimumRelation());
 		} else {
-			relWidth = theWindowAbout.getSize().getWidth() / Constants.ABOUT_WINDOW_INITIAL_WIDTH;
-			relHeight = theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT;
-			relation = Math.round(relWidth * relHeight * theWindowAbout.getMinimumRelation());
+			if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX)){
+				relWidth = theWindowAbout.getSize().getWidth() / Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX;
+				relHeight = theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX;
+				relation = Math.round(relWidth * relHeight * theWindowAbout.getMinimumRelation());
+			} else {
+				relWidth = theWindowAbout.getSize().getWidth() / Constants.ABOUT_WINDOW_INITIAL_WIDTH;
+				relHeight = theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT;
+				relation = Math.round(relWidth * relHeight * theWindowAbout.getMinimumRelation());
+			}
 		}
 
 		for (int i = 0; i < components.length; i++) {
