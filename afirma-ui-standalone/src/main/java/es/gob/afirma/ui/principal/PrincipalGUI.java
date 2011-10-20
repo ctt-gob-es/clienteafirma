@@ -86,6 +86,30 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	private int actualHeight = -1;
 	
+	public static int optionActualPositionX = -1;
+	
+	public static int optionActualPositionY = -1;
+	
+	public static int optionActualWidth = -1;
+	
+	public static int optionActualHeight = -1;
+	
+	public static int wizardActualPositionX = -1;
+	
+	public static int wizardActualPositionY = -1;
+	
+	public static int wizardActualWidth = -1;
+	
+	public static int wizardActualHeight = -1;
+	
+	public static int aboutActualPositionX = -1;
+	
+	public static int aboutActualPositionY = -1;
+	
+	public static int aboutActualWidth = -1;
+	
+	public static int aboutActualHeight = -1;
+	
 	private JMenuBar menu;
 	
 	public static JStatusBar bar = new JStatusBar();
@@ -103,9 +127,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 //	private JTabbedPane panelPest = null;
 	
 	private HorizontalTabbedPanel htPanel;
-	
-	private boolean maximized = false;
-	
+		
 	@Override
 	public int getMinimumRelation(){
 		return 7;
@@ -432,7 +454,6 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
 	    // la ventana principal con el tamaño adecuado
 	    if (GeneralConfig.isMaximized()){
-			maximized = true;
 			this.setExtendedState(MAXIMIZED_BOTH);
 		} else {
 			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){

@@ -97,23 +97,10 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 		    } else {
 		    	boton.setEnabled(true);
 		    	if (botonRestaurar != null) {
-			    	//Se comprueba si la ventana está restaurada
-			    	if ((this.getX() == actualPositionX) && (this.getY() == actualPositionY) 
-			    			&& (this.getWidth() == actualWidth) && (this.getHeight() == actualHeight)) {
-			    		botonRestaurar.setEnabled(false); //Se deshabilita
-			    	} else {
-			    		botonRestaurar.setEnabled(true); //Se habilita
-			    	}
+			    	botonRestaurar.setEnabled(false); //Se deshabilita
 		    	}
 		    }
 	    }
-	    
-		if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
-			actualPositionX = this.getX();
-			actualPositionY = this.getY();
-			actualWidth = this.getWidth();
-			actualHeight = this.getHeight();
-		}
 	}
 	
 	/**

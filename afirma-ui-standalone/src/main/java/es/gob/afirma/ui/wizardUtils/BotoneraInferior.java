@@ -12,7 +12,6 @@ package es.gob.afirma.ui.wizardUtils;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Panel;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,9 +23,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.ui.principal.Opciones;
+import es.gob.afirma.ui.principal.PrincipalGUI;
 import es.gob.afirma.ui.utils.Constants;
-import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -182,6 +180,7 @@ public class BotoneraInferior extends JPanel {
         cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N
         cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
+            	saveSizePosition();
             	for (JDialogWizard ventana : BotoneraInferior.this.ventanas)
             		ventana.dispose();
             }
@@ -205,6 +204,7 @@ public class BotoneraInferior extends JPanel {
 
         finalizar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
+            	saveSizePosition();
             	for (JDialogWizard ventana : BotoneraInferior.this.ventanas)
             		ventana.dispose();
             }
@@ -261,7 +261,6 @@ public class BotoneraInferior extends JPanel {
 		JAccessibilityDialogWizard.actualWidth = j.getWidth();
 		JAccessibilityDialogWizard.actualHeight = j.getHeight();
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-		//j.repaint();
 	}
 	
 	/**
@@ -280,7 +279,16 @@ public class BotoneraInferior extends JPanel {
 			}
     		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
 		}
-		
-		//j.repaint();
+	}
+	
+	/**
+	 * Guarda el tamaño y posicion de la ventana antes de cerrarse
+	 */
+	public void saveSizePosition(){
+		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
+		PrincipalGUI.wizardActualPositionX = j.getX();
+		PrincipalGUI.wizardActualPositionY = j.getY();
+		PrincipalGUI.wizardActualWidth = j.getWidth();
+		PrincipalGUI.wizardActualHeight = j.getHeight();
 	}
 }

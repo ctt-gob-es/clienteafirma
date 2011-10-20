@@ -16,7 +16,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Panel;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -119,6 +118,7 @@ public class Opciones extends JAccessibilityDialog {
      */
     private void initComponents() {
     	// Dimensiones de la ventana en Windows y Linux
+
     	if (GeneralConfig.isMaximized()){
     		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
@@ -132,17 +132,30 @@ public class Opciones extends JAccessibilityDialog {
     			setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
     		}
     	} else {
-    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
-    			if (Platform.getOS().equals(Platform.OS.LINUX)){
-    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
-    				setMinimumSize(new Dimension(getSize().width, getSize().height));
-    			} else {
-    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
-    				setMinimumSize(new Dimension(getSize().width, getSize().height));
-    			}
+    		if (PrincipalGUI.optionActualPositionX != -1){
+	    		setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
+	    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+	    			if (Platform.getOS().equals(Platform.OS.LINUX)){
+	    				setMinimumSize(new Dimension(Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX));
+	    			} else {
+	    				setMinimumSize(new Dimension(Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT));
+	    			}
+	    		} else {
+	    			setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
+	    		}
     		} else {
-    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
-    			setMinimumSize(new Dimension(getSize().width, getSize().height));
+	    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+	    			if (Platform.getOS().equals(Platform.OS.LINUX)){
+	    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX);
+	    				setMinimumSize(new Dimension(getSize().width, getSize().height));
+	    			} else {
+	    				setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_FONT_INITIAL_WIDTH, Constants.OPTION_FONT_INITIAL_HEIGHT);
+	    				setMinimumSize(new Dimension(getSize().width, getSize().height));
+	    			}
+	    		} else {
+	    			setBounds(this.getInitialX(), this.getInitialY(), Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
+	    			setMinimumSize(new Dimension(getSize().width, getSize().height));
+	    		}
     		}
     	}
     	
@@ -501,7 +514,11 @@ public class Opciones extends JAccessibilityDialog {
     		mainGui.generarMenuAyuda();
     	}
     	
-    	// Cerramos la pantalla
+    	// Cerramos la pantalla y guardamos su posición y tamaño actual
+    	PrincipalGUI.optionActualPositionX = this.getX();
+    	PrincipalGUI.optionActualPositionY = this.getY();
+    	PrincipalGUI.optionActualWidth = this.getWidth();
+    	PrincipalGUI.optionActualHeight = this.getHeight();
     	dispose();
     }
 
@@ -509,6 +526,10 @@ public class Opciones extends JAccessibilityDialog {
      * Cierra la ventana
      */
     private void cancelarActionPerformed() {
+    	PrincipalGUI.optionActualPositionX = this.getX();
+    	PrincipalGUI.optionActualPositionY = this.getY();
+    	PrincipalGUI.optionActualWidth = this.getWidth();
+    	PrincipalGUI.optionActualHeight = this.getHeight();
     	dispose();
     }
     

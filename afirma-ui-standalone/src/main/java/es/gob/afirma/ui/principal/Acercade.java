@@ -28,6 +28,8 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.utils.Constants;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityFrameAbout;
 import es.gob.afirma.ui.utils.Messages;
@@ -46,6 +48,31 @@ public class Acercade extends JAccessibilityFrameAbout {
 		return 9;
 	}
 	
+	/**
+	 * Posicion X inicial de la ventana dependiendo de la resolucion de pantalla.
+	 * @return int Posicion X
+	 */
+	public int getInitialX() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
+			return (screenSize.width - 420) / 2;
+		}
+		return (screenSize.width - 380) / 2;
+	}
+	
+	/**
+	 * Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resolucion de pantalla.
+	 * @return int Posicion Y
+	 */
+	public int getInitialY() {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)){
+			return (screenSize.height - 360) / 2;
+		}
+		return (screenSize.height - 320) / 2;
+	}
+	
 	public Acercade() {
 		initComponents();
 	}
@@ -54,12 +81,34 @@ public class Acercade extends JAccessibilityFrameAbout {
 	 * Iniciamos componentes
 	 */
 	private void initComponents() {
-		// Dimensiones de la pestana
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX))
-			setBounds((screenSize.width - 420) / 2, (screenSize.height-360) / 2, 490, 430);
-		else
-			setBounds((screenSize.width - 380) / 2, (screenSize.height-320) / 2, 450, 390);			
+		// Dimensiones de la pestana	
+		
+		if (GeneralConfig.isMaximized()){
+    		this.setExtendedState(MAXIMIZED_BOTH);
+			if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX)){
+    			setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX, Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX));
+    		} else {
+    			setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH, Constants.ABOUT_WINDOW_INITIAL_HEIGHT));
+    		}
+    	} else {
+    		this.setExtendedState(0);
+    		if (PrincipalGUI.aboutActualPositionX != -1){
+	    		setBounds(PrincipalGUI.aboutActualPositionX, PrincipalGUI.aboutActualPositionY, PrincipalGUI.aboutActualWidth, PrincipalGUI.aboutActualHeight);
+	    		if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX)){
+	    			setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX, Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX));
+	    		} else {
+	    			setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH, Constants.ABOUT_WINDOW_INITIAL_HEIGHT));
+	    		}
+    		} else {
+    			if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX)){
+    				setBounds(this.getInitialX(), this.getInitialY(), Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX, Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX);
+    				setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX, Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX));
+        		} else {
+        			setBounds(this.getInitialX(), this.getInitialY(), Constants.ABOUT_WINDOW_INITIAL_WIDTH, Constants.ABOUT_WINDOW_INITIAL_HEIGHT);
+        			setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH, Constants.ABOUT_WINDOW_INITIAL_HEIGHT));
+        		}
+    		}
+    	}
 		
 		// Icono de @firma
 		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
@@ -68,7 +117,6 @@ public class Acercade extends JAccessibilityFrameAbout {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setTitle(Messages.getString("ayuda.contenido")); // NOI18N
 		setResizable(true);
-		setMinimumSize(getSize());
 		getContentPane().setLayout(new GridBagLayout());
 
 		GridBagConstraints c = new GridBagConstraints();
@@ -131,6 +179,10 @@ public class Acercade extends JAccessibilityFrameAbout {
 	 * Escondemos la ventana
 	 */
 	void aceptarActionPerformed() {
+		PrincipalGUI.aboutActualPositionX = this.getX();
+		PrincipalGUI.aboutActualPositionY = this.getY();
+		PrincipalGUI.aboutActualWidth = this.getWidth();
+		PrincipalGUI.aboutActualHeight =  this.getHeight();
 		dispose();
 	}
 

@@ -66,10 +66,7 @@ public class AccessibilityOptionsPane {
 	private JCheckBox checkWindowSize;
 	
 	/** Casilla de verificacion del tama&ntilde;o del cursor de texto. */ 
-	private JCheckBox checkCursorSize;
-	
-	/**	Estado de las opciones de accesibilidad. */
-	private Boolean[] optionState;	
+	private JCheckBox checkCursorSize;	
 	
 	public AccessibilityOptionsPane(){
 		this.panel = new JPanel(new GridBagLayout());

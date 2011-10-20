@@ -9,17 +9,12 @@
  */
 package es.gob.afirma.ui.wizardUtils;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
-
-import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.ui.utils.Constants;
 
 /**
  * Dialogo configurado con los parametros del asistente
@@ -43,13 +38,6 @@ public class JDialogWizard extends JDialog implements ComponentListener {
 
         // Icono de @firma
         setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
-
-        // Dimensiones de la ventana
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        if (Platform.getOS().equals(Platform.OS.LINUX))
-            setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
-        else
-            setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
     }
 
     /**

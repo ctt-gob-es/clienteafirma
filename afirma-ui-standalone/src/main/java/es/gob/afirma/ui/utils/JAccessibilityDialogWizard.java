@@ -4,10 +4,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
+import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.principal.PrincipalGUI;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
@@ -31,13 +31,34 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	public JAccessibilityDialogWizard(){
 		super();
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this,null,null);
-		this.addComponentListener(adaptador);		
+		this.addComponentListener(adaptador);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (GeneralConfig.isMaximized()){
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+			if (Platform.getOS().equals(Platform.OS.LINUX)){
+				setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
+			} else {
+				setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+			}
 		} else {
-			setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+			if (PrincipalGUI.wizardActualPositionX != -1){
+	    		setBounds(PrincipalGUI.wizardActualPositionX, PrincipalGUI.wizardActualPositionY, PrincipalGUI.wizardActualWidth, PrincipalGUI.wizardActualHeight);
+	    		if (Platform.getOS().equals(Platform.OS.LINUX)){
+	    			setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
+	    		} else {
+	    			setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+	    		}
+    		} else {
+				if (Platform.getOS().equals(Platform.OS.LINUX)){
+			          setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
+			          setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
+				} else {
+			          setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
+			          setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+				}
+    		}
 		}
+		
 	}
 	
 	/**
