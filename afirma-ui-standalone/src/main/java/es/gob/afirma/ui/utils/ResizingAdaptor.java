@@ -46,6 +46,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	private final JAccessibilityDialogAdvisor theDialogAdvisor;
 	private final JAccessibilityFrameAbout theWindowAbout;
 
+
 	/**
 	 * Constructor
 	 * 
@@ -300,12 +301,21 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param c Componente de tipo JButton en el que se encuentra la imagen
 	 */
 	public final void resizeImageButton(double factor, Component c) {
-		ImageIcon image = new ImageIcon();
-		image = (ImageIcon)((JButton)c).getIcon();
-			ImageIcon newImage = new ImageIcon(image.getImage().getScaledInstance((int) Math.round(25 * 2 * factor),
-					(int) Math.round(25 * 2 * factor), java.awt.Image.SCALE_SMOOTH));
-			((JButton)c).setIcon(newImage);
-			((JButton)c).setPreferredSize(new Dimension((int) Math.round(25 * 2 * factor),(int) Math.round(25 * 2 * factor)));
+		
+		JButton button = (JButton) c;
+		ImageIcon imageIcon = new ImageIcon();
+		
+		//Se comprueba si se trata del botón de ayuda
+		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) {
+			imageIcon = HelpUtils.IMAGEICONHELP; //Se carga la imagen original
+		} else {
+			imageIcon = (ImageIcon)button.getIcon(); //Se carga la imagen del componente actual
+		}
+		//Se redimensionan las imágenes
+		ImageIcon newImage = new ImageIcon(imageIcon.getImage().getScaledInstance((int) Math.round(25 * 2 * factor),
+				(int) Math.round(25 * 2 * factor), java.awt.Image.SCALE_SMOOTH));
+		((JButton)c).setIcon(newImage);
+		((JButton)c).setPreferredSize(new Dimension((int) Math.round(25 * 2 * factor),(int) Math.round(25 * 2 * factor)));
 	}
 	
 	/**
