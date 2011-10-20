@@ -4,7 +4,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Enumeration;
@@ -23,7 +22,7 @@ import es.gob.afirma.ui.utils.JAccessibilityFrame;
  * asociado a ese bot&oacute;n. 
  */
 public class HorizontalTabbedPanel extends Container {
-
+	private int numBotones = 0;
     /** UID */
     private static final long serialVersionUID = 2340734316078849777L;
 
@@ -47,7 +46,7 @@ public class HorizontalTabbedPanel extends Container {
    
         this.setLayout(new GridBagLayout());
         
-        final GridBagConstraints c = new GridBagConstraints();
+        GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 1.0;
         
@@ -55,13 +54,14 @@ public class HorizontalTabbedPanel extends Container {
         
         this.toggledButtonsPanel = new JPanel();
         
-        GridLayout buttonsPanelLayout = new GridLayout(0, 1);
-        buttonsPanelLayout.setVgap(5);
+        GridBagLayout buttonsPanelLayout = new GridBagLayout();
+
+        c.weightx = 0.15;
         this.toggledButtonsPanel.setLayout(buttonsPanelLayout);
         this.add(this.toggledButtonsPanel, c);
         
         c.gridx = 1;
-        
+        c.weightx = 0.05;
         JPanel gapPanel = new JPanel();
         gapPanel.setPreferredSize(new Dimension(20, 1));
         this.add(gapPanel, c);
@@ -80,9 +80,25 @@ public class HorizontalTabbedPanel extends Container {
      * @param panel Panel que debe mostrarse al pulsar el bot&oacute;n.
      */
     public void addTab(JToggleButton button, JPanel panel) {
-
-        this.toggledButtonsPanel.add(button);
-
+    	if(this.firstButton){
+    		this.numBotones = 0;
+    	}
+    	else{
+    		this.numBotones++;
+    	}
+    	GridBagConstraints c = new GridBagConstraints();
+    	c.fill = GridBagConstraints.HORIZONTAL;
+    	c.gridx = 0;
+    	c.gridy = this.numBotones * 2;
+    	c.weightx = 1.0;
+    	c.weighty = 1.0;   	
+    	this.toggledButtonsPanel.add(button, c);
+    	c.fill = GridBagConstraints.BOTH;
+    	c.weighty = 1.0;
+    	c.weightx = 1.0;
+    	c.gridy = (this.numBotones * 2) + 1;
+    	this.toggledButtonsPanel.add(new JPanel(), c);
+    	
         this.buttonGroup.add(button);
         
         //panel.setBackground(Color.BLUE);
@@ -93,7 +109,8 @@ public class HorizontalTabbedPanel extends Container {
         if (this.firstButton) {
             button.doClick();
             this.firstButton = false;
-        }
+            this.numBotones = 0;
+        }        
     }
 
     /**
@@ -114,7 +131,7 @@ public class HorizontalTabbedPanel extends Container {
             
             this.layoutConstraints.fill = GridBagConstraints.BOTH;
             this.layoutConstraints.weightx = 1.0;
-            this.layoutConstraints.weighty = 1.0;          
+            this.layoutConstraints.weighty = 1.0;   
         }
         
         @Override
