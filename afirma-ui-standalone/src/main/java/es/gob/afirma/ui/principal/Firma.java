@@ -379,6 +379,9 @@ public class Firma extends JPanel {
                 pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null); //$NON-NLS-1$
 
             try {
+            	//Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
+            	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE);
+            	
                 keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
                         store,
                         kssc.getLib(),
@@ -409,7 +412,7 @@ public class Firma extends JPanel {
             }
             catch (KeyException e) {
             	//Control de la excepción generada al introducir mal la contraseña para el certificado
-                JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
             catch (AOCancelledOperationException e) {
