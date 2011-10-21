@@ -117,6 +117,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 public final class AOPDFSigner implements AOSigner {
     
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
+    private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
     
     /** Versi&oacute;n de iText necesaria para el uso de esta clase. */
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
@@ -290,7 +291,7 @@ public final class AOPDFSigner implements AOSigner {
     @SuppressWarnings("unused")
     private boolean isPdfFile(final byte[] data) {
 
-        byte[] buffer = new byte[5];
+        byte[] buffer = new byte[PDF_FILE_HEADER.length()];
         try {
             new ByteArrayInputStream(data).read(buffer);
         }
@@ -299,7 +300,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         // Comprobamos que cuente con una cabecera PDF
-        if (buffer != null && !"%PDF-".equals(new String(buffer))) { //$NON-NLS-1$
+        if (buffer != null && !PDF_FILE_HEADER.equals(new String(buffer))) { //$NON-NLS-1$
             return false;
         }
 
