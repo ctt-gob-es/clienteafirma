@@ -300,7 +300,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         // Comprobamos que cuente con una cabecera PDF
-        if (buffer != null && !PDF_FILE_HEADER.equals(new String(buffer))) { //$NON-NLS-1$
+        if (buffer != null && !PDF_FILE_HEADER.equals(new String(buffer))) {
             return false;
         }
 
