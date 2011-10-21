@@ -325,9 +325,9 @@ public class ResizingAdaptor extends ComponentAdapter {
 	private float getFontSize(){
 		if(GeneralConfig.isBigFontSize()){
 			if (theDialogWizard != null){
-				return 14;
-			} else {
 				return 15;
+			} else {
+				return 16;
 			}
 		}
 		else{
