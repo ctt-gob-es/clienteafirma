@@ -96,7 +96,6 @@ import es.gob.afirma.signers.xml.Utils;
  * <dd>Algoritmo de huella digital a usar en las referencias XML (en formato URL segun W3C)</dd> -->
  * </dl>
  * @version 0.2 */
-@SuppressWarnings("restriction")
 public final class AOODFSigner implements AOSigner {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
