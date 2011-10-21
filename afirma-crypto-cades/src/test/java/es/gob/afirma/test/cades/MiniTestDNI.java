@@ -32,7 +32,6 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  *
  */
-@SuppressWarnings("restriction")
 public class MiniTestDNI {
     
     private static final String DNIE_DRIVER_PATH = "name=testdni\r\nlibrary=c:/windows/system32/UsrPkcs11.dll\r\nshowInfo=false"; //$NON-NLS-1$
