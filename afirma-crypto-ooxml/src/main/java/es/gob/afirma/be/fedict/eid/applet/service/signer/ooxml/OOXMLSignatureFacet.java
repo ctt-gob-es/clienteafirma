@@ -81,7 +81,6 @@ import es.gob.afirma.be.fedict.eid.applet.service.signer.SignatureFacet;
 /** Office OpenXML Signature Facet implementation.
  * @author fcorneli
  * @see "http://msdn.microsoft.com/en-us/library/cc313071.aspx" */
-@SuppressWarnings("restriction")
 class OOXMLSignatureFacet implements SignatureFacet {
 
     private final AbstractOOXMLSignatureService signatureService;

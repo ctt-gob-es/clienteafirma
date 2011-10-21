@@ -40,7 +40,6 @@ import es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner;
 
 /** Firmas OOXML basadas en una versi&oacute;n fuertemente modificada de las
  * clases <code>es.gob.afirma.be.fedict.eid.applet.service</code>. */
-@SuppressWarnings("restriction")
 public final class AOOOXMLSigner implements AOSigner {
     
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$

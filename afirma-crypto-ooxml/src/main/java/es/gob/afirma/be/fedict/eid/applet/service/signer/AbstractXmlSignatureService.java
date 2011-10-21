@@ -104,7 +104,6 @@ import es.gob.afirma.be.fedict.eid.applet.service.spi.SignatureService;
 
 /** Abstract base class for an XML Signature Service implementation.
  * @author fcorneli */
-@SuppressWarnings("restriction")
 public abstract class AbstractXmlSignatureService implements SignatureService {
 
     private final List<SignatureFacet> signatureFacets;

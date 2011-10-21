@@ -67,7 +67,6 @@ import es.gob.afirma.be.fedict.eid.applet.service.signer.AbstractXmlSignatureSer
 /** Signature Service implementation for Office OpenXML document format XML
  * signatures.
  * @author Frank Cornelis */
-@SuppressWarnings("restriction")
 public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignatureService {
 
     protected AbstractOOXMLSignatureService() {

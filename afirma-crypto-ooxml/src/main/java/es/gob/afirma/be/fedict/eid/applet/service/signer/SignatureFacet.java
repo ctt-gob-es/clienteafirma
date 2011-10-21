@@ -49,7 +49,6 @@ import org.w3c.dom.Element;
 
 /** JSR105 Signature Facet interface.
  * @author fcorneli */
-@SuppressWarnings("restriction")
 public interface SignatureFacet {
 
     /** This method is being invoked by the XML signature service engine during

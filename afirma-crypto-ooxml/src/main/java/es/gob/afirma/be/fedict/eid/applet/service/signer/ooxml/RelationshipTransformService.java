@@ -87,7 +87,6 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
  * Specs: http://openiso.org/Ecma/376/Part2/12.2.4#26
  * </p>
  * @author Frank Cornelis */
-@SuppressWarnings("restriction")
 public class RelationshipTransformService extends TransformService {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
