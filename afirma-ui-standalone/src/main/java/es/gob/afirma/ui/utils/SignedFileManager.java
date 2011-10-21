@@ -56,13 +56,11 @@ public class SignedFileManager {
      * @return Filtro con las extensiones de fichero v&aacute;lidas para el
      *         formato de firma especificado. */
     public static final FileFilter getOutFileFilter(final String signFormat) {
-        if (signFormat.equals(AOSignConstants.SIGN_FORMAT_CMS)) {
+    	
+        if (signFormat.equals(AOSignConstants.SIGN_FORMAT_CMS)
+        		|| signFormat.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
             return new ExtFilter(new String[] {
                 "csig"}, Messages.getString("SignedFileManager.43")); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_CADES)) {
-            return new ExtFilter(new String[] {
-                "csig"}, Messages.getString("SignedFileManager.1")); //$NON-NLS-1$ //$NON-NLS-2$
         }
         else if (signFormat.equals(AOSignConstants.SIGN_FORMAT_PDF)) {
             return new ExtFilter(new String[] {
