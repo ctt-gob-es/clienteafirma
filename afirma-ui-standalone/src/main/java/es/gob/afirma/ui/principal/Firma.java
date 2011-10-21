@@ -293,7 +293,8 @@ public class Firma extends JPanel {
         firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
         firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
         firmar.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
+            @Override
+			public void actionPerformed(ActionEvent evt) {
                 firmarActionPerformed(comboAlmacen, comboFormato, campoFichero);
             }
         });
@@ -497,11 +498,6 @@ public class Firma extends JPanel {
             prop.setProperty("format", formato); //$NON-NLS-1$
             prop.setProperty("mode", modoFirma); //$NON-NLS-1$
             prop.setProperty("uri", uri.toASCIIString()); //$NON-NLS-1$
-
-            for (String key : prop.keySet().toArray(new String[0])) {
-                System.out.println(key + ": " + prop.getProperty(key));
-            }
-            System.out.println("---");
 
             byte[] signedData = null;
             try {
