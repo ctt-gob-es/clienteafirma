@@ -13,7 +13,6 @@ import java.util.Properties;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
-import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.principal.MainOptionsPane;
 import es.gob.afirma.ui.principal.UserProfile;
 
@@ -142,12 +141,8 @@ public class GeneralConfig {
 		if(UserProfile.currentUser.equals(Constants.defaultUser)){
 			config.putAll(configOptions);
 		} else {
-			config.setProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.fontBig", "false"));
-	    	config.setProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, Main.preferences.get(UserProfile.currentUser+".accesibility.fontStyle", "false"));
-	    	config.setProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, Main.preferences.get(UserProfile.currentUser+".accesibility.highContrast", "false"));
-	    	config.setProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, Main.preferences.get(UserProfile.currentUser+".accesibility.focus", "false"));
-	    	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.maximized", "false"));
-	    	config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.cursor", "false"));
+			config.putAll(configOptions);
+			
 		}
 		return config;
 	}

@@ -119,6 +119,7 @@ public class Opciones extends JAccessibilityDialog {
     private void initComponents() {
     	// Dimensiones de la ventana en Windows y Linux
 
+    	System.out.println(GeneralConfig.isMaximized());
     	if (GeneralConfig.isMaximized()){
     		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
@@ -498,6 +499,14 @@ public class Opciones extends JAccessibilityDialog {
 	 */
     private void aceptarActionPerformed(Properties config, Properties signatureConfig) {
 
+    	// Guardamos la posición y tamaño actual de la ventana sólo en caso de no estar maximizada por configuración
+    	if (!GeneralConfig.isMaximized()){
+	    	PrincipalGUI.optionActualPositionX = this.getX();
+	    	PrincipalGUI.optionActualPositionY = this.getY();
+	    	PrincipalGUI.optionActualWidth = this.getWidth();
+	    	PrincipalGUI.optionActualHeight = this.getHeight();
+    	}
+    	
     	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tamaño de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
     	Boolean needUpdateGUI = ((GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)))|| (GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) || (GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE)))|| (GeneralConfig.isRemarked() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE)))|| (GeneralConfig.isHighContrast() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST)))|| (GeneralConfig.isBigFontSize() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)))|| (GeneralConfig.isFontBold() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE)))|| update);
     	    	
@@ -515,11 +524,7 @@ public class Opciones extends JAccessibilityDialog {
     		mainGui.generarMenuAyuda();
     	}
     	
-    	// Cerramos la pantalla y guardamos su posición y tamaño actual
-    	PrincipalGUI.optionActualPositionX = this.getX();
-    	PrincipalGUI.optionActualPositionY = this.getY();
-    	PrincipalGUI.optionActualWidth = this.getWidth();
-    	PrincipalGUI.optionActualHeight = this.getHeight();
+    	// Cerramos la pantalla    	
     	dispose();
     }
 
@@ -527,10 +532,13 @@ public class Opciones extends JAccessibilityDialog {
      * Cierra la ventana
      */
     private void cancelarActionPerformed() {
-    	PrincipalGUI.optionActualPositionX = this.getX();
-    	PrincipalGUI.optionActualPositionY = this.getY();
-    	PrincipalGUI.optionActualWidth = this.getWidth();
-    	PrincipalGUI.optionActualHeight = this.getHeight();
+    	// Guardamos la posición y tamaño actual de la ventana sólo en caso de no estar maximizada por configuración
+    	if (!GeneralConfig.isMaximized()){
+	    	PrincipalGUI.optionActualPositionX = this.getX();
+	    	PrincipalGUI.optionActualPositionY = this.getY();
+	    	PrincipalGUI.optionActualWidth = this.getWidth();
+	    	PrincipalGUI.optionActualHeight = this.getHeight();
+    	}
     	dispose();
     }
     

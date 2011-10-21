@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.util.Properties;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -289,7 +290,14 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
     	} else {
     		currentUser = list.getSelectedValue().toString();
     	}
-    	GeneralConfig.loadConfig(GeneralConfig.getConfig());
+    	Properties config = new Properties();
+    	config.setProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.fontBig", "false"));
+    	config.setProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, Main.preferences.get(UserProfile.currentUser+".accesibility.fontStyle", "false"));
+    	config.setProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, Main.preferences.get(UserProfile.currentUser+".accesibility.highContrast", "false"));
+    	config.setProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, Main.preferences.get(UserProfile.currentUser+".accesibility.focus", "false"));
+    	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.maximized", "false"));
+    	config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.cursor", "false"));
+    	GeneralConfig.loadConfig(config);
     	new PrincipalGUI().main();
     	dispose();
     	

@@ -37,6 +37,7 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 import es.gob.afirma.ui.utils.Constants;
+import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -255,10 +256,13 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 	 * Guarda el tamaño y posicion de la ventana antes de cerrarse
 	 */
 	public void saveSizePosition(){
-		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		PrincipalGUI.wizardActualPositionX = j.getX();
-		PrincipalGUI.wizardActualPositionY = j.getY();
-		PrincipalGUI.wizardActualWidth = j.getWidth();
-		PrincipalGUI.wizardActualHeight = j.getHeight();
+		// Guardamos la posición y tamaño actual de la ventana sólo en caso de no estar maximizada por configuración
+    	if (!GeneralConfig.isMaximized()){
+			JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
+			PrincipalGUI.wizardActualPositionX = j.getX();
+			PrincipalGUI.wizardActualPositionY = j.getY();
+			PrincipalGUI.wizardActualWidth = j.getWidth();
+			PrincipalGUI.wizardActualHeight = j.getHeight();
+    	}
 	}
 }
