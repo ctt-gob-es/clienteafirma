@@ -13,7 +13,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -176,8 +175,8 @@ public class HelpUtils {
 		botonAyuda.setMnemonic(KeyEvent.VK_H); //Se le asigna un mnemonico al boton de ayuda
 		botonAyuda.getAccessibleContext().setAccessibleName(botonAyuda.getToolTipText());
 		//Se asigna una dimension al boton segun su icono
-		Dimension dimension = new Dimension(12,27);
-		botonAyuda.setPreferredSize(dimension);
+		/*Dimension dimension = new Dimension(12,27);
+		botonAyuda.setPreferredSize(dimension);*/
 		
 		botonAyuda.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
 		botonAyuda.setContentAreaFilled(false); //area del boton invisible
@@ -191,7 +190,7 @@ public class HelpUtils {
 				}
 				public void focusGained(FocusEvent e) {
 					//Se muestra un borde en el botón cuando este tiene el foco
-					botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
+					botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
 				}
 			});
 		}
