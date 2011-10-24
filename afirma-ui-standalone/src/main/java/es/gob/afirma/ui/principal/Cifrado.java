@@ -205,6 +205,7 @@ public class Cifrado extends JPanel {
 			comboMecanismo.setEnabled(false); //Se deshabilita la opción
 			//Opciones para el lector de pantalla
 			etiquetaMecanismo.setFocusable(true);
+			Utils.remarcar(etiquetaMecanismo);
 			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")
 			+ Messages.getString("Cifrado.origenL.0") + " "+ Messages.getString("Cifrado.origen.clave.combo.disabled"));
 		} else {
@@ -252,6 +253,7 @@ public class Cifrado extends JPanel {
 			comboAlgoritmo.setEnabled(false); //Se deshabilita la opción
 			//Opciones para el lector de pantalla
 			etiquetaAlgoritmo.setFocusable(true);
+			Utils.remarcar(etiquetaAlgoritmo);
 			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")
 			+ Messages.getString("Cifrado.origenLc.0")+ " "+ Messages.getString("Cifrado.origen.clave.combo.disabled"));
 		} else {

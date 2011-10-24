@@ -218,6 +218,7 @@ public class MainOptionsPane {
         policyOidLabel.setFocusable(true);
         policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText()+". Este cuadro de texto está deshabilitado por defecto.");
         
+        Utils.remarcar(policyOidLabel);
         Utils.setContrastColor(policyOidLabel);
         Utils.setFontBold(policyOidLabel);
         policyPanel.add(policyOidLabel, c2);
@@ -243,6 +244,7 @@ public class MainOptionsPane {
         policyUrlLabel.setFocusable(true);
         policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText()+". Este cuadro de texto está deshabilitado por defecto.");
         
+        Utils.remarcar(policyUrlLabel);
         Utils.setContrastColor(policyUrlLabel);
         Utils.setFontBold(policyUrlLabel);
         policyPanel.add(policyUrlLabel, c2);
