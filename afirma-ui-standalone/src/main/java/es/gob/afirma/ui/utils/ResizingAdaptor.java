@@ -303,7 +303,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	public final void resizeImageButton(double factor, Component c) {
 		
 		JButton button = (JButton) c;
-		ImageIcon imageIcon = new ImageIcon();
+		ImageIcon imageIcon = null;
 		
 		//Se comprueba si se trata del botón de ayuda
 		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) {
@@ -314,8 +314,9 @@ public class ResizingAdaptor extends ComponentAdapter {
 		//Se redimensionan las imágenes
 		ImageIcon newImage = new ImageIcon(imageIcon.getImage().getScaledInstance((int) Math.round(25 * 2 * factor),
 				(int) Math.round(25 * 2 * factor), java.awt.Image.SCALE_SMOOTH));
-		((JButton)c).setIcon(newImage);
-		((JButton)c).setPreferredSize(new Dimension((int) Math.round(25 * 2 * factor),(int) Math.round(25 * 2 * factor)));
+		button.setIcon(newImage);
+
+		button.setPreferredSize(new Dimension((int) Math.round(25 * 2 * factor),(int) Math.round(25 * 2 * factor)));
 	}
 	
 	/**
