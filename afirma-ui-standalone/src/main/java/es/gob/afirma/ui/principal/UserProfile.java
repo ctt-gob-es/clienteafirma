@@ -252,7 +252,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		
 		bottomPanel.add(buttonPanel, cons);
         
-		JPanel panelAyuda = new JPanel();
+		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("perfiles.usuario");
 		botonAyuda.setName("helpButton");
