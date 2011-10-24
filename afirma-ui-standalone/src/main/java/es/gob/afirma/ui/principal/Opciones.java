@@ -224,6 +224,7 @@ public class Opciones extends JAccessibilityDialog {
         JPanel bottomPanel = new JPanel(new GridBagLayout());
         
 		GridBagConstraints cons = new GridBagConstraints();
+		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientación de componentes al redimensionar
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.ipadx = 0;
 		cons.gridx = 0;
