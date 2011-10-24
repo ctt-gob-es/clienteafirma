@@ -203,6 +203,7 @@ public class Ensobrado extends JPanel {
 		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
+		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientación de componentes al redimensionar
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.ipadx = 15;
 		cons.gridx = 0;
