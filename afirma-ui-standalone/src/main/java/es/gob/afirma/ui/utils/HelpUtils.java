@@ -12,11 +12,14 @@ package es.gob.afirma.ui.utils;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dialog.ModalExclusionType;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -28,6 +31,7 @@ import javax.help.DefaultHelpBroker;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.WindowPresentation;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -162,7 +166,7 @@ public class HelpUtils {
 	 */
 	public static JButton helpButton(final String pagina) {
 
-		JButton botonAyuda = new JButton(IMAGEICONHELP);
+		final JButton botonAyuda = new JButton(IMAGEICONHELP);
 		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		if (!pagina.equals("perfiles.usuario")){
@@ -178,6 +182,20 @@ public class HelpUtils {
 		botonAyuda.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
 		botonAyuda.setContentAreaFilled(false); //area del boton invisible
 		
+		//Foco para el modo alto contraste
+		if (GeneralConfig.isHighContrast()) {
+			botonAyuda.addFocusListener(new FocusListener() {
+				public void focusLost(FocusEvent e) {
+					//Se quita el borde del botón al perder el foco
+					botonAyuda.setBorder(BorderFactory.createEmptyBorder());
+				}
+				public void focusGained(FocusEvent e) {
+					//Se muestra un borde en el botón cuando este tiene el foco
+					botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
+				}
+			});
+		}
+
 		//Accion para desplegar la pantalla de ayuda
 		botonAyuda.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -186,7 +204,7 @@ public class HelpUtils {
 			}
 		});
 		Utils.remarcar(botonAyuda);
-        
+
 		return botonAyuda;
 	}
 
