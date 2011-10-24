@@ -323,7 +323,7 @@ public class Opciones extends JAccessibilityDialog {
 		
 		bottomPanel.add(buttonPanel, cons);
         
-		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
+		JPanel panelAyuda = new JPanel();
         // Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("opciones.configuracion");
 		botonAyuda.setName("helpButton");

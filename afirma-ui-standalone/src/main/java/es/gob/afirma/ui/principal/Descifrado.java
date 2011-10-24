@@ -294,7 +294,7 @@ public class Descifrado extends JPanel {
 		
 		panelBotones.add(buttonPanel, cons);
         
-		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
+		JPanel panelAyuda = new JPanel();
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("descifrado");
 		botonAyuda.setName("helpButton");

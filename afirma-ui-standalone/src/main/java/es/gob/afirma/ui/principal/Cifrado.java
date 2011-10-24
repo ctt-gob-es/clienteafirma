@@ -313,7 +313,7 @@ public class Cifrado extends JPanel {
 		
 		panelBotones.add(buttonPanel, cons);
 
-		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
+		JPanel panelAyuda = new JPanel();
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("cifrado");
 		botonAyuda.setName("helpButton");

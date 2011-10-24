@@ -207,7 +207,7 @@ public class MultifirmaSimple extends JPanel {
 		cons.weightx = 0.0;
 		cons.gridx = 2;
 		
-		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
+		JPanel panelAyuda = new JPanel();
 		// Boton ayuda
 		JButton botonAyuda = HelpUtils.helpButton("multifirma");
 		botonAyuda.setName("helpButton");
