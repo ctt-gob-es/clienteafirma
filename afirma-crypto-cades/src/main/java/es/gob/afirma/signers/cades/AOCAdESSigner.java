@@ -32,7 +32,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
 /** Manejador de firmas binarias CADES.
- * Soporte de CAdES-BES y CAdES-EPES
+ * Soporta CAdES-BES y CAdES-EPES. &Uacute;nicamente expone los m&eacute;todos declarados en el interfaz implementado <code>AOSigner</code>.
  * @version 0.3 */
 public final class AOCAdESSigner implements AOSigner {
     
@@ -78,7 +78,7 @@ public final class AOCAdESSigner implements AOSigner {
      *    <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma, es posible trabajar sin proporcionarlos, indicando
      *    &uacute;nicamente su huella digital en el par&aacute;metro <code>data</code> y el algoritmo usado para su c&aacute;lculo.<br>
      *    <b>
-     *     Siempre que se de valor a este par&aacute;tro se supondr&aacute; que los datos proporcionado en el par&aacute;metro
+     *     Siempre que se de valor a este par&aacute;metro se supondr&aacute; que los datos proporcionados en el par&aacute;metro
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si. 
      *    </b>
      *   </dd>
@@ -184,7 +184,7 @@ public final class AOCAdESSigner implements AOSigner {
      *    <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma, es posible trabajar sin proporcionarlos, indicando
      *    &uacute;nicamente su huella digital en el par&aacute;metro <code>data</code> y el algoritmo usado para su c&aacute;lculo.<br>
      *    <b>
-     *     Siempre que se de valor a este par&aacute;tro se supondr&aacute; que los datos proporcionado en el par&aacute;metro
+     *     Siempre que se de valor a este par&aacute;metro se supondr&aacute; que los datos proporcionados en el par&aacute;metro
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si. 
      *    </b>
      *   </dd>
@@ -362,8 +362,8 @@ public final class AOCAdESSigner implements AOSigner {
         return null;
     }
 
-    /** Indica si un dato es una firma compatible con los m&eacute;todos de firm, cofirma y contrafirma de esta clase.
-     * @param is Datos que deseamos comprobar.
+    /** Indica si un dato es una firma compatible con los m&eacute;todos de firma, cofirma y contrafirma de esta clase.
+     * @param data Datos que deseamos comprobar.
      * @return <code>true</code> si el dato es una firma reconocida por esta clase (&uacute;nicamente CAdES), <code>false</code> en caso contrario. */
     public boolean isSign(final byte[] data) {
         if (data == null) {
@@ -376,7 +376,7 @@ public final class AOCAdESSigner implements AOSigner {
     /** Comprueba si unos datos sos susceptibles de ser firmados por esta clase.
      * Dado que las firmas CAdES pueden firmar cualquier dato binario, el resultado siempre ser&aacute;
      * <code>true</code> excepto si se proporciona <code>null</code>
-     * @param is Datos que deseamos comprobar.
+     * @param data Datos que deseamos comprobar.
      * @return <code>true</code> si el dato es v&aacute;aacute;lido para
      *         firmar, <code>false</code> en caso contrario. */
     public boolean isValidDataFile(final byte[] data) {

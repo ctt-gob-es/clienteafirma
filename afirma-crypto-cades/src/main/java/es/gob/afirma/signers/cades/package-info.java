@@ -28,7 +28,7 @@
  *  <p>
  *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior y con Android 3 o superior.<br> 
  *   Para compatibilidad con Android 2.x es necesario sustituir BouncyCastle por SpongyCastle. No hay llamadas
- *   al Proveedor de BouncyCastle por nombre ni instanciacionesdin&aacute;micas de clases de BouncyCastle, por
+ *   al Proveedor de BouncyCastle por nombre ni instanciaciones din&aacute;micas de clases de BouncyCastle, por
  *   lo que una simple sustituci&oacute;n de <code>import org.bouncycastle.</code> por <code>org.spongycastle.</code>
  *   es suficiente.
  *  </p>
