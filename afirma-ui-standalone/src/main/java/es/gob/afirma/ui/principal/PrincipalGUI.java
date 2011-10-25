@@ -86,6 +86,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	private int actualHeight = -1;
 	
+	private double maximizedHight = 0;
+	
+	private double maximizedWidth = 0;
+	
 	public static int optionActualPositionX = -1;
 	
 	public static int optionActualPositionY = -1;
@@ -453,12 +457,20 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
 	    // la ventana principal con el tamaño adecuado
-	    if (GeneralConfig.isMaximized() || this.getExtendedState()==MAXIMIZED_BOTH){
+	    if (this.getExtendedState()==MAXIMIZED_BOTH){
+	    	maximizedWidth = this.getSize().getWidth();
+			maximizedHight = this.getSize().getHeight();
+	    }
+	    if (GeneralConfig.isMaximized()){
 			this.setExtendedState(MAXIMIZED_BOTH);
 		} else {
 			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-				this.setExtendedState(0);
-				this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
+				if (actualWidth == maximizedWidth && actualHeight == maximizedHight){
+					this.setExtendedState(MAXIMIZED_BOTH);
+				} else{
+					this.setExtendedState(0);
+					this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
+				}
 			} else {
 				this.setExtendedState(0);
 				setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
