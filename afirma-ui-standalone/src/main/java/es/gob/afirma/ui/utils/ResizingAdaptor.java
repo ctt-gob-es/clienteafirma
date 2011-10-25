@@ -194,9 +194,9 @@ public class ResizingAdaptor extends ComponentAdapter {
 					TitledBorder b = (TitledBorder) componentBorder;
 					float resizeFactor = Math.round(relation / getResizingFactorFrame());
 					if (b.getTitleFont() != null) {
-					    b.setTitleFont(b.getTitleFont().deriveFont((float) (getFontSize() + resizeFactor)));
+					    b.setTitleFont(b.getTitleFont().deriveFont((float) (getFontSize()-2 + resizeFactor)));
 					} else {
-					    b.setTitleFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+					    b.setTitleFont(actualComponent.getFont().deriveFont((float) (getFontSize()-2 + resizeFactor)));
 					}
 				}
 			}
