@@ -128,20 +128,20 @@ public final class AOSignConstants {
 
     /** Permite definir los objetivos para la contrafirma:
      * <ul>
-     * <li>Signers: Contrafirma de firmantes concretos.</li>
-     * <li>Nodes: Contrafirma de nodos de firma concretos.</li>
-     * <li>Tree: Contrafirma de todo el &aacute;rbol de firma.</li>
-     * <li>Leafs: Contrafirma de todos los nodos de firma.</li>
+     * <li>SIGNERS: Contrafirma de firmantes concretos.</li>
+     * <li>NODES: Contrafirma de nodos de firma concretos.</li>
+     * <li>TREE: Contrafirma de todo el &aacute;rbol de firma.</li>
+     * <li>LEAFS: Contrafirma de todos los nodos de firma.</li>
      * </ul> */
     public static enum CounterSignTarget {
         /** Contrafirma de firmantes concretos. */
-        Signers,
+        SIGNERS,
         /** Contrafirma de nodos de firma concretos. */
-        Nodes,
+        NODES,
         /** Contrafirma de todo el &aacute;rbol de firma. */
-        Tree,
+        TREE,
         /** Contrafirma de todas las hojas del &aacute;rbol de firma. */
-        Leafs
+        LEAFS
     }
     
     // ************************************************************

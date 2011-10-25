@@ -266,7 +266,7 @@ public final class AOTreeNode {
     }
 
     //
-    // Tree Queries
+    // TREE Queries
     //
 
     /** Returns true if <code>anotherNode</code> is an ancestor of this node --

@@ -23,7 +23,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
     /** Firma un contenido (t&iacute;picamente un fichero).<br/>
      * Los algoritmos y modos de firma disponibles se declaran en {@link es.gob.afirma.misc.AOConstants}.
      * @param data
-     *        Datos que deseamos a firmar.
+     *        Datos que deseamos firmar.
      * @param algorithm
      *        Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
      * @param keyEntry
@@ -36,16 +36,15 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
     byte[] sign(byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) throws AOException;
 
     /** Recupera el &aacute;rbol de nodos de firma de una firma
-     * electr&oacute;nica. Cada uno de los nodos de firma est&aacute;
-     * representado por el alias del certificado con el que se realizo firma.<br/>
+     * electr&oacute;nica.
      * Los nodos del &aacute;rbol ser&aacute;n cadena de texto con el CommonName
-     * del certificado u objetos de tipo AOSimpleSignInfo con la
+     * del titular del certificado u objetos de tipo AOSimpleSignInfo con la
      * informaci&oacute;n b&aacute;sica de las firmas individuales, seg&uacute;n
      * el valor del par&aacute;metro <code>asSimpleSignInfo</code>. Los nodos se
      * mostrar&aacute;n en el mismo orden y con la misma estructura con el que
      * aparecen en la firma electr&oacute;nica.<br/>
      * El fichero se considera el nodo ra&iacute;z, la firma y cofirmas
-     * pender&aacute;n directamentede de &eacute;ste.
+     * pender&aacute;n directamentede de este.
      * @param sign
      *        Firma electr&oacute;nica de la que se desea obtener la
      *        estructura.
@@ -74,10 +73,9 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * aceptar&aacute;n todos los formatos permitidos para alguna de las
      * configuraciones. Por ejemplo, un signer XAdES aceptar datos XML o
      * binarios para la firma Detached pero s&oacute;lo XML para la Enveloped.
-     * Si este signer recibe unos datos binarios, devolver&aacute; <code>true</code>.
      * @param is
      *        Dato que deseamos comprobar.
-     * @return Devuelve <code>true</code> si el dato es V6aacute;lido para
+     * @return Devuelve <code>true</code> si el dato es v&aacute;lido para
      *         firmar, <code>false</code> en caso contrario. */
     boolean isValidDataFile(byte[] is);
 
@@ -109,7 +107,7 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      *         La firma introducida es nula. */
     byte[] getData(byte[] signData) throws AOException;
 
-    /** Obtiene la informacion general de un objeto de firma. Ya que un objeto de
+    /** Obtiene la informaci&oacute;n general de un objeto de firma. Ya que un objeto de
      * firma puede contener muchas firmas, se considera informaci&oacute;n
      * general la que aplica a todo el objeto. Esto es:
      * <ul>
