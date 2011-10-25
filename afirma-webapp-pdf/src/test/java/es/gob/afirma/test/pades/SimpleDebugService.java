@@ -26,7 +26,6 @@ public final class SimpleDebugService {
             final BufferedReader input = new BufferedReader(new InputStreamReader(connectionsocket.getInputStream()));
             final DataOutputStream output = new DataOutputStream(connectionsocket.getOutputStream());
             new Thread(new Runnable() {
-                @Override
                 public void run() {
                     try {
                         final String request = new String(input.readLine());
