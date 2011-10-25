@@ -18,18 +18,15 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.core.signers.AOCoSigner;
+import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.AOCoSigner;
-import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.signers.pkcs7.ExtractMimeType;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
@@ -222,31 +219,6 @@ public final class AOCAdESSigner implements AOSigner {
             return false;
         }
         return true;
-    }
-
-    /** Obtiene el tipo de datos declarado en una firma mediante su Mime Type. Si
-     * no se conoce el tipo de dato se devolver&aacute; <code>null</code>.
-     * Seg&uacute;n el formato de firma puede haber un tipo de datos por
-     * defecto: application/octect-stream,...
-     * @param signData
-     *        Firma electr&oacute;nica.
-     * @return Mime Type de los datos contenidos en la firma.
-     * @throws AOUnsupportedSignFormatException
-     *         Cuando la firma no est&eacute; soportada por el manejador
-     *         proporcionado. */
-    public String getDataMimeType(final byte[] signData) throws AOUnsupportedSignFormatException {
-
-        // Comprobamos que sea una firma valida
-        try {
-            this.isSign(signData);
-        }
-        catch (final Exception e1) {
-            throw new AOUnsupportedSignFormatException("No es un tipo de firma valido", e1); //$NON-NLS-1$
-        }
-
-        // Extraemos el mimetype y transformamos el OID a mimeType
-        return MimeHelper.transformOidToMimeType(new ExtractMimeType().extractMimeType(signData));
-
     }
 
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException {

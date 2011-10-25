@@ -14,7 +14,6 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 
 /** Define los requerimientos de las clases capaces de efectuar firmas digitales.
@@ -138,15 +137,4 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      *         La firma introducida es nula. */
     AOSignInfo getSignInfo(byte[] signData) throws AOException;
 
-    /** Obtiene el tipo de datos declarado en una firma mediante su Mime Type. Si
-     * no se conoce el tipo de dato se devolver&aacute; <code>null</code>.
-     * Seg&uacute;n el formato de firma puede haber un tipo de datos por
-     * defecto: application/octect-stream, data...
-     * @param signData
-     *        Firma electr&oacute;nica.
-     * @return Mime Type de los datos contenidos en la firma.
-     * @throws AOUnsupportedSignFormatException
-     *         Cuando la firma no est&eacute; soportada por el manejador
-     *         proporcionado. */
-    String getDataMimeType(byte[] signData) throws AOUnsupportedSignFormatException;
 }

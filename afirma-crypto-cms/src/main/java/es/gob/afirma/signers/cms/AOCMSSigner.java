@@ -22,14 +22,11 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
-import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.util.tree.AOTreeModel;
-import es.gob.afirma.signers.pkcs7.ExtractMimeType;
 import es.gob.afirma.signers.pkcs7.GenSignedData;
 import es.gob.afirma.signers.pkcs7.ObtainContentSignedData;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
@@ -297,29 +294,6 @@ public final class AOCMSSigner implements AOSigner {
             return false;
         }
         return true;
-    }
-
-    public String getDataMimeType(final byte[] signData) throws AOUnsupportedSignFormatException {
-
-        String numOid = ""; //$NON-NLS-1$
-        String oid = ""; //$NON-NLS-1$
-
-        // Comprobamos que sea una firma valida
-        try {
-            this.isSign(signData);
-        }
-        catch (final Exception e1) {
-            throw new AOUnsupportedSignFormatException("No es un tipo de firma valido"); //$NON-NLS-1$
-        }
-
-        // Extraemos el mimetype
-        final ExtractMimeType extract = new ExtractMimeType();
-        numOid = extract.extractMimeType(signData);
-
-        // Transformamos el OID a mimeType
-        oid = MimeHelper.transformOidToMimeType(numOid);
-
-        return oid;
     }
 
     /** A&ntilde;ade un atributo firmado al formato de firma seleccionado. Este
