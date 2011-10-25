@@ -127,15 +127,29 @@ public class ResizingAdaptor extends ComponentAdapter {
 				relation = Math.round(relWidth * relHeight * theDialog.getMinimumRelation());
 			}
 		} else if (theDialogWizard != null){
+			//Se comprueba si el sistema operativo es linux
 			if (Platform.getOS().equals(Platform.OS.LINUX)){
-				relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH_LINUX;
-				relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT_LINUX;
-				relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
+				//Se comprueba si está activado el modo negrita o fuente grande
+				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+					relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX;
+					relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX;
+				} else {
+					relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH_LINUX;
+					relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT_LINUX;
+				}
 			} else {
-				relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH;
-				relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT;
-				relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
+				//Se comprueba si está activado el modo negrita o fuente grande
+				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+					relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_FONT_INITIAL_WIDTH;
+					relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_FONT_INITIAL_HEIGHT;
+				} else {
+					relWidth = theDialogWizard.getSize().getWidth() / Constants.WIZARD_INITIAL_WIDTH;
+					relHeight = theDialogWizard.getSize().getHeight() / Constants.WIZARD_INITIAL_HEIGHT;
+				}
 			}
+			
+			//Se calcula la relación de los valores obtenidos
+			relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
 			
 		} else if (theDialogAdvisor != null){
 			relWidth = theDialogAdvisor.getSize().getWidth() / Constants.INIT_WINDOW_INITIAL_WIDTH;
