@@ -227,8 +227,6 @@ public class TestPAdESTriPhaseHTTPRemote {
 
 				Assert.assertNotNull(simpleSignInfo.getSigningTime());
 				Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
-				Assert.assertEquals("application/pdf", //$NON-NLS-1$
-						signer.getDataMimeType(result));
 				Assert.assertEquals(result, signer.getData(result));
 				Assert.assertEquals(AOSignConstants.SIGN_FORMAT_PDF, signer
 						.getSignInfo(result).getFormat());

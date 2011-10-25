@@ -215,7 +215,7 @@ public class TestPAdESTriPhaseHTTP extends JerseyTest {
 
                 Assert.assertNotNull(simpleSignInfo.getSigningTime());
                 Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
-                Assert.assertEquals("application/pdf", signer.getDataMimeType(result)); //$NON-NLS-1$
+
                 Assert.assertEquals(result, signer.getData(result));
                 Assert.assertEquals(AOSignConstants.SIGN_FORMAT_PDF, signer.getSignInfo(result)
                         .getFormat());
