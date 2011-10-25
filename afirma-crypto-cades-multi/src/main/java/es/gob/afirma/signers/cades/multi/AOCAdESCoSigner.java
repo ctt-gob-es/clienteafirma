@@ -20,7 +20,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCoSigner;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
-import es.gob.afirma.signers.cades.ValidateCADES;
+import es.gob.afirma.signers.cades.CAdESValidator;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Operaciones de cofirma CAdES. */
@@ -72,7 +72,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
             // Si la firma que nos introducen es SignedData
             //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
-            final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
+            final boolean signedData = new CAdESValidator().isCAdESSignedData(sign);
             if (signedData) {
 
                 final String mode = extraParams.getProperty("mode", AOSignConstants.DEFAULT_SIGN_MODE); //$NON-NLS-1$
@@ -132,7 +132,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         // Si la firma que nos introducen es SignedData
         //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
-        final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
+        final boolean signedData = new CAdESValidator().isCAdESSignedData(sign);
         if (signedData) {
             try {
                 return new CAdESCoSigner().coSigner(typeAlgorithm,

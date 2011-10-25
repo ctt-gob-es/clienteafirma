@@ -146,7 +146,7 @@ public final class TestCAdES {
                 
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));
-                Assert.assertTrue(CAdESValidator.isCADESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+                Assert.assertTrue(CAdESValidator.isCAdESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
                 
                 AOTreeModel tree = signer.getSignersStructure(result, false);
                 Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
@@ -255,7 +255,7 @@ public final class TestCAdES {
     private void checkSign(AOSigner signer, byte[] sign, PrivateKeyEntry[] pke, String[] signsAlias, String prueba) {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));
-        Assert.assertTrue(CAdESValidator.isCADESValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+        Assert.assertTrue(CAdESValidator.isCAdESValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
         
         // Arbol de alias
         AOTreeModel tree = signer.getSignersStructure(sign, false);

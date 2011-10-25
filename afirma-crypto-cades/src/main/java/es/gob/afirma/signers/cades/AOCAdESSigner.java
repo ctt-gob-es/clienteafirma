@@ -172,7 +172,7 @@ public final class AOCAdESSigner implements AOSigner {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
-        return new CAdESValidator().isCADESSignedData(data);
+        return new CAdESValidator().isCAdESSignedData(data);
     }
 
     public boolean isValidDataFile(final byte[] data) {
@@ -206,26 +206,26 @@ public final class AOCAdESSigner implements AOSigner {
         }
 
         // Comprobamos si su contenido es de tipo DATA
-        boolean valido = new CAdESValidator().isCADESData(data);
+        boolean valido = new CAdESValidator().isCAdESData(data);
         // Comprobamos si su contenido es de tipo SIGNEDDATA
         if (!valido) {
-            valido = new CAdESValidator().isCADESSignedData(data);
+            valido = new CAdESValidator().isCAdESSignedData(data);
         }
         // Comprobamos si su contenido es de tipo DIGESTDATA
         if (!valido) {
-            valido = new CAdESValidator().isCADESDigestedData(data);
+            valido = new CAdESValidator().isCAdESDigestedData(data);
         }
         // Comprobamos si su contenido es de tipo ENCRYPTEDDATA
         if (!valido) {
-            valido = new CAdESValidator().isCADESEncryptedData(data);
+            valido = new CAdESValidator().isCAdESEncryptedData(data);
         }
         // Comprobamos si su contenido es de tipo ENVELOPEDDATA
         if (!valido) {
-            valido = new CAdESValidator().isCADESEnvelopedData(data);
+            valido = new CAdESValidator().isCAdESEnvelopedData(data);
         }
         // Comprobamos si su contenido es de tipo SIGNEDANDENVELOPED
         if (!valido) {
-            valido = new CAdESValidator().isCADESSignedAndEnvelopedData(data);
+            valido = new CAdESValidator().isCAdESSignedAndEnvelopedData(data);
         }
         return valido;
     }

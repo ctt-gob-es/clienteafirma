@@ -19,7 +19,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOCounterSigner;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
-import es.gob.afirma.signers.cades.ValidateCADES;
+import es.gob.afirma.signers.cades.CAdESValidator;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
@@ -60,7 +60,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
         byte[] dataSigned = null;
 
         // Si la firma que nos introducen es SignedData
-        final boolean signedData = new ValidateCADES().isCADESSignedData(sign);
+        final boolean signedData = new CAdESValidator().isCAdESSignedData(sign);
         if (signedData) {
             try {
                 // CASO DE FIRMA DE ARBOL

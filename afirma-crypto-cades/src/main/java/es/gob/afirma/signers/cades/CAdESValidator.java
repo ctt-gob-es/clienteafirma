@@ -52,7 +52,7 @@ public final class CAdESValidator {
      *        El envoltorio.
      * @return si es de este tipo. */
     @SuppressWarnings("unused")
-    boolean isCADESData(final byte[] data) {
+    boolean isCAdESData(final byte[] data) {
         boolean isValid = true;
         try {
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
@@ -86,7 +86,7 @@ public final class CAdESValidator {
      * @param data
      *        El envoltorio.
      * @return si es de este tipo. */
-    public boolean isCADESSignedData(final byte[] data) {
+    public boolean isCAdESSignedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -148,7 +148,7 @@ public final class CAdESValidator {
      *        El envoltorio.
      * @return si es de este tipo. */
     @SuppressWarnings("unused")
-    boolean isCADESDigestedData(final byte[] data) {
+    boolean isCAdESDigestedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -184,7 +184,7 @@ public final class CAdESValidator {
      * @param data
      *        El envoltorio.
      * @return si es de este tipo. */
-    boolean isCADESEncryptedData(final byte[] data) {
+    boolean isCAdESEncryptedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -227,7 +227,7 @@ public final class CAdESValidator {
      *        El envoltorio.
      * @return si es de este tipo. */
     @SuppressWarnings("unused")
-    boolean isCADESEnvelopedData(final byte[] data) {
+    boolean isCAdESEnvelopedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -264,7 +264,7 @@ public final class CAdESValidator {
      * @param data
      *        El envoltorio.
      * @return si es de este tipo. */
-    boolean isCADESSignedAndEnvelopedData(final byte[] data) {
+    boolean isCAdESSignedAndEnvelopedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -312,24 +312,24 @@ public final class CAdESValidator {
      * @param type
      *        Tipo de firma que se quiere verificar.
      * @return La validez del archivo cumpliendo la estructura. */
-    public static boolean isCADESValid(final byte[] signData, final String type) {
+    public static boolean isCAdESValid(final byte[] signData, final String type) {
         if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DATA)) {
-            return new CAdESValidator().isCADESData(signData);
+            return new CAdESValidator().isCAdESData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA)) {
-            return new CAdESValidator().isCADESSignedData(signData);
+            return new CAdESValidator().isCAdESSignedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA)) {
-            return new CAdESValidator().isCADESDigestedData(signData);
+            return new CAdESValidator().isCAdESDigestedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
-            return new CAdESValidator().isCADESEncryptedData(signData);
+            return new CAdESValidator().isCAdESEncryptedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-            return new CAdESValidator().isCADESEnvelopedData(signData);
+            return new CAdESValidator().isCAdESEnvelopedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-            return new CAdESValidator().isCADESSignedAndEnvelopedData(signData);
+            return new CAdESValidator().isCAdESSignedAndEnvelopedData(signData);
         }
         LOGGER.warning("Tipo de contenido CADES no reconocido"); //$NON-NLS-1$
         return false;
