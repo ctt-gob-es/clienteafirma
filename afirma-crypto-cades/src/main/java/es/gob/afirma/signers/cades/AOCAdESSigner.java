@@ -230,44 +230,6 @@ public final class AOCAdESSigner implements AOSigner {
         return valido;
     }
 
-    /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
-     * Se permite la verificaci&oacute;n de los siguientes tipos de firma:
-     * <ul>
-     * <li>Data</li>
-     * <li>Signed Data</li>
-     * <li>Digested Data</li>
-     * <li>Encrypted Data</li>
-     * <li>Enveloped Data</li>
-     * <li>Signed and Enveloped Data</li>
-     * </ul>
-     * @param signData
-     *        Datos que se desean comprobar.
-     * @param type
-     *        Tipo de firma que se quiere verificar.
-     * @return La validez del archivo cumpliendo la estructura. */
-    public static boolean isCADESValid(final byte[] signData, final String type) {
-        if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DATA)) {
-            return new ValidateCADES().isCADESData(signData);
-        }
-        else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA)) {
-            return new ValidateCADES().isCADESSignedData(signData);
-        }
-        else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA)) {
-            return new ValidateCADES().isCADESDigestedData(signData);
-        }
-        else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
-            return new ValidateCADES().isCADESEncryptedData(signData);
-        }
-        else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-            return new ValidateCADES().isCADESEnvelopedData(signData);
-        }
-        else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-            return new ValidateCADES().isCADESSignedAndEnvelopedData(signData);
-        }
-        LOGGER.warning("Tipo de contenido CADES no reconocido"); //$NON-NLS-1$
-        return false;
-    }
-
     /** Obtiene el tipo de datos declarado en una firma mediante su Mime Type. Si
      * no se conoce el tipo de dato se devolver&aacute; <code>null</code>.
      * Seg&uacute;n el formato de firma puede haber un tipo de datos por
