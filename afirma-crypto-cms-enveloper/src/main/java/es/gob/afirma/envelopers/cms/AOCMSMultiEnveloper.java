@@ -97,11 +97,18 @@ public class AOCMSMultiEnveloper {
         return null;
     }
     
-  public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+  /** Cofirma un sobre digital CMS.
+ * @param data Datos contenidos en el sobre digital a cofirmar
+ * @param sign Sobre digital
+ * @param algorithm Algoritmo de firma
+ * @param keyEntry Entrada de clave privada a usar para la firma
+ * @param xParams Par&aacute;metros adicionales. &Uacute;nicamente se lee <i>precalculatedHashAlgorithm</i>
+ * @return Sobre digtal cofirmado
+ * @throws AOException
+ */
+public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
       
-        final Properties extraParams = (xParams != null) ? xParams : new Properties();
-
-        final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
+        final String precalculatedDigest = (xParams != null) ? xParams.getProperty("precalculatedHashAlgorithm") : null; //$NON-NLS-1$
 
         byte[] messageDigest = null;
         if (precalculatedDigest != null) {
@@ -140,7 +147,14 @@ public class AOCMSMultiEnveloper {
         }
     }
 
-    public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    /** Cofirma un sobre digital CMS.
+     * @param sign Sobre digital CMS ya firmado
+     * @param algorithm Algoritmo de firma a usar
+     * @param keyEntry ENtrada de clave privada para la firma
+     * @return Sobre cofirmado
+     * @throws AOException
+     */
+    public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry) throws AOException {
 
         // tipos de datos a firmar.
         if (this.dataTypeOID == null) {
