@@ -79,7 +79,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -214,7 +213,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
                                                             InvalidAlgorithmParameterException,
                                                             MarshalException,
                                                             javax.xml.crypto.dsig.XMLSignatureException,
-                                                            TransformerFactoryConfigurationError,
                                                             TransformerException,
                                                             IOException {
         // DOM Document construction.
@@ -393,7 +391,6 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
     }
 
     private void writeDocument(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,
-                                                                                                  TransformerFactoryConfigurationError,
                                                                                                   TransformerException,
                                                                                                   IOException {
         writeDocumentNoClosing(document, documentOutputStream);
@@ -401,14 +398,12 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
     }
 
     private  void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,
-                                                                                                           TransformerFactoryConfigurationError,
                                                                                                            TransformerException {
         // we need the XML processing initial line for OOXML
         writeDocumentNoClosing(document, documentOutputStream, false);
     }
 
     protected void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream, final boolean omitXmlDeclaration) throws TransformerConfigurationException,
-                                                                                                                                             TransformerFactoryConfigurationError,
                                                                                                                                              TransformerException {
         final NoCloseOutputStream outputStream = new NoCloseOutputStream(documentOutputStream);
         final Result result = new StreamResult(outputStream);
