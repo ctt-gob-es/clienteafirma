@@ -814,7 +814,7 @@ public class DirectorySignatureHelper {
                                                 final Properties signConfig) {
         boolean allOK = true;
         InputStream fis = null;
-        final CounterSignTarget target = (type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.Tree : CounterSignTarget.Leafs);
+        final CounterSignTarget target = (type == MassiveType.COUNTERSIGN_ALL ? CounterSignTarget.TREE : CounterSignTarget.LEAFS);
         AOSigner signer = this.defaultSigner;
         for (final File file : files) {
             if (originalFormat) {

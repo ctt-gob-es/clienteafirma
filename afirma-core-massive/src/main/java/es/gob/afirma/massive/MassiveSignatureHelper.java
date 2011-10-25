@@ -468,7 +468,7 @@ public final class MassiveSignatureHelper {
      *         Cuando ocurre un error durante la operaci&oacute;n de
      *         contrafirma. */
     private byte[] countersignTree(final AOSigner signer, final byte[] sign, final Properties config) throws AOException {
-        return countersignOperation(signer, sign, CounterSignTarget.Tree, config);
+        return countersignOperation(signer, sign, CounterSignTarget.TREE, config);
     }
 
     /** Contrafirma las hojas de la estructura de firma introducida usando el
@@ -486,7 +486,7 @@ public final class MassiveSignatureHelper {
      *         Cuando ocurre un error durante la operaci&oacute;n de
      *         contrafirma. */
     private byte[] countersignLeafs(final AOSigner signer, final byte[] sign, final Properties config) throws AOException {
-        return countersignOperation(signer, sign, CounterSignTarget.Leafs, config);
+        return countersignOperation(signer, sign, CounterSignTarget.LEAFS, config);
     }
 
     /** Contrafirma los nodos indicados de una firma electr&oacute;nica usando el
