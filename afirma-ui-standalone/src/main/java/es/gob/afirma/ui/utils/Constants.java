@@ -121,12 +121,12 @@ public class Constants {
     /**
      * Width inicial de los JAccessibilityDialogWizard de la aplicacion con variación de fuente en LINUX.
      */
-    public static final int WIZARD_FONT_INITIAL_WIDTH_LINUX = 700;
+    public static final int WIZARD_FONT_INITIAL_WIDTH_LINUX = 780;
     
     /**
      * Height inicial de los JAccessibilityDialogWizard de la aplicacion con variación de fuente en LINUX.
      */
-    public static final int WIZARD_FONT_INITIAL_HEIGHT_LINUX = 440;
+    public static final int WIZARD_FONT_INITIAL_HEIGHT_LINUX = 520;
     
     /**
      * Factor de redimensionado para las imagenes    
