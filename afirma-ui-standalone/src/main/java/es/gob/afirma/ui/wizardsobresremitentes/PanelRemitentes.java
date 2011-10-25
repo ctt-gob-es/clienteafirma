@@ -532,8 +532,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 				envelop = coEnveloper.cosign(
 						data,
 						AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
-						privateKey,
-						null);
+						privateKey);
 			} catch (AOException e) {
 				logger.warning("Ocurrio un error durante el proceso de agregar un nuevo remitente: "+e); //$NON-NLS-1$
 				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),  //$NON-NLS-1$
