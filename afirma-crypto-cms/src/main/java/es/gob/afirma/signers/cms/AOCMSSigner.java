@@ -222,30 +222,30 @@ public final class AOCMSSigner implements AOSigner {
         if (ValidateCMSSignedData.isCMSSignedData(sign)) {
             try {
                 // CASO DE FIRMA DE ARBOL
-                if (targetType == CounterSignTarget.Tree) {
+                if (targetType == CounterSignTarget.TREE) {
                     final int[] nodes = {
                         0
                     };
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Tree, nodes, keyEntry, this.dataType, this.atrib, this.uatrib);
+                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.TREE, nodes, keyEntry, this.dataType, this.atrib, this.uatrib);
                 }
                 // CASO DE FIRMA DE HOJAS
-                else if (targetType == CounterSignTarget.Leafs) {
+                else if (targetType == CounterSignTarget.LEAFS) {
                     final int[] nodes = {
                         0
                     };
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Leafs, nodes, keyEntry, this.dataType, this.atrib, this.uatrib);
+                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.LEAFS, nodes, keyEntry, this.dataType, this.atrib, this.uatrib);
                 }
                 // CASO DE FIRMA DE NODOS
-                else if (targetType == CounterSignTarget.Nodes) {
+                else if (targetType == CounterSignTarget.NODES) {
                     int[] nodesID = new int[targets.length];
                     for (int i = 0; i < targets.length; i++) {
                         nodesID[i] = ((Integer) targets[i]).intValue();
                     }
                     nodesID = new ReadNodesTree().simplyArray(nodesID);
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Nodes, nodesID, keyEntry, this.dataType, this.atrib, this.uatrib);
+                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.NODES, nodesID, keyEntry, this.dataType, this.atrib, this.uatrib);
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
-                else if (targetType == CounterSignTarget.Signers) {
+                else if (targetType == CounterSignTarget.SIGNERS) {
 
                     // clase que lee los nodos de un fichero firmado (p7s)
                     final String[] signers = new String[targets.length];
@@ -254,7 +254,7 @@ public final class AOCMSSigner implements AOSigner {
                     }
                     final ReadNodesTree rn2 = new ReadNodesTree();
                     final int[] nodes2 = rn2.readNodesFromSigners(signers, sign);
-                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.Signers, nodes2, keyEntry, this.dataType, this.atrib, this.uatrib);
+                    dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.SIGNERS, nodes2, keyEntry, this.dataType, this.atrib, this.uatrib);
 
                 }
             }
