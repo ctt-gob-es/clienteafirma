@@ -650,14 +650,6 @@ public final class AOODFSigner implements AOSigner {
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_ODF);
     }
 
-    public String getDataMimeType(final byte[] signData) throws AOUnsupportedSignFormatException {
-        final String mimetype = getODFMimeType(signData);
-        if (mimetype == null || !supportedFormats.contains(mimetype)) {
-            throw new AOUnsupportedSignFormatException("La firma introducida no es un documento ODF"); //$NON-NLS-1$
-        }
-        return mimetype;
-    }
-
     private String getODFMimeType(final byte[] signData) {
         String mimetype = null;
         try {

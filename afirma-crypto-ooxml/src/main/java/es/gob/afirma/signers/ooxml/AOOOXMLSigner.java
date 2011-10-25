@@ -11,7 +11,6 @@
 package es.gob.afirma.signers.ooxml;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Security;
 import java.security.cert.Certificate;
@@ -19,7 +18,6 @@ import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
@@ -27,12 +25,11 @@ import es.gob.afirma.be.fedict.eid.applet.service.signer.AbstractOOXMLSignatureS
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.OfficeXMLAnalizer;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -90,31 +87,6 @@ public final class AOOOXMLSigner implements AOSigner {
         return zipFile.getEntry("[Content_Types].xml") != null && (zipFile.getEntry("_rels/.rels") != null || zipFile.getEntry("_rels\\.rels") != null) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                && (zipFile.getEntry("docProps/app.xml") != null || zipFile.getEntry("docProps\\app.xml") != null) //$NON-NLS-1$ //$NON-NLS-2$
                && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-
-    public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
-
-        if (sign == null) {
-            throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
-        }
-
-        final InputStream contentTypesXml;
-        final ZipEntry zipEntry;
-        try {
-            final ZipFile zipFile = AOFileUtils.createTempZipFile(sign);
-            zipEntry = zipFile.getEntry("[Content_Types].xml"); //$NON-NLS-1$
-            contentTypesXml = zipFile.getInputStream(zipEntry);
-        }
-        catch (final Exception e) {
-            LOGGER.severe("Error al analizar el fichero de firma: " + e); //$NON-NLS-1$
-            return null;
-        }
-
-        if (zipEntry == null || contentTypesXml == null || isOOXMLFile(sign)) {
-            throw new AOUnsupportedSignFormatException("La firma introducida no es un documento OOXML"); //$NON-NLS-1$
-        }
-
-        return OfficeXMLAnalizer.getOOXMLMimeType(contentTypesXml);
     }
 
     public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {

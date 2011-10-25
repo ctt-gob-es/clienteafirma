@@ -68,12 +68,11 @@ import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -1407,16 +1406,16 @@ public final class AOXMLDSigSigner implements AOSigner {
                 root = this.doc.getDocumentElement();
             }
 
-            if (targetType == CounterSignTarget.Tree) {
+            if (targetType == CounterSignTarget.TREE) {
                 this.countersignTree(root, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm);
             }
-            else if (targetType == CounterSignTarget.Leafs) {
+            else if (targetType == CounterSignTarget.LEAFS) {
                 this.countersignLeafs(root, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm);
             }
-            else if (targetType == CounterSignTarget.Nodes) {
+            else if (targetType == CounterSignTarget.NODES) {
                 this.countersignNodes(root, targets, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm);
             }
-            else if (targetType == CounterSignTarget.Signers) {
+            else if (targetType == CounterSignTarget.SIGNERS) {
                 this.countersignSigners(root, targets, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm);
             }
 
@@ -1972,71 +1971,4 @@ public final class AOXMLDSigSigner implements AOSigner {
         return signInfo;
     }
 
-    public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
-
-        String mType = null;
-
-        // Si no hay datos a analizar
-        if (sign == null) {
-            throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
-        }
-
-        // Si no es una firma valida
-        if (!isSign(sign)) {
-            throw new AOUnsupportedSignFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
-        }
-
-        // Obtiene el documento y su raiz
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        Document tmpDoc = null;
-        Element rootSig = null;
-        try {
-            tmpDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-            rootSig = tmpDoc.getDocumentElement();
-        }
-        catch (final Exception e) {
-            LOGGER.warning("Error al analizar la firma: " + e); //$NON-NLS-1$
-            rootSig = null;
-        }
-
-        if (rootSig != null) {
-            // si es enveloped trata de obtener el MimeType del nodo raiz, que
-            // corresponde a los datos
-            if (isEnveloped(rootSig)) {
-                mType = rootSig.getAttribute("MimeType"); //$NON-NLS-1$
-            }
-            // si es enveloping
-            else if (isEnveloping(rootSig)) {
-                // si el documento no tiene como nodo raiz AFIRMA se anade este
-                // para que la lectura de las firmas del documento se haga
-                // correctamente
-                if (rootSig.getNodeName().equals(SIGNATURE_NODE_NAME)) {
-                    try {
-                        tmpDoc = insertarNodoAfirma(tmpDoc);
-                    }
-                    catch (final Exception e) {
-                        throw new AOUnsupportedSignFormatException("Error al analizar la firma."); //$NON-NLS-1$
-                    }
-                    rootSig = tmpDoc.getDocumentElement();
-                }
-
-                // obtiene el nodo de firma y el elemento que contiene los datos
-                final NodeList signatures = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Signature"); //$NON-NLS-1$
-                final NodeList objects = ((Element) signatures.item(0)).getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object"); //$NON-NLS-1$
-
-                mType = ((Element) objects.item(0)).getAttribute("MimeType"); //$NON-NLS-1$
-            }
-            // si es detached
-            else if (isDetached(rootSig)) {
-                mType = ((Element) rootSig.getFirstChild()).getAttribute("MimeType"); //$NON-NLS-1$
-            }
-        }
-
-        if (mType == null || mType.equals("")) { //$NON-NLS-1$
-            return null;
-        }
-
-        return mType;
-    }
 }
