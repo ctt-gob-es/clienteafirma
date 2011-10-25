@@ -178,13 +178,13 @@ final class CounterSigner {
         ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
         // FIRMA EN ARBOL
-        if (targetType.equals(CounterSignTarget.Tree)) {
+        if (targetType.equals(CounterSignTarget.TREE)) {
             signerInfos = CounterTree(signerInfosSd, parameters, signerCertificateChain[0], keyEntry);
         } // FIRMA DE LAS HOJAS
-        else if (targetType.equals(CounterSignTarget.Leafs)) {
+        else if (targetType.equals(CounterSignTarget.LEAFS)) {
             signerInfos = CounterLeaf(signerInfosSd, parameters, signerCertificateChain[0], keyEntry);
         } // FIRMA DE NODOS
-        else if (targetType.equals(CounterSignTarget.Nodes)) {
+        else if (targetType.equals(CounterSignTarget.NODES)) {
             // Firma de Nodos
             SignedData sigDat;
             SignedData aux = sd;
@@ -206,7 +206,7 @@ final class CounterSigner {
             // construimos el Signed Data y lo devolvemos
             return new ContentInfo(PKCSObjectIdentifiers.signedData, aux).getDEREncoded();
         }
-        else if (targetType.equals(CounterSignTarget.Signers)) {
+        else if (targetType.equals(CounterSignTarget.SIGNERS)) {
             // Firma de Nodos
             SignedData sigDat;
             SignedData aux = sd;

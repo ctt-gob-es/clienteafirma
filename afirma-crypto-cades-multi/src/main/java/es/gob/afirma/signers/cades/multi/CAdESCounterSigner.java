@@ -186,15 +186,15 @@ final class CAdESCounterSigner {
         ASN1EncodableVector signerInfos = new ASN1EncodableVector();
 
         // FIRMA EN ARBOL
-        if (targetType.equals(CounterSignTarget.Tree)) {
+        if (targetType.equals(CounterSignTarget.TREE)) {
             signerInfos = CounterTree(signerInfosSd, parameters, signerCertificateChain[0], keyEntry);
         }
         // FIRMA DE LAS HOJAS
-        else if (targetType.equals(CounterSignTarget.Leafs)) {
+        else if (targetType.equals(CounterSignTarget.LEAFS)) {
             signerInfos = CounterLeaf(signerInfosSd, parameters, signerCertificateChain[0], keyEntry);
         }
         // FIRMA DE NODOS
-        else if (targetType.equals(CounterSignTarget.Nodes)) {
+        else if (targetType.equals(CounterSignTarget.NODES)) {
             // Firma de Nodos
             SignedData sigDat;
             SignedData aux = sd;
@@ -215,7 +215,7 @@ final class CAdESCounterSigner {
             return new ContentInfo(PKCSObjectIdentifiers.signedData, aux).getDEREncoded();
         }
         // FIRMA DE LOS SIGNERS
-        else if (targetType.equals(CounterSignTarget.Signers)) {
+        else if (targetType.equals(CounterSignTarget.SIGNERS)) {
             // Firma de Nodos
             SignedData sigDat;
             SignedData aux = sd;
