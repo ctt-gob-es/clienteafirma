@@ -19,7 +19,7 @@ import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-/** Signature Policy qualifiers, tipo especial para CADES-EPES
+/** Tipo <i>SigPolicyQualifierInfo</i> de ASN.1 para CADES-EPES.
  *
  * <pre>
  *   SigPolicyQualifierInfo ::= SEQUENCE {

@@ -16,7 +16,8 @@ import java.security.KeyStore.PrivateKeyEntry;
 
 import es.gob.afirma.core.AOException;
 
-/** Clase que realiza la firma simple PKCS#1 V1.5 como parte externalizable de las firmas CAdES.
+/** Realizaci&oacute;n de firmas simples PKCS#1 V1.5 como parte externalizable de las firmas CAdES.
+ * La exposici&oacute;n de esta clase es necesaria para la realizaci&oacute; de firmas CAdES en tres fases.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public class PKCS1ExternalizableSigner {
     
@@ -24,12 +25,12 @@ public class PKCS1ExternalizableSigner {
      // No permitimos la instanciacion
     }
     
-    /** Realiza una firma PKCS#1 v1.5.
-     * @param signatureAlgorithm Algoritmo de firma
-     * @param keyEntry Puntero a la clave de firma
+    /** Realiza una firma electr&oacute;nica PKCS#1 v1.5.
+     * @param signatureAlgorithm Algoritmo de firma a utilizar
+     * @param keyEntry Entrada que apunta a la clave de privada a usar para la firma
      * @param data Datos a firmar
      * @return Firma PKCS#1 en binario puro no tratado
-     * @throws AOException en caso de cualqioer problema durante la firma
+     * @throws AOException en caso de cualquier problema durante la firma
      */
     public static byte[] sign(final String signatureAlgorithm, final PrivateKeyEntry keyEntry, final byte[] data) throws AOException {
         

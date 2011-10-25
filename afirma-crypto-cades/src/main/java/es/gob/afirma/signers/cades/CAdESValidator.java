@@ -31,36 +31,26 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.signers.pkcs7.DigestedData;
 import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
 
-/** Clase que verifica los distintos tipos de firma para CADES a partir de un
- * fichero pasado por par&aacute;metro.
- * La verificaci&oacute; es para los tipo:
- * <ul>
- * <li>Data</li>
- * <li>Signed Data</li>
- * <li>Digested Data</li>
- * <li>Encrypted Data</li>
- * <li>Enveloped Data</li>
- * <li>Signed and Enveloped Data</li>
- * </ul> */
-
+/** Agrupa distintos m&eacute;todos de verificaci&oacute;n estructural de datos CAdES. Es importante rese&ntilde;ar que las
+ * validaciones son &uacute;nicamente a nivel de estructura, y no a nivel de validez de la propia firma electr&oacute;ca o
+ * los firmantes. */
 public final class CAdESValidator {
     
     private static Logger LOGGER = Logger.getLogger("es.gob.afima"); //$NON-NLS-1$
     
-    /** M&eacute;todo que verifica que es una firma de tipo "data"
-     * @param data
-     *        El envoltorio.
-     * @return si es de este tipo. */
+    /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>.
+     * @param data Datos PKCS#7/CMS/CAdES.
+     * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>,
+     * <code>false</code> en caso contrario. */
     @SuppressWarnings("unused")
     boolean isCAdESData(final byte[] data) {
-        boolean isValid = true;
         try {
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             final Enumeration<?> e = ((ASN1Sequence) new ASN1InputStream(data).readObject()).getObjects();
             // Elementos que contienen los elementos OID Data
             final DERObjectIdentifier doi = (DERObjectIdentifier) e.nextElement();
             if (!doi.equals(PKCSObjectIdentifiers.data)) {
-                isValid = false;
+                return false;
             }
             // Contenido de Data
             final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
@@ -74,18 +64,16 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-            // LOGGER.severe("Error durante el proceso de conversion "
-            // + ex);
-            isValid = false;
+            return false;
         }
 
-        return isValid;
+        return true;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "Signed data"
-     * @param data
-     *        El envoltorio.
-     * @return si es de este tipo. */
+    /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>SignedData</i>.
+     * @param data Datos PKCS#7/CMS/CAdES.
+     * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedData</i>,
+     * <code>false</code> en caso contrario. */
     public boolean isCAdESSignedData(final byte[] data) {
         boolean isValid = false;
         try {
@@ -112,17 +100,14 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-            // LOGGER.severe("Error durante el proceso de conversion "
-            // + ex);
-            isValid = false;
+            return false;
         }
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que los SignerInfos tenga el par&aacute;metro
-     * que identifica que es de tipo cades.
-     * @param si
-     *        SignerInfo para la verificaci&oacute;n del p&aacute;rametro
+    /** Verifica que los <code>SignerInfos</code> tengan el par&aacute;metro
+     * que identifica que los datos son de tipo CAdES.
+     * @param si <code>SignerInfo</code> para la verificaci&oacute;n del p&aacute;rametro
      *        adecuado.
      * @return si contiene el par&aacute;metro. */
     private boolean verifySignerInfo(final SignerInfo si) {
@@ -143,10 +128,10 @@ public final class CAdESValidator {
         return isSignerValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "Digested data"
-     * @param data
-     *        El envoltorio.
-     * @return si es de este tipo. */
+    /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>DigestedData</i>.
+     * @param data Datos PKCS#7/CMS/CAdES.
+     * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>DigestedData</i>,
+     * <code>false</code> en caso contrario. */
     @SuppressWarnings("unused")
     boolean isCAdESDigestedData(final byte[] data) {
         boolean isValid = false;
@@ -172,18 +157,16 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-            // LOGGER.severe("Error durante el proceso de conversion "
-            // + ex);
-            isValid = false;
+            return false;
         }
 
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "Encrypted data"
-     * @param data
-     *        El envoltorio.
-     * @return si es de este tipo. */
+    /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>EncryptedData</i>.
+     * @param data Datos PKCS#7/CMS/CAdES.
+     * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>EncryptedData</i>,
+     * <code>false</code> en caso contrario. */
     boolean isCAdESEncryptedData(final byte[] data) {
         boolean isValid = false;
         try {
@@ -202,30 +185,30 @@ public final class CAdESValidator {
             final ASN1Sequence asq = (ASN1Sequence) doj.getObject();
 
             /*
-             * Estas variables no se usan, solo es para verificar que la
+             * Los resultados de las llamadas no se usan, solo es para verificar que la
              * conversion ha sido correcta. De no ser asi, se pasaria al manejo
              * de la excepcion.
              */
-            /* DERInteger version = */DERInteger.getInstance(asq.getObjectAt(0));
-            /* EncryptedContentInfo encryptedContentInfo = */EncryptedContentInfo.getInstance(asq.getObjectAt(1));
+            
+            DERInteger.getInstance(asq.getObjectAt(0));
+            EncryptedContentInfo.getInstance(asq.getObjectAt(1));
+            
             if (asq.size() == 3) {
-                /* ASN1TaggedObject unprotectedAttrs =(ASN1TaggedObject) */asq.getObjectAt(2);
+                asq.getObjectAt(2);
             }
 
         }
         catch (final Exception ex) {
-            // LOGGER.severe("Error durante el proceso de conversion "
-            // + ex);
-            isValid = false;
+            return false;
         }
 
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo "Enveloped data"
-     * @param data
-     *        El envoltorio.
-     * @return si es de este tipo. */
+    /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>EnvelopedData</i>.
+     * @param data Datos PKCS#7/CMS/CAdES.
+     * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>EnvelopedData</i>,
+     * <code>false</code> en caso contrario. */
     @SuppressWarnings("unused")
     boolean isCAdESEnvelopedData(final byte[] data) {
         boolean isValid = false;
@@ -251,19 +234,16 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-            // LOGGER.severe("Error durante el proceso de conversion "
-            // + ex);
-            isValid = false;
+            return false;
         }
 
         return isValid;
     }
 
-    /** M&eacute;todo que verifica que es una firma de tipo
-     * "Signed and Enveloped data"
-     * @param data
-     *        El envoltorio.
-     * @return si es de este tipo. */
+    /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>SignedAndEnvelopedData</i>.
+     * @param data Datos PKCS#7/CMS/CAdES.
+     * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedAndEnvelopedData</i>,
+     * <code>false</code> en caso contrario. */
     boolean isCAdESSignedAndEnvelopedData(final byte[] data) {
         boolean isValid = false;
         try {
@@ -290,28 +270,33 @@ public final class CAdESValidator {
 
         }
         catch (final Exception ex) {
-            // LOGGER.severe("Error durante el proceso de conversion "
-            // + ex);
-            isValid = false;
+            return false;
         }
         return isValid;
     }
     
-    /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
-     * Se permite la verificaci&oacute;n de los siguientes tipos de firma:
+    /** Comprueba que un archivo cumple con una estructura de tipo CAdES.
+     * Se permite la verificaci&oacute;n de los siguientes tipos de estructuras:
      * <ul>
-     * <li>Data</li>
-     * <li>Signed Data</li>
-     * <li>Digested Data</li>
-     * <li>Encrypted Data</li>
-     * <li>Enveloped Data</li>
-     * <li>Signed and Enveloped Data</li>
+     *  <li>Data</li>
+     *  <li>Signed Data</li>
+     *  <li>Digested Data</li>
+     *  <li>Encrypted Data</li>
+     *  <li>Enveloped Data</li>
+     *  <li>Signed and Enveloped Data</li>
      * </ul>
-     * @param signData
-     *        Datos que se desean comprobar.
-     * @param type
-     *        Tipo de firma que se quiere verificar.
-     * @return La validez del archivo cumpliendo la estructura. */
+     * @param signData Datos que se desean comprobar.
+     * @param type Tipo de firma o estructura CMS que se quiere verificar. Los valores aceptados son
+     *             <ul>
+     *              <li><code>AOSignConstants.CMS_CONTENTTYPE_DATA</code></li>
+     *              <li><code>AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA</code></li>
+     *              <li><code>AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA</code></li>
+     *              <li><code>AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA</code></li>
+     *              <li><code>AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA</code></li>
+     *              <li><code>AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA</code></li>
+     *             </ul>
+     * @return <code>true</code> si los datos proporcionados se corresponden con la estructura CAdES
+     *         indicada, <code>false</code> en caso contrario. */
     public static boolean isCAdESValid(final byte[] signData, final String type) {
         if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DATA)) {
             return new CAdESValidator().isCAdESData(signData);
@@ -335,20 +320,19 @@ public final class CAdESValidator {
         return false;
     }
 
-    /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
-     * Se realiza la verificaci&oacute;n sobre los los siguientes tipos de CMS
-     * reconocidos:
+    /** Comprueba que un archivo cumple con una estructura de tipo CAdES.
+     * Se permite la verificaci&oacute;n de los siguientes tipos de estructuras:
      * <ul>
-     * <li>Data</li>
-     * <li>Signed Data</li>
-     * <li>Digested Data</li>
-     * <li>Encrypted Data</li>
-     * <li>Enveloped Data</li>
-     * <li>Signed and Enveloped Data</li>
+     *  <li>Data</li>
+     *  <li>Signed Data</li>
+     *  <li>Digested Data</li>
+     *  <li>Encrypted Data</li>
+     *  <li>Enveloped Data</li>
+     *  <li>Signed and Enveloped Data</li>
      * </ul>
-     * @param data
-     *        Datos que deseamos comprobar.
-     * @return La validez del archivo cumpliendo la estructura. */
+     * @param data Datos que se desean comprobar.
+     * @return <code>true</code> si los datos proporcionados se corresponden con la estructura CAdES
+     *         indicada, <code>false</code> en caso contrario. */
     public static boolean isCAdESValid(final byte[] data) {
         // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
         // siempre sera nulo

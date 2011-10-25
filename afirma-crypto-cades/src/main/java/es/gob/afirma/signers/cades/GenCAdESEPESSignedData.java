@@ -26,7 +26,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 /** Generaci&oacute;n de firmas digitales CMS Advanced Electronic Signatures
  * (CAdES).
  * La implementaci&oacute;n es la misma que para el SignedData de CMS, salvo
- * que en los atributos del SignerInfo en vez de ir el n&uacute;mero de serie
+ * que en los atributos del SignerInfo, en vez de ir el n&uacute;mero de serie
  * (SerialNumber), va la firma del certificado.
  * <p>La Estructura del mensaje es la siguiente (se omite la parte correspondiente
  * a CMS):</p>
@@ -50,15 +50,12 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  *                                   SigPolicyQualifierInfo OPTIONAL}
  * </code>
  * </pre>
- *
- * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
- * para crear un mensaje SignedData de BouncyCastle: <a
- * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
+ */
 public final class GenCAdESEPESSignedData {
 
     /** Genera una firma digital usando una estructura PKCS#7
      * SignedData. Puede incluir el contenido del fichero codificado
-     * o s&oacute;lo una referencia.
+     * o s&oacute;lo una referencia a este.
      * @param parameters
      *        Par&aacute;metros necesarios para obtener los datos de
      *        SignedData.

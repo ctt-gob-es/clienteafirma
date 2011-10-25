@@ -51,14 +51,14 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-/** Utilidades varias para las firmas CAdES. */
+/** Utilidades varias relacionadas con firmas electr&oacute;nicas CAdES. */
 public class CAdESUtils {
     
     private CAdESUtils() {
         // No permitimos la instanciacion
     }
     
-    /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
+    /** Genera la parte que contiene la informaci&oacute;n del
      * Usuario. Se generan los atributos que se necesitan para generar la firma.
      * @param cert Certificado del firmante
      * @param digestAlgorithmName Nombre del algoritmo de huella digital a usar
