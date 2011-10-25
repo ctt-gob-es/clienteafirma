@@ -41,7 +41,7 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
  *  <dt><b>mode</b></dt>
  *   <dd>Modo de firma a usar (Expl&iacute;cita = <code>explicit</code> o Impl&iacute;cita = <code>implicit</code>)</dd>
  *  <dt><b>policyIdentifier</b></dt>
- *   <dd>Identificadora de la pol&iacute;tica de firma (normalmente un OID que identifica &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable)</dd>
+ *   <dd>Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.</dd>
  *  <dt><b>policyIdentifierHash</b></dt>
  *   <dd>
  *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato ASN.1 procesable).
@@ -116,11 +116,23 @@ public final class AOCAdESSigner implements AOSigner {
         }
     }
 
-    public byte[] cosign(final byte[] data, final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    /** Cofirma datos en formato CAdES. Para realizar la
+     * cofirma se necesitan los datos originales (que este m&eacute;todo
+     * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
+     * (a los que se agregar&aacute; el resultado de la nueva firma).
+     * <p><b>IMPORTANTE: Requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
+     * @param data Datos que deseamos a cofirmar.
+     * @param sign Firma CAdES o CMS de los datos que se quiere cofirmar.
+     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param extraParams Par&aacute;metros adicionales para la cofirma.
+     * @return Firma CAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
         try {
             return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCoSigner").newInstance()).cosign(data, sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
         }
-        catch(AOException e) {
+        catch(final AOException e) {
             throw e;
         }
         catch(final Exception e) {
@@ -128,11 +140,22 @@ public final class AOCAdESSigner implements AOSigner {
         }
     }
 
-    public byte[] cosign(final byte[] sign, String algorithm, final PrivateKeyEntry keyEntry, Properties extraParams) throws AOException {
+    /** Cofirma datos en formato CAdES. Para realizar la
+     * cofirma se necesita el documento en el que se encuentra la firma sobre la
+     * que se realiza la cofirma (a los que se agregar&aacute; el resultado de
+     * la nueva firma).
+     * <p><b>IMPORTANTE: Requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
+     * @param sign Firma CAdES o CMS de los datos que se quiere cofirmar.
+     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param extraParams Par&aacute;metros adicionales para la cofirma
+     * @return Firma CAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
         try {
             return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCoSigner").newInstance()).cosign(sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
         }
-        catch(AOException e) {
+        catch(final AOException e) {
             throw e;
         }
         catch(final Exception e) {
@@ -140,16 +163,34 @@ public final class AOCAdESSigner implements AOSigner {
         }
     }
 
+    /** Contrafirma nodos de firma concretos de una firma electr&oacute;nica.<br/>
+     * Los nodos que se deben firmar se indican en <code>targetType</code> y
+     * pueden ser:
+     * <ul>
+     *  <li>Todos los nodos del &aacute;rbol de firma</li>
+     *  <li>Los nodos hoja del &aacute;rbol de firma</li>
+     *  <li>Los nodos de firma cuyas posiciones se especifican en <code>target</code></li>
+     *  <li>Los nodos de firma realizados por los firmantes cuyo <i>Common Name</i> se indica en <code>target</code></li>
+     * </ul>
+     * <p><b>IMPORTANTE: Requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner</code> en el CLASSPATH</b></p>
+     * @param sign Firma CAdES o CMS con los nodos a contrafirmar
+     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     * @param targetType Tipo de objetivo de la contrafirma
+     * @param targets Informaci&oacute;n complementario seg&uacute;n el tipo de objetivo de la contrafirma
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param extraParams Par&aacute;metros adicionales para la contrafirma
+     * @return Firma CAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] countersign(final byte[] sign,
-                              String algorithm,
+                              final String algorithm,
                               final CounterSignTarget targetType,
                               final Object[] targets,
                               final PrivateKeyEntry keyEntry,
-                              Properties extraParams) throws AOException {
+                              final Properties extraParams) throws AOException {
         try {
             return ((AOCounterSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner").newInstance()).countersign(sign, algorithm, targetType, targets, keyEntry, extraParams); //$NON-NLS-1$
         }
-        catch(AOException e) {
+        catch(final AOException e) {
             throw e;
         }
         catch(final Exception e) {
@@ -183,53 +224,6 @@ public final class AOCAdESSigner implements AOSigner {
         return true;
     }
 
-    /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
-     * Se realiza la verificaci&oacute;n sobre los los siguientes tipos de CMS
-     * reconocidos:
-     * <ul>
-     * <li>Data</li>
-     * <li>Signed Data</li>
-     * <li>Digested Data</li>
-     * <li>Encrypted Data</li>
-     * <li>Enveloped Data</li>
-     * <li>Signed and Enveloped Data</li>
-     * </ul>
-     * @param data
-     *        Datos que deseamos comprobar.
-     * @return La validez del archivo cumpliendo la estructura. */
-    public boolean isCADESValid(final byte[] data) {
-        // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
-        // siempre sera nulo
-        if (data == null) {
-            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
-            return false;
-        }
-
-        // Comprobamos si su contenido es de tipo DATA
-        boolean valido = new CAdESValidator().isCAdESData(data);
-        // Comprobamos si su contenido es de tipo SIGNEDDATA
-        if (!valido) {
-            valido = new CAdESValidator().isCAdESSignedData(data);
-        }
-        // Comprobamos si su contenido es de tipo DIGESTDATA
-        if (!valido) {
-            valido = new CAdESValidator().isCAdESDigestedData(data);
-        }
-        // Comprobamos si su contenido es de tipo ENCRYPTEDDATA
-        if (!valido) {
-            valido = new CAdESValidator().isCAdESEncryptedData(data);
-        }
-        // Comprobamos si su contenido es de tipo ENVELOPEDDATA
-        if (!valido) {
-            valido = new CAdESValidator().isCAdESEnvelopedData(data);
-        }
-        // Comprobamos si su contenido es de tipo SIGNEDANDENVELOPED
-        if (!valido) {
-            valido = new CAdESValidator().isCAdESSignedAndEnvelopedData(data);
-        }
-        return valido;
-    }
-
     /** Obtiene el tipo de datos declarado en una firma mediante su Mime Type. Si
      * no se conoce el tipo de dato se devolver&aacute; <code>null</code>.
      * Seg&uacute;n el formato de firma puede haber un tipo de datos por
@@ -259,7 +253,7 @@ public final class AOCAdESSigner implements AOSigner {
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
-        if (!this.isCADESValid(signData)) {
+        if (!CAdESValidator.isCAdESValid(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
         return new ObtainContentSignedData().obtainData(signData);

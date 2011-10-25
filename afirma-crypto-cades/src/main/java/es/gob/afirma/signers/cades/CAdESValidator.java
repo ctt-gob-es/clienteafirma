@@ -335,5 +335,53 @@ public final class CAdESValidator {
         return false;
     }
 
+    /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
+     * Se realiza la verificaci&oacute;n sobre los los siguientes tipos de CMS
+     * reconocidos:
+     * <ul>
+     * <li>Data</li>
+     * <li>Signed Data</li>
+     * <li>Digested Data</li>
+     * <li>Encrypted Data</li>
+     * <li>Enveloped Data</li>
+     * <li>Signed and Enveloped Data</li>
+     * </ul>
+     * @param data
+     *        Datos que deseamos comprobar.
+     * @return La validez del archivo cumpliendo la estructura. */
+    public static boolean isCAdESValid(final byte[] data) {
+        // si se lee en el CMSDATA, el inputstream ya esta leido y en los demas
+        // siempre sera nulo
+        if (data == null) {
+            LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
+            return false;
+        }
+
+        // Comprobamos si su contenido es de tipo DATA
+        boolean valido = new CAdESValidator().isCAdESData(data);
+        // Comprobamos si su contenido es de tipo SIGNEDDATA
+        if (!valido) {
+            valido = new CAdESValidator().isCAdESSignedData(data);
+        }
+        // Comprobamos si su contenido es de tipo DIGESTDATA
+        if (!valido) {
+            valido = new CAdESValidator().isCAdESDigestedData(data);
+        }
+        // Comprobamos si su contenido es de tipo ENCRYPTEDDATA
+        if (!valido) {
+            valido = new CAdESValidator().isCAdESEncryptedData(data);
+        }
+        // Comprobamos si su contenido es de tipo ENVELOPEDDATA
+        if (!valido) {
+            valido = new CAdESValidator().isCAdESEnvelopedData(data);
+        }
+        // Comprobamos si su contenido es de tipo SIGNEDANDENVELOPED
+        if (!valido) {
+            valido = new CAdESValidator().isCAdESSignedAndEnvelopedData(data);
+        }
+        return valido;
+    }
+
+
 
 }

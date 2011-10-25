@@ -23,7 +23,6 @@ public interface AOCoSigner {
      * cofirma se necesitan los datos originales (que este m&eacute;todo
      * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
      * (a los que se agregar&aacute; el resultado de la nueva firma).<br/>
-     * Los algoritmos y modos de firma disponibles se declaran en AOSignConstants.
      * @param data
      *        Datos que deseamos a cofirmar.
      * @param sign
@@ -45,7 +44,6 @@ public interface AOCoSigner {
      * cofirma se necesita el documento en el que se encuentra la firma sobre la
      * que se realiza la cofirma (a los que se agregar&aacute; el resultado de
      * la nueva firma).<br/>
-     * Los algoritmos y modos de firma disponibles se declaran en {@link AOConstants}.
      * @param sign
      *        Firma de los datos que se quiere cofirmar.
      * @param algorithm

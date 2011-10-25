@@ -9,7 +9,7 @@
  ******************************************************************************/
 
 /**
- *	Contiene clases relacionadas con firmas digitales CAdES.
+ *	Contiene clases relacionadas con firmas digitales CAdES.<br>
  *  Dependencias:
  *  <ul>
  *   <li>N&uacute;cleo Afirma.</li>
