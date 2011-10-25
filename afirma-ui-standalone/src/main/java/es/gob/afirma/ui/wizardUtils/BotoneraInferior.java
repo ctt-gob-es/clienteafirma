@@ -71,7 +71,7 @@ public class BotoneraInferior extends JPanel {
 		// Configuracion del panel
     	setBorder(BorderFactory.createEtchedBorder());
     	setPreferredSize(this.dimensiones);
-        setLayout(new FlowLayout(FlowLayout.RIGHT, 1, 1));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 
         // Definicion de botones
         final JButton maximizar = new JButton();
