@@ -23,13 +23,13 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
-/** Clase que implementa firma digital CMS Advanced Electronic Signatures
+/** Generaci&oacute;n de firmas digitales CMS Advanced Electronic Signatures
  * (CAdES).
- * La implementaci&oacute;n es la misma que para el Signed Data de CMS, salvo
+ * La implementaci&oacute;n es la misma que para el SignedData de CMS, salvo
  * que en los atributos del SignerInfo en vez de ir el n&uacute;mero de serie
- * (SerialNumber), va la firma del certificado.<br>
- * La Estructura del mensaje es la siguiente (Se omite la parte correspondiente
- * a CMS):<br>
+ * (SerialNumber), va la firma del certificado.
+ * <p>La Estructura del mensaje es la siguiente (se omite la parte correspondiente
+ * a CMS):</p>
  *
  * <pre>
  * <code>
@@ -54,40 +54,38 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * La implementaci&oacute;n del c&oacute;digo ha seguido los pasos necesarios
  * para crear un mensaje SignedData de BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> */
-
 public final class GenCAdESEPESSignedData {
 
-    /** M&eacute;odo que genera una firma digital usando el sitema conocido como
-     * SignedData y que podr&aacute; ser con el contenido del fichero codificado
-     * o s&oacute;lo como referencia del fichero.
+    /** Genera una firma digital usando una estructura PKCS#7
+     * SignedData. Puede incluir el contenido del fichero codificado
+     * o s&oacute;lo una referencia.
      * @param parameters
      *        Par&aacute;metros necesarios para obtener los datos de
      *        SignedData.
      * @param omitContent
-     *        Par&aacute;metro qeu indica si en la firma va el contenido del
-     *        fichero o s&oacute;lo va de forma referenciada.
+     *        <code>false</code> si en la firma se desea incluir el contenido del
+     *        fichero o <code>true</code> si s&oacute;lo se desea usar una referencia.
      * @param policy Pol&iacute;tica de firma
      * @param signingCertificateV2
      *        <code>true</code> si se desea usar la versi&oacute;n 2 del
-     *        atributo <i>Signing Certificate</i> <code>false</code> para
+     *        atributo <i>SigningCertificate</i> <code>false</code> para
      *        usar la versi&oacute;n 1
      * @param keyEntry
      *        Entrada a la clave privada para firma.
      * @param messageDigest
-     *        Hash a aplicar en la firma.
+     *        Huella digital a aplicar en la firma.
      * @return La firma generada codificada.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
-     *         digital
+     *         digital indicados
      * @throws java.security.cert.CertificateException
-     *         Si se produce alguna excepci&oacute;n con los certificados de
+     *         En caso de cualquier problema con los certificados de
      *         firma.
      * @throws java.io.IOException
-     *         Si ocurre alg&uacute;n problema leyendo o escribiendo los
+     *         En caso de cualquier problema leyendo o escribiendo los
      *         datos
      * @throws AOException
-     *         Cuando ocurre un error durante el proceso de descifrado
-     *         (formato o clave incorrecto,...) */
+     *         Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
     public byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                      final boolean omitContent,
                                      final AdESPolicy policy,
