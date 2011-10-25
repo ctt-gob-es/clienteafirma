@@ -47,16 +47,15 @@ import com.lowagie.text.pdf.PdfString;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.misc.SHA2AltNamesProvider;
 import es.gob.afirma.core.signers.AOSignConstants;
+import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSignInfo;
+import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.signers.AdESPolicy;
-import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
-import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -143,9 +142,6 @@ public final class AOPDFSigner implements AOSigner {
 
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -666;
-
-    /** Mimetype asignado a los ficheros PDF. */
-    private static final String MIMETYPE_PDF = "application/pdf"; //$NON-NLS-1$
 
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
@@ -765,15 +761,4 @@ public final class AOPDFSigner implements AOSigner {
         // que se almacenan en el objeto AOSignInfo
     }
 
-    public String getDataMimeType(final byte[] sign) throws AOUnsupportedSignFormatException {
-        if (sign == null) {
-            throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
-        }
-
-        if (!this.isSign(sign)) {
-            throw new AOUnsupportedSignFormatException("La firma introducida no es un fichero de firma PDF"); //$NON-NLS-1$
-        }
-
-        return MIMETYPE_PDF;
-    }
 }
