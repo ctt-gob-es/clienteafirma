@@ -55,6 +55,15 @@
 
   <profiles>
     <profile>
+      <id>jdk1.5</id>
+      <activation>
+        <jdk>1.5</jdk>
+      </activation>
+      <modules>
+        <module>afirma-bootloader</module>
+      </modules>
+    </profile>
+    <profile>
       <id>jdk1.6</id>
       <activation>
         <jdk>1.6</jdk>
