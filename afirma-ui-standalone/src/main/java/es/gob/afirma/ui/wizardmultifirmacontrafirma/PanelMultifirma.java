@@ -123,18 +123,18 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		FileInputStream fis = null;
 		javax.swing.tree.DefaultTreeModel modeloArbolSwing;
 		try {
-			AOTreeModel modeloArbol = (AOTreeModel) AOSignerFactory.getSigner(signData).getSignersStructure(signData, false);
+			AOTreeModel modeloArbol = (AOTreeModel) AOSignerFactory.getSigner(this.signData).getSignersStructure(this.signData, false);
 			modeloArbolSwing = JSEUtils.convertToSwingModel(modeloArbol);
 
-			arbolFirmas.setModel(modeloArbolSwing);
+			this.arbolFirmas.setModel(modeloArbolSwing);
 
-			for (int i=0; i<arbolFirmas.getRowCount(); i++) {
-				arbolFirmas.expandRow(i);
+			for (int i=0; i<this.arbolFirmas.getRowCount(); i++) {
+				this.arbolFirmas.expandRow(i);
 			}
 
-			arbolFirmas.setSelectionRow(0);
+			this.arbolFirmas.setSelectionRow(0);
 		} catch (Exception e) {
-			logger.severe("No se pudo cargar el arbol de firmas del fichero '" + rutaFichero + "': "+e);
+			logger.severe("No se pudo cargar el arbol de firmas del fichero '" + this.rutaFichero + "': "+e);
 			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.arbol"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
@@ -161,25 +161,25 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		final String[] signers = new String[signersSet.size()];
 		signersSet.toArray(signers);
 
-		modeloLista = new AbstractListModel() {
+		this.modeloLista = new AbstractListModel() {
 
 			private static final long serialVersionUID = 1L;
 			
 			String[] strings = signers;
 
 			public int getSize() { 
-				return strings.length; 
+				return this.strings.length; 
 			}
 
 			public Object getElementAt(int i) { 
-				return strings[i]; 
+				return this.strings[i]; 
 			}
 		};
 
 		// Asignamos el modelo
-		listaFirmantes.setModel(modeloLista);
+		this.listaFirmantes.setModel(this.modeloLista);
 
-		return true;
+		return Boolean.TRUE;
 	}
 
 	/**
@@ -249,28 +249,28 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.BOTH;
 		
-		comboFirmas.addItemListener(new ItemListener() {
+		this.comboFirmas.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent evt) {
 				comboOpcionesItemStateChanged(etiqueta, panelArbol, panelLista);
 			}
 		});
-		comboFirmas.setModel(new DefaultComboBoxModel(new String[]{
-				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion1"),
-				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion2"),
-				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion3"),
-				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion4")}
+		this.comboFirmas.setModel(new DefaultComboBoxModel(new String[]{
+				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion1"), //$NON-NLS-1$
+				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion2"), //$NON-NLS-1$
+				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion3"), //$NON-NLS-1$
+				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion4")} //$NON-NLS-1$
 		));
 		
-		comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N
-		comboFirmas.getAccessibleContext().setAccessibleName(etiquetaFirmas.getText() + " " +comboFirmas.getToolTipText() + "ALT + F.");
-		comboFirmas.getAccessibleContext().setAccessibleDescription(comboFirmas.getToolTipText());
-		Utils.remarcar(comboFirmas);
-        Utils.setContrastColor(comboFirmas);
-		Utils.setFontBold(comboFirmas);
-		panelCentral.add(comboFirmas, c);
+		this.comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N
+		this.comboFirmas.getAccessibleContext().setAccessibleName(etiquetaFirmas.getText() + " " +this.comboFirmas.getToolTipText() + "ALT + F.");
+		this.comboFirmas.getAccessibleContext().setAccessibleDescription(this.comboFirmas.getToolTipText());
+		Utils.remarcar(this.comboFirmas);
+        Utils.setContrastColor(this.comboFirmas);
+		Utils.setFontBold(this.comboFirmas);
+		panelCentral.add(this.comboFirmas, c);
 		
 		 //Relación entre etiqueta y combo
-		etiquetaFirmas.setLabelFor(comboFirmas);
+		etiquetaFirmas.setLabelFor(this.comboFirmas);
   		//Asignación de mnemónico
 		etiquetaFirmas.setDisplayedMnemonic(KeyEvent.VK_F);
 
@@ -310,27 +310,27 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		renderer.setOpenIcon(leafIcon);
 		renderer.setClosedIcon(leafIcon);
 		
-		arbolFirmas.setRowHeight(25);
-		arbolFirmas.setCellRenderer(renderer);
-		arbolFirmas.addTreeExpansionListener(new TreeExpansionListener() {
+		this.arbolFirmas.setRowHeight(25);
+		this.arbolFirmas.setCellRenderer(renderer);
+		this.arbolFirmas.addTreeExpansionListener(new TreeExpansionListener() {
 			public void treeCollapsed(TreeExpansionEvent event) {
 				((JTree)event.getSource()).expandPath(event.getPath());
 			}
 			public void treeExpanded(TreeExpansionEvent event) {}
 		}); 
-		arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
-		arbolFirmas.getAccessibleContext().setAccessibleName(etiqueta.getText() + " " + arbolFirmas.getToolTipText() + "ALT + R.");
-		arbolFirmas.setSelectionRow(0);
-		arbolFirmas.setRootVisible(false);
-		Utils.remarcar(arbolFirmas);
-		Utils.setContrastColor(arbolFirmas);
-		Utils.setFontBold(arbolFirmas);
+		this.arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
+		this.arbolFirmas.getAccessibleContext().setAccessibleName(etiqueta.getText() + " " + this.arbolFirmas.getToolTipText() + "ALT + R.");
+		this.arbolFirmas.setSelectionRow(0);
+		this.arbolFirmas.setRootVisible(false);
+		Utils.remarcar(this.arbolFirmas);
+		Utils.setContrastColor(this.arbolFirmas);
+		Utils.setFontBold(this.arbolFirmas);
 		// Panel del arbol (firmantes seleccionados)
-		panelArbol.setViewportView(arbolFirmas);
+		panelArbol.setViewportView(this.arbolFirmas);
 		panelCentral.add(panelArbol, c);
 		
 		//Relación entre etiqueta y arbol
-		etiqueta.setLabelFor(arbolFirmas);
+		etiqueta.setLabelFor(this.arbolFirmas);
   		//Asignación de mnemónico
 		etiqueta.setDisplayedMnemonic(KeyEvent.VK_R);
 
@@ -340,17 +340,17 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		 */
 
 		// Lista de firmantes ()
-		Utils.remarcar(listaFirmantes);
-		Utils.setFontBold(listaFirmantes);
-		listaFirmantes.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes")); // NOI18N
-		listaFirmantes.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes.description")); // NOI18N
+		Utils.remarcar(this.listaFirmantes);
+		Utils.setFontBold(this.listaFirmantes);
+		this.listaFirmantes.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes")); // NOI18N
+		this.listaFirmantes.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes.description")); // NOI18N
 
 		// Panel de la lista
-		panelLista.setViewportView(listaFirmantes);
+		panelLista.setViewportView(this.listaFirmantes);
 		panelCentral.add(panelLista, c);
 		
 		//Relación entre etiqueta y lista
-		etiqueta.setLabelFor(listaFirmantes);
+		etiqueta.setLabelFor(this.listaFirmantes);
   		//Asignación de mnemónico
 		etiqueta.setDisplayedMnemonic(KeyEvent.VK_R);
 
@@ -358,7 +358,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
 		// Accesos rapidos al menu de ayuda
 		HelpUtils.enableHelpKey(panelLista, "multifirma.wizard.lista");
-		HelpUtils.enableHelpKey(comboFirmas, "multifirma.wizard.lista");
+		HelpUtils.enableHelpKey(this.comboFirmas, "multifirma.wizard.lista");
 		HelpUtils.enableHelpKey(panelArbol, "multifirma.wizard.arbolfirmantes"); 
 	}
 
@@ -372,7 +372,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	private void comboOpcionesItemStateChanged(JLabel etiqueta, 
 			JScrollPane panelArbol, JScrollPane panelLista) {
 		// Mostramos el listado para Firmantes seleccionados
-		if (comboFirmas.getSelectedIndex() == 1){
+		if (this.comboFirmas.getSelectedIndex() == 1){
 			panelArbol.setVisible(false);
 			panelLista.setVisible(true);
 			etiqueta.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.listaFirmantes"));
@@ -401,12 +401,12 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				JButton siguiente, JButton finalizar) {
 
 			// Si solo hay un elemento, se selecciona automaticamente
-			if (arbolFirmas.getRowCount() == 1) {
-				arbolFirmas.setSelectionRow(0);
+			if (PanelMultifirma.this.arbolFirmas.getRowCount() == 1) {
+				PanelMultifirma.this.arbolFirmas.setSelectionRow(0);
 			}
 			
 			// Comprobamos si se ha seleccionado algun elemento
-			if (arbolFirmas.isVisible() && arbolFirmas.getSelectionCount() == 0) {
+			if (PanelMultifirma.this.arbolFirmas.isVisible() && PanelMultifirma.this.arbolFirmas.getSelectionCount() == 0) {
 				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.lista"), 
 						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			} else {
@@ -427,19 +427,19 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			String intText = ".countersign";
 			byte[] signedData = null;
 			MultisignUtils msUtils = new MultisignUtils();
-			AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(kssc,this);
+			AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(this.kssc,this);
 			
-			byte[] signData = readFile(rutaFichero);
+			byte[] signData = readFile(this.rutaFichero);
 			
 			// Recuperamos la clave del certificado
-			PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(kssc, keyStoreManager, this);
+			PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
 			AOSigner signer = AOSignerFactory.getSigner(signData);
 
 			if (signer == null) {
 				throw new AOFormatFileException("El cliente no dispone de ning\u00FAn manejador que soporte\r\nel fichero de firma indicado");
 			}
 			if (!signer.isSign(signData)) {
-				throw new AOInvalidFormatException("El fichero '" + rutaFichero
+				throw new AOInvalidFormatException("El fichero '" + this.rutaFichero
 						+ "' no es un fichero de firma soportado.");
 			}
 			
@@ -451,7 +451,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
 			// Salvamos el fichero de datos
 			final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("Wizard.multifirma.simple.contrafirma.filechooser.save.title"), signedData,
-                    signer.getSignedName(rutaFichero, intText), null, this);
+                    signer.getSignedName(this.rutaFichero, intText), null, this);
 			// Si el usuario cancela el guardado de los datos, no nos desplazamos a la ultima pantalla
 			if (savedFile == null) {
 				return false;
@@ -487,7 +487,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			// Configuramos la operacion
 			Properties prop = GeneralConfig.getSignConfig();
 			
-			switch (comboFirmas.getSelectedIndex()){
+			switch (this.comboFirmas.getSelectedIndex()){
 				// NODOS SELECCIONADOS
 				case 0: {
 					Integer[] nodosSeleccionados = getSelectedSignNodes();
@@ -497,7 +497,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 						return null;
 					}
 					else {
-						signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.Nodes,
+						signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.NODES,
 								nodosSeleccionados, keyEntry, prop);
 					}
 					break;
@@ -511,20 +511,20 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 						return null;
 					}
 					else {
-						signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.Signers,
+						signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.SIGNERS,
 								nodosSeleccionados, keyEntry, prop);
 					}
 					break;
 				}
 				// EL ARBOL DE FIRMAS
 				case 2:{
-					signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.Tree,
+					signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.TREE,
 							null, keyEntry, prop);
 					break;
 				}
 				// FIRMA DE HOJAS
 				case 3:{
-					signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.Leafs,
+					signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.LEAFS,
 							null, keyEntry, prop);
 					break;
 				}
@@ -554,8 +554,8 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	 * @return &Iacute;ndices de los nodos de firma seleccionados.
 	 */
 	private Integer[] getSelectedSignNodes() {
-		if (arbolFirmas.getSelectionRows() != null) {
-			int[] nodesIndexes = arbolFirmas.getSelectionRows();
+		if (this.arbolFirmas.getSelectionRows() != null) {
+			int[] nodesIndexes = this.arbolFirmas.getSelectionRows();
 			// El array de nodos debe ir ordenado para asegurar que se firman los nodos correctos
 			Arrays.sort(nodesIndexes);
 			Integer[] nodesIndexesI = new Integer[nodesIndexes.length];
@@ -573,9 +573,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	 * @return &Iacute;ndices de los nodos de firma seleccionados.
 	 */
 	private String[] getSelectedSignNodesS() {
-		if (listaFirmantes.getSelectedValues() != null) {
+		if (this.listaFirmantes.getSelectedValues() != null) {
 			// Devolvemos los firmantes seleccionados
-			Object[] selectedValues = listaFirmantes.getSelectedValues();
+			Object[] selectedValues = this.listaFirmantes.getSelectedValues();
 	
 			String[] signers = new String[selectedValues.length];
 			for (int i=0; i<selectedValues.length; i++) 

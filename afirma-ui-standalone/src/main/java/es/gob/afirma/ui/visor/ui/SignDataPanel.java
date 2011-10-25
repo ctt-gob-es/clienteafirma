@@ -152,7 +152,7 @@ final class SignDataPanel extends JPanel {
             //openFileButton.setPreferredSize(new Dimension(150, 24));
             openFileButton.setMnemonic(KeyEvent.VK_E);
             openFileButton.setToolTipText(Messages.getString("SignDataPanel.4")); //$NON-NLS-1$
-            openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.3")+ ". " + Messages.getString("SignDataPanel.5")); //$NON-NLS-1$
+            openFileButton.getAccessibleContext().setAccessibleName(Messages.getString("SignDataPanel.3")+ ". " + Messages.getString("SignDataPanel.5")); //$NON-NLS-1$ //$NON-NLS-3$
             openFileButton.getAccessibleContext().setAccessibleDescription(Messages.getString("SignDataPanel.6")); //$NON-NLS-1$
             openFileButton.addActionListener(new ActionListener() {
                 @Override
@@ -398,8 +398,8 @@ final class SignDataPanel extends JPanel {
         //final DefaultTreeCellRenderer treeRenderer = new DefaultTreeCellRenderer();
         final LinksTreeCellRenderer treeRenderer = new LinksTreeCellRenderer();
         treeRenderer.setLeafIcon(null);
-        treeRenderer.setClosedIcon((Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) ? null : UIManager.getDefaults().getIcon("Tree.collapsedIcon")); //$NON-NLS-1$
-        treeRenderer.setOpenIcon((Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) ? null : UIManager.getDefaults().getIcon("Tree.expandedIcon")); //$NON-NLS-1$
+        treeRenderer.setClosedIcon((Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) ? null : UIManager.getDefaults().getIcon("TREE.collapsedIcon")); //$NON-NLS-1$
+        treeRenderer.setOpenIcon((Platform.OS.WINDOWS.equals(Platform.getOS()) || Platform.OS.MACOSX.equals(Platform.getOS())) ? null : UIManager.getDefaults().getIcon("TREE.expandedIcon")); //$NON-NLS-1$
 
         final JTree tree = new JTree(root);
         tree.setShowsRootHandles(true);
