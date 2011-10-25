@@ -74,7 +74,6 @@ import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.core.AOUnsupportedSignFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignInfo;
