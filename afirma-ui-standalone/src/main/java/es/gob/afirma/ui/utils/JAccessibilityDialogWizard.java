@@ -36,25 +36,58 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		if (GeneralConfig.isMaximized()){
 			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 			if (Platform.getOS().equals(Platform.OS.LINUX)){
-				setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
+				//Se comprueba si está activado el modo negrita o fuente grande
+				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+					setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
+				} else {
+					setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
+				}
+				
 			} else {
-				setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+				//Se comprueba si está activado el modo negrita o fuente grande
+				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+					setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
+				} else {
+					setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+				}
 			}
 		} else {
 			if (PrincipalGUI.wizardActualPositionX != -1){
 	    		setBounds(PrincipalGUI.wizardActualPositionX, PrincipalGUI.wizardActualPositionY, PrincipalGUI.wizardActualWidth, PrincipalGUI.wizardActualHeight);
 	    		if (Platform.getOS().equals(Platform.OS.LINUX)){
-	    			setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
+	    			//Se comprueba si está activado el modo negrita o fuente grande
+					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+						setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
+					} else {
+						setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
+					}
 	    		} else {
-	    			setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+	    			//Se comprueba si está activado el modo negrita o fuente grande
+					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+						setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
+					} else {
+						setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+					}
 	    		}
     		} else {
 				if (Platform.getOS().equals(Platform.OS.LINUX)){
+					//Se comprueba si está activado el modo negrita o fuente grande
+					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+						 setBounds((screenSize.width - Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX);
+				         setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
+					} else {
 			          setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
 			          setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
+					}
 				} else {
+					//Se comprueba si está activado el modo negrita o fuente grande
+					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+						 setBounds((screenSize.width - Constants.WIZARD_FONT_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_FONT_INITIAL_HEIGHT) / 2, Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT);
+				         setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
+					} else {
 			          setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
 			          setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
+					}
 				}
     		}
 		}
