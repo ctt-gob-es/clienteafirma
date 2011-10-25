@@ -43,7 +43,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * <li>Signed and Enveloped Data</li>
  * </ul> */
 
-public final class ValidateCADES {
+public final class CAdESValidator {
     
     private static Logger LOGGER = Logger.getLogger("es.gob.afima"); //$NON-NLS-1$
     
@@ -314,22 +314,22 @@ public final class ValidateCADES {
      * @return La validez del archivo cumpliendo la estructura. */
     public static boolean isCADESValid(final byte[] signData, final String type) {
         if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DATA)) {
-            return new ValidateCADES().isCADESData(signData);
+            return new CAdESValidator().isCADESData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA)) {
-            return new ValidateCADES().isCADESSignedData(signData);
+            return new CAdESValidator().isCADESSignedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA)) {
-            return new ValidateCADES().isCADESDigestedData(signData);
+            return new CAdESValidator().isCADESDigestedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
-            return new ValidateCADES().isCADESEncryptedData(signData);
+            return new CAdESValidator().isCADESEncryptedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-            return new ValidateCADES().isCADESEnvelopedData(signData);
+            return new CAdESValidator().isCADESEnvelopedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-            return new ValidateCADES().isCADESSignedAndEnvelopedData(signData);
+            return new CAdESValidator().isCADESSignedAndEnvelopedData(signData);
         }
         LOGGER.warning("Tipo de contenido CADES no reconocido"); //$NON-NLS-1$
         return false;

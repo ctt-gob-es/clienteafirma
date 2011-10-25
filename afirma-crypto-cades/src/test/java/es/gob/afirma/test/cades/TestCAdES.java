@@ -31,7 +31,7 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
-import es.gob.afirma.signers.cades.ValidateCADES;
+import es.gob.afirma.signers.cades.CAdESValidator;
 
 
 /**
@@ -146,7 +146,7 @@ public final class TestCAdES {
                 
                 Assert.assertNotNull(prueba, result);
                 Assert.assertTrue(signer.isSign(result));
-                Assert.assertTrue(ValidateCADES.isCADESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+                Assert.assertTrue(CAdESValidator.isCADESValid(result, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
                 
                 AOTreeModel tree = signer.getSignersStructure(result, false);
                 Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
@@ -255,7 +255,7 @@ public final class TestCAdES {
     private void checkSign(AOSigner signer, byte[] sign, PrivateKeyEntry[] pke, String[] signsAlias, String prueba) {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));
-        Assert.assertTrue(ValidateCADES.isCADESValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
+        Assert.assertTrue(CAdESValidator.isCADESValid(sign, AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA));
         
         // Arbol de alias
         AOTreeModel tree = signer.getSignersStructure(sign, false);
