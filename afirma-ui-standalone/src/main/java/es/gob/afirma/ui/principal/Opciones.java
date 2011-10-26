@@ -12,10 +12,12 @@ package es.gob.afirma.ui.principal;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -120,8 +122,15 @@ public class Opciones extends JAccessibilityDialog {
     	// Dimensiones de la ventana en Windows y Linux
 
     	if (GeneralConfig.isMaximized()){
-    		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+    		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+    		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+ 
+    		//Se obtienen las dimensiones de maximizado
+    		int maxWidth = (int)rect.getWidth();
+    		int maxHeight = (int)rect.getHeight();
+    		
+			this.setBounds(0,0, maxWidth, maxHeight);
+
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			if (Platform.getOS().equals(Platform.OS.LINUX)){
     				setMinimumSize(new Dimension(Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX));
@@ -568,9 +577,17 @@ public class Opciones extends JAccessibilityDialog {
 		actualPositionY = this.getY();
 		actualWidth = this.getWidth();
 		actualHeight = this.getHeight();
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 		JAccessibilityDialog j = getJAccessibilityDialog(this);
-		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		
+		//Se obtienen las dimensiones de maximizado
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+		
+		//Se hace el resize
+		j.setBounds(0,0, maxWidth, maxHeight);
 	}
 	
 	/**

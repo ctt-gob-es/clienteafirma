@@ -4,7 +4,8 @@ package es.gob.afirma.ui.utils;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -86,8 +87,15 @@ public abstract class JAccessibilityDialog extends JDialog {
 	 *  de Maximizar ventana. Tambien almacena el tamaño y posicion de la ventana para su restauracion.
 	 */
 	public void resized(ComponentEvent e) {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+		
+	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+
+	    //Dimensiones actuales del dialogo
 	    Dimension actualSize = getJAccessibilityDialog(this).getSize();
 	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialog(this));
 	    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialog(this));
