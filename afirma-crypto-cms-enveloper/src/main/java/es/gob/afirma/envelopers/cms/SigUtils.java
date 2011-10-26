@@ -27,6 +27,10 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 /** Clase que contiene una serie de m&eacute;todos utilizados por GenSignedData,
  * GenCadesSignedData, CoSigner y CounterSigner. */
 final class SigUtils {
+    
+    private SigUtils() {
+        // No permitimos la instanciacion
+    }
 
     /** M&eacute;todo que devuelve el Identificador del algoritmo.
      * @param oid
