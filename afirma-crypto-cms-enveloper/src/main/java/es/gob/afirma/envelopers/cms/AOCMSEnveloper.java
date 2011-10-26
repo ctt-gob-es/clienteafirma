@@ -162,7 +162,7 @@ public class AOCMSEnveloper implements AOEnveloper {
     
     /** Tipo de los datos contenidos en la envoltura. Siempre data por
      * est&aacute;ndar. */
-    private static Oid DATA_TYPE_OID;
+    private static final Oid DATA_TYPE_OID;
 
     /** Algoritmo de firma. */
     private String signatureAlgorithm = AOSignConstants.DEFAULT_SIGN_ALGO;
@@ -183,12 +183,14 @@ public class AOCMSEnveloper implements AOEnveloper {
     private String cipherKey = null;
 
     static {
+        Oid tmpOid = null;
         try {
-            DATA_TYPE_OID = new Oid( PKCSObjectIdentifiers.data.getId() );
+            tmpOid = new Oid( PKCSObjectIdentifiers.data.getId() );
         }
         catch (final Exception e) {
             /* Esto nunca podria fallar */
         }
+        DATA_TYPE_OID = tmpOid;
     }
 
     /** Configura un atributo firmado para agregarlo a un envoltorio.
@@ -438,7 +440,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando se produce un error al agregar el nuevo remitente.
      * @throws AOInvalidFormatException
      *         Tipo de envoltorio no soportado. */
-    byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException, AOInvalidFormatException {
+    byte[] addOriginator(final byte[] envelop, final PrivateKeyEntry ke) throws AOException {
         String contentInfo;
         final ValidateCMS validator = new ValidateCMS();
         if (validator.isCMSEnvelopedData(envelop)) {
@@ -580,11 +582,10 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws AOException
      *         Cuando se produce un error durante al desenvolver los datos. 
      * @throws NoSuchAlgorithmException */
-    byte[] recoverData(final byte[] cmsEnvelop) throws AOInvalidRecipientException,
+    byte[] recoverData(final byte[] cmsEnvelop) throws 
                                          InvalidKeyException,
                                          CertificateEncodingException,
                                          IOException,
-                                         AOInvalidFormatException,
                                          AOException, NoSuchAlgorithmException {
 
         final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
@@ -692,7 +693,6 @@ public class AOCMSEnveloper implements AOEnveloper {
     byte[] recoverCMSEnvelopedData(final byte[] envelopedData, final PrivateKeyEntry ke) throws IOException,
                                                                                         CertificateEncodingException,
                                                                                         AOException,
-                                                                                        AOInvalidRecipientException,
                                                                                         InvalidKeyException {
         return new CMSDecipherEnvelopData().dechiperEnvelopData(envelopedData, ke);
     }
@@ -720,7 +720,6 @@ public class AOCMSEnveloper implements AOEnveloper {
     byte[] recoverCMSSignedEnvelopedData(final byte[] signedEnvelopedData, final PrivateKeyEntry ke) throws IOException,
                                                                                                     CertificateEncodingException,
                                                                                                     AOException,
-                                                                                                    AOInvalidRecipientException,
                                                                                                     InvalidKeyException {
         return new CMSDecipherSignedAndEnvelopedData().dechiperSignedAndEnvelopData(signedEnvelopedData, ke);
     }
@@ -777,7 +776,6 @@ public class AOCMSEnveloper implements AOEnveloper {
     byte[] recoverCMSAuthenticatedEnvelopedData(final byte[] authenticatedEnvelopedData, final PrivateKeyEntry ke) throws IOException,
                                                                                                                   CertificateEncodingException,
                                                                                                                   AOException,
-                                                                                                                  AOInvalidRecipientException,
                                                                                                                   InvalidKeyException {
         return new CMSDecipherAuthenticatedEnvelopedData().dechiperAuthenticatedEnvelopedData(authenticatedEnvelopedData, ke);
     }

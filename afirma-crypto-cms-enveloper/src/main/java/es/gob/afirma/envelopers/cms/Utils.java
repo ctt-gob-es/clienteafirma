@@ -88,6 +88,10 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 
 /** Clase que contiene funciones comunes para CADES y CMS */
 final class Utils {
+    
+    private Utils() {
+        // No permitimos la instancacion
+    }
 
     private static final byte[] SALT = {
             (byte) 0xA2, (byte) 0x35, (byte) 0xDC, (byte) 0xA4, (byte) 0x11, (byte) 0x7C, (byte) 0x99, (byte) 0x4B
@@ -158,12 +162,9 @@ final class Utils {
      * p&uacute;blica del usuario que hace la firma.
      * @param config configuraci&oacute;n necesaria para crear la clave */
     private static SecretKey assignKey(final AOCipherConfig config) throws NoSuchAlgorithmException {
-        final SecureRandom rand = new SecureRandom();
-
         final KeyGenerator kg = KeyGenerator.getInstance(config.getAlgorithm().getName());
-        kg.init(rand);
-        final SecretKey encKey = kg.generateKey();
-        return encKey;
+        kg.init(new SecureRandom());
+        return kg.generateKey();
     }
 
     /** Obtiene un listado de certificados
@@ -433,25 +434,25 @@ final class Utils {
      * @throws NoSuchAlgorithmException */
     static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final Oid dataType, byte[] messageDigest) throws NoSuchAlgorithmException {
         // authenticatedAttributes
-        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
         if (dataType != null) {
-            ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
+            contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
         }
 
         // fecha de firma
-        ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
+        contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
 
         // MessageDigest
-        ContexExpecific.add(new Attribute(CMSAttributes.messageDigest,
+        contexExpecific.add(new Attribute(CMSAttributes.messageDigest,
                 new DERSet(new DEROctetString(
                         messageDigest != null ?
                                 messageDigest :
                                     MessageDigest.getInstance(digestAlgorithm).digest(datos))))
         );
 
-        return ContexExpecific;
+        return contexExpecific;
     }
 
     /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
@@ -465,14 +466,14 @@ final class Utils {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
             final Iterator<Map.Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<Oid, byte[]> e = it.next();
-                ContexExpecific.add(new Attribute(
+                contexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
                                                   // el array de bytes en formato string
@@ -483,7 +484,7 @@ final class Utils {
             return null;
         }
 
-        return SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
 
     static byte[] genMac(final String encryptionAlg, final byte[] content, final SecretKey ciphKey) throws NoSuchAlgorithmException, IOException {
@@ -630,9 +631,8 @@ final class Utils {
         e.nextElement();
 
         // Contenido de EnvelopedData
-        final ASN1TaggedObject doj = (ASN1TaggedObject) e.nextElement();
-        final ASN1Sequence authenticatedData = (ASN1Sequence) doj.getObject();
-        return authenticatedData;
+        return (ASN1Sequence) ((ASN1TaggedObject) e.nextElement()).getObject();
+
     }
 
     /** Descifra el contenido a partir de un fichero usando la clave del usuario.
@@ -753,14 +753,14 @@ final class Utils {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        final ASN1EncodableVector ContexExpecific = Utils.initContexExpecific(digestAlgorithm, datos, dataType, null);
+        final ASN1EncodableVector contexExpecific = Utils.initContexExpecific(digestAlgorithm, datos, dataType, null);
 
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
             final Iterator<Entry<Oid, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<Oid, byte[]> e = it.next();
-                ContexExpecific.add(new Attribute(
+                contexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
                                                   // el array de bytes en formato string
@@ -771,7 +771,7 @@ final class Utils {
             return null;
         }
 
-        return SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
     }
 
     /** Obtiene la estructura ASN.1 de firma usando los atributos del firmante.
