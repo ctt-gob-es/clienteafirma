@@ -71,12 +71,12 @@ public class Constants {
     /**
      * Width inicial de los JAccessibilityDialog de la aplicacion con variacion de fuente.
      */
-    public static final int OPTION_FONT_INITIAL_WIDTH = 605;
+    public static final int OPTION_FONT_INITIAL_WIDTH = 650;
     
     /**
      * Height inicial de los JAccessibilityDialog de la aplicacion con variacion de fuente.
      */
-    public static final int OPTION_FONT_INITIAL_HEIGHT = 600;
+    public static final int OPTION_FONT_INITIAL_HEIGHT = 575;
     
     /**
      * Width inicial de los JAccessibilityDialog de la aplicacion con variacion de fuente en LINUX.
