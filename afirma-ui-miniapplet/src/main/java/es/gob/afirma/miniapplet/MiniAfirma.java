@@ -134,7 +134,7 @@ public interface MiniAfirma {
      *                </ul>  
      * @return Texto decodificado.
      */
-    String getTextFromBase64(String data, String charset);
+    String getTextFromBase64(String data, String charset) throws IOException;
 
     /** Codifica un texto plano a Base64. Si se produce alg&uacute;n error se
      * devuelve <code>null</code>.
@@ -152,6 +152,6 @@ public interface MiniAfirma {
      * @param description Descripcion del tipo de ficheros buscado.
      * @return Ruta completa del fichero seleccionado. Se devuleve la ruta absoluta, pero no la can&oacute;nica
      */
-    String loadFilePath(String title, String exts, String description);
+    String loadFilePath(String title, String exts, String description) throws IOException, UnavailableServiceException;
     
 }

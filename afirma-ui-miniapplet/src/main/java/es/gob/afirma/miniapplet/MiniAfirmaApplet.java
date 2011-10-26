@@ -13,6 +13,7 @@ package es.gob.afirma.miniapplet;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
 
 import javax.jnlp.FileContents;
@@ -28,6 +29,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.miniapplet.actions.GetFileContentAction;
+import es.gob.afirma.miniapplet.actions.GetFilePathAction;
 
 /** MiniApplet de firma del proyecto Afirma.
  */
@@ -95,56 +97,54 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
-    public String getFileContent() throws AOCancelledOperationException, IOException, UnavailableServiceException, Exception {
-        
-        JOptionPane.showMessageDialog(this, "Entramos en el metodo");
-        
-        try {
-        if (this.fos == null) {
-//            try {
-                this.fos = (FileOpenService) ServiceManager.lookup("javax.jnlp.FileOpenService"); //$NON-NLS-1$
-//            }
-//            catch(final Exception e) {
-//                LOGGER.severe("Error obteniendo el servicio JNLP de salvado de ficheros, no se guardaron los datos: " + e); //$NON-NLS-1$
-//                return null;
-//            }
-        }
-        
-        
-//        try {
-            return new GetFileContentAction(this.fos).getResult();
-//        }
-//        catch (IOException e) {
-//            Logger.getLogger("es.gob.afirma").warning("Error al recuperar el fichero: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-//            return null;
-//        } 
-//        catch (AOCancelledOperationException e) {
-//            Logger.getLogger("es.gob.afirma").warning("Operacion cancelada por el usuario"); //$NON-NLS-1$ //$NON-NLS-2$
-//            return null;
-//        }
-            
-            
-        } catch (Exception e) {
-            Logger.getLogger("es.gob.afirma").warning("Capturamos la excepcion: " + e);
-            JOptionPane.showMessageDialog(this, "Capturamos la excepcion: " + e);
-            e.printStackTrace();
-            throw e;
-        }
+    public String getFileContent() throws IOException, UnavailableServiceException {
+    	if (this.fos == null) {
+    		try {
+    			this.fos = (FileOpenService) ServiceManager.lookup("javax.jnlp.FileOpenService"); //$NON-NLS-1$
+    		}
+    		catch(final Exception e) {
+    			LOGGER.severe("Error obteniendo el servicio JNLP de salvado de ficheros, no se guardaron los datos: " + e); //$NON-NLS-1$
+    			return null;
+    		}
+    	}
+
+    	try {
+    		return new GetFileContentAction(this.fos).getResult();
+    	} catch (AOCancelledOperationException e) {
+    		return null;
+    	}
     }
 
     @Override
-    public String getTextFromBase64(String data, String charset) {
-        return null;
+    public String getTextFromBase64(String base64Data, String charset) throws IOException {
+    	if (charset != null) {
+    		return new String(Base64.decode(base64Data), charset);
+    	}
+    	return new String(Base64.decode(base64Data));
     }
 
     @Override
     public String getBase64FromText(String plainText) {
-        return null;
+        return Base64.encodeBytes(plainText.getBytes());
     }
 
     @Override
-    public String loadFilePath(String title, String exts, String description) {
-        return null;
+    public String loadFilePath(String title, String exts, String description) throws IOException, UnavailableServiceException {
+    	if (this.fos == null) {
+    		try {
+    			this.fos = (FileOpenService) ServiceManager.lookup("javax.jnlp.FileOpenService"); //$NON-NLS-1$
+    		}
+    		catch(final Exception e) {
+    			LOGGER.severe("Error obteniendo el servicio JNLP de salvado de ficheros, no se guardaron los datos: " + e); //$NON-NLS-1$
+    			return null;
+    		}
+    	}
+
+    	try {
+    		return new GetFilePathAction(this.fos).getResult();
+    	} catch (AOCancelledOperationException e) {
+    		return null;
+    	}
     }
     
     @Override
