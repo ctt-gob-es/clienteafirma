@@ -54,15 +54,15 @@ public class Descifrado extends JPanel {
 	private static final long serialVersionUID = 1L;
 
     // Origen de la clave
-    final static List<String> mecanismos = new ArrayList<String>(Arrays.asList("PASSWORD","USERINPUT"));
+    final static List<String> mecanismos = new ArrayList<String>(Arrays.asList("PASSWORD","USERINPUT"));  //$NON-NLS-1$//$NON-NLS-2$
 
     // Algoritmos para mecanismo contrasena de cifrado
-    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("Contraseña con SHA1 y 3DES","Contraseï¿½a con SHA1 y RC2","Contraseï¿½a con MD5 y DES"));
-    final static List<String> algoritmoVc = new ArrayList<String>(Arrays.asList("PBEWithSHA1AndDESede","PBEWithSHA1AndRC2_40","PBEWithMD5AndDES"));
+    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("Contrase\u00F1a con SHA1 y 3DES","Contrase\u00F1a con SHA1 y RC2","Contrase\u00F1a con MD5 y DES"));
+    final static List<String> algoritmoVc = new ArrayList<String>(Arrays.asList("PBEWithSHA1AndDESede","PBEWithSHA1AndRC2_40","PBEWithMD5AndDES"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
 
     // Algoritmos para mecanismo clave de cifrado
     final static List<String> algoritmoLr = new ArrayList<String>(Arrays.asList("Advanced Encryption Standard (AES)","Alleged RC4","Blowfish","Data Encryption Standard (DES)","Triple DES (3DES)","RC2"));
-    final static List<String> algoritmoVr = new ArrayList<String>(Arrays.asList("AES","ARCFOUR","Blowfish","DES","DESede","RC2"));
+    final static List<String> algoritmoVr = new ArrayList<String>(Arrays.asList("AES","ARCFOUR","Blowfish","DES","DESede","RC2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
     public Descifrado() {
         initComponents();
