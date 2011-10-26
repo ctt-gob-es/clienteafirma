@@ -252,6 +252,14 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Algoritmo de huella digital por defecto para las referencias XML. */
     private static final String DIGEST_METHOD = DigestMethod.SHA1;
+    
+    private static final String HTTP_PROTOCOL_PREFIX = "http://"; //$NON-NLS-1$
+    private static final String HTTPS_PROTOCOL_PREFIX = "https://"; //$NON-NLS-1$
+    
+    private static final String STYLE_REFERENCE_PREFIX = "StyleReference-"; //$NON-NLS-1$
+    
+    private static final String MIMETYPE_STR = "MimeType"; //$NON-NLS-1$
+    private static final String ENCODING_STR = "Encoding"; //$NON-NLS-1$
 
     private String algo;
     private Document doc;
@@ -369,7 +377,7 @@ public final class AOXAdESSigner implements AOSigner {
                             // es HTTP o HTTPS, porque si es accesible
                             // remotamente no necesito el elemento, ya que se
                             // firma via referencia Externally Detached
-                            if (!styleHref.startsWith("http://") && !styleHref.startsWith("https://")) { //$NON-NLS-1$ //$NON-NLS-2$
+                            if (!styleHref.startsWith(HTTP_PROTOCOL_PREFIX) && !styleHref.startsWith(HTTPS_PROTOCOL_PREFIX)) {
                                 styleElement = tmpDoc.getDocumentElement();
                             }
 
@@ -425,9 +433,9 @@ public final class AOXAdESSigner implements AOSigner {
                 if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_DETACHED)) {
                     dataElement = docum.createElement(DETACHED_CONTENT_ELEMENT_NAME);
                     dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-                    dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType); 
                     if (encoding != null && (!"".equals(encoding))) { //$NON-NLS-1$
-                        dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
+                        dataElement.setAttributeNS(null, ENCODING_STR, encoding); 
                     }
                     dataElement.appendChild(docum.getDocumentElement());
 
@@ -437,9 +445,9 @@ public final class AOXAdESSigner implements AOSigner {
                             final Element tmpStyleElement = docum.createElement(DETACHED_STYLE_ELEMENT_NAME);
                             tmpStyleElement.setAttributeNS(null, "Id", styleId); //$NON-NLS-1$
                             if (styleType != null) {
-                                tmpStyleElement.setAttributeNS(null, "MimeType", styleType); //$NON-NLS-1$
+                                tmpStyleElement.setAttributeNS(null, MIMETYPE_STR, styleType); 
                             }
-                            tmpStyleElement.setAttributeNS(null, "Encoding", styleEncoding); //$NON-NLS-1$
+                            tmpStyleElement.setAttributeNS(null, ENCODING_STR, styleEncoding); 
 
                             tmpStyleElement.appendChild(docum.adoptNode(styleElement.cloneNode(true)));
 
@@ -492,7 +500,7 @@ public final class AOXAdESSigner implements AOSigner {
                         final MimeHelper mimeTypeHelper = new MimeHelper(decodedData);
                         final String tempMimeType = mimeTypeHelper.getMimeType();
                         mimeType = tempMimeType != null ? tempMimeType : XMLConstants.DEFAULT_MIMETYPE;
-                        dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
+                        dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType); 
                         dataElement.setTextContent(Base64.encodeBytes(decodedData));
                     }
                     else {
@@ -503,13 +511,13 @@ public final class AOXAdESSigner implements AOSigner {
                             LOGGER.info("El documento se considera binario, se convertira a Base64 antes de insertarlo en el XML y se declarara la transformacion"); //$NON-NLS-1$
                         }
                         // Usamos el MimeType identificado
-                        dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
+                        dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType); 
                         dataElement.setTextContent(Base64.encodeBytes(data));
                         wasEncodedToBase64 = true;
                     }
                     isBase64 = true;
                     encoding = XMLConstants.BASE64_ENCODING;
-                    dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
+                    dataElement.setAttributeNS(null, ENCODING_STR, encoding); 
                 }
                 catch (final Exception ex) {
                     throw new AOException("Error al convertir los datos a base64", ex); //$NON-NLS-1$
@@ -594,8 +602,8 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             dataElement.setAttributeNS(null, "Id", contentId); //$NON-NLS-1$
-            dataElement.setAttributeNS(null, "MimeType", mimeType); //$NON-NLS-1$
-            dataElement.setAttributeNS(null, "Encoding", encoding); //$NON-NLS-1$
+            dataElement.setAttributeNS(null, MIMETYPE_STR, mimeType); 
+            dataElement.setAttributeNS(null, ENCODING_STR, encoding); 
             if (hashAlgoUri != null) {
                 dataElement.setAttributeNS(null, "hashAlgorithm", hashAlgoUri); //$NON-NLS-1$
             }
@@ -636,7 +644,7 @@ public final class AOXAdESSigner implements AOSigner {
             throw new AOException("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         final String referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
-        final String referenceStyleId = "StyleReference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+        final String referenceStyleId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString(); 
 
         final List<Transform> transformList = new ArrayList<Transform>();
 
@@ -709,7 +717,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // Hojas de estilo para enveloping en Externally Detached
-            if (styleHref != null && styleElement == null && (styleHref.startsWith("http://") || styleHref.startsWith("https://"))) { //$NON-NLS-1$ //$NON-NLS-2$ // Comprobamos si la referencia al estilo es externa
+            if (styleHref != null && styleElement == null && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) { // Comprobamos si la referencia al estilo es externa
                 try {
                     referenceList.add(fac.newReference(styleHref,
                                                        digestMethod,
@@ -756,7 +764,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // Hojas de estilo remotas para detached
-            if (styleHref != null && styleElement == null && (styleHref.startsWith("http://") || styleHref.startsWith("https://"))) {  //$NON-NLS-1$//$NON-NLS-2$ // Comprobamos si la referencia al estilo es externa
+            if (styleHref != null && styleElement == null && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {  // Comprobamos si la referencia al estilo es externa
                 try {
                     referenceList.add(fac.newReference(styleHref,
                                                        digestMethod,
@@ -846,7 +854,7 @@ public final class AOXAdESSigner implements AOSigner {
             // Hojas de estilo remotas en Externally Detached
             if (styleHref != null && styleElement == null) {
                 // Comprobamos que la URL es valida
-                if (styleHref.startsWith("http://") || styleHref.startsWith("https://")) {  //$NON-NLS-1$//$NON-NLS-2$
+                if (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX)) {  
                     try {
                         referenceList.add(fac.newReference(styleHref,
                                                            digestMethod,
@@ -890,7 +898,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // Hojas de estilo remotas para enveloped
-            if (styleHref != null && styleElement == null && (styleHref.startsWith("http://") || styleHref.startsWith("https://"))) { //$NON-NLS-1$ //$NON-NLS-2$ // Comprobamos si la referencia al estilo es externa
+            if (styleHref != null && styleElement == null && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) { // Comprobamos si la referencia al estilo es externa
                 try {
                     referenceList.add(fac.newReference(styleHref,
                                                        digestMethod,
@@ -1134,13 +1142,13 @@ public final class AOXAdESSigner implements AOSigner {
 
                 final Element firstChild = (Element) rootSig.getFirstChild();
                 // si el documento es un xml se extrae como tal
-                if (firstChild.getAttribute("MimeType").equals("text/xml")) { //$NON-NLS-1$ //$NON-NLS-2$
+                if (firstChild.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$ 
                     elementRes = (Element) firstChild.getFirstChild();
                 }
                 // Si el MimeType es de tipo Hash (tipo creado para el cliente
                 // afirma) asi que la firma no tiene datos
                 // else if
-                // (firstChild.getAttribute("MimeType").startsWith("hash/")) {
+                // (firstChild.getAttribute(MIMETYPE_STR).startsWith("hash/")) {
                 // elementRes = null;
                 // }
                 // si el documento es binario se deshace la codificacion en
@@ -1172,17 +1180,9 @@ public final class AOXAdESSigner implements AOSigner {
                 // obtiene el nodo Object de la primera firma
                 final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
                 // si el documento es un xml se extrae como tal
-                if (object.getAttribute("MimeType").equals("text/xml")) { //$NON-NLS-1$ //$NON-NLS-2$
+                if (object.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$ 
                     elementRes = (Element) object.getFirstChild();
                 }
-                // Si el MimeType es de tipo Hash (tipo creado para el cliente
-                // afirma) asi que la firma no tiene datos
-                // else if (object.getAttribute("MimeType").startsWith("hash/"))
-                // {
-                // elementRes = null;
-                // }
-                // si el documento es binario se deshace la codificacion en
-                // Base64
                 else {
                   //TODO: Deshacer solo el Base64 si existe la transformacion Base64
                     return Base64.decode(object.getTextContent());
@@ -1337,12 +1337,12 @@ public final class AOXAdESSigner implements AOSigner {
             // Firmamos la primera referencia (que seran los datos firmados) y
             // las hojas de estilo que
             // tenga asignadas. Las hojas de estilo tendran un identificador que
-            // comience por "StyleReference-".
+            // comience por STYLE_REFERENCE_PREFIX.
             // TODO: Identificar las hojas de estilo de un modo generico.
             final NamedNodeMap currentNodeAttributes = currentElement.getAttributes();
             if (i == 0 || (currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
                                                                                                     .getNodeValue()
-                                                                                                    .startsWith("StyleReference-"))) { //$NON-NLS-1$
+                                                                                                    .startsWith(STYLE_REFERENCE_PREFIX))) { 
 
                 // Buscamos las transformaciones declaradas en la Referencia,
                 // para anadirlas
@@ -1366,8 +1366,8 @@ public final class AOXAdESSigner implements AOSigner {
                 String referenceId = null;
                 if ((currentNodeAttributes.getNamedItem("Id") != null && currentNodeAttributes.getNamedItem("Id")  //$NON-NLS-1$//$NON-NLS-2$
                                                                                               .getNodeValue()
-                                                                                              .startsWith("StyleReference-"))) { //$NON-NLS-1$
-                    referenceId = "StyleReference-" + UUID.randomUUID().toString(); //$NON-NLS-1$
+                                                                                              .startsWith(STYLE_REFERENCE_PREFIX))) { 
+                    referenceId = STYLE_REFERENCE_PREFIX + UUID.randomUUID().toString(); 
                 }
                 else {
                     referenceId = "Reference-" + UUID.randomUUID().toString(); //$NON-NLS-1$

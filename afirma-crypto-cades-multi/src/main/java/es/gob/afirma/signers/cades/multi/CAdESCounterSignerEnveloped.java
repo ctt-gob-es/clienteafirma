@@ -280,17 +280,14 @@ final class CAdESCounterSignerEnveloped {
                                             final X509Certificate cert,
                                             final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
-        final ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
+        final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
 
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            final ASN1Sequence atribute = (ASN1Sequence) signerInfosRaiz.getObjectAt(i);
-            final SignerInfo si = new SignerInfo(atribute);
-
-            final SignerInfo CounterSigner = getCounterUnsignedAtributes(si, parameters, cert, keyEntry);
-            CounterSigners.add(CounterSigner);
+            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i));
+            counterSigners.add(getCounterUnsignedAtributes(si, parameters, cert, keyEntry));
         }
 
-        return CounterSigners;
+        return counterSigners;
     }
 
     /** M&eacute;todo que contrafirma las hojas del arbol completo de forma
@@ -315,17 +312,14 @@ final class CAdESCounterSignerEnveloped {
                                             final X509Certificate cert,
                                             final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
-        final ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
+        final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
 
         for (int i = 0; i < signerInfosRaiz.size(); i++) {
-            final ASN1Sequence atribute = (ASN1Sequence) signerInfosRaiz.getObjectAt(i);
-            final SignerInfo si = new SignerInfo(atribute);
-
-            final SignerInfo CounterSigner = getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry);
-            CounterSigners.add(CounterSigner);
+            final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosRaiz.getObjectAt(i));
+            counterSigners.add(getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry));
         }
 
-        return CounterSigners;
+        return counterSigners;
     }
 
     /** M&eacute;todo que contrafirma un nodo determinado del arbol buscandolo de
@@ -354,7 +348,7 @@ final class CAdESCounterSignerEnveloped {
 
         final ASN1Set signerInfosRaiz = sd.getSignerInfos();
 
-        final ASN1EncodableVector CounterSigners = new ASN1EncodableVector();
+        final ASN1EncodableVector counterSigners = new ASN1EncodableVector();
         ASN1Set auxSignerRaiz;
 
         auxSignerRaiz = signerInfosRaiz;
@@ -363,20 +357,20 @@ final class CAdESCounterSignerEnveloped {
         for (int i = 0; i < auxSignerRaiz.size(); i++) {
             final ASN1Sequence atribute = (ASN1Sequence) auxSignerRaiz.getObjectAt(i);
             final SignerInfo si = new SignerInfo(atribute);
-            SignerInfo CounterSigner = null;
+            SignerInfo counterSigner = null;
             if (this.actualIndex == nodo) {
-                CounterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
+                counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
             }
             else {
                 if (this.actualIndex != nodo) {
-                    CounterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, nodo);
+                    counterSigner = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, nodo);
                 }
             }
             this.actualIndex++;
-            CounterSigners.add(CounterSigner);
+            counterSigners.add(counterSigner);
         }
 
-        return CounterSigners;
+        return counterSigners;
 
     }
 
@@ -407,7 +401,7 @@ final class CAdESCounterSignerEnveloped {
                                                                             AOException {
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
-        SignerInfo CounterSigner = null;
+        SignerInfo counterSigner = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {
             final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
 
@@ -417,12 +411,8 @@ final class CAdESCounterSignerEnveloped {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final ASN1Sequence atrib = (ASN1Sequence) eAtributesData.nextElement();
-                        final SignerInfo si = new SignerInfo(atrib);
-
-                        final SignerInfo obtained = getCounterUnsignedAtributes(si, parameters, cert, keyEntry);
-                        signerInfosU.add(obtained);
-
+                        final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
+                        signerInfosU.add(getCounterUnsignedAtributes(si, parameters, cert, keyEntry));
                     }
                 }
                 else {
@@ -431,23 +421,23 @@ final class CAdESCounterSignerEnveloped {
 
             }
             // FIRMA DEL NODO ACTUAL
-            CounterSigner = UnsignedAtributte(parameters, cert, signerInfo, keyEntry);
-            signerInfosU.add(CounterSigner);
+            counterSigner = UnsignedAtributte(parameters, cert, signerInfo, keyEntry);
+            signerInfosU.add(counterSigner);
 
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
-            final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+            final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
             if (signerInfosU.size() > 1) {
                 for (int i = 0; i < signerInfosU.size(); i++) {
                     if (signerInfosU.get(i) instanceof Attribute) {
-                        ContexExpecific.add(signerInfosU.get(i));
+                        contexExpecific.add(signerInfosU.get(i));
                     }
                     else {
-                        ContexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(i))));
+                        contexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(i))));
                     }
                 }
-                a1 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
-                CounterSigner =
+                a1 = SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+                counterSigner =
                         new SignerInfo(signerInfo.getSID(),
                                        signerInfo.getDigestAlgorithm(),
                                        signerInfo.getAuthenticatedAttributes(),
@@ -461,18 +451,16 @@ final class CAdESCounterSignerEnveloped {
                 if (signerInfosU.size() == 1) {
                     if (signerInfosU.get(0) instanceof Attribute) {
                         // anadimos el que hay
-                        ContexExpecific.add(signerInfosU.get(0));
+                        contexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
                         signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-                        final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
-                        ContexExpecific.add(uAtrib);
-
+                        contexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2)));
                     }
                     else {
-                        ContexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(0))));
+                        contexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(0))));
                     }
-                    a1 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
-                    CounterSigner =
+                    a1 = SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+                    counterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
                                            signerInfo.getAuthenticatedAttributes(),
@@ -487,7 +475,7 @@ final class CAdESCounterSignerEnveloped {
                     // signerInfosU.add(UnsignedAtributte(parameters, cert,
                     // signerInfo, keyEntry));
                     final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
-                    CounterSigner =
+                    counterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
                                            signerInfo.getAuthenticatedAttributes(),
@@ -501,18 +489,17 @@ final class CAdESCounterSignerEnveloped {
         }
         else {
             signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-            final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
-            CounterSigner =
+            counterSigner =
                     new SignerInfo(signerInfo.getSID(),
                                    signerInfo.getDigestAlgorithm(),
                                    signerInfo.getAuthenticatedAttributes(),
                                    signerInfo.getDigestEncryptionAlgorithm(),
                                    signerInfo.getEncryptedDigest(),
-                                   new DERSet(uAtrib) // unsignedAttr
+                                   new DERSet(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2))) // unsignedAttr
                     );
 
         }
-        return CounterSigner;
+        return counterSigner;
     }
 
     /** M&eacute;todo utilizado por la firma de una hoja del &eacute;rbol para
@@ -544,21 +531,18 @@ final class CAdESCounterSignerEnveloped {
 
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
-        SignerInfo CounterSigner = null;
+        SignerInfo counterSigner = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {
-            final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
+            final Enumeration<?> eAttributes = signerInfo.getUnauthenticatedAttributes().getObjects();
 
-            while (eAtributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+            while (eAttributes.hasMoreElements()) {
+                final Attribute data = new Attribute((ASN1Sequence) eAttributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final ASN1Sequence atrib = (ASN1Sequence) eAtributesData.nextElement();
-                        final SignerInfo si = new SignerInfo(atrib);
-
-                        final SignerInfo obtained = getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry);
-                        signerInfosU.add(obtained);
+                        final SignerInfo si = new SignerInfo((ASN1Sequence) eAtributesData.nextElement());
+                        signerInfosU.add(getCounterLeafUnsignedAtributes(si, parameters, cert, keyEntry));
                     }
                 }
                 else {
@@ -568,18 +552,18 @@ final class CAdESCounterSignerEnveloped {
             }
             // FIRMA DE CADA UNO DE LOS HIJOS
             ASN1Set a1;
-            final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+            final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
             if (signerInfosU.size() > 1) {
                 for (int i = 0; i < signerInfosU.size(); i++) {
                     if (signerInfosU.get(i) instanceof Attribute) {
-                        ContexExpecific.add(signerInfosU.get(i));
+                        contexExpecific.add(signerInfosU.get(i));
                     }
                     else {
-                        ContexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(i))));
+                        contexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(i))));
                     }
                 }
-                a1 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
-                CounterSigner =
+                a1 = SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
+                counterSigner =
                         new SignerInfo(signerInfo.getSID(),
                                        signerInfo.getDigestAlgorithm(),
                                        signerInfo.getAuthenticatedAttributes(),
@@ -590,32 +574,30 @@ final class CAdESCounterSignerEnveloped {
 
             }
             else {
-                final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
-                CounterSigner =
+                counterSigner =
                         new SignerInfo(signerInfo.getSID(),
                                        signerInfo.getDigestAlgorithm(),
                                        signerInfo.getAuthenticatedAttributes(),
                                        signerInfo.getDigestEncryptionAlgorithm(),
                                        signerInfo.getEncryptedDigest(),
-                                       new DERSet(uAtrib) // unsignedAttr
+                                       new DERSet(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU))) // unsignedAttr
                         );
 
             }
         }
         else {
             signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-            final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
-            CounterSigner =
+            counterSigner =
                     new SignerInfo(signerInfo.getSID(),
                                    signerInfo.getDigestAlgorithm(),
                                    signerInfo.getAuthenticatedAttributes(),
                                    signerInfo.getDigestEncryptionAlgorithm(),
                                    signerInfo.getEncryptedDigest(),
-                                   new DERSet(uAtrib) // unsignedAttr
+                                   new DERSet(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2))) // unsignedAttr
                     );
 
         }
-        return CounterSigner;
+        return counterSigner;
     }
 
     /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
@@ -640,22 +622,22 @@ final class CAdESCounterSignerEnveloped {
     private SignerInfo getCounterNodeUnsignedAtributes(final SignerInfo signerInfo,
                                                        final P7ContentSignerParameters parameters,
                                                        final X509Certificate cert,
-                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, IOException, CertificateException {
+                                                       final PrivateKeyEntry keyEntry) throws NoSuchAlgorithmException, 
+                                                                                              IOException, 
+                                                                                              CertificateException {
 
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
         final ASN1EncodableVector signerInfosU2 = new ASN1EncodableVector();
-        SignerInfo CounterSigner = null;
+        SignerInfo counterSigner = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {
-            final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
-            while (eAtributes.hasMoreElements()) {
-                final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
+            final Enumeration<?> eAttributes = signerInfo.getUnauthenticatedAttributes().getObjects();
+            while (eAttributes.hasMoreElements()) {
+                final Attribute data = new Attribute((ASN1Sequence) eAttributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
                     final ASN1Set setInto = data.getAttrValues();
                     final Enumeration<?> eAtributesData = setInto.getObjects();
                     while (eAtributesData.hasMoreElements()) {
-                        final ASN1Sequence atrib = (ASN1Sequence) eAtributesData.nextElement();
-                        final SignerInfo si = new SignerInfo(atrib);
-                        signerInfosU.add(si);
+                        signerInfosU.add(new SignerInfo((ASN1Sequence) eAtributesData.nextElement()));
                     }
                 }
                 else {
@@ -667,25 +649,23 @@ final class CAdESCounterSignerEnveloped {
             signerInfosU.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
 
             // FIRMA DE CADA UNO DE LOS HIJOS
-            ASN1Set a1;
-            final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+            final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
             if (signerInfosU.size() > 1) {
                 for (int i = 0; i < signerInfosU.size(); i++) {
                     if (signerInfosU.get(i) instanceof Attribute) {
-                        ContexExpecific.add(signerInfosU.get(i));
+                        contexExpecific.add(signerInfosU.get(i));
                     }
                     else {
-                        ContexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(i))));
+                        contexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(i))));
                     }
                 }
-                a1 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
-                CounterSigner =
+                counterSigner =
                         new SignerInfo(signerInfo.getSID(),
                                        signerInfo.getDigestAlgorithm(),
                                        signerInfo.getAuthenticatedAttributes(),
                                        signerInfo.getDigestEncryptionAlgorithm(),
                                        signerInfo.getEncryptedDigest(),
-                                       a1 // unsignedAttr
+                                       SigUtils.getAttributeSet(new AttributeTable(contexExpecific)) // unsignedAttr
                         );
 
             }
@@ -693,24 +673,23 @@ final class CAdESCounterSignerEnveloped {
                 if (signerInfosU.size() == 1) {
                     if (signerInfosU.get(0) instanceof Attribute) {
                         // anadimos el que hay
-                        ContexExpecific.add(signerInfosU.get(0));
+                        contexExpecific.add(signerInfosU.get(0));
                         // creamos el de la contrafirma.
                         signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
                         final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
-                        ContexExpecific.add(uAtrib);
+                        contexExpecific.add(uAtrib);
 
                     }
                     else {
-                        ContexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(0))));
+                        contexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(0))));
                     }
-                    a1 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
-                    CounterSigner =
+                    counterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
                                            signerInfo.getAuthenticatedAttributes(),
                                            signerInfo.getDigestEncryptionAlgorithm(),
                                            signerInfo.getEncryptedDigest(),
-                                           a1 // unsignedAttr
+                                           SigUtils.getAttributeSet(new AttributeTable(contexExpecific)) // unsignedAttr
                             );
                 }
                 else {
@@ -718,31 +697,29 @@ final class CAdESCounterSignerEnveloped {
                     // actual cuando no sea hoja
                     // signerInfosU.add(UnsignedAtributte(parameters, cert,
                     // signerInfo, keyEntry));
-                    final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
-                    CounterSigner =
+                    counterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
                                            signerInfo.getAuthenticatedAttributes(),
                                            signerInfo.getDigestEncryptionAlgorithm(),
                                            signerInfo.getEncryptedDigest(),
-                                           new DERSet(uAtrib) // unsignedAttr
+                                           new DERSet(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU))) // unsignedAttr
                             );
                 }
             }
         }
         else {
             signerInfosU2.add(UnsignedAtributte(parameters, cert, signerInfo, keyEntry));
-            final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2));
-            CounterSigner =
+            counterSigner =
                     new SignerInfo(signerInfo.getSID(),
                                    signerInfo.getDigestAlgorithm(),
                                    signerInfo.getAuthenticatedAttributes(),
                                    signerInfo.getDigestEncryptionAlgorithm(),
                                    signerInfo.getEncryptedDigest(),
-                                   new DERSet(uAtrib) // unsignedAttr
+                                   new DERSet(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU2))) // unsignedAttr
                     );
         }
-        return CounterSigner;
+        return counterSigner;
     }
 
     /** M&eacute;todo utilizado por la firma de un nodo del &eacute;rbol para
@@ -773,31 +750,27 @@ final class CAdESCounterSignerEnveloped {
                                                        final int node) throws NoSuchAlgorithmException, IOException, CertificateException, AOException {
 
         final ASN1EncodableVector signerInfosU = new ASN1EncodableVector();
-        SignerInfo CounterSigner = null;
-        SignerInfo CounterSigner2 = null;
+        SignerInfo counterSigner = null;
         if (signerInfo.getUnauthenticatedAttributes() != null) {
             final Enumeration<?> eAtributes = signerInfo.getUnauthenticatedAttributes().getObjects();
             while (eAtributes.hasMoreElements()) {
                 final Attribute data = new Attribute((ASN1Sequence) eAtributes.nextElement());
                 if (!data.getAttrType().equals(PKCSObjectIdentifiers.id_aa_signatureTimeStampToken)) {
-                    final ASN1Set setInto = data.getAttrValues();
-                    final Enumeration<?> eAtributesData = setInto.getObjects();
+                    final Enumeration<?> eAtributesData = data.getAttrValues().getObjects();
                     while (eAtributesData.hasMoreElements()) {
                         final ASN1Sequence atrib = (ASN1Sequence) eAtributesData.nextElement();
                         final SignerInfo si = new SignerInfo(atrib);
                         this.actualIndex++;
                         if (this.actualIndex != node) {
                             if (this.actualIndex < node) {
-                                CounterSigner2 = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, node);
-                                signerInfosU.add(CounterSigner2);
+                                signerInfosU.add(getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry, node));
                             }
                             else {
                                 signerInfosU.add(si);
                             }
                         }
                         else {
-                            final SignerInfo obtained = getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry);
-                            signerInfosU.add(obtained);
+                            signerInfosU.add(getCounterNodeUnsignedAtributes(si, parameters, cert, keyEntry));
                         }
                     }
                 }
@@ -807,25 +780,23 @@ final class CAdESCounterSignerEnveloped {
 
             }
             // FIRMA DE CADA UNO DE LOS HIJOS
-            ASN1Set a1;
-            final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+            final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
             if (signerInfosU.size() > 1) {
                 for (int i = 0; i < signerInfosU.size(); i++) {
                     if (signerInfosU.get(i) instanceof Attribute) {
-                        ContexExpecific.add(signerInfosU.get(i));
+                        contexExpecific.add(signerInfosU.get(i));
                     }
                     else {
-                        ContexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(i))));
+                        contexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(i))));
                     }
                 }
-                a1 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
-                CounterSigner =
+                counterSigner =
                         new SignerInfo(signerInfo.getSID(),
                                        signerInfo.getDigestAlgorithm(),
                                        signerInfo.getAuthenticatedAttributes(),
                                        signerInfo.getDigestEncryptionAlgorithm(),
                                        signerInfo.getEncryptedDigest(),
-                                       a1 // unsignedAttr
+                                       SigUtils.getAttributeSet(new AttributeTable(contexExpecific)) // unsignedAttr
                         );
 
             }
@@ -833,20 +804,19 @@ final class CAdESCounterSignerEnveloped {
                 if (signerInfosU.size() == 1) {
                     if (signerInfosU.get(0) instanceof Attribute) {
                         // anadimos el que hay
-                        ContexExpecific.add(signerInfosU.get(0));
+                        contexExpecific.add(signerInfosU.get(0));
 
                     }
                     else {
-                        ContexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(0))));
+                        contexExpecific.add(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU.get(0))));
                     }
-                    a1 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
-                    CounterSigner =
+                    counterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
                                            signerInfo.getAuthenticatedAttributes(),
                                            signerInfo.getDigestEncryptionAlgorithm(),
                                            signerInfo.getEncryptedDigest(),
-                                           a1 // unsignedAttr
+                                           SigUtils.getAttributeSet(new AttributeTable(contexExpecific)) // unsignedAttr
                             );
                 }
                 else {
@@ -854,20 +824,19 @@ final class CAdESCounterSignerEnveloped {
                     // actual cuando no sea hoja
                     // signerInfosU.add(UnsignedAtributte(parameters, cert,
                     // signerInfo, keyEntry));
-                    final Attribute uAtrib = new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU));
-                    CounterSigner =
+                    counterSigner =
                             new SignerInfo(signerInfo.getSID(),
                                            signerInfo.getDigestAlgorithm(),
                                            signerInfo.getAuthenticatedAttributes(),
                                            signerInfo.getDigestEncryptionAlgorithm(),
                                            signerInfo.getEncryptedDigest(),
-                                           new DERSet(uAtrib) // unsignedAttr
+                                           new DERSet(new Attribute(CMSAttributes.counterSignature, new DERSet(signerInfosU))) // unsignedAttr
                             );
                 }
             }
         }
         else {
-            CounterSigner =
+            counterSigner =
                     new SignerInfo(signerInfo.getSID(),
                                    signerInfo.getDigestAlgorithm(),
                                    signerInfo.getAuthenticatedAttributes(),
@@ -877,7 +846,7 @@ final class CAdESCounterSignerEnveloped {
                     );
 
         }
-        return CounterSigner;
+        return counterSigner;
     }
 
     /** M&eacute;todo que genera un signerInfo espec&iacute;fico utilizando los
@@ -968,7 +937,7 @@ final class CAdESCounterSignerEnveloped {
         try {
             tmp = this.signedAttr2.getEncoded(ASN1Encodable.DER);
         }
-        catch (final IOException ex) {
+        catch (final Exception ex) {
             throw new AOException("Error obteniendo los atributos firmados: " + ex); //$NON-NLS-1$
         }
 
