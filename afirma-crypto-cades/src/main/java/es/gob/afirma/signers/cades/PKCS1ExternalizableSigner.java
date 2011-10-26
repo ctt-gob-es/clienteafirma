@@ -17,7 +17,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import es.gob.afirma.core.AOException;
 
 /** Realizaci&oacute;n de firmas simples PKCS#1 V1.5 como parte externalizable de las firmas CAdES.
- * La exposici&oacute;n de esta clase es necesaria para la realizaci&oacute; de firmas CAdES en tres fases.
+ * La exposici&oacute;n de esta clase es necesaria para la realizaci&oacute;n de firmas CAdES en tres fases.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class PKCS1ExternalizableSigner {
     

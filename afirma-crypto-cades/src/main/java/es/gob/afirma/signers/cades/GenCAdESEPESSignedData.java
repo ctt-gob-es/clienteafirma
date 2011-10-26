@@ -71,7 +71,7 @@ public final class GenCAdESEPESSignedData {
      *        Entrada a la clave privada para firma.
      * @param messageDigest
      *        Huella digital a aplicar en la firma.
-     * @return La firma generada codificada.
+     * @return La firma generada codificada en ASN.1 binario.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital indicados
