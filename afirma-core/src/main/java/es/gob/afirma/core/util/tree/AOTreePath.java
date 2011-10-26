@@ -19,7 +19,7 @@ final class AOTreePath {
     private AOTreePath parentPath;
 
     /** Last path component. */
-    transient private Object lastPathComponent;
+    private transient Object lastPathComponent;
 
     /** Constructs a path from an array of Objects, uniquely identifying the path
      * from the root of the tree to a specific node, as returned by the tree's

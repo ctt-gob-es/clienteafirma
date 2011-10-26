@@ -48,7 +48,7 @@ public class AdESPolicy {
                 this.policyIdentifierHashAlgorithm ="SHA-512"; //$NON-NLS-1$
             }
             catch(final Exception e) {
-                throw new IllegalArgumentException("Si no se especifica la huella digital de la politica es necesario que el identificador sea una URL accesible universalmente: " + e); //$NON-NLS-1$
+                throw new IllegalArgumentException("Si no se especifica la huella digital de la politica es necesario que el identificador sea una URL accesible universalmente: " + e, e); //$NON-NLS-1$
             }
         }
         else {
@@ -63,7 +63,7 @@ public class AdESPolicy {
                     this.policyIdentifierHashAlgorithm = AOSignConstants.getDigestAlgorithmName(identifierHashAlgorithm);
                 }
                 catch(final Exception e) {
-                    throw new IllegalArgumentException("El algoritmo de huella digital no esta soportado: " + identifierHashAlgorithm); //$NON-NLS-1$
+                    throw new IllegalArgumentException("El algoritmo de huella digital no esta soportado: " + identifierHashAlgorithm, e); //$NON-NLS-1$
                 }
                 this.policyIdentifierHash = identifierHash;
             }
@@ -74,7 +74,7 @@ public class AdESPolicy {
                 this.policyQualifier = new URL(qualifier);
             }
             catch (final Exception e) {
-                throw new IllegalArgumentException("El cualificador de la politica debe ser una URL valida"); //$NON-NLS-1$
+                throw new IllegalArgumentException("El cualificador de la politica debe ser una URL valida", e); //$NON-NLS-1$
             }
         }
         
