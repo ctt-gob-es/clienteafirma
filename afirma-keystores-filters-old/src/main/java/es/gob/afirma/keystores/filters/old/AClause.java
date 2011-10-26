@@ -26,14 +26,14 @@ abstract class AClause implements Clause {
     private Nexus[] nexus;
     
     protected void setClauses(final Clause[] c) {
-        this.clauses = c;
+        this.clauses = c.clone();
     }
     
     protected void setNexus(final Nexus[] n) {
-        this.nexus = n;
+        this.nexus = n.clone();
     }
 
-    public boolean eval(X509Certificate cert) throws AOException {
+    public boolean eval(final X509Certificate cert) throws AOException {
         boolean eval;
         eval = this.clauses[0].eval(cert);
         for (int i = 0; i < this.nexus.length; i++) {
@@ -44,7 +44,7 @@ abstract class AClause implements Clause {
         return eval;
     }
 
-    public X509Certificate[] eval(X509Certificate[] certs) throws AOException {
+    public X509Certificate[] eval(final X509Certificate[] certs) throws AOException {
         Collection<X509Certificate> c = new ArrayList<X509Certificate>();
         for (int i = 0; i < certs.length; i++)
         {

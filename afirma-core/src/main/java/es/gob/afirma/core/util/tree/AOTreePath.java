@@ -35,7 +35,7 @@ final class AOTreePath {
         }
         this.lastPathComponent = path.clone()[path.length - 1];
         if (path.length > 1) {
-            this.parentPath = new AOTreePath(path, path.length - 1);
+            this.parentPath = new AOTreePath(path.clone(), path.length - 1);
         }
     }
 
@@ -43,7 +43,7 @@ final class AOTreePath {
     private AOTreePath(final Object[] path, final int length) {
         this.lastPathComponent = path.clone()[length - 1];
         if (length > 1) {
-            this.parentPath = new AOTreePath(path, length - 1);
+            this.parentPath = new AOTreePath(path.clone(), length - 1);
         }
     }
 
@@ -78,33 +78,6 @@ final class AOTreePath {
         }
         return path.lastPathComponent;
     }
-
-//    /** Tests two TreePaths for equality by checking each element of the paths
-//     * for equality. Two paths are considered equal if they are of the same
-//     * length, and contain the same elements (<code>.equals</code>).
-//     * @param o
-//     *        the Object to compare */
-//    @Override
-//    public boolean equals(final Object o) {
-//        if (o == this) {
-//            return true;
-//        }
-//        if (o instanceof TreePath) {
-//            TreePath oTreePath = (TreePath) o;
-//
-//            if (getPathCount() != oTreePath.getPathCount()) {
-//                return false;
-//            }
-//            for (TreePath path = this; path != null; path = path.parentPath) {
-//                if (!(path.lastPathComponent.equals(oTreePath.lastPathComponent))) {
-//                    return false;
-//                }
-//                oTreePath = oTreePath.parentPath;
-//            }
-//            return true;
-//        }
-//        return false;
-//    }
 
     /** Returns a string that displays and identifies this object's properties.
      * @return a String representation of this object */
