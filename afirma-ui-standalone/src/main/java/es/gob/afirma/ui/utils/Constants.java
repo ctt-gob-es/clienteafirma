@@ -31,12 +31,12 @@ public class Constants {
     /**
      * Width inicial de la pantalla de seleccion de usuario
      */
-    public static final int INIT_WINDOW_INITIAL_WIDTH = 500;
+    public static final int INIT_WINDOW_INITIAL_WIDTH = 515;
     
     /**
      * Height inicial de la pantalla de seleccion de usuario
      */
-    public static final int INIT_WINDOW_INITIAL_HEIGHT = 360;
+    public static final int INIT_WINDOW_INITIAL_HEIGHT = 375;
     
     /**
      * Width inicial de los JAccessibilityFrameAbout de la aplicacion
