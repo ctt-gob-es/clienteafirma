@@ -64,9 +64,19 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
-/** Clase para la firma electr&oacute;nica de ficheros Adobe PDF.
+/** Clase para la firma electr&oacute;nica de ficheros Adobe PDF en formato PAdES.
+ * <p>La compatibilidad con PAdES no es completa, omiti&eacute;ndose los siguientes aspectos de la normativa:</p>
+ * <ul>
+ *  <li>Firma separada de ficheros empotrados en el documento PDF.</li>
+ *  <li>Firma separada de ficheros adjuntos al documento PDF.</li>
+ * </ul>
  * <p>
- * Se mantiene contra iText 2.1.7 por cuestiones de licencia.
+ *  Estas mismas deficiencias provocan igualmente la incompatibilidad de las firmas generadas con "Carpetas PDF" (<i>Portfolios PDF</i>).
+ * </p>
+ * <p>
+ *  La clase necesita espec&iacute;ficamente iText 2.1.7 (no se usan versiones m&aacute;s actuales por cuestiones de licencia) y
+ *  BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).
+ * </p>
  * </p>
  * <p>
  * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
