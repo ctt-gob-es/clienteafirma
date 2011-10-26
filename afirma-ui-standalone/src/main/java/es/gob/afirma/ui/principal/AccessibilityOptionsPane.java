@@ -68,6 +68,11 @@ public class AccessibilityOptionsPane {
 	/** Casilla de verificacion del tama&ntilde;o del cursor de texto. */ 
 	private JCheckBox checkCursorSize;	
 	
+	public boolean isBigStyle = false;
+	
+	public static boolean continueBigStyle = false;
+
+	
 	public AccessibilityOptionsPane(){
 		this.panel = new JPanel(new GridBagLayout());
 		initComponents();
@@ -324,7 +329,13 @@ public class AccessibilityOptionsPane {
 		this.checkFocusVisible.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false")));
 		this.checkWindowSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, "false")));
 		this.checkCursorSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false")));
+
+		// Comprobamos si está activada al menos una de las opciones de accesibilidad sobre textos 
+		if (Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)) || Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE))){
+    		isBigStyle = true;
+    	}		
 	}
+
 	
 	/**
 	 * Recupera el estado actual del panel.
@@ -339,8 +350,14 @@ public class AccessibilityOptionsPane {
     	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, Boolean.toString(this.checkWindowSize.isSelected()));
     	config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Boolean.toString(this.checkCursorSize.isSelected()));
     	
+    	// Comprobamos si se han desactivados las dos opciones de accesibilidad sobre texto 
+    	if (isBigStyle && (!this.checkFontSize.isSelected() && !this.checkFontStyle.isSelected())){
+			continueBigStyle = true;
+		}
+    	
     	return config;
 	}
+
 	
 	/**
 	 * Aplica los valores por defecto.
