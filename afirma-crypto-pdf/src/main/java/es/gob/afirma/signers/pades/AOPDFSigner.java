@@ -163,7 +163,7 @@ public final class AOPDFSigner implements AOSigner {
             return signPDF(keyEntry, data, extraParams, signAlgorithm);
         }
         catch (final InvalidPdfException e) {
-            throw new AOFormatFileException("El documento no era un PDF valido"); //$NON-NLS-1$
+            throw new AOFormatFileException("El documento no era un PDF valido", e); //$NON-NLS-1$
         }
         catch (final AOException e) {
             throw e;
@@ -198,7 +198,7 @@ public final class AOPDFSigner implements AOSigner {
             return "signed.pdf"; //$NON-NLS-1$
         }
         if (originalName.toLowerCase().endsWith(PDF_FILE_SUFFIX)) { 
-            return originalName.substring(0, originalName.length() - 4) + inTextInt + PDF_FILE_SUFFIX; 
+            return originalName.substring(0, originalName.length() - PDF_FILE_SUFFIX.length()) + inTextInt + PDF_FILE_SUFFIX; 
         }
         return originalName + inTextInt + PDF_FILE_SUFFIX; 
     }
@@ -351,7 +351,7 @@ public final class AOPDFSigner implements AOSigner {
                                                           NoSuchAlgorithmException, 
                                                           CertificateException {
 
-        final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", "true")); //$NON-NLS-1$ //$NON-NLS-2$
+        final boolean useSystemDateTime = Boolean.parseBoolean(extraParams.getProperty("applySystemDate", Boolean.TRUE.toString())); //$NON-NLS-1$ 
         final String reason = extraParams.getProperty("signReason"); //$NON-NLS-1$
         final String signField = extraParams.getProperty("signField"); //$NON-NLS-1$
         final String signatureProductionCity = extraParams.getProperty("signatureProductionCity"); //$NON-NLS-1$
@@ -379,8 +379,8 @@ public final class AOPDFSigner implements AOSigner {
             // esta no pedimos contrasena por
             // dialogo, principalmente para no interrumpir un firmado por lotes
             // desatendido
-            if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                throw new AOException("La contrasena proporcionada no es valida para el PDF actual"); //$NON-NLS-1$
+            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$ 
+                throw new AOException("La contrasena proporcionada no es valida para el PDF actual", e); //$NON-NLS-1$
             }
             // La contrasena que nos han proporcionada no es buena o no nos
             // proporcionaron ninguna
@@ -393,12 +393,12 @@ public final class AOPDFSigner implements AOSigner {
             }
         }
 
-        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !"true".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
-            if ("false".equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (pdfReader.getCertificationLevel() != PdfSignatureAppearance.NOT_CERTIFIED && !Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ 
+            if (Boolean.FALSE.toString().equalsIgnoreCase(extraParams.getProperty("allowSigningCertifiedPdfs"))) { //$NON-NLS-1$ 
                 throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs estaba establecido a false)"); //$NON-NLS-1$
             }
 
-            if ("true".equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$//$NON-NLS-2$
+            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) {  //$NON-NLS-1$
                 throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
             }
 
@@ -521,7 +521,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         if (pdfReader.isEncrypted() && ownerPassword != null) {
-            if ("true".equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("avoidEncryptingSignedPdfs"))) { //$NON-NLS-1$ 
                 LOGGER.info(
                     "Aunque el PDF original estaba encriptado no se encriptara el PDF firmado (se establecio el indicativo 'avoidEncryptingSignedPdfs')" //$NON-NLS-1$
                 );
@@ -672,7 +672,7 @@ public final class AOPDFSigner implements AOSigner {
                 else {
                     final String tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm"); //$NON-NLS-1$
                     pk = new CMSTimestamper(
-                         !("false").equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$ //$NON-NLS-2$
+                         !(Boolean.FALSE.toString()).equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$ 
                          tsaPolicy, 
                          tsaURL, 
                          extraParams.getProperty("tsaUsr"),  //$NON-NLS-1$

@@ -97,7 +97,8 @@ public class PAdESTriPhaseSigner {
     
     private static final int CSIZE = 8000;
     
-    private static final Calendar cal = new GregorianCalendar();
+    //TODO: La fecha de firma debe ser establecida externamente, y no ser estatica
+    private static final Calendar CAL = new GregorianCalendar();
     
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -666;
@@ -144,7 +145,7 @@ public class PAdESTriPhaseSigner {
                 new AdESPolicy(extraParams),
                 true, 
                 md.digest(),
-                cal.getTime()
+                CAL.getTime()
             )
         );
     }
@@ -333,7 +334,7 @@ public class PAdESTriPhaseSigner {
             sap.setReason(reason);
         }
         
-        sap.setSignDate(cal);
+        sap.setSignDate(CAL);
 
         // Pagina en donde se imprime la firma
         if (page == LAST_PAGE) {
@@ -375,7 +376,7 @@ public class PAdESTriPhaseSigner {
 
         final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
         if (sap.getSignDate() != null) {
-            dic.setDate(new PdfDate(cal));
+            dic.setDate(new PdfDate(CAL));
         }
         dic.setName(PdfPKCS7.getSubjectFields(signerCertificateChain[0]).getField("CN")); //$NON-NLS-1$
         if (sap.getReason() != null) {
