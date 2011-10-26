@@ -14,6 +14,10 @@ package es.gob.afirma.ciphers;
  * Constantes para el uso de las funcionalidades de cifrado.
  */
 public class AOCipherConstants {
+    
+    private AOCipherConstants() {
+        // No permitimos la instancacion
+    }
 
     /** Modo de generaci&oacute;n autom&aacute;tica de clave sim&eacute;trica
      * aleatoria. */

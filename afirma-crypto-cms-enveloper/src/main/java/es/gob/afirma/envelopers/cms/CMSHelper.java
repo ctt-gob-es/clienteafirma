@@ -15,6 +15,10 @@ import java.util.logging.Logger;
 
 /** Utilidades para la firma CMS. */
 final class CMSHelper {
+    
+    private CMSHelper() {
+        // No permitimos la instanciacion
+    }
 
     /** M&eacute;todo que comprueba que un archivo cumple la estructura deseada.
      * Se realiza la verificaci&ocute;n sobre los los siguientes tipos de PKCS#7

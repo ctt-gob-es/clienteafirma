@@ -36,7 +36,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 
 /** Generador local de sellos de tiempo para PKCS#7. */
-public class CMSTimestamper {
+public final class CMSTimestamper {
     
     /** URL de la TSA de CatCert. */
     public static final String CATCERT_TSP = "http://psis.catcert.net/psis/catcert/tsp"; //$NON-NLS-1$
@@ -103,15 +103,15 @@ public class CMSTimestamper {
              final SignerInformation si = (SignerInformation) iter.next();              
              final byte[] tsToken = getTimeStampToken(si.getSignature(), hashAlgorithm);
              
-             DERObject derObj = new ASN1InputStream(new ByteArrayInputStream(tsToken)).readObject(); 
-             DERSet derSet = new DERSet(derObj); 
+             final DERObject derObj = new ASN1InputStream(new ByteArrayInputStream(tsToken)).readObject(); 
+             final DERSet derSet = new DERSet(derObj); 
 
-             Attribute unsignAtt = new Attribute(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), derSet); 
+             final Attribute unsignAtt = new Attribute(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), derSet); 
              
-             Hashtable<DERObjectIdentifier, Attribute> ht = new Hashtable<DERObjectIdentifier, Attribute>();
+             final Hashtable<DERObjectIdentifier, Attribute> ht = new Hashtable<DERObjectIdentifier, Attribute>();
              ht.put(new ASN1ObjectIdentifier(SIGNATURE_TIMESTAMP_TOKEN_OID), unsignAtt); 
 
-             AttributeTable unsignedAtts = new AttributeTable(ht); 
+             final AttributeTable unsignedAtts = new AttributeTable(ht); 
 
 
              vNewSigners.add(SignerInformation.replaceUnsignedAttributes(si, unsignedAtts)); 
@@ -125,7 +125,7 @@ public class CMSTimestamper {
     /** Obtiene el <i>token</i> de sello de tiempo.
      * @return Respuesta de la TSA (array de bytes seg&uacute;n RFC 3161) 
      * @throws IOException */
-    protected byte[] getTSAResponse(final byte[] requestBytes) throws IOException {
+    private byte[] getTSAResponse(final byte[] requestBytes) throws IOException {
 
          URLConnection tsaConnection = this.tsaURL.openConnection();
          tsaConnection.setDoInput(true);

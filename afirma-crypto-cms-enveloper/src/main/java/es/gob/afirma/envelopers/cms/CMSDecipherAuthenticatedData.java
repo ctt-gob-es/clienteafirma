@@ -68,13 +68,12 @@ final class CMSDecipherAuthenticatedData {
     byte[] decipherAuthenticatedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                      CertificateEncodingException,
                                                                                      AOException,
-                                                                                     AOInvalidRecipientException,
                                                                                      InvalidKeyException, NoSuchAlgorithmException {
         byte[] contenido = new byte[0];
 
         AuthenticatedData authenticated = null;
 
-        Enumeration<?> elementRecipient;
+        final Enumeration<?> elementRecipient;
         try {
             final ASN1Sequence authenticatedData = Utils.fetchWrappedData(cmsData);
 
@@ -93,7 +92,7 @@ final class CMSDecipherAuthenticatedData {
 
         final ASN1Set authAttr = authenticated.getAuthAttrs();
 
-        byte[] macGenerada = Utils.genMac(this.macAlgorithmConfig.getName(), authAttr.getDEREncoded(), this.cipherKey);
+        final byte[] macGenerada = Utils.genMac(this.macAlgorithmConfig.getName(), authAttr.getDEREncoded(), this.cipherKey);
         
         final byte[] macObtenida = authenticated.getMac().getOctets();
 

@@ -25,6 +25,10 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 /** Clase que permite verificar si unos datos se corresponden con una firma CMS. */
 final class ValidateCMSSignedData {
+    
+    private ValidateCMSSignedData() {
+        // No permitimos la instanciacion
+    }
 
     /** M&eacute;todo que verifica que es una firma de tipo "Signed data"
      * @param data
