@@ -195,7 +195,7 @@ public final class Platform {
      * ejecuci&oacute;n de Java actualmente en uso. Si no se puede obtener, se
      * devolver&aacute; {@code null}. Copiado de com.sun.deploy.config.Config.
      * @return Directorio del entorno de ejecuci&oacute;n de Java. */
-    private static final String recoverJavaHome() {
+    private static String recoverJavaHome() {
         String ret = null;
         try {
             ret = System.getProperty("jnlpx.home"); //$NON-NLS-1$
@@ -232,7 +232,7 @@ public final class Platform {
 
     /** Obtiene el directorio principal del sistema operativo del sistema.
      * @return Directorio principal del sistema operativo */
-    private static final String getSystemRoot() {
+    private static String getSystemRoot() {
         if (!Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return File.separator;
         }
@@ -267,7 +267,7 @@ public final class Platform {
      * No funciona correctamente en Windows de 64 bits //FIXME
      * @return Directorio principal de bibliotecas
      */
-    public static final String getSystemLibDir() {
+    public static String getSystemLibDir() {
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             String systemRoot = getSystemRoot();
             if (systemRoot == null) {

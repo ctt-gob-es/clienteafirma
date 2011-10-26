@@ -396,7 +396,7 @@ public final class Base64 {
      * in which case one of them will be picked, though there is
      * no guarantee as to which one will be picked.
      */
-    private static final byte[] getAlphabet( int options ) {
+    private static byte[] getAlphabet( int options ) {
         if ((options & URL_SAFE) == URL_SAFE) {
             return URL_SAFE_ALPHABET;
         } else if ((options & ORDERED) == ORDERED) {
@@ -414,7 +414,7 @@ public final class Base64 {
      * in which case one of them will be picked, though there is
      * no guarantee as to which one will be picked.
      */
-    static final byte[] getDecodabet( int options ) {
+    static byte[] getDecodabet( int options ) {
         if( (options & URL_SAFE) == URL_SAFE) {
             return URL_SAFE_DECODABET;
         } else if ((options & ORDERED) == ORDERED) {
@@ -704,7 +704,7 @@ public final class Base64 {
 
         // Only resize array if we didn't guess it right.
         if( e < outBuff.length - 1 ){
-            byte[] finalOut = new byte[e];
+            final byte[] finalOut = new byte[e];
             System.arraycopy(outBuff,0, finalOut,0,e);
             //System.err.println("Having to resize array from " + outBuff.length + " to " + e );
             return finalOut;

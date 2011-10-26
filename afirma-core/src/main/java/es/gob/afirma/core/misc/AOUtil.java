@@ -40,6 +40,8 @@ public final class AOUtil {
         // No permitimos la instanciacion
     }
     
+    private static final int BUFFER_SIZE = 4096;
+    
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     private static final String[] SUPPORTED_URI_SCHEMES = new String[] {
@@ -194,7 +196,7 @@ public final class AOUtil {
             return new byte[0];
         }
         int nBytes = 0;
-        final byte[] buffer = new byte[4096];
+        final byte[] buffer = new byte[BUFFER_SIZE];
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while ((nBytes = input.read(buffer)) != -1) {
             baos.write(buffer, 0, nBytes);

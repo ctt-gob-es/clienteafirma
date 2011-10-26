@@ -63,9 +63,9 @@ public final class MimeHelper {
             Object magicMatchObject = getMagicMatchMethod.invoke(null, this.data);
         
             Class<?> magicMatchClass = AOUtil.classForName("net.sf.jmimemagic.MagicMatch"); //$NON-NLS-1$
-            this.mimeInfo.mType = (String) magicMatchClass.getMethod("getMimeType", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
-            this.mimeInfo.extension = (String) magicMatchClass.getMethod("getExtension", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
-            this.mimeInfo.description = (String) magicMatchClass.getMethod("getDescription", (Class[]) null).invoke(magicMatchObject, (Object[]) null); //$NON-NLS-1$
+            this.mimeInfo.setMimeType((String) magicMatchClass.getMethod("getMimeType", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
+            this.mimeInfo.setExtension((String)magicMatchClass.getMethod("getExtension", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
+            this.mimeInfo.setDescription((String) magicMatchClass.getMethod("getDescription", (Class[]) null).invoke(magicMatchObject, (Object[]) null)); //$NON-NLS-1$
         }
         catch (final ClassNotFoundException e) {
             LOGGER.warning("No se encontro la biblioteca JMimeMagic para la deteccion del tipo de dato"); //$NON-NLS-1$
@@ -159,7 +159,7 @@ public final class MimeHelper {
             }
 
             if (this.mimeType == null && this.mimeInfo != null) {
-                this.mimeType = this.mimeInfo.mType;
+                this.mimeType = this.mimeInfo.getMimeType();
             }
 
             // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
@@ -195,7 +195,7 @@ public final class MimeHelper {
         }
 
         if (extension == null && this.mimeInfo != null) {
-            extension = this.mimeInfo.extension;
+            extension = this.mimeInfo.getExtension();
         }
 
         // Cuando el MimeType sea el de un fichero ZIP, comprobamos si es en
@@ -213,7 +213,7 @@ public final class MimeHelper {
      * @return Descripci&oacute;n del tipo de dato. */
     public String getDescription() {
         if (this.mimeInfo != null) {
-            return this.mimeInfo.description;
+            return this.mimeInfo.getDescription();
         }
         return null;
     }
@@ -222,134 +222,40 @@ public final class MimeHelper {
      * Almacena la informaci&oacute;n identificada del tipo de datos.
      */
     static class MimeInfo {
+        
         /** MimeType de los datos. */
-        String mType = null;
+        private String mType = null;
+        
+        void setMimeType(final String mimeType) {
+            this.mType = mimeType;
+        }
+        
+        String getMimeType() {
+            return this.mType;
+        }
+        
         /** Extensi&oacute;n com&uacute;n para el tipo de fichero. */
-        String extension = null;
+        private String extension = null;
+        
+        String getExtension() {
+            return this.extension;
+        }
+        
+        void setExtension(final String ext) {
+            this.extension = ext;
+        }
+        
+        String getDescription() {
+            return this.description;
+        }
+        
+        void setDescription(final String desc) {
+            this.description = desc;
+        }
+        
         /** Descripci&oacute;n del tipo de datos. */
-        String description = null;
+        private String description = null;
     }
     
-    // ************************************************************
-    // ***************** SOPORTE DE ADJUNTOS MIME *****************
-    // ************************************************************
-
-//    /** Devuelve un binario en forma de Base64 con cabecera MIME tal y como se
-//     * define en la especificaci&oacute;n MIME.
-//     * @param data
-//     *        Datos originales
-//     * @param contentID
-//     *        Identificador de los datos
-//     * @param contentType
-//     *        Tipo de los datos, en formato MIMEType. Si se proporciona <code>null</code> se intenta determinar
-//     * @param fileName
-//     *        Nombre del fichero original en el que se encontraban los datos
-//     * @param modificationDate
-//     *        Fecha de la &uacute;ltima modificaci&oacute;n de los datos
-//     * @return Codificaci&oacute;n MIME de los datos, con cabecera */
-//    public static String getMimeEncodedAsAttachment(final byte[] data,
-//                                                    final String contentID,
-//                                                    String contentType,
-//                                                    final String fileName,
-//                                                    final java.util.Date modificationDate) {
-//
-//        final StringBuilder sb = new StringBuilder();
-//
-//        sb.append("MIME-Version: 1.0\n");
-//        if (contentID != null) {
-//            sb.append("Content-ID: ");
-//            sb.append(contentID);
-//            sb.append('\n');
-//        }
-//
-//        if (contentType == null) {
-//            contentType = new MimeHelper(data).getMimeType();
-//        }
-//        if (contentType != null) {
-//            sb.append("Content-Type: ");
-//            sb.append(contentType);
-//            sb.append('\n');
-//        }
-//
-//        sb.append("Content-Disposition: attachment");
-//        // De la RFC 2183:
-//        // A short (length <= 78 characters)
-//        // parameter value containing only non-`tspecials' characters SHOULD be
-//        // represented as a single `token'.
-//        // A short (length <= 78 characters) parameter value containing
-//        // only ASCII characters, but including 'tspecials' characters, SHOULD
-//        // be represented as 'quoted-string'.
-//
-//        if (fileName != null) {
-//            if (!isPureAscii(fileName)) {
-//                LOGGER.warning("MIME solo soporta nombres de ficheros ASCII, se ignorara el campo 'filename': " + fileName);
-//            }
-//            else if (fileName.length() > 78) {
-//                LOGGER.warning("No se soporta la codificacion RFC 2184 para los nombres de fichero de mas de 78 caracteres, se ignorara el campo 'filename': " + fileName);
-//            }
-//            else {
-//                sb.append("; filename=");
-//                if (containsTSpecial(fileName)) {
-//                    sb.append('"');
-//                }
-//                sb.append(fileName);
-//                if (containsTSpecial(fileName)) {
-//                    sb.append('"');
-//                }
-//                sb.append(";");
-//            }
-//        }
-//
-//        if (modificationDate != null) {
-//            sb.append(" modification-date=\"");
-//            sb.append(modificationDate.toString());
-//            sb.append("\";");
-//        }
-//        sb.append('\n');
-//
-//        sb.append('\n');
-//
-//        sb.append(Base64.encode(data));
-//
-//        return sb.toString();
-//
-//    }
-
-//    private static final String[] MIME_T_SPECIALS = new String[] {
-//            "(", ")", "<", ">", "@", ",", ";", ":", "\\", "\"", "/", "[", "]", "?", "=", " "
-//    };
-
-//    private static boolean containsTSpecial(final String in) {
-//        if (in == null) {
-//            return false;
-//        }
-//        for (final String s : MIME_T_SPECIALS) {
-//            if (in.indexOf(s) != -1) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-//    /** Comprueba que la cadena de texto s&oacute;lo contenga caracteres ASCII.
-//     * @param v
-//     *        Cadena que se desea comprobar.
-//     * @return Devuelve {@code true} si todos los caracteres de la cadena son
-//     *         ASCII, {@code false} en caso contrario. */
-//    private static boolean isPureAscii(final String v) {
-//        final byte bytearray[] = v.getBytes();
-//        final java.nio.charset.CharsetDecoder d = java.nio.charset.Charset.forName("US-ASCII").newDecoder();
-//        try {
-//            d.decode(java.nio.ByteBuffer.wrap(bytearray)).toString();
-//        }
-//        catch (final java.nio.charset.CharacterCodingException e) {
-//            return false;
-//        }
-//        return true;
-//    }
-
-    // ************************************************************
-    // *** FIN SOPORTE DE ADJUNTOS MIME ***************************
-    // ************************************************************
 }
  
