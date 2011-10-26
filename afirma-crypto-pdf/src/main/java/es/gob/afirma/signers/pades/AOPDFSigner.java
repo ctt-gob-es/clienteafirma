@@ -110,6 +110,24 @@ public final class AOPDFSigner implements AOSigner {
     public static final int LAST_PAGE = -666;
 
     /** Firma un documento PDF en formato PAdES.
+     * <p>
+     *  Notas sobre documentos <i>certificados</i>:<br>
+     *  Si un PDF firmado se ha certificado (por ejemplo, a&ntilde;adiendo una firma electr&oacute;nica usando Adobe Reader), cualquier
+     *  modificaci&oacute;n posterior del fichero (como la adici&oacute;n de nuevas firmas con este m&eacute;todo) invalidar&aacute;
+     *  las firmas previamente existentes.<br>
+     *  Si se detecta un documento PDF certificado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
+     *  situaci&oacute;n y pidiendo confirmaci&oacute;n para continuar.<br>Si desea evitar interacciones directas con los usuarios
+     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headLess</code>.<br>
+     * </p>
+     * <p>
+     *  Notas sobre documentos protegidos con contrase&ntilde;a:<br>
+     *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
+     *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
+     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
+     *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
+     *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
+     *  para m&aacute;s informaci&oacute;n.
+     * </p>  
      * @param data Documento PDF a firmar
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -174,7 +192,7 @@ public final class AOPDFSigner implements AOSigner {
      *  <dt><b><i>ownerPassword</i></b></dt>
      *   <dd>
      *    Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.<br>
-     *    No se soporta la firma de documentos PDF cifrados con certificados.
+     *    No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>headLess</i></b></dt>
      *   <dd>
@@ -193,7 +211,7 @@ public final class AOPDFSigner implements AOSigner {
      *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
      *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
      *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
-     *    No se soporta el cifrado de documentos PDF con certificados.
+     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>tsaURL</i></b></dt>
      *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
@@ -241,7 +259,25 @@ public final class AOPDFSigner implements AOSigner {
 
     /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
      * puesto que las multifirmas en los ficheros PDF se limitan a firmas independientes "en serie", pero no implementando los mecanismos de
-     * cofirma o contrafirma de CAdES.<br>
+     * cofirma o contrafirma de CAdES.
+     * <p>
+     *  Notas sobre documentos <i>certificados</i>:<br>
+     *  Si un PDF firmado se ha certificado (por ejemplo, a&ntilde;adiendo una firma electr&oacute;nica usando Adobe Reader), cualquier
+     *  modificaci&oacute;n posterior del fichero (como la adici&oacute;n de nuevas firmas con este m&eacute;todo) invalidar&aacute;
+     *  las firmas previamente existentes.<br>
+     *  Si se detecta un documento PDF certificado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
+     *  situaci&oacute;n y pidiendo confirmaci&oacute;n para continuar.<br>Si desea evitar interacciones directas con los usuarios
+     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headLess</code>.<br>
+     * </p>
+     * <p>
+     *  Notas sobre documentos protegidos con contrase&ntilde;a:<br>
+     *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
+     *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
+     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
+     *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
+     *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
+     *  para m&aacute;s informaci&oacute;n.
+     * </p>
      * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>
      * @param data Se ignora el valor de este par&aacute;metro. <b>El documento PDF debe proporcionarse mediante el par&aacute;tro <code>sign</code></b>.
      * @param sign Documento PDF a firmar
@@ -308,7 +344,7 @@ public final class AOPDFSigner implements AOSigner {
      *  <dt><b><i>ownerPassword</i></b></dt>
      *   <dd>
      *    Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.<br>
-     *    No se soporta la firma de documentos PDF cifrados con certificados.
+     *    No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>headLess</i></b></dt>
      *   <dd>
@@ -327,7 +363,7 @@ public final class AOPDFSigner implements AOSigner {
      *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
      *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
      *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
-     *    No se soporta el cifrado de documentos PDF con certificados.
+     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>tsaURL</i></b></dt>
      *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
@@ -354,7 +390,25 @@ public final class AOPDFSigner implements AOSigner {
 
     /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
      * puesto que las multifirmas en los ficheros PDF se limitan a firmas independientes "en serie", pero no implementando los mecanismos de
-     * cofirma o contrafirma de CAdES.<br>
+     * cofirma o contrafirma de CAdES.
+     * <p>
+     *  Notas sobre documentos <i>certificados</i>:<br>
+     *  Si un PDF firmado se ha certificado (por ejemplo, a&ntilde;adiendo una firma electr&oacute;nica usando Adobe Reader), cualquier
+     *  modificaci&oacute;n posterior del fichero (como la adici&oacute;n de nuevas firmas con este m&eacute;todo) invalidar&aacute;
+     *  las firmas previamente existentes.<br>
+     *  Si se detecta un documento PDF certificado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
+     *  situaci&oacute;n y pidiendo confirmaci&oacute;n para continuar.<br>Si desea evitar interacciones directas con los usuarios
+     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headLess</code>.<br>
+     * </p>
+     * <p>
+     *  Notas sobre documentos protegidos con contrase&ntilde;a:<br>
+     *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
+     *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
+     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
+     *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
+     *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
+     *  para m&aacute;s informaci&oacute;n.
+     * </p>
      * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>
      * @param sign Documento PDF a firmar
      * @param algorithm Algoritmo a usar para la firma.
@@ -420,7 +474,7 @@ public final class AOPDFSigner implements AOSigner {
      *  <dt><b><i>ownerPassword</i></b></dt>
      *   <dd>
      *    Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.<br>
-     *    No se soporta la firma de documentos PDF cifrados con certificados.
+     *    No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>headLess</i></b></dt>
      *   <dd>
@@ -439,7 +493,7 @@ public final class AOPDFSigner implements AOSigner {
      *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
      *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
      *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
-     *    No se soporta el cifrado de documentos PDF con certificados.
+     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>tsaURL</i></b></dt>
      *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
@@ -462,7 +516,25 @@ public final class AOPDFSigner implements AOSigner {
 
     /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
      * puesto que las multifirmas en los ficheros PDF se limitan a firmas independientes "en serie", pero no implementando los mecanismos de
-     * cofirma o contrafirma de CAdES.<br>
+     * cofirma o contrafirma de CAdES.
+     * <p>
+     *  Notas sobre documentos <i>certificados</i>:<br>
+     *  Si un PDF firmado se ha certificado (por ejemplo, a&ntilde;adiendo una firma electr&oacute;nica usando Adobe Reader), cualquier
+     *  modificaci&oacute;n posterior del fichero (como la adici&oacute;n de nuevas firmas con este m&eacute;todo) invalidar&aacute;
+     *  las firmas previamente existentes.<br>
+     *  Si se detecta un documento PDF certificado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
+     *  situaci&oacute;n y pidiendo confirmaci&oacute;n para continuar.<br>Si desea evitar interacciones directas con los usuarios
+     *  consulte la documentaci&oacute;n de las opciones <code>allowSigningCertifiedPdfs</code> y <code>headLess</code>.<br>
+     * </p>
+     * <p>
+     *  Notas sobre documentos protegidos con contrase&ntilde;a:<br>
+     *  Si un PDF est&aacute; protegido con contrase&ntilde;a por estar cifrado, se mostrar&aacute; un di&aacute;logo gr&aacute;fico advirtiendo al usuario de esta
+     *  situaci&oacute;n y solicitando la contrase&ntilde;a de apertura del PDF.<br>Si desea evitar interacciones directas con los usuarios
+     *  consulte la documentaci&oacute;n de las opciones <code>ownerPassword</code> y <code>headLess</code>.
+     *  Adicionalmente, es posible, si el fichero de entrada estaba cifrado y protegido con contrase&ntilde;a, que la salida sea un documento PDF
+     *  igualmente cifrado y protegido con contrase&ntilde;a. Consulte la documentaci&oacute;n de la opci&oacute;n <code>avoidEncryptingSignedPdfs</code>
+     *  para m&aacute;s informaci&oacute;n.
+     * </p>
      * En general, es recomendable prescindir de este m&eacute;todo y llamar directamente al m&eacute;todo <code>sign(...)</code>
      * @param sign Documento PDF a firmar
      * @param targetType Se ignora el valor de este par&aacute;metro
@@ -530,7 +602,7 @@ public final class AOPDFSigner implements AOSigner {
      *  <dt><b><i>ownerPassword</i></b></dt>
      *   <dd>
      *    Contrase&ntilde;a de apertura del PDF (contrase&ntilde;a del propietario) si este estaba cifrado.<br>
-     *    No se soporta la firma de documentos PDF cifrados con certificados.
+     *    No se soporta la firma de documentos PDF cifrados con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>headLess</i></b></dt>
      *   <dd>
@@ -549,7 +621,7 @@ public final class AOPDFSigner implements AOSigner {
      *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
      *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
      *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
-     *    No se soporta el cifrado de documentos PDF con certificados.
+     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
      *   </dd>
      *  <dt><b><i>tsaURL</i></b></dt>
      *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
@@ -662,6 +734,10 @@ public final class AOPDFSigner implements AOSigner {
         return new AOTreeModel(root, root.getChildCount());
     }
 
+    /** Comprueba que los datos proporcionados sean un documento PDF.
+     * @param data Datos a comprobar
+     * @return <code>true</code> si los datos proporcionados son un documento PDF, <code>false</code> en caso contrario
+     */
     public boolean isSign(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$

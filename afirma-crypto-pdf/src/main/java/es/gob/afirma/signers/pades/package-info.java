@@ -13,13 +13,13 @@
  *  <p>Tabla de compatibilidad respecto a generaci&oacute;n en cliente de variantes de PAdES:</p>
  *  <p align="center"><table border="1" cellpadding="5">
  *   <tr>
- *    <td>CAdES-BES</td>
- *    <td>CAdES-EPES</dt>
- *    <td>CAdES-T</td>
- *    <td>CAdES-C</td>
- *    <td>CAdES-X</td>
- *    <td>CAdES-XL</td>
- *    <td>CAdES-A</td>
+ *    <td>PAdES-BES</td>
+ *    <td>PAdES-EPES</dt>
+ *    <td>PAdES-T</td>
+ *    <td>PAdES-C</td>
+ *    <td>PAdES-X</td>
+ *    <td>PAdES-XL</td>
+ *    <td>PAdES-A</td>
  *   </tr>
  *   <tr>
  *    <td bgcolor="green">Si<sup>1</sup></td>
@@ -35,6 +35,11 @@
  *   <sup>1</sup> No se soporta la firma ni de ficheros adjuntos a los documentos PDF ni de ficheros empotrados en los documentos PDF.<br>
  *   <sup>2</sup> La generaci&oacute;n de los sellos de tiempo para PAdES-T necesita conexi&oacute;n
  *   con una autoridad de sellado de tiempo (TSA).
+ *  </p>
+ *  <p>Los datos de firma electr—nica empotrados dentro de la estructura PDF equivalen a una firma CAdES con Signing Certificate V2.</p>
+ *  <p>
+ *   En general, no se soportan documentos PDF cifrados con certificados, con algoritmo AES256 o con cualquier otro medio introducido en
+ *   versiones de Adobe Acrobat posteriores a la 9.
  *  </p>
  *  <p align="center"><img src="doc-files/package-info-1.png"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias ditectas de primer nivel:</p>
