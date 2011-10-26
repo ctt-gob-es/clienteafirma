@@ -61,6 +61,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
+import es.gob.afirma.signers.pkcs7.CMSTimestamper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Clase para la firma electr&oacute;nica de ficheros Adobe PDF.
@@ -670,7 +671,7 @@ public final class AOPDFSigner implements AOSigner {
                 }
                 else {
                     final String tsaHashAlgorithm = extraParams.getProperty("tsaHashAlgorithm"); //$NON-NLS-1$
-                    pk = new PAdESTimestamper(
+                    pk = new CMSTimestamper(
                          !("false").equalsIgnoreCase(extraParams.getProperty("tsaRequireCert")),  //$NON-NLS-1$ //$NON-NLS-2$
                          tsaPolicy, 
                          tsaURL, 

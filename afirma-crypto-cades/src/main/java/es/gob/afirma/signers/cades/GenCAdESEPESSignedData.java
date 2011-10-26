@@ -75,10 +75,10 @@ public final class GenCAdESEPESSignedData {
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
      *         digital indicados
-     * @throws java.security.cert.CertificateException
+     * @throws CertificateException
      *         En caso de cualquier problema con los certificados de
      *         firma.
-     * @throws java.io.IOException
+     * @throws IOException
      *         En caso de cualquier problema leyendo o escribiendo los
      *         datos
      * @throws AOException

@@ -51,8 +51,9 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
-/** Utilidades varias relacionadas con firmas electr&oacute;nicas CAdES. */
-public class CAdESUtils {
+/** Utilidades varias relacionadas con firmas electr&oacute;nicas CAdES. 
+ * Se declara como clase p&uacute;blica para permitir su uso en el m&oacute;dulo de multifirmas CAdES */
+public final class CAdESUtils {
     
     private CAdESUtils() {
         // No permitimos la instanciacion

@@ -36,7 +36,7 @@ import es.gob.afirma.signers.pkcs7.SignedAndEnvelopedData;
  * los firmantes. */
 public final class CAdESValidator {
     
-    private static Logger LOGGER = Logger.getLogger("es.gob.afima"); //$NON-NLS-1$
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afima"); //$NON-NLS-1$
     
     /** Verifica si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>.
      * @param data Datos PKCS#7/CMS/CAdES.

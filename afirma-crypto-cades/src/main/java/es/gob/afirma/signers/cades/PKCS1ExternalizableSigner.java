@@ -19,7 +19,7 @@ import es.gob.afirma.core.AOException;
 /** Realizaci&oacute;n de firmas simples PKCS#1 V1.5 como parte externalizable de las firmas CAdES.
  * La exposici&oacute;n de esta clase es necesaria para la realizaci&oacute; de firmas CAdES en tres fases.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class PKCS1ExternalizableSigner {
+public final class PKCS1ExternalizableSigner {
     
     private PKCS1ExternalizableSigner() {
      // No permitimos la instanciacion
@@ -27,6 +27,15 @@ public class PKCS1ExternalizableSigner {
     
     /** Realiza una firma electr&oacute;nica PKCS#1 v1.5.
      * @param signatureAlgorithm Algoritmo de firma a utilizar
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>signatureAlgorithm</code>:</p>
+     * <ul>
+     *  <li><i>SHA1withRSA</i></li>
+     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>SHA256withRSA</i></li>
+     *  <li><i>SHA384withRSA</i></li>
+     *  <li><i>SHA512withRSA</i></li>
+     * </ul>
      * @param keyEntry Entrada que apunta a la clave de privada a usar para la firma
      * @param data Datos a firmar
      * @return Firma PKCS#1 en binario puro no tratado

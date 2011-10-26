@@ -31,7 +31,7 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.pades.PAdESTimestamper;
+import es.gob.afirma.signers.pkcs7.CMSTimestamper;
 
 /**
  * Pruebas del m&oacute;dulo PAdES de Afirma.
@@ -101,9 +101,9 @@ public class TestPAdES {
         System.out.println(prueba);
         
         final Properties extraParams = new Properties();
-        extraParams.put("tsaURL", PAdESTimestamper.CATCERT_TSP); //$NON-NLS-1$
-        extraParams.put("tsaPolicy", PAdESTimestamper.CATCERT_POLICY); //$NON-NLS-1$
-        extraParams.put("tsaRequireCert", PAdESTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
+        extraParams.put("tsaURL", CMSTimestamper.CATCERT_TSP); //$NON-NLS-1$
+        extraParams.put("tsaPolicy", CMSTimestamper.CATCERT_POLICY); //$NON-NLS-1$
+        extraParams.put("tsaRequireCert", CMSTimestamper.CATCERT_REQUIRECERT); //$NON-NLS-1$
         extraParams.put("tsaHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
 
         byte[] result = signer.sign(testPdf, "SHA512withRSA", pke, extraParams); //$NON-NLS-1$

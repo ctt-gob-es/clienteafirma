@@ -50,7 +50,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Firmador CAdES en tres fases independientes, adecuado para su uso en un entorno mixto cliente-servidor.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class CAdESTriPhaseSigner {
+public final class CAdESTriPhaseSigner {
     
     private CAdESTriPhaseSigner() {
      // No permitimos la instanciacion

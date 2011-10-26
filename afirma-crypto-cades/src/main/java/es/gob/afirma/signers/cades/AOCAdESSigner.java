@@ -43,23 +43,32 @@ public final class AOCAdESSigner implements AOSigner {
 
     /** Firma datos en formato CAdES.<br/>
      * @param data Datos que deseamos firmar.
-     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, SHA-512withRSA,...)
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li><i>SHA1withRSA</i></li>
+     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>SHA256withRSA</i></li>
+     *  <li><i>SHA384withRSA</i></li>
+     *  <li><i>SHA512withRSA</i></li>
+     * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
-     *  <dt><b>mode</b></dt>
+     *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
      *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluiran dentro de
      *    la propia firma los datos firmados
      *   </dd>
-     *  <dt><b>policyIdentifier</b></dt>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
      *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
-     *  <dt><b>policyIdentifierHash</b></dt>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
      *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
@@ -67,12 +76,12 @@ public final class AOCAdESSigner implements AOSigner {
      *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
      *    digital <i>al vuelo</i>.     
      *   </dd>
-     *  <dt><b>policyIdentifierHashAlgorithm</b></dt>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>
      *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      *   </dd>
-     *  <dt><b>precalculatedHashAlgorithm</b></dt>
+     *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
      *   <dd>
      *    Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona precalculada. Cuando se usan modos de firma
      *    <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma, es posible trabajar sin proporcionarlos, indicando
@@ -82,7 +91,7 @@ public final class AOCAdESSigner implements AOSigner {
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si. 
      *    </b>
      *   </dd>
-     *  <dt><b>signingCertificateV2</b></dt>
+     *  <dt><b><i>signingCertificateV2</i></b></dt>
      *   <dd>
      *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo 
      *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
@@ -91,7 +100,7 @@ public final class AOCAdESSigner implements AOSigner {
      * </dl>
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(byte[] data, String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
@@ -141,31 +150,55 @@ public final class AOCAdESSigner implements AOSigner {
         }
     }
 
-    /** Cofirma datos en formato CAdES. Para realizar la
+    /** Cofirma datos en formato CAdES a&ntilde;adiendo la nueva firma a una CAdES o CMS ya existente. Para realizar la
      * cofirma se necesitan los datos originales (que este m&eacute;todo
      * firmar&aacute; normalmente) y la firma sobre la que se realiza la cofirma
      * (a los que se agregar&aacute; el resultado de la nueva firma).
-     * <p><b>IMPORTANTE: Requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
+     * <p>
+     *  Nota sobre cofirmas cruzadas entre PKCS#7/CMS y CAdES:<br>
+     *  Las cofirmas de un documento dan como resultado varias firmas a un mismo nivel sobre este mismo documento, 
+     *  es decir, que ninguna firma envuelve a la otra ni una prevalece sobre la otra.
+     *  A nivel de formato interno, esto quiere decir que cuando cofirmamos un documento ya firmado previamente, 
+     *  esta firma previa no se modifica. Si tenemos en cuenta que CAdES es en realidad un subconjunto de CMS, el 
+     *  resultado de una cofirma CAdES sobre un documento firmado previamente con CMS (o viceversa), son dos firmas 
+     *  independientes, una en CAdES y otra en CMS.<br>
+     *  Dado que todas las firmas CAdES son CMS pero no todas las firmas CMS son CAdES, el resultado global de la firma 
+     *  se adec&uacute;a al est&aacute;ndar m‡s amplio, CMS en este caso.
+     *  Otro efecto de compatibilidad de formatos de las cofirmas con varios formatos en un œnico documento es la ruptura 
+     *  de la compatibilidad con PKCS#7, ya que, aunque las firmas generadas por el cliente mediante CMS son compatibles 
+     *  con PKCS#7, las generadas con CAdES no lo son, por lo que, en el momento que se introduzca una estructura CAdES, 
+     *  se pierde la compatibilidad PKCS#7 en el global de la firma.
+     * </p>
+     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
      * @param data Datos que deseamos a cofirmar.
      * @param sign Firma CAdES o CMS de los datos que se quiere cofirmar.
-     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li><i>SHA1withRSA</i></li>
+     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>SHA256withRSA</i></li>
+     *  <li><i>SHA384withRSA</i></li>
+     *  <li><i>SHA512withRSA</i></li>
+     * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param extraParams 
      * Par&aacute;metros adicionales para la cofirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
-     *  <dt><b>mode</b></dt>
+     *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
      *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluiran dentro de
      *    la propia firma los datos firmados
      *   </dd>
-     *  <dt><b>policyIdentifier</b></dt>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
      *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
-     *  <dt><b>policyIdentifierHash</b></dt>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
      *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
@@ -173,12 +206,12 @@ public final class AOCAdESSigner implements AOSigner {
      *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
      *    digital <i>al vuelo</i>.     
      *   </dd>
-     *  <dt><b>policyIdentifierHashAlgorithm</b></dt>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>
      *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      *   </dd>
-     *  <dt><b>precalculatedHashAlgorithm</b></dt>
+     *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
      *   <dd>
      *    Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona precalculada. Cuando se usan modos de firma
      *    <i>expl&iacute;citos</i>, en los que los datos no se incluyen en la firma, es posible trabajar sin proporcionarlos, indicando
@@ -188,7 +221,7 @@ public final class AOCAdESSigner implements AOSigner {
      *     <code>data</code> son la huella digital de los datos a firmar, y no los datos a firmar en si. 
      *    </b>
      *   </dd>
-     *  <dt><b>signingCertificateV2</b></dt>
+     *  <dt><b><i>signingCertificateV2</i></b></dt>
      *   <dd>
      *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo 
      *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
@@ -213,26 +246,50 @@ public final class AOCAdESSigner implements AOSigner {
      * cofirma se necesita el documento en el que se encuentra la firma sobre la
      * que se realiza la cofirma (a los que se agregar&aacute; el resultado de
      * la nueva firma).
-     * <p><b>IMPORTANTE: Requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
+     * <p>
+     *  Nota sobre cofirmas cruzadas entre PKCS#7/CMS y CAdES:<br>
+     *  Las cofirmas de un documento dan como resultado varias firmas a un mismo nivel sobre este mismo documento, 
+     *  es decir, que ninguna firma envuelve a la otra ni una prevalece sobre la otra.
+     *  A nivel de formato interno, esto quiere decir que cuando cofirmamos un documento ya firmado previamente, 
+     *  esta firma previa no se modifica. Si tenemos en cuenta que CAdES es en realidad un subconjunto de CMS, el 
+     *  resultado de una cofirma CAdES sobre un documento firmado previamente con CMS (o viceversa), son dos firmas 
+     *  independientes, una en CAdES y otra en CMS.<br>
+     *  Dado que todas las firmas CAdES son CMS pero no todas las firmas CMS son CAdES, el resultado global de la firma 
+     *  se adec&uacute;a al est&aacute;ndar m‡s amplio, CMS en este caso.
+     *  Otro efecto de compatibilidad de formatos de las cofirmas con varios formatos en un œnico documento es la ruptura 
+     *  de la compatibilidad con PKCS#7, ya que, aunque las firmas generadas por el cliente mediante CMS son compatibles 
+     *  con PKCS#7, las generadas con CAdES no lo son, por lo que, en el momento que se introduzca una estructura CAdES, 
+     *  se pierde la compatibilidad PKCS#7 en el global de la firma.
+     * </p>
+     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
      * @param sign Firma CAdES o CMS de los datos que se quiere cofirmar.
-     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li><i>SHA1withRSA</i></li>
+     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>SHA256withRSA</i></li>
+     *  <li><i>SHA384withRSA</i></li>
+     *  <li><i>SHA512withRSA</i></li>
+     * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param extraParams 
      * Par&aacute;metros adicionales para la cofirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
-     *  <dt><b>mode</b></dt>
+     *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
      *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluiran dentro de
      *    la propia firma los datos firmados
      *   </dd>
-     *  <dt><b>policyIdentifier</b></dt>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
      *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
-     *  <dt><b>policyIdentifierHash</b></dt>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
      *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
@@ -240,12 +297,12 @@ public final class AOCAdESSigner implements AOSigner {
      *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
      *    digital <i>al vuelo</i>.     
      *   </dd>
-     *  <dt><b>policyIdentifierHashAlgorithm</b></dt>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>
      *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      *   </dd>
-     *  <dt><b>signingCertificateV2</b></dt>
+     *  <dt><b><i>signingCertificateV2</i></b></dt>
      *   <dd>
      *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo 
      *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
@@ -275,9 +332,18 @@ public final class AOCAdESSigner implements AOSigner {
      *  <li>Los nodos de firma cuyas posiciones se especifican en <code>target</code> (<code>CounterSignTarget.NODES</code>)</li>
      *  <li>Los nodos de firma realizados por los firmantes cuyo <i>Common Name</i> (CN X.500) se indica en <code>target</code> (<code>CounterSignTarget.SIGNERS</code>)</li>
      * </ul>
-     * <p><b>IMPORTANTE: Requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner</code> en el CLASSPATH</b></p>
+     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner</code> en el CLASSPATH</b></p>
      * @param sign Firma CAdES o CMS con los nodos a contrafirmar
-     * @param algorithm Algoritmo a usar para la firma (SHA1withRSA, MD5withRSA,...)
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li><i>SHA1withRSA</i></li>
+     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li><i>SHA256withRSA</i></li>
+     *  <li><i>SHA384withRSA</i></li>
+     *  <li><i>SHA512withRSA</i></li>
+     * </ul>
      * @param targetType Tipo de objetivo de la contrafirma
      * @param targets Informaci&oacute;n complementario seg&uacute;n el tipo de objetivo de la contrafirma 
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
@@ -285,18 +351,18 @@ public final class AOCAdESSigner implements AOSigner {
      * Par&aacute;metros adicionales para la contrafirma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
      * <dl>
-     *  <dt><b>mode</b></dt>
+     *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
      *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluiran dentro de
      *    la propia firma los datos firmados
      *   </dd>
-     *  <dt><b>policyIdentifier</b></dt>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
      *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
-     *  <dt><b>policyIdentifierHash</b></dt>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
      *   <dd>
      *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
      *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
@@ -304,12 +370,12 @@ public final class AOCAdESSigner implements AOSigner {
      *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
      *    digital <i>al vuelo</i>.     
      *   </dd>
-     *  <dt><b>policyIdentifierHashAlgorithm</b></dt>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
      *   <dd>
      *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      *   </dd>
-     *  <dt><b>signingCertificateV2</b></dt>
+     *  <dt><b><i>signingCertificateV2</i></b></dt>
      *   <dd>
      *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo 
      *    <i>Signing Certificate</i> de CAdES. Si no se establece un valor para este par&aacute;metro
