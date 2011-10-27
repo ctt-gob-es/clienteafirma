@@ -2,19 +2,20 @@ package es.gob.afirma.miniapplet.actions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.PrivilegedExceptionAction;
 
 import javax.jnlp.FileOpenService;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
 
 /**
- * Acci&oacute;n para la recuperaci&oacute;n del contenido de un fichero.
+ * Acci&oacute;n para la recuperaci&oacute;n del contenido de un fichero seleccionado
+ * por el usuario.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class GetFileContentAction {
+public class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 
     private FileOpenService jnlpFos;
     
@@ -27,13 +28,15 @@ public class GetFileContentAction {
     }
     
     /**
-     * Recupera el contenido del fichero codificado en base 64.
+     * Muestra al usuario un di&aacute;logo modal para la seleccion de un fichero y devuelve
+     * su contenido.
      * @return El contenido del fichero.
      * @throws AOCancelledOperationException Cuando se cancela la operacion de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
-    public String getResult() throws AOCancelledOperationException, IOException {
-        FileSelectionDialog dialog = new FileSelectionDialog(this.jnlpFos);
+	@Override
+	public byte[] run() throws AOCancelledOperationException, IOException {
+        FileSelectionDialog dialog = new FileSelectionDialog(this.jnlpFos, null);
         InputStream is = dialog.getFileContent();
         byte[] content = AOUtil.getDataFromInputStream(is);
         try {
@@ -42,6 +45,6 @@ public class GetFileContentAction {
             /* Ignoramos este error */
         }
         
-        return Base64.encodeBytes(content);
-    }
+        return content;
+	}
 }

@@ -11,10 +11,7 @@
 package es.gob.afirma.miniapplet;
 
 import java.io.IOException;
-
-import javax.jnlp.UnavailableServiceException;
-
-import es.gob.afirma.core.AOCancelledOperationException;
+import java.security.PrivilegedActionException;
 
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
@@ -42,13 +39,22 @@ public interface MiniAfirma {
 
     /**
      * Firma unos datos seg&uacute;n la configuracion proporcionada.
+     * La configuraci&oacute;n que se puede proporcionar es el algoritmo,
+     * el formato de firma y par&aacute;metros adicionales del formato particular.
+     * Estos par&aacute;metrosd extra se indicar&aacute;n como un listado de cadenas
+     * con la forma {code CLAVE=VALOR}, en donde {@code CLAVE} es el nombre de la
+     * propiedad y {@code VALOR} el valor asignada a esta. Para utilizar el valor
+     * por defecto de una propiedad se dejar&aacute; de indicar esta en el listado de
+     * par&aacute;metros.
      * @param data Datos a firmar en Base64.
      * @param algorithm Algoritmo de firma.
      * @param format Formato de firma.
      * @param extraParams Par&aacute;metros adicionales para configurar la operac&oacute;n.
      * @return Firma electr&oacute;nica resultante en Base64.
+     * @throws IOException Cuando se produce un error durante la firma electr&oacute;nica.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String sign(String data, String algorithm, String format, String extraParams);
+    String sign(String data, String algorithm, String format, String[] extraParams) throws IOException, PrivilegedActionException;
 
     /**
      * Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
@@ -80,8 +86,10 @@ public interface MiniAfirma {
      * Si no se reconoce el formato de firma, se devuelve {@code null}.
      * @param sign Firma en Base64.
      * @return &Aacute;rbol de firmantes.
+     * @throws IOException Cuabndo se produzca un error al decodificar el base64.
+     * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
      */
-    String getSignersStructure(String sign);
+    String getSignersStructure(String signB64) throws IOException ;
 
     /**
      * Realiza una firma en cascada (Contrafirma) sobre una firma. SI no se indica lo contrario mediante <i>extraParams</i>
@@ -103,20 +111,20 @@ public interface MiniAfirma {
      * @param extension Extensi&oacute;n del fichero a guardar (que habitualmente indica el tipo)
      * @return {@code true} en caso de guardarse correctamente, {@code false} en caso
      * contrario.
+     * @throws IOException Cuando ocurre alg&uacute;n error en el guardado del fichero.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    boolean saveDataToFile(String data, String fileName, String extension);
+    boolean saveDataToFile(String data, String fileName, String extension) throws IOException, PrivilegedActionException;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
-     * que se devolver&aacute; el contenido en Base64. Si ocurre un error durante
-     * la operaci&oacute;n se devuelve {@code null}. Se usar&aacute; las funcionalidades
-     * de JNLP siempre que sea posible
+     * que se devolver&aacute; el contenido en Base64. Si el usuario cancela la operaci&oacute;n
+     * de selecci&oacute;n del fichero se devuelve {@code null}. Se usar&aacute; las funcionalidades
+     * de JNLP siempre que sea posible.
      * @return El contenido del fichero codificado en Base64.
-     * @throws IOException 
-     * @throws AOCancelledOperationException 
-     * @throws UnavailableServiceException 
-     * @throws Exception 
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String getFileContent() throws AOCancelledOperationException, IOException, UnavailableServiceException, Exception;
+    String getFileContent() throws IOException, PrivilegedActionException;
 
     /** Decodifica un texto en Base64. Si se produce alg&uacute;n error se
      * devuelve {@code null}.
@@ -144,14 +152,14 @@ public interface MiniAfirma {
     String getBase64FromText(String plainText);
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
-     * del que se recuperar&aacute; su ruta completa. Si no se selecciona
+     * del que se recuperar&aacute; su nombre. Si no se selecciona
      * ning&uacute;n fichero, se devuelve <code>null</code>. Se usar&aacute; las funcionalidades
-     * de JNLP siempre que sea posible
-     * @param title T&iacute;tulo del di&aacute;logo modal.
+     * de JNLP siempre que sea posible.
      * @param exts Extensiones de b&uacute;squeda.
-     * @param description Descripcion del tipo de ficheros buscado.
-     * @return Ruta completa del fichero seleccionado. Se devuleve la ruta absoluta, pero no la can&oacute;nica
+     * @return Nombre del fichero seleccionado.
+     * @throws IOException Cuando se produce un error al seleccionar el fichero.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String loadFilePath(String title, String exts, String description) throws IOException, UnavailableServiceException;
+    String loadFilename(String exts) throws IOException, PrivilegedActionException;
     
 }
