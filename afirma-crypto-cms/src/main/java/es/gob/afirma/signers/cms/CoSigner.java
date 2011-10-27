@@ -132,7 +132,7 @@ final class CoSigner {
         // 3. CONTENTINFO
         // si se introduce el contenido o no
         ContentInfo encInfo = null;
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
 
         if (omitContent == false) {
             final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
@@ -462,7 +462,7 @@ final class CoSigner {
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
+        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
 
         // fecha de firma
         contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
@@ -515,7 +515,7 @@ final class CoSigner {
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType.toString()))));
+        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
 
         // fecha de firma
         contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));

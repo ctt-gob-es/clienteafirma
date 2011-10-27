@@ -156,7 +156,7 @@ public final class GenSignedData {
         // si se introduce el contenido o no
 
         ContentInfo encInfo;
-        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType.toString());
+        final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(dataType);
 
         if (omitContent == false) {
             final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
@@ -254,7 +254,7 @@ public final class GenSignedData {
      *        Algoritmo Firmado.
      * @param datos
      *        Datos firmados.
-     * @param datatype
+     * @param dataType
      *        Identifica el tipo del contenido a firmar.
      * @param timestamp
      *        Introducir TimeStaming
@@ -266,7 +266,7 @@ public final class GenSignedData {
     private ASN1Set generateSignerInfo(final X509Certificate cert,
                                        String digestAlgorithm,
                                        final byte[] datos,
-                                       final String datatype,
+                                       final String dataType,
                                        final boolean timestamp,
                                        final Map<String, byte[]> atrib,
                                        final byte[] messageDigest) throws NoSuchAlgorithmException {
@@ -277,7 +277,7 @@ public final class GenSignedData {
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype.toString()))));
+        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
 
         // fecha de firma
         if (timestamp) {
