@@ -66,7 +66,7 @@ public class AOKeyStoreManager {
     }
     
     /**
-     * Inicializa un almacen PKCS#11.
+     * Inicializa un almac&eacute;n PKCS#11.
      * @param pssCallBack Callback para la recuperaci&oacute;n de la
      *        contrase&ntilde;a del almac&eacute;n.
      * @param params Parametros adicionales para la configuraci&oacute;n del
@@ -689,7 +689,7 @@ public class AOKeyStoreManager {
     }
 
     /** Recupera el repositorio que posea la descripci&oacute;n indicada. Si no
-     * existe un keystore con la descripci&oacute;n indicada, se devuleve <code>null</code>.
+     * existe un keystore con la descripci&oacute;n indicada, se devuelve <code>null</code>.
      * @param description
      *        Descripci&oacute;n del repositorio que se desea recuperar.
      * @return KeyStore Repositorio de certificados. */
