@@ -113,6 +113,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
         
 		c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
+        c.weighty=0.1;
         c.insets = new Insets(5, 13, 5, 13);
         c.gridy = 0;
         
@@ -149,11 +150,11 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 			j =Integer.parseInt(Main.preferences.get("users", "0"))+1; 
 		}
 		final String[] users = new String[j];
-		final String[] userssss = new String[j];
+		final String[] actual_user = new String[j];
 		for (int i = 0;i<=Integer.parseInt(Main.preferences.get("users", "0"))-1;i++){
-	        	userssss[i] = "user" + (i+1);
+	        	actual_user[i] = "user" + (i+1);
 	        	
-	        	users[i]=(Main.preferences.get(userssss[i], "error"));
+	        	users[i]=(Main.preferences.get(actual_user[i], "error"));
 	        	
 	    }
 		users[users.length-1] = Constants.defaultUser;
