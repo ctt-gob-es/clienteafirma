@@ -369,7 +369,12 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		int maxWidth = (int)rect.getWidth();
 		int maxHeight = (int)rect.getHeight();
 		//Se hace el resize
-		j.setBounds(0,0, maxWidth, maxHeight);
+		//Se hace el resize dependiendo del so
+		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+			this.setBounds(0,0, maxWidth, maxHeight);
+		} else {
+			this.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+		}
 		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
 		this.maximizar.setEnabled(false);
 		this.restaurar.setEnabled(true);

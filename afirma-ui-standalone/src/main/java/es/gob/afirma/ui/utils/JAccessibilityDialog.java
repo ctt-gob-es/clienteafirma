@@ -104,7 +104,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 
 	    //Dimensiones actuales del dialogo
-	    Dimension actualSize = getJAccessibilityDialog(this).getSize();
+	    Dimension actualSize = this.getSize();
 	    if (actualSize.equals(fullScreen)){
 	    	this.setResizable(false);
 	    } else {

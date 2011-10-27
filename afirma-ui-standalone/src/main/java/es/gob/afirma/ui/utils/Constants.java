@@ -146,6 +146,6 @@ public class Constants {
     /**
      * Margen a restar para calcular el tamaño de una ventana maximizada para linux.
      */
-    public static int maximizeVerticalMarginLinux = 48;
+    public static int maximizeVerticalMarginLinux = 52;
 }
 
