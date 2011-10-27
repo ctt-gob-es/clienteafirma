@@ -82,10 +82,10 @@ final class NSPreferences {
      *         configuraci&oacute;n. */
     private static FirefoxProfile[] readProfiles(final File iniFile) throws IOException {
 
-        final String NAME_ATR = "name="; //$NON-NLS-1$
-        final String IS_RELATIVE_ATR = "isrelative="; //$NON-NLS-1$
-        final String PATH_PROFILES_ATR = "path="; //$NON-NLS-1$
-        final String IS_DEFAULT_ATR = "default="; //$NON-NLS-1$
+        final String nameAtr = "name="; //$NON-NLS-1$
+        final String isRelativeAtr = "isrelative="; //$NON-NLS-1$
+        final String pathProfilesAtr = "path="; //$NON-NLS-1$
+        final String isDefaultAtr = "default="; //$NON-NLS-1$
 
         String line = null;
         final Vector<FirefoxProfile> profiles = new Vector<FirefoxProfile>();
@@ -100,20 +100,20 @@ final class NSPreferences {
 
                 final FirefoxProfile profile = new FirefoxProfile();
                 while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
-                    if (line.trim().toLowerCase().startsWith(NAME_ATR)) {
-                        profile.name = line.trim().substring(NAME_ATR.length());
+                    if (line.trim().toLowerCase().startsWith(nameAtr)) {
+                        profile.name = line.trim().substring(nameAtr.length());
                     }
-                    else if (line.trim().toLowerCase().startsWith(IS_RELATIVE_ATR)) {
+                    else if (line.trim().toLowerCase().startsWith(isRelativeAtr)) {
                         profile.isRelative =
-                                line.trim().substring(IS_RELATIVE_ATR.length()).equals("1"); //$NON-NLS-1$
+                                line.trim().substring(isRelativeAtr.length()).equals("1"); //$NON-NLS-1$
                     }
-                    else if (line.trim().toLowerCase().startsWith(PATH_PROFILES_ATR)) {
+                    else if (line.trim().toLowerCase().startsWith(pathProfilesAtr)) {
                         profile.path =
-                                line.trim().substring(PATH_PROFILES_ATR.length());
+                                line.trim().substring(pathProfilesAtr.length());
                     }
-                    else if (line.trim().toLowerCase().startsWith(IS_DEFAULT_ATR)) {
+                    else if (line.trim().toLowerCase().startsWith(isDefaultAtr)) {
                         profile.isDefault =
-                                line.trim().substring(IS_DEFAULT_ATR.length()).equals("1"); //$NON-NLS-1$
+                                line.trim().substring(isDefaultAtr.length()).equals("1"); //$NON-NLS-1$
                     }
                     else {
                         break;

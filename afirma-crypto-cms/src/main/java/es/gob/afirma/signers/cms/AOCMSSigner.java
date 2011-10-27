@@ -269,9 +269,9 @@ public final class AOCMSSigner implements AOSigner {
     }
 
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
-        final ReadNodesTree Rn = new ReadNodesTree();
+        final ReadNodesTree rn = new ReadNodesTree();
         try {
-            return Rn.readNodesTree(sign, asSimpleSignInfo);
+            return rn.readNodesTree(sign, asSimpleSignInfo);
         }
         catch (final Exception ex) {
             LOGGER.severe(ex.toString());

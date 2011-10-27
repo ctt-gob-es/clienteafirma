@@ -274,14 +274,14 @@ public final class GenSignedData {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // tipo de contenido
-        ContexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype.toString()))));
+        contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(datatype.toString()))));
 
         // fecha de firma
         if (timestamp) {
-            ContexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
+            contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(new Date()))));
         }
 
         // Si nos viene el hash de fuera no lo calculamos
@@ -294,11 +294,11 @@ public final class GenSignedData {
         }
 
         // MessageDigest
-        ContexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(md.clone()))));
+        contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(md.clone()))));
 
         // Serial Number
         // comentar lo de abajo para version del rfc 3852
-        ContexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
+        contexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
 
         // agregamos la lista de atributos a mayores.
         if (atrib.size() != 0) {
@@ -306,7 +306,7 @@ public final class GenSignedData {
             final Iterator<Map.Entry<String, byte[]>> it = atrib.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
-                ContexExpecific.add(new Attribute(
+                contexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
                                                   // el array de bytes en formato string
@@ -315,9 +315,9 @@ public final class GenSignedData {
 
         }
 
-        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
 
-        return SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
 
     }
 
@@ -332,14 +332,14 @@ public final class GenSignedData {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        final ASN1EncodableVector ContexExpecific = new ASN1EncodableVector();
+        final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
         // agregamos la lista de atributos a mayores.
         if (uatrib.size() != 0) {
             final Iterator<Map.Entry<String, byte[]>> it = uatrib.entrySet().iterator();
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
-                ContexExpecific.add(new Attribute(
+                contexExpecific.add(new Attribute(
                 // el oid
                                                   new DERObjectIdentifier((e.getKey()).toString()),
                                                   // el array de bytes en formato string
@@ -350,7 +350,7 @@ public final class GenSignedData {
             return null;
         }
 
-        return SigUtils.getAttributeSet(new AttributeTable(ContexExpecific));
+        return SigUtils.getAttributeSet(new AttributeTable(contexExpecific));
 
     }
 
