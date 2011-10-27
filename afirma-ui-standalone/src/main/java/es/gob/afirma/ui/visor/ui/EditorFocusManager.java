@@ -70,8 +70,8 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         	StyleConstants.setBackground(this.linkFocusedStyle, Color.WHITE);
             StyleConstants.setForeground(this.linkFocusedStyle, Color.BLACK);
         } else {
-        	StyleConstants.setBackground(this.linkFocusedStyle, UIManager.getColor("TREE.selectionBackground")); //$NON-NLS-1$
-            StyleConstants.setForeground(this.linkFocusedStyle, UIManager.getColor("TREE.selectionForeground")); //$NON-NLS-1$
+        	StyleConstants.setBackground(this.linkFocusedStyle, Color.BLUE); //$NON-NLS-1$
+            StyleConstants.setForeground(this.linkFocusedStyle, Color.WHITE); //$NON-NLS-1$
         }
         
         final AccessibleHypertext accessibleHypertext = (AccessibleHypertext) this.displayPane.getAccessibleContext().getAccessibleText();        
