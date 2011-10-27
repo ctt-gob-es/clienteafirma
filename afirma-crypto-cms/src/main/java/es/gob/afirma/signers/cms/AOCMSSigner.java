@@ -316,7 +316,7 @@ public final class AOCMSSigner implements AOSigner {
         this.uatrib.put(oid, value);
     }
 
-    public byte[] getData(final byte[] signData) throws AOInvalidFormatException, AOException {
+    public byte[] getData(final byte[] signData) throws AOException {
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
         }
@@ -330,7 +330,7 @@ public final class AOCMSSigner implements AOSigner {
         return originalName + (inText != null ? inText : "") + ".csig";  //$NON-NLS-1$//$NON-NLS-2$
     }
 
-    public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
 
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$

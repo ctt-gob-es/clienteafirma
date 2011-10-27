@@ -52,7 +52,7 @@ final class AOInstallUtils {
      * @throws URISyntaxException 
      * @throws IOException 
      * @throws FileNotFoundException */
-    static void unpack(final String pack200Filename) throws FileNotFoundException, IOException, URISyntaxException {
+    static void unpack(final String pack200Filename) throws IOException, URISyntaxException {
 
         // Obtenemos el nombre del fichero de salida
         String jarFilename = pack200Filename + JAR_SUFIX;
@@ -73,7 +73,7 @@ final class AOInstallUtils {
      * @throws URISyntaxException 
      * @throws IOException 
      * @throws FileNotFoundException */
-    static void unpack(final String pack200Filename, final String targetJarFilename) throws FileNotFoundException, IOException, URISyntaxException {
+    static void unpack(final String pack200Filename, final String targetJarFilename) throws IOException, URISyntaxException {
         if (pack200Filename == null) {
             throw new IllegalArgumentException("El Pack200 origen no puede ser nulo"); //$NON-NLS-1$
         }

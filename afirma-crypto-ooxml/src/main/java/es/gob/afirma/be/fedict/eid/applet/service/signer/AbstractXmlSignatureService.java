@@ -77,7 +77,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -383,21 +382,18 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         throw new IllegalArgumentException("unsupported sign algo: " + digestAlgo); //$NON-NLS-1$
     }
 
-    private void writeDocument(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,
-                                                                                                  TransformerException,
+    private void writeDocument(final Document document, final OutputStream documentOutputStream) throws TransformerException,
                                                                                                   IOException {
         writeDocumentNoClosing(document, documentOutputStream);
         documentOutputStream.close();
     }
 
-    private  void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,
-                                                                                                           TransformerException {
+    private void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream) throws TransformerException {
         // we need the XML processing initial line for OOXML
         writeDocumentNoClosing(document, documentOutputStream, false);
     }
 
-    protected void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream, final boolean omitXmlDeclaration) throws TransformerConfigurationException,
-                                                                                                                                             TransformerException {
+    protected void writeDocumentNoClosing(final Document document, final OutputStream documentOutputStream, final boolean omitXmlDeclaration) throws TransformerException {
         final NoCloseOutputStream outputStream = new NoCloseOutputStream(documentOutputStream);
         final Result result = new StreamResult(outputStream);
         final Transformer xformer = TransformerFactory.newInstance().newTransformer();

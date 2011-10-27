@@ -48,9 +48,7 @@ import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -129,8 +127,6 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
     private ZipOutputStream copyOOXMLContent(final String signatureZipEntryName, final OutputStream signedOOXMLOutputStream) throws IOException,
                                                                                                                             ParserConfigurationException,
                                                                                                                             SAXException,
-                                                                                                                            TransformerConfigurationException,
-                                                                                                                            TransformerFactoryConfigurationError,
                                                                                                                             TransformerException {
         final ZipOutputStream zipOutputStream = new ZipOutputStream(signedOOXMLOutputStream);
         final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.getOfficeOpenXMLDocument()));
@@ -221,8 +217,6 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
 
     private void addOriginSigsRels(final String signatureZipEntryName, final ZipOutputStream zipOutputStream) throws ParserConfigurationException,
                                                                                                              IOException,
-                                                                                                             TransformerConfigurationException,
-                                                                                                             TransformerFactoryConfigurationError,
                                                                                                              TransformerException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);

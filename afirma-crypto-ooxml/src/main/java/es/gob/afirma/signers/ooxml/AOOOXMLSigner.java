@@ -52,7 +52,7 @@ public final class AOOOXMLSigner implements AOSigner {
         }
     }
 
-    public byte[] getData(final byte[] sign) throws AOInvalidFormatException, AOException {
+    public byte[] getData(final byte[] sign) throws AOException {
 
         // Si no es una firma OOXML valida, lanzamos una excepcion
         if (!isSign(sign)) {
@@ -89,7 +89,7 @@ public final class AOOOXMLSigner implements AOSigner {
                && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
