@@ -19,22 +19,16 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.Properties;
 
-import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
-import javax.swing.event.ListDataListener;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
