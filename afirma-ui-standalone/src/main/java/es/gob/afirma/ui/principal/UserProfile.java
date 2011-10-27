@@ -21,15 +21,20 @@ import java.util.Properties;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.event.ListDataListener;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
@@ -61,8 +66,8 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	}
     
     public static String currentUser;
-    
-    JList list = new JList();
+        
+    JComboBox comboPerfiles = new JComboBox();
 	
 	/**
 	 * Posición X inicial de la ventana dependiendo de la resolución de pantalla.
@@ -137,7 +142,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		JLabel label = new JLabel();
 		label.setText(Messages.getString("UserProfile.list.label")); // NOI18N
 		label.setDisplayedMnemonic(KeyEvent.VK_P);
-		label.setLabelFor(list);
+		label.setLabelFor(comboPerfiles);
 		
 		add(label,c);
 		c.gridy = c.gridy + 1;
@@ -159,34 +164,18 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	    }
 		users[users.length-1] = Constants.defaultUser;
 		final String[] strings = users;
-
-		list.setModel(new AbstractListModel() {
-			private static final long serialVersionUID = 1L;
-
-				public int getSize() { 
-					return strings.length; 
-				}
-
-				public Object getElementAt(int i) { 
-					return strings[i]; 
-				}
-			});
-		list.setSelectedIndex(strings.length-1);
-		config(list);
-		if (strings.length<4){
-			list.setVisibleRowCount(strings.length);
-		} else {
-			list.setVisibleRowCount(4);
-		}
-		JScrollPane barra = new JScrollPane(list);
-		add(barra, c); 
+		comboPerfiles.setModel(new DefaultComboBoxModel(strings));
+		comboPerfiles.setSelectedIndex(strings.length-1);
+		config(comboPerfiles);
+ 
+		add(comboPerfiles,c);
 		
 		c.gridy = c.gridy + 1;
 		c.insets = new Insets(0, 0, 0, 0);
 		add(createButtonsPanel(), c);
 		
         //Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(list, "perfil.cargar");
+        HelpUtils.enableHelpKey(comboPerfiles, "perfil.cargar");
        
 		
 	}
@@ -306,10 +295,10 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
      * 
      */
     public void aceptarPerformed(){
-    	if (list.getSelectedValue()==null){
+    	if (comboPerfiles.getSelectedItem().toString()==Constants.defaultUser){
     		currentUser = Constants.defaultUser;
     	} else {
-    		currentUser = list.getSelectedValue().toString();
+    		currentUser = comboPerfiles.getSelectedItem().toString();
     	}
     	Properties config = new Properties();
     	config.setProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.fontBig", "false"));
@@ -343,14 +332,14 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 			});
 			
 		}
-    	if (component instanceof JList){
-			final JList list = (JList) component;
-			list.addFocusListener(new FocusListener() {
+    	if (component instanceof JComboBox){
+			final JComboBox combo = (JComboBox) component;
+			combo.addFocusListener(new FocusListener() {
 				public void focusLost(FocusEvent e) {
-					list.setBorder(BorderFactory.createEmptyBorder());
+					combo.setBorder(BorderFactory.createEmptyBorder());
 				}
 				public void focusGained(FocusEvent e) {
-					list.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+					combo.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
 			});
 		}
