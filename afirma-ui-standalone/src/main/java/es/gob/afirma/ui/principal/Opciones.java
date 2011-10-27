@@ -130,6 +130,10 @@ public class Opciones extends JAccessibilityDialog {
     		int maxHeight = (int)rect.getHeight();
     		
 			this.setBounds(0,0, maxWidth, maxHeight);
+			
+
+			this.maximizar.setEnabled (false);
+			this.restaurar.setEnabled (true);
 
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			if (Platform.getOS().equals(Platform.OS.LINUX)){
@@ -141,6 +145,10 @@ public class Opciones extends JAccessibilityDialog {
     			setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
     		}
     	} else {
+    		
+    		this.maximizar.setEnabled (true);
+			this.restaurar.setEnabled (false);
+
     		if (PrincipalGUI.optionActualPositionX != -1){
 	    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 	    			setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
@@ -586,6 +594,9 @@ public class Opciones extends JAccessibilityDialog {
 		int maxWidth = (int)rect.getWidth();
 		int maxHeight = (int)rect.getHeight();
 		
+		this.maximizar.setEnabled (false);
+		this.restaurar.setEnabled (true);
+		
 		//Se hace el resize
 		j.setBounds(0,0, maxWidth, maxHeight);
 	}
@@ -610,6 +621,8 @@ public class Opciones extends JAccessibilityDialog {
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}
+		this.maximizar.setEnabled (true);
+		this.restaurar.setEnabled (false);
 	}
 	
 	private class OpenHelpActionListener implements ActionListener {

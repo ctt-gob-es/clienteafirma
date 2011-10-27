@@ -11,6 +11,8 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.JDialog;
 
+import es.gob.afirma.core.misc.Platform;
+
 /**
  * Clase para generar un JDialog con la posibilidad de redimension.
  * Extiende JDialog
@@ -88,31 +90,35 @@ public abstract class JAccessibilityDialog extends JDialog {
 	 */
 	public void resized(ComponentEvent e) {
 
-		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		int maxWidth = (int)rect.getWidth();
-		int maxHeight = (int)rect.getHeight();
-		
-	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-
-	    //Dimensiones actuales del dialogo
-	    Dimension actualSize = getJAccessibilityDialog(this).getSize();
-	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialog(this));
-	    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialog(this));
-	    if(botonMaximizar != null){
-	    	if (actualSize.equals(fullScreen)){
-				botonMaximizar.setEnabled(false);
-				if (botonRestaurar != null) {
-	    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
-	    			botonRestaurar.setEnabled(true);
-	    		}
-		    } else {
-		    	botonMaximizar.setEnabled(true);
-		    	if (botonRestaurar != null) {
-			    	botonRestaurar.setEnabled(false); //Se deshabilita
-		    	}
+		/*if (!Platform.getOS().equals(Platform.OS.LINUX)){
+			//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+			Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+			int maxWidth = (int)rect.getWidth();
+			int maxHeight = (int)rect.getHeight();
+			
+			
+			
+		    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+	
+		    //Dimensiones actuales del dialogo
+		    Dimension actualSize = getJAccessibilityDialog(this).getSize();
+		    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialog(this));
+		    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialog(this));
+		    if(botonMaximizar != null){
+		    	if (actualSize.equals(fullScreen)){
+					botonMaximizar.setEnabled(false);
+					if (botonRestaurar != null) {
+		    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
+		    			botonRestaurar.setEnabled(true);
+		    		}
+			    } else {
+			    	botonMaximizar.setEnabled(true);
+			    	if (botonRestaurar != null) {
+				    	botonRestaurar.setEnabled(false); //Se deshabilita
+			    	}
+			    }
 		    }
-	    }
+		}*/
 	}
 	
 	/**

@@ -107,7 +107,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 * @param container Contenedor donde se encuentra el componente a buscar
 	 * @return
 	 */
-	private Component getComponentByName(String name, Container container){
+	/*private Component getComponentByName(String name, Container container){
 		if(name.equals(container.getName())){
 			return container;
 		}
@@ -128,7 +128,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			}
 		}
 		return null;
-	}
+	}*/
 	
 	@Override
 	/**
@@ -136,7 +136,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 *  de Maximizar ventana
 	 */
 	public void componentResized(ComponentEvent e) {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		/*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 	    Dimension actualSize = getJAccessibilityDialogWizard(this).getSize();
 	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
@@ -154,8 +154,22 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			    	botonRestaurar.setEnabled(false); //Se deshabilita
 		    	}
 		    }
-	    }
+	    }*/
 	}
+
+/*	*//**
+	 * Método que activa o desactiva el componente según lo indicado por parámetros.
+	 * @param idComponent identificador del componente
+	 * @param enabled estado
+	 *//*
+	private void setStateComponent(String idComponent, boolean enabled) {
+		Component component = getComponentByName(idComponent, getJAccessibilityDialogWizard(this));
+		if(component != null){
+			component.setEnabled(enabled);
+		}
+	}*/
+	
+	
 	
 	/**
 	 * Busca el JAccessibilityDialogWizard padre de un componente.

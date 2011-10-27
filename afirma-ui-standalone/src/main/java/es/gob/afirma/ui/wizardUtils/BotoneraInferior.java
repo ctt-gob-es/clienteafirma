@@ -40,6 +40,9 @@ public class BotoneraInferior extends JPanel {
 	private List<JDialogWizard> ventanas;
 	private int posicion;
 	
+	private JButton restaurar = null; 
+	private JButton maximizar = null; 
+	
 	public List<JDialogWizard> getVentanas() {
 		return this.ventanas;
 	}
@@ -74,7 +77,7 @@ public class BotoneraInferior extends JPanel {
         setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 
         // Definicion de botones
-        final JButton maximizar = new JButton();
+        maximizar = new JButton();
         final JButton anterior = new JButton();
         final JButton siguiente = new JButton();
         final JButton cancelar = new JButton();
@@ -99,7 +102,7 @@ public class BotoneraInferior extends JPanel {
         
         JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
 	    // Boton restaurar
-	    JButton restaurar = new JButton();
+	    restaurar = new JButton();
 	    restaurar.setText(Messages.getString("Wizard.restaurar"));
 	    restaurar.setName("restaurar");
 	    restaurar.setMnemonic(KeyEvent.VK_R);
@@ -114,6 +117,14 @@ public class BotoneraInferior extends JPanel {
 	    
 	    panelRestaurar.add(restaurar);
 	    add(panelRestaurar);
+	    
+	    //Control de habilitado de los botones de maximizar y restaurar según la configuración de
+	    //accesibilidad
+	    if (GeneralConfig.isMaximized()){
+        	maximizar.setEnabled(false);
+        } else {
+        	restaurar.setEnabled(false);
+        }
         
         //Espacio entre botones
 		JPanel panelVacio = new JPanel();
@@ -262,6 +273,9 @@ public class BotoneraInferior extends JPanel {
 		JAccessibilityDialogWizard.actualWidth = j.getWidth();
 		JAccessibilityDialogWizard.actualHeight = j.getHeight();
 		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
+		this.maximizar.setEnabled(false);
+		this.restaurar.setEnabled(true);
 	}
 	
 	/**
@@ -280,6 +294,9 @@ public class BotoneraInferior extends JPanel {
 			}
     		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
 		}
+		//Se deshabilita el botón de restaurar puesto que se ha pulsado.
+		this.maximizar.setEnabled(true);
+		this.restaurar.setEnabled(false);
 	}
 	
 	/**
