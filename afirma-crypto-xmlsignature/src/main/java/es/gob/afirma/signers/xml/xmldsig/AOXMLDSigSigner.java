@@ -1897,7 +1897,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return docAfirma;
     }
 
-    public AOSignInfo getSignInfo(final byte[] sign) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }

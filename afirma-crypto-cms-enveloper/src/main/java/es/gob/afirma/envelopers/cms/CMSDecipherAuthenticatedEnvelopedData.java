@@ -56,7 +56,6 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
     public byte[] dechiperAuthenticatedEnvelopedData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                               CertificateEncodingException,
                                                                                               AOException,
-                                                                                              AOInvalidRecipientException,
                                                                                               InvalidKeyException {
 
         // Contendra el contenido a tratar.

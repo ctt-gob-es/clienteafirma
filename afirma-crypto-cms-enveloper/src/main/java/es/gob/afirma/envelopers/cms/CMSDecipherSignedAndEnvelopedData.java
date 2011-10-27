@@ -55,7 +55,6 @@ public final class CMSDecipherSignedAndEnvelopedData {
     public byte[] dechiperSignedAndEnvelopData(final byte[] cmsData, final PrivateKeyEntry keyEntry) throws IOException,
                                                                                         CertificateEncodingException,
                                                                                         AOException,
-                                                                                        AOInvalidRecipientException,
                                                                                         InvalidKeyException {
 
         // Contendra el contenido a tratar.

@@ -639,7 +639,7 @@ public final class AOODFSigner implements AOSigner {
         return signData;
     }
 
-    public AOSignInfo getSignInfo(final byte[] signData) throws AOInvalidFormatException, AOException {
+    public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
         }
