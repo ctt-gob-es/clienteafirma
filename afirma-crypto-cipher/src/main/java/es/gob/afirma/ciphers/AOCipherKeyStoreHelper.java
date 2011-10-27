@@ -214,7 +214,7 @@ public final class AOCipherKeyStoreHelper {
     /** Obtiene la ruta absoluta del fichero de almac&eacute;n de las claves de
      * cifrado.
      * @return Ruta absoluta del fichero. */
-    public final static String getCipherKeystore() {
+    public static final String getCipherKeystore() {
         return Platform.getUserHome() + File.separator + "ciphkeys.jceks"; //$NON-NLS-1$
     }
 }

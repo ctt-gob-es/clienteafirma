@@ -47,7 +47,6 @@ public final class ReadNodesTree {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
     private String StringRetorn = ""; //$NON-NLS-1$
-    private AOTreeNode raiz;
     private AOTreeNode rama;
     private AOTreeNode rama2;
     private int seleccionados[];
@@ -111,7 +110,7 @@ public final class ReadNodesTree {
         }
 
         // Para la creacion del arbol
-        this.raiz = new AOTreeNode("Datos"); //$NON-NLS-1$
+        final AOTreeNode raiz = new AOTreeNode("Datos"); //$NON-NLS-1$
 
         // introducimos el nuevo SignerInfo del firmante actual.
 
@@ -128,7 +127,7 @@ public final class ReadNodesTree {
                 this.listaCert.add(nameSigner);
                 getUnsignedAtributesWithCertificates(si.getUnauthenticatedAttributes(), this.rama, certificates);
 
-                this.raiz.add(this.rama);
+                raiz.add(this.rama);
             }
         }
         else if (signerInfosSd != null) {
@@ -141,11 +140,11 @@ public final class ReadNodesTree {
                 this.lista.add(nameSigner);
                 getUnsignedAtributes(si.getUnauthenticatedAttributes(), this.rama, certificates);
 
-                this.raiz.add(this.rama);
+                raiz.add(this.rama);
             }
         }
 
-        return new AOTreeModel(this.raiz);
+        return new AOTreeModel(raiz);
     }
 
     /** M&eacute;todo para obtener las contrafirmas.

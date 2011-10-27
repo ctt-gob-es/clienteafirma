@@ -26,11 +26,11 @@ final class OOXMLUtil {
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** Tipo de relaci&oacute;n correspondiente a una firma OOXML. */
-    private final static String OOXML_SIGNATURE_RELATIONSHIP_TYPE =
+    private static final String OOXML_SIGNATURE_RELATIONSHIP_TYPE =
             "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature"; //$NON-NLS-1$
 
     /** Tipo de relaci&oacute;n correspondiente a la relaci&oacute;n de firmas OOXML. */
-    private final static String OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE =
+    private static final String OOXML_SIGNATURE_ORIGIN_RELATIONSHIP_TYPE =
             "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin"; //$NON-NLS-1$
 
     /** Cuenta el n&uacute;mero de firmas del documento OOXML. Si se produce

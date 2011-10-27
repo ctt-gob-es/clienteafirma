@@ -93,7 +93,7 @@ public abstract class AbstractOOXMLSignatureService extends AbstractXmlSignature
     }
 
     /** Gives back the OOXML to be signed. */
-    abstract protected byte[] getOfficeOpenXMLDocument();
+    protected abstract byte[] getOfficeOpenXMLDocument();
 
     /** Obtiene el fichero OOXMLK firmado.
      * @param signatureData

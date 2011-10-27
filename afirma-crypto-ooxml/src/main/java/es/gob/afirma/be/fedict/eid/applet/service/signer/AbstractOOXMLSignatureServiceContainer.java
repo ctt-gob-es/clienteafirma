@@ -50,7 +50,7 @@ public final class AbstractOOXMLSignatureServiceContainer {
     private static final class OOXMLSignatureService extends AbstractOOXMLSignatureService {
 
         @Override
-        protected final String getSignatureDigestAlgorithm() {
+        protected String getSignatureDigestAlgorithm() {
             return this.digestAlgorithm;
         }
 
@@ -74,7 +74,7 @@ public final class AbstractOOXMLSignatureServiceContainer {
         }
 
         @Override
-        protected final byte[] getOfficeOpenXMLDocument() {
+        protected byte[] getOfficeOpenXMLDocument() {
             return this.ooxml;
         }
 
@@ -88,7 +88,7 @@ public final class AbstractOOXMLSignatureServiceContainer {
      * @param signerCount N&uacute;mero de firma
      * @return Documento OOXML firmado
      * @throws Exception Cuando ocurre cualquier problema durante el proceso */
-    public final byte[] sign(final InputStream ooxml,
+    public byte[] sign(final InputStream ooxml,
                              final List<X509Certificate> certChain,
                              final String digestAlgorithm,
                              final PrivateKey pk,

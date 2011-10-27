@@ -60,7 +60,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
 
         @Override
         public void handleStartTag(final HTML.Tag t, final MutableAttributeSet a, final int pos) {
-            if (t.toString().toLowerCase().equals("afirma")) { //$NON-NLS-1$
+            if (t.toString().equalsIgnoreCase("afirma")) { //$NON-NLS-1$
                 final String type = (String) a.getAttribute(HTML.Attribute.TYPE);
                 if (type != null && type.equals("file")) { //$NON-NLS-1$
                     final String uri = (String) a.getAttribute(HTML.Attribute.HREF);
@@ -75,7 +75,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
 
         @Override
         public void handleEndTag(final HTML.Tag t, final int pos) {
-            if (!t.toString().toLowerCase().equals("afirma")) { //$NON-NLS-1$
+            if (!t.toString().equalsIgnoreCase("afirma")) { //$NON-NLS-1$
                 super.handleEndTag(t, pos);
             }
             this.tagLevel--;
@@ -83,7 +83,7 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
 
         @Override
         public void handleSimpleTag(final HTML.Tag t, final MutableAttributeSet a, final int pos) {
-            if (t.toString().toLowerCase().equals("afirma")) { //$NON-NLS-1$
+            if (t.toString().equalsIgnoreCase("afirma")) { //$NON-NLS-1$
                 if (!a.isDefined(HTML.Attribute.ENDTAG)) {
                     final String type = (String) a.getAttribute(HTML.Attribute.TYPE);
                     if (type != null && type.equals("file")) { //$NON-NLS-1$
