@@ -46,7 +46,7 @@ public final class ReadNodesTree {
 
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
     
-    private String StringRetorn = ""; //$NON-NLS-1$
+    private String stringRetorn = ""; //$NON-NLS-1$
     private AOTreeNode rama;
     private AOTreeNode rama2;
     private int seleccionados[];
@@ -64,11 +64,11 @@ public final class ReadNodesTree {
     // DefaultTreeModel modelo;
 
     String getStringRetorn() {
-        return this.StringRetorn;
+        return this.stringRetorn;
     }
 
-    void setStringRetorn(final String StringRetorn) {
-        this.StringRetorn = StringRetorn;
+    void setStringRetorn(final String stringRetorn) {
+        this.stringRetorn = stringRetorn;
     }
 
     /** Genera el &aacute;rbol que representa las firmas.
