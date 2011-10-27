@@ -11,7 +11,6 @@
 package es.gob.afirma.applet.old.websign;
 
 import java.awt.BorderLayout;
-import java.awt.HeadlessException;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
