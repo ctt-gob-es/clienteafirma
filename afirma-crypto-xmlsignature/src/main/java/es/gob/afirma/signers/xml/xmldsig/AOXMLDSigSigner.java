@@ -668,21 +668,18 @@ public final class AOXMLDSigSigner implements AOSigner {
                 throw new AOException("Error al generar la firma en formato enveloping", e); //$NON-NLS-1$
             }
 
-            // Hojas de estilo para enveloping en Externally Detached
-            if (styleHref != null && styleElement == null) {
-                // Comprobamos si la referencia al estilo es externa
-                if (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX)) { 
-                    try {
-                        referenceList.add(fac.newReference(styleHref,
-                                                           digestMethod,
-                                                           Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                      (TransformParameterSpec) null)),
-                                                           null,
-                                                           referenceStyleId));
-                    }
-                    catch (final Exception e) {
-                        LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
-                    }
+            // Hojas de estilo para enveloping en Externally Detached. Comprobamos si la referencia al estilo es externa
+            if ((styleHref != null && styleElement == null) && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
+                try {
+                    referenceList.add(fac.newReference(styleHref,
+                                                       digestMethod,
+                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
+                                                                                                  (TransformParameterSpec) null)),
+                                                       null,
+                                                       referenceStyleId));
+                }
+                catch (final Exception e) {
+                    LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
                 }
             }
 
@@ -718,21 +715,18 @@ public final class AOXMLDSigSigner implements AOSigner {
                 throw new AOException("Error al generar la firma en formato detached implicito", e); //$NON-NLS-1$
             }
 
-            // Hojas de estilo remotas para detached
-            if (styleHref != null && styleElement == null) {
-                // Comprobamos si la referencia al estilo es externa
-                if (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX)) { 
-                    try {
-                        referenceList.add(fac.newReference(styleHref,
-                                                           digestMethod,
-                                                           Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                      (TransformParameterSpec) null)),
-                                                           null,
-                                                           referenceStyleId));
-                    }
-                    catch (final Exception e) {
-                        LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
-                    }
+            // Hojas de estilo remotas para detached. Comprobamos si la referencia al estilo es externa
+            if ((styleHref != null && styleElement == null) && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
+                try {
+                    referenceList.add(fac.newReference(styleHref,
+                                                       digestMethod,
+                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
+                                                                                                  (TransformParameterSpec) null)),
+                                                       null,
+                                                       referenceStyleId));
+                }
+                catch (final Exception e) {
+                    LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
                 }
             }
 
@@ -855,23 +849,19 @@ public final class AOXMLDSigSigner implements AOSigner {
                 throw new AOException("Error al generar la firma en formato enveloped", e); //$NON-NLS-1$
             }
 
-            // Hojas de estilo remotas para enveloped
-            if (styleHref != null && styleElement == null) {
-                // Comprobamos si la referencia al estilo es externa
-                if (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX)) { 
-                    try {
-                        referenceList.add(fac.newReference(styleHref,
-                                                           digestMethod,
-                                                           Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                      (TransformParameterSpec) null)),
-                                                           null,
-                                                           referenceStyleId));
-                    }
-                    catch (final Exception e) {
-                        LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
-                    }
+            // Hojas de estilo remotas para enveloped. Comprobamos si la referencia al estilo es externa
+            if ((styleHref != null && styleElement == null) && (styleHref.startsWith(HTTP_PROTOCOL_PREFIX) || styleHref.startsWith(HTTPS_PROTOCOL_PREFIX))) {
+                try {
+                    referenceList.add(fac.newReference(styleHref,
+                                                       digestMethod,
+                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
+                                                                                                  (TransformParameterSpec) null)),
+                                                       null,
+                                                       referenceStyleId));
                 }
-
+                catch (final Exception e) {
+                    LOGGER.severe("No ha sido posible anadir la referencia a la hoja de estilo del XML, esta no se firmara: " + e); //$NON-NLS-1$
+                }
             }
 
         }
@@ -915,21 +905,19 @@ public final class AOXMLDSigSigner implements AOSigner {
             // Si es enveloped hay que anadir la hoja de estilo dentro de la
             // firma y
             // referenciarla
-            if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)) {
-                if (styleElement != null) {
-                    objectList.add(fac.newXMLObject(Collections.singletonList(new DOMStructure(styleElement)), styleId, styleType, styleEncoding));
-                    try {
-                        referenceList.add(fac.newReference(tmpStyleUri,
-                                                           digestMethod,
-                                                           Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
-                                                                                                      (TransformParameterSpec) null)),
-                                                           null,
-                                                           referenceStyleId));
-                    }
-                    catch (final Exception e) {
-                        LOGGER
-                              .severe("No se ha podido anadir una referencia a la hoja de estilo, esta se incluira dentro de la firma, pero no estara firmada: " + e); //$NON-NLS-1$
-                    }
+            if ((format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED)) && (styleElement != null)) {
+                objectList.add(fac.newXMLObject(Collections.singletonList(new DOMStructure(styleElement)), styleId, styleType, styleEncoding));
+                try {
+                    referenceList.add(fac.newReference(tmpStyleUri,
+                                                       digestMethod,
+                                                       Collections.singletonList(fac.newTransform(canonicalizationAlgorithm,
+                                                                                                  (TransformParameterSpec) null)),
+                                                       null,
+                                                       referenceStyleId));
+                }
+                catch (final Exception e) {
+                    LOGGER
+                          .severe("No se ha podido anadir una referencia a la hoja de estilo, esta se incluira dentro de la firma, pero no estara firmada: " + e); //$NON-NLS-1$
                 }
             }
 

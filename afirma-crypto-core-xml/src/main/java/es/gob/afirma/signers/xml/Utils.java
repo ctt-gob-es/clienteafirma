@@ -691,11 +691,9 @@ public final class Utils {
     private static int countSubstring(final String text, final String substring) {
         int count = 0;
         for (int i = 0; i <= (text.length() - substring.length()); i++) {
-            if (substring.charAt(0) == text.charAt(i)) {
-                if (substring.equals(text.substring(i, i + substring.length()))) {
-                    count++;
-                    i += substring.length() - 1;
-                }
+            if ((substring.charAt(0) == text.charAt(i)) && (substring.equals(text.substring(i, i + substring.length())))) {
+                count++;
+                i += substring.length() - 1;
             }
         }
         return count;
