@@ -11,7 +11,9 @@ package es.gob.afirma.ui.wizardUtils;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -266,13 +268,22 @@ public class BotoneraInferior extends JPanel {
 	 */
 	public void maximizarActionPerformed(){
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		
+
 		JAccessibilityDialogWizard.actualPositionX = j.getX();
 		JAccessibilityDialogWizard.actualPositionY = j.getY();
 		JAccessibilityDialogWizard.actualWidth = j.getWidth();
 		JAccessibilityDialogWizard.actualHeight = j.getHeight();
-		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
+		//Se obtienen las dimensiones de maximizado
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+				
+		//Se hace el resize
+		j.setBounds(0,0, maxWidth, maxHeight);
+				
 		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
 		this.maximizar.setEnabled(false);
 		this.restaurar.setEnabled(true);

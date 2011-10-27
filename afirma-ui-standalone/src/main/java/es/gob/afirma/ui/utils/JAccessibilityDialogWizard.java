@@ -3,6 +3,8 @@ package es.gob.afirma.ui.utils;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 
@@ -34,7 +36,16 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		this.addComponentListener(adaptador);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		if (GeneralConfig.isMaximized()){
-			this.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+			//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+			Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
+			//Se obtienen las dimensiones de maximizado
+			int maxWidth = (int)rect.getWidth();
+			int maxHeight = (int)rect.getHeight();
+			
+			//Se hace el resize
+			this.setBounds(0,0, maxWidth, maxHeight);
+			
 			if (Platform.getOS().equals(Platform.OS.LINUX)){
 				//Se comprueba si está activado el modo negrita o fuente grande
 				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
