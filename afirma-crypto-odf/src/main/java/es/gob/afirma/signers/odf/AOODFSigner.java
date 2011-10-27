@@ -102,16 +102,16 @@ public final class AOODFSigner implements AOSigner {
     private static String OPENOFFICE = "urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0"; //$NON-NLS-1$
 
     /** Mimetypes de los formatos ODF soportados. */
-    private static final Set<String> supportedFormats;
+    private static final Set<String> SUPPORTED_FORMATS;
 
     /** Algoritmo de huella digital por defecto para las referencias XML. */
     private static final String DIGEST_METHOD = DigestMethod.SHA1;
 
     static {
-        supportedFormats = new HashSet<String>();
-        supportedFormats.add("application/vnd.oasis.opendocument.text"); //$NON-NLS-1$
-        supportedFormats.add("application/vnd.oasis.opendocument.spreadsheet"); //$NON-NLS-1$
-        supportedFormats.add("application/vnd.oasis.opendocument.presentation"); //$NON-NLS-1$
+        SUPPORTED_FORMATS = new HashSet<String>();
+        SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.text"); //$NON-NLS-1$
+        SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.spreadsheet"); //$NON-NLS-1$
+        SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.presentation"); //$NON-NLS-1$
     }
 
     /** Firma o cofirma un documento OpenOffice de tipo ODT, ODS y ODG.<br/>
@@ -583,7 +583,7 @@ public final class AOODFSigner implements AOSigner {
 
         // Sera valido si el mimetype coincide con alguno de los formatos ODF
         // soportados
-        return mimetype != null && supportedFormats.contains(mimetype);
+        return mimetype != null && SUPPORTED_FORMATS.contains(mimetype);
     }
 
     public String getSignedName(final String originalName, final String inText) {
