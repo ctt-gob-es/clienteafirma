@@ -3,11 +3,14 @@ package es.gob.afirma.ui.utils;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.swing.JDialog;
+
+import es.gob.afirma.core.misc.Platform;
 
 /**
  * Clase para generar un JDialog con la posibilidad de redimension.
@@ -82,6 +85,27 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 	 * Evento de redimensionado. Almacena el tamaño y posicion de la ventana para su restauracion.
 	 */
 	public void resized(final ComponentEvent e) {
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+		
+		//Se comprueba el so
+		if (Platform.getOS().equals(Platform.OS.LINUX)){
+			maxHeight = maxHeight - Constants.maximizeVerticalMarginLinux;
+		}
+		
+		//Dimensiones que se van a considerar de maximizado
+	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+
+	    //Dimensiones actuales del dialogo
+	    Dimension actualSize = getJAccessibilityDialogAdvisor(this).getSize();
+	    if (actualSize.equals(fullScreen)){
+	    	this.setResizable(false);
+	    } else {
+	    	this.setResizable(true);
+	    }
+			    
 		/*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 	    Dimension actualSize = getJAccessibilityDialogAdvisor(this).getSize();
