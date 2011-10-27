@@ -90,35 +90,42 @@ public abstract class JAccessibilityDialog extends JDialog {
 	 */
 	public void resized(ComponentEvent e) {
 
-		/*if (!Platform.getOS().equals(Platform.OS.LINUX)){
-			//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-			Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-			int maxWidth = (int)rect.getWidth();
-			int maxHeight = (int)rect.getHeight();
-			
-			
-			
-		    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-	
-		    //Dimensiones actuales del dialogo
-		    Dimension actualSize = getJAccessibilityDialog(this).getSize();
-		    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialog(this));
-		    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialog(this));
-		    if(botonMaximizar != null){
-		    	if (actualSize.equals(fullScreen)){
-					botonMaximizar.setEnabled(false);
-					if (botonRestaurar != null) {
-		    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
-		    			botonRestaurar.setEnabled(true);
-		    		}
-			    } else {
-			    	botonMaximizar.setEnabled(true);
-			    	if (botonRestaurar != null) {
-				    	botonRestaurar.setEnabled(false); //Se deshabilita
-			    	}
-			    }
-		    }
-		}*/
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+		
+		//Se comprueba el so
+		if (Platform.getOS().equals(Platform.OS.LINUX)){
+			maxHeight = maxHeight - Constants.maximizeVerticalMarginLinux;
+		}
+		
+		//Dimensiones que se van a considerar de maximizado
+	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+
+	    //Dimensiones actuales del dialogo
+	    Dimension actualSize = getJAccessibilityDialog(this).getSize();
+	    if (actualSize.equals(fullScreen)){
+	    	this.setResizable(false);
+	    } else {
+	    	this.setResizable(true);
+	    }
+//		    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialog(this));
+//		    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialog(this));
+//		    if(botonMaximizar != null){
+//		    	if (actualSize.equals(fullScreen)){
+//					/*botonMaximizar.setEnabled(false);
+//					if (botonRestaurar != null) {
+//		    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
+//		    			botonRestaurar.setEnabled(true);
+//		    		}*/
+//			    } else {
+//			    	botonMaximizar.setEnabled(true);
+//			    	if (botonRestaurar != null) {
+//				    	botonRestaurar.setEnabled(false); //Se deshabilita
+//			    	}
+//			    }
+//		    }
 	}
 	
 	/**

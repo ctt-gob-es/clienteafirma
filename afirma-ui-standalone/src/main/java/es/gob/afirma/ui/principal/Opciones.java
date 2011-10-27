@@ -149,6 +149,10 @@ public class Opciones extends JAccessibilityDialog {
     		} else {
     			setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
     		}
+			
+			//Si está maximizada no se permite que se redimensione a mano
+			//this.setResizable(false);
+			
     	} else {
     		
     		this.maximizar.setEnabled (true);
@@ -196,13 +200,16 @@ public class Opciones extends JAccessibilityDialog {
 	    			setMinimumSize(new Dimension(getSize().width, getSize().height));
 	    		}
     		}
+    		
+    		//Si no está maximizada se permite que se redimensione a mano
+    		//this.setResizable(true);
     	}
 
     	
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(Messages.getString("Opciones.opciones")); // NOI18N
-        setResizable(true);
+        //setResizable(false);
         getContentPane().setLayout(new GridBagLayout());
         
         GridBagConstraints c = new GridBagConstraints();
@@ -605,7 +612,7 @@ public class Opciones extends JAccessibilityDialog {
 		if (!Platform.getOS().equals(Platform.OS.LINUX)){
 			this.setBounds(0,0, maxWidth, maxHeight);
 		} else {
-			this.setBounds(0,0, maxWidth, maxHeight- Constants.maximizeVerticalMarginLinux);
+			this.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
 		}
 	}
 	
@@ -613,6 +620,7 @@ public class Opciones extends JAccessibilityDialog {
 	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
+		
 		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
 			this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		} else {
