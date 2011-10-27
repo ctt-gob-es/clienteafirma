@@ -18,10 +18,19 @@
 
 package es.gob.afirma.be.fedict.eid.applet.service.spi;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.dsig.XMLSignatureException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.xml.sax.SAXException;
 
 /** Interface for signature service component.
  * @author Frank Cornelis */
@@ -44,8 +53,15 @@ public interface SignatureService {
      *        the optional list of certificates.
      * @param signingKey 
      * @return the digest to be signed.
-     * @throws NoSuchAlgorithmException */
-    byte[] preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain, PrivateKey signingKey) throws NoSuchAlgorithmException;
+     * @throws NoSuchAlgorithmException 
+     * @throws IOException 
+     * @throws TransformerException 
+     * @throws XMLSignatureException 
+     * @throws MarshalException 
+     * @throws ParserConfigurationException 
+     * @throws InvalidAlgorithmParameterException 
+     * @throws SAXException */
+    byte[] preSign(List<DigestInfo> digestInfos, List<X509Certificate> signingCertificateChain, PrivateKey signingKey) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, ParserConfigurationException, MarshalException, XMLSignatureException, TransformerException, IOException, SAXException;
 
     /** Post-sign callback method. Received the signature value. Depending on the
      * configuration the signing certificate chain is also obtained.
@@ -57,6 +73,10 @@ public interface SignatureService {
      * @param signingCertificateChain
      *        the optional chain of signing certificates. 
      * @param signatureId 
-     * @return Resultado de la tercera fase de firma */
-    byte[] postSign(byte[] signedXML, List<X509Certificate> signingCertificateChain, String signatureId, byte[] signatureValue);
+     * @return Resultado de la tercera fase de firma 
+     * @throws IOException 
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
+     * @throws TransformerException */
+    byte[] postSign(byte[] signedXML, List<X509Certificate> signingCertificateChain, String signatureId, byte[] signatureValue) throws ParserConfigurationException, SAXException, IOException, TransformerException;
 }

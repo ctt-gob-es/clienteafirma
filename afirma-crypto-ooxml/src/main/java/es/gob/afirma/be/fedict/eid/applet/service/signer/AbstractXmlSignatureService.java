@@ -65,6 +65,7 @@ import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignContext;
+import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
@@ -147,41 +148,38 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         return "XML Document"; //$NON-NLS-1$
     }
 
-    public byte[] preSign(final List<DigestInfo> digestInfos, final List<X509Certificate> signingCertificateChain, final PrivateKey signingKey) throws NoSuchAlgorithmException {
-        try {
-            return getSignedXML(getSignatureDigestAlgorithm(), digestInfos, signingCertificateChain, signingKey);
-        }
-        catch (final Exception e) {
-            throw new RuntimeException("XML signature error: " + e.getMessage(), e); //$NON-NLS-1$
-        }
+    public byte[] preSign(final List<DigestInfo> digestInfos, 
+                          final List<X509Certificate> signingCertificateChain, 
+                          final PrivateKey signingKey) throws NoSuchAlgorithmException, 
+                                                              InvalidAlgorithmParameterException, 
+                                                              ParserConfigurationException, 
+                                                              MarshalException, 
+                                                              XMLSignatureException, 
+                                                              TransformerException, 
+                                                              IOException, 
+                                                              SAXException {
+        return getSignedXML(getSignatureDigestAlgorithm(), digestInfos, signingCertificateChain, signingKey);
     }
 
     public byte[] postSign(final byte[] signedXML,
                            final List<X509Certificate> signingCertificateChain,
                            final String signatureId,
-                           final byte[] signatureValue) {
+                           final byte[] signatureValue) throws ParserConfigurationException, 
+                                                               SAXException, 
+                                                               IOException, 
+                                                               TransformerException {
 
         // Load the signature DOM document.
-        final Document document;
-        try {
-            document = loadDocument(new ByteArrayInputStream(signedXML));
-        }
-        catch (final Exception e) {
-            throw new RuntimeException("DOM error: " + e.getMessage(), e); //$NON-NLS-1$
-        }
+        final Document document = loadDocument(new ByteArrayInputStream(signedXML));
 
         // Locate the correct ds:Signature node.
         final Element nsElement = document.createElement("ns"); //$NON-NLS-1$
         nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS); //$NON-NLS-1$
-        final Element signatureElement;
-        try {
-            signatureElement = (Element) XPathAPI.selectSingleNode(document, "//ds:Signature[@Id='" + signatureId + "']", nsElement); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        catch (final TransformerException e) {
-            throw new RuntimeException("XPATH error: " + e.getMessage(), e); //$NON-NLS-1$
-        }
+
+        final Element signatureElement = (Element) XPathAPI.selectSingleNode(document, "//ds:Signature[@Id='" + signatureId + "']", nsElement); //$NON-NLS-1$ //$NON-NLS-2$
+
         if (null == signatureElement) {
-            throw new RuntimeException("ds:Signature not found for @Id: " + signatureId); //$NON-NLS-1$
+            throw new IllegalArgumentException("ds:Signature not found for @Id: " + signatureId); //$NON-NLS-1$
         }
 
         // Insert signature value into the ds:SignatureValue element
@@ -191,12 +189,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
         // TODO: Cambiar a OOXMLSignedDocumentOutputStream
         final ByteArrayOutputStream signedDocumentOutputStream = new ByteArrayOutputStream();
-        try {
-            writeDocument(document, signedDocumentOutputStream);
-        }
-        catch (final Exception e) {
-            throw new RuntimeException("error writing the signed XML document: " + e.getMessage(), e); //$NON-NLS-1$
-        }
+        writeDocument(document, signedDocumentOutputStream);
         return signedDocumentOutputStream.toByteArray();
     }
 
@@ -214,7 +207,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
                                                             MarshalException,
                                                             javax.xml.crypto.dsig.XMLSignatureException,
                                                             TransformerException,
-                                                            IOException {
+                                                            IOException, SAXException {
         // DOM Document construction.
         Document document = getEnvelopingDocument();
         if (null == document) {
@@ -365,12 +358,12 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         if ("SHA-512".equals(digestAlgo) || "SHA512".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$
             return DigestMethod.SHA512;
         }
-        throw new RuntimeException("unsupported digest algo: " + digestAlgo); //$NON-NLS-1$
+        throw new IllegalArgumentException("unsupported digest algo: " + digestAlgo); //$NON-NLS-1$
     }
 
     private String getSignatureMethod(final String digestAlgo) {
         if (null == digestAlgo) {
-            throw new RuntimeException("digest algo is null"); //$NON-NLS-1$
+            throw new IllegalArgumentException("digest algo is null"); //$NON-NLS-1$
         }
         if ("SHA-1".equals(digestAlgo) || "SHA1".equals(digestAlgo) || "SHA".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             return SignatureMethod.RSA_SHA1;
@@ -387,7 +380,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
         if ("RIPEMD160".equals(digestAlgo) || "RIPEMD-160".equals(digestAlgo)) { //$NON-NLS-1$ //$NON-NLS-2$
             return XMLSignature.ALGO_ID_SIGNATURE_RSA_RIPEMD160;
         }
-        throw new RuntimeException("unsupported sign algo: " + digestAlgo); //$NON-NLS-1$
+        throw new IllegalArgumentException("unsupported sign algo: " + digestAlgo); //$NON-NLS-1$
     }
 
     private void writeDocument(final Document document, final OutputStream documentOutputStream) throws TransformerConfigurationException,

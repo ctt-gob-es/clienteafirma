@@ -96,7 +96,11 @@ class OOXMLSignatureFacet implements SignatureFacet {
                         final String signatureId,
                         final List<X509Certificate> signingCertificateChain,
                         final List<Reference> references,
-                        final List<XMLObject> objects) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+                        final List<XMLObject> objects) throws NoSuchAlgorithmException, 
+                                                              InvalidAlgorithmParameterException, 
+                                                              IOException, 
+                                                              ParserConfigurationException, 
+                                                              SAXException {
 
         addManifestObject(signatureFactory, document, signatureId, references, objects);
 
@@ -107,7 +111,11 @@ class OOXMLSignatureFacet implements SignatureFacet {
                                    final Document document,
                                    final String signatureId,
                                    final List<Reference> references,
-                                   final List<XMLObject> objects) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+                                   final List<XMLObject> objects) throws NoSuchAlgorithmException, 
+                                                                         InvalidAlgorithmParameterException, 
+                                                                         IOException, 
+                                                                         ParserConfigurationException, 
+                                                                         SAXException {
         final Manifest manifest = constructManifest(signatureFactory);
         final String objectId = "idPackageObject"; // really has to be this value. //$NON-NLS-1$
         final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
@@ -123,15 +131,12 @@ class OOXMLSignatureFacet implements SignatureFacet {
     }
 
     private Manifest constructManifest(final XMLSignatureFactory signatureFactory) throws NoSuchAlgorithmException,
-                                                                                               InvalidAlgorithmParameterException {
+                                                                                          InvalidAlgorithmParameterException, 
+                                                                                          IOException, 
+                                                                                          ParserConfigurationException, 
+                                                                                          SAXException {
         final List<Reference> manifestReferences = new LinkedList<Reference>();
-
-        try {
-            addRelationshipsReferences(signatureFactory, manifestReferences);
-        }
-        catch (final Exception e) {
-            throw new RuntimeException("error: " + e.getMessage(), e); //$NON-NLS-1$
-        }
+        addRelationshipsReferences(signatureFactory, manifestReferences);
 
         /*
          * Word
