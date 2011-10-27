@@ -129,7 +129,12 @@ public class Opciones extends JAccessibilityDialog {
     		int maxWidth = (int)rect.getWidth();
     		int maxHeight = (int)rect.getHeight();
     		
-			this.setBounds(0,0, maxWidth, maxHeight);
+    		//Se maximiza dependiendo del so
+    		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+    			this.setBounds(0,0, maxWidth, maxHeight);
+    		} else {
+    			this.setBounds(0,0, maxWidth, maxHeight- Constants.maximizeVerticalMarginLinux);
+    		}
 			
 
 			this.maximizar.setEnabled (false);
@@ -588,7 +593,6 @@ public class Opciones extends JAccessibilityDialog {
 		
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		JAccessibilityDialog j = getJAccessibilityDialog(this);
 		
 		//Se obtienen las dimensiones de maximizado
 		int maxWidth = (int)rect.getWidth();
@@ -597,8 +601,12 @@ public class Opciones extends JAccessibilityDialog {
 		this.maximizar.setEnabled (false);
 		this.restaurar.setEnabled (true);
 		
-		//Se hace el resize
-		j.setBounds(0,0, maxWidth, maxHeight);
+		//Se hace el resize dependiendo del so
+		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+			this.setBounds(0,0, maxWidth, maxHeight);
+		} else {
+			this.setBounds(0,0, maxWidth, maxHeight- Constants.maximizeVerticalMarginLinux);
+		}
 	}
 	
 	/**
