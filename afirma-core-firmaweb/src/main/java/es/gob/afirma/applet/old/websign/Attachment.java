@@ -13,12 +13,17 @@ package es.gob.afirma.applet.old.websign;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-class Attachment {
-    final String url;
+final class Attachment {
+    
+    private final String url;
 
     Attachment(final String url) {
         this.url = url;
         // this.bytes= bytes;
+    }
+    
+    String getURL() {
+        return this.url;
     }
 
     String getName() {

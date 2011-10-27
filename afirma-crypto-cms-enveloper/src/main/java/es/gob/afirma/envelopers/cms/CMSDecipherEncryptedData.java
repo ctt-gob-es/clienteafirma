@@ -10,9 +10,14 @@
 
 package es.gob.afirma.envelopers.cms;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -48,9 +53,20 @@ final class CMSDecipherEncryptedData {
      *         (formato o clave incorrecto,...)
      * @throws InvalidKeyException
      *         Cuando se proporciona una clave incorrecta para el
-     *         descifrado. */
+     *         descifrado. 
+     * @throws BadPaddingException 
+     * @throws IllegalBlockSizeException 
+     * @throws InvalidAlgorithmParameterException 
+     * @throws NoSuchPaddingException 
+     * @throws NoSuchAlgorithmException */
     @SuppressWarnings("unused")
-    byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException, InvalidKeyException {
+    byte[] dechiperEncryptedData(final byte[] encryptedData, final String pass) throws AOException, 
+                                                                                       InvalidKeyException, 
+                                                                                       NoSuchAlgorithmException, 
+                                                                                       NoSuchPaddingException, 
+                                                                                       InvalidAlgorithmParameterException, 
+                                                                                       IllegalBlockSizeException, 
+                                                                                       BadPaddingException {
 
         AlgorithmIdentifier alg = null;
         EncryptedContentInfo eci = null;
@@ -88,17 +104,8 @@ final class CMSDecipherEncryptedData {
         final byte[] contCifrado = eci.getEncryptedContent().getOctets();
 
         // Desciframos.
-        try {
-            deciphered = Utils.deCipherContent(contCifrado, this.config, this.cipherKey);
-        }
-        catch (final InvalidKeyException ex) {
-            throw ex;
-        }
-        catch (final Exception ex) {
-            throw new AOException("El fichero no contiene un tipo EncryptedData", ex); //$NON-NLS-1$
-        }
+        return Utils.deCipherContent(contCifrado, this.config, this.cipherKey);
 
-        return deciphered;
     }
 
     /** Asigna la clave para firmar el contenido del fichero que queremos

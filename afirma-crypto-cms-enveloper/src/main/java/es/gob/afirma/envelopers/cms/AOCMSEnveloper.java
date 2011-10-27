@@ -12,6 +12,7 @@ package es.gob.afirma.envelopers.cms;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -24,6 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.ietf.jgss.Oid;
@@ -581,12 +586,21 @@ public class AOCMSEnveloper implements AOEnveloper {
      *         Cuando no se ha indicado un envoltorio soportado.
      * @throws AOException
      *         Cuando se produce un error durante al desenvolver los datos. 
-     * @throws NoSuchAlgorithmException */
+     * @throws NoSuchAlgorithmException 
+     * @throws BadPaddingException 
+     * @throws IllegalBlockSizeException 
+     * @throws InvalidAlgorithmParameterException 
+     * @throws NoSuchPaddingException */
     byte[] recoverData(final byte[] cmsEnvelop) throws 
                                          InvalidKeyException,
                                          CertificateEncodingException,
                                          IOException,
-                                         AOException, NoSuchAlgorithmException {
+                                         AOException, 
+                                         NoSuchAlgorithmException, 
+                                         NoSuchPaddingException, 
+                                         InvalidAlgorithmParameterException, 
+                                         IllegalBlockSizeException, 
+                                         BadPaddingException {
 
         final org.bouncycastle.asn1.ASN1InputStream is = new org.bouncycastle.asn1.ASN1InputStream(cmsEnvelop);
 
@@ -665,8 +679,19 @@ public class AOCMSEnveloper implements AOEnveloper {
      * @throws InvalidKeyException
      *         Cuando la clave proporcionada no es v&aacute;lida.
      * @throws AOException
-     *         Cuando se produce un error al desenvolver los datos. */
-    byte[] recoverCMSEncryptedData(final byte[] encryptedData, final String passkey) throws InvalidKeyException, AOException {
+     *         Cuando se produce un error al desenvolver los datos. 
+     * @throws BadPaddingException 
+     * @throws IllegalBlockSizeException 
+     * @throws InvalidAlgorithmParameterException 
+     * @throws NoSuchPaddingException 
+     * @throws NoSuchAlgorithmException */
+    byte[] recoverCMSEncryptedData(final byte[] encryptedData, final String passkey) throws InvalidKeyException, 
+                                                                                            AOException, 
+                                                                                            NoSuchAlgorithmException, 
+                                                                                            NoSuchPaddingException, 
+                                                                                            InvalidAlgorithmParameterException, 
+                                                                                            IllegalBlockSizeException, 
+                                                                                            BadPaddingException {
         return new CMSDecipherEncryptedData().dechiperEncryptedData(encryptedData, passkey);
     }
 

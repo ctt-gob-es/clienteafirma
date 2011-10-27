@@ -56,9 +56,9 @@ public final class FirmadorWeb {
 
             // Anadimos los ficheros
             for (final Attachment attach : attachments) {
-                if (attach.url.trim().length() > 0) {
+                if (attach.getURL().trim().length() > 0) {
                     // Escribimos el tag de apertura
-                    final String openTag = "<afirma type='filecontent' path='" + URLEncoder.encode(attach.url, "UTF-8") + "'><!--\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    final String openTag = "<afirma type='filecontent' path='" + URLEncoder.encode(attach.getURL(), "UTF-8") + "'><!--\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     dos.write(openTag.getBytes());
                     dos.flush();
 

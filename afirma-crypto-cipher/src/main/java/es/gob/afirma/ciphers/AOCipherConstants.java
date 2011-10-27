@@ -13,7 +13,7 @@ package es.gob.afirma.ciphers;
 /**
  * Constantes para el uso de las funcionalidades de cifrado.
  */
-public class AOCipherConstants {
+public final class AOCipherConstants {
     
     private AOCipherConstants() {
         // No permitimos la instancacion
