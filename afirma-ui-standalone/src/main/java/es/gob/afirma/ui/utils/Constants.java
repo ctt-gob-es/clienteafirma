@@ -31,7 +31,7 @@ public class Constants {
     /**
      * Width inicial de la pantalla de seleccion de usuario
      */
-    public static final int INIT_WINDOW_INITIAL_WIDTH = 515;
+    public static final int INIT_WINDOW_INITIAL_WIDTH = 530;
     
     /**
      * Height inicial de la pantalla de seleccion de usuario
@@ -146,6 +146,6 @@ public class Constants {
     /**
      * Margen a restar para calcular el tamaño de una ventana maximizada para linux.
      */
-    public static int maximizeVerticalMarginLinux = 35;
+    public static int maximizeVerticalMarginLinux = 48;
 }
 
