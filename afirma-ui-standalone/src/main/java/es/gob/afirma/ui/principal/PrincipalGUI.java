@@ -12,7 +12,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -117,6 +119,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	private JMenuBar menu;
 	
 	public static JStatusBar bar = new JStatusBar();
+	
+	private static int linuxMargin = 35;
 	
 	/**
 	 * Tema por defecto de tipo Metal.
@@ -462,7 +466,24 @@ public class PrincipalGUI extends JAccessibilityFrame {
 			maximizedHight = this.getSize().getHeight();
 	    }
 	    if (GeneralConfig.isMaximized()){
-			this.setExtendedState(MAXIMIZED_BOTH);
+	    	if (Platform.getOS().equals(Platform.OS.LINUX)) {
+	    		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+	    		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
+	    		//Se obtienen las dimensiones de maximizado
+	    		int maxWidth = (int)rect.getWidth();
+	    		int maxHeight = (int)rect.getHeight();
+	    		if (!Platform.getOS().equals(Platform.OS.LINUX)) {
+	    			//Se hace el resize
+	    			this.setBounds(0,0, maxWidth, maxHeight);
+	    		} else {
+	    			//Se hace el resize
+	    			this.setBounds(0,0, maxWidth, maxHeight-linuxMargin);
+	    		}
+	    		
+	    	} else {
+	    		this.setExtendedState(MAXIMIZED_BOTH);
+	    	}
 		} else {
 			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
 				if (actualWidth == maximizedWidth && actualHeight == maximizedHight){
@@ -731,17 +752,17 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * 
 	 */
 	public void resized(ComponentEvent e) {
+		//Tamaño de la ventana
 		Dimension screenSize = this.getSize();
 	    bar.setPreferredSize(new Dimension((int) screenSize.getWidth()*10/100,(int) screenSize.getHeight()*5/100));
 	    bar.setLabelSize((int) screenSize.getWidth(),(int) screenSize.getHeight()*4/100);
-	    screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	    
+	    //Se guarda la posición en el caso de que no se haya maximizado por configuración
 		if (!GeneralConfig.isMaximized()){
-			if (this.getWidth()!=(int)screenSize.getWidth() && this.getHeight()!=(int)screenSize.getHeight()-35){
-				actualPositionX = this.getX();
-				actualPositionY = this.getY();
-				actualWidth = this.getWidth();
-				actualHeight = this.getHeight();
-			}
+			actualPositionX = this.getX();
+			actualPositionY = this.getY();
+			actualWidth = this.getWidth();
+			actualHeight = this.getHeight();
 		}
 	}
 	
