@@ -157,8 +157,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
         addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.slide+xml", manifestReferences); //$NON-NLS-1$
         addParts(signatureFactory, "application/vnd.openxmlformats-officedocument.presentationml.tableStyles+xml", manifestReferences); //$NON-NLS-1$
 
-        final Manifest manifest = signatureFactory.newManifest(manifestReferences);
-        return manifest;
+        return signatureFactory.newManifest(manifestReferences);
     }
 
     private void addSignatureTime(final XMLSignatureFactory signatureFactory, final Document document, final String signatureId, final List<XMLStructure> objectContent) {
@@ -351,8 +350,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
             if (false == zipEntryName.equals(zipEntry.getName())) {
                 continue;
             }
-            final Document document = loadDocument(zipInputStream);
-            return document;
+            return loadDocument(zipInputStream);
         }
         return null;
     }
@@ -363,8 +361,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        final Document document = documentBuilder.parse(inputSource);
-        return document;
+        return documentBuilder.parse(inputSource);
     }
 
     private Document loadDocument(final InputStream documentInputStream) throws ParserConfigurationException, SAXException, IOException {
@@ -372,8 +369,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        final Document document = documentBuilder.parse(inputSource);
-        return document;
+        return documentBuilder.parse(inputSource);
     }
 
     public void postSign(final Element signatureElement, final List<X509Certificate> signingCertificateChain) {

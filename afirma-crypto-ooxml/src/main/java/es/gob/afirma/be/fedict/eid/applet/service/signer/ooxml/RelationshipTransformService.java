@@ -60,7 +60,6 @@ import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.TransformException;
 import javax.xml.crypto.dsig.TransformService;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -117,7 +116,7 @@ public class RelationshipTransformService extends TransformService {
         final DOMStructure domParent = (DOMStructure) parent;
         final Node parentNode = domParent.getNode();
         try {
-            /* System.out.println("parent: " + */toString(parentNode)/* ) */;
+            toString(parentNode);
         }
         catch (final TransformerException e) {
             throw new InvalidAlgorithmParameterException();
@@ -175,9 +174,7 @@ public class RelationshipTransformService extends TransformService {
             throw new TransformException(e.getMessage(), e);
         }
         try {
-            /*
-             * System.out.println("relationships document: " +
-             */toString(relationshipsDocument)/* ) */;
+            toString(relationshipsDocument);
         }
         catch (final TransformerException e) {
             throw new TransformException(e.getMessage(), e);
@@ -189,7 +186,6 @@ public class RelationshipTransformService extends TransformService {
         for (int nodeIdx = 0; nodeIdx < childNodes.getLength(); nodeIdx++) {
             final Node childNode = childNodes.item(nodeIdx);
             if (Node.ELEMENT_NODE != childNode.getNodeType()) {
-                // System.out.println("removing node");
                 relationshipsElement.removeChild(childNode);
                 nodeIdx--;
                 continue;
@@ -225,15 +221,11 @@ public class RelationshipTransformService extends TransformService {
         for (int nodeIdx = 0; nodeIdx < nodeCount; nodeIdx++) {
             final Node relationshipNode = relationshipNodes.item(0);
             final Element relationshipElement = (Element) relationshipNode;
-            // System.out.println("unsorted Id: " +
-            // relationshipElement.getAttribute("Id"));
             relationshipElements.add(relationshipElement);
             relationshipsElement.removeChild(relationshipNode);
         }
         Collections.sort(relationshipElements, new RelationshipComparator());
         for (final Element relationshipElement : relationshipElements) {
-            // System.out.println("sorted Id: " +
-            // relationshipElement.getAttribute("Id"));
             relationshipsElement.appendChild(relationshipElement);
         }
     }
@@ -242,8 +234,7 @@ public class RelationshipTransformService extends TransformService {
         final Source source = new DOMSource(dom);
         final StringWriter stringWriter = new StringWriter();
         final Result result = new StreamResult(stringWriter);
-        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        final Transformer transformer = transformerFactory.newTransformer();
+        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
         /*
          * We have to omit the ?xml declaration if we want to embed the
          * document.
@@ -261,8 +252,6 @@ public class RelationshipTransformService extends TransformService {
         final Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
         transformer.transform(source, result);
-        // System.out.println("result: " + new
-        // String(outputStream.toByteArray()));
         return new OctetStreamData(new ByteArrayInputStream(outputStream.toByteArray()));
     }
 
@@ -270,18 +259,14 @@ public class RelationshipTransformService extends TransformService {
         final InputSource inputSource = new InputSource(documentInputStream);
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
-        final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        final Document document = documentBuilder.parse(inputSource);
-        return document;
+        return documentBuilderFactory.newDocumentBuilder().parse(inputSource);
     }
 
     public Data transform(final Data data, final XMLCryptoContext context, final OutputStream os) throws TransformException {
-        // System.out.println("transform(data,context,os)");
         return null;
     }
 
     public boolean isFeatureSupported(final String feature) {
-        // System.out.println("isFeatureSupported(feature)");
         return false;
     }
 }

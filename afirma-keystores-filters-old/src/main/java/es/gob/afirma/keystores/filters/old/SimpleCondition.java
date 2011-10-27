@@ -56,10 +56,18 @@ final class SimpleCondition extends AClause implements ConditionConstants {
             fin = operatorMatcher.end();
             String strOperator = str.substring(ini, fin);
             
-            if (strOperator.equals("="))				 this.operator = Operator.EQ; //$NON-NLS-1$
-	        else if (strOperator.equals("#MATCHES#"))	 this.operator = Operator.MATCHES; //$NON-NLS-1$
-            else if (strOperator.equals("#NOT_MATCHES#"))this.operator = Operator.NOT_MATCHES; //$NON-NLS-1$
-            else throw new AOException("Operador desconocido: " + str); //$NON-NLS-1$
+            if (strOperator.equals("=")) { //$NON-NLS-1$
+                this.operator = Operator.EQ; 
+            }
+	        else if (strOperator.equals("#MATCHES#")) { //$NON-NLS-1$
+	            this.operator = Operator.MATCHES; 
+	        }
+            else if (strOperator.equals("#NOT_MATCHES#")) { //$NON-NLS-1$
+                this.operator = Operator.NOT_MATCHES; 
+            }
+            else {
+                throw new AOException("Operador desconocido: " + str); //$NON-NLS-1$
+            }
         }
         else {
             throw new AOException("Error de sintaxis: " + str); //$NON-NLS-1$
