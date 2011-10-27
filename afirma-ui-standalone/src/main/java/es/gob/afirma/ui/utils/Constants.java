@@ -142,5 +142,10 @@ public class Constants {
      * Nombre del usuario por defecto
      */
     public static String defaultUser = "Por defecto";
+    
+    /**
+     * Margen a restar para calcular el tamaño de una ventana maximizada para linux.
+     */
+    public static int maximizeVerticalMarginLinux = 35;
 }
 
