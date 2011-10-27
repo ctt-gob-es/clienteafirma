@@ -5,10 +5,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,6 +42,17 @@ import es.gob.afirma.ui.utils.Messages;
 public class UserProfile extends JAccessibilityDialogAdvisor {
 
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Botón maximizar.
+	 */
+	private JButton maximizar = null;
+
+	/**
+	 * Botón restaurar.
+	 */
+	private JButton restaurar = null;
+	
 	
 	@Override
 	public int getMinimumRelation() {
@@ -194,7 +207,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
         
 		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
 		//Boton maximizar ventana
-		JButton maximizar = new JButton();
+		maximizar = new JButton();
 		maximizar.setText(Messages.getString("Wizard.maximizar"));
 	    maximizar.setName("maximizar");
 	    maximizar.setMnemonic(KeyEvent.VK_M);
@@ -208,7 +221,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		
 	    JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
 	    // Boton restaurar
-	    JButton restaurar = new JButton();
+	    restaurar = new JButton();
 	    restaurar.setText(Messages.getString("Wizard.restaurar"));
 	    restaurar.setName("restaurar");
 	    restaurar.setMnemonic(KeyEvent.VK_R);
@@ -219,6 +232,14 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		});
 	    config(restaurar);
 	    panelRestaurar.add(restaurar);
+	    
+	    //Control de habilitado de los botones de maximizar y restaurar según la configuración de
+	    //accesibilidad
+	    if (GeneralConfig.isMaximized()){
+        	maximizar.setEnabled(false);
+        } else {
+        	restaurar.setEnabled(false);
+        }
 	    
 	    JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		// Boton aceptar
@@ -351,14 +372,23 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	 */
 	public void maximizarActionPerformed(){
 		JAccessibilityDialogAdvisor j = getJAccessibilityDialogAdvisor(this);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		
 		actualPositionX = j.getX();
 		actualPositionY = j.getY();
 		actualWidth = j.getWidth();
 		actualHeight = j.getHeight();
-		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 		
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
+		//Se obtienen las dimensiones de maximizado
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+		//Se hace el resize
+		j.setBounds(0,0, maxWidth, maxHeight);
+		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
+		this.maximizar.setEnabled(false);
+		this.restaurar.setEnabled(true);
 	}
 	
 	/**
@@ -366,6 +396,9 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 	 */
 	public void restaurarActionPerformed(){
 		this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
+		//Se deshabilita el botón de restaurar puesto que se ha pulsado.
+		this.maximizar.setEnabled(true);
+		this.restaurar.setEnabled(false);
 		
 	}
 	

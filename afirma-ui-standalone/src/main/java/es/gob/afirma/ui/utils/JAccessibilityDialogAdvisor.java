@@ -82,7 +82,7 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 	 * Evento de redimensionado. Almacena el tamaño y posicion de la ventana para su restauracion.
 	 */
 	public void resized(final ComponentEvent e) {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		/*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 	    Dimension actualSize = getJAccessibilityDialogAdvisor(this).getSize();
 	    Component boton = getComponentByName("maximizar", getJAccessibilityDialogAdvisor(this));
@@ -100,7 +100,7 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 			    	botonRestaurar.setEnabled(false); //Se deshabilita
 		    	}
 		    }
-	    }
+	    }*/
 	}
 	
 	/**
