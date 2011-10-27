@@ -13,6 +13,8 @@ package es.gob.afirma.miniapplet;
 import java.io.IOException;
 import java.security.PrivilegedActionException;
 
+import es.gob.afirma.core.AOFormatFileException;
+
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
  * del Mini-Applet del Cliente AFirma.
@@ -52,9 +54,10 @@ public interface MiniAfirma {
      * @param extraParams Par&aacute;metros adicionales para configurar la operac&oacute;n.
      * @return Firma electr&oacute;nica resultante en Base64.
      * @throws IOException Cuando se produce un error durante la firma electr&oacute;nica.
+     * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String sign(String data, String algorithm, String format, String[] extraParams) throws IOException, PrivilegedActionException;
+    String sign(String data, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
 
     /**
      * Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
@@ -70,9 +73,28 @@ public interface MiniAfirma {
      * @param format Formato de firma.
      * @param extraParams Par&aacute;metros adicionales para configurar la operac&oacute;n.
      * @return Cofirma resultante en Base64.
+	 * @throws IOException Cuando se produce un error durante la cofirma electr&oacute;nica.
+     * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
+     * se puede identificar el formato de la firma.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String coSign(String sign, String data, String algorithm, String format, String extraParams);
+    String coSign(String sign, String data, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
 
+    /**
+     * Realiza una firma en cascada (Contrafirma) sobre una firma. Si no se indica lo contrario
+     * mediante <i>extraParams</i> se contrafirman todos los nodos hoja.
+     * @param sign Firma electr&oacute;nica que se desea contrafirmar.
+     * @param algorithm Algoritmo de firma.
+     * @param format Formato de firma.
+     * @param extraParams Par&aacute;metros adicionales para configurar la operaci&oacute;n.
+     * @return Contrafirma resultante en Base64.
+     * @throws IOException Cuando se produzca algun error durante la operaci&oacute;n.
+     * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
+     * se puede identificar el formato de la firma.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     */
+    String counterSign(String sign, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
+    
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
      * firmantes se separan por '\n' y comienzan por tantos '\t' como el nivel
      * en el que est&aacute;n.<br>
@@ -90,17 +112,6 @@ public interface MiniAfirma {
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
      */
     String getSignersStructure(String signB64) throws IOException ;
-
-    /**
-     * Realiza una firma en cascada (Contrafirma) sobre una firma. SI no se indica lo contrario mediante <i>extraParams</i>
-     * se contrafirman todos los nodos hoja
-     * @param sign Firma electr&oacute;nica que se desea contrafirmar.
-     * @param algorithm Algoritmo de firma.
-     * @param format Formato de firma.
-     * @param extraParams Par&aacute;metros adicionales para configurar la operaci&oacute;n.
-     * @return Contrafirma resultante en Base64.
-     */
-    String counterSign(String sign, String algorithm, String format, String extraParams);
 
     /**
      * Muestra un di&aacute;logo modal que permite al usuario seleccionar

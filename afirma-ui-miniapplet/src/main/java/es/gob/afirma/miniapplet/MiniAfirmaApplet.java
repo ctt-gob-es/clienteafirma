@@ -23,10 +23,13 @@ import javax.jnlp.ServiceManager;
 import javax.swing.JApplet;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.miniapplet.actions.CoSignAction;
+import es.gob.afirma.miniapplet.actions.CounterSignAction;
 import es.gob.afirma.miniapplet.actions.GetFileContentAction;
 import es.gob.afirma.miniapplet.actions.GetFilenameAction;
 import es.gob.afirma.miniapplet.actions.SaveFileAction;
@@ -52,16 +55,21 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     private String pathHint = Platform.getUserHome();
 
     @Override
-    public String sign(String dataB64, String algorithm, String format, String[] extraParams) throws IOException, PrivilegedActionException {
+    public String sign(String dataB64, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (dataB64 == null) {
     		throw new NullPointerException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
+    	}
+    	
+    	AOSigner signer = AOSignerFactory.getSigner(format);
+    	if (signer == null) {
+    		throw new AOFormatFileException("El formato de firma indicado no esta soportado"); //$NON-NLS-1$
     	}
     	
     	SelectPrivateKeyAction action = new SelectPrivateKeyAction(Platform.getOS(), Platform.getBrowser(this.userAgent), this); 
     	
     	PrivateKeyEntry keyEntry = AccessController.doPrivileged(action);
 
-    	AOSigner signer = AOSignerFactory.getSigner(format);
+    	
     	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
     	SignAction signAction = new SignAction(signer, Base64.decode(dataB64), algorithm, keyEntry, params); 
     	
@@ -69,14 +77,67 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
-    public String coSign(String sign, String data, String algorithm, String format, String extraParams) {
-        return null;
+    public String coSign(String signB64, String dataB64, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
+    	if (signB64 == null) {
+    		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
+    	}
+    	
+    	
+    	byte[] sign = Base64.decode(signB64);
+    	byte[] data = (dataB64 == null ? null : Base64.decode(dataB64));
+    	
+    	
+    	AOSigner signer;
+    	String signerErrorMessage;
+    	if (format != null) {
+    		signer = AOSignerFactory.getSigner(format);
+    		signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
+    	} else {
+    		signer = AOSignerFactory.getSigner(sign);
+    		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
+    	}
+    	if (signer == null) {
+    		throw new AOFormatFileException(signerErrorMessage);
+    	}
+    	
+    	SelectPrivateKeyAction action = new SelectPrivateKeyAction(Platform.getOS(), Platform.getBrowser(this.userAgent), this); 
+    	PrivateKeyEntry keyEntry = AccessController.doPrivileged(action);
+
+    	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+    	CoSignAction coSignAction = new CoSignAction(signer, sign, data, algorithm, keyEntry, params); 
+    	
+    	return Base64.encodeBytes(AccessController.doPrivileged(coSignAction));
     }
 
 
     @Override
-    public String counterSign(String sign, String algorithm, String format, String extraParams) {
-        return null;
+    public String counterSign(String signB64, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
+    	if (signB64 == null) {
+    		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
+    	}
+    	
+    	byte[] sign = Base64.decode(signB64);
+    	
+    	AOSigner signer;
+    	String signerErrorMessage;
+    	if (format != null) {
+    		signer = AOSignerFactory.getSigner(format);
+    		signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
+    	} else {
+    		signer = AOSignerFactory.getSigner(sign);
+    		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
+    	}
+    	if (signer == null) {
+    		throw new AOFormatFileException(signerErrorMessage);
+    	}
+    	
+    	SelectPrivateKeyAction action = new SelectPrivateKeyAction(Platform.getOS(), Platform.getBrowser(this.userAgent), this); 
+    	PrivateKeyEntry keyEntry = AccessController.doPrivileged(action);
+
+    	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+    	CounterSignAction counterSignAction = new CounterSignAction(signer, sign, algorithm, keyEntry, params); 
+    	
+    	return Base64.encodeBytes(AccessController.doPrivileged(counterSignAction));
     }
     
     @Override
