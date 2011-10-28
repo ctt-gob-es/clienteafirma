@@ -14,12 +14,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /** M&eacute;todos de utilidad para Mozilla Firefox y Nestcape.
  * Inspirada en la clase com.sun.deploy.net.proxy.NSPreferences de Sun
  * Microsystems. */
 final class NSPreferences {
+    
+    private NSPreferences() {
+        // No permitimos la instanciacion
+    }
 
     /** Devuelve el directorio del perfil activo de Firefox. Si no hubiese perfil
      * activo, devolver&iacute;a el directorio del perfil por defecto y si
@@ -47,7 +52,7 @@ final class NSPreferences {
         final FirefoxProfile[] profiles = readProfiles(iniFile);
         for (final FirefoxProfile profile : profiles) {
             if (isProfileLocked(profile)) {
-                currentProfilePath = profile.absolutePath;
+                currentProfilePath = profile.getAbsolutePath();
                 break;
             }
         }
@@ -55,8 +60,8 @@ final class NSPreferences {
         // Si no hay ninguno actualmente activo, tomamos el por defecto
         if (currentProfilePath == null) {
             for (final FirefoxProfile profile : profiles) {
-                if (profile.isDefault) {
-                    currentProfilePath = profile.absolutePath;
+                if (profile.isDefault()) {
+                    currentProfilePath = profile.getAbsolutePath();
                     break;
                 }
             }
@@ -64,7 +69,7 @@ final class NSPreferences {
 
         // Si no hay ninguno por defecto, se toma el primero
         if (profiles.length > 0) {
-            currentProfilePath = profiles[0].absolutePath;
+            currentProfilePath = profiles[0].getAbsolutePath();
         }
 
         return currentProfilePath;
@@ -88,7 +93,7 @@ final class NSPreferences {
         final String isDefaultAtr = "default="; //$NON-NLS-1$
 
         String line = null;
-        final Vector<FirefoxProfile> profiles = new Vector<FirefoxProfile>();
+        final List<FirefoxProfile> profiles = new ArrayList<FirefoxProfile>();
         final BufferedReader in = new BufferedReader(new FileReader(iniFile));
         try {
             while ((line = in.readLine()) != null) {
@@ -101,19 +106,22 @@ final class NSPreferences {
                 final FirefoxProfile profile = new FirefoxProfile();
                 while ((line = in.readLine()) != null && line.trim().length() > 0 && !line.trim().toLowerCase().startsWith("[profile")) { //$NON-NLS-1$
                     if (line.trim().toLowerCase().startsWith(nameAtr)) {
-                        profile.name = line.trim().substring(nameAtr.length());
+                        profile.setName(line.trim().substring(nameAtr.length()));
                     }
                     else if (line.trim().toLowerCase().startsWith(isRelativeAtr)) {
-                        profile.isRelative =
-                                line.trim().substring(isRelativeAtr.length()).equals("1"); //$NON-NLS-1$
+                        profile.setRelative(
+                                line.trim().substring(isRelativeAtr.length()).equals("1") //$NON-NLS-1$
+                        );
                     }
                     else if (line.trim().toLowerCase().startsWith(pathProfilesAtr)) {
-                        profile.path =
-                                line.trim().substring(pathProfilesAtr.length());
+                        profile.setPath(
+                                line.trim().substring(pathProfilesAtr.length())
+                        );
                     }
                     else if (line.trim().toLowerCase().startsWith(isDefaultAtr)) {
-                        profile.isDefault =
-                                line.trim().substring(isDefaultAtr.length()).equals("1"); //$NON-NLS-1$
+                        profile.setDefault(
+                                line.trim().substring(isDefaultAtr.length()).equals("1") //$NON-NLS-1$
+                        );
                     }
                     else {
                         break;
@@ -121,8 +129,8 @@ final class NSPreferences {
                 }
 
                 // Debemos encontrar al menos el nombre y la ruta del perfil
-                if (profile.name != null || profile.path != null) {
-                    profile.absolutePath = profile.isRelative ? new File(iniFile.getParent(), profile.path).toString() : profile.path;
+                if (profile.getName() != null || profile.getPath() != null) {
+                    profile.setAbsolutePath(profile.isRelative() ? new File(iniFile.getParent(), profile.getPath()).toString() : profile.getPath());
 
                     profiles.add(profile);
                 }
@@ -149,18 +157,61 @@ final class NSPreferences {
      *        Informaci&oacute;n del perfil de Firefox.
      * @return Devuelve {@code true} si el perfil esta bloqueado, {@code false} en caso contrario. */
     private static boolean isProfileLocked(final FirefoxProfile profile) {
-        return new File(profile.absolutePath, "parent.lock").exists() || // En //$NON-NLS-1$
-                                                                         // Windows
-               new File(profile.absolutePath, "lock").exists(); // En UNIX //$NON-NLS-1$
+        return new File(profile.getAbsolutePath(), "parent.lock").exists() || // En Windows //$NON-NLS-1$
+               new File(profile.getAbsolutePath(), "lock").exists(); // En UNIX //$NON-NLS-1$
     }
 
     /** Clase que almacena la configuraci&oacute;n para la identificacion de un
      * perfil de Mozilla Firefox. */
     static final class FirefoxProfile {
-        String name = null;
-        boolean isRelative = true;
-        String path = null;
-        String absolutePath = null;
-        boolean isDefault = false;
+        private String name = null;
+        
+        String getName() {
+            return this.name;
+        }
+        
+        void setName(final String n) {
+            this.name = n;
+        }
+        
+        private boolean relative = true;
+        
+        boolean isRelative() {
+            return this.relative;
+        }
+        
+        void setRelative(final boolean r) {
+            this.relative = r;
+        }
+        
+        private String path = null;
+        
+        String getPath() {
+            return this.path;
+        }
+        
+        void setPath(final String p) {
+            this.path = p;
+        }
+        
+        private String absolutePath = null;
+        
+        String getAbsolutePath() {
+            return this.absolutePath;
+        }
+        
+        void setAbsolutePath(final String ap) {
+            this.absolutePath = ap;
+        }
+        
+        private boolean def = false;
+        
+        boolean isDefault() {
+            return this.def;
+        }
+        
+        void setDefault(final boolean d) {
+            this.def = d;
+        }
     }
 }

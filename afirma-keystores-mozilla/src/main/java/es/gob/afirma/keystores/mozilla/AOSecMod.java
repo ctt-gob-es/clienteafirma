@@ -11,10 +11,11 @@
 package es.gob.afirma.keystores.mozilla;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -26,7 +27,7 @@ import es.gob.afirma.core.misc.Platform;
 final class AOSecMod {
 
     /** Listado de m&oacute;dulos almacenados en el fichero "Secmod.db". */
-    private static Vector<ModuleName> modules = null;
+    private static List<ModuleName> modules = null;
 
     private AOSecMod() {
         // No permitimos la instanciacion
@@ -81,7 +82,7 @@ final class AOSecMod {
      *         durante la b&acute;squeda
      * @throws AOException
      *         Cuando ocurre cualquier problema durante el proceso */
-    static Vector<ModuleName> getModules(final String dir) throws AOException {
+    static List<ModuleName> getModules(final String dir) throws AOException {
         
         if (dir == null || "".equals(dir)) { //$NON-NLS-1$
             throw new IllegalArgumentException("El directorio del perfil de Mozilla no puede ser nulo"); //$NON-NLS-1$
@@ -109,7 +110,7 @@ final class AOSecMod {
 
             // Obtenemos los modulos PKCS#11 asegurandonos de que no aparecen
             // mas de una vez
-            modules = new Vector<ModuleName>();
+            modules = new ArrayList<ModuleName>();
             final Set<String> libs = new HashSet<String>();
             for (int i = 0; i < secMod.length; i++) {
                 try {

@@ -44,6 +44,8 @@ final class MozillaKeyStoreUtilities {
     private static final String NSSDBM3_DLL = "nssdbm3.dll";  //$NON-NLS-1$
     private static final String SQLITE3_DLL = "sqlite3.dll"; //$NON-NLS-1$
     
+    private static final String NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
+    
     private MozillaKeyStoreUtilities() {
         // No permitimos la instanciacion
     }
@@ -323,9 +325,9 @@ final class MozillaKeyStoreUtilities {
         // *********************************************************************
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
-        if (new File("/usr/lib/libsoftokn3.so").exists() && new File("/lib/libnspr4.so").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$ 
             try {
-                System.load("/lib/libnspr4.so"); //$NON-NLS-1$
+                System.load(NSPR4_SO);
                 nssLibDir = "/usr/lib"; //$NON-NLS-1$
             }
             catch (final Exception e) {
@@ -536,9 +538,9 @@ final class MozillaKeyStoreUtilities {
         // *********************************************************************
         // Compobamos antes el caso especifico de NSS partido entre /usr/lib y
         // /lib, que se da en Fedora
-        if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File("/lib/libnspr4.so").exists()) { //$NON-NLS-1$ //$NON-NLS-2$
+        if (Platform.OS.LINUX.equals(Platform.getOS()) && new File("/usr/lib/libsoftokn3.so").exists() && new File(NSPR4_SO).exists()) { //$NON-NLS-1$ 
             try {
-                System.load("/lib/libnspr4.so"); //$NON-NLS-1$
+                System.load(NSPR4_SO); 
                 if (new File("/lib/libplds4.so").exists()) { //$NON-NLS-1$
                     System.load("/lib/libplds4.so"); //$NON-NLS-1$
                 }
