@@ -26,7 +26,7 @@ public class ExtraParamsProcessor {
 		for (String entry : entries) {
 			if (entry != null && !entry.startsWith("#") &&  //$NON-NLS-1$
 					((n = entry.indexOf('=')) != -1) && (n != 0)) {
-				params.setProperty(entry.substring(0, n), (n < entry.length() - 1) ?
+				params.setProperty(entry.substring(0, n).toLowerCase(), (n < entry.length() - 1) ?
 						entry.substring(n + 1) : ""); //$NON-NLS-1$
 			}
 		}

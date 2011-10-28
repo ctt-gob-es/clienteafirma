@@ -9,10 +9,16 @@ import es.gob.afirma.core.signers.AOSigner;
 
 /**
  * Acci&oacute;n privilegiada para realizar una contrafirma electr&oacute;nica.
+ * Se contrafirmar&aacute;n todos los nodos hoja de la firma, salvo que se
+ * especifique lo contrario.
  * @author Carlos Gamuci Mill&aacute;n.
  */
 public class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 
+	private static final String COUNTERSIGN_TARGET_KEY = "target"; //$NON-NLS-1$
+	
+	private static final String COUNTERSIGN_TARGET_TREE = "tree"; //$NON-NLS-1$
+	
 	private AOSigner signer;
 	
 	private byte[] sign;
@@ -41,7 +47,16 @@ public class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 	
 	@Override
 	public byte[] run() throws Exception {
+		
+		CounterSignTarget target = CounterSignTarget.LEAFS;
+		if (this.extraParams.containsKey(COUNTERSIGN_TARGET_KEY)) {
+			String targetValue = this.extraParams.getProperty(COUNTERSIGN_TARGET_KEY);
+			if (COUNTERSIGN_TARGET_TREE.equalsIgnoreCase(targetValue)) {
+				target = CounterSignTarget.TREE;
+			}
+		}
+		
 		return this.signer.countersign(this.sign, this.algorithm,
-				CounterSignTarget.LEAFS, null, this.keyEntry, this.extraParams);
+				target, null, this.keyEntry, this.extraParams);
 	}
 }

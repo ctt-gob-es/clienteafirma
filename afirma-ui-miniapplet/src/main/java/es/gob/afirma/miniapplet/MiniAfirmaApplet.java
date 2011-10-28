@@ -47,11 +47,16 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     
     private static final String APPLET_PARAM_USER_AGENT = "userAgent"; //$NON-NLS-1$
     
+    /** Identificador del navegador Web que carga el applet. */
     private String userAgent = null;
     
+    /** Servicio para la carga de ficheros. */
     private FileOpenService fos = null;
+    
+    /** Servicio para el guardado de ficheros. */
     private FileSaveService fss = null;
     
+    /** Ruta recomendada para la apertura de di&aacute;logos se seleccion y guardado de ficheros. */
     private String pathHint = Platform.getUserHome();
 
     @Override

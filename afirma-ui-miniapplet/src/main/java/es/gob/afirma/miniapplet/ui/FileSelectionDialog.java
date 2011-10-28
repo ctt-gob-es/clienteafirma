@@ -1,10 +1,14 @@
 package es.gob.afirma.miniapplet.ui;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.jnlp.FileContents;
 import javax.jnlp.FileOpenService;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 
@@ -37,12 +41,21 @@ public class FileSelectionDialog {
      * @throws IOException Si se produce alg&uacute;n error en la carga del fichero.
      */
     public InputStream getFileContent() throws AOCancelledOperationException, IOException {
-        FileContents fileContents = this.jnlpFos.openFileDialog(null, this.exts);
-        if (fileContents == null) {
-            throw new AOCancelledOperationException("El usuario cancelo la seleccion del fichero"); //$NON-NLS-1$
-        }
-
-        return fileContents.getInputStream();
+//        FileContents fileContents = this.jnlpFos.openFileDialog(null, this.exts);
+//        if (fileContents == null) {
+//            throw new AOCancelledOperationException("El usuario cancelo la seleccion del fichero"); //$NON-NLS-1$
+//        }
+//
+//        return fileContents.getInputStream();
+    	
+    	JFileChooser fc = new JFileChooser();
+    	fc.setDialogTitle("Carga de datos"); //$NON-NLS-1$
+    	fc.setFileFilter(this.getExtensionFileFilter(this.exts, "Ficheros")); //$NON-NLS-1$
+    	int result = fc.showOpenDialog(null);
+    	if (result != JFileChooser.APPROVE_OPTION) {
+    		throw new AOCancelledOperationException("El usuario cancelo la seleccion del fichero"); //$NON-NLS-1$
+    	}
+    	return new FileInputStream(fc.getSelectedFile());
     }
     
     /**
@@ -59,5 +72,30 @@ public class FileSelectionDialog {
         }
 
         return fileContents.getName();
+    }
+    
+    /**
+     * Crea un filtro de fichero por extensi&oacute;n.
+     * @param extensions Extensiones de fichero permitidas.
+     * @param description Descripci&oacute;n del tipo de fichero.
+     * @return
+     */
+    private FileFilter getExtensionFileFilter(final String[] extensions, final String description) {
+    	return new FileFilter() {
+			@Override
+			public String getDescription() {
+				return description;
+			}
+			
+			@Override
+			public boolean accept(File f) {
+				for (String ext : extensions) {
+					if (f.getName().endsWith(ext)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		};
     }
 }

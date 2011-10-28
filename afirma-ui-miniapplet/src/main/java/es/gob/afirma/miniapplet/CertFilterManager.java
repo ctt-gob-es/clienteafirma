@@ -8,7 +8,7 @@ import es.gob.afirma.keystores.filters.DNIeFilter;
 
 public class CertFilterManager {
 
-	private final static String FILTER_PREFIX_KEY = "Filter"; //$NON-NLS-1$
+	private final static String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
 	
 	private final static String FILTER_TYPE_DNIE = "dnie:"; //$NON-NLS-1$
 	
