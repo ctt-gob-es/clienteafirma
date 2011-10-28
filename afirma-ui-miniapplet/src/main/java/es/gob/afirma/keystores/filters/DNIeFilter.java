@@ -21,7 +21,7 @@ public class DNIeFilter implements CertificateFilter {
 	public DNIeFilter() {
 		
 		this.rfc2254Filter = new RFC2254CertificateFilter(
-				"(cn=*\28FIRMA\29)", //$NON-NLS-1$
+				"(cn=*FIRMA*)", //$NON-NLS-1$
 				"(&(cn=AC DNIE 00*)(ou=DNIE)(o=DIRECCION GENERAL DE LA POLICIA)(c=ES))"); //$NON-NLS-1$
 		
 		this.keyUsageFilter = new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE);
