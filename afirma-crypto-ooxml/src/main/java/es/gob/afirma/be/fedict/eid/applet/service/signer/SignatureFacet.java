@@ -45,6 +45,7 @@ import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -68,13 +69,14 @@ public interface SignatureFacet {
      * @throws NoSuchAlgorithmException 
      * @throws SAXException 
      * @throws ParserConfigurationException 
-     * @throws IOException */
+     * @throws IOException 
+     * @throws TransformerException */
     void preSign(XMLSignatureFactory signatureFactory,
                  Document document,
                  String signatureId,
                  List<X509Certificate> signingCertificateChain,
                  List<Reference> references,
-                 List<XMLObject> objects) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, IOException, ParserConfigurationException, SAXException;
+                 List<XMLObject> objects) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, IOException, ParserConfigurationException, SAXException, TransformerException;
 
     /** This method is being invoked by the XML signature service engine during
      * the post-sign phase. Via this method a signature facet can extend the XML

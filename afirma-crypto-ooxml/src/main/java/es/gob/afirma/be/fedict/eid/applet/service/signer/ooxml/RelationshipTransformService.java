@@ -86,7 +86,7 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
  * Specs: http://openiso.org/Ecma/376/Part2/12.2.4#26
  * </p>
  * @author Frank Cornelis */
-public class RelationshipTransformService extends TransformService {
+final class RelationshipTransformService extends TransformService {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -101,7 +101,7 @@ public class RelationshipTransformService extends TransformService {
 
     @Override
     public void init(final TransformParameterSpec params) throws InvalidAlgorithmParameterException {
-        if (false == params instanceof RelationshipTransformParameterSpec) {
+        if (!(params instanceof RelationshipTransformParameterSpec)) {
             throw new InvalidAlgorithmParameterException();
         }
         final RelationshipTransformParameterSpec relParams = (RelationshipTransformParameterSpec) params;
@@ -119,7 +119,7 @@ public class RelationshipTransformService extends TransformService {
             toString(parentNode);
         }
         catch (final TransformerException e) {
-            throw new InvalidAlgorithmParameterException();
+            throw new InvalidAlgorithmParameterException(e);
         }
         final Element nsElement = parentNode.getOwnerDocument().createElement("ns"); //$NON-NLS-1$
         nsElement.setAttributeNS(Constants.NamespaceSpecNS, "xmlns:ds", Constants.SignatureSpecNS); //$NON-NLS-1$
@@ -130,7 +130,7 @@ public class RelationshipTransformService extends TransformService {
         }
         catch (final TransformerException e) {
             LOGGER.severe("transformer exception: " + e.getMessage()); //$NON-NLS-1$
-            throw new InvalidAlgorithmParameterException();
+            throw new InvalidAlgorithmParameterException(e);
         }
         if (0 == nodeList.getLength()) {
             LOGGER.warning("no RelationshipReference/@SourceId parameters present"); //$NON-NLS-1$
@@ -192,7 +192,7 @@ public class RelationshipTransformService extends TransformService {
             }
             final Element childElement = (Element) childNode;
             final String idAttribute = childElement.getAttribute("Id"); //$NON-NLS-1$
-            if (false == this.sourceIds.contains(idAttribute)) {
+            if (!this.sourceIds.contains(idAttribute)) {
                 relationshipsElement.removeChild(childNode);
                 nodeIdx--;
             }

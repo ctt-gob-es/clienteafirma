@@ -35,10 +35,20 @@
 
 package es.gob.afirma.be.fedict.eid.applet.service.signer;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.dsig.XMLSignatureException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.xml.sax.SAXException;
 
 import es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml.AbstractOOXMLSignatureService;
 import es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
@@ -63,7 +73,7 @@ public final class AbstractOOXMLSignatureServiceContainer {
                 this.ooxml = AOUtil.getDataFromInputStream(ooxmlis);
             }
             catch (final Exception e) {
-                throw new IllegalArgumentException("No se ha podido leer el OOXML desde el flujo de entrada"); //$NON-NLS-1$
+                throw new IllegalArgumentException("No se ha podido leer el OOXML desde el flujo de entrada", e); //$NON-NLS-1$
             }
             if (digestAlgo == null) {
                 this.digestAlgorithm = "SHA1"; //$NON-NLS-1$
@@ -87,12 +97,27 @@ public final class AbstractOOXMLSignatureServiceContainer {
      * @param pk Clave privada
      * @param signerCount N&uacute;mero de firma
      * @return Documento OOXML firmado
+     * @throws XMLSignatureException 
+     * @throws MarshalException 
+     * @throws TransformerException 
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
+     * @throws IOException 
+     * @throws InvalidAlgorithmParameterException 
+     * @throws NoSuchAlgorithmException 
      * @throws Exception Cuando ocurre cualquier problema durante el proceso */
     public byte[] sign(final InputStream ooxml,
                              final List<X509Certificate> certChain,
                              final String digestAlgorithm,
                              final PrivateKey pk,
-                             final int signerCount) throws Exception {
+                             final int signerCount) throws NoSuchAlgorithmException, 
+                                                           InvalidAlgorithmParameterException, 
+                                                           IOException, 
+                                                           ParserConfigurationException, 
+                                                           SAXException, 
+                                                           TransformerException, 
+                                                           MarshalException, 
+                                                           XMLSignatureException {
 
         OOXMLProvider.install();
 

@@ -11,7 +11,8 @@
 package es.gob.afirma.signers.ooxml;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -22,6 +23,10 @@ import es.gob.afirma.core.misc.AOUtil;
 
 /** Clase con m&eacute;todos de utilidad para las firmas OOXML. */
 final class OOXMLUtil {
+    
+    private OOXMLUtil() {
+        // No permitimos la instanciacion
+    }
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
@@ -94,7 +99,7 @@ final class OOXMLUtil {
         }
 
         // Contamos las relaciones de firma
-        final Vector<RelationShip> relations = new Vector<RelationShip>();
+        final List<RelationShip> relations = new ArrayList<RelationShip>();
         for (final RelationShip rel : parser.getRelationships()) {
             if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
                 relations.add(rel);
@@ -144,7 +149,7 @@ final class OOXMLUtil {
         }
 
         // Contamos las relaciones de firma
-        final Vector<byte[]> relations = new Vector<byte[]>();
+        final List<byte[]> relations = new ArrayList<byte[]>();
         for (final RelationShip rel : parser.getRelationships()) {
             if (OOXML_SIGNATURE_RELATIONSHIP_TYPE.equals(rel.getType())) {
 

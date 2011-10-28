@@ -233,36 +233,10 @@ public final class AOOOXMLSigner implements AOSigner {
                              final PrivateKeyEntry keyEntry,
                              final Properties extraParams) throws AOException {
 
-        // Cogemos el algoritmo de digest
-        String digestAlgo;
-        if (algorithm == null) {
-            digestAlgo = "SHA1"; //$NON-NLS-1$
-        }
-        else if (algorithm.startsWith("SHA-1") || algorithm.startsWith("SHA1") || algorithm.startsWith("SHAwith")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            digestAlgo = "SHA1"; //$NON-NLS-1$
-        }
-        else if (algorithm.startsWith("SHA-512") || algorithm.startsWith("SHA512")) { //$NON-NLS-1$ //$NON-NLS-2$
-            digestAlgo = "SHA512"; //$NON-NLS-1$
-        }
-        else if (algorithm.startsWith("SHA-384") || algorithm.startsWith("SHA384")) { //$NON-NLS-1$ //$NON-NLS-2$
-            digestAlgo = "SHA384"; //$NON-NLS-1$
-        }
-        else if (algorithm.startsWith("SHA-256") || algorithm.startsWith("SHA256")) { //$NON-NLS-1$ //$NON-NLS-2$
-            digestAlgo = "SHA256"; //$NON-NLS-1$
-        }
-        else if (algorithm.startsWith("RIPEND-160") || algorithm.startsWith("RIPEND160")) { //$NON-NLS-1$ //$NON-NLS-2$
-            digestAlgo = "RIPEND160"; //$NON-NLS-1$
-        }
-        else {
-            LOGGER.warning("El algoritmo de firma '" + algorithm //$NON-NLS-1$
-                                                      + "' no esta soportado en OOXML, se utilizara SHA1 con RSA"); //$NON-NLS-1$
-            digestAlgo = "SHA1"; //$NON-NLS-1$
-        }
 
-        /*
-         * Si se solicito una firma explicita, advertimos no son compatibles con
-         * OOXML y se ignorara esta configuracion
-         */
+         // Si se solicito una firma explicita, advertimos no son compatibles con
+         // OOXML y se ignorara esta configuracion
+
         if (extraParams != null && extraParams.containsKey("mode") && extraParams.getProperty("mode").equals(AOSignConstants.SIGN_MODE_EXPLICIT)) { //$NON-NLS-1$ //$NON-NLS-2$
             LOGGER.warning("El formato de firma OOXML no soporta el modo de firma explicita, " + "se ignorara esta configuracion"); //$NON-NLS-1$ //$NON-NLS-2$
         }
@@ -299,7 +273,7 @@ public final class AOOOXMLSigner implements AOSigner {
         try {
             return new AbstractOOXMLSignatureServiceContainer().sign(new ByteArrayInputStream(ooxmlDocument),
                                                                      certChain,
-                                                                     digestAlgo,
+                                                                     AOSignConstants.getDigestAlgorithmName(algorithm),
                                                                      keyEntry.getPrivateKey(),
                                                                      signNum);
         }

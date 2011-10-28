@@ -276,7 +276,7 @@ public abstract class AbstractXmlSignatureService implements SignatureService {
 
             final List<XMLStructure> objectContentList = object.getContent();
             for (final XMLStructure objectContent : objectContentList) {
-                if (false == objectContent instanceof Manifest) {
+                if (!(objectContent instanceof Manifest)) {
                     continue;
                 }
                 final Manifest manifest = (Manifest) objectContent;

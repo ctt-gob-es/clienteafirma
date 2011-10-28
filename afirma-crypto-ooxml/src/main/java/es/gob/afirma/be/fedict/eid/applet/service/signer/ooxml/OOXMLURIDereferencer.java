@@ -103,10 +103,10 @@ class OOXMLURIDereferencer implements URIDereferencer {
             entryName = uri.substring(1); // remove '/'
         }
         else {
-            entryName = uri.toString();
+            entryName = uri;
         }
-        if (-1 != entryName.indexOf("?")) { //$NON-NLS-1$
-            entryName = entryName.substring(0, entryName.indexOf("?")); //$NON-NLS-1$
+        if (-1 != entryName.indexOf('?')) {
+            entryName = entryName.substring(0, entryName.indexOf('?'));
         }
 
         final ZipInputStream ooxmlZipInputStream = new ZipInputStream(new ByteArrayInputStream(this.ooxml));

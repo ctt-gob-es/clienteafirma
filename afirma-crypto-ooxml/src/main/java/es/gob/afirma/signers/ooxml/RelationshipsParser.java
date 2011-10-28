@@ -64,7 +64,7 @@ final class RelationshipsParser {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlRelationships);
         }
         catch (final Exception e) {
-            throw new AOException("El flujo de datos proporcionado no era un XML valido"); //$NON-NLS-1$
+            throw new AOException("El flujo de datos proporcionado no era un XML valido", e); //$NON-NLS-1$
         }
 
         // Obtenemos la raiz

@@ -84,6 +84,8 @@ import es.gob.afirma.be.fedict.eid.applet.service.signer.SignatureFacet;
 class OOXMLSignatureFacet implements SignatureFacet {
 
     private final AbstractOOXMLSignatureService signatureService;
+    
+    private static final String DIGITAL_SIGNATURE_SCHEMA = "http://schemas.openxmlformats.org/package/2006/digital-signature"; //$NON-NLS-1$
 
     /** Main constructor.
      * @param signatureService */
@@ -100,7 +102,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
                                                               InvalidAlgorithmParameterException, 
                                                               IOException, 
                                                               ParserConfigurationException, 
-                                                              SAXException {
+                                                              SAXException, TransformerException {
 
         addManifestObject(signatureFactory, document, signatureId, references, objects);
 
@@ -115,7 +117,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
                                                                          InvalidAlgorithmParameterException, 
                                                                          IOException, 
                                                                          ParserConfigurationException, 
-                                                                         SAXException {
+                                                                         SAXException, TransformerException {
         final Manifest manifest = constructManifest(signatureFactory);
         final String objectId = "idPackageObject"; // really has to be this value. //$NON-NLS-1$
         final List<XMLStructure> objectContent = new LinkedList<XMLStructure>();
@@ -134,7 +136,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
                                                                                           InvalidAlgorithmParameterException, 
                                                                                           IOException, 
                                                                                           ParserConfigurationException, 
-                                                                                          SAXException {
+                                                                                          SAXException, TransformerException {
         final List<Reference> manifestReferences = new LinkedList<Reference>();
         addRelationshipsReferences(signatureFactory, manifestReferences);
 
@@ -165,14 +167,14 @@ class OOXMLSignatureFacet implements SignatureFacet {
          * SignatureTime
          */
         final Element signatureTimeElement =
-                document.createElementNS("http://schemas.openxmlformats.org/package/2006/digital-signature", "mdssi:SignatureTime"); //$NON-NLS-1$ //$NON-NLS-2$
+                document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:SignatureTime"); //$NON-NLS-1$ 
         signatureTimeElement.setAttributeNS(Constants.NamespaceSpecNS,
                                             "xmlns:mdssi", //$NON-NLS-1$
-                                            "http://schemas.openxmlformats.org/package/2006/digital-signature"); //$NON-NLS-1$
-        final Element formatElement = document.createElementNS("http://schemas.openxmlformats.org/package/2006/digital-signature", "mdssi:Format"); //$NON-NLS-1$ //$NON-NLS-2$
+                                            DIGITAL_SIGNATURE_SCHEMA); 
+        final Element formatElement = document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:Format"); //$NON-NLS-1$ 
         formatElement.setTextContent("YYYY-MM-DDThh:mm:ssTZD"); //$NON-NLS-1$
         signatureTimeElement.appendChild(formatElement);
-        final Element valueElement = document.createElementNS("http://schemas.openxmlformats.org/package/2006/digital-signature", "mdssi:Value"); //$NON-NLS-1$ //$NON-NLS-2$
+        final Element valueElement = document.createElementNS(DIGITAL_SIGNATURE_SCHEMA, "mdssi:Value"); //$NON-NLS-1$ 
         valueElement.setTextContent(new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").format(new Date())); //$NON-NLS-1$
         signatureTimeElement.appendChild(valueElement);
 
@@ -289,14 +291,8 @@ class OOXMLSignatureFacet implements SignatureFacet {
     }
 
     private void addParts(final XMLSignatureFactory signatureFactory, final String contentType, final List<Reference> references) throws NoSuchAlgorithmException,
-                                                                                                               InvalidAlgorithmParameterException {
-        List<String> documentResourceNames;
-        try {
-            documentResourceNames = getResourceNames(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()), contentType);
-        }
-        catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+                                                                                                               InvalidAlgorithmParameterException, IOException, ParserConfigurationException, SAXException, TransformerException {
+        final List<String> documentResourceNames = getResourceNames(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()), contentType);
         final DigestMethod digestMethod = signatureFactory.newDigestMethod(DigestMethod.SHA1, null);
         for (final String documentResourceName : documentResourceNames) {
 
@@ -312,7 +308,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
                                                                                    TransformerException {
         final List<String> signatureResourceNames = new LinkedList<String>();
         if (null == ooxmldoc) {
-            throw new RuntimeException("OOXML document is null"); //$NON-NLS-1$
+            throw new IllegalArgumentException("OOXML document is null"); //$NON-NLS-1$
         }
         final ZipInputStream zipInputStream = new ZipInputStream(ooxmldoc);
         ZipEntry zipEntry;
@@ -340,7 +336,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
         if (null != document) {
             return document;
         }
-        throw new RuntimeException("ZIP entry not found: " + zipEntryName); //$NON-NLS-1$
+        throw new IOException("ZIP entry not found: " + zipEntryName); //$NON-NLS-1$
     }
 
     private Document findDocument(final String zipEntryName) throws IOException, ParserConfigurationException, SAXException {
