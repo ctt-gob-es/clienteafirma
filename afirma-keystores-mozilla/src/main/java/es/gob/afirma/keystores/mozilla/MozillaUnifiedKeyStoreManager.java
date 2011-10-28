@@ -61,9 +61,9 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
         // Por si el proveedor estubiese ya instalado por una ejecucion anterior
         // intentamos obtenerlo directamente
-        this.nssProvider = Security.getProvider("SunPKCS11-NSSCrypto-AFirma"); //$NON-NLS-1$
+        setNSSProvider(Security.getProvider("SunPKCS11-NSSCrypto-AFirma")); //$NON-NLS-1$
         try {
-            if (this.nssProvider == null) {
+            if (getNSSProvider() == null) {
                 LOGGER.info("Inicializando almacen unificado de Firefox (NSS + modulos PKCS#11)"); //$NON-NLS-1$
 
                 final String nssDirectory = MozillaKeyStoreUtilities.getSystemNSSLibDir();
@@ -81,12 +81,13 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
                 LOGGER.info("Configuracion de NSS para SunPKCS11:\n" + p11NSSConfigFile); //$NON-NLS-1$
 
-                this.nssProvider =
+                setNSSProvider(
                         (Provider) AOUtil.classForName("sun.security.pkcs11.SunPKCS11") //$NON-NLS-1$
                                         .getConstructor(InputStream.class)
-                                        .newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()));
+                                        .newInstance(new ByteArrayInputStream(p11NSSConfigFile.getBytes()))
+                );
 
-                Security.addProvider(this.nssProvider);
+                Security.addProvider(getNSSProvider());
                 LOGGER.info("Proveedor PKCS#11 para Firefox anadido"); //$NON-NLS-1$
             }
         }
@@ -99,9 +100,9 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
 
         KeyStore ks = null;
 
-        if (this.nssProvider != null) {
+        if (getNSSProvider() != null) {
             try {
-                ks = KeyStore.getInstance("PKCS11", this.nssProvider); //$NON-NLS-1$
+                ks = KeyStore.getInstance("PKCS11", getNSSProvider()); //$NON-NLS-1$
             }
             catch (final Exception e) {
                 LOGGER.warning("No se ha podido obtener el KeyStore PKCS#11 NSS del proveedor SunPKCS11, se continuara con los almacenes externos: " + e); //$NON-NLS-1$

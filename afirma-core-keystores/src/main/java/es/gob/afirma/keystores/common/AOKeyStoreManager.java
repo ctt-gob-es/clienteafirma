@@ -47,7 +47,15 @@ public class AOKeyStoreManager {
 
     /** Instancia del provider de NSS. S&oacute;lo se permite una instancia de
      * esta clase, as&iacute; que la cacheamos. */
-    protected Provider nssProvider = null;
+    private Provider nssProvider = null;
+    
+    protected Provider getNSSProvider() {
+        return this.nssProvider;
+    }
+    
+    protected void setNSSProvider(final Provider p) {
+        this.nssProvider = p;
+    }
 
     /** Instancia del provider CAPI de Sun. Aunque se permite m&aacute;s de una
      * instancia de este provider, lo cacheamos para evitar problemas. */
