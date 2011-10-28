@@ -1,6 +1,7 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -34,13 +35,15 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this,null,null);
 		this.addComponentListener(adaptador);
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		if (GeneralConfig.isMaximized()){
-			//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-			Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
-			//Se obtienen las dimensiones de maximizado
-			int maxWidth = (int)rect.getWidth();
-			int maxHeight = (int)rect.getHeight();
+		//Se obtienen las dimensiones de maximizado
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+		
+		if (GeneralConfig.isMaximized()){
 			
 			//Se hace el resize dependiendo del so
 			if (!Platform.getOS().equals(Platform.OS.LINUX)){
@@ -50,7 +53,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			}
 			
 			if (Platform.getOS().equals(Platform.OS.LINUX)){
-				//Se comprueba si está activado el modo negrita o fuente grande
+				//Se comprueba si esta activado el modo negrita o fuente grande
 				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 					setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
 				} else {
@@ -58,7 +61,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 				}
 				
 			} else {
-				//Se comprueba si está activado el modo negrita o fuente grande
+				//Se comprueba si esta activado el modo negrita o fuente grande
 				if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 					setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
 				} else {
@@ -69,14 +72,14 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			if (PrincipalGUI.wizardActualPositionX != -1){
 	    		setBounds(PrincipalGUI.wizardActualPositionX, PrincipalGUI.wizardActualPositionY, PrincipalGUI.wizardActualWidth, PrincipalGUI.wizardActualHeight);
 	    		if (Platform.getOS().equals(Platform.OS.LINUX)){
-	    			//Se comprueba si está activado el modo negrita o fuente grande
+	    			//Se comprueba si esta activado el modo negrita o fuente grande
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
 					} else {
 						setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
 					}
 	    		} else {
-	    			//Se comprueba si está activado el modo negrita o fuente grande
+	    			//Se comprueba si esta activado el modo negrita o fuente grande
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
 					} else {
@@ -85,7 +88,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	    		}
     		} else {
 				if (Platform.getOS().equals(Platform.OS.LINUX)){
-					//Se comprueba si está activado el modo negrita o fuente grande
+					//Se comprueba si esta activado el modo negrita o fuente grande
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						 setBounds((screenSize.width - Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX);
 				         setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH_LINUX, Constants.WIZARD_FONT_INITIAL_HEIGHT_LINUX));
@@ -94,7 +97,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			          setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX));
 					}
 				} else {
-					//Se comprueba si está activado el modo negrita o fuente grande
+					//Se comprueba si esta activado el modo negrita o fuente grande
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						 setBounds((screenSize.width - Constants.WIZARD_FONT_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_FONT_INITIAL_HEIGHT) / 2, Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT);
 				         setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
@@ -106,12 +109,14 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
     		}
 		}
 		
+		
+		
 	}
 	
 	/**
-	 * Relación mínima que se aplica para la redimensión de los componentes.
-	 * Cuanto menor es este número menor es la redimensión aplicada.
-	 * @return int Relación mínima
+	 * Relaci&oacute;n m&iacute;nima que se aplica para la redimensi&oacute;n de los componentes.
+	 * Cuanto menor es este n&uacute;mero menor es la redimensi&oacute;n aplicada.
+	 * @return int Relaci&oacute;n m&iacute;nima
 	 */
 	public abstract int getMinimumRelation();
 	
@@ -121,7 +126,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 * @param container Contenedor donde se encuentra el componente a buscar
 	 * @return
 	 */
-	/*private Component getComponentByName(String name, Container container){
+	private Component getComponentByName(String name, Container container){
 		if(name.equals(container.getName())){
 			return container;
 		}
@@ -142,11 +147,11 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			}
 		}
 		return null;
-	}*/
+	}
 	
 	@Override
 	/**
-	 * Evento de redimensionado. Comprueba el tamaÃ±o de la ventana para habilitar o deshabilitar el boton
+	 * Evento de redimensionado. Comprueba el tama&ntilde;o de la ventana para habilitar o deshabilitar el bot&oacute;n
 	 *  de Maximizar ventana
 	 */
 	public void componentResized(ComponentEvent e) {
@@ -170,6 +175,30 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	    } else {
 	    	this.setResizable(true);
 	    }
+	    
+	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
+		Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this));
+		
+		//Se comprueba el estado de los botones de maximizado y restauracion
+		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+			if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
+				botonMaximizar.setEnabled (false);
+				botonRestaurar.setEnabled (true);
+			} else {
+				botonMaximizar.setEnabled (true);
+				botonRestaurar.setEnabled (false);
+			}
+		} else {
+			
+			if (this.getSize().equals(new Dimension(maxWidth,maxHeight - Constants.maximizeVerticalMarginLinux))){
+				botonMaximizar.setEnabled (false);
+				botonRestaurar.setEnabled (true);
+			} else {
+				botonMaximizar.setEnabled (true);
+				botonRestaurar.setEnabled (false);
+			}
+		}
+	    
 		/*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 	    Dimension actualSize = getJAccessibilityDialogWizard(this).getSize();
@@ -192,7 +221,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	}
 
 /*	*//**
-	 * Método que activa o desactiva el componente según lo indicado por parámetros.
+	 * M&eacute;todo que activa o desactiva el componente seg&uacute;n lo indicado por par&aacute;metros.
 	 * @param idComponent identificador del componente
 	 * @param enabled estado
 	 *//*

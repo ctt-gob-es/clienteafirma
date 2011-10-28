@@ -72,10 +72,10 @@ public class Opciones extends JAccessibilityDialog {
     /** Panel con las pesta&ntilde;as de opciones. */
     private JTabbedPane mainPanel;
     
-    /** Botón para maximizar la ventana */
+    /** Bot&oacute;n para maximizar la ventana */
     private JButton maximizar = new JButton();
     
-    /** Botón para restaurar la ventana una vez maximizada */
+    /** Bot&oacute;n para restaurar la ventana una vez maximizada */
     private JButton restaurar = new JButton();
     
     public Opciones(PrincipalGUI mainGUI) {
@@ -93,8 +93,8 @@ public class Opciones extends JAccessibilityDialog {
 	}
 	
     /**
-	 * Posición X inicial de la ventana dependiendo de la resolución de pantalla.
-	 * @return int Posición X
+	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
+	 * @return int Posici&oacute;n X
 	 */
     public int getInitialX() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
@@ -102,9 +102,9 @@ public class Opciones extends JAccessibilityDialog {
 	}
     
     /**
-	 * Posición Y inicial de la ventana dependiendo del sistema operativo y de la
-	 * resolución de pantalla.
-	 * @return int Posición Y
+	 * Posici&oacute;n Y inicial de la ventana dependiendo del sistema operativo y de la
+	 * resoluci&oacute;n de pantalla.
+	 * @return int Posici&oacute;n Y
 	 */
 	public int getInitialY() {
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
@@ -119,27 +119,21 @@ public class Opciones extends JAccessibilityDialog {
      * Inicializacion de componentes
      */
     private void initComponents() {
-    	// Dimensiones de la ventana en Windows y Linux
+    	//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
+		//Se obtienen las dimensiones de maximizado
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+		
+		// Dimensiones de la ventana en Windows y Linux
     	if (GeneralConfig.isMaximized()){
-    		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-    		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
- 
-    		//Se obtienen las dimensiones de maximizado
-    		int maxWidth = (int)rect.getWidth();
-    		int maxHeight = (int)rect.getHeight();
-    		
     		//Se maximiza dependiendo del so
     		if (!Platform.getOS().equals(Platform.OS.LINUX)){
     			this.setBounds(0,0, maxWidth, maxHeight);
     		} else {
     			this.setBounds(0,0, maxWidth, maxHeight- Constants.maximizeVerticalMarginLinux);
     		}
-			
-
-			this.maximizar.setEnabled (false);
-			this.restaurar.setEnabled (true);
-
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			if (Platform.getOS().equals(Platform.OS.LINUX)){
     				setMinimumSize(new Dimension(Constants.OPTION_FONT_INITIAL_WIDTH_LINUX, Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX));
@@ -148,16 +142,8 @@ public class Opciones extends JAccessibilityDialog {
     			}
     		} else {
     			setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
-    		}
-			
-			//Si está maximizada no se permite que se redimensione a mano
-			//this.setResizable(false);
-			
+    		}			
     	} else {
-    		
-    		this.maximizar.setEnabled (true);
-			this.restaurar.setEnabled (false);
-
     		if (PrincipalGUI.optionActualPositionX != -1){
 	    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 	    			setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
@@ -200,11 +186,27 @@ public class Opciones extends JAccessibilityDialog {
 	    			setMinimumSize(new Dimension(getSize().width, getSize().height));
 	    		}
     		}
-    		
-    		//Si no está maximizada se permite que se redimensione a mano
-    		//this.setResizable(true);
     	}
-
+    	
+    	//Se comprueba el estado de los botones de maximizado y restauracion
+		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+			if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
+				this.maximizar.setEnabled (false);
+	    		this.restaurar.setEnabled (true);
+			} else {
+				this.maximizar.setEnabled (true);
+	    		this.restaurar.setEnabled (false);
+			}
+		} else {
+			
+			if (this.getSize().equals(new Dimension(maxWidth,maxHeight - Constants.maximizeVerticalMarginLinux))){
+				this.maximizar.setEnabled (false);
+	    		this.restaurar.setEnabled (true);
+			} else {
+				this.maximizar.setEnabled (true);
+	    		this.restaurar.setEnabled (false);
+			}
+		}
     	
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -252,9 +254,9 @@ public class Opciones extends JAccessibilityDialog {
         
         // Definicion de mnemonicos.
         int tabNum = 0;
-        mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pestaï¿½a
-        mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pestaï¿½a
-        mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestaï¿½a
+        mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pesta�a
+        mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pesta�a
+        mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pesta�a
 
         c.weighty = 0.1;
         c.fill = GridBagConstraints.BOTH;
@@ -270,7 +272,7 @@ public class Opciones extends JAccessibilityDialog {
         JPanel bottomPanel = new JPanel(new GridBagLayout());
         
 		GridBagConstraints cons = new GridBagConstraints();
-		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientación de componentes al redimensionar
+		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes al redimensionar
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.ipadx = 0;
 		cons.gridx = 0;
@@ -318,7 +320,7 @@ public class Opciones extends JAccessibilityDialog {
 		// Boton aceptar
         JButton aceptar = new JButton();
         aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
-        aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al botï¿½n aceptar
+        aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
         aceptar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	
@@ -344,7 +346,7 @@ public class Opciones extends JAccessibilityDialog {
         // Boton cancelar
         JButton	cancelar = new JButton();
         cancelar.setText(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
-        cancelar.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al botï¿½n cancelar
+        cancelar.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al boton cancelar
         cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 cancelarActionPerformed();
@@ -546,7 +548,7 @@ public class Opciones extends JAccessibilityDialog {
 	 */
     private void aceptarActionPerformed(Properties config, Properties signatureConfig) {
 
-    	// Guardamos la posición y tamaño actual de la ventana sólo en caso de no estar maximizada por configuración
+    	// Guardamos la posicion y tama�o actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.optionActualPositionX = this.getX();
 	    	PrincipalGUI.optionActualPositionY = this.getY();
@@ -554,7 +556,7 @@ public class Opciones extends JAccessibilityDialog {
 	    	PrincipalGUI.optionActualHeight = this.getHeight();
     	}
     	
-    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tamaño de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
+    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tama�o de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
     	Boolean needUpdateGUI = ((GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)))|| (GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) || (GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE)))|| (GeneralConfig.isRemarked() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE)))|| (GeneralConfig.isHighContrast() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST)))|| (GeneralConfig.isBigFontSize() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)))|| (GeneralConfig.isFontBold() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE)))|| update);
     	    	
     	// Guardamos el estado actual de la configuracion de la herramienta
@@ -579,7 +581,7 @@ public class Opciones extends JAccessibilityDialog {
      * Cierra la ventana
      */
     private void cancelarActionPerformed() {
-    	// Guardamos la posición y tamaño actual de la ventana sólo en caso de no estar maximizada por configuración
+    	// Guardamos la posicion y tama�o actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.optionActualPositionX = this.getX();
 	    	PrincipalGUI.optionActualPositionY = this.getY();
@@ -590,7 +592,7 @@ public class Opciones extends JAccessibilityDialog {
     }
     
     /**
-	 * Cambia el tamaño de la ventana al tamaño máximo de pantalla menos el tamaño de la barra de tareas de windows
+	 * Cambia el tama&ntilde;o de la ventana al tama&ntilde;o m&aacute;ximo de pantalla menos el tama&ntilde;o de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
 		actualPositionX = this.getX();
@@ -617,7 +619,7 @@ public class Opciones extends JAccessibilityDialog {
 	}
 	
 	/**
-	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
 		
