@@ -60,17 +60,10 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     		throw new NullPointerException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
     	}
     	
-    	AOSigner signer = AOSignerFactory.getSigner(format);
-    	if (signer == null) {
-    		throw new AOFormatFileException("El formato de firma indicado no esta soportado"); //$NON-NLS-1$
-    	}
-    	
-    	SelectPrivateKeyAction action = new SelectPrivateKeyAction(Platform.getOS(), Platform.getBrowser(this.userAgent), this); 
-    	
-    	PrivateKeyEntry keyEntry = AccessController.doPrivileged(action);
-
-    	
+    	AOSigner signer = this.selectSigner(format, null);
     	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+    	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
+
     	SignAction signAction = new SignAction(signer, Base64.decode(dataB64), algorithm, keyEntry, params); 
     	
         return Base64.encodeBytes(AccessController.doPrivileged(signAction));
@@ -82,28 +75,13 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}
     	
-    	
     	byte[] sign = Base64.decode(signB64);
     	byte[] data = (dataB64 == null ? null : Base64.decode(dataB64));
     	
-    	
-    	AOSigner signer;
-    	String signerErrorMessage;
-    	if (format != null) {
-    		signer = AOSignerFactory.getSigner(format);
-    		signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
-    	} else {
-    		signer = AOSignerFactory.getSigner(sign);
-    		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
-    	}
-    	if (signer == null) {
-    		throw new AOFormatFileException(signerErrorMessage);
-    	}
-    	
-    	SelectPrivateKeyAction action = new SelectPrivateKeyAction(Platform.getOS(), Platform.getBrowser(this.userAgent), this); 
-    	PrivateKeyEntry keyEntry = AccessController.doPrivileged(action);
-
+    	AOSigner signer = this.selectSigner(format, sign);
     	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+    	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
+
     	CoSignAction coSignAction = new CoSignAction(signer, sign, data, algorithm, keyEntry, params); 
     	
     	return Base64.encodeBytes(AccessController.doPrivileged(coSignAction));
@@ -118,23 +96,10 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	
     	byte[] sign = Base64.decode(signB64);
     	
-    	AOSigner signer;
-    	String signerErrorMessage;
-    	if (format != null) {
-    		signer = AOSignerFactory.getSigner(format);
-    		signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
-    	} else {
-    		signer = AOSignerFactory.getSigner(sign);
-    		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
-    	}
-    	if (signer == null) {
-    		throw new AOFormatFileException(signerErrorMessage);
-    	}
-    	
-    	SelectPrivateKeyAction action = new SelectPrivateKeyAction(Platform.getOS(), Platform.getBrowser(this.userAgent), this); 
-    	PrivateKeyEntry keyEntry = AccessController.doPrivileged(action);
-
+    	AOSigner signer = this.selectSigner(format, sign);
     	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+    	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
+    	
     	CounterSignAction counterSignAction = new CounterSignAction(signer, sign, algorithm, keyEntry, params); 
     	
     	return Base64.encodeBytes(AccessController.doPrivileged(counterSignAction));
@@ -147,7 +112,6 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	}
     	
     	byte[] sign = Base64.decode(signB64);
-    	
     	AOSigner signer = AOSignerFactory.getSigner(sign);
     	
         return AOUtil.showTreeAsString(signer.getSignersStructure(sign, false), null, null);
@@ -175,7 +139,6 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     public String loadFilename(String exts) throws IOException, PrivilegedActionException {
     	
     	String[] extensions = (exts == null ? null : exts.split(",")); //$NON-NLS-1$
-    	
     	try {
     		return AccessController.doPrivileged(new GetFilenameAction(this.fos, extensions));
     	} catch (AOCancelledOperationException e) {
@@ -231,4 +194,45 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
     }
 
+    /**
+     * Permite que el usuario seleccione un certificado del almac&eacute;n por defecto y devuelve
+     * su clave privada.
+     * @param params Configuraci&oacute;n general establecida para la operaci&oacute;n.
+     * @return Clave privada asociada al certificado seleccionado.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
+     */
+    private PrivateKeyEntry selectPrivateKey(Properties params) throws PrivilegedActionException {
+    	SelectPrivateKeyAction action = new SelectPrivateKeyAction(
+    			Platform.getOS(), Platform.getBrowser(this.userAgent), new CertFilterManager(params), this);
+    	
+    	return AccessController.doPrivileged(action);
+    }
+    
+    /**
+     * Devuelve un manejador de firma compatible con un formato de firma o, de no establecerse, con
+     * una firma electr&oacute;nica concreta.
+     * @param format Formato de firma.
+     * @param sign Firma electr&oacute;nica.
+     * @return Manejador de firma.
+     * @throws AOFormatFileException Cuando el formato o la firma no estan soportados.
+     * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
+     */
+    private AOSigner selectSigner(String format, byte[] sign) throws AOFormatFileException {
+    	AOSigner signer = null;
+    	String signerErrorMessage;
+    	if (format != null) {
+    		signer = AOSignerFactory.getSigner(format);
+    		signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
+    	} else if (sign != null) {
+    		signer = AOSignerFactory.getSigner(sign);
+    		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
+    	} else {
+    		throw new NullPointerException("No se ha indicado el formato ni la firma que se desea tratar"); //$NON-NLS-1$
+    	}
+    	if (signer == null) {
+    		throw new AOFormatFileException(signerErrorMessage);
+    	}
+    	return signer;
+    }
 }
