@@ -685,8 +685,8 @@ public final class AOUtil {
                 if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
                     urls.add(url);
                 }
-                classLoader = new URLClassLoader(urls.toArray(new URL[0]));
             }
+            classLoader = new URLClassLoader(urls.toArray(new URL[0]));
         }
         return classLoader;
     }
