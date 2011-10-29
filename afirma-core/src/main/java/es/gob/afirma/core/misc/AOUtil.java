@@ -14,10 +14,10 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -124,11 +124,11 @@ public final class AOUtil {
      * @param uri
      *        URI del fichero a leer
      * @return Flujo de entrada hacia el contenido del fichero
-     * @throws FileNotFoundException
-     *         Cuando no se encuentra el fichero indicado
      * @throws AOException
-     *         Cuando ocurre cualquier problema obteniendo el flujo */
-    public static InputStream loadFile(final URI uri) throws FileNotFoundException, AOException {
+     *         Cuando ocurre cualquier problema obteniendo el flujo 
+     * @throws IOException 
+     * @throws MalformedURLException */
+    public static InputStream loadFile(final URI uri) throws AOException, MalformedURLException, IOException {
 
         if (uri == null) {
             throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
@@ -137,48 +137,23 @@ public final class AOUtil {
         if (uri.getScheme().equals("file")) { //$NON-NLS-1$
             // Es un fichero en disco. Las URL de Java no soportan file://, con
             // lo que hay que diferenciarlo a mano
-            try {
-                // Retiramos el "file://" de la uri
-                String path = uri.getSchemeSpecificPart();
-                if (path.startsWith("//")) { //$NON-NLS-1$
-                    path = path.substring(2);
-                }
-                return new FileInputStream(new File(path));
+
+            // Retiramos el "file://" de la uri
+            String path = uri.getSchemeSpecificPart();
+            if (path.startsWith("//")) { //$NON-NLS-1$
+                path = path.substring(2);
             }
-            catch (final NullPointerException e) {
-                throw e;
-            }
-            catch (final FileNotFoundException e) {
-                throw e;
-            }
-            catch (final Exception e) {
-                throw new AOException("Error intentando abrir un archivo en almacenamiento local", e); //$NON-NLS-1$
-            }
+            return new FileInputStream(new File(path));
         }
 
         // Es una URL
-        InputStream tmpStream;
-        try {
-            tmpStream = new BufferedInputStream(uri.toURL().openStream());
-        }
-        catch (final Exception e) {
-            throw new AOException("Error intentando abrir la URI '" + uri.toASCIIString() + "' como URL", e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        InputStream tmpStream = new BufferedInputStream(uri.toURL().openStream());
+        
         // Las firmas via URL fallan en la descarga por temas de Sun, asi que
         // descargamos primero
         // y devolvemos un Stream contra un array de bytes
-        final byte[] tmpBuffer;
-        try {
-            tmpBuffer = getDataFromInputStream(tmpStream);
-        }
-        catch (final Exception e) {
-            throw new AOException("Error leyendo el fichero remoto '" + uri.toString() + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        final byte[] tmpBuffer = getDataFromInputStream(tmpStream);
 
-        // LOGGER.info(
-        // "Leido fichero de " + tmpBuffer.length + " bytes:\n" + new
-        // String(tmpBuffer)
-        // );
         return new java.io.ByteArrayInputStream(tmpBuffer);
     }
 

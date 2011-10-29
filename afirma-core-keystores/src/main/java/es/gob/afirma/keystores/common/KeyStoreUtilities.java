@@ -240,7 +240,7 @@ public final class KeyStoreUtilities {
                         else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
                             aliassesByFriendlyName.remove(al);
                             LOGGER.info(
-                            "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
+                              "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
                             );
                             continue;
                         }
@@ -248,13 +248,13 @@ public final class KeyStoreUtilities {
                     catch (final UnsupportedOperationException e) {
                         aliassesByFriendlyName.remove(al);
                         LOGGER.info(
-                        "El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
+                          "El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
                         );
                         continue;
                     }
                     catch (final Exception e) {
                         LOGGER.info(
-                        "Se ha incluido un certificado (" + al + ") con clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
+                          "Se ha incluido un certificado (" + al + ") con clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
                         );
                     }
                 }

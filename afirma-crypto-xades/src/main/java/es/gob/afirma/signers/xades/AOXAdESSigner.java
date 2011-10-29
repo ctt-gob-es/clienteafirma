@@ -1620,9 +1620,6 @@ public final class AOXAdESSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            if (e instanceof UnsupportedOperationException) {
-                throw (UnsupportedOperationException) e;
-            }
             throw new AOException("Error al generar la contrafirma", e); //$NON-NLS-1$
         }
 
@@ -1668,9 +1665,6 @@ public final class AOXAdESSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            if (e instanceof UnsupportedOperationException) {
-                throw (UnsupportedOperationException) e;
-            }
             throw new AOException("No se ha podido realizar la contrafirma del arbol", e); //$NON-NLS-1$
         }
     }
@@ -1703,9 +1697,6 @@ public final class AOXAdESSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            if (e instanceof UnsupportedOperationException) {
-                throw (UnsupportedOperationException) e;
-            }
             throw new AOException("No se ha podido realizar la contrafirma de hojas", e); //$NON-NLS-1$
         }
     }
@@ -1757,9 +1748,6 @@ public final class AOXAdESSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            if (e instanceof UnsupportedOperationException) {
-                throw (UnsupportedOperationException) e;
-            }
             throw new AOException("No se ha podido realizar la contrafirma de nodos", e); //$NON-NLS-1$
         }
     }
@@ -1954,9 +1942,9 @@ public final class AOXAdESSigner implements AOSigner {
         }
         
         // Cadena de certificados
-        Certificate[] rawcerts = keyEntry.getCertificateChain();
-        List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
-        for (Certificate c : rawcerts) {
+        final Certificate[] rawcerts = keyEntry.getCertificateChain();
+        final List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
+        for (final Certificate c : rawcerts) {
             if (c instanceof X509Certificate) {
                 certificates.add((X509Certificate)c);
             }

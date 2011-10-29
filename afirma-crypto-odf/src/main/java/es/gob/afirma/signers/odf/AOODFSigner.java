@@ -533,7 +533,7 @@ public final class AOODFSigner implements AOSigner {
             }
 
             for (int i = 0; i < numSignatures; i++) {
-                if (arrayRef[i] == "") { //$NON-NLS-1$
+                if ("".equals(arrayRef[i])) { //$NON-NLS-1$
                     tree.add(arrayNodes[i]);
                 }
             }

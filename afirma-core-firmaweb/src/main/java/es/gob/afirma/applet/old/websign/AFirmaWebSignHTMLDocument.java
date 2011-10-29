@@ -74,7 +74,6 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             else {
                 super.handleStartTag(t, a, pos);
             }
-            this.tagLevel++;
         }
 
         @Override
@@ -82,7 +81,6 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             if (!t.toString().equalsIgnoreCase("afirma")) { //$NON-NLS-1$
                 super.handleEndTag(t, pos);
             }
-            this.tagLevel--;
         }
 
         @Override
@@ -111,8 +109,6 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
             Logger.getLogger("es.gob.afirma").severe("Error: " + errorMsg + ", posicion: " + pos); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             super.handleError(errorMsg, pos);
         }
-
-        private int tagLevel;
 
         void startFile(final String uri) {
             try {

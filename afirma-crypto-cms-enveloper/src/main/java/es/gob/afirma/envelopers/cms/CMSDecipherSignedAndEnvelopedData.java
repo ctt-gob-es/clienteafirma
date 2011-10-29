@@ -84,17 +84,15 @@ public final class CMSDecipherSignedAndEnvelopedData {
         final KeyAsigned keyAsigned = Utils.assignKey(encryptedKeyDatas.getEncryptedKey(), keyEntry, algClave);
 
         // Desciframos el contenido.
-        final byte[] deciphered;
-        final byte[] contCifrado = contenidoCifrado.getEncryptedContent().getOctets();
         try {
-            deciphered = Utils.deCipherContent(contCifrado, keyAsigned.getConfig(), keyAsigned.getCipherKey());
+            return Utils.deCipherContent(
+                     contenidoCifrado.getEncryptedContent().getOctets(), 
+                     keyAsigned.getConfig(), 
+                     keyAsigned.getCipherKey()
+            );
         }
         catch (final Exception ex) {
-            if (ex instanceof InvalidKeyException) {
-                throw (InvalidKeyException) ex;
-            }
             throw new AOException("Error al descifrar los contenidos del sobre digital", ex); //$NON-NLS-1$
         }
-        return deciphered;
     }
 }

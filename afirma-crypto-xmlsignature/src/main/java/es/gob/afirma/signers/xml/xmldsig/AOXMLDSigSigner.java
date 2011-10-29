@@ -1405,9 +1405,6 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         }
         catch (final Exception e) {
-            if (e instanceof UnsupportedOperationException) {
-                throw (UnsupportedOperationException) e;
-            }
             throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
         }
 
@@ -1441,9 +1438,6 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            if (e instanceof UnsupportedOperationException) {
-                throw (UnsupportedOperationException) e;
-            }
             throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
         }
     }
@@ -1488,9 +1482,6 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            if (e instanceof UnsupportedOperationException) {
-                throw (UnsupportedOperationException) e;
-            }
             throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
         }
     }
@@ -1595,9 +1586,6 @@ public final class AOXMLDSigSigner implements AOSigner {
             }
         }
         catch (final Exception e) {
-            if (e instanceof UnsupportedOperationException) {
-                throw (UnsupportedOperationException) e;
-            }
             throw new AOException("No se ha podido realizar la contrafirma", e); //$NON-NLS-1$
         }
     }
