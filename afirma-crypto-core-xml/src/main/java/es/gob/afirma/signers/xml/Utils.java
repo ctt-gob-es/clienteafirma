@@ -79,6 +79,13 @@ public final class Utils {
     /** Hoja de estilo local (rutal local no dereferenciable) a un XML */
     public static final class IsInnerlException extends Exception {
         private static final long serialVersionUID = -8769490831203570286L;
+        
+        /** Construye la excepci&oacute;n que indica que una referencia apunta al interior del mismo XML.
+         * @param e Excepci&oacute;n anterior en la cadena */
+        public IsInnerlException(final Throwable e) {
+            super(e);
+        }
+        
     }
 
     /** No se puede dereferenciar la hoja de estilo. */
@@ -155,7 +162,7 @@ public final class Utils {
             final String fileName = idParts[idParts.length - 1];
 
             if (fileName.startsWith("#")) { //$NON-NLS-1$
-                throw new IsInnerlException(); 
+                throw new IsInnerlException(e); 
             }
             else if (id.startsWith("file://")) { //$NON-NLS-1$
                 // Preguntamos al usuario para la dereferenciacion
@@ -173,7 +180,7 @@ public final class Utils {
                     );
                     
                     if (xmlStyleFile == null) {
-                        throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo"); //$NON-NLS-1$
+                        throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo", e); //$NON-NLS-1$
                     }
                     try {
                         final InputStream is = new FileInputStream(xmlStyleFile);
@@ -191,7 +198,7 @@ public final class Utils {
                 }
             }
             else {
-                throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo: " + id); //$NON-NLS-1$
+                throw new CannotDereferenceException("No se ha podido dereferenciar la hoja de estilo: " + id, e); //$NON-NLS-1$
             }
         }
 
@@ -389,7 +396,7 @@ public final class Utils {
      * @throws NoSuchAlgorithmException
      *         Cuando se encuentre un algoritmo de transformaci&oacurte;n no
      *         soportado. */
-    public static ArrayList<Transform> getObjectReferenceTransforms(final Node referenceNode, final String namespacePrefix) throws NoSuchAlgorithmException,
+    public static List<Transform> getObjectReferenceTransforms(final Node referenceNode, final String namespacePrefix) throws NoSuchAlgorithmException,
                                                                                                                         InvalidAlgorithmParameterException {
 
         final ArrayList<Transform> transformList = new ArrayList<Transform>();

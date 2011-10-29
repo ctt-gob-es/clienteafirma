@@ -467,7 +467,7 @@ public final class AOXAdESSigner implements AOSigner {
             // captura de error en caso de no ser un documento xml
             catch (final Exception e) {
                 if (format.equals(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED)) {
-                    throw new AOFormatFileException("El modo Enveloped solo permite firmar datos XML"); //$NON-NLS-1$
+                    throw new AOFormatFileException("El modo Enveloped solo permite firmar datos XML", e); //$NON-NLS-1$
                 }
                 // para los formatos de firma internally detached y enveloping
                 // se trata de convertir el documento a base64
@@ -1347,7 +1347,7 @@ public final class AOXAdESSigner implements AOSigner {
                 // Buscamos las transformaciones declaradas en la Referencia,
                 // para anadirlas
                 // tambien en la nueva
-                final ArrayList<Transform> currentTransformList;
+                final List<Transform> currentTransformList;
                 try {
                     currentTransformList = Utils.getObjectReferenceTransforms(currentElement, XML_SIGNATURE_PREFIX);
                 }
@@ -1619,10 +1619,10 @@ public final class AOXAdESSigner implements AOSigner {
                 this.countersignSigners(root, targets, keyEntry, extraParams, algorithm);
             }
         }
-        catch (final UnsupportedOperationException e) {
-            throw e;
-        }
         catch (final Exception e) {
+            if (e instanceof UnsupportedOperationException) {
+                throw (UnsupportedOperationException) e;
+            }
             throw new AOException("Error al generar la contrafirma", e); //$NON-NLS-1$
         }
 
@@ -1667,10 +1667,10 @@ public final class AOXAdESSigner implements AOSigner {
                 this.cs(nodes[i], keyEntry, extraParams, algorithm);
             }
         }
-        catch (final UnsupportedOperationException e) {
-            throw e;
-        }
         catch (final Exception e) {
+            if (e instanceof UnsupportedOperationException) {
+                throw (UnsupportedOperationException) e;
+            }
             throw new AOException("No se ha podido realizar la contrafirma del arbol", e); //$NON-NLS-1$
         }
     }
@@ -1702,10 +1702,10 @@ public final class AOXAdESSigner implements AOSigner {
                 }
             }
         }
-        catch (final UnsupportedOperationException e) {
-            throw e;
-        }
         catch (final Exception e) {
+            if (e instanceof UnsupportedOperationException) {
+                throw (UnsupportedOperationException) e;
+            }
             throw new AOException("No se ha podido realizar la contrafirma de hojas", e); //$NON-NLS-1$
         }
     }
@@ -1756,10 +1756,10 @@ public final class AOXAdESSigner implements AOSigner {
                 this.cs(node, keyEntry, extraParams, algorithm);
             }
         }
-        catch (final UnsupportedOperationException e) {
-            throw e;
-        }
         catch (final Exception e) {
+            if (e instanceof UnsupportedOperationException) {
+                throw (UnsupportedOperationException) e;
+            }
             throw new AOException("No se ha podido realizar la contrafirma de nodos", e); //$NON-NLS-1$
         }
     }
