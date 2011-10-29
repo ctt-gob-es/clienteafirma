@@ -11,6 +11,7 @@
 package es.gob.afirma.applet;
 
 import java.awt.Component;
+import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
@@ -154,8 +155,9 @@ final class KeyStoreConfigurationManager {
      * @param password
      *        Contrase&ntilde;a del almac&eacute;n de claves
      * @throws AOKeystoreAlternativeException
-     *         Cuando ocurre un error durante la inicializaci&oacute;n */
-    private void initKeyStore(final String path, final String password) throws AOCancelledOperationException, AOKeystoreAlternativeException {
+     *         Cuando ocurre un error durante la inicializaci&oacute;n 
+     * @throws InvalidKeyException */
+    private void initKeyStore(final String path, final String password) throws AOCancelledOperationException, AOKeystoreAlternativeException, InvalidKeyException {
 
         if (this.showLoadingWarning) {
             JOptionPane.showMessageDialog(this.parent,

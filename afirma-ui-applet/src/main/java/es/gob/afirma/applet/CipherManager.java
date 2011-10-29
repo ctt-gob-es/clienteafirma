@@ -455,8 +455,9 @@ public final class CipherManager {
      * @throws NoSuchAlgorithmException
      *         Algoritmo de cifrado no soportado.
      * @throws AOException
-     *         Ocurri&oacute; un error al obtener la clave. */
-    public Key getConfiguredKey() throws NoSuchAlgorithmException, AOException {
+     *         Ocurri&oacute; un error al obtener la clave. 
+     * @throws KeyException */
+    public Key getConfiguredKey() throws NoSuchAlgorithmException, AOException, KeyException {
         return this.getConfiguredKey(new AOSunJCECipher(), this.cipherConfig);
     }
 
@@ -475,8 +476,9 @@ public final class CipherManager {
      * @throws IllegalArgumentException
      *         Modo de clave no soportado.
      * @throws AOException
-     *         Ocurri&oacute; un error al obtener la clave. */
-    private Key getConfiguredKey(final AOCipher cipher, final AOCipherConfig config) throws NoSuchAlgorithmException, AOException {
+     *         Ocurri&oacute; un error al obtener la clave. 
+     * @throws KeyException */
+    private Key getConfiguredKey(final AOCipher cipher, final AOCipherConfig config) throws NoSuchAlgorithmException, AOException, KeyException {
 
         Key cipherKey;
 

@@ -944,22 +944,22 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
     public boolean counterSignTree() {
         LOGGER.info("Invocando counterSignTree"); //$NON-NLS-1$
-        return this.counterSign(AOSignConstants.CounterSignTarget.Tree);
+        return this.counterSign(AOSignConstants.CounterSignTarget.TREE);
     }
 
     public boolean counterSignLeafs() {
         LOGGER.info("Invocando counterSignLeafs"); //$NON-NLS-1$
-        return this.counterSign(AOSignConstants.CounterSignTarget.Leafs);
+        return this.counterSign(AOSignConstants.CounterSignTarget.LEAFS);
     }
 
     public boolean counterSignSigners() {
         LOGGER.info("Invocando counterSignSigners"); //$NON-NLS-1$
-        return this.counterSign(AOSignConstants.CounterSignTarget.Signers);
+        return this.counterSign(AOSignConstants.CounterSignTarget.SIGNERS);
     }
 
     public boolean counterSignIndexes() {
         LOGGER.info("Invocando counterSignIndexes"); //$NON-NLS-1$
-        return this.counterSign(AOSignConstants.CounterSignTarget.Nodes);
+        return this.counterSign(AOSignConstants.CounterSignTarget.NODES);
     }
 
     private boolean counterSign(final AOSignConstants.CounterSignTarget target) {
@@ -1025,7 +1025,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
 
                 // Obtenemos los parametros para la contrafirma de
                 // firmantes
-                if (target == AOSignConstants.CounterSignTarget.Signers) {
+                if (target == AOSignConstants.CounterSignTarget.SIGNERS) {
                     if (SignApplet.this.signersToCounterSign == null || SignApplet.this.signersToCounterSign.length < 1) {
                         try {
                             params = UIDialogs.showSignersSelectionPane(signer.getSignersStructure(originalSign, false), SignApplet.this);
@@ -1047,7 +1047,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
 
                 // Obtenemos los parametros para la contrafirma de nodos
-                else if (target == AOSignConstants.CounterSignTarget.Nodes) {
+                else if (target == AOSignConstants.CounterSignTarget.NODES) {
                     // Si no se establecen los nodos de firma mediante
                     // setSignersToCounterSign(String)
                     // mostramos el panel de seleccion de nodos. Este

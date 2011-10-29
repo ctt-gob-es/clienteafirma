@@ -1,15 +1,19 @@
 package es.gob.afirma.applet;
 
+import java.util.logging.Logger;
+
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 
-public class CryptoUtils {
+public final class CryptoUtils {
 
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
+    
     /** Recupera el hash en hexadecimal de los datos de entrada del applet para
      * firma.
      * @return Hash en hexadecimal formateado o <code>null</code> si no se
      *         introdujeron o no pudieron leerse los datos. */
-    public static String getHexDigestData(final String algorithm) {
+    public static String getHexDigestData(final String algorithm) { 
 
         byte[] hashData = null;
         // Si estamos firmando datos o si es una firma de hash implicita

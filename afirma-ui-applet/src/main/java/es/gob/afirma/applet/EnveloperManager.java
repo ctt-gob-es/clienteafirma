@@ -499,8 +499,9 @@ public final class EnveloperManager {
      * @throws CertificateEncodingException
      *         El certificado de firma no es v&aacute;lido.
      * @throws NoSuchAlgorithmException
-     *         Algoritmo no soportado. */
-    private byte[] createCMSEnvelopData(final byte[] content) throws IOException, CertificateEncodingException, NoSuchAlgorithmException {
+     *         Algoritmo no soportado. 
+     * @throws AOException */
+    private byte[] createCMSEnvelopData(final byte[] content) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, AOException {
         return this.enveloper.createCMSEnvelopedData(content, this.ksConfigManager.getCertificateKeyEntry(), // Si hay uno
                                                                                                    // seleccionado, se
                                                                                                    // utiliza

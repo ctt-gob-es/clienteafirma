@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.naming.ldap.LdapName;
@@ -169,7 +170,7 @@ public final class SignText {
 
         // Obtenemos la lista de nombres descriptivos de los alias de los
         // certificados
-        final Hashtable<String, String> aliasesByFriendlyName;
+        final Map<String, String> aliasesByFriendlyName;
         try {
             aliasesByFriendlyName =
                     KeyStoreUtilities.getAliasesByFriendlyName(this.alias, // aliases
