@@ -19,6 +19,10 @@ import java.util.zip.Inflater;
 /** Clase de ayuda de compresi&oacute;n. Permite tanto comprimir como
  * descomprimir. */
 final class BinaryUtils {
+    
+    private BinaryUtils() {
+        // No permitimos la instanciacion
+    }
 
     /** M&eacute;todo que comprime una entrada con un nivel de compresion dado.
      * @param input

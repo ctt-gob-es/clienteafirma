@@ -28,7 +28,13 @@ public final class FirmadorWeb {
     /** Firma de una p&aacute;gina Web XHTML. */
     public static class FirmaWeb {
 
-        final File tmpWebDataFile;
+        private final File tmpWebDataFile;
+        
+        /** Obtiene el fichero temporal de datos Web.
+         * @return Fichero temporal de datos Web. */
+        public File getTmpWebDataFile() {
+            return this.tmpWebDataFile;
+        }
 
         FirmaWeb(final File tmpWebDataFile) {
             this.tmpWebDataFile = tmpWebDataFile;

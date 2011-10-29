@@ -23,8 +23,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
@@ -282,7 +283,7 @@ final class AOBootUtil {
     static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOBootUtil.class.getClassLoader();
         if (classLoader instanceof URLClassLoader) {
-            final Vector<URL> urls = new Vector<URL>();
+            final List<URL> urls = new ArrayList<URL>();
             for (final URL url : ((URLClassLoader)classLoader).getURLs()) {
                 if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
                     urls.add(url);

@@ -68,7 +68,7 @@ class ProgressStatus extends JComponent {
 
         // Formateamos el valor obtenido
         String valorPorcentaje = new Double(percentage).toString();
-        final int dotIndex = valorPorcentaje.indexOf("."); //$NON-NLS-1$
+        final int dotIndex = valorPorcentaje.indexOf('.');
         if (valorPorcentaje.length() - dotIndex > 2) {
             valorPorcentaje = valorPorcentaje.substring(0, dotIndex + 2);
         }

@@ -247,9 +247,7 @@ public final class ReadNodesTree {
         }
 
         solucion = new int[cont];
-        for (int b = 0; b < cont; b++) {
-            solucion[b] = nodesToSign[b];
-        }
+        System.arraycopy(nodesToSign, 0, solucion, 0, cont);
         solucion = simplyArray(solucion);
         Arrays.sort(solucion);// de mayor a menor
 

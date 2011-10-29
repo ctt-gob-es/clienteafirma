@@ -26,7 +26,11 @@ import javax.swing.text.html.StyleSheet;
 final class AFirmaWebSignHTMLDocument extends HTMLDocument {
     private static final long serialVersionUID = 1L;
 
-    static List<Attachment> files = new ArrayList<Attachment>();
+    private static List<Attachment> files = new ArrayList<Attachment>();
+    
+    static void addAttachment(final Attachment a) {
+        files.add(a);
+    }
     
     static List<Attachment> getAttachedFiles() {
         return files;
@@ -89,10 +93,10 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
                     if (type != null && type.equals("file")) { //$NON-NLS-1$
                         final String uri = (String) a.getAttribute(HTML.Attribute.HREF);
                         try {
-                            AFirmaWebSignHTMLDocument.files.add(new Attachment(URLDecoder.decode(uri, "UTF-8"))); //$NON-NLS-1$
+                            AFirmaWebSignHTMLDocument.addAttachment(new Attachment(URLDecoder.decode(uri, "UTF-8"))); //$NON-NLS-1$
                         }
                         catch (final IOException e) {
-                            AFirmaWebSignHTMLDocument.files.add(new Attachment(uri));
+                            AFirmaWebSignHTMLDocument.addAttachment(new Attachment(uri));
                         }
                     }
                 }
@@ -112,10 +116,10 @@ final class AFirmaWebSignHTMLDocument extends HTMLDocument {
 
         void startFile(final String uri) {
             try {
-                AFirmaWebSignHTMLDocument.files.add(new Attachment(URLDecoder.decode(uri, "UTF-8"))); //$NON-NLS-1$
+                AFirmaWebSignHTMLDocument.addAttachment(new Attachment(URLDecoder.decode(uri, "UTF-8"))); //$NON-NLS-1$
             }
             catch (final UnsupportedEncodingException e) {
-                AFirmaWebSignHTMLDocument.files.add(new Attachment(uri));
+                AFirmaWebSignHTMLDocument.addAttachment(new Attachment(uri));
             }
         }
 

@@ -89,10 +89,10 @@ public final class CMSDecipherAuthenticatedEnvelopedData {
         try {
             deciphered = Utils.deCipherContent(contCifrado, keyAsigned.getConfig(), keyAsigned.getCipherKey());
         }
-        catch (final InvalidKeyException ex) {
-            throw ex;
-        }
         catch (final Exception ex) {
+            if (ex instanceof InvalidKeyException) {
+                throw (InvalidKeyException) ex;
+            }
             throw new AOException("Error al descifrar los contenidos del sobre digital", ex); //$NON-NLS-1$
         }
         return deciphered;
