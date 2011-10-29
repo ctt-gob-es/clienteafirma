@@ -2083,10 +2083,9 @@ public final class AOXAdESSigner implements AOSigner {
             // que nos vemos obligados a crear un nodo padre, del que colgara
             // todo el arbol de firmas,
             // para que lo detecte correctamente
-            final Document signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-            final Element rootNode = signDoc.getDocumentElement();
+            final Element rootNode = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
-            final ArrayList<Node> signNodes = new ArrayList<Node>();
+            final List<Node> signNodes = new ArrayList<Node>();
             if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
                 signNodes.add(rootNode);
             }
@@ -2100,85 +2099,6 @@ public final class AOXAdESSigner implements AOSigner {
             if (signNodes.size() == 0 || !checkSignNodes(signNodes)) {
                 return false;
             }
-
-            // final List<Node> envelopedSig = new ArrayList<Node>();
-            //
-            // // Se identifican las firmas enveloped del documento
-            // for (int i = 0; i < signatures.getLength(); i++) {
-            // Element signature = (Element)signatures.item(i);
-            // NodeList transforms = signature.getElementsByTagNameNS(DSIGNNS,
-            // "Transform");
-            // if(((Element)transforms.item(transforms.getLength()-1))
-            // .getAttribute("Algorithm").equals(Transform.ENVELOPED))
-            // envelopedSig.add(signature);
-            // }
-            //
-            // XAdES_EPES xades;
-            // XMLAdvancedSignature xmlSignature;
-            // List<SignatureStatus> ssList;
-            //
-            // // Comprobaremos las firmas enveloped 1 a 1, por eso, si hay mas
-            // de una firma, las recorremos
-            // // eliminando el resto para cada comprobacion individual
-            // if (envelopedSig.size() > 1) {
-            // //se eliminan todas las firmas enveloped salvo la que se quiere
-            // verificar
-            // for (int i = 0; i < envelopedSig.size(); i++) {
-            // Node removedChild = null;
-            // for (int j = 0; j < envelopedSig.size(); j++) {
-            // if (i != j) {
-            // removedChild = envelopedSig.get(j);
-            // rootNode.removeChild(removedChild);
-            // }
-            // }
-            //
-            // //instancia XADES_EPES
-            // xades = (XAdES_EPES) XAdES.newInstance(
-            // XAdES.EPES,
-            // xadesNamespace,
-            // XADES_SIGNATURE_PREFIX,
-            // XML_SIGNATURE_PREFIX,
-            // DIGEST_METHOD,
-            // rootNode
-            // );
-            //
-            // // Comprueba si las firmas del documento son validas
-            // xmlSignature = XMLAdvancedSignature.newInstance(xades);
-            // ssList = xmlSignature.validate();
-            //
-            // // Si alguna firma fuera erronea devuelve false, en caso
-            // contrario es true
-            // if (!SignatureStatus.isValid(ssList))
-            // return false;
-            //
-            // //vuelve a incluir la firma eliminada
-            // rootNode.appendChild(removedChild);
-            // }
-            //
-            // return true;
-            // }
-            //
-            //
-            // // A partir de aqui se comprueban las firmas no enveloped y
-            // enveloped simples (sin multifirma)
-            //
-            // // Instancia XADES_EPES
-            // xades = (XAdES_EPES) XAdES.newInstance(
-            // XAdES.EPES,
-            // xadesNamespace,
-            // XADES_SIGNATURE_PREFIX,
-            // XML_SIGNATURE_PREFIX,
-            // DIGEST_METHOD,
-            // rootNode
-            // );
-            //
-            // // Comprueba si las firmas del documento son validas
-            // xmlSignature = XMLAdvancedSignature.newInstance(xades);
-            // ssList = xmlSignature.validate();
-            //
-            // // Si alguna firma fuera erronea devuelve false, en caso
-            // contrario es true
-            // return SignatureStatus.isValid(ssList);
         }
         catch (final Exception e) {
             return false;
