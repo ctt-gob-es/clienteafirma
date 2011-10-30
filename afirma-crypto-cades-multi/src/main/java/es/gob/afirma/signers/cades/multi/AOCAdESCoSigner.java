@@ -30,18 +30,12 @@ public class AOCAdESCoSigner implements AOCoSigner {
     static final boolean DEFAULT_USE_SIGNING_CERTIFICATE_V2 = true;
 
     public byte[] cosign(final byte[] data, 
-                         final byte[] sign, String algorithm, 
+                         final byte[] sign, 
+                         final String algorithm, 
                          final PrivateKeyEntry keyEntry, 
                          final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
-
-        if (algorithm.equalsIgnoreCase("RSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA;
-        }
-        else if (algorithm.equalsIgnoreCase("DSA")) { //$NON-NLS-1$
-            algorithm = AOSignConstants.SIGN_ALGORITHM_SHA1WITHDSA;
-        }
 
         final String precalculatedDigest = extraParams.getProperty("precalculatedHashAlgorithm"); //$NON-NLS-1$
         final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$

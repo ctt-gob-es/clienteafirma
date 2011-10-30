@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 
 import es.gob.afirma.core.misc.AOUtil;
 
-class WebSignMessages {
+final class WebSignMessages {
     private static final String BUNDLE_NAME = "websignmessages"; //$NON-NLS-1$
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), AOUtil.getCleanClassLoader());

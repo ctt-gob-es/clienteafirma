@@ -229,7 +229,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
         final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()));
         ZipEntry zipEntry;
         while (null != (zipEntry = zipInputStream.getNextEntry())) {
-            if (false == zipEntry.getName().endsWith(".rels")) { //$NON-NLS-1$
+            if (!zipEntry.getName().endsWith(".rels")) { //$NON-NLS-1$
                 continue;
             }
             final Document relsDocument = loadDocumentNoClose(zipInputStream);
@@ -313,7 +313,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
         final ZipInputStream zipInputStream = new ZipInputStream(ooxmldoc);
         ZipEntry zipEntry;
         while (null != (zipEntry = zipInputStream.getNextEntry())) {
-            if (false == "[Content_Types].xml".equals(zipEntry.getName())) { //$NON-NLS-1$
+            if (!"[Content_Types].xml".equals(zipEntry.getName())) { //$NON-NLS-1$
                 continue;
             }
             final Document contentTypesDocument = loadDocument(zipInputStream);
@@ -343,7 +343,7 @@ class OOXMLSignatureFacet implements SignatureFacet {
         final ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(this.signatureService.getOfficeOpenXMLDocument()));
         ZipEntry zipEntry;
         while (null != (zipEntry = zipInputStream.getNextEntry())) {
-            if (false == zipEntryName.equals(zipEntry.getName())) {
+            if (!zipEntryName.equals(zipEntry.getName())) {
                 continue;
             }
             return loadDocument(zipInputStream);

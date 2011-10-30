@@ -181,7 +181,7 @@ final class CAdESCoSigner {
         ContentInfo encInfo = null;
         final ASN1ObjectIdentifier contentTypeOID = new ASN1ObjectIdentifier(PKCSObjectIdentifiers.data.getId());
 
-        if (omitContent == false) {
+        if (!omitContent) {
             final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
             final byte[] content2 = parameters.getContent();
             final CMSProcessable msg = new CMSProcessableByteArray(content2);
