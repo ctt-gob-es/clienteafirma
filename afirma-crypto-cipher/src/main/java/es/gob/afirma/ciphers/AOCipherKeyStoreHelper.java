@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Enumeration;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -122,43 +125,32 @@ public final class AOCipherKeyStoreHelper {
      * @throws AOException
      *         Cuando ocurre cualquier problema durante la carga.
      * @throws IOException
-     *         Cuando se inserta una clave incorrecta. */
-    public void loadCipherKeyStore() throws AOException, IOException {
+     *         Cuando se inserta una clave incorrecta. 
+     * @throws CertificateException 
+     * @throws NoSuchAlgorithmException 
+     * @throws KeyStoreException */
+    public void loadCipherKeyStore() throws AOException, 
+                                            IOException, 
+                                            NoSuchAlgorithmException, 
+                                            CertificateException, 
+                                            KeyStoreException {
         if (this.ks == null) {
-            try {
-                this.ks = KeyStore.getInstance("JCEKS"); //$NON-NLS-1$
-            }
-            catch (final Exception e) {
-                throw new AOException("Error al instalanciar un almacen de claves JCEKS", e); //$NON-NLS-1$
-            }
+            this.ks = KeyStore.getInstance("JCEKS"); //$NON-NLS-1$
         }
+        
         if (!storeExists()) {
             LOGGER.warning("El almacen no existe, se creara uno nuevo"); //$NON-NLS-1$
             createCipherKeyStore();
         }
-        final InputStream ksIs;
+        
+        final InputStream ksIs = new FileInputStream(getCipherKeystore());
+        this.ks.load(new BufferedInputStream(ksIs), this.pss);
+        
         try {
-            ksIs = new FileInputStream(getCipherKeystore());
-        }
-        catch (final IOException e) {
-            throw new AOException("Error al cargar el almacen de claves de cifrado", e); //$NON-NLS-1$
-        }
-        try {
-            this.ks.load(new BufferedInputStream(ksIs), this.pss);
-        }
-        catch (final IOException e) {
-            throw e;
+            ksIs.close();
         }
         catch (final Exception e) {
-            throw new AOException("Error al cargar el almacen de claves de cifrado", e); //$NON-NLS-1$
-        }
-        finally {
-            try {
-                ksIs.close();
-            }
-            catch (final Exception e) {
-                // Ignoramos los errores en el cierre
-            }
+            // Ignoramos los errores en el cierre
         }
     }
 
@@ -185,8 +177,15 @@ public final class AOCipherKeyStoreHelper {
      *         Cuando ocurre cualquier problema durante la carga del
      *         almac&eacute;n.
      * @throws IOException
-     *         Cuando la contrase&ntilde;a es incorrecta. */
-    public AOCipherKeyStoreHelper(final char[] p) throws AOException, IOException {
+     *         Cuando la contrase&ntilde;a es incorrecta. 
+     * @throws KeyStoreException 
+     * @throws CertificateException 
+     * @throws NoSuchAlgorithmException */
+    public AOCipherKeyStoreHelper(final char[] p) throws AOException, 
+                                                         IOException, 
+                                                         NoSuchAlgorithmException, 
+                                                         CertificateException, 
+                                                         KeyStoreException {
         if (p == null) {
             throw new IllegalArgumentException("Se necesita una contrasena para instanciar la clase"); //$NON-NLS-1$
         }

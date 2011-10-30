@@ -195,10 +195,10 @@ final class CoSigner {
         ASN1Set signedAttr = null;
         if (messageDigest == null) {
             signedAttr =
-                    generateSignerInfo(signerCertificateChain[0], digestAlgorithm, parameters.getContent(), dataType, atrib);
+                    generateSignerInfo(digestAlgorithm, parameters.getContent(), dataType, atrib);
         }
         else {
-            signedAttr = generateSignerInfoFromHash(signerCertificateChain[0], digestAlgorithm, messageDigest, dataType, atrib);
+            signedAttr = generateSignerInfoFromHash(signerCertificateChain[0], messageDigest, dataType, atrib);
         }
 
         // atributos no firmados.
@@ -404,11 +404,11 @@ final class CoSigner {
 
         // atributos firmados
         if (contenidoDatos != null) {
-            signedAttr = generateSignerInfo(signerCertificateChain[0], digestAlgorithm, contenidoDatos, dataType, atrib);
+            signedAttr = generateSignerInfo(digestAlgorithm, contenidoDatos, dataType, atrib);
         }
         else if (messageDigest != null) {
             signedAttr =
-                    generateSignerInfoFromHash(signerCertificateChain[0], digestAlgorithm, messageDigest, dataType, atrib);
+                    generateSignerInfoFromHash(signerCertificateChain[0], messageDigest, dataType, atrib);
         }
         else {
             // En este caso no puedo usar un hash de fuera, ya que no me han
@@ -454,7 +454,7 @@ final class CoSigner {
      *        del archivo de firma.
      * @return Los atributos firmados de la firma.
      * @throws java.security.NoSuchAlgorithmException */
-    private ASN1Set generateSignerInfo(final X509Certificate cert, String digestAlgorithm, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) throws NoSuchAlgorithmException {
+    private ASN1Set generateSignerInfo(String digestAlgorithm, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) throws NoSuchAlgorithmException {
 
         // // ATRIBUTOS
 
@@ -507,7 +507,7 @@ final class CoSigner {
      *        Lista de atributos firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos firmados de la firma. */
-    private ASN1Set generateSignerInfoFromHash(final X509Certificate cert, final String digestAlgorithm, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) {
+    private ASN1Set generateSignerInfoFromHash(final X509Certificate cert, final byte[] datos, final String dataType, final Map<String, byte[]> atrib) {
 
         // // ATRIBUTOS
 

@@ -99,7 +99,7 @@ public final class AOODFSigner implements AOSigner {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    private static String OPENOFFICE = "urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0"; //$NON-NLS-1$
+    private static final String OPENOFFICE = "urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0"; //$NON-NLS-1$
 
     /** Mimetypes de los formatos ODF soportados. */
     private static final Set<String> SUPPORTED_FORMATS;

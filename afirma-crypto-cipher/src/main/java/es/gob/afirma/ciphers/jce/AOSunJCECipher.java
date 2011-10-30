@@ -252,11 +252,8 @@ public final class AOSunJCECipher implements AOCipher {
         try {
             return KeyGenerator.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER).generateKey();
         }
-        catch (final NoSuchAlgorithmException e) {
-            throw e;
-        }
         catch (final Exception e) {
-            throw new AOException("No se pudo generar una clave compatible para la configuracion '" + algorithmConfig + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new AOException("No se pudo generar una clave compatible para la configuracion '" + algorithmConfig + "': " + e , e); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
