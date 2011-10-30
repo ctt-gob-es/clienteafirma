@@ -40,14 +40,15 @@ import javax.swing.text.html.HTMLEditorKit;
 
 final class BrowserDialog extends JDialog {
     
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1554097041346695276L;
 
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    boolean firmar = false;
+    private boolean firmar = false;
+    
+    void setFirmar(final boolean f) {
+        this.firmar = f;
+    }
 
     private final Action afirmar = new AbstractAction() {
         private static final long serialVersionUID = 1L;
@@ -57,7 +58,7 @@ final class BrowserDialog extends JDialog {
         }
 
         public void actionPerformed(final ActionEvent e) {
-            BrowserDialog.this.firmar = true;
+            BrowserDialog.this.setFirmar(true);
             dispose();
         }
     };
@@ -70,7 +71,7 @@ final class BrowserDialog extends JDialog {
         }
 
         public void actionPerformed(final ActionEvent e) {
-            BrowserDialog.this.firmar = false;
+            BrowserDialog.this.setFirmar(false);
             dispose();
         }
     };

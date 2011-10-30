@@ -43,8 +43,12 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
 
     final class KeyEntry {
         // private Key privateKey;
-        final X509Certificate certChain[];
+        private final X509Certificate certChain[];
         private String alias;
+        
+        X509Certificate[] getCertChain() {
+            return this.certChain.clone();
+        }
 
         KeyEntry(final X509Certificate[] chain) {
             this((String)null, chain);
@@ -375,7 +379,7 @@ public abstract class KeyStoreAddressBook extends KeyStoreSpi {
     @Override
     public final String engineGetCertificateAlias(final Certificate cert) {
         for (final KeyEntry entry : this.entries) {
-            if (entry.certChain != null && entry.certChain[0].equals(cert)) {
+            if (entry.getCertChain() != null && entry.getCertChain()[0].equals(cert)) {
                 return entry.getAlias();
             }
         }

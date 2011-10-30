@@ -115,6 +115,9 @@ public final class Utils {
     /** La referencia de hoja de estilo apunta a un no-XML. */
     public static final class ReferenceIsNotXMLException extends Exception {
         private static final long serialVersionUID = 8076672806350530425L;
+        ReferenceIsNotXMLException(final Throwable e) {
+            super(e);
+        }
     }
 
     /** Dereferencia una joja de estilo en forma de Documento DOM.
@@ -209,7 +212,7 @@ public final class Utils {
             throw new CannotDereferenceException("No se ha dereferenciado la hoja de estilo"); //$NON-NLS-1$
         }
         catch (final Exception e) {
-            throw new ReferenceIsNotXMLException();
+            throw new ReferenceIsNotXMLException(e);
         }
     }
 

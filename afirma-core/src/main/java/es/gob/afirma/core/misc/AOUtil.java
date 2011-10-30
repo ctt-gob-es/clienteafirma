@@ -128,7 +128,7 @@ public final class AOUtil {
      *         Cuando ocurre cualquier problema obteniendo el flujo 
      * @throws IOException 
      * @throws MalformedURLException */
-    public static InputStream loadFile(final URI uri) throws AOException, MalformedURLException, IOException {
+    public static InputStream loadFile(final URI uri) throws AOException, IOException {
 
         if (uri == null) {
             throw new IllegalArgumentException("Se ha pedido el contenido de una URI nula"); //$NON-NLS-1$
