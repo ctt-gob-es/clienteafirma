@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -84,13 +85,24 @@ public class MultifirmaMasiva extends JPanel {
 		Utils.setFontBold(comboAlmacen);
 		add(comboAlmacen, c);
 		
+		//Espacio en blanco
+        JPanel emptyPanel01 = new JPanel();
+        emptyPanel01.setPreferredSize(new Dimension(1, 1));
+        c.weightx = 1.0;
+        c.weighty = 0.2;
+        c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 2;
+        c.insets = new Insets(0, 0, 0, 0);
+        add(emptyPanel01, c);
+		
 		//Relación entre etiqueta y combo
 		etiquetaAlmacen.setLabelFor(comboAlmacen);
 		//Asignación de mnemónico
 		etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
 		
 		c.insets = new Insets(13, 13, 0, 13);
-		c.gridy = 2;
+		c.gridy = 3;
 		c.weighty = 0.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		// Panel que engloba los tipos de multifirma
@@ -119,7 +131,8 @@ public class MultifirmaMasiva extends JPanel {
 		add(panelTipos, c);
 
 		c.weighty = 1.0;
-		c.gridy = 3;
+		c.gridheight = 4;
+		c.gridy = 4;
 		
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
 		JPanel emptyPanel = new JPanel();
@@ -183,7 +196,7 @@ public class MultifirmaMasiva extends JPanel {
 		c.gridwidth	= 2;
         c.insets = new Insets(13,13,13,13);
         c.weighty = 0.0;
-        c.gridy = 4;
+        c.gridy = 8;
 		
 		add(panelBotones, c);
 		

@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -159,8 +160,20 @@ public class Ensobrado extends JPanel {
         Utils.setFontBold(checkAnadir);
         add(checkAnadir, c);
 
+        //Espacio en blanco
+        JPanel emptyPanel01 = new JPanel();
+        emptyPanel01.setPreferredSize(new Dimension(1, 1));
+        c.weightx = 1.0;
+        c.weighty = 0.2;
+        c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 3;
+        c.insets = new Insets(0, 0, 0, 0);
+        add(emptyPanel01, c);
+        
         c.insets = new Insets(13, 13, 0, 13);
-		c.gridy	= 3;
+		c.gridy	= 4;
+		c.weighty = 0.0;
         
         // Etiqueta almacen o repositorio
         JLabel etiquetaOpciones = new JLabel();
@@ -170,7 +183,7 @@ public class Ensobrado extends JPanel {
         add(etiquetaOpciones, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
-		c.gridy = 4;
+		c.gridy = 5;
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.BOTH;
         
@@ -192,7 +205,8 @@ public class Ensobrado extends JPanel {
         etiquetaOpciones.setDisplayedMnemonic(KeyEvent.VK_T);
         
         c.weighty = 1.0;
-		c.gridy = 5;
+		c.gridy = 6;
+		c.gridheight = 4;
 		c.fill = GridBagConstraints.HORIZONTAL;
         
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
@@ -258,7 +272,7 @@ public class Ensobrado extends JPanel {
         c.insets = new Insets(13,13,13,13);
         c.weightx = 1.0;
         c.weighty = 0.0;
-        c.gridy = 6;
+        c.gridy = 10;
 		
 		add(panelBotones, c);
         

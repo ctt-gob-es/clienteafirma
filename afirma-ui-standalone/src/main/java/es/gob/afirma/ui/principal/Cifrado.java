@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -162,11 +163,23 @@ public class Cifrado extends JPanel {
 		panelExaminar.add(examinar);
 		add(panelExaminar, c);
 		
+		//Espacio en blanco
+        JPanel emptyPanel01 = new JPanel();
+        emptyPanel01.setPreferredSize(new Dimension(1, 1));
+        c.weightx = 1.0;
+        c.weighty = 0.2;
+        c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 2;
+        c.insets = new Insets(0, 0, 0, 0);
+        add(emptyPanel01, c);
+		
 		c.insets = new Insets(13, 13, 0, 13);
+		c.weighty = 0.0;
 		c.weightx = 1.0;
 		c.gridwidth = 2;
 		c.gridx = 0;
-		c.gridy	= 2;
+		c.gridy	= 3;
 		
 		// Etiqueta mecanismo cifrado
 		JLabel etiquetaMecanismo = new JLabel();
@@ -176,7 +189,7 @@ public class Cifrado extends JPanel {
 		add(etiquetaMecanismo, c);
 
 		c.insets = new Insets(0, 13, 0, 13);
-		c.gridy = 3;
+		c.gridy = 4;
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.BOTH;
 		
@@ -216,10 +229,20 @@ public class Cifrado extends JPanel {
 			etiquetaMecanismo.setDisplayedMnemonic(KeyEvent.VK_A);
 		}
 
+		//Espacio en blanco
+        JPanel emptyPanel02 = new JPanel();
+        emptyPanel02.setPreferredSize(new Dimension(1, 1));
+        c.weightx = 1.0;
+        c.weighty = 0.2;
+        c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 5;
+        c.insets = new Insets(0, 0, 0, 0);
+        add(emptyPanel02, c);
 		
 		c.insets = new Insets(13, 13, 0, 13);
 		c.weightx = 1.0;
-		c.gridy = 4;
+		c.gridy = 6;
 		c.weighty = 0.0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		
@@ -232,7 +255,7 @@ public class Cifrado extends JPanel {
 		add(etiquetaAlgoritmo, c);
 		
 		c.insets = new Insets(0, 13, 0, 13);
-		c.gridy = 5;
+		c.gridy = 7;
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.BOTH;
 		
@@ -266,7 +289,8 @@ public class Cifrado extends JPanel {
 
 		
 		c.weighty = 1.0;
-		c.gridy = 6;
+		c.gridy = 8;
+		c.gridheight = 4;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		
 		// Panel vacio para alinear el boton de aceptar en la parte de abajo de la pantalla
@@ -331,7 +355,7 @@ public class Cifrado extends JPanel {
         c.insets = new Insets(13,13,13,13);
         c.weightx = 1.0;
         c.weighty = 0.0;
-        c.gridy = 7;
+        c.gridy = 12;
 		
 		add(panelBotones, c);
 		
