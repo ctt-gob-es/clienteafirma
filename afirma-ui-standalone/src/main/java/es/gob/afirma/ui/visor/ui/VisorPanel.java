@@ -12,10 +12,12 @@ package es.gob.afirma.ui.visor.ui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,6 +54,10 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 
     /** Version ID */
     private static final long serialVersionUID = 8309157734617505338L;
+    
+    JButton maximizar = new JButton();
+    
+    JButton restaurar = new JButton();
 
     /** Construye un panel con la informaci&oacute;n extra&iacute;da de una firma. Si no se
      * indica la firma, esta se cargar&aacute; desde un fichero. Es obligatorio introducir
@@ -121,7 +127,6 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 
         JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
         //Boton maximizar
-        JButton maximizar = new JButton();
         maximizar.setText(Messages.getString("Wizard.maximizar"));
         maximizar.setName("maximizar");
         maximizar.setMnemonic(KeyEvent.VK_M);
@@ -139,7 +144,6 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         
         JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
 	    // Boton restaurar
-	    JButton restaurar = new JButton();
 	    restaurar.setText(Messages.getString("Wizard.restaurar"));
 	    restaurar.setName("restaurar");
 	    restaurar.setMnemonic(KeyEvent.VK_R);
@@ -224,20 +228,38 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 	 * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
+
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		
+
 		JAccessibilityDialogWizard.actualPositionX = j.getX();
 		JAccessibilityDialogWizard.actualPositionY = j.getY();
 		JAccessibilityDialogWizard.actualWidth = j.getWidth();
 		JAccessibilityDialogWizard.actualHeight = j.getHeight();
-		j.setBounds(0,0,(int)screenSize.getWidth(), (int)screenSize.getHeight()-35);		
+		
+		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+
+		//Se obtienen las dimensiones de maximizado
+		int maxWidth = (int)rect.getWidth();
+		int maxHeight = (int)rect.getHeight();
+				
+		//Se hace el resize dependiendo del so
+		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+			j.setBounds(0,0, maxWidth, maxHeight);
+		} else {
+			j.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+		}
+				
+		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
+		this.maximizar.setEnabled(false);
+		this.restaurar.setEnabled(true);
 	}
 	
 	/**
 	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
+
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
 		if (JAccessibilityDialogWizard.actualPositionX != -1 && JAccessibilityDialogWizard.actualPositionY != -1 && JAccessibilityDialogWizard.actualWidth != -1 && JAccessibilityDialogWizard.actualHeight != -1){
 			j.setBounds(JAccessibilityDialogWizard.actualPositionX, JAccessibilityDialogWizard.actualPositionY, JAccessibilityDialogWizard.actualWidth, JAccessibilityDialogWizard.actualHeight);
@@ -250,6 +272,9 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 			}
     		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
 		}
+		//Se deshabilita el botón de restaurar puesto que se ha pulsado.
+		this.maximizar.setEnabled(true);
+		this.restaurar.setEnabled(false);
 	}
 	
 	/**
