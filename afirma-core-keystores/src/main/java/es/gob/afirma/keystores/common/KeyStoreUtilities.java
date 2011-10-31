@@ -166,7 +166,7 @@ public final class KeyStoreUtilities {
         for (final String trimmedAlias : trimmedAliases) {
             aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
         }
-
+        
         String tmpCN;
         String issuerTmpCN;
 
@@ -259,6 +259,9 @@ public final class KeyStoreUtilities {
                     }
                 }
 
+                
+                
+                
                 if (tmpCert != null && certFilters != null) {
                     boolean allFiltersOK = true;
                     for (final CertificateFilter cf : certFilters) {
@@ -291,33 +294,6 @@ public final class KeyStoreUtilities {
                         );
                         aliassesByFriendlyName.remove(al);
                     }
-                }
-            }
-        }
-
-        else {
-
-            // Vamos a ver si en vez de un alias nos llega un Principal X.500
-            // completo,
-            // en cuyo caso es muy largo como para mostrase y mostrariamos solo
-            // el
-            // CN o una version truncada si no nos cuela como X.500.
-            // En este bucle usamos la clave tanto como clave como valor porque
-            // asi se ha inicializado
-            // el HashTable.
-            for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
-                final String value = aliassesByFriendlyName.get(al);
-                if (value.length() > ALIAS_MAX_LENGTH) {
-                    tmpCN = AOUtil.getCN(value);
-                    if (tmpCN != null) {
-                        aliassesByFriendlyName.put(al, tmpCN);
-                    }
-                    else {
-                        aliassesByFriendlyName.put(al, value.substring(0, ALIAS_MAX_LENGTH - 3) + "..."); //$NON-NLS-1$
-                    }
-                }
-                else {
-                    aliassesByFriendlyName.put(al, value.trim());
                 }
             }
         }
