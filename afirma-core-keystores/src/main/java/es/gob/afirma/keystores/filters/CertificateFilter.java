@@ -11,17 +11,35 @@
 package es.gob.afirma.keystores.filters;
 
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Filtro para certificados. Debe autocontener toda la l&oacute;gica que indique si un
  * certificado cumple o no las condiciones del filtro.
  * El establecimiento de los datos encesarios para las condiciones de filtrado queda fuera
  * del interfaz y debe ser espec&iacute;fico para cada implementaci&oacute;n.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public interface CertificateFilter {
+public abstract class CertificateFilter {
     
     /** Comprueba si un certificado se adec&uacute;a al filtro
      * @param cert Certificado a comprobar
      * @return <code>true</code> si el certificado se adec&uacute;a al filtro, <code>false</code> en caso contrario
      */
-    boolean matches(final X509Certificate cert);
+    public abstract boolean matches(final X509Certificate cert);
+    
+    /**
+     * Obtiene los certificados de un listado que cumplen con un determinado criterio. Por defecto,
+     * el establecido en el m&eacute;todo {@link #matches(X509Certificate)}. 
+     * @param certs Listado de certificados.
+     * @return Certificados que cumplen el criterio.
+     */
+    public X509Certificate[] matches(X509Certificate[] certs) {
+    	List<X509Certificate> filteredCerts = new ArrayList<X509Certificate>();
+    	for (X509Certificate cert : certs) {
+    		if (matches(cert)) {
+    			filteredCerts.add(cert);
+    		}
+    	}
+    	return filteredCerts.toArray(new X509Certificate[filteredCerts.size()]);
+    }
 }

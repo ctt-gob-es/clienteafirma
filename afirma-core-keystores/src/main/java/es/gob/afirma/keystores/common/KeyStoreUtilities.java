@@ -127,8 +127,6 @@ public final class KeyStoreUtilities {
 
     }
 
-    private static final int ALIAS_MAX_LENGTH = 120;
-
     /** Obtiene una hashtable con las descripciones usuales de los alias de
      * certificados (como claves de estas &uacute;ltimas).
      * @param alias
@@ -142,9 +140,6 @@ public final class KeyStoreUtilities {
      * @param checkPrivateKeys
      *        Indica si se debe comprobar que el certificado tiene clave
      *        privada o no, para no mostrar aquellos que carezcan de ella
-     * @param checkValidity
-     *        Indica si se debe comprobar la validez temporal de un
-     *        certificado al ser seleccionado
      * @param showExpiredCertificates
      *        Indica si se deben o no mostrar los certificados caducados o
      *        aun no v&aacute;lidos
@@ -154,148 +149,146 @@ public final class KeyStoreUtilities {
     public static Map<String, String> getAliasesByFriendlyName(final String[] alias,
                                                                             final List<KeyStore> kss,
                                                                             final boolean checkPrivateKeys,
-                                                                            final boolean checkValidity,
                                                                             final boolean showExpiredCertificates,
                                                                             final List<CertificateFilter> certFilters) {
 
-        final String[] trimmedAliases = alias.clone();
-
-        // Creamos un HashTable con la relacion Alias-Nombre_a_mostrar de los
-        // certificados
-        final Hashtable<String, String> aliassesByFriendlyName = new Hashtable<String, String>(trimmedAliases.length);
-        for (final String trimmedAlias : trimmedAliases) {
-            aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
-        }
-        
         String tmpCN;
         String issuerTmpCN;
 
         X509Certificate tmpCert;
-        if (kss != null && kss.size() > 0) {
+        if (kss == null || kss.size() <= 0) {
+        	return new Hashtable<String, String>();
+        }
 
-            KeyStore ks = null;
-            for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
-                tmpCert = null;
+        Hashtable<X509Certificate, String> certs = new Hashtable<X509Certificate, String>();
 
-                // Seleccionamos el KeyStore en donde se encuentra el alias
-                for (final KeyStore tmpKs : kss) {
-                    try {
-                        tmpCert = (X509Certificate) tmpKs.getCertificate(al);
-                    }
-                    catch (final Exception e) {
-                        LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
-                        continue;
-                    }
-                    if (tmpCert != null) {
-                        ks = tmpKs;
-                        break;
-                    }
-                }
+        KeyStore ks = null;
+        for (final String al : alias.clone()) {
+        	tmpCert = null;
 
-                // Si no tenemos Store para el alias en curso, pasamos al
-                // siguiente alias
-                if (ks == null) {
-                    continue;
-                }
+        	// Seleccionamos el KeyStore en donde se encuentra el alias
+        	for (final KeyStore tmpKs : kss) {
+        		try {
+        			tmpCert = (X509Certificate) tmpKs.getCertificate(al);
+        		}
+        		catch (final Exception e) {
+        			LOGGER.warning("No se ha inicializado el KeyStore indicado: " + e); //$NON-NLS-1$
+        			continue;
+        		}
+        		if (tmpCert != null) {
+        			ks = tmpKs;
+        			break;
+        		}
+        	}
 
-                if (tmpCert == null)
-                 {
-                    LOGGER.warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$
-                }
+        	// Si no tenemos Store para el alias en curso, pasamos al
+        	// siguiente alias
+        	if (ks == null) {
+        		continue;
+        	}
 
-                if (!showExpiredCertificates && tmpCert != null) {
-                    try {
-                        tmpCert.checkValidity();
-                    }
-                    catch (final Exception e) {
-                        LOGGER.info(
-                                    "Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
-                        );
-                        aliassesByFriendlyName.remove(al);
-                        continue;
-                    }
-                }
+        	if (tmpCert == null)
+        	{
+        		LOGGER.warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$
+        	}
 
-                if (checkPrivateKeys && tmpCert != null) {
-                    try {
-                        if ("KeychainStore".equals(ks.getType())) { //$NON-NLS-1$
-                            final KeyStore tmpKs = ks;
-                            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                                public Void run() {
-                                    final PrivateKey key;
-                                    try {
-                                        LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
-                                        key = (PrivateKey) tmpKs.getKey(al, "dummy".toCharArray()); //$NON-NLS-1$
-                                    }
-                                    catch (final Exception e) {
-                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X", e); //$NON-NLS-1$
-                                    }
-                                    if (key == null) {
-                                        throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X"); //$NON-NLS-1$
-                                    }
-                                    return null;
-                                }
-                            });
-                        }
-                        else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
-                            aliassesByFriendlyName.remove(al);
-                            LOGGER.info(
-                              "El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
-                            );
-                            continue;
-                        }
-                    }
-                    catch (final UnsupportedOperationException e) {
-                        aliassesByFriendlyName.remove(al);
-                        LOGGER.info(
-                          "El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
-                        );
-                        continue;
-                    }
-                    catch (final Exception e) {
-                        LOGGER.info(
-                          "Se ha incluido un certificado (" + al + ") con clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
-                        );
-                    }
-                }
+        	if (!showExpiredCertificates && tmpCert != null) {
+        		try {
+        			tmpCert.checkValidity();
+        		}
+        		catch (final Exception e) {
+        			LOGGER.info(
+        					"Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
+        			);
+        			continue;
+        		}
+        	}
 
-                
-                
-                
-                if (tmpCert != null && certFilters != null) {
-                    boolean allFiltersOK = true;
-                    for (final CertificateFilter cf : certFilters) {
-                        if (!cf.matches(tmpCert)) {
-                            allFiltersOK = false;
-                            break;
-                        }
-                    }
-                    if (allFiltersOK) {
-                        tmpCN = AOUtil.getCN(tmpCert);
-                        issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
+        	if (checkPrivateKeys && tmpCert != null) {
+        		try {
+        			if ("KeychainStore".equals(ks.getType())) { //$NON-NLS-1$
+        				final KeyStore tmpKs = ks;
+        				AccessController.doPrivileged(new PrivilegedAction<Void>() {
+        					public Void run() {
+        						final PrivateKey key;
+        						try {
+        							LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
+        							key = (PrivateKey) tmpKs.getKey(al, "dummy".toCharArray()); //$NON-NLS-1$
+        						}
+        						catch (final Exception e) {
+        							throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X", e); //$NON-NLS-1$
+        						}
+        						if (key == null) {
+        							throw new UnsupportedOperationException("No se ha podido recuperar directamente la clave privada en Mac OS X"); //$NON-NLS-1$
+        						}
+        						return null;
+        					}
+        				});
+        			}
+        			else if (!(ks.getEntry(al, new KeyStore.PasswordProtection(new char[0])) instanceof KeyStore.PrivateKeyEntry)) {
+        				LOGGER.info(
+        						"El certificado '" + al + "' no era tipo trusted pero su clave tampoco era de tipo privada, no se mostrara" //$NON-NLS-1$ //$NON-NLS-2$
+        				);
+        				continue;
+        			}
+        		}
+        		catch (final UnsupportedOperationException e) {
+        			LOGGER.info(
+        					"El certificado '" + al + "' no se mostrara por no soportar operaciones de clave privada" //$NON-NLS-1$ //$NON-NLS-2$
+        			);
+        			continue;
+        		}
+        		catch (final Exception e) {
+        			LOGGER.info(
+        					"Se ha incluido un certificado (" + al + ") con clave privada inaccesible: " + e //$NON-NLS-1$ //$NON-NLS-2$
+        			);
+        		}
+        	}
 
-                        if (tmpCN != null && issuerTmpCN != null) {
-                            aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        }
+        	if (tmpCert != null) {
+        		certs.put(tmpCert, al);
+        	}
+        }
 
-                        else if (tmpCN != null /* && isValidString(tmpCN) */) {
-                            aliassesByFriendlyName.put(al, tmpCN);
-                        }
-                        else {
-                            // Hacemos un trim() antes de insertar, porque los alias de los certificados de las tarjetas
-                            // CERES terminan con un '\r', que se ve como un caracter extrano
-                            aliassesByFriendlyName.put(al, al.trim());
-                        }
-                    }
-                    else {
-                        // Eliminamos aquellos certificados que no hayan encajado
-                        LOGGER.info(
-                        "El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
-                        );
-                        aliassesByFriendlyName.remove(al);
-                    }
-                }
-            }
+        Hashtable<String, String> aliassesByFriendlyName = new Hashtable<String, String>();
+        for (String trimmedAlias : certs.values().toArray(new String[0])) {
+        	aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
+        }
+        
+        if (certFilters != null) {
+        	X509Certificate[] filteredCerts = certs.keySet().toArray(new X509Certificate[0]);
+        	for (final CertificateFilter cf : certFilters) {
+        		filteredCerts = cf.matches(filteredCerts);
+        	}
+
+        	for (final X509Certificate cert : filteredCerts) {
+        		String al = certs.get(cert);
+
+        		if (filteredCerts.length > 0) {
+        			tmpCN = AOUtil.getCN(cert);
+        			issuerTmpCN = AOUtil.getCN(cert.getIssuerX500Principal().getName());
+
+        			if (tmpCN != null && issuerTmpCN != null) {
+        				aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + cert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        			}
+
+        			else if (tmpCN != null /* && isValidString(tmpCN) */) {
+        				aliassesByFriendlyName.put(al, tmpCN);
+        			}
+        			else {
+        				// Hacemos un trim() antes de insertar, porque los alias de los certificados de las tarjetas
+        				// CERES terminan con un '\r', que se ve como un caracter extrano
+        				aliassesByFriendlyName.put(al, al.trim());
+        			}
+        		}
+        		else {
+        			// Eliminamos aquellos certificados que no hayan encajado
+        			LOGGER.info(
+        					"El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
+        			);
+        			aliassesByFriendlyName.remove(al);
+        		}
+        	}
         }
 
         return aliassesByFriendlyName;
@@ -392,7 +385,7 @@ public final class KeyStoreUtilities {
         }
 
         final Map<String, String> aliassesByFriendlyName =
-                KeyStoreUtilities.getAliasesByFriendlyName(alias, kss, checkPrivateKeys, checkValidity, showExpiredCertificates, certFilters);
+                KeyStoreUtilities.getAliasesByFriendlyName(alias, kss, checkPrivateKeys, showExpiredCertificates, certFilters);
 
         // Miramos si despues de filtrar las entradas queda alguna o se ha
         // quedado la lista vacia
