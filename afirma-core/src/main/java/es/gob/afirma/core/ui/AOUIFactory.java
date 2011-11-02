@@ -49,26 +49,37 @@ public final class AOUIFactory {
     /** JOptionPane.INFORMATION_MESSAGE. */
     public static final int INFORMATION_MESSAGE;
     
-    private static final AOUIManager UIMANAGER;
+    private static AOUIManager uiManager;
     
     static {
         try {
             if (Platform.OS.ANDROID.equals(Platform.getOS())) {
                 throw new UnsupportedOperationException("No se soporta GUI en Android"); //$NON-NLS-1$
             }
-            UIMANAGER = (AOUIManager) AOUtil.classForName("es.gob.afirma.core.ui.jse.JSEUIManager").newInstance(); //$NON-NLS-1$
-            PLAIN_MESSAGE = UIMANAGER.getPlainMessageCode();
-            YES_NO_OPTION = UIMANAGER.getYesNoOptionCode();
-            WARNING_MESSAGE = UIMANAGER.getWarningMessageCode();
-            YES_OPTION = UIMANAGER.getYesOptionCode();
-            NO_OPTION = UIMANAGER.getNoOptionCode();
-            OK_CANCEL_OPTION = UIMANAGER.getOkCancelOptionCode();
-            OK_OPTION = UIMANAGER.getOkOptionCode();
-            INFORMATION_MESSAGE = UIMANAGER.getInformationMessageCode();
+            uiManager = (AOUIManager) AOUtil.classForName("es.gob.afirma.core.ui.jse.JSEUIManager").newInstance(); //$NON-NLS-1$
+            PLAIN_MESSAGE = uiManager.getPlainMessageCode();
+            YES_NO_OPTION = uiManager.getYesNoOptionCode();
+            WARNING_MESSAGE = uiManager.getWarningMessageCode();
+            YES_OPTION = uiManager.getYesOptionCode();
+            NO_OPTION = uiManager.getNoOptionCode();
+            OK_CANCEL_OPTION = uiManager.getOkCancelOptionCode();
+            OK_OPTION = uiManager.getOkOptionCode();
+            INFORMATION_MESSAGE = uiManager.getInformationMessageCode();
         }
         catch(final Exception e) {
             throw new UnsupportedOperationException("No se ha podido instanciar el gestor de interfaces graficas: " + e, e); //$NON-NLS-1$
         }
+    }
+    
+    /**
+     * Establece el manejador de interfaces que gestionar&aacute; los di&aacute;logos
+     * gr&aacute;ficos que utilizar&aacute; @firma para mostrar o solicitar informaci&oacute;n.
+     * @param manager Manejador de interfaces.
+     */
+    public static void setUIManager(AOUIManager manager) {
+    	if (manager != null) {
+    		uiManager = manager;
+    	}
     }
     
     /** Pregunta al usuario por una contrase&ntilde;a.
@@ -82,7 +93,7 @@ public final class AOUIFactory {
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
     public static char[] getPassword(final String text, final Object c) {
-        return UIMANAGER.getPassword(text, c);
+        return uiManager.getPassword(text, c);
     }
     
     /** Pregunta al usuario por una contrase&ntilde;a. S&oacute;lo admite los caracteres
@@ -105,7 +116,7 @@ public final class AOUIFactory {
      *         Cuando el usuario cancela el proceso de solicitud de
      *         contrase&ntilde;a */
     public static char[] getPassword(final String text, final String charset, final boolean beep, final Object c) {
-        return UIMANAGER.getPassword(text, charset, beep, c);
+        return uiManager.getPassword(text, charset, beep, c);
     }
     
     /**
@@ -118,7 +129,7 @@ public final class AOUIFactory {
      * @return Opci&oacute;n seleccionada
      */
     public static int showConfirmDialog(final Object parentComponent, final Object message, final String title, final int optionType, final int messageType) {
-        return UIMANAGER.showConfirmDialog(parentComponent, message, title, optionType, messageType);
+        return uiManager.showConfirmDialog(parentComponent, message, title, optionType, messageType);
     }
     
     /**
@@ -133,7 +144,7 @@ public final class AOUIFactory {
      * @return Valor seleccionado
      */
     public static Object showInputDialog(final Object parentComponent, final Object message, final String title, final int messageType, final Object icon, final Object[] selectionValues, final Object initialSelectionValue) {
-        return UIMANAGER.showInputDialog(parentComponent, message, title, messageType, icon, selectionValues, initialSelectionValue);
+        return uiManager.showInputDialog(parentComponent, message, title, messageType, icon, selectionValues, initialSelectionValue);
     }
     
     /** Pregunta al usuario por un nombre de fichero para su carga.
@@ -146,7 +157,7 @@ public final class AOUIFactory {
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     public static String getLoadFileName(String[] extensions, String description, Object parentComponent) {
-        return UIMANAGER.getLoadFileName(extensions, description, parentComponent);
+        return uiManager.getLoadFileName(extensions, description, parentComponent);
     }
 
     /** Pregunta al usuario por un nombre de fichero para su carga.
@@ -161,7 +172,7 @@ public final class AOUIFactory {
      *        Componente padre (para la modalidad)
      * @return Nombre de fichero (con ruta) seleccionado por el usuario */
     public static String getLoadFileName(final String dialogTitle,final String[] extensions, final String description, final Object parentComponent) {
-        return UIMANAGER.getLoadFileName(dialogTitle, extensions, description, parentComponent);
+        return uiManager.getLoadFileName(dialogTitle, extensions, description, parentComponent);
     }
     
     /** Pregunta al usuario por la localizaci&oacute;n de un fichero espec&iacute;fico para su carga.
@@ -176,7 +187,7 @@ public final class AOUIFactory {
      *        Componente padre (para la modalidad)
      * @return Fichero seleccionado por el usuario */
     public static File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
-        return UIMANAGER.getLoadFile(dialogTitle, fileName, description, parent);
+        return uiManager.getLoadFile(dialogTitle, fileName, description, parent);
     }
 
     /** Pregunta al usuario por la localizaci&oacute;n en la que se desean guardar
@@ -194,6 +205,6 @@ public final class AOUIFactory {
      * @return Fichero en el qeu se almacenan los datos.
      */
     public static File getSaveDataToFile(final byte[] data, final File selectedFile, final Object fileFilter, final Object parent) {
-        return UIMANAGER.saveDataToFile(data, selectedFile, fileFilter, parent);
+        return uiManager.saveDataToFile(data, selectedFile, fileFilter, parent);
     }
 }
