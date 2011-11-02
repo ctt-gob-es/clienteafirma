@@ -17,7 +17,7 @@ public abstract class JAccessibilityFrame extends JFrame {
 	
 	public JAccessibilityFrame(){
 		super();
-		this.resizingAdaptor = new ResizingAdaptor(this, null, null,null,null);
+		this.resizingAdaptor = new ResizingAdaptor(this, null, null,null,null,null);
 		this.addComponentListener(this.resizingAdaptor);
 	}
 	
