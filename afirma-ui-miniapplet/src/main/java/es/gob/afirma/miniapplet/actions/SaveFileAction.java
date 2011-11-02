@@ -120,7 +120,7 @@ public class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
             }
             final File tempFile = fc.getSelectedFile();
             if (tempFile.exists()) {
-            	if (tempFile.isDirectory() && !tempFile.canWrite()) {
+            	if (tempFile.isDirectory() || !tempFile.canWrite()) {
             		JOptionPane.showMessageDialog(this.parent,
             				Messages.getString("SaveFileAction.0", tempFile.getAbsolutePath()), //$NON-NLS-1$
             				Messages.getString("SaveFileAction.1"), //$NON-NLS-1$

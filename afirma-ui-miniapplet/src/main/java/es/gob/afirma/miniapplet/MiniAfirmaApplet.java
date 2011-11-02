@@ -19,6 +19,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.swing.JApplet;
+import javax.swing.UIManager;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOFormatFileException;
@@ -177,6 +178,10 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     @Override
     public void init() {
     	this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
+    	
+    	this.configureLookAndFeel();
+    	
+    	LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
     }
 
     /**
@@ -219,5 +224,25 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     		throw new AOFormatFileException(signerErrorMessage);
     	}
     	return signer;
+    }
+    
+    /**
+     * Configura la apariencia de los di&aacute;logos Java siguiendo la configuraci&oacute;n
+     * establecida en el sistema. 
+     */
+    private void configureLookAndFeel() {
+        final String lookandfeel = UIManager.getSystemLookAndFeelClassName();
+        try {
+            UIManager.setLookAndFeel(lookandfeel);
+        }
+        catch (final Exception e) {
+            LOGGER.warning("No se ha podido establecer el Look&Feel '" + lookandfeel + //$NON-NLS-1$
+            			   "', las ventanas careceran de decoracion: " //$NON-NLS-1$
+                           + e);
+        }
+
+        // Nos aseguramos de que los dialogos salgan decorados
+        javax.swing.JDialog.setDefaultLookAndFeelDecorated(true);
+        javax.swing.JFrame.setDefaultLookAndFeelDecorated(true);
     }
 }
