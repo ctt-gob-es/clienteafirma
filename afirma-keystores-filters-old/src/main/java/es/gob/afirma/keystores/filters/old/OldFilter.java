@@ -22,7 +22,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
  * @deprecated
  */
 @Deprecated
-public class OldFilter implements CertificateFilter {
+public class OldFilter extends CertificateFilter {
 	
 	/** Expresi&oacute;n del filtro de certificados. **/
 	private final String filter;
