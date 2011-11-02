@@ -23,11 +23,12 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Clase que representa un filtro de certificados para
  * el di&aacute;logo de selecci&oacute;n. */
-public final class RFC2254CertificateFilter implements CertificateFilter {
+public final class RFC2254CertificateFilter extends CertificateFilter {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
-    public boolean matches(final X509Certificate cert) {
+    @Override
+	public boolean matches(final X509Certificate cert) {
         return filterSubjectByRFC2254(this.rfc2254SubjectFilter, cert)
                && filterIssuerByRFC2254(this.rfc2254IssuerFilter, cert);
     }

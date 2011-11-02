@@ -16,14 +16,15 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Clase que representa un filtro de certificados por los atributos KeyUsage para
  * el di&aacute;logo de selecci&oacute;n. */
-public class KeyUsageFilter implements CertificateFilter {
+public class KeyUsageFilter extends CertificateFilter {
     
     private static final int KEYUSAGE_NBITS = 9;
     
     /** El KeyUsage m&iacute;nimos que debe cumplir el certificado. */
     private final Boolean[] keyUsageFilter;
 
-    public boolean matches(final X509Certificate cert) {
+    @Override
+	public boolean matches(final X509Certificate cert) {
         if (cert == null) {
             return false;
         }

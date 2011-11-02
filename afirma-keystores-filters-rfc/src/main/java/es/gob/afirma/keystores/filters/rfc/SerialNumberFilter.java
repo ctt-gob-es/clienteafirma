@@ -17,7 +17,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Filtro de certificados por su n&uacute;mero de serie.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class SerialNumberFilter implements CertificateFilter {
+public class SerialNumberFilter extends CertificateFilter {
     
     private final BigInteger serialNumber;
     
@@ -31,7 +31,8 @@ public class SerialNumberFilter implements CertificateFilter {
         this.serialNumber = serial;
     }
 
-    public boolean matches(X509Certificate cert) {
+    @Override
+	public boolean matches(X509Certificate cert) {
         if (cert == null) {
             return false;
         }
