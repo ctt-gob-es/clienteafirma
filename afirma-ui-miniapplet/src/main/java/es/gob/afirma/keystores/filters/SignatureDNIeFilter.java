@@ -9,7 +9,7 @@ import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
  * Filtro de certificados que s&oacute;lo admite el certificado de firma del DNIe.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public class DNIeFilter implements CertificateFilter {
+public class SignatureDNIeFilter extends CertificateFilter {
 
 	private RFC2254CertificateFilter rfc2254Filter = null;
 	private KeyUsageFilter keyUsageFilter = null;
@@ -18,11 +18,11 @@ public class DNIeFilter implements CertificateFilter {
 	 * Contruye el filtro gen&eacute;rico para la selecci&oacute;n de los certificados de firma
 	 * del DNIe.
 	 */
-	public DNIeFilter() {
+	public SignatureDNIeFilter() {
 		
 		this.rfc2254Filter = new RFC2254CertificateFilter(
 				null,
-				"(&(cn=AC DNIE 00*)(ou=DNIE)(o=DIRECCION GENERAL DE LA POLICIA)(c=ES))"); //$NON-NLS-1$
+				"(&(cn=AC DNIE *)(ou=DNIE)(o=DIRECCION GENERAL DE LA POLICIA)(c=ES))"); //$NON-NLS-1$
 		
 		this.keyUsageFilter = new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE);
 	}
