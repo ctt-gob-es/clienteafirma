@@ -42,13 +42,15 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
 public final class KeyStoreUtilities {
+    
+    private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    private static final int ALIAS_MAX_LENGTH = 120;
+	
     private KeyStoreUtilities() {
         // No permitimos la instanciacion
     }
     
-    static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
-
     /** Crea las l&iacute;neas de configuraci&oacute;n para el proveedor PKCS#11
      * de Sun.
      * @param lib
@@ -151,13 +153,18 @@ public final class KeyStoreUtilities {
                                                                             final boolean checkPrivateKeys,
                                                                             final boolean showExpiredCertificates,
                                                                             final List<CertificateFilter> certFilters) {
-
+    	
         String tmpCN;
         String issuerTmpCN;
 
         X509Certificate tmpCert;
         if (kss == null || kss.size() <= 0) {
-        	return new Hashtable<String, String>();
+
+        	Hashtable<String, String> revisedAlias = new Hashtable<String, String>();
+        	for (final String al : alias) {
+        		revisedAlias.put(al, al);
+        	}
+        	return trimAlias(revisedAlias);
         }
 
         Hashtable<X509Certificate, String> certs = new Hashtable<X509Certificate, String>();
@@ -291,7 +298,7 @@ public final class KeyStoreUtilities {
         	}
         }
 
-        return aliassesByFriendlyName;
+        return trimAlias(aliassesByFriendlyName);
 
     }
     
@@ -577,5 +584,32 @@ public final class KeyStoreUtilities {
             return "/usr/local/lib/opensc-pkcs11.so"; //$NON-NLS-1$
         }
         throw new AOKeyStoreManagerException("No hay controlador PKCS#11 de DNIe instalado en este sistema"); //$NON-NLS-1$
+    }
+    
+    /**
+     * Revisa si los alias exceden el l&iacute;mite de longitud establecido y, en caso
+     * afirmativo, comprueba si son un principal X.500. De serlo, se devolver&aacute;
+     * &uacute;nicamente su CommonName (CN) o su Organizative Unit (OU) en su defecto.
+     * Si no se encuentra ninguno de los dos, se limitar&aacute; la cadena al
+     * tama&ntilde;o m&aacute;ximo permitido. 
+     * @param aliases Listado de alias de certificados junto con la cadena que se
+     * utilizar&aacute; para representarlo.
+     * @return Listado de alias de certificados y las cadenas utilizadas para
+     * representarlos.
+     */
+    private static Hashtable<String, String> trimAlias(Hashtable<String, String> aliases) {
+    	for (final String al : aliases.keySet().toArray(new String[0])) {
+    		if (al.length() > ALIAS_MAX_LENGTH) {
+    			String tmpCN = AOUtil.getCN(al);
+    			if (tmpCN != null) {
+    				aliases.put(al, tmpCN);
+    			} else {
+    				aliases.put(al, al.substring(0, ALIAS_MAX_LENGTH - 3) + "..."); //$NON-NLS-1$
+    			}
+    		} else {
+    			aliases.put(al, al.trim());
+    		}
+    	}
+    	return aliases;
     }
 }
