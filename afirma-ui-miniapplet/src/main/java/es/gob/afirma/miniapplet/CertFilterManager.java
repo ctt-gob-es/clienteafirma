@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import es.gob.afirma.keystores.filters.CertificateFilter;
-import es.gob.afirma.keystores.filters.DNIeFilter;
+import es.gob.afirma.keystores.filters.SSLFilter;
+import es.gob.afirma.keystores.filters.SignatureDNIeFilter;
 
+/**
+ * Identifica y obtiene los filtros de certificados definidos en las propiedades
+ * de una operaci&oacute;n de firma/multifirma electr&oacute;nica.
+ *  
+ * @author Carlos Gamuci Mill&aacute;n
+ */
 public class CertFilterManager {
 
 	private final static String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
 	
 	private final static String FILTER_TYPE_DNIE = "dnie:"; //$NON-NLS-1$
-	
-	private final static String FILTER_TYPE_DNI = "dni:"; //$NON-NLS-1$
 	
 	private final static String FILTER_TYPE_SSL = "ssl:"; //$NON-NLS-1$
 	
@@ -35,11 +40,9 @@ public class CertFilterManager {
 		
 		CertificateFilter filter;
 		if (filterValue.toLowerCase().startsWith(FILTER_TYPE_DNIE)) {
-			filter = new DNIeFilter();
-//		} else if (filterValue.toLowerCase().startsWith(FILTER_TYPE_DNI)) {
-//			filter = new DNIFilter();
-//		} else if (filterValue.toLowerCase().startsWith(FILTER_TYPE_SSL)) {
-//			filter = new SSLFilter();
+			filter = new SignatureDNIeFilter();
+		} else if (filterValue.toLowerCase().startsWith(FILTER_TYPE_SSL)) {
+			filter = new SSLFilter(filterValue.substring(FILTER_TYPE_SSL.length()));
 		} else {
 			return;
 		}

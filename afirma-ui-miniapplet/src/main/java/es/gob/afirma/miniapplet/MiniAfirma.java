@@ -118,25 +118,46 @@ public interface MiniAfirma {
      * el directorio y el nombre de fichero para el guardado de datos. Se usar&aacute; las funcionalidades
      * de JNLP siempre que sea posible
      * @param data Datos en Base64 que se desean guardar
+     * @param title T&iacute;tulo para el di&aacute;logo.
      * @param fileName Nombre que se debe proponer al usuario en el di&aacute;logo para guardar el fichero. Puede ser nulo
      * @param extension Extensi&oacute;n del fichero a guardar (que habitualmente indica el tipo)
+     * @param description Descripci&oacute;n del tipo de fichero que se desea guardar.
      * @return {@code true} en caso de guardarse correctamente, {@code false} en caso
      * contrario.
      * @throws IOException Cuando ocurre alg&uacute;n error en el guardado del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    boolean saveDataToFile(String data, String fileName, String extension) throws IOException, PrivilegedActionException;
+    boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws IOException, PrivilegedActionException;
 
+    
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; el contenido en Base64. Si el usuario cancela la operaci&oacute;n
      * de selecci&oacute;n del fichero se devuelve {@code null}. Se usar&aacute; las funcionalidades
      * de JNLP siempre que sea posible.
+     * @param title T&iacute;tulo para el di&aacute;logo.
+     * @param extensions Extensiones de b&uacute;squeda.
+     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El contenido del fichero codificado en Base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String getFileContent() throws IOException, PrivilegedActionException;
+    String getFileContent(String title, String extensions, String description) throws IOException, PrivilegedActionException;
 
+
+    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
+     * del que se recuperar&aacute; su nombre. Si no se selecciona
+     * ning&uacute;n fichero, se devuelve <code>null</code>. Se usar&aacute; las funcionalidades
+     * de JNLP siempre que sea posible.
+     * @param title T&iacute;tulo para el di&aacute;logo.
+     * @param extensions Extensiones de b&uacute;squeda.
+     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
+     * @return Nombre del fichero seleccionado.
+     * @throws IOException Cuando se produce un error al seleccionar el fichero.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     */
+    String loadFilename(String title, String extensions, String description) throws IOException, PrivilegedActionException;
+    
+    
     /** Decodifica un texto en Base64. Si se produce alg&uacute;n error se
      * devuelve {@code null}.
      * @param data Datos en Base64.
@@ -161,16 +182,4 @@ public interface MiniAfirma {
      * @return Texto codificado en Base64.
      */
     String getBase64FromText(String plainText);
-
-    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
-     * del que se recuperar&aacute; su nombre. Si no se selecciona
-     * ning&uacute;n fichero, se devuelve <code>null</code>. Se usar&aacute; las funcionalidades
-     * de JNLP siempre que sea posible.
-     * @param exts Extensiones de b&uacute;squeda.
-     * @return Nombre del fichero seleccionado.
-     * @throws IOException Cuando se produce un error al seleccionar el fichero.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     */
-    String loadFilename(String exts) throws IOException, PrivilegedActionException;
-    
 }

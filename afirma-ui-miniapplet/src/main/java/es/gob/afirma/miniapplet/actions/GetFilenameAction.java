@@ -1,9 +1,8 @@
 package es.gob.afirma.miniapplet.actions;
 
+import java.awt.Component;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
-
-import javax.jnlp.FileOpenService;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
@@ -13,18 +12,28 @@ import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
  * @author Carlos Gamuci Mill&aacute;n
  */
 public class GetFilenameAction implements PrivilegedExceptionAction<String> {
-
-    private FileOpenService jnlpFos;
+    
+    private String title;
     
     private String[] exts;
     
+    private String desc;
+    
+    private Component parent;
+    
     /**
      * Crea la acci&oacute;n en base a un servicio JNLP para la carga de ficheros.
-     * @param fos Servicio de carga de ficheros.
+     * @param title T&iacute;tulo del di&aacute;logo.
+     * @param exts Extensiones de fichero aceptadas por defecto.
+     * @param description Descripci&opacute;n del tipo de fichero aceptado por defecto.
+     * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public GetFilenameAction(final FileOpenService fos, String[] exts ) {
-        this.jnlpFos = fos;
+    public GetFilenameAction(final String title, final String[] exts, final String description,
+    		 final Component parent) {
+        this.title = title;
         this.exts = exts;
+        this.desc = description;
+        this.parent = parent;
     }
     
     /**
@@ -36,7 +45,7 @@ public class GetFilenameAction implements PrivilegedExceptionAction<String> {
      */
 	@Override
 	public String run() throws AOCancelledOperationException, IOException {
-        FileSelectionDialog dialog = new FileSelectionDialog(this.jnlpFos, this.exts);
-        return dialog.getFilename();
+        FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.parent);
+        return dialog.getPath();
 	}
 }

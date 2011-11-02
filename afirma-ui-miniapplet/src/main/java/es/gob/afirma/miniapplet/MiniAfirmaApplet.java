@@ -10,6 +10,7 @@
 
 package es.gob.afirma.miniapplet;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -17,9 +18,6 @@ import java.security.PrivilegedActionException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.jnlp.FileOpenService;
-import javax.jnlp.FileSaveService;
-import javax.jnlp.ServiceManager;
 import javax.swing.JApplet;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -49,15 +47,9 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     
     /** Identificador del navegador Web que carga el applet. */
     private String userAgent = null;
-    
-    /** Servicio para la carga de ficheros. */
-    private FileOpenService fos = null;
-    
-    /** Servicio para el guardado de ficheros. */
-    private FileSaveService fss = null;
-    
+        
     /** Ruta recomendada para la apertura de di&aacute;logos se seleccion y guardado de ficheros. */
-    private String pathHint = Platform.getUserHome();
+    private File pathHint = new File(Platform.getUserHome());
 
     @Override
     public String sign(String dataB64, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
@@ -124,14 +116,15 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 
     @Override
-    public boolean saveDataToFile(String data, String fileName, String extension) throws PrivilegedActionException, IOException {
+    public boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException {
         if (data == null) {
             LOGGER.warning("Se ha solicitado guardar en disco un contenido nulo, se ignorara la peticion"); //$NON-NLS-1$
             return false;
         }
 
-        SaveFileAction saveFileAction = new SaveFileAction(
-        		this.fss, Base64.decode(data), new String[] { extension }, fileName, this.pathHint);
+        SaveFileAction saveFileAction = new SaveFileAction(title, Base64.decode(data),
+        		new String[] { extension }, description,
+        		(fileName != null ? new File(this.pathHint, fileName) : this.pathHint), this);
         
     	try {
     		return AccessController.doPrivileged(saveFileAction).booleanValue();
@@ -141,21 +134,26 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
-    public String loadFilename(String exts) throws IOException, PrivilegedActionException {
+    public String loadFilename(String title, String exts, String description) throws IOException, PrivilegedActionException {
     	
     	String[] extensions = (exts == null ? null : exts.split(",")); //$NON-NLS-1$
     	try {
-    		return AccessController.doPrivileged(new GetFilenameAction(this.fos, extensions));
+    		return AccessController.doPrivileged(new GetFilenameAction(
+    				title, extensions, description, this));
     	} catch (AOCancelledOperationException e) {
     		return null;
     	}
     }
     
     @Override
-    public String getFileContent() throws IOException, PrivilegedActionException {
+    public String getFileContent(String title, String exts, String description) throws IOException, PrivilegedActionException {
+    	
+    	String[] extensions = (exts == null ? null : exts.split(",")); //$NON-NLS-1$
+    	
     	byte[] data;
     	try {
-    		data = AccessController.doPrivileged(new GetFileContentAction(this.fos));
+    		data = AccessController.doPrivileged(new GetFileContentAction(
+    				title, extensions, description, this));
     	} catch (AOCancelledOperationException e) {
     		return null;
     	}
@@ -178,24 +176,6 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     
     @Override
     public void init() {
-
-    	if (this.fos == null) {
-    		try {
-    			this.fos = (FileOpenService) ServiceManager.lookup("javax.jnlp.FileOpenService"); //$NON-NLS-1$
-    		}
-    		catch(final Exception e) {
-    			LOGGER.severe("Error obteniendo el servicio JNLP de carga de ficheros: " + e); //$NON-NLS-1$
-    		}
-    	}
-        if (this.fss == null) {
-            try {
-                this.fss = (FileSaveService) ServiceManager.lookup("javax.jnlp.FileSaveService"); //$NON-NLS-1$
-            }
-            catch(final Exception e) {
-                LOGGER.severe("Error obteniendo el servicio JNLP de guardado de ficheros: " + e); //$NON-NLS-1$
-            }
-        }
-    	
     	this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
     }
 

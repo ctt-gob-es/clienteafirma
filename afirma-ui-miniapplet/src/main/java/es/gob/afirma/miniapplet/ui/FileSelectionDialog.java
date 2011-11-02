@@ -1,12 +1,11 @@
 package es.gob.afirma.miniapplet.ui;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.jnlp.FileContents;
-import javax.jnlp.FileOpenService;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
@@ -19,18 +18,27 @@ import es.gob.afirma.core.AOCancelledOperationException;
  */
 public class FileSelectionDialog {
 
-    private FileOpenService jnlpFos;
+    private String title;
     
     private String[] exts;
+    
+    private String desc;
+    
+    private Component parent;
     
     /**
      * Crea el di&aacute;logo a partire de un servicio JNLP para la apertura de
      * ficheros.
-     * @param jnlpFos Servicio para la apertura de ficheros.
+     * @param title T&iacute;tulo a utilizar en el di&aacute;logo de selecci&oacute;n.
+     * @param exts Extensiones de fichero aceptadas.
+     * @param description Descripci&oacute;n del tipo de fichero aceptado por defecto.
+     * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public FileSelectionDialog(FileOpenService jnlpFos, String[] exts) {
-        this.jnlpFos = jnlpFos;
+    public FileSelectionDialog(String title, String[] exts, String description, final Component parent) {
+        this.title = title;
         this.exts = exts;
+        this.desc = description;
+        this.parent = parent;
     }
     
     /**
@@ -41,37 +49,38 @@ public class FileSelectionDialog {
      * @throws IOException Si se produce alg&uacute;n error en la carga del fichero.
      */
     public InputStream getFileContent() throws AOCancelledOperationException, IOException {
-//        FileContents fileContents = this.jnlpFos.openFileDialog(null, this.exts);
-//        if (fileContents == null) {
-//            throw new AOCancelledOperationException("El usuario cancelo la seleccion del fichero"); //$NON-NLS-1$
-//        }
-//
-//        return fileContents.getInputStream();
-    	
-    	JFileChooser fc = new JFileChooser();
-    	fc.setDialogTitle("Carga de datos"); //$NON-NLS-1$
-    	fc.setFileFilter(this.getExtensionFileFilter(this.exts, "Ficheros")); //$NON-NLS-1$
-    	int result = fc.showOpenDialog(null);
-    	if (result != JFileChooser.APPROVE_OPTION) {
-    		throw new AOCancelledOperationException("El usuario cancelo la seleccion del fichero"); //$NON-NLS-1$
-    	}
-    	return new FileInputStream(fc.getSelectedFile());
+    	return new FileInputStream(this.selectFile().getSelectedFile());
     }
     
     /**
      * Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero y
-     * devuelve el nombre del mismo.
-     * @return Nombre del fichero seleccionado.
+     * devuelve la ruta del mismo.
+     * @return Ruta absoluta del fichero seleccionado.
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n.
-     * @throws IOException Si se produce alg&uacute;n error en la selecci&oacute;n del fichero.
      */
-    public String getFilename() throws AOCancelledOperationException, IOException {
-        FileContents fileContents = this.jnlpFos.openFileDialog(null, null);
-        if (fileContents == null) {
-            throw new AOCancelledOperationException("El usuario cancelo la seleccion del fichero"); //$NON-NLS-1$
-        }
+    public String getPath() throws AOCancelledOperationException {
+    	return this.selectFile().getSelectedFile().getAbsolutePath();
+    }
+    
 
-        return fileContents.getName();
+    /**
+     * Muestra un di&aacute;logo modal que permite la selecci&oacute;n de un fichero. 
+     * @return Di&aacute;logo con el fichero seleccionado.
+     * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n.
+     */
+    private JFileChooser selectFile() {
+    	JFileChooser fc = new JFileChooser();
+    	if (this.title != null) {
+    		fc.setDialogTitle(this.title);
+    	}
+    	if (this.exts != null) {
+    		fc.setFileFilter(this.getExtensionFileFilter(this.exts, this.desc));
+    	}
+    	int result = fc.showOpenDialog(this.parent);
+    	if (result != JFileChooser.APPROVE_OPTION) {
+    		throw new AOCancelledOperationException("El usuario cancelo la seleccion del fichero"); //$NON-NLS-1$
+    	}
+    	return fc;
     }
     
     /**

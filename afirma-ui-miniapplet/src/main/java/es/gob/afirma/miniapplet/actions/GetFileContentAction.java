@@ -1,10 +1,9 @@
 package es.gob.afirma.miniapplet.actions;
 
+import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.PrivilegedExceptionAction;
-
-import javax.jnlp.FileOpenService;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -17,14 +16,28 @@ import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
  */
 public class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 
-    private FileOpenService jnlpFos;
+    
+    private String title;
+    
+    private String[] exts;
+    
+    private String desc;
+    
+    private Component parent;
     
     /**
      * Crea la acci&oacute;n en base a un servicio JNLP para la carga de ficheros.
-     * @param fos Servicio de carga de ficheros.
+     * @param title T&iacute;tulo del di&aacute;logo.
+     * @param exts Extensiones de fichero aceptadas por defecto.
+     * @param description Descripci&opacute;n del tipo de fichero aceptado por defecto.
+     * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public GetFileContentAction(final FileOpenService fos) {
-        this.jnlpFos = fos;
+    public GetFileContentAction(final String title, final String[] exts, final String description,
+    		 final Component parent) {
+        this.title = title;
+        this.exts = exts;
+        this.desc = description;
+        this.parent = parent;
     }
     
     /**
@@ -36,15 +49,19 @@ public class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
      */
 	@Override
 	public byte[] run() throws AOCancelledOperationException, IOException {
-        FileSelectionDialog dialog = new FileSelectionDialog(this.jnlpFos, null);
+        FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.parent);
         InputStream is = dialog.getFileContent();
-        byte[] content = AOUtil.getDataFromInputStream(is);
-        try {
-            is.close();
-        } catch (Exception e) {
-            /* Ignoramos este error */
-        }
         
-        return content;
+        try {
+        	return AOUtil.getDataFromInputStream(is);
+        } finally {
+        	if (is != null) {
+        		try {
+        			is.close();
+        		} catch (Exception e) {
+        			/* Ignoramos este error */
+        		}
+        	}
+        }
 	}
 }
