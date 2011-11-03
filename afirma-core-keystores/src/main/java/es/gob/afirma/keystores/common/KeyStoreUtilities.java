@@ -268,6 +268,24 @@ public final class KeyStoreUtilities {
         		filteredCerts = cf.matches(filteredCerts);
         	}
 
+        	for (X509Certificate cert : certs.keySet().toArray(new X509Certificate[0])) {
+        		boolean accepted = false;
+        		for (X509Certificate fc : filteredCerts) {
+        			if (fc.equals(cert)) {
+        				accepted = true;
+        				break;
+        			}
+        		}
+        		if (!accepted) {
+        			certs.remove(cert);
+        		}
+        	}
+        	
+        	aliassesByFriendlyName.clear();
+        	for (String trimmedAlias : certs.values().toArray(new String[0])) {
+            	aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
+            }
+        	
         	for (final X509Certificate cert : filteredCerts) {
         		String al = certs.get(cert);
 
