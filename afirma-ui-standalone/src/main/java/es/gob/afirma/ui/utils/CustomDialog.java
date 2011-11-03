@@ -58,6 +58,11 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private JButton okButton = null;
 	
 	/**
+	 * Boton de NO.
+	 */
+	private JButton noButton = null;
+	
+	/**
 	 * Boton de Cancel.
 	 */
 	private JButton cancelButton = null;
@@ -360,12 +365,30 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
 			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
 			//Botón no
-			customDialog.cancelButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N);
+			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N);
+			JPanel noPanel = new JPanel();
+			noPanel.add(customDialog.noButton);
+			customDialog.buttonsPanel.add(noPanel, cons);
+			customDialog.noButton.addActionListener(customDialog);
+		} else if (typeOption == JOptionPane.YES_NO_CANCEL_OPTION) {
+			//Botón Sí
+			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
+			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
+			//Botón No
+			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N);
+			JPanel noPanel = new JPanel();
+			noPanel.add(customDialog.noButton);
+			customDialog.buttonsPanel.add(noPanel, cons);
+			customDialog.noButton.addActionListener(customDialog);
+			//Botón Cancelar
+			cons.gridx = 4;
+			customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
 			JPanel cancelPanel = new JPanel();
 			cancelPanel.add(customDialog.cancelButton);
 			customDialog.buttonsPanel.add(cancelPanel, cons);
 			customDialog.cancelButton.addActionListener(customDialog);
-		} else {
+		}
+		else {
 			//Botón Cancelar
 			customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
 			JPanel cancelPanel = new JPanel();
@@ -413,7 +436,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.setVisible(true);
 		
 		//Control para saber si se ha pulsado el botón cancelar
-		if (customDialog.getAnswer()!= JOptionPane.NO_OPTION) {
+		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
 			return customDialog.textField.getText();
 		}
 		return null;
@@ -497,13 +520,15 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
 		if (e.getSource().equals(okButton)) {
-			setVisible(false);
 			answer = JOptionPane.YES_OPTION;
-		} else {
-			setVisible(false);
+		} else if (e.getSource().equals(noButton)) {
 			answer = JOptionPane.NO_OPTION;
+		} else {
+			answer = JOptionPane.CANCEL_OPTION;
 		}
+		setVisible(false);
 		
 	}
 }
