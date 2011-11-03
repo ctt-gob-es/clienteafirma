@@ -84,7 +84,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 			} else if (this.theCustomDialog != null) {
 				this.adjustFontSize(this.theCustomDialog.getComponents());
 			}else {
-				this.adjustFontSize(this.theFileChooser.getDialog().getComponents());
+				//this.adjustFontSize(this.theFileChooser.getDialog().getComponents());
 			}
 	}
 
@@ -105,7 +105,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 		} else if (this.theCustomDialog != null) {
 			this.adjustFontSize(this.theCustomDialog.getComponents());
 		}else {
-			this.adjustFontSize(theFileChooser.getDialog().getComponents());
+			//this.adjustFontSize(theFileChooser.getDialog().getComponents());
 		}
 	}
 
@@ -187,9 +187,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 			relHeight = theCustomDialog.getSize().getHeight() / Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theCustomDialog.getMinimumRelation());
 		}else {
-			relWidth = theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
+			/*relWidth = theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
 			relHeight = theFileChooser.getDialog().getSize().getHeight() / Constants.FILE_INITIAL_HEIGHT;
-			relation = Math.round(relWidth * relHeight * theFileChooser.getMinimumRelation());
+			relation = Math.round(relWidth * relHeight * theFileChooser.getMinimumRelation());*/
+			relation=0;
 		}
 
 		for (int i = 0; i < components.length; i++) {
