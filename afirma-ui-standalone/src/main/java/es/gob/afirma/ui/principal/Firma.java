@@ -525,7 +525,7 @@ public class Firma extends JPanel {
                         JOptionPane.YES_NO_OPTION);*/
                 int incluir = CustomDialog.showConfirmDialog(this, true,Messages.getString("Firma.incluir.original"),
                         "Firma",
-                        JOptionPane.YES_NO_OPTION);
+                        JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
                 modoFirma = (incluir == JOptionPane.NO_OPTION ? AOSignConstants.SIGN_MODE_EXPLICIT : AOSignConstants.SIGN_MODE_IMPLICIT);
             }
 
