@@ -2,6 +2,7 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
@@ -26,6 +27,25 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	protected static int actualHeight = -1;
 	
 	/**
+	 * Constructor con parámetros.
+	 */
+	public JAccessibilityCustomDialog(JDialog dialog, boolean modal){
+		super(dialog, modal);
+		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this);
+		this.addComponentListener(adaptador);
+		this.addComponentListener(new ComponentAdapter() {
+		    public void componentResized(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		    public void componentMoved(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		});
+	}
+	
+	/**
 	 * Constructor.
 	 */
 	public JAccessibilityCustomDialog(){
@@ -42,7 +62,6 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		    	resized(e);
 		    }
 		});
-
 	}
 	
 	/**
@@ -58,17 +77,40 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 *  de Maximizar ventana. Tambien almacena el tamaño y posicion de la ventana para su restauracion.
 	 */
 	public void resized(ComponentEvent e) {
-
+		//Variable que controlará sin las dimensiones van a exceder el límite
+		boolean limitControl = false;
+		
 		//Se obtienen las dimensiones de maximizado
 		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
 		int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
 
-		
 		//Dimensiones que se van a considerar de maximizado
 	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);
 
 	    //Dimensiones actuales del dialogo
 	    Dimension actualSize = this.getSize();
+	    
+	    //Se comprueba las bounds del diálogo actual
+	    if (e.getSource() instanceof CustomDialog) {
+	    	CustomDialog customDialog = (CustomDialog) e.getSource();
+	    	Rectangle rect = customDialog.getBounds();
+	    	
+	    	//Se comprueba que no sobrepasen el límite
+	    	if (rect.width > maxWidth) {
+	    		rect.width = maxWidth;
+	    		limitControl = true;
+	    	}
+	    	if (rect.height > maxHeight) {
+	    		rect.height = maxHeight;
+	    		limitControl = true;
+	    	}
+	    	//Si sobrepasaban el limite, se hace un resize a las dimensiones límite indicadas
+	    	if (limitControl) {
+	    		this.setBounds(rect.x, rect.y, rect.width, rect.height);
+	    	}
+	    }
+	    
+	    //Control de posibilidad de redimensionado
 	    if (actualSize.equals(fullScreen)){
 	    	this.setResizable(false);
 	    } else {
@@ -95,4 +137,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		 }
 		 return resultingJAccessibilityDialog;
 	 }
+	
+
+
 }
