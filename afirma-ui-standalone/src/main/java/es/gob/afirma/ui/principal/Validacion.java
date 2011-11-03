@@ -32,7 +32,8 @@ import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
+
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -222,18 +223,18 @@ public class Validacion extends JPanel {
      */
     private void validateActionPerformance(String signPath) {
         if (signPath == null || signPath.trim().length() <= 0) {
-            JAccessibilityOptionPane.showMessageDialog(Validacion.this, Messages.getString("Validacion.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        	CustomDialog.showMessageDialog(Validacion.this, true, Messages.getString("Validacion.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
         
         File signFile = new File(signPath);
         if (!signFile.exists() || !signFile.isFile()) {
-            JAccessibilityOptionPane.showMessageDialog(Validacion.this, Messages.getString("Validacion.msg.error.nofichero", signPath), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        	CustomDialog.showMessageDialog(Validacion.this, true, Messages.getString("Validacion.msg.error.nofichero", signPath), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
         
         if (!signFile.canRead()) {
-            JAccessibilityOptionPane.showMessageDialog(Validacion.this, Messages.getString("Validacion.msg.error.noLectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        	CustomDialog.showMessageDialog(Validacion.this, true, Messages.getString("Validacion.msg.error.noLectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
         
