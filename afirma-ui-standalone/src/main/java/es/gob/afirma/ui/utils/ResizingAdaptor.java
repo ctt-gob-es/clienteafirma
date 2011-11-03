@@ -47,7 +47,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	private final JAccessibilityDialogAdvisor theDialogAdvisor;
 	private final JAccessibilityFrameAbout theWindowAbout;
 	private final JAccessibilityFileChooser theFileChooser;
-
+	private final JAccessibilityCustomDialog theCustomDialog;
 
 	/**
 	 * Constructor
@@ -55,13 +55,15 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param window
 	 *            ventana a redimensionar
 	 */
-	public ResizingAdaptor(JAccessibilityFrame window, JAccessibilityDialog dialog, JAccessibilityDialogWizard dialogWizard,JAccessibilityDialogAdvisor dialogAdvisor,JAccessibilityFrameAbout windowAbout,JAccessibilityFileChooser fileChooser) {
+	public ResizingAdaptor(JAccessibilityFrame window, JAccessibilityDialog dialog, JAccessibilityDialogWizard dialogWizard,JAccessibilityDialogAdvisor dialogAdvisor,JAccessibilityFrameAbout windowAbout,JAccessibilityFileChooser fileChooser,
+			JAccessibilityCustomDialog customDialog) {
 		this.theWindow = window;
 		this.theDialog = dialog;
 		this.theDialogWizard = dialogWizard;
 		this.theDialogAdvisor = dialogAdvisor;
 		this.theWindowAbout = windowAbout;
 		this.theFileChooser = fileChooser;
+		this.theCustomDialog = customDialog;
 	}
 
 	@Override
@@ -79,7 +81,9 @@ public class ResizingAdaptor extends ComponentAdapter {
 				this.adjustFontSize(this.theDialogAdvisor.getComponents());
 			} else if (this.theWindowAbout != null){
 				this.adjustFontSize(this.theWindowAbout.getComponents());
-			} else {
+			} else if (this.theCustomDialog != null) {
+				this.adjustFontSize(this.theCustomDialog.getComponents());
+			}else {
 				this.adjustFontSize(this.theFileChooser.getDialog().getComponents());
 			}
 	}
@@ -98,7 +102,9 @@ public class ResizingAdaptor extends ComponentAdapter {
 			this.adjustFontSize(theDialogAdvisor.getComponents());
 		} else if (theWindowAbout != null){
 			this.adjustFontSize(theWindowAbout.getComponents());
-		} else {
+		} else if (this.theCustomDialog != null) {
+			this.adjustFontSize(this.theCustomDialog.getComponents());
+		}else {
 			this.adjustFontSize(theFileChooser.getDialog().getComponents());
 		}
 	}
@@ -176,7 +182,11 @@ public class ResizingAdaptor extends ComponentAdapter {
 			relWidth = theWindowAbout.getSize().getWidth() / Constants.ABOUT_WINDOW_INITIAL_WIDTH;
 			relHeight = theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theWindowAbout.getMinimumRelation());
-		} else {
+		} else if (theCustomDialog != null){
+			relWidth = theCustomDialog.getSize().getWidth() / Constants.CUSTOMDIALOG_INITIAL_WIDTH;
+			relHeight = theCustomDialog.getSize().getHeight() / Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
+			relation = Math.round(relWidth * relHeight * theCustomDialog.getMinimumRelation());
+		}else {
 			relWidth = theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
 			relHeight = theFileChooser.getDialog().getSize().getHeight() / Constants.FILE_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theFileChooser.getMinimumRelation());
@@ -201,7 +211,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 					} else if (theWindowAbout != null) {
 						float resizeFactor = Math.round(relation / getResizingFactorFrameAbout());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
-					} else {
+					} else if (theCustomDialog != null) {
+						float resizeFactor = Math.round(relation / getResizingFactorCustomDialog());
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+					}else {
 						float resizeFactor = Math.round(relation / getResizingFactorFileChooser());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					}
@@ -215,6 +228,8 @@ public class ResizingAdaptor extends ComponentAdapter {
 					} else if (theDialogAdvisor != null){
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else if (theWindowAbout != null){
+						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
+					}  else if (theCustomDialog != null){
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else {
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
@@ -268,9 +283,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 			}
 			
 			//imagenes dentro de JLabel
-			if (actualComponent instanceof JLabel) {
+			/*if (actualComponent instanceof JLabel) {
 				int w = 125;
 				int h = 35;
+				
 				int multiplicando = 2;
 				if (((JLabel)actualComponent).getIcon() != null) {
 					float resizeFactor;
@@ -284,12 +300,42 @@ public class ResizingAdaptor extends ComponentAdapter {
 						resizeFactor = (float) (theDialogAdvisor.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else if (theWindowAbout != null){
 						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					}else if (theCustomDialog != null){
+						resizeFactor = (float) (theCustomDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else {
 						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}
 					resizeImage(resizeFactor, actualComponent, w, h, multiplicando);
 				}
-			}
+			} */
+			//Redimensionado de una etiqueta con icono
+			if (actualComponent instanceof IconLabel) {
+				int multiplicando = 4;
+				IconLabel iconLabel = (IconLabel)actualComponent;
+				if (iconLabel.getOriginalIcon() != null) {
+					float resizeFactor;
+					if(theWindow != null){
+						resizeFactor = (float) (theWindow.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else if(theDialog != null) {
+						resizeFactor = (float) (theDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else if (theDialogWizard != null){
+						resizeFactor = (float) (theDialogWizard.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else if (theDialogAdvisor != null){
+						resizeFactor = (float) (theDialogAdvisor.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else if (theWindowAbout != null){
+						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					}else if (theCustomDialog != null){
+						resizeFactor = (float) (theCustomDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else {
+						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					}
+					//Se obtienen las dimensiones del icono original
+					 int w = iconLabel.getOriginalIcon().getIconWidth();
+					 int h = iconLabel.getOriginalIcon().getIconHeight();
+					 //Se hace el resize de la imagen
+					resizeImage(resizeFactor, actualComponent, w, h, multiplicando);
+				}
+			} 
 			
 			//imagenes dentro de JButton
 			if (actualComponent instanceof JButton) {
@@ -305,6 +351,8 @@ public class ResizingAdaptor extends ComponentAdapter {
 						resizeFactor = (float) (theDialogAdvisor.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else if (theWindowAbout != null){
 						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					}  else if (theCustomDialog != null){
+						resizeFactor = (float) (theCustomDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else {
 						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}
@@ -327,7 +375,14 @@ public class ResizingAdaptor extends ComponentAdapter {
 		if(JAccessibilityDialogWizard.getJAccessibilityDialogWizard(c)==null){
 			if (theFileChooser==null){			
 				ImageIcon image = new ImageIcon();
-				image = (ImageIcon)((JLabel)c).getIcon();
+				//Se comprueba si el componente es instancia de IconLabel
+				if (c instanceof IconLabel) {
+					IconLabel iconLabel = (IconLabel) c;
+					//Se selecciona la imagen original del icono para hacer el resize
+					image = (ImageIcon)iconLabel.getOriginalIcon();
+				} else {
+					image = (ImageIcon)((JLabel)c).getIcon();
+				}
 				ImageIcon newImage = new ImageIcon(image.getImage().getScaledInstance((int) Math.round(w * multiplicando * factor), (int) Math.round(h * multiplicando * factor), java.awt.Image.SCALE_SMOOTH));
 				((JLabel)c).setIcon(newImage);
 			}
@@ -476,6 +531,14 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @return Float con el factor a aplicar.
 	 */
 	private float getResizingFactorFileChooser(){
+		return 3f;
+	}
+	
+	/**
+	 * Indica el factor de redimensionado que se aplicara en los componentes de un CustomDialog. Este metodo es util para aplicar factores distintos a distinto componentes.
+	 * @return Float con el factor a aplicar.
+	 */
+	private float getResizingFactorCustomDialog(){
 		return 3f;
 	}
 }
