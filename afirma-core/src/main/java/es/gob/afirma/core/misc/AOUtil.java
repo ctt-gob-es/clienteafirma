@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import sun.plugin2.applet.JNLP2ClassLoader;
+
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -653,7 +655,7 @@ public final class AOUtil {
      */
     public static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOUtil.class.getClassLoader();
-        if (classLoader.getClass().getName().equals("sun.plugin2.applet.JNLP2ClassLoader")) { //$NON-NLS-1$
+        if (classLoader instanceof JNLP2ClassLoader) {
         	return classLoader;
         } else if (classLoader instanceof URLClassLoader) {
             ArrayList<URL> urls = new ArrayList<URL>();
