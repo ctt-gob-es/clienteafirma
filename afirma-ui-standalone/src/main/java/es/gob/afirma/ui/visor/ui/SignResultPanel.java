@@ -18,8 +18,8 @@ import javax.swing.event.HyperlinkEvent;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import es.gob.afirma.signature.SignValidity;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
@@ -176,8 +176,8 @@ final class SignResultPanel extends JPanel {
                     }
                 }
                 catch (final Exception e) {
-                    JAccessibilityOptionPane.showMessageDialog(
-                        SignResultPanel.this,
+                    CustomDialog.showMessageDialog(
+                        SignResultPanel.this, true,
                         Messages.getString("SignResultPanel.0") + he.getURL(), //$NON-NLS-1$
                         Messages.getString("SignResultPanel.1"), //$NON-NLS-1$
                         JOptionPane.ERROR_MESSAGE
