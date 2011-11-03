@@ -343,9 +343,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param title titulo del dialogo
 	 * @param messageType tipo de mensaje
 	 */
-	public static int showConfirmDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
+	public static int showConfirmDialog(Component componentParent, boolean modal, String message, String title, int typeOption, int typeMessage){
 		
-		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, JOptionPane.QUESTION_MESSAGE);
+		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
 		
 		//Restricciones
 		GridBagConstraints cons = new GridBagConstraints();
@@ -355,7 +355,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
 		//Se comprueba el tipo de diálogo
-		if (typeMessage == JOptionPane.YES_NO_OPTION) {
+		if (typeOption == JOptionPane.YES_NO_OPTION) {
 			//Botón Sí
 			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
 			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
