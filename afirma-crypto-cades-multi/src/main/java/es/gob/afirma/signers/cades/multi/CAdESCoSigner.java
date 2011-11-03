@@ -400,7 +400,7 @@ final class CAdESCoSigner {
         final ASN1EncodableVector signerInfos = new ASN1EncodableVector();
         // introducimos el nuevo SignerInfo del firmante actual.
         
-        byte[] messageDigest = md.clone();
+        byte[] messageDigest = md != null ? md.clone() : null;
 
         for (int i = 0; i < signerInfosSd.size(); i++) {
             final SignerInfo si = new SignerInfo((ASN1Sequence) signerInfosSd.getObjectAt(i));
