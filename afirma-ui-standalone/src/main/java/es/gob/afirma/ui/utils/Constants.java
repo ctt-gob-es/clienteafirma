@@ -141,7 +141,7 @@ public class Constants {
     /**
      * Width inicial de los JAccessibilityCustomDialog de la aplicacion.
      */
-    public static final int CUSTOMDIALOG_INITIAL_WIDTH = 550;
+    public static final int CUSTOMDIALOG_INITIAL_WIDTH = 555;
     
     /**
      * Height inicial de los JAccessibilityCustomDialog de la aplicacion.
@@ -151,7 +151,7 @@ public class Constants {
     /**
      * Width de maximizado de los JAccessibilityCustomDialog de la aplicacion.
      */
-    public static final int CUSTOMDIALOG_MAX_WIDTH = 750;
+    public static final int CUSTOMDIALOG_MAX_WIDTH = 755;
     
     /**
      * Height de maximizado de los JAccessibilityCustomDialog de la aplicacion.
