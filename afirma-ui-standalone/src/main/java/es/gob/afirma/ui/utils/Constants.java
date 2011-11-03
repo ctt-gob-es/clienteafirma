@@ -139,6 +139,26 @@ public class Constants {
     public static final int FILE_INITIAL_HEIGHT = 397;
     
     /**
+     * Width inicial de los JAccessibilityCustomDialog de la aplicacion.
+     */
+    public static final int CUSTOMDIALOG_INITIAL_WIDTH = 550;
+    
+    /**
+     * Height inicial de los JAccessibilityCustomDialog de la aplicacion.
+     */
+    public static final int CUSTOMDIALOG_INITIAL_HEIGHT = 150;
+    
+    /**
+     * Width de maximizado de los JAccessibilityCustomDialog de la aplicacion.
+     */
+    public static final int CUSTOMDIALOG_MAX_WIDTH = 750;
+    
+    /**
+     * Height de maximizado de los JAccessibilityCustomDialog de la aplicacion.
+     */
+    public static final int CUSTOMDIALOG_MAX_HEIGHT = 350;
+    
+    /**
      * Factor de redimensionado para las imagenes    
      */
     public static final double RESIZING_IMAGES_FACTOR = 0.0015;
