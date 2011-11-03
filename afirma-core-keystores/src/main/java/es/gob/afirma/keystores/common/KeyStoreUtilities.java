@@ -215,11 +215,11 @@ public final class KeyStoreUtilities {
         		try {
         			if ("KeychainStore".equals(ks.getType())) { //$NON-NLS-1$
         				final KeyStore tmpKs = ks;
+        				LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
         				AccessController.doPrivileged(new PrivilegedAction<Void>() {
         					public Void run() {
         						final PrivateKey key;
         						try {
-        							LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
         							key = (PrivateKey) tmpKs.getKey(al, "dummy".toCharArray()); //$NON-NLS-1$
         						}
         						catch (final Exception e) {
