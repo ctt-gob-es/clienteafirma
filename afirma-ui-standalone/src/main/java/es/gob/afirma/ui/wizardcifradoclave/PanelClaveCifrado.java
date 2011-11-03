@@ -50,11 +50,11 @@ import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
@@ -280,7 +280,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	void almacenActionPerformed() {
 		// Comprobamos que el almacen exista.
     	if(!AOCipherKeyStoreHelper.storeExists()) {
-    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.almacen.noexiste"), 
+    		CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.almacen.noexiste"), 
     				Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE);
     		return;
     	}
@@ -292,12 +292,12 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	} catch (AOCancelledOperationException e) {
     		logger.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen.");
     	}  catch (IOException e) {
-    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.msg.error.contrasenia"), 
+    		CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.msg.error.contrasenia"), 
     				Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE);
     	}catch (AOException e) {
-    		JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE);
+    		CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE);
     	} catch (Exception e) {
-    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.almacen.error.clave"), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE);
+    		CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.almacen.error.clave"), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE);
     	}
 	}
 	
@@ -403,7 +403,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 
 	    // Comprobamos si se ha generado alguna clave
 	    if (this.campoClave.getText() == null || this.campoClave.getText().equals("")){
-	    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+	    	CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	        return false;
 	    }
 	    // Generamos la clave necesaria para el cifrado
@@ -411,7 +411,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	        this.cipherKey = this.cipherConfig.getCipher().decodeKey(this.campoClave.getText(), this.cipherConfig.getConfig(), null);
 	    } catch (Exception ex) {
 	        logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex);
-	        JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.cifrado"), 
+	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cifrado"), 
 	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	        return false;
 	    }
@@ -422,15 +422,15 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	        fileContent = getFileContent();
 	    } catch (NullPointerException ex) {
 	        logger.warning("No se ha indicado un fichero de datos: " + ex);
-	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 	        return false;
 	    } catch (FileNotFoundException ex) {
 	        logger.warning("No se encuentra el fichero: " + ex);
-	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 	        return false;
 	    } catch (Exception ex) {
 	        logger.warning("Ocurrio un error al leer el fichero: " + ex);
-	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 	        return false;
 	    }                
 
@@ -440,12 +440,12 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 	        result = this.cipherConfig.getCipher().cipher(fileContent, this.cipherConfig.getConfig(), this.cipherKey);
 	    } catch (KeyException e) {
 	        logger.severe("Clave no valida: " + e);
-	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clave"), 
+	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clave"), 
 	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	        return false;
 	    } catch (Exception ex) {
 	        logger.warning("Error al cifrar: " + ex);
-	        JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.operacion"), 
+	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.operacion"), 
 	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 
 	        return false;
@@ -453,7 +453,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 
 	    // Guardamos los datos
 	    if (result == null) {
-	    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
+	    	CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
 	        return false;
 	    }
 	    // Almacenamos el fichero de salida de la operacion
@@ -503,11 +503,11 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 					}
 				} catch (IOException e) {
 					if (tries < 3) {
-						JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("WizardCifrado.msg.error.contrasenia"),
+						CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.msg.error.contrasenia"),
 								Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
 					} else {
 						// Abortamos al tercer intento incorrecto de introducir la clave
-						JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.pass.incorrecto.almacenar"),
+						CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.pass.incorrecto.almacenar"),
 								Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
 						return;
 					}
@@ -518,13 +518,13 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     		String alias = JOptionPane.showInputDialog(this, Messages.getString("Cifrado.introducir.alias"), Messages.getString("Cifrado.introducir.alias.titulo"));
     		cksh.storeKey(alias + " (" + this.cipherConfig.getConfig().getAlgorithm().getName() + ")", this.cipherKey);
 		} catch(AOCancelledOperationException e) {
-			JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.cancelar"),
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cancelar"),
     				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
     	} catch (AOException e) {
-    		JAccessibilityOptionPane.showMessageDialog(this,	Messages.getString("Cifrado.msg.error.clavecifrar"),
+    		CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clavecifrar"),
     				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE);
     	} catch(Exception e) {
-    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.clavecifrar"),
+    		CustomDialog.showMessageDialog(this, true,  Messages.getString("Cifrado.msg.error.clavecifrar"),
     				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE );
     	}
 	}

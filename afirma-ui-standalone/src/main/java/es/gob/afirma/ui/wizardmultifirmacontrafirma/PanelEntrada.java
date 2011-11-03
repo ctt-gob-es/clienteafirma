@@ -43,10 +43,10 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -226,7 +226,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 							
 				// Si es PDF, ODF o OOXML lo firmamos y saltamos al final
 				if (formato != null) {	
-					JAccessibilityOptionPane.showMessageDialog((PanelEntrada) getVentanas().get(1), Messages.getString("Wizard.multifirma.simple.message"), Messages.getString("informacion"), JOptionPane.INFORMATION_MESSAGE);	
+					CustomDialog.showMessageDialog((PanelEntrada) getVentanas().get(1), true, Messages.getString("Wizard.multifirma.simple.message"), Messages.getString("informacion"), JOptionPane.INFORMATION_MESSAGE);	
 					if (firmarFichero(dataFile, formato, ficheroFirma)) {					
 						// Nos saltamos la pagina 2
 						getVentanas().get(3).setVisibleAndHide(true, getVentanas().get(1));
@@ -250,7 +250,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	public boolean checkFicheroEntrada(String ficheroFirma) {
 		// Comprobaciï¿½n de la ruta de fichero de entrada.
 		if (ficheroFirma == null || ficheroFirma.equals("") || !new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		
@@ -284,11 +284,11 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 			);			
 		} catch (AOException e) {
 			logger.severe("Ocurrio un error al generar la firma electronica: " + e);
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.generar.firma"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.generar.firma"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		} catch (Exception e) {
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.generar.firma"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.generar.firma"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		} 
@@ -315,12 +315,12 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 			data = AOUtil.getDataFromInputStream(fileIn);
 		} catch (FileNotFoundException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		} catch (IOException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		}

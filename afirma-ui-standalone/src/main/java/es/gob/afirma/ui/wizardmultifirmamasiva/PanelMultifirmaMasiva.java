@@ -49,11 +49,11 @@ import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.massive.MassiveType;
 import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.DirectorySignatureHelperAdv;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.OpenFileMessageDialog;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -463,13 +463,13 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 		// Comprobamos rutas de los ficheros
 		String directorio = this.campoDirectorio.getText();
 		if (directorio == null || directorio.equals("")){
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.directorio.destino"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.destino"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return Boolean.FALSE;
 		}
 		//Comprobacion de las extensiones.
 		String log = this.campoFicheroLog.getText();
 		if (log == null || log.equals("")){
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.fichero.log"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.fichero.log"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return Boolean.FALSE;
 		}
 		
@@ -520,13 +520,13 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         } catch(AOException e){
         	logger.severe(e.toString());
         	//El pop-up muestra el mensaje de la excepción
-        	JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), 
+        	CustomDialog.showMessageDialog(this, true, e.getMessage(), 
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE);
         	return Boolean.FALSE;
         } catch(Exception e){
         	logger.severe(e.toString());
         	//El pop-up muestra el mensaje de la excepción
-        	JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), 
+        	CustomDialog.showMessageDialog(this, true, e.getMessage(), 
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); 
         	e.printStackTrace();
         	return Boolean.FALSE;
@@ -567,7 +567,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         }
 
         if (resultadoFirma) {
-        	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.ok"),  //$NON-NLS-1$
+        	CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.ok"),  //$NON-NLS-1$
         			Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.INFORMATION_MESSAGE);  //$NON-NLS-1$
         } else {
         	OpenFileMessageDialog.show(this, Messages.getString("Wizard.multifirma.ko"),  //$NON-NLS-1$

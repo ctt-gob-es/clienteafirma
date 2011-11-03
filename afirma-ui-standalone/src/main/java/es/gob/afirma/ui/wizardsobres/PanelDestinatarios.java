@@ -43,11 +43,11 @@ import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -305,12 +305,12 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 			return;
 		} catch (InvalidKeyException e) {
 			//Control de la excepcon generada al introducir mal la contrasena para el almacen
-            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return;
         } catch (Exception e) {
 		    e.printStackTrace();
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.abrir.almacen"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.abrir.almacen"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -331,7 +331,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else 
-				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.usuario.existe"), 
+				CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.usuario.existe"), 
 						Messages.getString("error"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
@@ -410,7 +410,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	public Boolean verificarCertificados() {
 		DefaultListModel listModel = (DefaultListModel) listaDestinatarios.getModel();
 		if (listModel.isEmpty()){
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
 		

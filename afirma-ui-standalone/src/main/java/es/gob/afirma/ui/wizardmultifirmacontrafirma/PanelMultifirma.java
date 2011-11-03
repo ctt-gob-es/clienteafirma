@@ -57,10 +57,10 @@ import es.gob.afirma.core.ui.jse.JSEUtils;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.MultisignUtils;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -135,7 +135,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			this.arbolFirmas.setSelectionRow(0);
 		} catch (Exception e) {
 			logger.severe("No se pudo cargar el arbol de firmas del fichero '" + this.rutaFichero + "': "+e);
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.arbol"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.arbol"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		} finally {
@@ -407,7 +407,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			
 			// Comprobamos si se ha seleccionado algun elemento
 			if (PanelMultifirma.this.arbolFirmas.isVisible() && PanelMultifirma.this.arbolFirmas.getSelectionCount() == 0) {
-				JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.lista"), 
+				CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.lista"), 
 						Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			} else {
 				// Salvo que la firma finalice correctamente, permaneceremos en la ventana actual
@@ -462,7 +462,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		} catch (Exception e){
 		    e.printStackTrace();
 			logger.severe(e.toString());
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
@@ -492,7 +492,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				case 0: {
 					Integer[] nodosSeleccionados = getSelectedSignNodes();
 					if (nodosSeleccionados == null) {
-						JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.lista"), 
+						CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.lista"), 
 								Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 						return null;
 					}
@@ -506,7 +506,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				case 1:{
 					String[] nodosSeleccionados = getSelectedSignNodesS();
 					if (nodosSeleccionados == null) {
-						JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firmante"), 
+						CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.firmante"), 
 								Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 						return null;
 					}
@@ -531,17 +531,17 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			}
 		} catch (AOException e) {
 			logger.warning(e.getMessage()+": "+e);
-			JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			return null;
 		} catch (UnsupportedOperationException e) {
 			logger.warning("La firma seleccionada no soporta la operacion de contrafirma: "+e);
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.firma.soporte"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.firma.soporte"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		} catch (Exception e){
 			logger.warning("Ocurrio un error al contrafirmar el fichero de firma: "+e);
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.contrafirmar"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.contrafirmar"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
@@ -595,12 +595,12 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			data = AOUtil.getDataFromInputStream(fileIn);
 		} catch (FileNotFoundException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		} catch (IOException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		}

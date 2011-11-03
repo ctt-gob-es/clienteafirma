@@ -31,10 +31,10 @@ import javax.swing.JTextField;
 import javax.swing.text.Caret;
 
 import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.Utils;
@@ -293,10 +293,10 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		//comprobaciï¿½n de la ruta de fichero de entrada.
 		String directorio = campoDirectorio.getText();
 		if (directorio == null || directorio.equals("")) {
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.directorio.origen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.origen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		} else if (!new File(directorio).exists() || !new File(directorio).isDirectory()) {
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Wizard.multifirma.error.directorio.origen2"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.origen2"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		
