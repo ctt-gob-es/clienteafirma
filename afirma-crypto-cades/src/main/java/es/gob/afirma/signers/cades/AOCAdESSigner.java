@@ -81,6 +81,10 @@ public final class AOCAdESSigner implements AOSigner {
      *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      *   </dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>
+     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
+     *   </dd>
      *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
      *   <dd>
      *    Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona precalculada. Cuando se usan modos de firma
@@ -211,6 +215,10 @@ public final class AOCAdESSigner implements AOSigner {
      *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      *   </dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>
+     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
+     *   </dd>
      *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
      *   <dd>
      *    Algoritmo de huella digital (a usar para la firma) cuando esta se proporciona precalculada. Cuando se usan modos de firma
@@ -230,15 +238,16 @@ public final class AOCAdESSigner implements AOSigner {
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] data, 
+                         final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         final Properties extraParams) throws AOException {
         try {
             return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCoSigner").newInstance()).cosign(data, sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
         }
-        catch(final AOException e) {
-            throw e;
-        }
         catch(final Exception e) {
-            throw new UnsupportedOperationException("No se pueden realizar cofirmas CAdES", e); //$NON-NLS-1$
+            throw new AOException("Error general en la cofirma: " + e, e); //$NON-NLS-1$
         }
     }
 
@@ -302,6 +311,10 @@ public final class AOCAdESSigner implements AOSigner {
      *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      *   </dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>
+     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
+     *   </dd>
      *  <dt><b><i>signingCertificateV2</i></b></dt>
      *   <dd>
      *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo 
@@ -311,15 +324,15 @@ public final class AOCAdESSigner implements AOSigner {
      * </dl>
      * @return Firma CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         final Properties extraParams) throws AOException {
         try {
             return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCoSigner").newInstance()).cosign(sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
         }
-        catch(final AOException e) {
-            throw e;
-        }
         catch(final Exception e) {
-            throw new UnsupportedOperationException("No se pueden realizar cofirmas CAdES", e); //$NON-NLS-1$
+            throw new AOException("Error general en la cofirma: " + e, e); //$NON-NLS-1$
         }
     }
 
@@ -375,6 +388,10 @@ public final class AOCAdESSigner implements AOSigner {
      *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
      *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
      *   </dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>
+     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
+     *   </dd>
      *  <dt><b><i>signingCertificateV2</i></b></dt>
      *   <dd>
      *    Debe establecerse a <code>true</code> si se desea usar la versi&oacute;n 2 del atributo 
@@ -393,11 +410,8 @@ public final class AOCAdESSigner implements AOSigner {
         try {
             return ((AOCounterSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner").newInstance()).countersign(sign, algorithm, targetType, targets, keyEntry, extraParams); //$NON-NLS-1$
         }
-        catch(final AOException e) {
-            throw e;
-        }
         catch(final Exception e) {
-            throw new UnsupportedOperationException("No se pueden realizar contrafirmas CAdES", e); //$NON-NLS-1$
+            throw new AOException("Error general en la contrafirma: " + e, e); //$NON-NLS-1$
         }
     }
 
