@@ -11,7 +11,7 @@ import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
  * Acci&oacute;n para la recuperaci&oacute;n del nombre de un fichero.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class GetFilenameAction implements PrivilegedExceptionAction<String> {
+public class GetFilePathAction implements PrivilegedExceptionAction<String> {
     
     private String title;
     
@@ -22,13 +22,13 @@ public class GetFilenameAction implements PrivilegedExceptionAction<String> {
     private Component parent;
     
     /**
-     * Crea la acci&oacute;n en base a un servicio JNLP para la carga de ficheros.
+     * Crea la acci&oacute;n para la recuperaci&oacute;n de la ruta de un fichero.
      * @param title T&iacute;tulo del di&aacute;logo.
      * @param exts Extensiones de fichero aceptadas por defecto.
      * @param description Descripci&opacute;n del tipo de fichero aceptado por defecto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public GetFilenameAction(final String title, final String[] exts, final String description,
+    public GetFilePathAction(final String title, final String[] exts, final String description,
     		 final Component parent) {
         this.title = title;
         this.exts = exts;
@@ -37,7 +37,7 @@ public class GetFilenameAction implements PrivilegedExceptionAction<String> {
     }
     
     /**
-     * Muestra un di&aacute;logo modal para la carga de un fichero y recuperar el nombre
+     * Muestra un di&aacute;logo modal para la carga de un fichero y recuperar la ruta
      * del mismo.
      * @return Nombre del fichero.
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.

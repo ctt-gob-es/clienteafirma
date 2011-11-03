@@ -44,6 +44,7 @@ public class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 	
 	@Override
 	public byte[] run() throws Exception {
+		System.out.println(this.data);
 		if (this.data == null) {
 			return this.signer.cosign(this.sign, this.algorithm, this.keyEntry, this.extraParams);
 		}

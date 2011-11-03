@@ -105,8 +105,9 @@ public class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
     	if (this.exts != null) {
     		fc.setFileFilter(this.getExtensionFileFilter(this.exts, this.desc));
     	}
-    	
-    	fc.setSelectedFile(this.fileHint);
+    	if (this.fileHint != null) {
+    		fc.setSelectedFile(this.fileHint);
+    	}
 		
     	boolean selectedFile = false;
         File finalFile = null;

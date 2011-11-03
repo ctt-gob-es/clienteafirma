@@ -59,6 +59,7 @@ public interface MiniAfirma {
      */
     String sign(String data, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
 
+    
     /**
      * Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
      * que los datos est&eacute;n contenidos en la firma original o que se indiquen de
@@ -80,9 +81,12 @@ public interface MiniAfirma {
      */
     String coSign(String sign, String data, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
 
+    
     /**
-     * Realiza una firma en cascada (Contrafirma) sobre una firma. Si no se indica lo contrario
-     * mediante <i>extraParams</i> se contrafirman todos los nodos hoja.
+     * Realiza una firma en cascada (Contrafirma) sobre una firma. Se contrafirman todos los
+     * nodos hoja salvo que mediante <i>extraParams</i> se indique el par&aacute;metro
+     * "{@code target=tree}", en cuyo caso se contrafirmar&aacute;n todos los nodos del
+     * &aacute;rbol.
      * @param sign Firma electr&oacute;nica que se desea contrafirmar.
      * @param algorithm Algoritmo de firma.
      * @param format Formato de firma.
@@ -94,6 +98,7 @@ public interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
     String counterSign(String sign, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
+    
     
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
      * firmantes se separan por '\n' y comienzan por tantos '\t' como el nivel
@@ -113,13 +118,14 @@ public interface MiniAfirma {
      */
     String getSignersStructure(String signB64) throws IOException ;
 
+    
     /**
      * Muestra un di&aacute;logo modal que permite al usuario seleccionar
-     * el directorio y el nombre de fichero para el guardado de datos. Se usar&aacute; las funcionalidades
-     * de JNLP siempre que sea posible
+     * el directorio y el nombre de fichero para el guardado de datos.
      * @param data Datos en Base64 que se desean guardar
      * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param fileName Nombre que se debe proponer al usuario en el di&aacute;logo para guardar el fichero. Puede ser nulo
+     * @param fileName Nombre que se debe proponer al usuario en el di&aacute;logo para
+     * guardar el fichero. Puede ser nulo.
      * @param extension Extensi&oacute;n del fichero a guardar (que habitualmente indica el tipo)
      * @param description Descripci&oacute;n del tipo de fichero que se desea guardar.
      * @return {@code true} en caso de guardarse correctamente, {@code false} en caso
@@ -132,8 +138,7 @@ public interface MiniAfirma {
     
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; el contenido en Base64. Si el usuario cancela la operaci&oacute;n
-     * de selecci&oacute;n del fichero se devuelve {@code null}. Se usar&aacute; las funcionalidades
-     * de JNLP siempre que sea posible.
+     * de selecci&oacute;n del fichero se devuelve {@code null}.
      * @param title T&iacute;tulo para el di&aacute;logo.
      * @param extensions Extensiones de b&uacute;squeda.
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
@@ -145,9 +150,8 @@ public interface MiniAfirma {
 
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
-     * del que se recuperar&aacute; su nombre. Si no se selecciona
-     * ning&uacute;n fichero, se devuelve <code>null</code>. Se usar&aacute; las funcionalidades
-     * de JNLP siempre que sea posible.
+     * del que se recuperar&aacute; su ruta absoluta. Si no se selecciona
+     * ning&uacute;n fichero, se devuelve <code>null</code>.
      * @param title T&iacute;tulo para el di&aacute;logo.
      * @param extensions Extensiones de b&uacute;squeda.
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
@@ -155,7 +159,7 @@ public interface MiniAfirma {
      * @throws IOException Cuando se produce un error al seleccionar el fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String loadFilename(String title, String extensions, String description) throws IOException, PrivilegedActionException;
+    String loadFilePath(String title, String extensions, String description) throws IOException, PrivilegedActionException;
     
     
     /** Decodifica un texto en Base64. Si se produce alg&uacute;n error se
@@ -176,6 +180,7 @@ public interface MiniAfirma {
      */
     String getTextFromBase64(String data, String charset) throws IOException;
 
+    
     /** Codifica un texto plano a Base64. Si se produce alg&uacute;n error se
      * devuelve <code>null</code>.
      * @param plainText Texto plano.

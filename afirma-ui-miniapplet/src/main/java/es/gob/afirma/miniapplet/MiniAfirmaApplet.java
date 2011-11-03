@@ -30,7 +30,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.miniapplet.actions.CoSignAction;
 import es.gob.afirma.miniapplet.actions.CounterSignAction;
 import es.gob.afirma.miniapplet.actions.GetFileContentAction;
-import es.gob.afirma.miniapplet.actions.GetFilenameAction;
+import es.gob.afirma.miniapplet.actions.GetFilePathAction;
 import es.gob.afirma.miniapplet.actions.SaveFileAction;
 import es.gob.afirma.miniapplet.actions.SelectPrivateKeyAction;
 import es.gob.afirma.miniapplet.actions.SignAction;
@@ -124,7 +124,8 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         }
 
         SaveFileAction saveFileAction = new SaveFileAction(title, Base64.decode(data),
-        		new String[] { extension }, description,
+        		(extension != null ? new String[] { extension } : null),
+        		(extension != null && description != null ? description : null),
         		(fileName != null ? new File(this.pathHint, fileName) : this.pathHint), this);
         
     	try {
@@ -135,11 +136,11 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
-    public String loadFilename(String title, String exts, String description) throws IOException, PrivilegedActionException {
+    public String loadFilePath(String title, String exts, String description) throws IOException, PrivilegedActionException {
     	
     	String[] extensions = (exts == null ? null : exts.split(",")); //$NON-NLS-1$
     	try {
-    		return AccessController.doPrivileged(new GetFilenameAction(
+    		return AccessController.doPrivileged(new GetFilePathAction(
     				title, extensions, description, this));
     	} catch (AOCancelledOperationException e) {
     		return null;
@@ -150,7 +151,6 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     public String getFileContent(String title, String exts, String description) throws IOException, PrivilegedActionException {
     	
     	String[] extensions = (exts == null ? null : exts.split(",")); //$NON-NLS-1$
-    	
     	byte[] data;
     	try {
     		data = AccessController.doPrivileged(new GetFileContentAction(
@@ -214,6 +214,12 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	if (format != null) {
     		signer = AOSignerFactory.getSigner(format);
     		signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
+    		if (signer != null && sign != null) {
+    			if (!signer.isSign(sign)) {
+    				signer = null;
+    				signerErrorMessage = "La firma electronica no es compatible con el formato de firma indicado"; //$NON-NLS-1$
+    			}
+    		}
     	} else if (sign != null) {
     		signer = AOSignerFactory.getSigner(sign);
     		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$

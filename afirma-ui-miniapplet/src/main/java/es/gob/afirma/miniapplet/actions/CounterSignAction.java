@@ -47,11 +47,10 @@ public class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 	
 	@Override
 	public byte[] run() throws Exception {
-		
 		CounterSignTarget target = CounterSignTarget.LEAFS;
 		if (this.extraParams.containsKey(COUNTERSIGN_TARGET_KEY)) {
-			String targetValue = this.extraParams.getProperty(COUNTERSIGN_TARGET_KEY);
-			if (COUNTERSIGN_TARGET_TREE.equalsIgnoreCase(targetValue)) {
+			String targetValue = this.extraParams.getProperty(COUNTERSIGN_TARGET_KEY).trim();
+			if (COUNTERSIGN_TARGET_TREE.equals(targetValue)) {
 				target = CounterSignTarget.TREE;
 			}
 		}
