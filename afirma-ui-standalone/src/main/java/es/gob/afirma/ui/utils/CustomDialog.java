@@ -270,6 +270,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Maximize button
 		JPanel maximizePanel = new JPanel();
 		this.maximizeButton = getButton(Messages.getString("Wizard.maximizar"), KeyEvent.VK_M );
+		this.maximizeButton.setName("maximizar");
 		maximizePanel.add(this.maximizeButton);
 		this.maximizeButton.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent e) {
@@ -285,6 +286,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Restore button
 		JPanel restorePanel = new JPanel();
 		this.restoreButton = getButton(Messages.getString("Wizard.restaurar"), KeyEvent.VK_R );
+		this.restoreButton.setName("restaurar");
 		restorePanel.add(this.restoreButton);
 		this.restoreButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
@@ -445,8 +447,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		actualHeight = this.getHeight();
 		
 		//Se obtienen las dimensiones de maximizado
-		int maxWidth = 750;
-		int maxHeight = 350;
+		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
+		int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
 		
 		//Se hace el resize
 		this.setBounds(getInitialX(maxWidth), getInitialY(maxHeight), maxWidth, maxHeight);
