@@ -53,80 +53,100 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     private File pathHint = new File(Platform.getUserHome());
 
     @Override
-    public String sign(String dataB64, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
+    public String sign(final String dataB64, final String algorithm, final String format, final String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (dataB64 == null) {
     		throw new NullPointerException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
     	}
     	
-    	AOSigner signer = this.selectSigner(format, null);
+    	String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
+    	String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
+    	
+    	AOSigner signer = this.selectSigner(signFormat, null);
     	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
     	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
 
-    	SignAction signAction = new SignAction(signer, Base64.decode(dataB64), algorithm, keyEntry, params); 
+    	SignAction signAction = new SignAction(signer, Base64.decode(dataB64), signAlgo, keyEntry, params); 
     	
         return Base64.encodeBytes(AccessController.doPrivileged(signAction));
     }
 
     @Override
-    public String coSign(String signB64, String dataB64, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
+    public String coSign(final String signB64, final String dataB64, final String algorithm, final String format, final String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}
     	
+    	String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
+    	String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
+    	
     	byte[] sign = Base64.decode(signB64);
     	byte[] data = (dataB64 == null ? null : Base64.decode(dataB64));
     	
-    	AOSigner signer = this.selectSigner(format, sign);
+    	AOSigner signer = this.selectSigner(signFormat, sign);
     	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
     	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
 
-    	CoSignAction coSignAction = new CoSignAction(signer, sign, data, algorithm, keyEntry, params); 
+    	CoSignAction coSignAction = new CoSignAction(signer, sign, data, signAlgo, keyEntry, params); 
     	
     	return Base64.encodeBytes(AccessController.doPrivileged(coSignAction));
     }
 
 
     @Override
-    public String counterSign(String signB64, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
+    public String counterSign(final String signB64, final String algorithm, final String format, final String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}
+    	String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
+    	String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
     	
     	byte[] sign = Base64.decode(signB64);
     	
-    	AOSigner signer = this.selectSigner(format, sign);
+    	AOSigner signer = this.selectSigner(signFormat, sign);
     	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
     	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
     	
-    	CounterSignAction counterSignAction = new CounterSignAction(signer, sign, algorithm, keyEntry, params); 
+    	CounterSignAction counterSignAction = new CounterSignAction(signer, sign, signAlgo, keyEntry, params); 
     	
     	return Base64.encodeBytes(AccessController.doPrivileged(counterSignAction));
     }
     
     @Override
-    public String getSignersStructure(String signB64) throws IOException {
+    public String getSignersStructure(final String signB64) throws IOException, AOFormatFileException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
     	}
     	
     	byte[] sign = Base64.decode(signB64);
     	AOSigner signer = AOSignerFactory.getSigner(sign);
+    	if (signer == null) {
+    		throw new AOFormatFileException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
+    	}
     	
         return AOUtil.showTreeAsString(signer.getSignersStructure(sign, false), null, null);
     }
 
 
     @Override
-    public boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException {
+    public boolean saveDataToFile(final String data, final String title, final String fileName, final String extension, final String description) throws PrivilegedActionException, IOException {
         if (data == null) {
             LOGGER.warning("Se ha solicitado guardar en disco un contenido nulo, se ignorara la peticion"); //$NON-NLS-1$
             return false;
         }
 
-        SaveFileAction saveFileAction = new SaveFileAction(title, Base64.decode(data),
-        		(extension != null ? new String[] { extension } : null),
-        		(extension != null && description != null ? description : null),
-        		(fileName != null ? new File(this.pathHint, fileName) : this.pathHint), this);
+        String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+        
+        String[] extensions = (extension == null || extension.trim().length() < 1 ?
+        		null : new String[] { extension.trim() });
+        
+        String descFiles = (extensions != null && description != null && description.trim().length() > 0 ?
+				description.trim() : (extensions != null ? extension : null));
+        
+		File fileHint = (fileName != null && fileName.trim().length() > 0 ?
+				new File(this.pathHint, fileName) : this.pathHint);
+				
+        SaveFileAction saveFileAction = new SaveFileAction(titleDialog, Base64.decode(data),
+        		extensions, descFiles, fileHint, this);
         
     	try {
     		return AccessController.doPrivileged(saveFileAction).booleanValue();
@@ -136,25 +156,39 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
-    public String loadFilePath(String title, String exts, String description) throws IOException, PrivilegedActionException {
+    public String loadFilePath(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException {
     	
-    	String[] extensions = (exts == null ? null : exts.split(",")); //$NON-NLS-1$
+    	String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+        
+        String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+        		null : new String[] { extensions.trim() });
+        
+        String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+				description.trim() : (exts != null ? extensions : null));
+        
     	try {
     		return AccessController.doPrivileged(new GetFilePathAction(
-    				title, extensions, description, this));
+    				titleDialog, exts, descFiles, this));
     	} catch (AOCancelledOperationException e) {
     		return null;
     	}
     }
     
     @Override
-    public String getFileContent(String title, String exts, String description) throws IOException, PrivilegedActionException {
+    public String getFileContent(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException {
     	
-    	String[] extensions = (exts == null ? null : exts.split(",")); //$NON-NLS-1$
+    	String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+        
+        String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+        		null : new String[] { extensions.trim() });
+        
+        String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+				description.trim() : (exts != null ? extensions : null));
+    	
     	byte[] data;
     	try {
     		data = AccessController.doPrivileged(new GetFileContentAction(
-    				title, extensions, description, this));
+    				titleDialog, exts, descFiles, this));
     	} catch (AOCancelledOperationException e) {
     		return null;
     	}
@@ -163,16 +197,19 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
-    public String getTextFromBase64(String base64Data, String charset) throws IOException {
-    	if (charset != null) {
+    public String getTextFromBase64(final String base64Data, final String charset) throws IOException {
+    	if (base64Data == null) {
+    		return null;
+    	}
+    	if (charset != null && charset.trim().length() > 0) {
     		return new String(Base64.decode(base64Data), charset);
     	}
     	return new String(Base64.decode(base64Data));
     }
 
     @Override
-    public String getBase64FromText(String plainText) {
-        return Base64.encodeBytes(plainText.getBytes());
+    public String getBase64FromText(final String plainText) {
+        return plainText != null ? Base64.encodeBytes(plainText.getBytes()) : null;
     }
     
     @Override

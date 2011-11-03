@@ -98,6 +98,9 @@ public class FileSelectionDialog {
 			
 			@Override
 			public boolean accept(File f) {
+				if (f.isDirectory()) {
+					return true;
+				}
 				for (String ext : extensions) {
 					if (f.getName().endsWith(ext)) {
 						return true;
