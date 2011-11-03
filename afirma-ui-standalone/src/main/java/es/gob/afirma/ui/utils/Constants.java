@@ -129,6 +129,16 @@ public class Constants {
     public static final int WIZARD_FONT_INITIAL_HEIGHT_LINUX = 520;
     
     /**
+     * Width inicial de los JAccessibilityFileChooser de la aplicacion.
+     */
+    public static final int FILE_INITIAL_WIDTH = 623;
+    
+    /**
+     * Height inicial de los JAccessibilityFileChooser de la aplicacion.
+     */
+    public static final int FILE_INITIAL_HEIGHT = 397;
+    
+    /**
      * Factor de redimensionado para las imagenes    
      */
     public static final double RESIZING_IMAGES_FACTOR = 0.0015;
