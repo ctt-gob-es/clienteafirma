@@ -33,6 +33,28 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
 /** Manejador de firmas binarias CADES.
  * Soporta CAdES-BES y CAdES-EPES. &Uacute;nicamente expone los m&eacute;todos declarados en el interfaz implementado <code>AOSigner</code>.
+ * <p>Un posible ejemplo de uso ser&iacute;a el siguiente:</p>
+ * <pre>
+ * 
+ *   // Establecemos los parametros adicionales
+ *   final Properties extraParams = new Properties();
+ *   extraParams.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT);
+ *   extraParams.setProperty("policyIdentifier", "urn:oid:2.16.724.1.3.1.1.2.1.8");
+ *   extraParams.setProperty("policyIdentifierHash", "tSbjbefbEoLcD06K/IR8FtuhhVE=");
+ *   extraParams.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1");
+ *   
+ *   // Usamos un PKCS#12 / PFX para obtener el certificado y su clave privada
+ *   final FileInputStream fis = new FileInputStream("cert.pfx"); 
+ *   KeyStore ks = KeyStore.getInstance("PKCS12");
+ *   ks.load(fis, "contrasena".toCharArray());
+ *   final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection("contrasena".toCharArray()));
+ *   final X509Certificate cert = (X509Certificate) ks.getCertificate("alias");
+ *   
+ *   // Realizamos la firma CAdES
+ *   final AOSigner signer = new AOCAdESSigner();
+ *   final byte[] firma = signer.sign("Texto a firmar".getBytes(), "SHA1withRSA", pke, extraParams);
+ * 
+ * </pre>
  * @version 0.3 */
 public final class AOCAdESSigner implements AOSigner {
     

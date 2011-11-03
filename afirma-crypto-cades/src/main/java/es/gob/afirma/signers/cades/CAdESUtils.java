@@ -96,9 +96,6 @@ public final class CAdESUtils {
 
         if (signingCertificateV2) {
 
-            //********************************************/
-            //***** La Nueva operatividad esta comentada */
-            //********************************************/
             // INICIO SINGING CERTIFICATE-V2
 
             /** IssuerSerial ::= SEQUENCE { issuer GeneralNames, serialNumber
@@ -201,12 +198,12 @@ public final class CAdESUtils {
         // INICIO SIGPOLICYID ATTRIBUTE
 
         if (policy.getPolicyIdentifier() != null) {
-            /*
+            /**
              * SigPolicyId ::= OBJECT IDENTIFIER Politica de firma.
              */
             final DERObjectIdentifier doiSigPolicyId = new DERObjectIdentifier(policy.getPolicyIdentifier().toLowerCase().replace("urn:oid:", "")); //$NON-NLS-1$ //$NON-NLS-2$
 
-            /*
+            /**
              *   OtherHashAlgAndValue ::= SEQUENCE {
              *     hashAlgorithm    AlgorithmIdentifier,
              *     hashValue        OCTET STRING }
@@ -240,7 +237,7 @@ public final class CAdESUtils {
             
             final DigestInfo otherHashAlgAndValue = new DigestInfo(hashid, hashed);
             
-            /*
+            /**
              *   SigPolicyQualifierInfo ::= SEQUENCE {
              *       SigPolicyQualifierId  SigPolicyQualifierId,
              *       SigQualifier          ANY DEFINED BY policyQualifierId }
@@ -250,7 +247,7 @@ public final class CAdESUtils {
                 spqInfo = new SigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
             }
             
-            /*
+            /**
              * SignaturePolicyId ::= SEQUENCE {
              *  sigPolicyId           SigPolicyId,
              *  sigPolicyHash         SigPolicyHash,
@@ -334,7 +331,7 @@ public final class CAdESUtils {
             throw new IllegalArgumentException("La politica de firma no puede ser nula en este punto"); //$NON-NLS-1$
         }
         
-        /*
+        /**
          * PolicyQualifierInfo ::= SEQUENCE {
          *          policyQualifierId  PolicyQualifierId,
          *          qualifier          ANY DEFINED BY policyQualifierId } 
@@ -355,7 +352,7 @@ public final class CAdESUtils {
             pqi = new PolicyQualifierInfo(new DERSequence(v));
         }
         
-        /*
+        /**
          * PolicyInformation ::= SEQUENCE {
          *     policyIdentifier   CertPolicyId,
          *     policyQualifiers   SEQUENCE SIZE (1..MAX) OF
