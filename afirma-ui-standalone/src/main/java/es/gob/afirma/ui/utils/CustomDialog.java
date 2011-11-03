@@ -330,13 +330,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 */
 	public static void showMessageDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
 	
-		CustomDialog customDialog = null;
-		if (componentParent instanceof JDialog) {
-			customDialog = new CustomDialog((JDialog)componentParent, modal, message, title, typeMessage);
-		} else {
-			customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
-		}
-		//CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 		customDialog.textField.setVisible(false); //Se oculta el campo de texto
 		customDialog.setVisible(true);
@@ -349,8 +343,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param title titulo del dialogo
 	 * @param messageType tipo de mensaje
 	 */
-	public static void showConfirmDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
-		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+	public static int showConfirmDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
+		
+		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, JOptionPane.QUESTION_MESSAGE);
 		
 		//Restricciones
 		GridBagConstraints cons = new GridBagConstraints();
@@ -359,16 +354,31 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.gridy = 0;
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
-		customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
-		JPanel cancelPanel = new JPanel();
-		cancelPanel.add(customDialog.cancelButton);
-		customDialog.buttonsPanel.add(cancelPanel, cons);
-		customDialog.cancelButton.addActionListener(customDialog);
+		//Se comprueba el tipo de diálogo
+		if (typeMessage == JOptionPane.YES_NO_OPTION) {
+			//Botón Sí
+			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
+			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
+			//Botón no
+			customDialog.cancelButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N);
+			JPanel cancelPanel = new JPanel();
+			cancelPanel.add(customDialog.cancelButton);
+			customDialog.buttonsPanel.add(cancelPanel, cons);
+			customDialog.cancelButton.addActionListener(customDialog);
+		} else {
+			//Botón Cancelar
+			customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+			JPanel cancelPanel = new JPanel();
+			cancelPanel.add(customDialog.cancelButton);
+			customDialog.buttonsPanel.add(cancelPanel, cons);
+			customDialog.cancelButton.addActionListener(customDialog);
+		}
 		
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 		customDialog.textField.setVisible(false);//Se oculta el campo de texto
 				
 		customDialog.setVisible(true);
+		return customDialog.getAnswer();
 	}
 	
 	/**
