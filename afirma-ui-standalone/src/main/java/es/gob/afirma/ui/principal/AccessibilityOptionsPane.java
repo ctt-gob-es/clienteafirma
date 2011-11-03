@@ -16,9 +16,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
@@ -330,7 +330,7 @@ public class AccessibilityOptionsPane {
 		this.checkWindowSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, "false")));
 		this.checkCursorSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false")));
 
-		// Comprobamos si est� activada al menos una de las opciones de accesibilidad sobre textos 
+		// Comprobamos si est� activada al menos una de las opciones de accesibilidad sobre textos 
 		if (Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)) || Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE))){
     		isBigStyle = true;
     	}		
@@ -388,16 +388,16 @@ public class AccessibilityOptionsPane {
 		int user = 0;
 		user = Integer.parseInt(Main.preferences.get("users", "0"));
 		boolean exists = false;
-		String name;
+		String name = null;
 		if (user > 0){
 			String text = "Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración."+"<br>"+"Actualmente existen los siguientes perfiles: "+"<br>";
 			for (int i = 0;i<user;i++){
 				System.out.println(Main.preferences.get("user"+(i+1), "error"));
 				text += Main.preferences.get("user"+(i+1), "error")+"<br>";
 			}
-			name = JAccessibilityOptionPane.showInputDialog(null, text, "Insercción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(null, true, text, "Insercción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		} else{
-			name = JAccessibilityOptionPane.showInputDialog(null,"Nombre del perfil (debe ser una unica palabra).", "Inserccion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(null, true, "Nombre del perfil (debe ser una unica palabra).", "Inserccion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (name!=null){
 			if (name.trim().length()!=0){
@@ -432,7 +432,7 @@ public class AccessibilityOptionsPane {
 				Main.preferences.put(name.trim()+".accesibility.maximized",String.valueOf(this.checkWindowSize.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.cursor",String.valueOf(this.checkCursorSize.isSelected()));
 			} else {
-				JAccessibilityOptionPane.showMessageDialog(this.panel,"Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
+				CustomDialog.showMessageDialog(this.panel, true, "Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
