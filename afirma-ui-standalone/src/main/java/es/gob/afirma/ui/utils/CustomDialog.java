@@ -412,7 +412,11 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		customDialog.setVisible(true);
 		
-		return customDialog.textField.getText();
+		//Control para saber si se ha pulsado el botón cancelar
+		if (customDialog.getAnswer()!= JOptionPane.NO_OPTION) {
+			return customDialog.textField.getText();
+		}
+		return null;
 		
 		
 	}
