@@ -1,6 +1,7 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
@@ -110,32 +111,73 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    	}
 	    }
 	    
-	    //Control de posibilidad de redimensionado
+	    Component botonMaximizar = getComponentByName("maximizar", this);
+		Component botonRestaurar = getComponentByName("restaurar", this);
+	    
+	    //Control de posibilidad de redimensionado y habilitado/deshabilitado de botones
 	    if (actualSize.equals(fullScreen)){
 	    	this.setResizable(false);
+	    	if ((botonMaximizar!=null) && (botonRestaurar!=null)) {
+	    		botonMaximizar.setEnabled (false);
+	    		botonRestaurar.setEnabled (true);
+	    	}
 	    } else {
 	    	this.setResizable(true);
-	    } 
+	    	if ((botonMaximizar!=null) && (botonRestaurar!=null)) {
+	    		botonMaximizar.setEnabled (true);
+	    		botonRestaurar.setEnabled (false);
+	    	}
+	    }
 	}
 	
 	/**
-	 * Busca el JAccessibilityDialog padre de un componente.
-	 * @param component El componente.
-	 * @return El JAccessibilityDialog buscado.
+	 * Obtiene un componente de un contenedor a traves de su nombre
+	 * @param name Nombre del componente a buscar
+	 * @param container Contenedor donde se encuentra el componente a buscar
+	 * @return
 	 */
-	public static JAccessibilityDialog getJAccessibilityDialog(Component component)
+	private Component getComponentByName(String name, Container container){
+		if(name.equals(container.getName())){
+			return container;
+		}
+		else {
+			Component[] componentes = container.getComponents();
+			for(int i = 0; i < componentes.length; i++){
+				if(componentes[i] instanceof Container){
+					Component res = getComponentByName(name, (Container) componentes[i]);
+					if(res != null){
+						return res;
+					}
+				}
+				else{
+					if(componentes[i].getName().equals(name)){
+						return componentes[i];
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * Busca el JAccessibilityCustomDialog padre de un componente.
+	 * @param component El componente.
+	 * @return El JAccessibilityCustomDialog buscado.
+	 */
+	public static JAccessibilityCustomDialog getJAccessibilityCustomDialog(Component component)
 	{
-		JAccessibilityDialog  resultingJAccessibilityDialog = null;
-		while (component != null && resultingJAccessibilityDialog == null)
+		JAccessibilityCustomDialog  resultingJAccessibilityCustomDialog = null;
+		while (component != null && resultingJAccessibilityCustomDialog == null)
 		{
 	        if (component instanceof JAccessibilityDialog){
-	        	resultingJAccessibilityDialog = (JAccessibilityDialog)component;
+	        	resultingJAccessibilityCustomDialog = (JAccessibilityCustomDialog)component;
 	        }
 	        else{
 	        	component = component.getParent();
 	        }
 		 }
-		 return resultingJAccessibilityDialog;
+		 return resultingJAccessibilityCustomDialog;
 	 }
 	
 
