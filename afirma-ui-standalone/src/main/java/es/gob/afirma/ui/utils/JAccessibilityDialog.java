@@ -2,7 +2,6 @@ package es.gob.afirma.ui.utils;
 
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -33,7 +32,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	
 	public JAccessibilityDialog(){
 		super();
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,this,null,null,null,null);
+		ResizingAdaptor adaptador = new ResizingAdaptor(null,this,null,null,null,null,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent e)
@@ -60,7 +59,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	 * @param name Nombre del componente a buscar
 	 * @param container Contenedor donde se encuentra el componente a buscar
 	 * @return
-	 */
+	 *//*
 	private Component getComponentByName(String name, Container container){
 		if(name.equals(container.getName())){
 			return container;
@@ -82,7 +81,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 			}
 		}
 		return null;
-	}
+	}*/
 	
 	/**
 	 * Evento de redimensionado. Comprueba el tamaÃ±o de la ventana para habilitar o deshabilitar el boton

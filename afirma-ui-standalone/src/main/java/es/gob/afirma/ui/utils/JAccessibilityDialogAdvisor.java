@@ -1,7 +1,6 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -34,7 +33,7 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 	
 	public JAccessibilityDialogAdvisor(){
 		super();
-		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null,null);
+		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null,null,null);
 		this.addComponentListener(this.resizingAdaptor);
 		this.addComponentListener(new ComponentAdapter() {
 		    @Override
@@ -132,7 +131,7 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 	 * @param name Nombre del componente a buscar
 	 * @param container Contenedor donde se encuentra el componente a buscar
 	 * @return
-	 */
+	 *//*
 	private Component getComponentByName(String name, Container container){
 		if(name.equals(container.getName())){
 			return container;
@@ -154,6 +153,6 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 			}
 		}
 		return null;
-	}
+	}*/
 	
 }
