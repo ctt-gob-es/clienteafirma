@@ -49,6 +49,87 @@ import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.SigUtils;
 
 /** Firmador CAdES en tres fases independientes, adecuado para su uso en un entorno mixto cliente-servidor.
+ * <p>La firma electr&oacute;nica en tres fases est&aacute; pensada para entornos donde la clave privada reside
+ * en un sistema con al menos alguna de las siguientes restricciones:</p>
+ * <ul>
+ *  <li>
+ *   El sistema no es compatible con el Cliente @firma. En este caso, dado que el 95% del c&oacute;digo se
+ *   ejecuta en un sistema externo, solo es necesario portar el 5% restante.
+ *  </li>
+ *  <li>
+ *   El sistema tiene unas capacidades muy limitadas en cuanto a proceso computacional, memoria o comunicaciones por
+ *   red. En este caso, el sistema solo realiza una operaci&oacute;n criptogr&aacute;fica, una firma PKCS#1,
+ *   mucho menos demandante de potencia de proceso que una firma completa CAdES, y, adicionalmente, no trata el
+ *   documento a firmar completo, sino &uacute;icamente una prque&ntilde;a cantidad de datos resultante de un
+ *   pre-proceso (la pre-firma) realizado por el sistema externo, lo que resulta en un enorme decremento en las necesidades
+ *   de memoria y transmisi&oacute;n de datos.
+ *  </li>
+ *  <li>
+ *   Por motivos de seguridad, el documento a firmar no puede salir de un sistema externo. Como se ha descrito en el punto
+ *   anterior, en este caso el documento jam&aacute;s sale del sistema externo, sino que se transfiere &uacute;nicamente
+ *   el resultado de la pre-firma, desde la cual es imposible reconstruir el documento original.
+ *  </li>
+ * </ul>
+ * <p>
+ *  Estos condicionantes convierten la firma trif&aacute;sica en una opci&oacute;n perfectamente adaptada a los
+ *  dispositivos m&oacute;viles, donde se dan tanto la heterogeneidad de sistemas operativos (Apple iOS, Google
+ *  Android, RIM BlackBerry, Microsoft Windows Phone, etc.) y las limitaciones en potencia de proceso, memoria
+ *  y comunicaciones; en estas &uacute;ltimas hay que tener en cuenta el coste, especialmente si estamos haciendo
+ *  uso de una red de otro operador en itinerancia (<i>roaming</i>).
+ * </p>
+ * <p>
+ *  El funcionamiento t&iacute;pico de una firma trif&aacute;sica en la que intervienen un disposotivo m&oacute;vil,
+ *  un servidor Web (que hace la pre-firma y la post-firma) y un servidor documental podr&iacute;a ser el siguiente:
+ * </p>
+ * <p><b>Pre-firma:</b></p>
+ * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-1.png"></p>
+ * <ul>
+ *  <li>El dispositivo móvil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
+ *  <li>El servidor Web solicita el documento a servidor documental.</li>
+ *  <li>
+ *   El servidor documental entrega el documento al servidor Web.<br>Es importante recalcar que el servidor
+ *   documental no necesita almacenar ning&uacute;n dato de sesi&oacute;n y que este no est&aacute; expuesto a Internet
+ *   de forma directa en ning&uacute;n momento.
+ *  </li>
+ *  <li>
+ *   El servidor Web calcula la pre-firma, entregando el resultado (muy peque&ntilde;o en tama&ntilde;o) al dispositivo.<br>
+ *   Es importante recalcar que el servidor Web no necesita almacenar ning&uacute;n dato de sesi&oacute;n ni
+ *   exponer los documentos directamente al dispositivo.
+ *  </li>
+ * </ul>
+ * <p><b>Firma:</b></p>
+ * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-2.png"></p>
+ * <ul>
+ *  <li>
+ *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica 
+ *   simple (computacionalmente ligera) de los datos de la pre-firma. La clave privada del usuario nunca sale
+ *   del dispositivo y no se expone externamente en ningún momento.
+ *  </li>
+ * </ul>
+ * <p><b>Post-firma:</b></p>
+ * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-3.png"></p>
+ * <ul>
+ *  <li>
+ *   El dispositivo m&oacute;vil solicita una post-firma al servidor Web indicando un identificador de 
+ *   documento y proporcionando el resultado de su pre-firma firmada.
+ *  </li>
+ *  <li>El servidor Web solicita el documento a servidor documental.</li>
+ *  <li>El servidor documental entrega el documento al servidor Web.</li>
+ *  <li>
+ *   El servidor Web calcula la post-firma y compone el documento final firmado, entregando el resultado 
+ *   al servidor documental para su almac&eacute;n.
+ *  </li>
+ *  <li>El servidor documental almacena el nuevo documento y devuelve un identificador al servidor Web.</li>
+ *  <li>
+ *   El servidor Web comunica al dispositivo el éxito de la operación y el identificador del fichero 
+ *   ya firmado y almacenado.
+ *  </li>
+ * </ul>
+ * <p>
+ *  Es conveniente tener en cuenta al usar firmas trif&aacute;sicas que es necesario disponer de un mecanismo
+ *  para que el usuario pueda ver en todo momento los documentos que est&aacute; firmando (una copia que refleje
+ *  con fidelidad el contenido firmado puede ser suficiente) para evitar situaciones de repudio.
+ * </p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class CAdESTriPhaseSigner {
     
