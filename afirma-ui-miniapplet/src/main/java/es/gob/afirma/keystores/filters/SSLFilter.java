@@ -49,7 +49,7 @@ public class SSLFilter extends CertificateFilter {
 	
 	@Override
 	public boolean matches(X509Certificate cert) {
-		return this.getCertificateSN(cert).equals(this.serialNumber);
+		return this.prepareSerialNumber(this.getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
 	}
 	
 	@Override
