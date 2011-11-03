@@ -55,9 +55,9 @@ import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.RequestFocusListener;
@@ -353,7 +353,8 @@ public class Desensobrado extends JPanel {
     	// Obtenemos la ruta del sobre
     	String envelopPath = campoFichero.getText();
     	if(envelopPath == null || envelopPath.equals("") || !new File(envelopPath).exists() || !new File(envelopPath).isFile()) { 
-    		JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+    		//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+    		CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
     		campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
     	}
     	else {
@@ -364,7 +365,8 @@ public class Desensobrado extends JPanel {
     			envelopData = AOUtil.getDataFromInputStream(envelopFis);
     		} catch (Exception e) {
     			logger.severe("No se ha encontrado o no se ha podido leer el fichero: "+envelopPath);
-    			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE);
+    			//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE);
+    			CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
 
@@ -379,18 +381,22 @@ public class Desensobrado extends JPanel {
     			return;
     		} catch (KeyException e) {
             	//Control de la excepción generada al introducir mal la contraseña para el almacén
-                JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+                //JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    			CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             } catch (AOKeystoreAlternativeException e) {
-           	 	JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+           	 	//JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            	CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
            	 	return;
             } catch (AOException e) {
     			logger.severe("Error al abrir el almacen de claves del usuario: "+e);
-    			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    			//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    			CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     			return;
     		} catch (Exception e) {
     			logger.severe("Error al recuperar el certificado del usuario: "+e);
-    			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    			//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    			CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     			return;
     		}
     		
@@ -409,18 +415,21 @@ public class Desensobrado extends JPanel {
     		        recoveredData = new CMSDecipherAuthenticatedEnvelopedData().dechiperAuthenticatedEnvelopedData(envelopData, privateKeyEntry);
     		        // Envoltorio no reconocido
     		    } else {
-    		    	JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+    		    	//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+    		    	CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.sobre"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     		        return;
     		    }
     		} catch (AOException e) {
     			logger.severe("Error al abrir el sobre digital: "+e); //$NON-NLS-1$
     			//El pop-up muestra el mensaje de la excepción
-    			JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+    			//JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+    			CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     			return;
     		} catch (Exception e) {
     			logger.severe("Error al abrir el sobre digital: "+e); //$NON-NLS-1$
     			//El pop-up muestra el mensaje de la excepción
-    			JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
+    			//JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
+    			CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
     			return;
     		}
 

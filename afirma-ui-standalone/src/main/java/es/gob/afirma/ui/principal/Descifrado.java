@@ -37,9 +37,9 @@ import javax.swing.text.Caret;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
-import es.gob.afirma.ui.utils.JAccessibilityOptionPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
@@ -390,7 +390,8 @@ public class Descifrado extends JPanel {
         
         // Sacamos la ruta del archivo
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) {
-			JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.fichero"), Messages.getString("Descifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+			//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Descifrado.msg.error.fichero"), Messages.getString("Descifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+        	CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.fichero"), Messages.getString("Descifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
         	campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
         }
         else
