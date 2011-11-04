@@ -185,7 +185,9 @@ public interface MiniAfirma {
     /** Codifica un texto plano a Base64. Si se produce alg&uacute;n error se
      * devuelve <code>null</code>.
      * @param plainText Texto plano.
+     * @param charset Codificaci&oacute;n de caracteres del texto.
      * @return Texto codificado en Base64.
+     * @throws Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
-    String getBase64FromText(String plainText);
+    public String getBase64FromText(String plainText, String charset) throws IOException;
 }
