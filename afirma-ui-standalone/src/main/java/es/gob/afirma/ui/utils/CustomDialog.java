@@ -12,13 +12,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
+import es.gob.afirma.core.AOCancelledOperationException;
 /**
  * Componente dialogo que define los alerts de la aplicacion.
  * @author inteco
@@ -43,9 +49,15 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private JPanel buttonsPanel = null;
 	
 	/**
-	 * Campo de texto.
+	 * Panel principal.
 	 */
-	private JTextField textField = null;
+	private JPanel mainPanel = null;
+	
+	/**
+	 * Campo de texto o campo de contraseña
+	 */
+	private JComponent component = null;
+	
 	
 	/**
 	 * Etiqueta que contiene el icono de la alerta.
@@ -170,7 +182,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		container.setLayout(new GridBagLayout());
 		
 		//Panel con los datos del diálogo
-		JPanel mainPanel = new JPanel(new GridBagLayout());
+		 this.mainPanel = new JPanel(new GridBagLayout());
 
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
@@ -183,7 +195,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         //Icono del diálogo
        setIconLabel(typeMessage);
        // this.iconLabel.setBackground(Color.red);
-       mainPanel.add(iconLabel, c);
+       this.mainPanel.add(iconLabel, c);
 
         c.gridx = 1;
         c.weightx = 1.0;
@@ -196,22 +208,22 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Foco a la etiqueta
 		this.infoLabel.addAncestorListener(new RequestFocusListener());
 		//Se añade la etiqueta al panel de información general
-		mainPanel.add(this.infoLabel, c);
+		this.mainPanel.add(this.infoLabel, c);
 		
-		c.gridy = 1;
+		/*c.gridy = 1;
 		c.weightx = 0.0;
         //c.weighty = 0.0;
         c.gridwidth = 2;
         c.insets = new Insets(0,10,0,10);  //right padding
         
         //campo de texto del diálogo
-        this.textField = new JTextField("");
-        this.textField.setVisible(false); //Se oculta el campo
-        Utils.remarcar(this.textField);
-        Utils.setContrastColor(this.textField);
-        Utils.setFontBold(this.textField);
+        this.component = new JTextField("");
+        this.component.setVisible(false); //Se oculta el campo
+        Utils.remarcar(this.component);
+        Utils.setContrastColor(this.component);
+        Utils.setFontBold(this.component);
       //Se añade el campo de texto al panel de información general
-        mainPanel.add(this.textField, c);
+        this.mainPanel.add(this.component, c);*/
 
 		//Panel de botones
 		createButtonsPanel();
@@ -227,7 +239,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         //cons.gridheight = 1;
         
         //se añade el panel de información
-        container.add(mainPanel, cons);        
+        container.add(this.mainPanel, cons);        
         cons.gridy = 1;
         cons.gridx = 0;
        // cons.weightx = 1.0;
@@ -337,7 +349,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	
 		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
-		customDialog.textField.setVisible(false); //Se oculta el campo de texto
+		//customDialog.component.setVisible(false); //Se oculta el campo de texto
 		customDialog.setVisible(true);
 	}
 	
@@ -398,7 +410,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		}
 		
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
-		customDialog.textField.setVisible(false);//Se oculta el campo de texto
+		//customDialog.component.setVisible(false);//Se oculta el campo de texto
 				
 		customDialog.setVisible(true);
 		return customDialog.getAnswer();
@@ -414,7 +426,29 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	public static String showInputDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
 		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
 		
-		//Restricciones
+		
+		//Restricciones para el panel de datos
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 1;   
+		c.gridy = 1;
+		c.weightx = 0.0;
+        //c.weighty = 0.0;
+        c.gridwidth = 2;
+        c.insets = new Insets(10,10,0,10);  //right padding
+        
+        //campo de texto del diálogo
+        customDialog.component = new JTextField("");
+        Utils.remarcar(customDialog.component);
+        Utils.setContrastColor(customDialog.component);
+        Utils.setFontBold(customDialog.component);
+       //Se añade el campo de texto al panel de información general
+        customDialog.mainPanel.add(customDialog.component, c);
+        
+       //Se relaciona la etiqueta con el componente
+	   	customDialog.infoLabel.setLabelFor(customDialog.component);
+		
+		//Restricciones botones
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.gridx = 3;
@@ -429,7 +463,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.cancelButton.addActionListener(customDialog);
         
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
-		customDialog.textField.setVisible(true); //Se hace visible el campo de texto
+		customDialog.component.setVisible(true); //Se hace visible el campo de texto
 		
 		customDialog.cancelButton.addActionListener(customDialog);
 		
@@ -437,11 +471,75 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		//Control para saber si se ha pulsado el botón cancelar
 		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
-			return customDialog.textField.getText();
+			return ((JTextField)customDialog.component).getText();
 		}
 		return null;
+
+	}
+	
+	/**
+	 * Muestra un dialogo de solicitado de password.
+	 * @param componentParent componente padre
+	 * @param message mensaje a mostrar
+	 * @param title titulo del dilogo
+	 * @param messageType tipo de mensaje
+	 */
+	public static char[] showInputPasswordDialog(Component componentParent, boolean modal, final String charSet, final boolean beep, String message, String title, int typeMessage){
+		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		 
+		//Restricciones para el panel de datos
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 1;   
+		c.gridy = 1;
+		c.weightx = 0.0;
+        //c.weighty = 0.0;
+        c.gridwidth = 2;
+        c.insets = new Insets(10,10,0,10);  //right padding
+        
+        //campo de password del diálogo
+        customDialog.component = new JPasswordField("");
+        customDialog.component.setVisible(true); //Se muestra el campo
+        Utils.remarcar(customDialog.component);
+        Utils.setContrastColor(customDialog.component);
+        Utils.setFontBold(customDialog.component);
+        //Se añade el campo de texto al panel de información general
+        customDialog.mainPanel.add(customDialog.component, c);
+        
+	   	 if (charSet != null) {
+	   		 ((JPasswordField)customDialog.component).setDocument(new JTextFieldFilter(charSet, beep));
+	     }
+	   	 
+	     //Se relaciona la etiqueta con el componente
+	   	customDialog.infoLabel.setLabelFor(customDialog.component);
 		
+		//Restricciones del panel de botones
+		GridBagConstraints cons = new GridBagConstraints();
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.gridx = 3;
+		cons.gridy = 0;
+		cons.insets = new Insets(0,0,0,10);  //right padding
+
+		//Cancel button
+		customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		JPanel cancelPanel = new JPanel();
+		cancelPanel.add(customDialog.cancelButton);
+		customDialog.buttonsPanel.add(cancelPanel, cons);
+		customDialog.cancelButton.addActionListener(customDialog);
+        
+		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
+		customDialog.component.setVisible(true); //Se hace visible el campo de texto
 		
+		customDialog.cancelButton.addActionListener(customDialog);
+		
+		customDialog.setVisible(true);
+		
+		//Control para saber si se ha pulsado el botón cancelar
+		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
+			return ((JPasswordField)customDialog.component).getPassword();
+		}
+		throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario");
+
 	}
 	
 	private JButton getButton(String text, int mnemonic){
@@ -531,4 +629,48 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		setVisible(false);
 		
 	}
+	
+	 /** Original code: <a
+     * href="http://tactika.com/realhome/realhome.html">http://
+     * tactika.com/realhome/realhome.html</a>
+     * @author Real Gagnon */
+    private static final class JTextFieldFilter extends PlainDocument {
+
+        private static final long serialVersionUID = -5746396042117084830L;
+
+        private String acceptedChars = null;
+
+        /** Crea un nuevo filtro para campo de entrada de texto.
+         * @param acceptedchars
+         *        Cadena que debe contener todos los caracteres aceptados.
+         *        Cualquier caracter no incluido en esta cadena ser&aacute;
+         *        considerado inv&aacute;lido
+         * @param beepOnError
+         *        <code>true</code> si desea que se reproduzca un sonido
+         *        cuando el usuario introduce un caracter no v&aacute;lido,
+         *        false en caso contrario */
+        JTextFieldFilter(final String acceptedchars, final boolean beepOnError) {
+            this.beep = beepOnError;
+            this.acceptedChars = acceptedchars;
+        }
+
+        private boolean beep = false;
+
+        @Override
+        public void insertString(final int offset, final String str, final AttributeSet attr) throws BadLocationException {
+            if (str == null) {
+                return;
+            }
+            for (int i = 0; i < str.length(); i++) {
+                if (this.acceptedChars.indexOf(String.valueOf(str.charAt(i))) == -1) {
+                    if (this.beep) {
+                        Toolkit.getDefaultToolkit().beep();
+                    }
+                    return;
+                }
+            }
+            super.insertString(offset, str, attr);
+        }
+
+    }
 }
