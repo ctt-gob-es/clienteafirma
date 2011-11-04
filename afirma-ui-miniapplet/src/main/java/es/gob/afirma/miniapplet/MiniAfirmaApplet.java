@@ -209,9 +209,13 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
     @Override
     public String getBase64FromText(final String plainText, final String charset) throws IOException {
-        return plainText != null ?
-        		Base64.encodeBytes(charset != null ? plainText.getBytes(charset) : plainText.getBytes()) :
-        			null;
+    	if (plainText == null) {
+    		return null;
+    	}
+    	if (charset != null && charset.trim().length() > 0) {
+    		return Base64.encodeBytes(plainText.getBytes(charset));
+    	}
+        return Base64.encodeBytes(plainText.getBytes());
     }
     
     @Override
