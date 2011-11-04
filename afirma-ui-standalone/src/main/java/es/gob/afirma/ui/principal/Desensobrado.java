@@ -45,7 +45,6 @@ import es.gob.afirma.envelopers.cms.CMSDecipherAuthenticatedEnvelopedData;
 import es.gob.afirma.envelopers.cms.CMSDecipherEnvelopData;
 import es.gob.afirma.envelopers.cms.CMSDecipherSignedAndEnvelopedData;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
@@ -62,6 +61,7 @@ import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.UIPasswordCallbackAccessibility;
 import es.gob.afirma.ui.utils.Utils;
 
 /**
@@ -454,7 +454,9 @@ public class Desensobrado extends JPanel {
     	if (store == AOKeyStore.WINDOWS ||
     			store == AOKeyStore.WINROOT) pssCallback = new NullPasswordCallback();
     	else if (store==AOKeyStore.PKCS12){
-    		pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
+    		//pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
+    		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
+        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
         	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository")); //$NON-NLS-1$
             if (selectedFile != null) {
             	lib = selectedFile.getAbsolutePath();
@@ -463,7 +465,11 @@ public class Desensobrado extends JPanel {
             }
     		
     	}
-    	else  pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
+    	else {
+    		//pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
+    		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
+        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+    	}
 
     	try {
 	    	return AOKeyStoreManagerFactory.getAOKeyStoreManager(

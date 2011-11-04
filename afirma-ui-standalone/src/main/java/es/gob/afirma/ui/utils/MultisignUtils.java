@@ -20,7 +20,6 @@ import javax.security.auth.callback.PasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
@@ -50,9 +49,12 @@ public class MultisignUtils {
         		store == AOKeyStore.WINROOT || 
         		store == AOKeyStore.SINGLE) pssCallback = new NullPasswordCallback();
         else if(store == AOKeyStore.PKCS12){
-        	pssCallback = new UIPasswordCallback(
+        	/*pssCallback = new UIPasswordCallback(
         			Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
-    				null);
+    				null);*/
+        	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
+        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+        	
         	File selectedFile = SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository")); //$NON-NLS-1$
             if (selectedFile != null) {
             	lib = selectedFile.getAbsolutePath();
@@ -60,10 +62,14 @@ public class MultisignUtils {
             	throw new AOCancelledOperationException();
             }
         }
-        else 
-        	pssCallback = new UIPasswordCallback(
-    			Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
-				null);
+        else {
+        	/*pssCallback = new UIPasswordCallback(
+        			Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
+    				null);*/
+        	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
+        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+        }
+        	
 
         try {
 	        return AOKeyStoreManagerFactory.getAOKeyStoreManager(
