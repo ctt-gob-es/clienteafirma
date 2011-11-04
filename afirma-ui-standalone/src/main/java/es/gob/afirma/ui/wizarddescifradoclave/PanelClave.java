@@ -38,7 +38,6 @@ import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -244,8 +243,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	AOCipherKeyStoreHelper cKs = null;
     	try {
     		cKs = new AOCipherKeyStoreHelper(
-    				AOUIFactory.getPassword(Messages.getString("WizardDescifrado.clave.pass"), this)
-    		);
+					CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("WizardDescifrado.clave.pass"), Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
     	} catch (AOCancelledOperationException e) {
     		throw e;
     	} catch (IOException e) {
