@@ -152,7 +152,7 @@ public interface MiniAfirma {
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
      * del que se recuperar&aacute; su ruta absoluta. Si no se selecciona
-     * ning&uacute;n fichero, se devuelve <code>null</code>.
+     * ning&uacute;n fichero, se devuelve {@code null}.
      * @param title T&iacute;tulo para el di&aacute;logo.
      * @param extensions Extensiones de b&uacute;squeda.
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
@@ -163,7 +163,7 @@ public interface MiniAfirma {
     String loadFilePath(String title, String extensions, String description) throws IOException, PrivilegedActionException;
     
     
-    /** Decodifica un texto en Base64. Si se produce alg&uacute;n error se
+    /** Decodifica un texto en Base64. Si se introducen datos nulos se
      * devuelve {@code null}.
      * @param data Datos en Base64.
      * @param charset Juego de caracteres a utilizar en el texto de salida.
@@ -182,10 +182,20 @@ public interface MiniAfirma {
     String getTextFromBase64(String data, String charset) throws IOException;
 
     
-    /** Codifica un texto plano a Base64. Si se produce alg&uacute;n error se
-     * devuelve <code>null</code>.
+    /** Codifica un texto plano a Base64. Si se introduce un texto nulo se
+     * devuelve {@code null}.
      * @param plainText Texto plano.
-     * @param charset Codificaci&oacute;n de caracteres del texto.
+     * @param charset Juego de caracteres del texto.
+     * 				  El nombre de este debe seguir las convenciones de la <a href="http://ietf.org/rfc/rfc2278.txt">RFC2278</a>, 
+     *                soport&aacute;ndose al menos los siguientes:
+     *                <ul>
+     *                 <li>US-ASCII</li>
+     *                 <li>ISO-8859-1</li>
+     *                 <li>UTF-8</li>
+     *                 <li>UTF-16BE</li>
+     *                 <li>UTF-16LE</li>
+     *                 <li>UTF-16</li>
+     *                </ul>  
      * @return Texto codificado en Base64.
      * @throws Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
