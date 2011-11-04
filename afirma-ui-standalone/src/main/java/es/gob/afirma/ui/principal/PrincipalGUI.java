@@ -116,6 +116,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	public static int aboutActualHeight = -1;
 	
+	public static int fileActualPositionX = -1;
+	
+	public static int fileActualPositionY = -1;
+	
+	public static int fileActualWidth = -1;
+	
+	public static int fileActualHeight = -1;
+	
 	private JMenuBar menu;
 	
 	public static JStatusBar bar = new JStatusBar();
@@ -791,6 +799,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				UIManager.put("ToolTip.foreground",Color.WHITE);
 				UIManager.put("ToolTip.background",Color.BLACK);
 				UIManager.put("Label.foreground",Color.WHITE);
+				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI");
+				UIManager.put("TableHeader.foreground", Color.WHITE);
 				
 
 			} else {
@@ -809,6 +819,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				UIManager.put("ToolTip.foreground",Color.BLACK);
 				UIManager.put("ToolTip.background",new Color(255,255,225));
 				UIManager.put("Label.foreground",Color.BLACK);
+				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI");
+				UIManager.put("TableHeader.foreground", Color.BLACK);
 			}
 			
 		} catch (ClassNotFoundException e1) {

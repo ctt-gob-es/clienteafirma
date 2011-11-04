@@ -397,23 +397,34 @@ public class Firma extends JPanel {
             return;
         }
 
+      //Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
+    	//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE);
+    	CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE);
+        
         try {
             PasswordCallback pssCallback;
             KeyStoreConfiguration kssc = (KeyStoreConfiguration)comboAlmacen.getSelectedItem();
             AOKeyStore store = kssc.getType();
+            String lib = kssc.getLib();
             if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT ||
                     store == AOKeyStore.SINGLE) 
                 pssCallback = new NullPasswordCallback();
+            else if(store==AOKeyStore.PKCS12){
+            	pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null); //$NON-NLS-1$
+            	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository")); //$NON-NLS-1$
+                if (selectedFile != null) {
+                	lib = selectedFile.getAbsolutePath();
+                } else {
+                	return;
+                }
+            }
             else
                 pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null); //$NON-NLS-1$
 
             try {
-            	//Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
-            	//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE);
-            	CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE);
                 keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(
                         store,
-                        kssc.getLib(),
+                        lib,
                         kssc.toString(),
                         pssCallback,
                         this

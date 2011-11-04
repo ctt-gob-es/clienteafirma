@@ -447,17 +447,28 @@ public class Desensobrado extends JPanel {
     	}
     }
 
-    private AOKeyStoreManager getKeyStoreManager(KeyStoreConfiguration ksConfiguration) throws AOException, InvalidKeyException, AOKeystoreAlternativeException {
+    private AOKeyStoreManager getKeyStoreManager(KeyStoreConfiguration ksConfiguration) throws AOException, InvalidKeyException, AOKeystoreAlternativeException, AOCancelledOperationException {
     	PasswordCallback pssCallback;
     	AOKeyStore store = ksConfiguration.getType();
+    	String lib = ksConfiguration.getLib();
     	if (store == AOKeyStore.WINDOWS ||
     			store == AOKeyStore.WINROOT) pssCallback = new NullPasswordCallback();
+    	else if (store==AOKeyStore.PKCS12){
+    		pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
+        	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository")); //$NON-NLS-1$
+            if (selectedFile != null) {
+            	lib = selectedFile.getAbsolutePath();
+            } else {
+            	throw new AOCancelledOperationException();
+            }
+    		
+    	}
     	else  pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
 
     	try {
 	    	return AOKeyStoreManagerFactory.getAOKeyStoreManager(
 	    			store,
-	    			ksConfiguration.getLib(),
+	    			lib,
 	    			ksConfiguration.toString(),
 	    			pssCallback,
 	    			this

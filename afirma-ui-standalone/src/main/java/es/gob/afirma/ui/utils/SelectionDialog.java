@@ -73,7 +73,8 @@ public class SelectionDialog {
         }
 	    
 		//Instancia del componente FileChooser accesible
-		JAccessibilityFileChooser fc = new JAccessibilityFileChooser(new File(currentDir));
+        JAccessibilityFileChooser fc = new JAccessibilityFileChooser(new File(currentDir));
+		
 		fc.setDialogTitle(title);
 		fc.setFileSelectionMode(selectionMode);
 		if (filter != null) {
@@ -81,6 +82,7 @@ public class SelectionDialog {
 		}
 		
 		File filePath = null;
+		
 		if(fc.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			filePath = fc.getSelectedFile();
 			if (filePath.getParentFile() != null) {

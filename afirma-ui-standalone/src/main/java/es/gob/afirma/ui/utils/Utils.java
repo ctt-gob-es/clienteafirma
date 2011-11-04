@@ -35,6 +35,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.MenuEvent;
@@ -116,19 +117,33 @@ public class Utils {
 	 * @param component El componente seleccionado.
 	 */
 	public static void remarcar(JComponent component){
+		
 		if (GeneralConfig.isRemarked()){
 			if (component instanceof JButton){
 				final JButton button = (JButton) component;
 				button.addFocusListener(new FocusListener() {
 					public void focusLost(FocusEvent e) {
+						if (button.getParent() instanceof JPanel){
 						((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
+						} else if (button.getParent() instanceof JToolBar){
+							button.setBorder(BorderFactory.createEmptyBorder());
+						}
 					}
 					
 					public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
-							((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+							if (button.getParent() instanceof JPanel){
+								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+							} else if (button.getParent() instanceof JToolBar){
+								button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+							}
 						} else {
-							((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+							if (button.getParent() instanceof JPanel){
+								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+							} else if (button.getParent() instanceof JToolBar){
+								button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+							}
+							
 						}
 					}
 				});
@@ -137,14 +152,27 @@ public class Utils {
 				final JToggleButton button = (JToggleButton) component;
 				button.addFocusListener(new FocusListener() {
 					public void focusLost(FocusEvent e) {
-						((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
+						if (button.getParent() instanceof JPanel){
+							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
+						} else if (button.getParent() instanceof JToolBar){
+							button.setBorder(BorderFactory.createEmptyBorder());
+						}
 					}
 					
 					public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
-							((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+							if (button.getParent() instanceof JPanel){
+								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+							} else if (button.getParent() instanceof JToolBar){
+								button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+							}
 						} else {
-							((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+							if (button.getParent() instanceof JPanel){
+								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+							} else if (button.getParent() instanceof JToolBar) {
+								button.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+							}
+							
 						}
 					}
 				});
@@ -366,15 +394,30 @@ public class Utils {
 						}
 					}
 				} //Comprobacion del tipo de borde
-			} // comprobacion de si tiene borde
+			} 			
 		} else {
 			//Se comprueba si la configuracion pide que la fuente este en negrita
 			if (GeneralConfig.isFontBold()){
-				//Se indica que la fuente es negrita
-				component.setFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
+				if (component instanceof JToolBar){
+					//Se indica que la fuente es negrita
+					for (int i=0;i<component.getComponentCount();i++){
+						component.getComponent(i).setFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
+					}
+				} else {
+					//Se indica que la fuente es negrita
+					component.setFont(new Font(component.getFont().getName(),Font.BOLD , component.getFont().getSize()));
+				}
 			} else {
-				//Se indica que la fuente es texto plano
-				component.setFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
+				if (component instanceof JToolBar){
+					//Se indica que la fuente es texto plano
+					for (int i=0;i<component.getComponentCount();i++){
+						component.getComponent(i).setFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
+					}
+				} else {
+					//Se indica que la fuente es texto plano
+					component.setFont(new Font(component.getFont().getName(),Font.PLAIN , component.getFont().getSize()));
+				}
+				
 			}
 		}
 	}

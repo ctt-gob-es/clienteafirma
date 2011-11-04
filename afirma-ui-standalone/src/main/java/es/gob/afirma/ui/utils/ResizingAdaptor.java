@@ -20,17 +20,21 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.JTableHeader;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.tree.DefaultTreeCellRenderer;
+
+import sun.swing.FilePane;
 
 import es.gob.afirma.core.misc.Platform;
 
@@ -48,6 +52,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	private final JAccessibilityFrameAbout theWindowAbout;
 	private final JAccessibilityFileChooser theFileChooser;
 	private final JAccessibilityCustomDialog theCustomDialog;
+	private final JAccessibilityFileChooserToSave theFileChooserToSave;
 
 	/**
 	 * Constructor
@@ -56,7 +61,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 *            ventana a redimensionar
 	 */
 	public ResizingAdaptor(JAccessibilityFrame window, JAccessibilityDialog dialog, JAccessibilityDialogWizard dialogWizard,JAccessibilityDialogAdvisor dialogAdvisor,JAccessibilityFrameAbout windowAbout,JAccessibilityFileChooser fileChooser,
-			JAccessibilityCustomDialog customDialog) {
+			JAccessibilityCustomDialog customDialog,JAccessibilityFileChooserToSave fileChooserToSave) {
 		this.theWindow = window;
 		this.theDialog = dialog;
 		this.theDialogWizard = dialogWizard;
@@ -64,6 +69,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 		this.theWindowAbout = windowAbout;
 		this.theFileChooser = fileChooser;
 		this.theCustomDialog = customDialog;
+		this.theFileChooserToSave = fileChooserToSave;
 	}
 
 	@Override
@@ -83,8 +89,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 				this.adjustFontSize(this.theWindowAbout.getComponents());
 			} else if (this.theCustomDialog != null) {
 				this.adjustFontSize(this.theCustomDialog.getComponents());
-			}else {
-				//this.adjustFontSize(this.theFileChooser.getDialog().getComponents());
+			}else if (this.theFileChooser != null){
+				this.adjustFontSize(this.theFileChooser.getDialog().getComponents());
+			} else {
+				this.adjustFontSize(this.theFileChooserToSave.getDialog().getComponents());
 			}
 	}
 
@@ -104,8 +112,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 			this.adjustFontSize(theWindowAbout.getComponents());
 		} else if (this.theCustomDialog != null) {
 			this.adjustFontSize(this.theCustomDialog.getComponents());
-		}else {
-			//this.adjustFontSize(theFileChooser.getDialog().getComponents());
+		}else if (this.theFileChooser != null){
+			this.adjustFontSize(this.theFileChooser.getDialog().getComponents());
+		} else {
+			this.adjustFontSize(this.theFileChooserToSave.getDialog().getComponents());
 		}
 	}
 
@@ -186,11 +196,14 @@ public class ResizingAdaptor extends ComponentAdapter {
 			relWidth = theCustomDialog.getSize().getWidth() / Constants.CUSTOMDIALOG_INITIAL_WIDTH;
 			relHeight = theCustomDialog.getSize().getHeight() / Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theCustomDialog.getMinimumRelation());
-		}else {
-			/*relWidth = theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
+		} else if (theFileChooser != null){
+			relWidth = theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
 			relHeight = theFileChooser.getDialog().getSize().getHeight() / Constants.FILE_INITIAL_HEIGHT;
-			relation = Math.round(relWidth * relHeight * theFileChooser.getMinimumRelation());*/
-			relation=0;
+			relation = Math.round(relWidth * relHeight * theFileChooser.getMinimumRelation());			
+		} else {
+			relWidth = theFileChooserToSave.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
+			relHeight = theFileChooserToSave.getDialog().getSize().getHeight() / Constants.FILE_INITIAL_HEIGHT;
+			relation = Math.round(relWidth * relHeight * theFileChooserToSave.getMinimumRelation());
 		}
 
 		for (int i = 0; i < components.length; i++) {
@@ -327,8 +340,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}else if (theCustomDialog != null){
 						resizeFactor = (float) (theCustomDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else {
+					} else if (theFileChooser != null){
 						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else {
+						resizeFactor = (float) (theFileChooserToSave.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}
 					//Se obtienen las dimensiones del icono original
 					 int w = iconLabel.getOriginalIcon().getIconWidth();
@@ -354,8 +369,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}  else if (theCustomDialog != null){
 						resizeFactor = (float) (theCustomDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else {
+					} else if (theFileChooser != null){
 						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					} else {
+						resizeFactor = (float) (theFileChooserToSave.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}
 					resizeImageButton(resizeFactor, actualComponent);
 				}
@@ -398,7 +415,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 */
 	public final void resizeImageButton(double factor, Component c) {
 		
-		if (theFileChooser==null){
+		if (theFileChooser==null && theFileChooserToSave==null){
 			
 		
 		JButton button = (JButton) c;
@@ -427,7 +444,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 		if(GeneralConfig.isBigFontSize()){
 			if (theDialogWizard != null){
 				return 15;
-			} else if (theFileChooser != null){
+			} else if (theFileChooser != null || theFileChooserToSave != null){
 				return 13;
 			} else {
 				return 16;
@@ -438,7 +455,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 				return 12;
 			} else if (theDialogAdvisor != null){
 				return 15;
-			} else if (theFileChooser != null) {
+			} else if (theFileChooser != null || theFileChooserToSave != null) {
 				return 11;
 			} else {
 				return 13;
@@ -483,6 +500,12 @@ public class ResizingAdaptor extends ComponentAdapter {
 		else if(a instanceof JList)
 			return true;
 		else if(a instanceof JFileChooser)
+			return true;
+		else if(a instanceof JTable)
+			return true;
+		else if(a instanceof JTableHeader)
+			return true;
+		else if(a instanceof FilePane)
 			return true;
 		return false;
 	}

@@ -32,7 +32,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 */
 	public JAccessibilityCustomDialog(JDialog dialog, boolean modal){
 		super(dialog, modal);
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this);
+		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent e)
@@ -51,7 +51,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 */
 	public JAccessibilityCustomDialog(){
 		super();
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this);
+		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent e)

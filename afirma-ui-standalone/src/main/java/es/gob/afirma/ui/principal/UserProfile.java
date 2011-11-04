@@ -301,12 +301,11 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
     	config.setProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, Main.preferences.get(UserProfile.currentUser+".accesibility.highContrast", "false"));
     	config.setProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, Main.preferences.get(UserProfile.currentUser+".accesibility.focus", "false"));
     	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.maximized", "false"));
+    	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, Main.preferences.get(UserProfile.currentUser+".accesibility.accessibility", "true"));
     	config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.cursor", "false"));
     	GeneralConfig.loadConfig(config);
     	new PrincipalGUI().main();
-    	dispose();
-    	
-		
+    	dispose();	
     }
     
     /**

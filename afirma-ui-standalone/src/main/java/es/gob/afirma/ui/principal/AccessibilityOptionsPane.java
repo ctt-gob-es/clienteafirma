@@ -44,6 +44,9 @@ public class AccessibilityOptionsPane {
 	/** Clave para la configuraci&oacute;n de tama&ntilde;o de ventana. */
 	public static final String MAIN_WINDOWS_SIZE = "main.windowsSize";
 	
+	/** Clave para la configuraci&oacute;n de tama&ntilde;o de ventana. */
+	public static final String MAIN_WINDOWS_ACCESSIBILITY = "main.windowsAccessibility";
+	
 	/** Clave para la configuraci&oacute;n de tama&ntilde;o del cursor de texto. */
 	public static final String MAIN_CURSOR_SIZE = "main.cursorSize";
 	
@@ -64,6 +67,9 @@ public class AccessibilityOptionsPane {
 	
 	/** Casilla de verificacion del tama&ntilde;o de las ventanas. */ 
 	private JCheckBox checkWindowSize;
+	
+	/** Casilla de verificacion de la desactivaci&oacute;n de la accesibilidad en las ventanas de selecci&oacute;n de archivos. */ 
+	private JCheckBox checkWindowAccessibility;
 	
 	/** Casilla de verificacion del tama&ntilde;o del cursor de texto. */ 
 	private JCheckBox checkCursorSize;	
@@ -219,6 +225,22 @@ public class AccessibilityOptionsPane {
         
         panelWindowSize.add(this.checkWindowSize);
         windowPanel.add(panelWindowSize, c2);
+        c2.gridy = c2.gridy + 1;
+        JPanel panelWindowAccessibility = new JPanel(new GridLayout(1, 1));
+        panelWindowAccessibility.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.ventana"));
+        //Checkbox para deshabilitar la accesibilidad en los dialogos de seleccion de archivo
+        this.checkWindowAccessibility = new JCheckBox();
+        this.checkWindowAccessibility.setText(Messages.getString("Opciones.accesibilidad.ventana.accesibilidad")); // NOI18N
+        //checkWindowAccessibility.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
+        this.checkWindowAccessibility.setSelected(GeneralConfig.isAvanzados()); 
+        this.checkWindowAccessibility.setBounds(12, 20, 340, 23);
+        this.checkWindowAccessibility.setMnemonic(KeyEvent.VK_B); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        Utils.remarcar(this.checkWindowAccessibility);
+        Utils.setContrastColor(this.checkWindowAccessibility);
+        Utils.setFontBold(this.checkWindowAccessibility);
+        
+        panelWindowAccessibility.add(this.checkWindowAccessibility);
+        windowPanel.add(panelWindowAccessibility, c2);
         
         this.panel.add(windowPanel, c);   
         c.gridy = c.gridy + 1;
@@ -328,6 +350,7 @@ public class AccessibilityOptionsPane {
 		this.checkHighContrast.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, "false")));
 		this.checkFocusVisible.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false")));
 		this.checkWindowSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, "false")));
+		this.checkWindowAccessibility.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true")));
 		this.checkCursorSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false")));
 
 		// Comprobamos si est� activada al menos una de las opciones de accesibilidad sobre textos 
@@ -348,6 +371,7 @@ public class AccessibilityOptionsPane {
     	config.setProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, Boolean.toString(this.checkHighContrast.isSelected()));
     	config.setProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, Boolean.toString(this.checkFocusVisible.isSelected()));
     	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, Boolean.toString(this.checkWindowSize.isSelected()));
+    	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, Boolean.toString(this.checkWindowAccessibility.isSelected()));
     	config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Boolean.toString(this.checkCursorSize.isSelected()));
     	
     	// Comprobamos si se han desactivados las dos opciones de accesibilidad sobre texto 
@@ -416,6 +440,7 @@ public class AccessibilityOptionsPane {
 							Main.preferences.remove(name.trim()+".accesibility.highContrast");
 							Main.preferences.remove(name.trim()+".accesibility.focus");
 							Main.preferences.remove(name.trim()+".accesibility.maximized");
+							Main.preferences.remove(name.trim()+".accesibility.accessibility");
 							Main.preferences.remove(name.trim()+".accesibility.cursor");
 						}
 					}
@@ -430,6 +455,7 @@ public class AccessibilityOptionsPane {
 				Main.preferences.put(name.trim()+".accesibility.highContrast",String.valueOf(this.checkHighContrast.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.focus",String.valueOf(this.checkFocusVisible.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.maximized",String.valueOf(this.checkWindowSize.isSelected()));
+				Main.preferences.put(name.trim()+".accesibility.accessibility",String.valueOf(this.checkWindowAccessibility.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.cursor",String.valueOf(this.checkCursorSize.isSelected()));
 			} else {
 				CustomDialog.showMessageDialog(this.panel, true, "Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);

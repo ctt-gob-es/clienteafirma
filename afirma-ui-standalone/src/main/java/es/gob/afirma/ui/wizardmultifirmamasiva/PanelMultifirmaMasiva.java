@@ -482,13 +482,23 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	PasswordCallback pssCallback;
 
         	AOKeyStore store = this.kssc.getType();
+        	String lib = this.kssc.getLib();
         	if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT ||
         			store == AOKeyStore.SINGLE) 
         		pssCallback = new NullPasswordCallback();
+        	else if(store == AOKeyStore.PKCS12){
+        		pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null);
+        		File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository")); //$NON-NLS-1$
+                if (selectedFile != null) {
+                	lib = selectedFile.getAbsolutePath();
+                } else {
+                	throw new AOCancelledOperationException("No se ha seleccionado el almacén de certificados"); //$NON-NLS-1$ 
+                }
+        	}
         	else 
         		pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null); 
 
-        	keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, this.kssc.getLib(), this.kssc.toString(),
+        	keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, this.kssc.toString(),
         			pssCallback, this);
 
         	// Seleccionamos un certificado

@@ -33,7 +33,7 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 	
 	public JAccessibilityDialogAdvisor(){
 		super();
-		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null,null,null);
+		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null,null,null,null);
 		this.addComponentListener(this.resizingAdaptor);
 		this.addComponentListener(new ComponentAdapter() {
 		    @Override

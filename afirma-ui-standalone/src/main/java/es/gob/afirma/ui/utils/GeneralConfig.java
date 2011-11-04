@@ -70,6 +70,14 @@ public class GeneralConfig {
 	}
 	
 	/**
+	 * Indica si el ususario ha activado o desactivado la opcion de desactivar accesibilidad en ventanas de seleci&oacute;n de archivos
+	 * @return boolean Indicando el estado de la opcion
+	 */
+	public static boolean isAccessibility() {
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true"));
+	}
+	
+	/**
 	 * Indica si el ususario ha activado o desactivado la opcion de cursor de texto grande
 	 * @return boolean Indicando el estado de la opcion
 	 */

@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
+import java.io.File;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.logging.Logger;
@@ -44,9 +45,21 @@ public class MultisignUtils {
         PasswordCallback pssCallback;
 
         AOKeyStore store = kssc.getType();
+        String lib =  kssc.getLib();
         if (store == AOKeyStore.WINDOWS || 
         		store == AOKeyStore.WINROOT || 
         		store == AOKeyStore.SINGLE) pssCallback = new NullPasswordCallback();
+        else if(store == AOKeyStore.PKCS12){
+        	pssCallback = new UIPasswordCallback(
+        			Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
+    				null);
+        	File selectedFile = SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository")); //$NON-NLS-1$
+            if (selectedFile != null) {
+            	lib = selectedFile.getAbsolutePath();
+            } else {
+            	throw new AOCancelledOperationException();
+            }
+        }
         else 
         	pssCallback = new UIPasswordCallback(
     			Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
@@ -55,7 +68,7 @@ public class MultisignUtils {
         try {
 	        return AOKeyStoreManagerFactory.getAOKeyStoreManager(
 	            store,
-	            kssc.getLib(),
+	            lib,
 	            kssc.toString(),
 	            pssCallback,
 	            padre
