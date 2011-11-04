@@ -46,7 +46,6 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -316,8 +315,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	AOCipherKeyStoreHelper cKs = null;
     	try {
     		cKs = new AOCipherKeyStoreHelper(
-    				AOUIFactory.getPassword(Messages.getString("WizardCifrado.almacen.claves.contrasenia"), this)
-    		);
+    				CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("WizardCifrado.almacen.claves.contrasenia"), Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
     	} catch (AOCancelledOperationException e) {
     		throw e;
     	} catch (IOException e) {
@@ -498,7 +496,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 				try {
 					if (!AOCipherKeyStoreHelper.storeExists()) {
 						cksh = new AOCipherKeyStoreHelper(
-					            AOUIFactory.getPassword(Messages.getString("Cifrado.introducir.pass"), this));
+								CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("Cifrado.introducir.pass"), Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
+						
 					} else {
 						//cksh = new AOCipherKeyStoreHelper(new UIPasswordCallback(Messages.getString("Cifrado.introducir.pass.almacen"), this).getPassword());
 						PasswordCallback pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Cifrado.introducir.pass.almacen"), this,
