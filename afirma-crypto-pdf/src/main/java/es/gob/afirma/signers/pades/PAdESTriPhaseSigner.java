@@ -41,45 +41,20 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 
-/** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF.
+/** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * No firma (aun) PDF cifrados
- * <p>
- * Necesita iText 2.1.7 con modificaciones espec&iacute;ficas.
- * </p>
- * <p>
- * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
- * <dl>
- * <dt>signReason</dt>
- * <dd>Raz&oacute;n por la que se realiza la firma</dd>
- * <dt>signField</dt>
- * <dd>Nombre del campo en donde insertar la firma</dd>
- * <dt>signatureProductionCity</dt>
- * <dd>Ciudad en la que se realiza la firma</dd>
- * <dt>signerContact</dt>
- * <dd>Contacto del firmante</dd>
- * <dt>signaturePage</dt>
- * <dd>P&aacute;gina del PDF donde insertar la firma</dd>
- * <dt>policyIdentifier</dt>
- * <dd>URL identificadora de la pol&iacute;tica de firma (normalmente una URL hacia el documento que describe la pol&iacute;tica)</dd>
- * <dt>policyQualifier</dt>
- * <dd>OID calificador de la pol&iacute;tica de firma</dd>
- * <dt>allowSigningCertifiedPdfs</dt>
- * <dd>Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados, si no se establece o se establece a <code>false</code> se
- * lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado. <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
- * establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b>
- * </dl>
- * </p> 
+ * <p>Necesita iText 2.1.7 con modificaciones espec&iacute;ficas.</p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * */
 public class PAdESTriPhaseSigner {
     
-    /** Versi&oacute;n de iText necesaria para el uso de esta clase. */
+    /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
     
-    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase. */
+    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase (1.46 o superior). */
     public static final String BC_VERSION = "1.46"; //$NON-NLS-1$
     
-    /** Construye un firmador PAdES, comprobando que la versiones existentes de iText y Bouncycastle sean las adecuadas. 
+    /** Construye un firmador PAdES trif&aacute;sico, comprobando que la versiones existentes de iText y Bouncycastle sean las adecuadas. 
      * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles
      */
     public PAdESTriPhaseSigner() {
@@ -104,11 +79,87 @@ public class PAdESTriPhaseSigner {
     public static final int LAST_PAGE = -666;
     
     /** Obtiene la prefirma PAdES/CAdES de un PDF (atributos CAdES a firmar)
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma
-     * @param inPDF PDF a firmar
-     * @param signerCertificateChain Cadena de certificados del firmante
-     * @param rubricJpegImage R&uacute;brica (JPEG binario) a insertar en el PDF
-     * @param xParams Opciones adicionales para la firma
+     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma. Debe usarse exactamente el mismo valor en la post-firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
+     * <ul>
+     *  <li><i>SHA1</i></li>
+     *  <li><i>MD5</i> (no recomendado por vulnerable)</li>
+     *  <li><i>MD2</i> (no recomendado por vulnerable)</li>
+     *  <li><i>SHA-256</i></li>
+     *  <li><i>SHA-384</i></li>
+     *  <li><i>SHA-512</i></li>
+     * </ul>
+     * @param inPDF PDF a firmar. Debe usarse exactamente el mismo documento en la post-firma.
+     * @param signerCertificateChain Cadena de certificados del firmante Debe usarse exactamente la misma cadena de certificados en la post-firma.
+     * @param rubricJpegImage R&uacute;brica (JPEG binario) a insertar en el PDF. Debe usarse exactamente la misma imagen en la post-firma.
+     * @param xParams Par&aacute;metros adicionales para la firma. Deben usarse exactamente los mismos valores en la post-firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>signReason</i></b></dt>
+     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
+     *  <dt><b><i>signField</i></b></dt>
+     *   <dd>
+     *    Nombre del campo en donde insertar la firma.
+     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo 
+     *    por su nombre.<br>
+     *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
+     *   </dd>
+     *  <dt><b><i>signatureProductionCity</i></b></dt>
+     *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
+     *  <dt><b><i>signerContact</i></b></dt>
+     *   <dd>
+     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico 
+     *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
+     *   </dd>
+     *  <dt><b><i>signaturePage</i></b></dt>
+     *   <dd>
+     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
+     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
+     *    p&aacute;ginas de este.
+     *   </dd>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
+     *   <dd>
+     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
+     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
+     *   </dd>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
+     *   <dd>
+     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
+     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
+     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
+     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
+     *    digital <i>al vuelo</i>.     
+     *   </dd>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
+     *   <dd>
+     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
+     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
+     *   </dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>
+     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
+     *   </dd>
+     *  <dt><b><i>allowSigningCertifiedPdfs</i></b></dt>
+     *   <dd>
+     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados, si no se establece o se establece a <code>false</code> se
+     *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
+     *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
+     *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
+     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
+     *   </dd>
+     *  <dt><b><i>tsaURL</i></b></dt>
+     *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
+     *  <dt><b><i>tsaPolicy</i></b></dt>
+     *   <dd>Pol&iacute;tica de sellado de tiempo (obligatoria si se indica <code>tsaURL</code>).</dd>
+     *  <dt><b><i>tsaHashAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).</dd>
+     *  <dt><b><i>tsaRequireCert</i></b></dt>
+     *   <dd><code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).</dd>
+     *  <dt><b><i>tsaUsr</i></b></dt>
+     *   <dd>Nombre de usuario de la TSA.</dd>
+     *  <dt><b><i>tsaPwd</i></b></dt>
+     *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
+     * </dl>
      * @return Prefirma CAdES/PAdES (atributos CAdES a firmar)
      * @throws IOException
      * @throws AOException
@@ -327,8 +378,6 @@ public class PAdESTriPhaseSigner {
         
         // iText antiguo
         sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
-        // iText nuevo
-        // sap.setRenderingMode(PdfSignatureAppearance.RenderingMode.NAME_AND_DESCRIPTION);
         
         if (reason != null) {
             sap.setReason(reason);
