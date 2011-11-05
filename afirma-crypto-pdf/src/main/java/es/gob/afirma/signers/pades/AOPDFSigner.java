@@ -84,15 +84,14 @@ public final class AOPDFSigner implements AOSigner {
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
     
-    /** Versi&oacute;n de iText necesaria para el uso de esta clase. */
+    /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
     private static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
     
-    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase. */
+    /** Versi&oacute;n de BouncyCastle necesaria para el uso de esta clase (1.46 o superior). */
     private static final String BC_VERSION = "1.46"; //$NON-NLS-1$
     
     /** Construye un firmador PAdES, comprobando que la versiones existentes en el <i>CLASSPATH</i> de iText y BouncyCastle sean las adecuadas. 
-     * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles
-     */
+     * @throws UnsupportedOperationException si se encuentra bibliotecas iText o BouncyCastle en versiones incompatibles */
     public AOPDFSigner() {
         final String itextVersion = Platform.getITextVersion();
         if (!ITEXT_VERSION.equals(itextVersion)) {
@@ -647,10 +646,16 @@ public final class AOPDFSigner implements AOSigner {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros PDF"); //$NON-NLS-1$
     }
 
+    /** Devuelve el nombre de fichero de firma predeterminado que se recomienda usar para
+     * un PDF firmado con nombre original igual al proporcionado.
+     * En este caso el resultado ser&aacute; siempre el nombre original m&aacute;s un
+     * sufijo adicional (opcional) previo a la extensi&oacute;n. 
+     * Siempre se termina el nombre de fichero con la extensi&oacute;n <i>.pdf</i>, incluso si el nombre original carec&iacute;a de esta.
+     * @param originalName Nombre del fichero original que se firma.
+     * @param inText Sufijo a agregar al nombre de fichero devuelto, inmediatamente anterior a la extensi&oacute;n.
+     * @return Nombre apropiado para el fichero de firma. */
     public String getSignedName(final String originalName, final String inText) {
-
         final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
-
         if (originalName == null) {
             return "signed.pdf"; //$NON-NLS-1$
         }
@@ -660,6 +665,22 @@ public final class AOPDFSigner implements AOSigner {
         return originalName + inTextInt + PDF_FILE_SUFFIX; 
     }
 
+    /** Recupera el &aacute;rbol de nodos de firma de una firma electr&oacute;nica.
+     * Los nodos del &aacute;rbol ser&aacute;n textos con el <i>CommonName</i> (CN X.500)
+     * del titular del certificado u objetos de tipo AOSimpleSignInfo con la
+     * informaci&oacute;n b&aacute;sica de las firmas individuales, seg&uacute;n
+     * el valor del par&aacute;metro <code>asSimpleSignInfo</code>. Los nodos se
+     * mostrar&aacute;n en el mismo orden y con la misma estructura con el que
+     * aparecen en la firma electr&oacute;nica.<br>
+     * La propia estructura de firma se considera el nodo ra&iacute;z, la firma y cofirmas
+     * pender&aacute;n directamentede de este.
+     * @param sign Firma electr&oacute;nica de la que se desea obtener la estructura.
+     * @param asSimpleSignInfo
+     *        Si es <code>true</code> se devuelve un &aacute;rbol con la
+     *        informaci&oacute;n b&aacute;sica de cada firma individual
+     *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres (CN X.500) de los
+     *        titulares certificados.
+     * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
         
         SHA2AltNamesProvider.install();
@@ -1200,6 +1221,10 @@ public final class AOPDFSigner implements AOSigner {
         return originalName + ".signed.pdf"; //$NON-NLS-1$
     }
 
+    /** Si la entrada es un documento PDF, devuelve el mismo documento PDF.
+     * @param sign Documento PDF
+     * @return Mismo documento PDF de entrada, sin modificar en ning&uacute; aspecto.
+     * @throws AOInvalidFormatException Si los datos de entrada no son un documento PDF. */
     public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
 
         // Si no es una firma PDF valida, lanzamos una excepcion
@@ -1211,6 +1236,11 @@ public final class AOPDFSigner implements AOSigner {
         return sign;
     }
 
+    /** Si la entrada es un documento PDF, devuelve un objeto <code>AOSignInfo</code>
+     * con el formato establecido a <code>AOSignConstants.SIGN_FORMAT_PDF</code>.
+     * @param data Documento PDF.
+     * @return Objeto <code>AOSignInfo</code> con el formato establecido a <code>AOSignConstants.SIGN_FORMAT_PDF</code>.
+     * @throws AOException Si los datos de entrada no son un documento PDF. */
     public AOSignInfo getSignInfo(final byte[] data) throws AOException {
         if (data == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$

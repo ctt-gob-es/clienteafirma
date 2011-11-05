@@ -44,6 +44,7 @@ import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
  * <p>No firma PDF cifrados.</p>
  * <p>Necesita iText 2.1.7 con modificaciones espec&iacute;ficas.</p>
+ * <p>Esta clase no interacciona directamente en ning&uacute;n momento con el usuario ni usa interfaces gr&aacute;ficos.</p>
  * <p>La firma electr&oacute;nica en tres fases est&aacute; pensada para entornos donde la clave privada reside
  * en un sistema con al menos alguna de las siguientes restricciones:</p>
  * <ul>
@@ -127,11 +128,18 @@ import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
  * </p>
  * <p>
  *  Una pecualiaridad de las firmas trif&aacute;sicas PAdES es que en la generaci&oacute;n o firma de un PDF se genera de forma
- *  autom&aacute;tica un identificados &uacute;nico y aleatorio llamado <i>FILE_ID</i> que hace que dos PDF exactamente iguales pero
- *  firmados en momentos diferentes generen cocumentos PDF con un <i>FILE_ID</i> distinto, y por lo tanto la huella
- *  digital de la firma electr&oacute;nica es distinta.<br>
+ *  autom&aacute;tica un identificador &uacute;nico y aleatorio llamado <i>FILE_ID</i>, que hace que al firmar en momentos diferentes
+ *  dos PDF exactamente iguales se generen PDF con un <i>FILE_ID</i> distinto, y, por lo tanto, con la huella
+ *  digital de la firma electr&oacute;nica distinta.<br>
  *  Para solventar este inconveniente, en la firma trif&aacute;sica PDF, se considera prefirma tanto la totalidad de los atributos
  *  CAdES a firmar como el <i>FILE_ID</i> del PDF que se debe compartir entre pre-firma y post-firma.
+ * </p>
+ *  Notas sobre documentos <i>certificados</i>:<br>
+ *  Si un PDF firmado se ha certificado (por ejemplo, a&ntilde;adiendo una firma electr&oacute;nica usando Adobe Reader), cualquier
+ *  modificaci&oacute;n posterior del fichero (como la adici&oacute;n de nuevas firmas con este m&eacute;todo) invalidar&aacute;
+ *  las firmas previamente existentes.<br>
+ *  Consulte la documentaci&oacute;n de la opci&oacute;n <code>allowSigningCertifiedPdfs</code> para establecer un comportamiento por
+ *  defecto respecto a los PDF certificados.
  * </p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * */

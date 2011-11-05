@@ -42,8 +42,8 @@ public interface AOSigner extends AOCoSigner, AOCounterSigner {
      * @param asSimpleSignInfo
      *        Si es <code>true</code> se devuelve un &aacute;rbol con la
      *        informaci&oacute;n b&aacute;sica de cada firma individual
-     *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres de los
-     *        certificados.
+     *        mediante objetos <code>AOSimpleSignInfo</code>, si es <code>false</code> un &aacute;rbol con los nombres (CN X.500) de los
+     *        titulares de los certificados.
      * @return &Aacute;rbol de nodos de firma o <code>null</code> en caso de error. */
     AOTreeModel getSignersStructure(byte[] sign, boolean asSimpleSignInfo);
 
