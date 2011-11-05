@@ -731,14 +731,13 @@ public final class AOPDFSigner implements AOSigner {
                 try {
                     // iText antiguo
                     final Field digestField = AOUtil.classForName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
-                    // iText nuevo
-                    //final Field digestField = AOUtil.classForName("com.itextpdf.text.pdf.PdfPKCS7").getDeclaredField("digest"); //$NON-NLS-1$ //$NON-NLS-2$
+                    // En iText nuevo seria "final Field digestField = AOUtil.classForName("com.itextpdf.text.pdf.PdfPKCS7").getDeclaredField("digest");"
                     digestField.setAccessible(true);
                     pkcs1Object = digestField.get(pcks7);
                 }
                 catch (final Exception e) {
                     LOGGER.severe(
-                                  "No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
+                      "No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: " + e //$NON-NLS-1$
                     );
                     continue;
                 }
@@ -784,8 +783,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         try {
-            // Si lanza una excepcion al crear la instancia, no es un fichero
-            // PDF
+            // Si lanza una excepcion al crear la instancia, no es un fichero PDF
             new PdfReader(data);
         }
         catch (final BadPasswordException e) {
@@ -862,8 +860,7 @@ public final class AOPDFSigner implements AOSigner {
         }
         catch (final BadPasswordException e) {
             // Comprobamos que el signer esta en modo interactivo, y si no lo
-            // esta no pedimos contrasena por
-            // dialogo, principalmente para no interrumpir un firmado por lotes
+            // esta no pedimos contrasena por dialogo, principalmente para no interrumpir un firmado por lotes
             // desatendido
             if (Boolean.TRUE.toString().equalsIgnoreCase(extraParams.getProperty("headLess"))) { //$NON-NLS-1$ 
                 throw new AOException("La contrasena proporcionada no es valida para el PDF actual", e); //$NON-NLS-1$
@@ -888,7 +885,8 @@ public final class AOPDFSigner implements AOSigner {
                 throw new UnsupportedOperationException("No se permite la firma de PDF certificados (el paramtro allowSigningCertifiedPdfs no estaba establecido y no se permiten dialogos graficos)"); //$NON-NLS-1$
             }
 
-            if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null, PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
+            if (AOUIFactory.NO_OPTION == AOUIFactory.showConfirmDialog(null, 
+                                                                       PDFMessages.getString("AOPDFSigner.8"), //$NON-NLS-1$
                                                                        PDFMessages.getString("AOPDFSigner.9"), //$NON-NLS-1$
                                                                        AOUIFactory.YES_NO_OPTION,
                                                                        AOUIFactory.WARNING_MESSAGE)) {
@@ -897,8 +895,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         // ******************************************************************************
-        // ********* Comprobaciones de adjuntos y empotrados PDF
-        // ************************
+        // ********* Comprobaciones de adjuntos y empotrados PDF ************************
         // ******************************************************************************
 
         PdfArray array;
@@ -923,10 +920,7 @@ public final class AOPDFSigner implements AOSigner {
                                        "Se ha encontrado un adjunto (" + fs.getAsString((PdfName) name) //$NON-NLS-1$
                                           + ") en el PDF, pero no se firmara de forma independiente"); //$NON-NLS-1$
                                 }
-                                // System.out.println(fs.getAsString(name).toString());
-                                // System.out.println(new
-                                // String(PdfReader.getStreamBytes((PRStream)refs.getAsStream(name))));
-                                // System.out.println();
+                                // System.out.println(new String(PdfReader.getStreamBytes((PRStream)refs.getAsStream(name))));
                             }
                         }
                     }
@@ -951,11 +945,8 @@ public final class AOPDFSigner implements AOSigner {
                                 LOGGER.warning("Se ha encontrado un fichero empotrado (" + filespec.getAsString((PdfName) key) //$NON-NLS-1$
                                                + ") en el PDF, pero no se firmara de forma independiente"); //$NON-NLS-1$
 
-                                // System.out.println(filespec.getAsString(key).toString());
-                                // System.out.println(new
-                                // String(PdfReader.getStreamBytes((PRStream)
+                                // System.out.println(new String(PdfReader.getStreamBytes((PRStream)
                                 // PdfReader.getPdfObject(refs.getAsIndirectObject(key)))));
-                                // System.out.println();
                             }
                         }
                     }
@@ -964,8 +955,7 @@ public final class AOPDFSigner implements AOSigner {
         }
 
         // ******************************************************************************
-        // ********* Fin comprobaciones de adjuntos y empotrados PDF
-        // ********************
+        // ********* Fin comprobaciones de adjuntos y empotrados PDF ********************
         // ******************************************************************************
 
         // Los derechos van firmados por Adobe, y como desde iText se invalidan
@@ -997,8 +987,7 @@ public final class AOPDFSigner implements AOSigner {
         sap.setLayer4Text(""); //$NON-NLS-1$
         // iText antiguo
         sap.setRender(PdfSignatureAppearance.SignatureRenderDescription);
-        // iText nuevo
-        // sap.setRenderingMode(PdfSignatureAppearance.RenderingMode.NAME_AND_DESCRIPTION);
+        // En iText nuevo seria "sap.setRenderingMode(PdfSignatureAppearance.RenderingMode.NAME_AND_DESCRIPTION);"
         if (reason != null) {
             sap.setReason(reason);
         }
@@ -1089,21 +1078,6 @@ public final class AOPDFSigner implements AOSigner {
 
         sap.setCryptoDictionary(dic);
 
-        // int chainCertSize = 0;
-        // for(Certificate cert : chain) {
-        // chainCertSize += cert.getEncoded().length;
-        // }
-        // System.out.println("Tama\u00F1o de la cadena de certificacion: " +
-        // chainCertSize);
-        // System.out.println("Tama\u00F1o del cert: " +
-        // chain[0].getEncoded().length);
-        // System.out.println("Clave: " +
-        // ((java.security.interfaces.RSAPublicKey)chain[0].getPublicKey()).getModulus().bitLength());
-
-        // 2229 <- CamerFirma Demo SHA-1 (1024)
-        // 5123 <- Firma Profesional Demo SHA-1 (1024)
-        // 5031 <- DNIe SHA-2 (2048)
-
         final int csize = 8000;
         final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
         exc.put(PdfName.CONTENTS, Integer.valueOf(csize * 2 + 2));
@@ -1172,20 +1146,13 @@ public final class AOPDFSigner implements AOSigner {
         
 
         // ********************************************************************************
-        // *************** FIN CALCULO DEL SIGNED DATA
-        // ************************************
+        // *************** FIN CALCULO DEL SIGNED DATA ************************************
         // ********************************************************************************
 
-        // System.out.println("Tamano de la firma PDF: " + pk.length);
-
         final byte[] outc = new byte[csize];
-
         final PdfDictionary dic2 = new PdfDictionary();
-
         System.arraycopy(pk, 0, outc, 0, pk.length);
-
         dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));
-
         sap.close(dic2);
 
         return baos.toByteArray();
@@ -1252,8 +1219,7 @@ public final class AOPDFSigner implements AOSigner {
 
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_PDF);
         // Aqui podria venir el analisis de la firma buscando alguno de los
-        // otros datos de relevancia
-        // que se almacenan en el objeto AOSignInfo
+        // otros datos de relevancia que se almacenan en el objeto AOSignInfo
     }
 
 }
