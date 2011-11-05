@@ -42,11 +42,100 @@ import es.gob.afirma.core.signers.AdESPolicy;
 import es.gob.afirma.signers.cades.CAdESTriPhaseSigner;
 
 /** Clase para la firma electr&oacute;nica en tres fases de ficheros Adobe PDF en formato PAdES.
- * No firma (aun) PDF cifrados
+ * <p>No firma PDF cifrados.</p>
  * <p>Necesita iText 2.1.7 con modificaciones espec&iacute;ficas.</p>
+ * <p>La firma electr&oacute;nica en tres fases est&aacute; pensada para entornos donde la clave privada reside
+ * en un sistema con al menos alguna de las siguientes restricciones:</p>
+ * <ul>
+ *  <li>
+ *   El sistema no es compatible con el Cliente @firma. En este caso, dado que el 95% del c&oacute;digo se
+ *   ejecuta en un sistema externo, solo es necesario portar el 5% restante.
+ *  </li>
+ *  <li>
+ *   El sistema tiene unas capacidades muy limitadas en cuanto a proceso computacional, memoria o comunicaciones por
+ *   red. En este caso, el sistema solo realiza una operaci&oacute;n criptogr&aacute;fica, una firma PKCS#1,
+ *   mucho menos demandante de potencia de proceso que una firma completa PAdES, y, adicionalmente, no trata el
+ *   documento a firmar completo, sino &uacute;icamente una prque&ntilde;a cantidad de datos resultante de un
+ *   pre-proceso (la pre-firma) realizado por el sistema externo, lo que resulta en un enorme decremento en las necesidades
+ *   de memoria y transmisi&oacute;n de datos.
+ *  </li>
+ *  <li>
+ *   Por motivos de seguridad, el documento a firmar no puede salir de un sistema externo. Como se ha descrito en el punto
+ *   anterior, en este caso el documento jam&aacute;s sale del sistema externo, sino que se transfiere &uacute;nicamente
+ *   el resultado de la pre-firma, desde la cual es imposible reconstruir el documento original.
+ *  </li>
+ * </ul>
+ * <p>
+ *  Estos condicionantes convierten la firma trif&aacute;sica en una opci&oacute;n perfectamente adaptada a los
+ *  dispositivos m&oacute;viles, donde se dan tanto la heterogeneidad de sistemas operativos (Apple iOS, Google
+ *  Android, RIM BlackBerry, Microsoft Windows Phone, etc.) y las limitaciones en potencia de proceso, memoria
+ *  y comunicaciones; en estas &uacute;ltimas hay que tener en cuenta el coste, especialmente si estamos haciendo
+ *  uso de una red de otro operador en itinerancia (<i>roaming</i>).
+ * </p>
+ * <p>
+ *  El funcionamiento t&iacute;pico de una firma trif&aacute;sica en la que intervienen un disposotivo m&oacute;vil,
+ *  un servidor Web (que hace la pre-firma y la post-firma) y un servidor documental podr&iacute;a ser el siguiente:
+ * </p>
+ * <p><b>Pre-firma:</b></p>
+ * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-1.png"></p>
+ * <ul>
+ *  <li>El dispositivo móvil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
+ *  <li>El servidor Web solicita el documento a servidor documental.</li>
+ *  <li>
+ *   El servidor documental entrega el documento al servidor Web.<br>Es importante recalcar que el servidor
+ *   documental no necesita almacenar ning&uacute;n dato de sesi&oacute;n y que este no est&aacute; expuesto a Internet
+ *   de forma directa en ning&uacute;n momento.
+ *  </li>
+ *  <li>
+ *   El servidor Web calcula la pre-firma, entregando el resultado (muy peque&ntilde;o en tama&ntilde;o) al dispositivo.<br>
+ *   Es importante recalcar que el servidor Web no necesita almacenar ning&uacute;n dato de sesi&oacute;n ni
+ *   exponer los documentos directamente al dispositivo.
+ *  </li>
+ * </ul>
+ * <p><b>Firma:</b></p>
+ * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-2.png"></p>
+ * <ul>
+ *  <li>
+ *   El dispositivo m&oacute;vil realiza, de forma completamente aislada una firma electr&oacute;nica 
+ *   simple (computacionalmente ligera) de los datos de la pre-firma. La clave privada del usuario nunca sale
+ *   del dispositivo y no se expone externamente en ningún momento.
+ *  </li>
+ * </ul>
+ * <p><b>Post-firma:</b></p>
+ * <p align="center"><img src="doc-files/PAdESTriPhaseSigner-3.png"></p>
+ * <ul>
+ *  <li>
+ *   El dispositivo m&oacute;vil solicita una post-firma al servidor Web indicando un identificador de 
+ *   documento y proporcionando el resultado de su pre-firma firmada.
+ *  </li>
+ *  <li>El servidor Web solicita el documento a servidor documental.</li>
+ *  <li>El servidor documental entrega el documento al servidor Web.</li>
+ *  <li>
+ *   El servidor Web calcula la post-firma y compone el documento final firmado, entregando el resultado 
+ *   al servidor documental para su almac&eacute;n.
+ *  </li>
+ *  <li>El servidor documental almacena el nuevo documento y devuelve un identificador al servidor Web.</li>
+ *  <li>
+ *   El servidor Web comunica al dispositivo el éxito de la operación y el identificador del fichero 
+ *   ya firmado y almacenado.
+ *  </li>
+ * </ul>
+ * <p>
+ *  Es conveniente tener en cuenta al usar firmas trif&aacute;sicas que es necesario disponer de un mecanismo
+ *  para que el usuario pueda ver en todo momento los documentos que est&aacute; firmando (una copia que refleje
+ *  con fidelidad el contenido firmado puede ser suficiente) para evitar situaciones de repudio.
+ * </p>
+ * <p>
+ *  Una pecualiaridad de las firmas trif&aacute;sicas PAdES es que en la generaci&oacute;n o firma de un PDF se genera de forma
+ *  autom&aacute;tica un identificados &uacute;nico y aleatorio llamado <i>FILE_ID</i> que hace que dos PDF exactamente iguales pero
+ *  firmados en momentos diferentes generen cocumentos PDF con un <i>FILE_ID</i> distinto, y por lo tanto la huella
+ *  digital de la firma electr&oacute;nica es distinta.<br>
+ *  Para solventar este inconveniente, en la firma trif&aacute;sica PDF, se considera prefirma tanto la totalidad de los atributos
+ *  CAdES a firmar como el <i>FILE_ID</i> del PDF que se debe compartir entre pre-firma y post-firma.
+ * </p>
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  * */
-public class PAdESTriPhaseSigner {
+public final class PAdESTriPhaseSigner {
     
     /** Versi&oacute;n de iText necesaria para el uso de esta clase (2.1.7). */
     public static final String ITEXT_VERSION = "2.1.7"; //$NON-NLS-1$
@@ -78,7 +167,7 @@ public class PAdESTriPhaseSigner {
     /** Referencia a la &uacute;ltima p&aacute;gina del documento PDF. */
     public static final int LAST_PAGE = -666;
     
-    /** Obtiene la prefirma PAdES/CAdES de un PDF (atributos CAdES a firmar)
+    /** Obtiene la pre-firma PAdES/CAdES de un PDF (atributos CAdES a firmar)
      * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma. Debe usarse exactamente el mismo valor en la post-firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
      * <ul>
@@ -160,7 +249,7 @@ public class PAdESTriPhaseSigner {
      *  <dt><b><i>tsaPwd</i></b></dt>
      *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
      * </dl>
-     * @return Prefirma CAdES/PAdES (atributos CAdES a firmar)
+     * @return pre-firma CAdES/PAdES (atributos CAdES a firmar)
      * @throws IOException
      * @throws AOException
      */
@@ -186,7 +275,7 @@ public class PAdESTriPhaseSigner {
         } 
         md.update(original);
 
-        // Prefirma CAdES
+        // pre-firma CAdES
         return new PdfPreSignResult(
             ptps.getFileID(),
             CAdESTriPhaseSigner.preSign(
@@ -201,16 +290,91 @@ public class PAdESTriPhaseSigner {
         );
     }
 
-    /**
-     * Post-firma en PAdES.
-     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma (debe ser el mismo que el usado en la prefirma)
-     * @param inPDF PDF a firmar (debe ser el mismo que el usado en la prefirma)
-     * @param signerCertificateChain Cadena de certificados del firmante (debe ser la misma que la usado en la prefirma)
-     * @param rubricJpegImage R&uacute;brica (JPEG binario) a insertar en el PDF (debe ser la misma que la usada en la prefirma)
-     * @param extraParams Opciones adicionales para la firma (deben ser las mismas que las usadas en la prefirma)
-     * @param signature Resultado de la firma PKCS#1 v1.5
-     * @param signedAttributes Resultado de la prefirma CAdES/PAdES (atributos CAdES a firmar)
-     * @param fileID FileID del PDF generado en la prefirma
+    /** Post-firma en PAdES un documento PDF a partir de una pre-firma y la firma PKCS#1, generando un PDF final completo.
+     * @param digestAlgorithmName Nombre del algoritmo de huella digital usado para la firma (debe ser el mismo que el usado en la pre-firma).
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>digestAlgorithmName</code>:</p>
+     * <ul>
+     *  <li><i>SHA1</i></li>
+     *  <li><i>MD5</i> (no recomendado por vulnerable)</li>
+     *  <li><i>MD2</i> (no recomendado por vulnerable)</li>
+     *  <li><i>SHA-256</i></li>
+     *  <li><i>SHA-384</i></li>
+     *  <li><i>SHA-512</i></li>
+     * </ul>
+     * @param inPDF PDF a firmar (debe ser el mismo que el usado en la pre-firma).
+     * @param signerCertificateChain Cadena de certificados del firmante (debe ser la misma que la usado en la pre-firma).
+     * @param rubricJpegImage R&uacute;brica (JPEG binario) a insertar en el PDF (debe ser la misma que la usada en la pre-firma).
+     * @param extraParams Opciones adicionales para la firma (deben ser las mismas que las usadas en la pre-firma).
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>extraParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>signReason</i></b></dt>
+     *   <dd>Raz&oacute;n por la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
+     *  <dt><b><i>signField</i></b></dt>
+     *   <dd>
+     *    Nombre del campo en donde insertar la firma.
+     *    Si el documento PDF tiene ya un campo de firma precreado es posible utilizarlo para insertar la firma generada, referenci&aacute;ndolo 
+     *    por su nombre.<br>
+     *    Si se indica un nombre de campo de firma que no exista en el documento PDF proporcionado, se generar&aacute; una excepci&oacute;n.
+     *   </dd>
+     *  <dt><b><i>signatureProductionCity</i></b></dt>
+     *   <dd>Ciudad en la que se realiza la firma (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).</dd>
+     *  <dt><b><i>signerContact</i></b></dt>
+     *   <dd>
+     *    Contacto del firmante, usualmente una direcci&oacute;n de coreo electr&oacute;nico 
+     *    (este dato se a&ntilde;ade al diccionario PDF, y no a la propia firma).
+     *   </dd>
+     *  <dt><b><i>signaturePage</i></b></dt>
+     *   <dd>
+     *    P&aacute;gina del documento PDF donde insertar la firma. Puede usarse la constante <code>LAST_PAGE</code>
+     *    para referirse a la &uacute;ltima p&aacute;gina del documento PDF si se desconoce el n&uacute;mero total de
+     *    p&aacute;ginas de este.
+     *   </dd>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
+     *   <dd>
+     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
+     *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
+     *   </dd>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
+     *   <dd>
+     *    Huella digital del documento de pol&iacute;tica de firma (normalmente del mismo fichero en formato ASN.1 procesable).
+     *    Si no se indica una huella digital y el par&aacute;metro <code>policyIdentifier</code> no es una URL accesible 
+     *    universalmente se usar&aacute; <code>0</code>, mientras que si no se indica una huella digital pero el par&aacute;metro
+     *    <code>policyIdentifier</code> es una URL accesible universalmente, se descargara el fichero apuntado por la URL para calcular la huella
+     *    digital <i>al vuelo</i>.     
+     *   </dd>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
+     *   <dd>
+     *    Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>.
+     *    Es obligario indicarlo cuando se proporciona una huella digital distinta de <code>0</code>.
+     *   </dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>
+     *    URL que apunta al documento descriptivo de la pol&iacute;tica de firma (normalmente un documento PDF con una descripci&oacute;n textual).
+     *   </dd>
+     *  <dt><b><i>allowSigningCertifiedPdfs</i></b></dt>
+     *   <dd>
+     *    Si se establece a <code>true</code> permite la firma o cofirma de PDF certificados, si no se establece o se establece a <code>false</code> se
+     *    lanza una excepci&oacute;n en caso de intentar firmar o cofirmar un PDF certificado.<br>
+     *    <b>Solo tiene efecto cuando <code>headLess</code> est&aacute;
+     *    establecido a <code>true</code>, si <code>headLess</code> est&aacute; a <code>false</code> se ignora este par&aacute;metro.</b><br>
+     *    No se soporta el cifrado de documentos PDF con certificados o con algoritmo AES256.
+     *   </dd>
+     *  <dt><b><i>tsaURL</i></b></dt>
+     *   <dd>URL de la autoridad de sello de tiempo (si no se indica no se a&ntilde;ade sello de tiempo).</dd>
+     *  <dt><b><i>tsaPolicy</i></b></dt>
+     *   <dd>Pol&iacute;tica de sellado de tiempo (obligatoria si se indica <code>tsaURL</code>).</dd>
+     *  <dt><b><i>tsaHashAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de huella digital a usar para el sello de tiempo (si no se establece se usa SHA-1).</dd>
+     *  <dt><b><i>tsaRequireCert</i></b></dt>
+     *   <dd><code>true</code> si se requiere el certificado de la TSA, false en caso contrario (si no se establece se asume <code>true</code>).</dd>
+     *  <dt><b><i>tsaUsr</i></b></dt>
+     *   <dd>Nombre de usuario de la TSA.</dd>
+     *  <dt><b><i>tsaPwd</i></b></dt>
+     *   <dd>Contrase&ntilde;a del usuario de la TSA. Se ignora si no de ha establecido adem&aacute;s <code>tsaUsr</code>.</dd>
+     * </dl>
+     * @param signature Resultado de la firma PKCS#1 v1.5 de los datos de la pre-firma.
+     * @param signedAttributes Resultado de la pre-firma CAdES/PAdES (atributos CAdES a firmar)
+     * @param fileID FileID del PDF generado en la pre-firma
      * @return PDF firmado
      * @throws AOException en caso de cualquier tipo de error
      * @throws IOException 
@@ -263,15 +427,16 @@ public class PAdESTriPhaseSigner {
         }
     }
     
-    
-    /** <i>JavaBean</i> que encapsula los resultados de la prefirma PDF. */
+    /** Resultado de una pre-firma (como primera parte de un firma trif&aacute;sica) PAdES. */
+    /** <i>JavaBean</i> que encapsula los resultados de la pre-firma PDF. */
     public static class PdfPreSignResult {
+        
         private final String fileID;
         private final byte[] preSign;
         
         PdfPreSignResult(final String fid, final byte[] pre) {
             if (fid == null || pre == null || "".equals(fid) || pre.length < 1) { //$NON-NLS-1$
-                throw new IllegalArgumentException("Es obligatorio proporcionar un MAC y una prefirma"); //$NON-NLS-1$
+                throw new IllegalArgumentException("Es obligatorio proporcionar un MAC y una pre-firma"); //$NON-NLS-1$
             }
             this.fileID = fid;
             this.preSign = pre.clone();
@@ -285,12 +450,13 @@ public class PAdESTriPhaseSigner {
         }
 
         /** Obtiene los atributos CAdES a firmar.
-         * @return Atributos CAdES a firmar (prefirma) */
+         * @return Atributos CAdES a firmar (pre-firma) */
         public byte[] getPreSign() {
             return this.preSign;
         }
         
     }
+    
     private static class PdfTriPhaseSession {
         
         private final PdfSignatureAppearance sap;
