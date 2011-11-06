@@ -44,7 +44,7 @@ import es.gob.afirma.signers.pkcs7.ReadNodesTree;
  *   extraParams.setProperty("policyIdentifierHashAlgorithm", "http://www.w3.org/2000/09/xmldsig#sha1");
  *   
  *   // Usamos un PKCS#12 / PFX para obtener el certificado y su clave privada
- *   final FileInputStream fis = new FileInputStream("cert.pfx"); 
+ *   final InputStream fis = new FileInputStream("cert.pfx"); 
  *   KeyStore ks = KeyStore.getInstance("PKCS12");
  *   ks.load(fis, "contrasena".toCharArray());
  *   final PrivateKeyEntry pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection("contrasena".toCharArray()));
