@@ -10,7 +10,6 @@
 
 package es.gob.afirma.signers.pkcs7;
 
-import java.net.URI;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
@@ -83,17 +82,4 @@ public final class P7ContentSignerParameters {
         return this.certChain.clone();
     }
 
-    /** Obtiene la URL de la autoridad de sellado de tiempo.
-     * @return URL de la autoridad de sellado de tiempo */
-    public URI getTimestampingAuthority() {
-        LOGGER.info("Se ha solicitado la URI de la autoridad de sellado de tiempo, pero como es una caracteristica aun no soportada se devolvio null"); //$NON-NLS-1$
-        return null;
-    }
-
-    /** Obtiene el certificado de la autoridad de sellado de tiempo.
-     * @return Certificado de la autoridad de sellado de tiempo */
-    public X509Certificate getTimestampingAuthorityCertificate() {
-        LOGGER.info("Se ha solicitado el certificado de la autoridad de sellado de tiempo, pero como es una caracteristica aun no soportada se devolvio null"); //$NON-NLS-1$
-        return null;
-    }
 }
