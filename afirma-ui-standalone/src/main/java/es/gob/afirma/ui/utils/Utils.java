@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javax.security.auth.callback.PasswordCallback;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -53,7 +54,9 @@ import javax.swing.event.MenuListener;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.ui.principal.PrincipalGUI;
@@ -609,6 +612,25 @@ public class Utils {
             }
         }
         return null;
+    }
+    
+    /** Recupera el manejador de claves asociado a un certificado seg&uacute;n el
+     * repositorio en el que se aloja.
+     * @param store Almace&eacute;n de claves del certificado.
+     * @param parent Componente sobre el que se deben visualizar los
+     *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
+     * @return Manejador para la solicitud de la clave. */
+    public static PasswordCallback getCertificatePC(final AOKeyStore store, final Object parent) {
+        if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
+            || store == AOKeyStore.WINADDRESSBOOK
+            || store == AOKeyStore.WINCA
+            || store == AOKeyStore.SINGLE
+            || store == AOKeyStore.MOZ_UNI
+            || store == AOKeyStore.PKCS11
+            || store == AOKeyStore.APPLE) {
+                return new NullPasswordCallback();
+        }
+        return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
     }
 		
 }
