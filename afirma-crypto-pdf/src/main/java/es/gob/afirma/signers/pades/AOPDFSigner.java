@@ -61,7 +61,7 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
-import es.gob.afirma.signers.pkcs7.CMSTimestamper;
+import es.gob.afirma.signers.pkcs7.tsp.CMSTimestamper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 
 /** Manejador de firmas binarias de ficheros Adobe PDF en formato PAdES.
