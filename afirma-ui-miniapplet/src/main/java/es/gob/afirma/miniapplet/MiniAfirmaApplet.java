@@ -54,7 +54,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     private File pathHint = new File(Platform.getUserHome());
 
     @Override
-    public String sign(final String dataB64, final String algorithm, final String format, final String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
+    public String sign(final String dataB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (dataB64 == null) {
     		throw new NullPointerException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
     	}
@@ -72,7 +72,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
-    public String coSign(final String signB64, final String dataB64, final String algorithm, final String format, final String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
+    public String coSign(final String signB64, final String dataB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}
@@ -94,7 +94,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 
     @Override
-    public String counterSign(final String signB64, final String algorithm, final String format, final String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
+    public String counterSign(final String signB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}

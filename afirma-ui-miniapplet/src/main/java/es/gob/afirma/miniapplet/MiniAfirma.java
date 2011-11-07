@@ -43,11 +43,11 @@ public interface MiniAfirma {
      * Firma unos datos seg&uacute;n la configuracion proporcionada.
      * La configuraci&oacute;n que se puede proporcionar es el algoritmo,
      * el formato de firma y par&aacute;metros adicionales del formato particular.
-     * Estos par&aacute;metrosd extra se indicar&aacute;n como un listado de cadenas
-     * con la forma {code CLAVE=VALOR}, en donde {@code CLAVE} es el nombre de la
-     * propiedad y {@code VALOR} el valor asignada a esta. Para utilizar el valor
-     * por defecto de una propiedad se dejar&aacute; de indicar esta en el listado de
-     * par&aacute;metros.
+     * Estos par&aacute;metros extra se indicar&aacute;n como una cadena de
+     * m&uacute;ltiples l&iacute;neas con la forma {code CLAVE=VALOR}, en donde
+     * {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado
+     * a esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute;
+     * de indicar esta en el listado depar&aacute;metros.
      * @param data Datos a firmar en Base64.
      * @param algorithm Algoritmo de firma.
      * @param format Formato de firma.
@@ -57,17 +57,25 @@ public interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String sign(String data, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
+    String sign(String data, String algorithm, String format, String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
 
     
     /**
      * Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
      * que los datos est&eacute;n contenidos en la firma original o que se indiquen de
-     * forma externa. Si no se proporcionasen los datos, &uacute;nicamente se realizar&aacute; la cofirma
-     * si el algoritmo de firma indicado conincide con el de la firma ya existente.
-     * Tanto si la firma est&aacute; contenida en los datos (por ejemplo, en OOXML, ODF, PDF, etc.) como si los datos est&aacute;n contenidos en la firma,
-     * el par&aacute;metro <i>data</i> debe establecerse a <code>null</code> (s&oacute;lo se establece si firma y datos se
-     * encuentran en erchivos independientes)
+     * forma externa. Si no se proporcionasen los datos, &uacute;nicamente se realizar&aacute;
+     * la cofirma si el algoritmo de firma indicado conincide con el de la firma ya existente.
+     * Tanto si la firma est&aacute; contenida en los datos (por ejemplo, en OOXML, ODF, PDF,
+     * etc.) como si los datos est&aacute;n contenidos en la firma, el par&aacute;metro
+     * <i>data</i> debe establecerse a <code>null</code> (s&oacute;lo se establece si firma y
+     * datos se encuentran en erchivos independientes).
+     * Es posible configurar la multifirma generada por medio de una serie de par&aacute;metros
+     * extra propios de cada formato de firma (consultar la documentaci&oacute;n de cada formato
+     * particular). Estos par&aacute;metros extra se indicar&aacute;n como una cadena de
+     * m&uacute;ltiples l&iacute;neas con la forma {code CLAVE=VALOR}, en donde
+     * {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado
+     * a esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute;
+     * de indicar esta en el listado depar&aacute;metros.
      * @param sign Firma electr&oacute;nica en Base64.
      * @param data Datos en Base64 que se desean cofirmar.
      * @param algorithm Algoritmo de firma.
@@ -79,14 +87,21 @@ public interface MiniAfirma {
      * se puede identificar el formato de la firma.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String coSign(String sign, String data, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
+    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
 
     
     /**
      * Realiza una firma en cascada (Contrafirma) sobre una firma. Se contrafirman todos los
-     * nodos hoja salvo que mediante <i>extraParams</i> se indique el par&aacute;metro
+     * nodos hoja salvo que mediante {@code extraParams} se indique el par&aacute;metro
      * "{@code target=tree}", en cuyo caso se contrafirmar&aacute;n todos los nodos del
      * &aacute;rbol.
+     * Los par&aacute;metro adicionales permiten configurar m&uacute;ltiples opciones de la
+     * contrafirma. Consulte la documentaci&oacute;n de cada formato de firma particular para
+     * conocer cu&aacute;les puede utilizar. Estos par&aacute;metros extra se indicar&aacute;n
+     * como una cadena de m&uacute;ltiples l&iacute;neas con la forma {code CLAVE=VALOR}, en
+     * donde {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado a
+     * esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute; de indicar
+     * esta en el listado depar&aacute;metros.
      * @param sign Firma electr&oacute;nica que se desea contrafirmar.
      * @param algorithm Algoritmo de firma.
      * @param format Formato de firma.
@@ -97,7 +112,7 @@ public interface MiniAfirma {
      * se puede identificar el formato de la firma.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String counterSign(String sign, String algorithm, String format, String[] extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
+    String counterSign(String sign, String algorithm, String format, String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
     
     
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
