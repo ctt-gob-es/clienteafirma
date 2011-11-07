@@ -11,15 +11,12 @@ import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
  * Acci&oacute;n para la recuperaci&oacute;n del nombre de un fichero.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class GetFilePathAction implements PrivilegedExceptionAction<String> {
+public final class GetFilePathAction implements PrivilegedExceptionAction<String> {
     
-    private String title;
-    
-    private String[] exts;
-    
-    private String desc;
-    
-    private Component parent;
+    private final String title;
+    private final String[] exts;
+    private final String desc;
+    private final Component parent;
     
     /**
      * Crea la acci&oacute;n para la recuperaci&oacute;n de la ruta de un fichero.
@@ -45,7 +42,6 @@ public class GetFilePathAction implements PrivilegedExceptionAction<String> {
      */
 	@Override
 	public String run() throws AOCancelledOperationException, IOException {
-        FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.parent);
-        return dialog.getPath();
+        return new FileSelectionDialog(this.title, this.exts, this.desc, this.parent).getPath();
 	}
 }

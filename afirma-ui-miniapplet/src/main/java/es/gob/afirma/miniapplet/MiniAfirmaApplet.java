@@ -38,7 +38,7 @@ import es.gob.afirma.util.signers.AOSignerFactory;
 
 /** MiniApplet de firma del proyecto Afirma.
  */
-public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
+public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
     private static final long serialVersionUID = -4364574240099120486L;
     
@@ -58,14 +58,14 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     		throw new NullPointerException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
     	}
     	
-    	String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
-    	String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
+    	final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
+    	final String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
     	
-    	AOSigner signer = this.selectSigner(signFormat, null);
-    	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-    	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
+    	final AOSigner signer = this.selectSigner(signFormat, null);
+    	final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+    	final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
 
-    	SignAction signAction = new SignAction(signer, Base64.decode(dataB64), signAlgo, keyEntry, params); 
+    	final SignAction signAction = new SignAction(signer, Base64.decode(dataB64), signAlgo, keyEntry, params); 
     	
         return Base64.encodeBytes(AccessController.doPrivileged(signAction));
     }
@@ -76,17 +76,17 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}
     	
-    	String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
-    	String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
+    	final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
+    	final String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
     	
-    	byte[] sign = Base64.decode(signB64);
-    	byte[] data = (dataB64 == null ? null : Base64.decode(dataB64));
+    	final byte[] sign = Base64.decode(signB64);
+    	final byte[] data = (dataB64 == null ? null : Base64.decode(dataB64));
     	
-    	AOSigner signer = this.selectSigner(signFormat, sign);
-    	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-    	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
+    	final AOSigner signer = this.selectSigner(signFormat, sign);
+    	final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+    	final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
 
-    	CoSignAction coSignAction = new CoSignAction(signer, sign, data, signAlgo, keyEntry, params); 
+    	final CoSignAction coSignAction = new CoSignAction(signer, sign, data, signAlgo, keyEntry, params); 
     	
     	return Base64.encodeBytes(AccessController.doPrivileged(coSignAction));
     }
@@ -97,16 +97,16 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}
-    	String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
-    	String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
+    	final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
+    	final String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
     	
-    	byte[] sign = Base64.decode(signB64);
+    	final byte[] sign = Base64.decode(signB64);
     	
-    	AOSigner signer = this.selectSigner(signFormat, sign);
-    	Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-    	PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
+    	final AOSigner signer = this.selectSigner(signFormat, sign);
+    	final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+    	final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
     	
-    	CounterSignAction counterSignAction = new CounterSignAction(signer, sign, signAlgo, keyEntry, params); 
+    	final CounterSignAction counterSignAction = new CounterSignAction(signer, sign, signAlgo, keyEntry, params); 
     	
     	return Base64.encodeBytes(AccessController.doPrivileged(counterSignAction));
     }
@@ -117,8 +117,8 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     		throw new NullPointerException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
     	}
     	
-    	byte[] sign = Base64.decode(signB64);
-    	AOSigner signer = AOSignerFactory.getSigner(sign);
+    	final byte[] sign = Base64.decode(signB64);
+    	final AOSigner signer = AOSignerFactory.getSigner(sign);
     	if (signer == null) {
     		throw new AOFormatFileException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
     	}
@@ -134,23 +134,24 @@ public class MiniAfirmaApplet extends JApplet implements MiniAfirma {
             return false;
         }
 
-        String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+        final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
         
-        String[] extensions = (extension == null || extension.trim().length() < 1 ?
+        final String[] extensions = (extension == null || extension.trim().length() < 1 ?
         		null : new String[] { extension.trim() });
         
-        String descFiles = (extensions != null && description != null && description.trim().length() > 0 ?
+        final String descFiles = (extensions != null && description != null && description.trim().length() > 0 ?
 				description.trim() : (extensions != null ? extension : null));
         
-		File fileHint = (fileName != null && fileName.trim().length() > 0 ?
+		final File fileHint = (fileName != null && fileName.trim().length() > 0 ?
 				new File(this.pathHint, fileName) : this.pathHint);
 				
-        SaveFileAction saveFileAction = new SaveFileAction(titleDialog, Base64.decode(data),
+        final SaveFileAction saveFileAction = new SaveFileAction(titleDialog, Base64.decode(data),
         		extensions, descFiles, fileHint, this);
         
     	try {
     		return AccessController.doPrivileged(saveFileAction).booleanValue();
-    	} catch (AOCancelledOperationException e) {
+    	} 
+    	catch (final AOCancelledOperationException e) {
     		return false;
     	}
     }

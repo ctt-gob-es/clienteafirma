@@ -16,15 +16,15 @@ import es.gob.afirma.core.AOCancelledOperationException;
  * Di&aacute;logo para la selecci&oacute;n de un fichero y la devoluci&oacute;n de
  * un flujo de datos con su contenido.
  */
-public class FileSelectionDialog {
+public final class FileSelectionDialog {
 
-    private String title;
+    private final String title;
     
-    private String[] exts;
+    private final String[] exts;
     
-    private String desc;
+    private final String desc;
     
-    private Component parent;
+    private final Component parent;
     
     /**
      * Crea el di&aacute;logo a partire de un servicio JNLP para la apertura de
@@ -34,7 +34,10 @@ public class FileSelectionDialog {
      * @param description Descripci&oacute;n del tipo de fichero aceptado por defecto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public FileSelectionDialog(String title, String[] exts, String description, final Component parent) {
+    public FileSelectionDialog(final String title, 
+                               final String[] exts, 
+                               final String description, 
+                               final Component parent) {
         this.title = title;
         this.exts = exts;
         this.desc = description;
@@ -69,7 +72,7 @@ public class FileSelectionDialog {
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n.
      */
     private JFileChooser selectFile() {
-    	JFileChooser fc = new JFileChooser();
+    	final JFileChooser fc = new JFileChooser();
     	if (this.title != null) {
     		fc.setDialogTitle(this.title);
     	}
@@ -101,7 +104,7 @@ public class FileSelectionDialog {
 				if (f.isDirectory()) {
 					return true;
 				}
-				for (String ext : extensions) {
+				for (final String ext : extensions) {
 					if (f.getName().endsWith(ext)) {
 						return true;
 					}

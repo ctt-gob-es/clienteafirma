@@ -14,16 +14,12 @@ import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
  * por el usuario.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
+public final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 
-    
-    private String title;
-    
-    private String[] exts;
-    
-    private String desc;
-    
-    private Component parent;
+    private final String title;
+    private final String[] exts;
+    private final String desc;
+    private final Component parent;
     
     /**
      * Crea la acci&oacute;n en base a un servicio JNLP para la carga de ficheros.
@@ -49,16 +45,18 @@ public class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
      */
 	@Override
 	public byte[] run() throws AOCancelledOperationException, IOException {
-        FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.parent);
-        InputStream is = dialog.getFileContent();
+        final FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.parent);
+        final InputStream is = dialog.getFileContent();
         
         try {
         	return AOUtil.getDataFromInputStream(is);
-        } finally {
+        } 
+        finally {
         	if (is != null) {
         		try {
         			is.close();
-        		} catch (Exception e) {
+        		} 
+        		catch (final Exception e) {
         			/* Ignoramos este error */
         		}
         	}

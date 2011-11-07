@@ -13,21 +13,17 @@ import es.gob.afirma.core.signers.AOSigner;
  * especifique lo contrario.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
+public final class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 
 	private static final String COUNTERSIGN_TARGET_KEY = "target"; //$NON-NLS-1$
 	
 	private static final String COUNTERSIGN_TARGET_TREE = "tree"; //$NON-NLS-1$
 	
-	private AOSigner signer;
-	
-	private byte[] sign;
-	
-	private String algorithm;
-	
-	private PrivateKeyEntry keyEntry;
-	
-	private Properties extraParams;
+	private final AOSigner signer;
+	private final byte[] sign;
+	private final String algorithm;
+	private final PrivateKeyEntry keyEntry;
+	private final Properties extraParams;
 	
 	/**
 	 * Crea la acci&oacute;n para contrafirmar una firma electr&oacute;nica.
@@ -37,7 +33,11 @@ public class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 	 * @param keyEntry Clave privada de firma.
 	 * @param extraParams Datos adicionales para la configuraci&oacute;n de la contrafirma.
 	 */
-	public CounterSignAction(AOSigner signer, byte[] sign, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) {
+	public CounterSignAction(final AOSigner signer, 
+	                         final byte[] sign, 
+	                         final String algorithm, 
+	                         final PrivateKeyEntry keyEntry, 
+	                         final Properties extraParams) {
 		this.signer = signer;
 		this.sign = sign;
 		this.algorithm = algorithm;
@@ -49,7 +49,7 @@ public class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 	public byte[] run() throws Exception {
 		CounterSignTarget target = CounterSignTarget.LEAFS;
 		if (this.extraParams.containsKey(COUNTERSIGN_TARGET_KEY)) {
-			String targetValue = this.extraParams.getProperty(COUNTERSIGN_TARGET_KEY).trim();
+			final String targetValue = this.extraParams.getProperty(COUNTERSIGN_TARGET_KEY).trim();
 			if (COUNTERSIGN_TARGET_TREE.equals(targetValue)) {
 				target = CounterSignTarget.TREE;
 			}

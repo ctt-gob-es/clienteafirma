@@ -10,17 +10,13 @@ import es.gob.afirma.core.signers.AOSigner;
  * Acci&oacute;n privilegiada de firma electr&oacute;nica.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public class SignAction implements PrivilegedExceptionAction<byte[]> {
+public final class SignAction implements PrivilegedExceptionAction<byte[]> {
 
-	private AOSigner signer;
-	
-	private byte[] data;
-	
-	private String algorithm;
-	
-	private PrivateKeyEntry keyEntry;
-	
-	private Properties extraParams;
+	private final AOSigner signer;
+	private final byte[] data;
+	private final String algorithm;
+	private final PrivateKeyEntry keyEntry;
+	private final Properties extraParams;
 	
 	/**
 	 * Crea la acci&oacute;n para la firma de datos.
@@ -30,7 +26,11 @@ public class SignAction implements PrivilegedExceptionAction<byte[]> {
 	 * @param keyEntry Clave privada de firma.
 	 * @param extraParams Datos adicionales para la configuraci&oacute;n de la firma.
 	 */
-	public SignAction(AOSigner signer, byte[] data, String algorithm, PrivateKeyEntry keyEntry, Properties extraParams) {
+	public SignAction(final AOSigner signer, 
+	                  final byte[] data, 
+	                  final String algorithm, 
+	                  final PrivateKeyEntry keyEntry, 
+	                  final Properties extraParams) {
 		this.signer = signer;
 		this.data = data;
 		this.algorithm = algorithm;

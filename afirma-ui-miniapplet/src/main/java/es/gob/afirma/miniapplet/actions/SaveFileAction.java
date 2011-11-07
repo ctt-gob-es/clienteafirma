@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.miniapplet.Messages;
+import es.gob.afirma.miniapplet.MiniAppletMessages;
 
 /**
  * Acci&oacute;n para almacenar un fichero en disco.
@@ -126,15 +126,15 @@ public class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
             if (tempFile.exists()) {
             	if (tempFile.isDirectory() || !tempFile.canWrite()) {
             		JOptionPane.showMessageDialog(this.parent,
-            				Messages.getString("SaveFileAction.0", tempFile.getAbsolutePath()), //$NON-NLS-1$
-            				Messages.getString("SaveFileAction.1"), //$NON-NLS-1$
+            				MiniAppletMessages.getString("SaveFileAction.0", tempFile.getAbsolutePath()), //$NON-NLS-1$
+            				MiniAppletMessages.getString("SaveFileAction.1"), //$NON-NLS-1$
             				JOptionPane.WARNING_MESSAGE);
             		continue;
             	}
             	final int resp =
             		JOptionPane.showConfirmDialog(this.parent,
-            				Messages.getString("SaveFileAction.2", tempFile.getAbsolutePath()), //$NON-NLS-1$
-            				Messages.getString("SaveFileAction.1"), //$NON-NLS-1$
+            				MiniAppletMessages.getString("SaveFileAction.2", tempFile.getAbsolutePath()), //$NON-NLS-1$
+            				MiniAppletMessages.getString("SaveFileAction.1"), //$NON-NLS-1$
             				JOptionPane.YES_NO_CANCEL_OPTION,
             				JOptionPane.QUESTION_MESSAGE);
             	if (resp == JOptionPane.YES_OPTION) { // Sobreescribir fichero

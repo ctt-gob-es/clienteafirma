@@ -19,7 +19,7 @@ import es.gob.afirma.core.misc.AOUtil;
  * serie concreto (esto deber&iacute; devolver com&uacute;nmente un &uacute;nico certificado).s&oacute;lo admite el certificado de firma del DNIe.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public class SSLFilter extends CertificateFilter {
+public final class SSLFilter extends CertificateFilter {
 	
 	private static final String[] SUBJECT_SN_PREFIX = new String[] {
 		"serialnumber=", //$NON-NLS-1$
@@ -27,40 +27,35 @@ public class SSLFilter extends CertificateFilter {
 		"2.5.4.5=" //$NON-NLS-1$
 	};
 	
-	private String serialNumber;
-	
-	private AuthenticationDNIeFilter authenticationDnieCertFilter; 
-	
-	private SignatureDNIeFilter signatureDnieCertFilter;
+	private final String serialNumber;
+	private final AuthenticationDNIeFilter authenticationDnieCertFilter;
+	private final SignatureDNIeFilter signatureDnieCertFilter;
 	
 	/**
 	 * Contruye el filtro a partir del n&uacute;mero de serie del certificado que
 	 * deseamos obtener.
 	 * @param serialNumber N&uacute;mero de serie del certificado
 	 */
-	public SSLFilter(String serialNumber) {
-		
+	public SSLFilter(final String serialNumber) {
 		this.serialNumber = this.prepareSerialNumber(serialNumber);
-		
 		this.authenticationDnieCertFilter = new AuthenticationDNIeFilter();
-		
 		this.signatureDnieCertFilter = new SignatureDNIeFilter();
 	}
 	
 	@Override
-	public boolean matches(X509Certificate cert) {
+	public boolean matches(final X509Certificate cert) {
 		return this.prepareSerialNumber(this.getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
 	}
 	
 	@Override
-	public X509Certificate[] matches(X509Certificate[] certs) {
+	public X509Certificate[] matches(final X509Certificate[] certs) {
 		
-		Set<X509Certificate> filteredCerts = new HashSet<X509Certificate>();
-		for (X509Certificate cert : certs) {
+		final Set<X509Certificate> filteredCerts = new HashSet<X509Certificate>();
+		for (final X509Certificate cert : certs) {
 			try {
 				if (this.matches(cert)) {
 					if (this.isAuthenticationDnieCert(cert)) {
-						for (X509Certificate cert2 : certs) {
+						for (final X509Certificate cert2 : certs) {
 							if (this.isSignatureDnieCert(cert2) && this.getSubjectSN(cert2) != null &&
 									this.getSubjectSN(cert2).equalsIgnoreCase(this.getSubjectSN(cert)) &&
 									this.getExpiredDate(cert2).equals(this.getExpiredDate(cert))) {
@@ -68,11 +63,12 @@ public class SSLFilter extends CertificateFilter {
 								break;
 							}
 						}
-					} else {
+					} 
+					else {
 						filteredCerts.add(cert);
 					}
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning( //$NON-NLS-1$
 						"Error en la verificacion del certificado '" + //$NON-NLS-1$
 						cert.getSerialNumber() + "': " + e);  //$NON-NLS-1$
@@ -81,11 +77,11 @@ public class SSLFilter extends CertificateFilter {
 		return filteredCerts.toArray(new X509Certificate[filteredCerts.size()]);
 	}
 	
-	private boolean isAuthenticationDnieCert(X509Certificate cert) {
+	private boolean isAuthenticationDnieCert(final X509Certificate cert) {
 		return this.authenticationDnieCertFilter.matches(cert);
 	}
 	
-	private boolean isSignatureDnieCert(X509Certificate cert) {
+	private boolean isSignatureDnieCert(final X509Certificate cert) {
 		return this.signatureDnieCertFilter.matches(cert);
 	}
 	
@@ -97,18 +93,19 @@ public class SSLFilter extends CertificateFilter {
 	 * @param cert Certificado.
 	 * @return Numero de serie del subject en hexadecimal.
 	 */
-	private String getSubjectSN(X509Certificate cert) {
+	private String getSubjectSN(final X509Certificate cert) {
 		final String principal = cert.getSubjectX500Principal().getName();
-    	List<Rdn> rdns;
+    	final List<Rdn> rdns;
 		try {
 			rdns = new LdapName(principal).getRdns();
-		} catch (InvalidNameException e) {
+		} 
+		catch (final InvalidNameException e) {
 			return null;
 		}
 		if (rdns != null && !rdns.isEmpty()) {
-			for (Rdn rdn : rdns) {
-				String rdnText = rdn.toString();
-				for (String rdnPrefix : SUBJECT_SN_PREFIX) {
+			for (final Rdn rdn : rdns) {
+				final String rdnText = rdn.toString();
+				for (final String rdnPrefix : SUBJECT_SN_PREFIX) {
 					if (rdnText.startsWith(rdnPrefix)) {
 						return rdnText.substring(rdnPrefix.length()).replace("#", ""); //$NON-NLS-1$ //$NON-NLS-2$
 					}
@@ -123,7 +120,7 @@ public class SSLFilter extends CertificateFilter {
 	 * @param cert Certificado.
 	 * @return Fecha de caducidad.
 	 */
-	private String getExpiredDate(X509Certificate cert) {
+	private String getExpiredDate(final X509Certificate cert) {
 		return new SimpleDateFormat("yyyy-MM-dd").format(cert.getNotAfter()); //$NON-NLS-1$
 	}
 	
@@ -135,11 +132,11 @@ public class SSLFilter extends CertificateFilter {
 	 * @param cert Certificado.
 	 * @return Numero de serie en hexadecimal.
 	 */
-	private String getCertificateSN(X509Certificate cert) {
+	private String getCertificateSN(final X509Certificate cert) {
     	return this.bigIntegerToHex(cert.getSerialNumber());
 	}
 	
-	private String bigIntegerToHex(BigInteger bi) {
+	private String bigIntegerToHex(final BigInteger bi) {
 		return AOUtil.hexify(bi.toByteArray(), ""); //$NON-NLS-1$
 	}
 	
@@ -148,9 +145,8 @@ public class SSLFilter extends CertificateFilter {
 	 * @param serialNumber Numero de serie en hexadecimal.
 	 * @return Numero de serie preparado.
 	 */
-	private String prepareSerialNumber(String sn) {
-		
-		String preparedSn = sn.trim().replace(" ", "").replace("#", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	private String prepareSerialNumber(final String sn) {
+		final String preparedSn = sn.trim().replace(" ", "").replace("#", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int n = 0;
 		while(n < preparedSn.length()) {
 			if (preparedSn.charAt(n) != '0') {

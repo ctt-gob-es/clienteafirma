@@ -13,17 +13,15 @@ import es.gob.afirma.keystores.filters.SignatureDNIeFilter;
  *  
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class CertFilterManager {
+public final class CertFilterManager {
 
-	private final static String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
-	
-	private final static String FILTER_TYPE_DNIE = "dnie:"; //$NON-NLS-1$
-	
-	private final static String FILTER_TYPE_SSL = "ssl:"; //$NON-NLS-1$
+	private static final String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
+	private static final String FILTER_TYPE_DNIE = "dnie:"; //$NON-NLS-1$
+	private static final String FILTER_TYPE_SSL = "ssl:"; //$NON-NLS-1$
 	
 	private boolean mandatoryCertificate = false;
 	
-	private List<CertificateFilter> filters;
+	private final List<CertificateFilter> filters = new ArrayList<CertificateFilter>();
 	
 	/**
 	 * Identifica los filtros que deben aplicarse sobre una serie de certificados para
@@ -31,25 +29,25 @@ public class CertFilterManager {
 	 * @param propertyFilters Listado de propiedades entre las que identificar las que
 	 * establecen los criterios de filtrado.
 	 */
-	public CertFilterManager(Properties propertyFilters) {
+	public CertFilterManager(final Properties propertyFilters) {
 		
-		String filterValue = propertyFilters.getProperty(FILTER_PREFIX_KEY);
+		final String filterValue = propertyFilters.getProperty(FILTER_PREFIX_KEY);
 		if (filterValue == null) {
 			return;
 		}
 		
-		CertificateFilter filter;
+		final CertificateFilter filter;
 		if (filterValue.toLowerCase().startsWith(FILTER_TYPE_DNIE)) {
 			filter = new SignatureDNIeFilter();
-		} else if (filterValue.toLowerCase().startsWith(FILTER_TYPE_SSL)) {
+		} 
+		else if (filterValue.toLowerCase().startsWith(FILTER_TYPE_SSL)) {
 			filter = new SSLFilter(filterValue.substring(FILTER_TYPE_SSL.length()));
-		} else {
+		} 
+		else {
 			return;
 		}
 		
-		this.filters = new ArrayList<CertificateFilter>();
 		this.filters.add(filter);
-		
 		this.mandatoryCertificate = true;
 	}
 	

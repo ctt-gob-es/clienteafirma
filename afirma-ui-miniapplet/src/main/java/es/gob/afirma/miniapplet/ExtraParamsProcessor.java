@@ -2,7 +2,9 @@ package es.gob.afirma.miniapplet;
 
 import java.util.Properties;
 
-public class ExtraParamsProcessor {
+/** Clase de utilidad para el proceso de propiedades enviadas desde JavaScript
+ * y recogidas desde java en formato <code>Properties<code>. */
+public final class ExtraParamsProcessor {
 
 	/**
 	 * Transforma los par&aacute;metros indicados en entradas de un properties.
@@ -17,13 +19,13 @@ public class ExtraParamsProcessor {
 	 */
 	public static Properties convertToProperties(String[] entries) {
 
-		Properties params = new Properties();
+		final Properties params = new Properties();
 		if (entries == null) {
 			return params;
 		}
 
 		int n;
-		for (String entry : entries) {
+		for (final String entry : entries) {
 			if (entry != null && !entry.startsWith("#") &&  //$NON-NLS-1$
 					((n = entry.indexOf('=')) != -1) && (n != 0)) {
 				params.setProperty(entry.substring(0, n).toLowerCase(), (n < entry.length() - 1) ?

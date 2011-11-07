@@ -19,13 +19,11 @@ import es.gob.afirma.miniapplet.CertFilterManager;
  * de firma por el usuario.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateKeyEntry> {
+public final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateKeyEntry> {
 
-	private AOKeyStore keyStore;
-	
-	private Component parent;
-	
-	private CertFilterManager filterManager = null;
+	private final AOKeyStore keyStore;
+	private final Component parent;
+	private final CertFilterManager filterManager;
 	
 	/**
 	 * Crea la acci&oacute;n para la seleccion de la clave privada de un certificado.
@@ -35,18 +33,25 @@ public class SelectPrivateKeyAction implements PrivilegedExceptionAction<Private
 	 * @param parent Componente padre sobre el que se montanlos di&aacute;logos que se
 	 * visualizan como parte de la acci&oacute;n.
 	 */
-	public SelectPrivateKeyAction(OS os, BROWSER browser, CertFilterManager filterManager, Component parent) {
+	public SelectPrivateKeyAction(final OS os, 
+	                              final BROWSER browser, 
+	                              final CertFilterManager filterManager, 
+	                              final Component parent) {
 		if (os == OS.WINDOWS) {
 			if (browser == BROWSER.FIREFOX) {
 				this.keyStore = AOKeyStore.MOZ_UNI;
-			} else {
+			} 
+			else {
 				this.keyStore = AOKeyStore.WINDOWS;
 			}
-		} else if (os == OS.LINUX || os == OS.SOLARIS) {
+		} 
+		else if (os == OS.LINUX || os == OS.SOLARIS) {
 			this.keyStore = AOKeyStore.MOZ_UNI;
-		} else if (os == OS.MACOSX) {
+		} 
+		else if (os == OS.MACOSX) {
 			this.keyStore = AOKeyStore.APPLE;
-		} else {
+		} 
+		else {
 			this.keyStore = AOKeyStore.PKCS12; 	
 		}
 		this.filterManager = filterManager;
@@ -55,10 +60,13 @@ public class SelectPrivateKeyAction implements PrivilegedExceptionAction<Private
 	
 	@Override
 	public PrivateKeyEntry run() throws Exception {
-
-		AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-				this.keyStore, null, null,
-				KeyStoreUtilities.getPreferredPCB(this.keyStore, this.parent), this.parent);
+		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
+			this.keyStore, 
+			null, 
+			null,
+			KeyStoreUtilities.getPreferredPCB(this.keyStore, this.parent), 
+			this.parent
+		);
 		
 		
 		boolean mandatoryCertificate = false;
@@ -68,15 +76,16 @@ public class SelectPrivateKeyAction implements PrivilegedExceptionAction<Private
 			mandatoryCertificate = this.filterManager.isMandatoryCertificate();
 		}
 		
-		String selectedAlias = KeyStoreUtilities.showCertSelectionDialog(
-    			ksm.getAliases(),
-    			ksm.getKeyStores(),
-    			this,
-    			true,
-    			true,
-    			true,
-    			filters,
-    			mandatoryCertificate);
+		final String selectedAlias = KeyStoreUtilities.showCertSelectionDialog(
+			ksm.getAliases(),
+			ksm.getKeyStores(),
+			this,
+			true,
+			true,
+			true,
+			filters,
+			mandatoryCertificate
+		);
     	
     	return ksm.getKeyEntry(selectedAlias,
     			KeyStoreUtilities.getCertificatePC(this.keyStore, this.parent));

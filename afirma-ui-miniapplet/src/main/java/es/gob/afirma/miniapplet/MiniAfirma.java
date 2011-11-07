@@ -111,7 +111,7 @@ public interface MiniAfirma {
      * <li>Firma 'compleja': "firmante1\n\tfirmante2\n\tfirmante3\n\t\tfirmante4\nfirmante5"</li>
      * </ul>
      * Si no se reconoce el formato de firma, se devuelve {@code null}.
-     * @param sign Firma en Base64.
+     * @param signB64 Firma en Base64.
      * @return &Aacute;rbol de firmantes.
      * @throws IOException Cuabndo se produzca un error al decodificar el base64.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
@@ -178,6 +178,7 @@ public interface MiniAfirma {
      *                 <li>UTF-16</li>
      *                </ul>  
      * @return Texto decodificado.
+     * @throws IOException 
      */
     String getTextFromBase64(String data, String charset) throws IOException;
 
@@ -197,7 +198,7 @@ public interface MiniAfirma {
      *                 <li>UTF-16</li>
      *                </ul>  
      * @return Texto codificado en Base64.
-     * @throws Cuando se indica una codificaci&oacute;n no v&aacute;lida.
+     * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
     public String getBase64FromText(String plainText, String charset) throws IOException;
 }

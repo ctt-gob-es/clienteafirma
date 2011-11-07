@@ -2,13 +2,14 @@ package es.gob.afirma.miniapplet;
 
 import java.util.ResourceBundle;
 
-public class Messages {
+/** Gestor de mensajes de texto del MiniApplet. */
+public final class MiniAppletMessages {
 	private static final String BUNDLE_NAME = "miniappletmessages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
 			.getBundle(BUNDLE_NAME);
 
-	private Messages() {
+	private MiniAppletMessages() {
         // No permitimos la instanciacion
 	}
 
