@@ -27,6 +27,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.miniapplet.actions.CoSignAction;
 import es.gob.afirma.miniapplet.actions.CounterSignAction;
 import es.gob.afirma.miniapplet.actions.GetFileContentAction;
@@ -34,7 +35,7 @@ import es.gob.afirma.miniapplet.actions.GetFilePathAction;
 import es.gob.afirma.miniapplet.actions.SaveFileAction;
 import es.gob.afirma.miniapplet.actions.SelectPrivateKeyAction;
 import es.gob.afirma.miniapplet.actions.SignAction;
-import es.gob.afirma.util.signers.AOSignerFactory;
+
 
 /** MiniApplet de firma del proyecto Afirma.
  */
