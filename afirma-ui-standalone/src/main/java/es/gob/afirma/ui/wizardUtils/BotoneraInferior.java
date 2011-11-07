@@ -88,6 +88,7 @@ public class BotoneraInferior extends JPanel {
         JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
         //Boton maximizar
         maximizar.setText(Messages.getString("Wizard.maximizar"));
+        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
         maximizar.setName("maximizar");
         maximizar.setMnemonic(KeyEvent.VK_M);
         maximizar.addActionListener(new ActionListener() {
@@ -107,6 +108,7 @@ public class BotoneraInferior extends JPanel {
 	    restaurar = new JButton();
 	    restaurar.setText(Messages.getString("Wizard.restaurar"));
 	    restaurar.setName("restaurar");
+	    restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
 	    restaurar.setMnemonic(KeyEvent.VK_R);
 	    restaurar.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {

@@ -129,6 +129,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         //Boton maximizar
         maximizar.setText(Messages.getString("Wizard.maximizar"));
         maximizar.setName("maximizar");
+        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
         maximizar.setMnemonic(KeyEvent.VK_M);
         maximizar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -146,6 +147,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 	    // Boton restaurar
 	    restaurar.setText(Messages.getString("Wizard.restaurar"));
 	    restaurar.setName("restaurar");
+	    restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
 	    restaurar.setMnemonic(KeyEvent.VK_R);
 	    restaurar.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {

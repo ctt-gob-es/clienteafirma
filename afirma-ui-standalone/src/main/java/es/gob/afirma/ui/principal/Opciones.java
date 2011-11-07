@@ -254,9 +254,9 @@ public class Opciones extends JAccessibilityDialog {
         
         // Definicion de mnemonicos.
         int tabNum = 0;
-        mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pestaña
-        mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pestaña
-        mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestaña
+        mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pestaï¿½a
+        mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pestaï¿½a
+        mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestaï¿½a
 
         c.weighty = 0.1;
         c.fill = GridBagConstraints.BOTH;
@@ -286,6 +286,7 @@ public class Opciones extends JAccessibilityDialog {
 		//Boton maximizar ventana
 		maximizar.setText(Messages.getString("Wizard.maximizar"));
 	    maximizar.setName("maximizar");
+	    maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
 	    maximizar.setMnemonic(KeyEvent.VK_M);
 	    maximizar.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
@@ -301,6 +302,7 @@ public class Opciones extends JAccessibilityDialog {
 	    // Boton restaurar
 	    restaurar.setText(Messages.getString("Wizard.restaurar"));
 	    restaurar.setName("restaurar");
+	    restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
 	    restaurar.setMnemonic(KeyEvent.VK_R);
 	    restaurar.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
@@ -548,7 +550,7 @@ public class Opciones extends JAccessibilityDialog {
 	 */
     private void aceptarActionPerformed(Properties config, Properties signatureConfig) {
 
-    	// Guardamos la posicion y tamaño actual de la ventana solo en caso de no estar maximizada por configuracion
+    	// Guardamos la posicion y tamaï¿½o actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.optionActualPositionX = this.getX();
 	    	PrincipalGUI.optionActualPositionY = this.getY();
@@ -556,7 +558,7 @@ public class Opciones extends JAccessibilityDialog {
 	    	PrincipalGUI.optionActualHeight = this.getHeight();
     	}
     	
-    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tamaño de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
+    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tamaï¿½o de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
     	Boolean needUpdateGUI = ((GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)))|| (GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) || (GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE)))|| (GeneralConfig.isRemarked() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE)))|| (GeneralConfig.isHighContrast() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST)))|| (GeneralConfig.isBigFontSize() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)))|| (GeneralConfig.isFontBold() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE)))|| update);
     	    	
     	// Guardamos el estado actual de la configuracion de la herramienta
@@ -581,7 +583,7 @@ public class Opciones extends JAccessibilityDialog {
      * Cierra la ventana
      */
     private void cancelarActionPerformed() {
-    	// Guardamos la posicion y tamaño actual de la ventana solo en caso de no estar maximizada por configuracion
+    	// Guardamos la posicion y tamaï¿½o actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.optionActualPositionX = this.getX();
 	    	PrincipalGUI.optionActualPositionY = this.getY();
