@@ -51,6 +51,7 @@ import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
@@ -71,7 +72,7 @@ import es.gob.afirma.ui.utils.SelectionDialog;
 import es.gob.afirma.ui.utils.SignedFileManager;
 import es.gob.afirma.ui.utils.UIPasswordCallbackAccessibility;
 import es.gob.afirma.ui.utils.Utils;
-import es.gob.afirma.util.signers.AOSignerFactory;
+
 
 /**
  * Clase que muestra los elementos necesarios para realizar una firma.

@@ -53,6 +53,7 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.jse.JSEUtils;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
@@ -68,7 +69,6 @@ import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.util.signers.AOSignerFactory;
 
 
 public class PanelMultifirma extends JAccessibilityDialogWizard {

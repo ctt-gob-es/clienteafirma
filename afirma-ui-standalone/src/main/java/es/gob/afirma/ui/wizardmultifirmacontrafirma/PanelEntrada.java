@@ -40,6 +40,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -55,7 +56,6 @@ import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-import es.gob.afirma.util.signers.AOSignerFactory;
 
 /**
  * Panel de entrada del archivo
