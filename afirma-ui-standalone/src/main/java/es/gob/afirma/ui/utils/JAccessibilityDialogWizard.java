@@ -180,44 +180,13 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this));
 		
 		//Se comprueba el estado de los botones de maximizado y restauracion
-		if (!Platform.getOS().equals(Platform.OS.LINUX)){
-			if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
-				botonMaximizar.setEnabled (false);
-				botonRestaurar.setEnabled (true);
-			} else {
-				botonMaximizar.setEnabled (true);
-				botonRestaurar.setEnabled (false);
-			}
+		if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
+			botonMaximizar.setEnabled (false);
+			botonRestaurar.setEnabled (true);
 		} else {
-			
-			if (this.getSize().equals(new Dimension(maxWidth,maxHeight - Constants.maximizeVerticalMarginLinux))){
-				botonMaximizar.setEnabled (false);
-				botonRestaurar.setEnabled (true);
-			} else {
-				botonMaximizar.setEnabled (true);
-				botonRestaurar.setEnabled (false);
-			}
+			botonMaximizar.setEnabled (true);
+			botonRestaurar.setEnabled (false);
 		}
-	    
-		/*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-	    Dimension actualSize = getJAccessibilityDialogWizard(this).getSize();
-	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
-	    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this));
-	    if(botonMaximizar != null){
-	    	if (actualSize.equals(fullScreen)){
-	    		botonMaximizar.setEnabled(false);
-	    		if (botonRestaurar != null) {
-	    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
-	    			botonRestaurar.setEnabled(true);
-	    		}
-		    } else {
-		    	botonMaximizar.setEnabled(true);
-		    	if (botonRestaurar != null) {
-			    	botonRestaurar.setEnabled(false); //Se deshabilita
-		    	}
-		    }
-	    }*/
 	}
 
 /*	*//**
