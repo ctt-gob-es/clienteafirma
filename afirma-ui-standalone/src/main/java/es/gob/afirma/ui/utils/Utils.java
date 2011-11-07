@@ -10,14 +10,23 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -29,6 +38,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
@@ -41,12 +51,19 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
 /**
  * Clase con utilidades varias
  */
 public class Utils {
+	
+	 private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 	
 	/**
 	 * Abre un fichero en la aplicaci\u00F3n predefinida por el sistema operativo actual.
@@ -439,6 +456,159 @@ public class Utils {
      *        Valor asignado. */
     public static void setPreference(final String key, final String value, Preferences preferences) {
         preferences.put(key, value);
+    }
+    
+    /** Muestra un di&aacute;logo para que el usuario seleccione entre los
+     * certificados mostrados. Es posible indicar que s&ocuate;lo puede haber un
+     * certificado tras recuperarlos del repositorio y aplicar los filtros, en
+     * cuyo caso se seleccionar&iacute; autom&aacute;ticamente. Si se pidiese
+     * que se seleccione autom&aacute;ticamemte un certificado y hubiese
+     * m&aacute;s de uno, se devolver&iacute;a una excepci&oacute;n.
+     * @param alias
+     *        Alias de los certificados entre los que el usuario debe
+     *        seleccionar uno
+     * @param kss
+     *        Listado de KeyStores de donde se han sacadon los alias (debe
+     *        ser <code>null</code> si se quiere usar el m&eacute;todo para
+     *        seleccionar otra cosa que no sean certificados X.509 (como
+     *        claves de cifrado)
+     * @param parentComponent
+     *        Componente padre (para ls amodalidad)
+     * @param checkPrivateKeys
+     *        Indica si se debe comprobar que el certificado tiene clave
+     *        privada o no, para no mostrar aquellos que carezcan de ella
+     * @param checkValidity
+     *        Indica si se debe comprobar la validez temporal de un
+     *        certificado al ser seleccionado
+     * @param showExpiredCertificates
+     *        Indica si se deben o no mostrar los certificados caducados o
+     *        aun no v&aacute;lidos
+     * @param certFilters
+     *        Filtros sobre los certificados a mostrar
+     * @param mandatoryCertificate
+     *        Indica si los certificados disponibles (tras aplicar el
+     *        filtro) debe ser solo uno.
+     * @return Alias seleccionado por el usuario
+     * @throws AOCancelledOperationException
+     *         Si el usuario cancela manualmente la operaci&oacute;n
+     * @throws AOCertificatesNotFoundException
+     *         Si no hay certificados que mostrar al usuario */
+    public static String showCertSelectionDialog(final String[] alias,
+                                                       final List<KeyStore> kss,
+                                                       final Object parentComponent,
+                                                       final boolean checkPrivateKeys,
+                                                       final boolean checkValidity,
+                                                       final boolean showExpiredCertificates,
+                                                       final List<CertificateFilter> certFilters,
+                                                       final boolean mandatoryCertificate) throws AOCertificatesNotFoundException {
+        if (alias == null || alias.length == 0) {
+            throw new AOCertificatesNotFoundException("El almac\u00E9n no conten\u00EDa entradas"); //$NON-NLS-1$
+        }
+
+        final Map<String, String> aliassesByFriendlyName =
+                KeyStoreUtilities.getAliasesByFriendlyName(alias, kss, checkPrivateKeys, showExpiredCertificates, certFilters);
+
+        // Miramos si despues de filtrar las entradas queda alguna o se ha
+        // quedado la lista vacia
+        if (aliassesByFriendlyName.size() == 0) {
+            throw new AOCertificatesNotFoundException("El almacen no contenia entradas validas"); //$NON-NLS-1$
+        }
+
+        // Si se ha pedido que se seleccione automaticamente un certificado, se
+        // seleccionara
+        // si hay mas de un certificado que se ajuste al filtro, se dara a
+        // elegir
+        if (mandatoryCertificate && aliassesByFriendlyName.size() == 1) {
+            return aliassesByFriendlyName.keySet().toArray()[0].toString();
+        }
+
+        // Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
+        // mayusculas y min�sculas
+        final String[] finalOrderedAliases = aliassesByFriendlyName.values().toArray(new String[0]);
+        Arrays.sort(finalOrderedAliases, new Comparator<String>() {
+            public int compare(final String o1, final String o2) {
+                if (o1 == null && o2 == null) {
+                    return 0;
+                }
+                else if (o1 == null) {
+                    return 1;
+                }
+                else if (o2 == null) {
+                    return -1;
+                }
+                else{
+                    return o1.compareToIgnoreCase(o2);
+                }
+            }
+        });
+
+        final Object o = CustomDialog.showInputDialog(
+             (Component)parentComponent, true, Messages.getString("CustomDialog.showInputDialog.certificate.message"), //$NON-NLS-1$
+             Messages.getString("CustomDialog.showInputDialog.certificate.title"), //$NON-NLS-1$
+             JOptionPane.PLAIN_MESSAGE,
+             finalOrderedAliases,
+             null
+        );
+
+        final String certName;
+        if (o != null) {
+            certName = o.toString();
+        }
+        else {
+            throw new AOCancelledOperationException("Operacion de seleccion de certificado cancelada"); //$NON-NLS-1$
+        }
+
+        for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
+            if (aliassesByFriendlyName.get(al).equals(certName)) {
+                if (checkValidity && kss != null) {
+                    boolean rejected = false;
+                    for (final KeyStore ks : kss) {
+                        try {
+                            if (!ks.containsAlias(al)) {
+                                continue;
+                            }
+                        }
+                        catch (final Exception e) {
+                            continue;
+                        }
+
+                        String errorMessage = null;
+                        try {
+                            ((X509Certificate)ks.getCertificate(al)).checkValidity();
+                        }
+                        catch (final CertificateExpiredException e) {
+                            errorMessage = Messages.getString("CustomDialog.showInputDialog.certificate.expiredMessage"); //$NON-NLS-1$
+                        }
+                        catch (final CertificateNotYetValidException e) {
+                            errorMessage = Messages.getString("CustomDialog.showInputDialog.certificate.invalidMessage"); //$NON-NLS-1$
+                        }
+                        catch (final KeyStoreException e) {
+                            errorMessage = Messages.getString("CustomDialog.showInputDialog.certificate.exceptionMessage"); //$NON-NLS-1$
+                        }
+
+                        if (errorMessage != null) {
+                            LOGGER.warning("Error durante la validacion: " + errorMessage); //$NON-NLS-1$
+                            if (CustomDialog.showConfirmDialog(
+                                  (Component)parentComponent, true,
+                                  errorMessage,
+                                  Messages.getString("CustomDialog.warning"), //$NON-NLS-1$
+                                  AOUIFactory.YES_NO_OPTION,
+                                  AOUIFactory.WARNING_MESSAGE
+                            ) == AOUIFactory.YES_OPTION) {
+                                return al;
+                            }
+                            rejected = true;
+                        }
+
+                        if (rejected) {
+                            throw new AOCancelledOperationException("Se ha reusado un certificado probablemente no valido"); //$NON-NLS-1$
+                        }
+                    }
+                }
+                return al;
+            }
+        }
+        return null;
     }
 		
 }
