@@ -13,6 +13,7 @@ import java.awt.Component;
 import java.io.File;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -25,6 +26,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /**
  * Utilidades para las multifirmas
@@ -102,7 +104,8 @@ public class MultisignUtils {
         PrivateKeyEntry privateKeyEntry = null;
         
         // Seleccionamos un certificado
-        String selectedcert = KeyStoreUtilities.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), padre, true, true, true);
+        String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), padre, true, true, true,
+        		new Vector<CertificateFilter>(0), false);
 
         // Comprobamos si se ha cancelado la seleccion
         if (selectedcert == null) 
