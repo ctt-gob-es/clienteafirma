@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -199,6 +200,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 
         c.gridx = 1;
         c.weightx = 1.0;
+        c.weighty = 2.0;
         //c.weighty = 1.0;
         c.gridwidth = 2;
 	       
@@ -209,21 +211,6 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		this.infoLabel.addAncestorListener(new RequestFocusListener());
 		//Se añade la etiqueta al panel de información general
 		this.mainPanel.add(this.infoLabel, c);
-		
-		/*c.gridy = 1;
-		c.weightx = 0.0;
-        //c.weighty = 0.0;
-        c.gridwidth = 2;
-        c.insets = new Insets(0,10,0,10);  //right padding
-        
-        //campo de texto del diálogo
-        this.component = new JTextField("");
-        this.component.setVisible(false); //Se oculta el campo
-        Utils.remarcar(this.component);
-        Utils.setContrastColor(this.component);
-        Utils.setFontBold(this.component);
-      //Se añade el campo de texto al panel de información general
-        this.mainPanel.add(this.component, c);*/
 
 		//Panel de botones
 		createButtonsPanel();
@@ -239,15 +226,13 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         //cons.gridheight = 1;
         
         //se añade el panel de información
-        container.add(this.mainPanel, cons);        
+        container.add(this.mainPanel, cons);
         cons.gridy = 1;
         cons.gridx = 0;
-       // cons.weightx = 1.0;
-        //cons.weighty = 1.0;
-       // cons.gridheight = 1;
         
         //Se añade el panel de botones
         container.add(this.buttonsPanel, cons);
+
 	}
 
 	/**
@@ -257,17 +242,20 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private void setIconLabel(int typeMessage) {
 		//Según el tipo de mensaje se selecciona el icono
   		Icon icon = null;
-  		if (typeMessage == JOptionPane.ERROR_MESSAGE) {
-  			icon = UIManager.getIcon("OptionPane.errorIcon");
-  		} else if (typeMessage == JOptionPane.WARNING_MESSAGE) {
-  			icon = UIManager.getIcon("OptionPane.warningIcon");
-  		} else if (typeMessage == JOptionPane.QUESTION_MESSAGE) {
-  			icon = UIManager.getIcon("OptionPane.questionIcon");
-  		} else {
-			icon = UIManager.getIcon("OptionPane.informationIcon");
+  		//Se comprueba el tipo de mensaje para poner o no, un icono
+  		if (typeMessage != JOptionPane.PLAIN_MESSAGE) {
+	  		if (typeMessage == JOptionPane.ERROR_MESSAGE) {
+	  			icon = UIManager.getIcon("OptionPane.errorIcon");
+	  		} else if (typeMessage == JOptionPane.WARNING_MESSAGE) {
+	  			icon = UIManager.getIcon("OptionPane.warningIcon");
+	  		} else if (typeMessage == JOptionPane.QUESTION_MESSAGE) {
+	  			icon = UIManager.getIcon("OptionPane.questionIcon");
+	  		} else {
+				icon = UIManager.getIcon("OptionPane.informationIcon");
+	  		}
+	  		this.iconLabel.setIcon(icon);
+	  		this.iconLabel.setOriginalIcon(icon);
   		}
-  		this.iconLabel.setIcon(icon);
-  		this.iconLabel.setOriginalIcon(icon);
 	}
 	
 	/**
@@ -410,7 +398,6 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		}
 		
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
-		//customDialog.component.setVisible(false);//Se oculta el campo de texto
 				
 		customDialog.setVisible(true);
 		return customDialog.getAnswer();
@@ -433,7 +420,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.gridx = 1;   
 		c.gridy = 1;
 		c.weightx = 0.0;
-        //c.weighty = 0.0;
+        c.weighty = 1.0;
         c.gridwidth = 2;
         c.insets = new Insets(10,10,0,10);  //right padding
         
@@ -472,6 +459,71 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Control para saber si se ha pulsado el botón cancelar
 		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
 			return ((JTextField)customDialog.component).getText();
+		}
+		return null;
+
+	}
+	
+	/**
+	 * Muestra un dialogo de inserccion.
+	 * @param componentParent componente padre
+	 * @param message mensaje a mostrar
+	 * @param title titulo del dilogo
+	 * @param messageType tipo de mensaje
+	 */
+	public static Object showInputDialog(Component componentParent, boolean modal, String message, String title, int typeMessage,
+			final Object[] selectionValues, final Object initialSelectionValue){
+		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		
+		
+		//Restricciones para el panel de datos
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 1;   
+		c.gridy = 1;
+		c.weightx = 0.0;
+		c.weighty = 1.0;
+        c.gridwidth = 2;
+        c.insets = new Insets(10,10,0,10);  //right padding
+        
+        //campo de texto del diálogo
+        customDialog.component = new JComboBox(selectionValues);
+        if (initialSelectionValue != null) {
+        	((JComboBox)customDialog.component).setSelectedItem(initialSelectionValue);
+        }
+        Utils.remarcar(customDialog.component);
+        Utils.setContrastColor(customDialog.component);
+        Utils.setFontBold(customDialog.component);
+       //Se añade el campo de texto al panel de información general
+        customDialog.mainPanel.add(customDialog.component, c);
+        
+       //Se relaciona la etiqueta con el componente
+	   	customDialog.infoLabel.setLabelFor(customDialog.component);
+		
+		//Restricciones botones
+		GridBagConstraints cons = new GridBagConstraints();
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.gridx = 3;
+		cons.gridy = 0;
+		cons.insets = new Insets(0,0,0,10);  //right padding
+
+		//Cancel button
+		customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		JPanel cancelPanel = new JPanel();
+		cancelPanel.add(customDialog.cancelButton);
+		customDialog.buttonsPanel.add(cancelPanel, cons);
+		customDialog.cancelButton.addActionListener(customDialog);
+        
+		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
+		customDialog.component.setVisible(true); //Se hace visible el campo de texto
+		
+		customDialog.cancelButton.addActionListener(customDialog);
+		
+		customDialog.setVisible(true);
+		
+		//Control para saber si se ha pulsado el botón cancelar
+		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
+			return ((JComboBox)customDialog.component).getSelectedItem();
 		}
 		return null;
 
@@ -587,7 +639,6 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		//Se hace el resize
 		this.setBounds(getInitialX(maxWidth), getInitialY(maxHeight), maxWidth, maxHeight);
-		//this.setBounds(0, 0, maxWidth, maxHeight);
 		
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
 		this.maximizeButton.setEnabled (false);
@@ -609,7 +660,6 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		} else {
     		setBounds(getInitialX(minWidth), getInitialY(minHeight), minWidth, minHeight);
-			//setBounds(0, 0, minWidth, minHeight);	
 		}
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
 		this.maximizeButton.setEnabled (true);
