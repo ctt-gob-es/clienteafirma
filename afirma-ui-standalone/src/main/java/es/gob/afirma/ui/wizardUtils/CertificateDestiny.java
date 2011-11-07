@@ -13,6 +13,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -20,9 +21,10 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.Utils;
 
 /**
  * Certificado destinatario de un sobre digital. 
@@ -57,8 +59,9 @@ public class CertificateDestiny {
 	public CertificateDestiny(AOKeyStoreManager keyStoreManager, JDialogWizard dialogo) {
 		try {
 			// Seleccionamos un certificado
-			String selectedcert = KeyStoreUtilities.showCertSelectionDialog(
-			        keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), dialogo, false, true, true);
+			String selectedcert = Utils.showCertSelectionDialog(
+			        keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), dialogo, false, true, true, 
+			        new Vector<CertificateFilter>(0), false);
 
 			// Comprobamos si se ha cancelado la seleccion
 			if (selectedcert == null) 

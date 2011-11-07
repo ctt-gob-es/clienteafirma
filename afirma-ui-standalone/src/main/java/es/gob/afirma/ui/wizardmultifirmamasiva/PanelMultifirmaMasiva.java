@@ -26,6 +26,7 @@ import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.util.List;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -46,6 +47,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.massive.MassiveType;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
@@ -504,7 +506,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         			pssCallback, this);
 
         	// Seleccionamos un certificado
-        	String selectedcert = KeyStoreUtilities.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
+        	String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true,
+        			new Vector<CertificateFilter>(0), false);
 
         	// Comprobamos si se ha cancelado la seleccion
         	if (selectedcert == null) 
