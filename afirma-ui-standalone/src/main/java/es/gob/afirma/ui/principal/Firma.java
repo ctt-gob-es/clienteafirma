@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -57,6 +58,7 @@ import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -391,14 +393,12 @@ public class Firma extends JPanel {
 
         // Obtenemos la ruta del fichero a firmar
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) {
-            //JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             campoFichero.requestFocusInWindow();
             return;
         }
 
       //Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
-    	//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE);
     	CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE);
         
         try {
@@ -437,17 +437,17 @@ public class Firma extends JPanel {
                 );
             } catch (InvalidKeyException e) {
             	//Control de la excepción generada al introducir mal la contraseña para el almacén
-                //JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             	CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }  catch (AOKeystoreAlternativeException e) {
-            	 //JOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+
             	CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                  return;
             }
 
             // Seleccionamos un certificado
-            String selectedcert = KeyStoreUtilities.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true);
+            String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true, new Vector<CertificateFilter>(0),
+                    false);
 
             // Comprobamos si se ha cancelado la seleccion
             if (selectedcert == null) 
@@ -460,7 +460,6 @@ public class Firma extends JPanel {
             }
             catch (KeyException e) {
             	//Control de la excepción generada al introducir mal la contraseña para el certificado
-            	//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             	CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -487,7 +486,6 @@ public class Firma extends JPanel {
             }
             catch (Exception e) {
                 logger.warning("Formato de firma no soportado: " + e); //$NON-NLS-1$
-                //JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 return;
@@ -497,8 +495,7 @@ public class Firma extends JPanel {
             try {
                 uri = AOUtil.createURI(campoFichero.getText());
             } catch (Exception e) {
-                logger.severe("La ruta del fichero de datos no es v\u00E1lida: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                //JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.ruta"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+                logger.severe("La ruta del fichero de datos no es v\u00E1lida: " + e); //$NON-NLS-1$ //$NON-NLS-2$ 
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.ruta"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 campoFichero.requestFocusInWindow();
@@ -512,12 +509,10 @@ public class Firma extends JPanel {
                 fileData = AOUtil.getDataFromInputStream(fileIn);					
             }
             catch (FileNotFoundException e) {
-                //JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.fichero.noencontrado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             	CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.fichero.noencontrado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
             catch (IOException e) {
-                //JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.fichero.leer"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
             	CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.fichero.leer"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -535,11 +530,6 @@ public class Firma extends JPanel {
             // los contrario
             String modoFirma = AOSignConstants.SIGN_MODE_IMPLICIT;
             if (formato.equals(AOSignConstants.SIGN_FORMAT_CADES)){ 
-               /* int incluir = JAccessibilityOptionPane.showConfirmDialog(
-                        this,
-                        Messages.getString("Firma.incluir.original"),
-                        "Firma",
-                        JOptionPane.YES_NO_OPTION);*/
                 int incluir = CustomDialog.showConfirmDialog(this, true,Messages.getString("Firma.incluir.original"),
                         "Firma",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
@@ -562,18 +552,15 @@ public class Firma extends JPanel {
                 );
             } catch (AOFormatFileException e) {
                 logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
-                //JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.generar.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             } catch (AOException e) {
                 logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
                 e.printStackTrace();
-                //JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             } catch (Exception e) {
                 logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
-                //JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -590,12 +577,6 @@ public class Firma extends JPanel {
                     this);
 
             if (savedFile!= null)
-                /*JAccessibilityOptionPane.showMessageDialog(
-                        this,
-                        Messages.getString("Firma.msg.ok"),  //$NON-NLS-1$
-                        Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"),  //$NON-NLS-1$
-                        JOptionPane.INFORMATION_MESSAGE
-                );*/
             	CustomDialog.showMessageDialog(
                         this, true,
                         Messages.getString("Firma.msg.ok"),  //$NON-NLS-1$
@@ -610,7 +591,6 @@ public class Firma extends JPanel {
         } catch (AOException e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             logger.severe("Error: "+e.getMessage());
-            //JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), "Firma", JOptionPane.ERROR_MESSAGE);
             CustomDialog.showMessageDialog(this, true, e.getMessage(), "Firma", JOptionPane.ERROR_MESSAGE);
         } catch(Exception e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
