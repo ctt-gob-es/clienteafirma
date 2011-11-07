@@ -14,6 +14,7 @@ import java.awt.Cursor;
 import java.awt.Dialog.ModalExclusionType;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -63,7 +64,7 @@ public class HelpUtils {
 	 * @return	Ventana con el panel de ayuda
 	 */
 	static HelpBroker getHelp() {
-	    
+
 		if (helpBroker == null) {
 			try {
 				// Cargamos el archivo de datos de la ayuda
@@ -72,19 +73,24 @@ public class HelpUtils {
 				// Creamos la ventana de ayuda
 				HelpSet helpset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
 				helpBroker = helpset.createHelpBroker();
+				
 				helpBroker.initPresentation();
 				WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
 				JFrame helpwindow = (JFrame) wp.getHelpWindow();
+				
 				//La ventana de ayuda no debe ser bloqueada por ninguna ventana de la aplicacion
 				helpwindow.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 				
 				// Introducimos el icono en la ventana
 				Image icon = Toolkit.getDefaultToolkit().createImage(HelpUtils.class.getClassLoader().getResource("resources/images/afirma_ico.png"));
 				helpwindow.setIconImage(icon);	
+				
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
+			visualize(false);
 		}
+
 		
 		return helpBroker;
 	}
@@ -117,16 +123,42 @@ public class HelpUtils {
 	 * @param id Identificador de la entrada de la ayuda a la que se desea acceder.
 	 */
 	public static void enableHelpKey(Component component, String id) {
+		
 		components.put(id, component);
 		getHelp().enableHelpKey(component, id, helpset);
+		if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+		} else if (GeneralConfig.isBigFontSize()){
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));	
+		} else if (GeneralConfig.isFontBold()){
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+		} else {
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+		}
+		
+		
 	}	
 	
 	/**
 	 * Visualiza la ayuda en la pagina de "Introduccion"
 	 */
-	public static void visualize() {
-		getHelp().setDisplayed(true);
+	public static void visualize(boolean show) {
+		if (show){
+			getHelp().setDisplayed(true);
+		}
+		
 		getHelp().setCurrentID("introduccion");
+		if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+		} else if (GeneralConfig.isBigFontSize()){
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));	
+		} else if (GeneralConfig.isFontBold()){
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+		} else {
+			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+		}
 	}
 
 	//TODO: el siguiente metodo se podria borrar
@@ -149,6 +181,16 @@ public class HelpUtils {
 			public void mouseClicked(MouseEvent e) {
 				getHelp().setDisplayed(true);
 				getHelp().setCurrentID(pagina);	
+				if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+				} else if (GeneralConfig.isBigFontSize()){
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));	
+				} else if (GeneralConfig.isFontBold()){
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+				} else {
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+				}
 			}
 		});
 		
@@ -201,6 +243,16 @@ public class HelpUtils {
 			public void actionPerformed(ActionEvent evt) {
 				getHelp().setDisplayed(true);
 				getHelp().setCurrentID(pagina);
+				if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+				} else if (GeneralConfig.isBigFontSize()){
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));	
+				} else if (GeneralConfig.isFontBold()){
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+				} else {
+					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+				}
 			}
 		});
 		Utils.remarcar(botonAyuda);
@@ -218,7 +270,27 @@ public class HelpUtils {
 	    if (pagina != null) {
 	        try {
 	            getHelp().setCurrentID(pagina);
+	            if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+	    		} else if (GeneralConfig.isBigFontSize()){
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));	
+	    		} else if (GeneralConfig.isFontBold()){
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+	    		} else {
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+	    		}
 	        } catch (Exception e) {
+	        	if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
+	    		} else if (GeneralConfig.isBigFontSize()){
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));	
+	    		} else if (GeneralConfig.isFontBold()){
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
+	    		} else {
+	    			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
+	    		}
 	            /* No hacemos nada para que se abra por la pagina principal */
 	        }
 	    }

@@ -456,7 +456,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Seleccion menu ayuda: Muestra la ventana con el panel de ayuda
 	 */
 	private void ayudaHTMLActionPerformed() {
-		HelpUtils.visualize();
+		HelpUtils.visualize(true);
 	}
 	
 	/**
@@ -599,7 +599,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonCifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonCifrado.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " +  //$NON-NLS-1$  //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
         JPanel panelCifrado = new Cifrado();
         this.htPanel.addTab(buttonCifrado, panelCifrado);
 
@@ -615,7 +615,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonDescifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonDescifrado.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
         JPanel panelDescifrado = new Descifrado();
         this.htPanel.addTab(buttonDescifrado, panelDescifrado);
 
