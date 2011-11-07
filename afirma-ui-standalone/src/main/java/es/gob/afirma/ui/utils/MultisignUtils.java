@@ -25,7 +25,6 @@ import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 
 /**
@@ -115,7 +114,7 @@ public class MultisignUtils {
         try {
         	privateKeyEntry = keyStoreManager.getKeyEntry(
                         selectedcert,
-                        KeyStoreUtilities.getCertificatePC(store, padre)
+                        Utils.getCertificatePC(store, padre)
                         );
             } catch (KeyException e) {
                 throw new AOException("Error obteniendo la clave privada del certificado", e); //$NON-NLS-1$

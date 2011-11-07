@@ -46,7 +46,6 @@ import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.massive.MassiveType;
 import es.gob.afirma.ui.utils.ConfigureCaret;
@@ -515,7 +514,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 
         	// Recuperamos la clave del certificado
         	try {
-        		privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, KeyStoreUtilities.getCertificatePC(store, this));
+        		privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, this));
         	} catch (KeyException e) {
         		throw e;
         	} catch (AOCancelledOperationException e) {

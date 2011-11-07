@@ -53,7 +53,6 @@ import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.HelpUtils;
@@ -596,7 +595,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		// Recuperamos la clave del certificado
 		PrivateKeyEntry privateKeyEntry = null;
 		try {
-			privateKeyEntry = keyStoreManager.getKeyEntry(seleccionado, KeyStoreUtilities.getCertificatePC(kconf.getType(), this));
+			privateKeyEntry = keyStoreManager.getKeyEntry(seleccionado, Utils.getCertificatePC(kconf.getType(), this));
 		} catch (KeyException e) {
 			throw new AOException("Error al recuperar la clave privada del certificado", e); //$NON-NLS-1$
 		} catch (AOCancelledOperationException e) {

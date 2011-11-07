@@ -51,7 +51,6 @@ import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.common.KeyStoreConfiguration;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
@@ -510,7 +509,7 @@ public class Desensobrado extends JPanel {
     	try {
     		privateKeyEntry = keyStoreManager.getKeyEntry(
     				selectedcert,
-    				KeyStoreUtilities.getCertificatePC(((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(), this)
+    				Utils.getCertificatePC(((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(), this)
     		);
     	}
     	catch (KeyException e) {

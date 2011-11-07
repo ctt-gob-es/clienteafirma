@@ -176,6 +176,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		this.setTitle(title);
 		
+		
 		this.answer = JOptionPane.NO_OPTION;
 		//Contenedor del diálogo
 		Container container = getContentPane();
@@ -306,6 +307,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//OK button
 		JPanel okPanel = new JPanel();
 		this.okButton = getButton(Messages.getString("PrincipalGUI.aceptar"), KeyEvent.VK_A);
+	
 		okPanel.add(this.okButton);
 		this.buttonsPanel.add(okPanel, consButtons);
 		
@@ -426,6 +428,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         
         //campo de texto del diálogo
         customDialog.component = new JTextField("");
+        customDialog.component.addAncestorListener(new RequestFocusListener());
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
@@ -488,6 +491,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         
         //campo de texto del diálogo
         customDialog.component = new JComboBox(selectionValues);
+        customDialog.component.addAncestorListener(new RequestFocusListener());
         if (initialSelectionValue != null) {
         	((JComboBox)customDialog.component).setSelectedItem(initialSelectionValue);
         }
@@ -545,13 +549,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.gridx = 1;   
 		c.gridy = 1;
 		c.weightx = 0.0;
+		c.weighty = 1.0;
         //c.weighty = 0.0;
         c.gridwidth = 2;
         c.insets = new Insets(10,10,0,10);  //right padding
         
         //campo de password del diálogo
         customDialog.component = new JPasswordField("");
-        customDialog.component.setVisible(true); //Se muestra el campo
+        customDialog.component.addAncestorListener(new RequestFocusListener());
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
