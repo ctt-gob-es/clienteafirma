@@ -50,6 +50,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.standalone.LookAndFeelManager;
@@ -57,7 +58,6 @@ import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
 import es.gob.afirma.standalone.crypto.CertificateInfo;
 import es.gob.afirma.standalone.crypto.CompleteSignInfo;
-import es.gob.afirma.util.signers.AOSignerFactory;
 
 final class SignDataPanel extends JPanel {
 
