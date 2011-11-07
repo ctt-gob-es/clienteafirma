@@ -623,11 +623,18 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         	String cancelKey = "cancel";
     		this.getRootPane().getInputMap (JComponent.WHEN_IN_FOCUSED_WINDOW).put (KeyStroke.getKeyStroke (KeyEvent.VK_ESCAPE, 0), cancelKey);
     		this.getRootPane ().getActionMap ().put (cancelKey, new AbstractAction () {
-    			public void actionPerformed (ActionEvent event) {
+    			/**
+				 * UID.
+				 */
+				private static final long serialVersionUID = 1L;
+				/**
+				 * Indica que la acción es la de pulsar el botón cancelar.
+				 */
+				public void actionPerformed (ActionEvent event) {
     				CustomDialog.cancelButton.doClick ();
     			}
 
-    			});
+    		});
         }
 
 		return button;
