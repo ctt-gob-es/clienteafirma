@@ -29,6 +29,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +47,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.ciphers.AOCipherConfig;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.ui.utils.CipherConfig;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
@@ -327,7 +328,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	// Si no se establecio el alias de la clave de cifrado, se la pedimos al usuario
     	String alias = null;
     	try {
-    		alias = KeyStoreUtilities.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true);
+    		alias = Utils.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true,
+    				new Vector<CertificateFilter>(0), false);
     	} catch (AOCancelledOperationException e) {
     		throw e;
     	} catch (Exception e) {
