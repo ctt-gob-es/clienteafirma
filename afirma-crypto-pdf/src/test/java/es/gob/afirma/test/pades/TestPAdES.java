@@ -31,7 +31,7 @@ import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.pkcs7.CMSTimestamper;
+import es.gob.afirma.signers.pkcs7.tsp.CMSTimestamper;
 
 /**
  * Pruebas del m&oacute;dulo PAdES de Afirma.
