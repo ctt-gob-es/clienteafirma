@@ -125,23 +125,19 @@ public class SelectionDialog {
         if (parent instanceof Component) {
             parentComponent = (Component) parent;
         }
-        
-        //Instancia del dialogo de guardado accesible
-        final JAccessibilityFileChooserToSave fileChooser = new JAccessibilityFileChooserToSave();
-        String currentDir = Main.preferences.get("dialog.save.dir", null); //$NON-NLS-1$
-        if (currentDir != null) {
-            fileChooser.setCurrentDirectory(new File(currentDir));
-        }
-        
-        fileChooser.setDialogTitle(dialogTitle); //Se le asigna un titulo al diálogo
-        
         File resultFile = null;
         boolean tryAgain = true;
         File file = null;
         while (tryAgain) {
-
-            tryAgain = false;
-            
+        	tryAgain = false;
+	        //Instancia del dialogo de guardado accesible
+	        final JAccessibilityFileChooserToSave fileChooser = new JAccessibilityFileChooserToSave();
+	        String currentDir = Main.preferences.get("dialog.save.dir", null); //$NON-NLS-1$
+	        if (currentDir != null) {
+	            fileChooser.setCurrentDirectory(new File(currentDir));
+	        }
+	        
+	        fileChooser.setDialogTitle(dialogTitle); //Se le asigna un titulo al diálogo
             fileChooser.getAccessibleContext().setAccessibleName(Messages.getString("SelectionDialog.saveDialog.accesible.name")); //$NON-NLS-1$
             fileChooser.getAccessibleContext().setAccessibleDescription(Messages.getString("SelectionDialog.saveDialog.accesible.desc")); //$NON-NLS-1$
             fileChooser.setToolTipText(Messages.getString("SelectionDialog.saveDialog.accesible.name")); //$NON-NLS-1$

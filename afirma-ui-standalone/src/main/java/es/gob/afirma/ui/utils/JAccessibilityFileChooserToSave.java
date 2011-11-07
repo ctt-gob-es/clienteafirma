@@ -353,82 +353,84 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
             c.fill = GridBagConstraints.BOTH;
             c.insets = new Insets(5,5,5,5);
             ArrayList<JPanel> todo = getPanels(this);
-            if (jTool!=null){
-            	for (int i = 0; i<jTool.getComponentCount();i++){
-            		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
-            		if (jTool.getComponent(i).getClass().getName().equals("javax.swing.JToggleButton")){
-            			((JToggleButton)(jTool.getComponent(i))).addKeyListener(new KeyListener() {
-    						
-    						@Override
-    						public void keyTyped(KeyEvent e) {
-    							// TODO Auto-generated method stub
-    							
-    						}
-    						
-    						@Override
-    						public void keyReleased(KeyEvent e) {
-    							// TODO Auto-generated method stub
-    							
-    						}
-    						
-    						@Override
-    						public void keyPressed(KeyEvent e) {
-    							// TODO Auto-generated method stub
-    							if (e.getKeyCode() == KeyEvent.VK_SPACE){
-    								callResize();
-    							}
-    						}
-    					});
-            			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
-            			((JToggleButton)(jTool.getComponent(i))).addMouseListener(new MouseListener() {
-    						
-    						@Override
-    						public void mouseReleased(MouseEvent e) {
-    							// TODO Auto-generated method stub
-    							
-    						}
-    						
-    						@Override
-    						public void mousePressed(MouseEvent e) {
-    							// TODO Auto-generated method stub
-    							
-    						}
-    						
-    						@Override
-    						public void mouseExited(MouseEvent e) {
-    							// TODO Auto-generated method stub
-    							
-    						}
-    						
-    						@Override
-    						public void mouseEntered(MouseEvent e) {
-    							// TODO Auto-generated method stub
-    							
-    						}
-    						
-    						@Override
-    						public void mouseClicked(MouseEvent e) {
-    							// TODO Auto-generated method stub
-    							callResize();
-    						}
-    					});
-            		}
-            		Utils.remarcar((JComponent)jTool.getComponent(i));
-                	Utils.setFontBold((JComponent)jTool.getComponent(i));
-            	}
-            	c.weightx = 0;
-                c.weighty = 0;
-            	c.gridy = 0;
-            	contentPane.add(jTool, c);
-            }
-            
-            for (int i = 0; i<todo.size();i++){
-            	todos(todo.get(i));
-            	c.weightx = 0.5;
-            	c.weighty = 0.5;				
-            	c.gridy = c.gridy + 1;
-            	contentPane.add(todo.get(i) , c);
-            }
+            if (todo.size()!=0){
+	            if (jTool!=null){
+	            	for (int i = 0; i<jTool.getComponentCount();i++){
+	            		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
+	            		if (jTool.getComponent(i).getClass().getName().equals("javax.swing.JToggleButton")){
+	            			((JToggleButton)(jTool.getComponent(i))).addKeyListener(new KeyListener() {
+	    						
+	    						@Override
+	    						public void keyTyped(KeyEvent e) {
+	    							// TODO Auto-generated method stub
+	    							
+	    						}
+	    						
+	    						@Override
+	    						public void keyReleased(KeyEvent e) {
+	    							// TODO Auto-generated method stub
+	    							
+	    						}
+	    						
+	    						@Override
+	    						public void keyPressed(KeyEvent e) {
+	    							// TODO Auto-generated method stub
+	    							if (e.getKeyCode() == KeyEvent.VK_SPACE){
+	    								callResize();
+	    							}
+	    						}
+	    					});
+	            			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
+	            			((JToggleButton)(jTool.getComponent(i))).addMouseListener(new MouseListener() {
+	    						
+	    						@Override
+	    						public void mouseReleased(MouseEvent e) {
+	    							// TODO Auto-generated method stub
+	    							
+	    						}
+	    						
+	    						@Override
+	    						public void mousePressed(MouseEvent e) {
+	    							// TODO Auto-generated method stub
+	    							
+	    						}
+	    						
+	    						@Override
+	    						public void mouseExited(MouseEvent e) {
+	    							// TODO Auto-generated method stub
+	    							
+	    						}
+	    						
+	    						@Override
+	    						public void mouseEntered(MouseEvent e) {
+	    							// TODO Auto-generated method stub
+	    							
+	    						}
+	    						
+	    						@Override
+	    						public void mouseClicked(MouseEvent e) {
+	    							// TODO Auto-generated method stub
+	    							callResize();
+	    						}
+	    					});
+	            		}
+	            		Utils.remarcar((JComponent)jTool.getComponent(i));
+	                	Utils.setFontBold((JComponent)jTool.getComponent(i));
+	            	}
+	            	c.weightx = 0;
+	                c.weighty = 0;
+	            	c.gridy = 0;
+	            	contentPane.add(jTool, c);
+	            }
+	            
+	            for (int i = 0; i<todo.size();i++){
+	            	todos(todo.get(i));
+	            	c.weightx = 0.5;
+	            	c.weighty = 0.5;				
+	            	c.gridy = c.gridy + 1;
+	            	contentPane.add(todo.get(i) , c);
+	            }
+            } 
         }
   
         if (JDialog.isDefaultLookAndFeelDecorated()) {
