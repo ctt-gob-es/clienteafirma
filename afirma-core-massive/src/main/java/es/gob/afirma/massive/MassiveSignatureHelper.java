@@ -29,7 +29,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.util.AOBase64;
-import es.gob.afirma.util.signers.AOSignerFactory;
+import es.gob.afirma.core.signers.AOSignerFactory;
 
 
 /** M&oacute;dulo para el soporte de multifirmas m&aacute;sivas. Permite
