@@ -130,9 +130,10 @@ public interface MiniAfirma {
      * @return &Aacute;rbol de firmantes.
      * @throws IOException Cuabndo se produzca un error al decodificar el base64.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
      */
-    String getSignersStructure(String signB64) throws IOException, AOFormatFileException ;
+    String getSignersStructure(String signB64) throws IOException, AOFormatFileException, PrivilegedActionException ;
 
     
     /**

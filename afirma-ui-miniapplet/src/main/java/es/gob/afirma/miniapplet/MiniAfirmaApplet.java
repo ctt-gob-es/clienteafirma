@@ -27,13 +27,13 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.miniapplet.actions.CoSignAction;
 import es.gob.afirma.miniapplet.actions.CounterSignAction;
 import es.gob.afirma.miniapplet.actions.GetFileContentAction;
 import es.gob.afirma.miniapplet.actions.GetFilePathAction;
 import es.gob.afirma.miniapplet.actions.SaveFileAction;
 import es.gob.afirma.miniapplet.actions.SelectPrivateKeyAction;
+import es.gob.afirma.miniapplet.actions.SelectSignerAction;
 import es.gob.afirma.miniapplet.actions.SignAction;
 
 
@@ -113,13 +113,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
     
     @Override
-    public String getSignersStructure(final String signB64) throws IOException, AOFormatFileException {
+    public String getSignersStructure(final String signB64) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
     	}
     	
     	final byte[] sign = Base64.decode(signB64);
-    	final AOSigner signer = AOSignerFactory.getSigner(sign);
+    	final AOSigner signer = this.getSigner(sign);
     	if (signer == null) {
     		throw new AOFormatFileException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
     	}
@@ -251,13 +251,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
      * @param sign Firma electr&oacute;nica.
      * @return Manejador de firma.
      * @throws AOFormatFileException Cuando el formato o la firma no estan soportados.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
      */
-    private AOSigner selectSigner(String format, byte[] sign) throws AOFormatFileException {
+    private AOSigner selectSigner(String format, byte[] sign) throws AOFormatFileException, PrivilegedActionException {
     	AOSigner signer = null;
     	String signerErrorMessage;
     	if (format != null) {
-    		signer = AOSignerFactory.getSigner(format);
+    		signer = this.getSigner(format);
     		signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
     		if (signer != null && sign != null) {
     			if (!signer.isSign(sign)) {
@@ -266,7 +267,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     			}
     		}
     	} else if (sign != null) {
-    		signer = AOSignerFactory.getSigner(sign);
+    		signer = this.getSigner(sign);
     		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
     	} else {
     		throw new NullPointerException("No se ha indicado el formato ni la firma que se desea tratar"); //$NON-NLS-1$
@@ -275,6 +276,30 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     		throw new AOFormatFileException(signerErrorMessage);
     	}
     	return signer;
+    }
+    
+    /**
+     * Recupera un manejador de firma compatible con el formato indicado. Si no se encuentra uno
+     * compatible, se devuelve {@code null}.
+     * @param format Nombre de un formato de firma.
+     * @return Manejador de firma.
+     * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
+     */
+    private AOSigner getSigner(final String format) throws PrivilegedActionException {
+    	SelectSignerAction action = new SelectSignerAction(format);
+    	return AccessController.doPrivileged(action);
+    }
+    
+    /**
+     * Recupera un manejador de firma compatible con la firma indicada. Si no se encuentra uno
+     * compatible, se devuelve {@code null}.
+     * @param signature Firma electr&oacute;nica.
+     * @return Manejador de firma.
+     * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
+     */
+    private AOSigner getSigner(final byte[] signature) throws PrivilegedActionException {
+    	SelectSignerAction action = new SelectSignerAction(signature);
+    	return AccessController.doPrivileged(action);
     }
     
     /**
