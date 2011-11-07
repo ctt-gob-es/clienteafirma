@@ -10,6 +10,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+
+import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -78,7 +81,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Boton de Cancel.
 	 */
-	private JButton cancelButton = null;
+	private static JButton cancelButton = null;
 	
 	/**
 	 * Boton de restaurar.
@@ -386,19 +389,19 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			customDialog.noButton.addActionListener(customDialog);
 			//Botón Cancelar
 			cons.gridx = 4;
-			customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+			cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
 			JPanel cancelPanel = new JPanel();
-			cancelPanel.add(customDialog.cancelButton);
+			cancelPanel.add(cancelButton);
 			customDialog.buttonsPanel.add(cancelPanel, cons);
-			customDialog.cancelButton.addActionListener(customDialog);
+			cancelButton.addActionListener(customDialog);
 		}
 		else {
 			//Botón Cancelar
-			customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+			cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
 			JPanel cancelPanel = new JPanel();
-			cancelPanel.add(customDialog.cancelButton);
+			cancelPanel.add(cancelButton);
 			customDialog.buttonsPanel.add(cancelPanel, cons);
-			customDialog.cancelButton.addActionListener(customDialog);
+			cancelButton.addActionListener(customDialog);
 		}
 		
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
@@ -448,16 +451,16 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
 		//Cancel button
-		customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
 		JPanel cancelPanel = new JPanel();
-		cancelPanel.add(customDialog.cancelButton);
+		cancelPanel.add(cancelButton);
 		customDialog.buttonsPanel.add(cancelPanel, cons);
-		customDialog.cancelButton.addActionListener(customDialog);
+		cancelButton.addActionListener(customDialog);
         
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
 		customDialog.component.setVisible(true); //Se hace visible el campo de texto
 		
-		customDialog.cancelButton.addActionListener(customDialog);
+		cancelButton.addActionListener(customDialog);
 		
 		customDialog.setVisible(true);
 		
@@ -514,16 +517,16 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
 		//Cancel button
-		customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
 		JPanel cancelPanel = new JPanel();
-		cancelPanel.add(customDialog.cancelButton);
+		cancelPanel.add(cancelButton);
 		customDialog.buttonsPanel.add(cancelPanel, cons);
-		customDialog.cancelButton.addActionListener(customDialog);
+		cancelButton.addActionListener(customDialog);
         
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
 		customDialog.component.setVisible(true); //Se hace visible el campo de texto
 		
-		customDialog.cancelButton.addActionListener(customDialog);
+		cancelButton.addActionListener(customDialog);
 		
 		customDialog.setVisible(true);
 		
@@ -580,17 +583,17 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
 		//Cancel button
-		customDialog.cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
 		JPanel cancelPanel = new JPanel();
-		cancelPanel.add(customDialog.cancelButton);
+		cancelPanel.add(cancelButton);
 		customDialog.buttonsPanel.add(cancelPanel, cons);
-		customDialog.cancelButton.addActionListener(customDialog);
-        
+		cancelButton.addActionListener(customDialog);
+
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
 		customDialog.component.setVisible(true); //Se hace visible el campo de texto
 		
-		customDialog.cancelButton.addActionListener(customDialog);
-		
+		cancelButton.addActionListener(customDialog);
+
 		customDialog.setVisible(true);
 		
 		//Control para saber si se ha pulsado el botón cancelar
@@ -600,13 +603,33 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario");
 
 	}
-	
+
+	/**
+	 * Método que crea un botón.
+	 * Si el botón corresponde al de cancelar, se le asigna la tecla esc.
+	 * @param text texto del botón
+	 * @param mnemonic atajo
+	 * @return botón
+	 */
 	private JButton getButton(String text, int mnemonic){
 		JButton button = new JButton (text);
 		button.setMnemonic(mnemonic);
 		Utils.remarcar(button);
         Utils.setContrastColor(button);
         Utils.setFontBold(button);
+        //Se comprueba si el botón es el de cancelar
+        if (text.equalsIgnoreCase(Messages.getString("PrincipalGUI.cancelar"))) {
+        	//Se asigna la tecla escape a dicho botón
+        	String cancelKey = "cancel";
+    		this.getRootPane().getInputMap (JComponent.WHEN_IN_FOCUSED_WINDOW).put (KeyStroke.getKeyStroke (KeyEvent.VK_ESCAPE, 0), cancelKey);
+    		this.getRootPane ().getActionMap ().put (cancelKey, new AbstractAction () {
+    			public void actionPerformed (ActionEvent event) {
+    				CustomDialog.cancelButton.doClick ();
+    			}
+
+    			});
+        }
+
 		return button;
 	}
 
@@ -672,6 +695,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
 	}
+
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
