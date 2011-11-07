@@ -312,6 +312,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		this.buttonsPanel.add(okPanel, consButtons);
 		
 		this.okButton.addActionListener(this);
+		//Se asigna este botón como botón por defecto de la ventana.
+		this.getRootPane().setDefaultButton(this.okButton);
 		
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized()){
