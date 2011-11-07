@@ -1,15 +1,11 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.swing.JDialog;
 
-import es.gob.afirma.core.misc.Platform;
 
 /**
  * Clase para generar un JDialog con la posibilidad de redimension.
@@ -85,7 +81,7 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 	 */
 	public void resized(final ComponentEvent e) {
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+		/*Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 		int maxWidth = (int)rect.getWidth();
 		int maxHeight = (int)rect.getHeight();
 		
@@ -103,27 +99,8 @@ public abstract class JAccessibilityDialogAdvisor extends JDialog {
 	    	this.setResizable(false);
 	    } else {
 	    	this.setResizable(true);
-	    }
-			    
-		/*Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	    Dimension fullScreen = new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-	    Dimension actualSize = getJAccessibilityDialogAdvisor(this).getSize();
-	    Component boton = getComponentByName("maximizar", getJAccessibilityDialogAdvisor(this));
-	    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogAdvisor(this));
-	    if(boton != null){
-	    	if (actualSize.equals(fullScreen)){
-				boton.setEnabled(false);
-				if (botonRestaurar != null) {
-	    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
-	    			botonRestaurar.setEnabled(true);
-	    		}
-		    } else {
-		    	boton.setEnabled(true);
-		    	if (botonRestaurar != null) {
-			    	botonRestaurar.setEnabled(false); //Se deshabilita
-		    	}
-		    }
 	    }*/
+			    
 	}
 	
 	/**
