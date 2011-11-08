@@ -9,6 +9,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 import es.gob.afirma.core.misc.Platform;
 
@@ -30,8 +31,12 @@ public abstract class JAccessibilityDialog extends JDialog {
 	
 	protected static int actualHeight = -1;
 	
-	public JAccessibilityDialog(){
-		super();
+	/**
+	 * Constructor.
+	 * @param frame ventana padre.
+	 */
+	public JAccessibilityDialog(JFrame frame){
+		super(frame);
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,this,null,null,null,null,null,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
