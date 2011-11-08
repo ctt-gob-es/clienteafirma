@@ -246,7 +246,7 @@ public class Opciones extends JAccessibilityDialog {
         contextOptions.loadConfig(GeneralConfig.getConfig());
         
         //Opciones de accesibilidad
-        accessibilityOptions =  new AccessibilityOptionsPane();
+        accessibilityOptions =  new AccessibilityOptionsPane(this);
         
         mainPanel.addTab(Messages.getString("Opciones.accesibilidad"),
         		null,
