@@ -43,6 +43,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
@@ -346,6 +347,21 @@ public class Utils {
 					}
 					public void menuCanceled(MenuEvent e) {
 						
+					}
+				});
+			}
+			if (component instanceof JScrollPane){
+				final JScrollPane scrollPane = (JScrollPane) component;
+				scrollPane.addFocusListener( new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						scrollPane.setBorder(BorderFactory.createEmptyBorder());
+					}
+					public void focusGained(FocusEvent e) {
+						if (GeneralConfig.isHighContrast()){
+							scrollPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+						} else {
+							scrollPane.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+						}
 					}
 				});
 			}
