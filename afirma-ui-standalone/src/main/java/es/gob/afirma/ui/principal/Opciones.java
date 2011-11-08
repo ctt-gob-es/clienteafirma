@@ -78,7 +78,12 @@ public class Opciones extends JAccessibilityDialog {
     /** Bot&oacute;n para restaurar la ventana una vez maximizada */
     private JButton restaurar = new JButton();
     
+    /**
+     * Constructor.
+     * @param mainGUI ventana padre
+     */
     public Opciones(PrincipalGUI mainGUI) {
+    	super(mainGUI);
     	this.mainGui = mainGUI;
         initComponents();
     }
