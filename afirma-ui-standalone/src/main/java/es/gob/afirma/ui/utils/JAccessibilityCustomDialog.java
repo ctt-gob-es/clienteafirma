@@ -8,6 +8,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 
 /**
@@ -32,6 +33,25 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 */
 	public JAccessibilityCustomDialog(JDialog dialog, boolean modal){
 		super(dialog, modal);
+		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
+		this.addComponentListener(adaptador);
+		this.addComponentListener(new ComponentAdapter() {
+		    public void componentResized(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		    public void componentMoved(ComponentEvent e)
+		    {
+		    	resized(e);
+		    }
+		});
+	}
+	
+	/**
+	 * Constructor con parámetros.
+	 */
+	public JAccessibilityCustomDialog(JFrame frame, boolean modal){
+		super(frame, modal);
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
