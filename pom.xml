@@ -28,6 +28,7 @@
     <module>afirma-core-firmaweb</module>
     <module>afirma-core-massive</module>
     <module>afirma-crypto-core-pkcs7</module>
+    <module>afirma-crypto-core-pkcs7-tsp</module>
     <module>afirma-crypto-cms</module>
     <module>afirma-crypto-cms-enveloper</module>
     <module>afirma-crypto-cades</module>
