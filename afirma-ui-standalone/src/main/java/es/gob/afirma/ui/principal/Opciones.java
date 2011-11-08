@@ -387,7 +387,7 @@ public class Opciones extends JAccessibilityDialog {
 		botonAyuda.addActionListener(new OpenHelpActionListener(this.mainPanel));
 		
         cons.ipadx = 0;
-		cons.weightx = 0.02;
+        cons.weightx = 0.5;
 		cons.gridx = 2;
 		
 		panelAyuda.add(botonAyuda);        
