@@ -415,13 +415,14 @@ public class AccessibilityOptionsPane {
 		String name = null;
 		if (user > 0){
 			String text = "Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración."+"<br>"+"Actualmente existen los siguientes perfiles: "+"<br>";
+			String listProfiles = "";
 			for (int i = 0;i<user;i++){
-				System.out.println(Main.preferences.get("user"+(i+1), "error"));
-				text += Main.preferences.get("user"+(i+1), "error")+"<br>";
+				//System.out.println(Main.preferences.get("user"+(i+1), "error"));
+				listProfiles += Main.preferences.get("user"+(i+1), "error")+"<br>";
 			}
-			name = CustomDialog.showInputDialog(null, true, text, "Insercción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(null, true, text, listProfiles, "Inserción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		} else{
-			name = CustomDialog.showInputDialog(null, true, "Nombre del perfil (debe ser una unica palabra).", "Inserccion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(null, true, "Nombre del perfil (debe ser una unica palabra).", "Insercion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (name!=null){
 			if (name.trim().length()!=0){
