@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
 import es.gob.afirma.ciphers.AOCipherConstants;
@@ -384,8 +385,7 @@ public class Cifrado extends JPanel {
 		
 		// Sacamos la ruta del archivo
 		if (campoFichero.getText() == null || campoFichero.getText().equals("")) {
-			//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
 			campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
 		}
 		else {

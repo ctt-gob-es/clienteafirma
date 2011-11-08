@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.Caret;
@@ -313,7 +314,7 @@ public class Ensobrado extends JPanel {
      */
     private void generarActionPerformed (JTextField campoFichero) {
     	if(campoFichero.getText() == null || campoFichero.getText().equals("")) {
-    		CustomDialog.showMessageDialog(this, true, Messages.getString("Ensobrado.msg.error.fichero"), Messages.getString("Ensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+    		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Ensobrado.msg.error.fichero"), Messages.getString("Ensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
     		campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
     	}
         else {

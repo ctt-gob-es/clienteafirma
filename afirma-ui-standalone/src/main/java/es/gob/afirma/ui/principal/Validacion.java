@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
@@ -223,18 +224,18 @@ public class Validacion extends JPanel {
      */
     private void validateActionPerformance(String signPath) {
         if (signPath == null || signPath.trim().length() <= 0) {
-        	CustomDialog.showMessageDialog(Validacion.this, true, Messages.getString("Validacion.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Validacion.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
         
         File signFile = new File(signPath);
         if (!signFile.exists() || !signFile.isFile()) {
-        	CustomDialog.showMessageDialog(Validacion.this, true, Messages.getString("Validacion.msg.error.nofichero", signPath), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Validacion.msg.error.nofichero", signPath), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
         
         if (!signFile.canRead()) {
-        	CustomDialog.showMessageDialog(Validacion.this, true, Messages.getString("Validacion.msg.error.noLectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Validacion.msg.error.noLectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
         

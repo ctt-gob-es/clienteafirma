@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Caret;
 
 import es.gob.afirma.core.AOCancelledOperationException;
@@ -354,8 +355,7 @@ public class Desensobrado extends JPanel {
     	// Obtenemos la ruta del sobre
     	String envelopPath = campoFichero.getText();
     	if(envelopPath == null || envelopPath.equals("") || !new File(envelopPath).exists() || !new File(envelopPath).isFile()) { 
-    		//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
-    		CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+    		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
     		campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
     	}
     	else {
@@ -366,8 +366,7 @@ public class Desensobrado extends JPanel {
     			envelopData = AOUtil.getDataFromInputStream(envelopFis);
     		} catch (Exception e) {
     			logger.severe("No se ha encontrado o no se ha podido leer el fichero: "+envelopPath);
-    			//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE);
-    			CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE);
+    			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.fichero2"), "Error", JOptionPane.ERROR_MESSAGE);
     			return;
     		}
 
@@ -382,22 +381,18 @@ public class Desensobrado extends JPanel {
     			return;
     		} catch (KeyException e) {
             	//Control de la excepción generada al introducir mal la contraseña para el almacén
-                //JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    			CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             } catch (AOKeystoreAlternativeException e) {
-           	 	//JOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-            	CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
            	 	return;
             } catch (AOException e) {
     			logger.severe("Error al abrir el almacen de claves del usuario: "+e);
-    			//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    			CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     			return;
     		} catch (Exception e) {
     			logger.severe("Error al recuperar el certificado del usuario: "+e);
-    			//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-    			CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     			return;
     		}
     		
@@ -416,21 +411,18 @@ public class Desensobrado extends JPanel {
     		        recoveredData = new CMSDecipherAuthenticatedEnvelopedData().dechiperAuthenticatedEnvelopedData(envelopData, privateKeyEntry);
     		        // Envoltorio no reconocido
     		    } else {
-    		    	//JAccessibilityOptionPane.showMessageDialog(this, Messages.getString("Desensobrado.msg.error.sobre"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-    		    	CustomDialog.showMessageDialog(this, true, Messages.getString("Desensobrado.msg.error.sobre"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+    		    	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.sobre"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     		        return;
     		    }
     		} catch (AOException e) {
     			logger.severe("Error al abrir el sobre digital: "+e); //$NON-NLS-1$
     			//El pop-up muestra el mensaje de la excepción
-    			//JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-    			CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+    			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     			return;
     		} catch (Exception e) {
     			logger.severe("Error al abrir el sobre digital: "+e); //$NON-NLS-1$
     			//El pop-up muestra el mensaje de la excepción
-    			//JAccessibilityOptionPane.showMessageDialog(this, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
-    			CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
+    			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, e.getMessage(), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
     			return;
     		}
 
@@ -456,7 +448,7 @@ public class Desensobrado extends JPanel {
     			store == AOKeyStore.WINROOT) pssCallback = new NullPasswordCallback();
     	else if (store==AOKeyStore.PKCS12){
     		//pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
-    		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
+    		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), SwingUtilities.getRoot(this),
         			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
         	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository")); //$NON-NLS-1$
             if (selectedFile != null) {
@@ -468,7 +460,7 @@ public class Desensobrado extends JPanel {
     	}
     	else {
     		//pssCallback = new UIPasswordCallback(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null); //$NON-NLS-1$ //$NON-NLS-2$
-    		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
+    		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), SwingUtilities.getRoot(this),
         			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
     	}
 
@@ -497,7 +489,7 @@ public class Desensobrado extends JPanel {
 
     private PrivateKeyEntry getPrivateKeyEntry(AOKeyStoreManager keyStoreManager, JComboBox comboAlmacen) throws AOException, KeyException {
     	// Seleccionamos un certificado
-    	String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true,
+    	String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), SwingUtilities.getRoot(this), true, true, true,
     			new Vector<CertificateFilter>(0), false);
 
     	// Comprobamos si se ha cancelado la seleccion
@@ -509,7 +501,7 @@ public class Desensobrado extends JPanel {
     	try {
     		privateKeyEntry = keyStoreManager.getKeyEntry(
     				selectedcert,
-    				Utils.getCertificatePC(((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(), this)
+    				Utils.getCertificatePC(((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(), SwingUtilities.getRoot(this))
     		);
     	}
     	catch (KeyException e) {
