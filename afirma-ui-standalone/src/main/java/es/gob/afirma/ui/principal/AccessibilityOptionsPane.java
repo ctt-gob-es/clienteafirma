@@ -13,6 +13,7 @@ import java.util.Properties;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -77,9 +78,15 @@ public class AccessibilityOptionsPane {
 	public boolean isBigStyle = false;
 	
 	public static boolean continueBigStyle = false;
+	
+	/**
+	 * Componente padre.
+	 */
+	private JDialog parent = null;
 
 	
-	public AccessibilityOptionsPane(){
+	public AccessibilityOptionsPane(JDialog parent){
+		this.parent = parent;
 		this.panel = new JPanel(new GridBagLayout());
 		initComponents();
 	}
@@ -420,9 +427,9 @@ public class AccessibilityOptionsPane {
 				//System.out.println(Main.preferences.get("user"+(i+1), "error"));
 				listProfiles += Main.preferences.get("user"+(i+1), "error")+"<br>";
 			}
-			name = CustomDialog.showInputDialog(null, true, text, listProfiles, "Inserción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(this.parent, true, text, listProfiles, "Inserción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		} else{
-			name = CustomDialog.showInputDialog(null, true, "Nombre del perfil (debe ser una unica palabra).", "Insercion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(this.parent, true, "Nombre del perfil (debe ser una unica palabra).", "Insercion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (name!=null){
 			if (name.trim().length()!=0){
@@ -459,7 +466,7 @@ public class AccessibilityOptionsPane {
 				Main.preferences.put(name.trim()+".accesibility.accessibility",String.valueOf(this.checkWindowAccessibility.isSelected()));
 				Main.preferences.put(name.trim()+".accesibility.cursor",String.valueOf(this.checkCursorSize.isSelected()));
 			} else {
-				CustomDialog.showMessageDialog(this.panel, true, "Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
+				CustomDialog.showMessageDialog(this.parent, true, "Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
