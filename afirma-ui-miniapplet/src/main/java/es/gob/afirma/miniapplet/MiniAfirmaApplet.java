@@ -29,12 +29,15 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.miniapplet.actions.CoSignAction;
 import es.gob.afirma.miniapplet.actions.CounterSignAction;
+import es.gob.afirma.miniapplet.actions.GetEcoJavaVersionAction;
 import es.gob.afirma.miniapplet.actions.GetFileContentAction;
 import es.gob.afirma.miniapplet.actions.GetFilePathAction;
+import es.gob.afirma.miniapplet.actions.GetFileNameContentAction;
 import es.gob.afirma.miniapplet.actions.SaveFileAction;
 import es.gob.afirma.miniapplet.actions.SelectPrivateKeyAction;
 import es.gob.afirma.miniapplet.actions.SelectSignerAction;
 import es.gob.afirma.miniapplet.actions.SignAction;
+import es.gob.afirma.miniapplet.actions.VerifyPlatformAction;
 
 
 /** MiniApplet de firma del proyecto Afirma.
@@ -66,7 +69,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
     	final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
 
-    	final SignAction signAction = new SignAction(signer, Base64.decode(dataB64), signAlgo, keyEntry, params); 
+    	final SignAction signAction = new SignAction(signer, Base64.decode(dataB64),
+    			signAlgo, keyEntry, ExtraParamsProcessor.expandProperties(params)); 
     	
         return Base64.encodeBytes(AccessController.doPrivileged(signAction));
     }
@@ -87,7 +91,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
     	final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
 
-    	final CoSignAction coSignAction = new CoSignAction(signer, sign, data, signAlgo, keyEntry, params); 
+    	final CoSignAction coSignAction = new CoSignAction(signer, sign, data,
+    			signAlgo, keyEntry, ExtraParamsProcessor.expandProperties(params)); 
     	
     	return Base64.encodeBytes(AccessController.doPrivileged(coSignAction));
     }
@@ -107,7 +112,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
     	final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
     	
-    	final CounterSignAction counterSignAction = new CounterSignAction(signer, sign, signAlgo, keyEntry, params); 
+    	final CounterSignAction counterSignAction = new CounterSignAction(signer, sign,
+    			signAlgo, keyEntry, ExtraParamsProcessor.expandProperties(params)); 
     	
     	return Base64.encodeBytes(AccessController.doPrivileged(counterSignAction));
     }
@@ -199,6 +205,35 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
     @Override
+	public String getFileNameContentText(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException {
+    	return this.getFileNameContent(title, extensions, description, false);
+    }
+    
+    @Override
+	public String getFileNameContentBase64(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException {
+    	return this.getFileNameContent(title, extensions, description, true);
+    }
+    
+    private String getFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
+
+    	String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+
+    	String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+    			null : new String[] { extensions.trim() });
+
+    	String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+    			description.trim() : (exts != null ? extensions : null));
+
+    	try { 
+    		return AccessController.doPrivileged(new GetFileNameContentAction(
+        			titleDialog, exts, descFiles, asBase64, this)); 
+    	} catch (AOCancelledOperationException e) {
+    		return null;
+    	}
+    }
+
+    
+    @Override
     public String getTextFromBase64(final String base64Data, final String charset) throws IOException {
     	if (base64Data == null) {
     		return null;
@@ -229,6 +264,16 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
     }
 
+    @Override
+	public String getEcoJava() { 
+    	return AccessController.doPrivileged(new GetEcoJavaVersionAction());
+    } 
+
+    @Override
+    public void verifyPlatform() throws PrivilegedActionException {
+    	AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
+    }
+    
     /**
      * Permite que el usuario seleccione un certificado del almac&eacute;n por defecto y devuelve
      * su clave privada.

@@ -165,6 +165,33 @@ public interface MiniAfirma {
      */
     String getFileContent(String title, String extensions, String description) throws IOException, PrivilegedActionException;
 
+    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
+     * que se devolver&aacute; su nombre y su contenido en formato texto unicode. El
+     * resultado devuelto es una cadena con el nombre y el contenido separados por el
+     * car&aacute;cter '|'. Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
+     * del fichero se devuelve {@code null}.
+     * @param title T&iacute;tulo para el di&aacute;logo.
+     * @param extensions Extensiones de b&uacute;squeda.
+     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
+     * @return El nombre del fichero y su contenido en unicode.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     */
+    String getFileNameContentText(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException;
+    
+    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
+     * que se devolver&aacute; su nombre y su contenido en base64. El resultado
+     * devuelto es una cadena con el nombre y el contenido separados por el
+     * car&aacute;cter '|'. Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
+     * del fichero se devuelve {@code null}.
+     * @param title T&iacute;tulo para el di&aacute;logo.
+     * @param extensions Extensiones de b&uacute;squeda.
+     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
+     * @return El nombre del fichero y su contenido en base64.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     */
+    String getFileNameContentBase64(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
      * del que se recuperar&aacute; su ruta absoluta. Si no se selecciona
@@ -217,4 +244,22 @@ public interface MiniAfirma {
      * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
     public String getBase64FromText(String plainText, String charset) throws IOException;
+    
+    /**
+     * Recupera la versi&oacute;n de Java en uso con el formato "JX", en donde X es un n&uacute;mero
+     * entero que identifica la versi&oacute;n. X ser&aacute; 4 para Java 1.4 o invferior, 5 para Java 5,
+     * 6 para Java 6 y 7 para cualquier otro. 
+     * @return Versi&oacute;n de Java.
+     */
+    public String getEcoJava();
+    
+    /**
+     * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
+     * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
+     * descripci&oacute;n del problema.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws RuntimeException Cuando se encuentra alguna incopatibilidad en el entorno de
+     * ejecuci&oacute;n.
+     */
+    void verifyPlatform() throws PrivilegedActionException;
 }
