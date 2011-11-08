@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -233,10 +234,10 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         container.add(this.mainPanel, cons);
         cons.gridy = 1;
         cons.gridx = 0;
+        cons.weighty = 0.5;
         
         //Se añade el panel de botones
         container.add(this.buttonsPanel, cons);
-
 	}
 
 	/**
@@ -411,7 +412,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	}
 	
 	/**
-	 * Muestra un dialogo de inserccion.
+	 * Muestra un dialogo de insercion.
 	 * @param componentParent componente padre
 	 * @param message mensaje a mostrar
 	 * @param title titulo del dilogo
@@ -473,7 +474,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	}
 	
 	/**
-	 * Muestra un dialogo de inserccion.
+	 * Muestra un dialogo de insercion. El componente de inserción será un combo.
 	 * @param componentParent componente padre
 	 * @param message mensaje a mostrar
 	 * @param title titulo del dilogo
@@ -492,7 +493,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.weightx = 0.0;
 		c.weighty = 1.0;
         c.gridwidth = 2;
-        c.insets = new Insets(10,10,0,10);  //right padding
+        c.insets = new Insets(0,10,0,10);  //right padding
         
         //campo de texto del diálogo
         customDialog.component = new JComboBox(selectionValues);
@@ -533,6 +534,101 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Control para saber si se ha pulsado el botón cancelar
 		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
 			return ((JComboBox)customDialog.component).getSelectedItem();
+		}
+		return null;
+
+	}
+	
+	/**
+	 * Muestra un dialogo de insercion que estará compuesto por dos etiquetas, una de ellas con posibilidad de mostrar
+	 * barras de scroll y un cuadro de texto.
+	 * @param componentParent componente padre
+	 * @param message mensaje a mostrar
+	 * @param title titulo del dilogo
+	 * @param messageType tipo de mensaje
+	 */
+	public static String showInputDialog(Component componentParent, boolean modal, String message, String scroll_list, String title, int typeMessage){
+		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		
+		
+		//Restricciones para el panel de datos
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 1;   
+		c.gridy = 1;
+		c.weightx = 0.0;
+        c.weighty = 3.0;
+        c.gridwidth = 2;
+        c.insets = new Insets(5,10,5,10);  //right padding
+
+        //Se crea una etiqueta con la lista que se ha pasado.
+        InfoLabel labelScroll = new InfoLabel(scroll_list, true);
+        labelScroll.setFocusable(false);
+        //Se crea un panel de scrolls
+        JScrollPane scrPane = new JScrollPane(labelScroll, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+		JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrPane.setOpaque(true);
+		scrPane.setFocusable(true);
+		
+		labelScroll.setLabelFor(scrPane);
+		
+	/*	if (!scroll_list.equalsIgnoreCase("")) {
+			String[] profiles = scroll_list.split("<br>");
+			String accesibleName = "";
+			for (int i =0; i< profiles.length; i++) {
+				accesibleName += profiles[i] + ", ";
+			}
+			scrPane.getAccessibleContext().setAccessibleName(accesibleName);
+		}*/
+		
+		
+		//Se asignan las configuraciones de accesibilidad
+		Utils.remarcar(scrPane);
+        Utils.setContrastColor(scrPane);
+        Utils.setFontBold(scrPane);
+        //Se añade el scroll al panel principal
+		customDialog.mainPanel.add(scrPane, c);
+		
+		c.insets = new Insets(10,10,5,10);  //right padding
+		c.gridy = 2;
+		c.weighty =1.0;
+        
+        //campo de texto del diálogo
+        customDialog.component = new JTextField("");
+        customDialog.component.addAncestorListener(new RequestFocusListener());
+        Utils.remarcar(customDialog.component);
+        Utils.setContrastColor(customDialog.component);
+        Utils.setFontBold(customDialog.component);
+       //Se añade el campo de texto al panel de información general
+        customDialog.mainPanel.add(customDialog.component, c);
+        
+       //Se relaciona la etiqueta con el componente
+	   //labelScroll.setLabelFor(customDialog.component);
+		
+		//Restricciones botones
+		GridBagConstraints cons = new GridBagConstraints();
+		cons.fill = GridBagConstraints.HORIZONTAL;
+		cons.gridx = 3;
+		cons.gridy = 0;
+		cons.insets = new Insets(0,0,0,10);  //right padding
+
+		//Cancel button
+		cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		JPanel cancelPanel = new JPanel();
+		cancelPanel.add(cancelButton);
+		customDialog.buttonsPanel.add(cancelPanel, cons);
+		cancelButton.addActionListener(customDialog);
+        
+		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
+		customDialog.component.setVisible(true); //Se hace visible el campo de texto
+		
+		cancelButton.addActionListener(customDialog);
+		
+		customDialog.setVisible(true);
+		
+		//Control para saber si se ha pulsado el botón cancelar
+		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
+			return ((JTextField)customDialog.component).getText();
 		}
 		return null;
 
