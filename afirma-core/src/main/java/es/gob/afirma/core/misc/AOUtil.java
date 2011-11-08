@@ -653,18 +653,15 @@ public final class AOUtil {
      */
     public static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOUtil.class.getClassLoader();
-        if (classLoader.getClass().getName().equals("sun.plugin2.applet.JNLP2ClassLoader")) { //$NON-NLS-1$
-        	return classLoader;
-        } else if (classLoader instanceof URLClassLoader) {
-            ArrayList<URL> urls = new ArrayList<URL>();
-            for (URL url : ((URLClassLoader) classLoader).getURLs()) {
-            	if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
-                    urls.add(url);
-                }
-            }
-            classLoader = new URLClassLoader(urls.toArray(new URL[0]), AOUtil.class.getClassLoader());
+        if (classLoader instanceof URLClassLoader) {
+        	ArrayList<URL> urls = new ArrayList<URL>();
+        	for (URL url : ((URLClassLoader) classLoader).getURLs()) {
+        		if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
+        			urls.add(url);
+        		}
+        	}
+        	classLoader = new URLClassLoader(urls.toArray(new URL[0]));
         }
-        
         return classLoader;
     }
 }
