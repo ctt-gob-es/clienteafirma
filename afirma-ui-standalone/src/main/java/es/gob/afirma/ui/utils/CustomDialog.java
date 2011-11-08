@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -105,7 +106,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Constructor.
 	 *
-	 * @param componentParent componente padre.
+	 * @param JDialog componente padre.
 	 * @param modal modal
 	 * @param message mensaje
 	 * @param title titulo
@@ -130,6 +131,22 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	public CustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
 		super();
 		this.setModal(modal);
+		initComponents(message, title, typeMessage);
+		setLocationRelativeTo(componentParent);
+		
+	}
+	
+	/**
+	 * Constructor.
+	 *
+	 * @param JFrame componente padre.
+	 * @param modal modal
+	 * @param message mensaje
+	 * @param title titulo
+	 * @param typeMessage tipo de mensaje
+	 */
+	public CustomDialog(JFrame componentParent, boolean modal, String message, String title, int typeMessage){
+		super(componentParent, modal);
 		initComponents(message, title, typeMessage);
 		setLocationRelativeTo(componentParent);
 		
@@ -342,8 +359,17 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param messageType tipo de mensaje
 	 */
 	public static void showMessageDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
-	
-		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		//Instancia de CustomDialog
+		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage);
+		
+		if (componentParent instanceof JDialog) {
+			customDialog = new CustomDialog((JDialog)componentParent, modal, message, title, typeMessage);
+		} else if (componentParent instanceof JFrame){
+			customDialog = new CustomDialog((JFrame)componentParent, modal, message, title, typeMessage);
+		} else {
+			customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		}
+				
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 		//customDialog.component.setVisible(false); //Se oculta el campo de texto
 		customDialog.setVisible(true);
@@ -358,7 +384,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 */
 	public static int showConfirmDialog(Component componentParent, boolean modal, String message, String title, int typeOption, int typeMessage){
 		
-		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage);
 		
 		//Restricciones
 		GridBagConstraints cons = new GridBagConstraints();
@@ -419,9 +445,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param messageType tipo de mensaje
 	 */
 	public static String showInputDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
-		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
-		
-		
+		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage);
+
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -482,8 +507,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 */
 	public static Object showInputDialog(Component componentParent, boolean modal, String message, String title, int typeMessage,
 			final Object[] selectionValues, final Object initialSelectionValue){
-		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
 		
+		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage);
 		
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
@@ -548,9 +573,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param messageType tipo de mensaje
 	 */
 	public static String showInputDialog(Component componentParent, boolean modal, String message, String scroll_list, String title, int typeMessage){
-		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
 		
-		
+		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage);
+
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -642,7 +667,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param messageType tipo de mensaje
 	 */
 	public static char[] showInputPasswordDialog(Component componentParent, boolean modal, final String charSet, final boolean beep, String message, String title, int typeMessage){
-		CustomDialog customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		
+		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage);
 		 
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
@@ -797,6 +823,23 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
+	}
+
+	/**
+	 * Método que devuelve una instancia de CustomDialog.
+	 * @return instancia de CustomDialog.
+	 */
+	public static CustomDialog getInstanceCustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage){
+		CustomDialog customDialog = null;
+		//Se chequea cual será el componente padre.
+		if (componentParent instanceof JDialog) {
+			customDialog = new CustomDialog((JDialog)componentParent, modal, message, title, typeMessage);
+		} else if (componentParent instanceof JFrame){
+			customDialog = new CustomDialog((JFrame)componentParent, modal, message, title, typeMessage);
+		} else {
+			customDialog = new CustomDialog(componentParent, modal, message, title, typeMessage);
+		}
+		return customDialog;
 	}
 
 
