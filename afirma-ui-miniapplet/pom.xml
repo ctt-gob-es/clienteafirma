@@ -21,6 +21,18 @@
     </dependency>
 
     <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-core-keystores</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>es.gob.afirma</groupId>
+      <artifactId>afirma-keystores-filters-rfc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.jvnet.hudson</groupId>
       <artifactId>netx</artifactId>
       <version>0.5-hudson-2</version>
