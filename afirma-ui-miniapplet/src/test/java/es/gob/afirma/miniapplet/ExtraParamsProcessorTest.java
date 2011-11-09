@@ -6,8 +6,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+/** Pruebas del paso de propiedades desde JavaScript a Java. */
 public class ExtraParamsProcessorTest {
 
+    /** Prueba del paso de propiedades desde String con l&iacute;neas delimitadas por <code>\n</code> a <code>Properties</code> de Java. */
 	@Test
 	public void testExtraParamProcessor() {
 

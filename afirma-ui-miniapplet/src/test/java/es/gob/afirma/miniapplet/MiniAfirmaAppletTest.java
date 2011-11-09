@@ -1,12 +1,16 @@
 package es.gob.afirma.miniapplet;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.Base64;
 
+/** Pruebas del MiniApplet.  */
 public class MiniAfirmaAppletTest {
 
+	/** Prueba de firma simple con DNIe. */
 	@Test
+	@Ignore
 	public void signWithDNIe() {
 		
 		MiniAfirmaApplet applet = new MiniAfirmaApplet();
