@@ -355,7 +355,7 @@ public class Utils {
 				final JScrollPane scrollPane = (JScrollPane) component;
 				scrollPane.addFocusListener( new FocusListener() {
 					public void focusLost(FocusEvent e) {
-						scrollPane.setBorder(BorderFactory.createEmptyBorder());
+						scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 					}
 					public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
@@ -397,8 +397,7 @@ public class Utils {
 				((JLabel)component.getComponent(0)).setForeground(Color.WHITE);
 			} else if (component instanceof JEditorPane){
 				component.setBackground(Color.BLACK);
-			} else{
-				
+			} else {
 				component.setForeground(Color.WHITE);
 				component.setBackground(Color.BLACK);
 			}
