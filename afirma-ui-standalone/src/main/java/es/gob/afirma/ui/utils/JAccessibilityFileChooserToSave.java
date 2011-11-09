@@ -311,32 +311,35 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
         	contentPane.setLayout(new GridLayout());
         	contentPane.add(this , BorderLayout.CENTER);
         } else {
-        	 dialog.addComponentListener(new ComponentListener() {
-     			
-     			@Override
-     			public void componentShown(ComponentEvent e) {
-     				// TODO Auto-generated method stub
-     				
-     			}
-     			
-     			@Override
-     			public void componentResized(ComponentEvent e) {
-     				// TODO Auto-generated method stub
-     				resized();
-     			}
-     			
-     			@Override
-     			public void componentMoved(ComponentEvent e) {
-     				// TODO Auto-generated method stub
-     				resized();
-     			}
-     			
-     			@Override
-     			public void componentHidden(ComponentEvent e) {
-     				// TODO Auto-generated method stub
-     				
-     			}
-     		});
+        	removeWindowsToolBar();
+        	contentPane.setLayout(new GridLayout());
+        	
+        	dialog.addComponentListener(new ComponentListener() {
+    			
+    			@Override
+    			public void componentShown(ComponentEvent e) {
+    				// TODO Auto-generated method stub
+    				
+    			}
+    			
+    			@Override
+    			public void componentResized(ComponentEvent e) {
+    				// TODO Auto-generated method stub
+    				resized();
+    			}
+    			
+    			@Override
+    			public void componentMoved(ComponentEvent e) {
+    				// TODO Auto-generated method stub
+    				resized();
+    			}
+    			
+    			@Override
+    			public void componentHidden(ComponentEvent e) {
+    				// TODO Auto-generated method stub
+    				
+    			}
+    		});
         	// Dimensiones de la ventana
         	if (GeneralConfig.isMaximized()){
         		dialog.setPreferredSize(new Dimension(maxWidth, maxHeight));
@@ -347,92 +350,81 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
     	    		dialog.setPreferredSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
         		}
         	}
-            dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
-        	contentPane.setLayout(new GridBagLayout());
-        	GridBagConstraints c = new GridBagConstraints();
-            c.fill = GridBagConstraints.BOTH;
-            c.insets = new Insets(5,5,5,5);
-            ArrayList<JPanel> todo = getPanels(this);
-            if (todo.size()!=0){
-	            if (jTool!=null){
-	            	for (int i = 0; i<jTool.getComponentCount();i++){
-	            		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
-	            		if (jTool.getComponent(i).getClass().getName().equals("javax.swing.JToggleButton")){
-	            			((JToggleButton)(jTool.getComponent(i))).addKeyListener(new KeyListener() {
-	    						
-	    						@Override
-	    						public void keyTyped(KeyEvent e) {
-	    							// TODO Auto-generated method stub
-	    							
-	    						}
-	    						
-	    						@Override
-	    						public void keyReleased(KeyEvent e) {
-	    							// TODO Auto-generated method stub
-	    							
-	    						}
-	    						
-	    						@Override
-	    						public void keyPressed(KeyEvent e) {
-	    							// TODO Auto-generated method stub
-	    							if (e.getKeyCode() == KeyEvent.VK_SPACE){
-	    								callResize();
-	    							}
-	    						}
-	    					});
-	            			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
-	            			((JToggleButton)(jTool.getComponent(i))).addMouseListener(new MouseListener() {
-	    						
-	    						@Override
-	    						public void mouseReleased(MouseEvent e) {
-	    							// TODO Auto-generated method stub
-	    							
-	    						}
-	    						
-	    						@Override
-	    						public void mousePressed(MouseEvent e) {
-	    							// TODO Auto-generated method stub
-	    							
-	    						}
-	    						
-	    						@Override
-	    						public void mouseExited(MouseEvent e) {
-	    							// TODO Auto-generated method stub
-	    							
-	    						}
-	    						
-	    						@Override
-	    						public void mouseEntered(MouseEvent e) {
-	    							// TODO Auto-generated method stub
-	    							
-	    						}
-	    						
-	    						@Override
-	    						public void mouseClicked(MouseEvent e) {
-	    							// TODO Auto-generated method stub
-	    							callResize();
-	    						}
-	    					});
-	            		}
-	            		Utils.remarcar((JComponent)jTool.getComponent(i));
-	                	Utils.setFontBold((JComponent)jTool.getComponent(i));
-	            	}
-	            	c.weightx = 0;
-	                c.weighty = 0;
-	            	c.gridy = 0;
-	            	contentPane.add(jTool, c);
-	            }
-	            
-	            for (int i = 0; i<todo.size();i++){
-	            	todos(todo.get(i));
-	            	c.weightx = 0.5;
-	            	c.weighty = 0.5;				
-	            	c.gridy = c.gridy + 1;
-	            	contentPane.add(todo.get(i) , c);
-	            }
-            } 
+        	dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+            for (int i = 0; i<this.getComponentCount();i++){
+            	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){
+            		jTool = (JToolBar)this.getComponent(i);
+            		for (int j = 0; j<jTool.getComponentCount();j++){
+                		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
+                		if (jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){
+                			((JToggleButton)(jTool.getComponent(j))).addKeyListener(new KeyListener() {
+        						
+        						@Override
+        						public void keyTyped(KeyEvent e) {
+        							// TODO Auto-generated method stub
+        							
+        						}
+        						
+        						@Override
+        						public void keyReleased(KeyEvent e) {
+        							// TODO Auto-generated method stub
+        							
+        						}
+        						
+        						@Override
+        						public void keyPressed(KeyEvent e) {
+        							// TODO Auto-generated method stub
+        							if (e.getKeyCode() == KeyEvent.VK_SPACE){
+        								callResize();
+        							}
+        						}
+        					});
+                			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
+                			((JToggleButton)(jTool.getComponent(j))).addMouseListener(new MouseListener() {
+        						
+        						@Override
+        						public void mouseReleased(MouseEvent e) {
+        							// TODO Auto-generated method stub
+        							
+        						}
+        						
+        						@Override
+        						public void mousePressed(MouseEvent e) {
+        							// TODO Auto-generated method stub
+        							
+        						}
+        						
+        						@Override
+        						public void mouseExited(MouseEvent e) {
+        							// TODO Auto-generated method stub
+        							
+        						}
+        						
+        						@Override
+        						public void mouseEntered(MouseEvent e) {
+        							// TODO Auto-generated method stub
+        							
+        						}
+        						
+        						@Override
+        						public void mouseClicked(MouseEvent e) {
+        							// TODO Auto-generated method stub
+        							callResize();
+        						}
+        					});
+                		}
+                		Utils.remarcar((JComponent)jTool.getComponent(j));
+                    	Utils.setFontBold((JComponent)jTool.getComponent(j));
+                	}
+            	} else {
+            		accessibility((JPanel)this.getComponent(i));
+            	}
+            	
+            }
+            
+            contentPane.add(this , BorderLayout.CENTER);
         }
-  
+        
         if (JDialog.isDefaultLookAndFeelDecorated()) {
             boolean supportsWindowDecorations = UIManager
                     .getLookAndFeel().getSupportsWindowDecorations();
@@ -450,30 +442,37 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
         	this.theDialog = dialog;
      		dialog.addComponentListener(resizingAdaptor);
         }
-       
-		
+        
         return dialog;
 	}
 	
-	public ArrayList<JPanel> getPanels(Container cont){
-		ArrayList<JPanel> array = new ArrayList<JPanel>();
-		for (int i=0; i<cont.getComponentCount();i++){
-        	if (cont.getComponent(i) instanceof JPanel){
-        		array.add((JPanel)cont.getComponent(i));
-        	} else if (cont.getComponent(i) instanceof JToolBar){
-        		this.jTool = (JToolBar)cont.getComponent(i);
+	/**
+	 * Elimina la barra de accesos a carpetas de windows de la ventana
+	 */
+	public void removeWindowsToolBar(){
+		
+		for (int i=0; i<this.getComponentCount();i++){
+			if (this.getComponent(i) instanceof JToolBar){
+        		if (!this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){
+        			this.remove(this.getComponent(i));
+        			
+        		}
         	}
         }
-		return array;
+
 	}
 	
-	public void todos(JPanel jfile){	
-		for (int i=0;i<jfile.getComponentCount();i++){
-			if (jfile.getComponent(i) instanceof JPanel){
-				todos((JPanel)jfile.getComponent(i));
+	/**
+	 * Aplica la configuraci&oacute;n de accesibilidad a los componentes del panel
+	 * @param jPanel Panel con los componentes. Puede contener m&aacute;s paneles
+	 */
+	public void accessibility(JPanel jPanel){		
+		for (int i=0;i<jPanel.getComponentCount();i++){
+			if (jPanel.getComponent(i) instanceof JPanel){
+				accessibility((JPanel)jPanel.getComponent(i));
 			} else {
-				Utils.remarcar((JComponent)jfile.getComponent(i));
-				Utils.setFontBold((JComponent)jfile.getComponent(i));
+				Utils.remarcar((JComponent)jPanel.getComponent(i));
+				Utils.setFontBold((JComponent)jPanel.getComponent(i));
 			}
 		}
 	}
