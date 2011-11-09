@@ -621,7 +621,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         	 for (final String str : list) {
         		 InfoLabel infoLabel = new InfoLabel(str, true);
         		 infoLabel.setFocusable(false);
-        		 panel.add(infoLabel);;
+        		 panel.add(infoLabel);
         		 fullList+=". "+str;
              }
         }
