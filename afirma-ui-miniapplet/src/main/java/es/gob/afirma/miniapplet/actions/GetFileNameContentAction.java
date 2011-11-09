@@ -14,19 +14,15 @@ import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
  * Acci&oacute;n para la recuperaci&oacute;n del nombre y contenido de un fichero.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class GetFileNameContentAction implements PrivilegedExceptionAction<String> {
+public final class GetFileNameContentAction implements PrivilegedExceptionAction<String> {
     
 	private static final String SEPARATOR = "|"; //$NON-NLS-1$
 	
-    private String title;
-    
-    private String[] exts;
-    
-    private String desc;
-     
-    private boolean asBase64;
-    
-    private Component parent;
+    private final String title;
+    private final String[] exts;
+    private final String desc;
+    private final boolean asBase64;
+    private final Component parent;
     
     /**
      * Crea la acci&oacute;n para la recuperaci&oacute;n del nombre y el contenido de un fichero.
@@ -37,7 +33,6 @@ public class GetFileNameContentAction implements PrivilegedExceptionAction<Strin
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
     public GetFileNameContentAction(final String title, final String[] exts, final String desc, final boolean asBase64, final Component parent) {
-
     	this.title = title;
         this.exts = exts;
         this.desc = desc;
@@ -53,19 +48,19 @@ public class GetFileNameContentAction implements PrivilegedExceptionAction<Strin
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
-	@Override
 	public String run() throws AOCancelledOperationException, IOException {
-		        
-        String path = (new FileSelectionDialog(this.title, this.exts, this.desc, this.parent)).getPath();
-        File file = new File(path);
-        FileInputStream is = new FileInputStream(file);
+        final String path = (new FileSelectionDialog(this.title, this.exts, this.desc, this.parent)).getPath();
+        final File file = new File(path);
+        final FileInputStream is = new FileInputStream(file);
         byte[] contentFic = null;
         try {
         	contentFic = AOUtil.getDataFromInputStream(is);
-        } finally {
+        } 
+        finally {
         	try {
         		is.close();
-        	} catch (Exception e) {
+        	} 
+        	catch (final Exception e) {
         		/* Ignoramos este error */
         	}
         }

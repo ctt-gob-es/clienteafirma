@@ -58,7 +58,6 @@ public final class SelectPrivateKeyAction implements PrivilegedExceptionAction<P
 		this.parent = parent;
 	}
 	
-	@Override
 	public PrivateKeyEntry run() throws Exception {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			this.keyStore, 
@@ -67,7 +66,6 @@ public final class SelectPrivateKeyAction implements PrivilegedExceptionAction<P
 			KeyStoreUtilities.getPreferredPCB(this.keyStore, this.parent), 
 			this.parent
 		);
-		
 		
 		boolean mandatoryCertificate = false;
 		List<CertificateFilter> filters = null;

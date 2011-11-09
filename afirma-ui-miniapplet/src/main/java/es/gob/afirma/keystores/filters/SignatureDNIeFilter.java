@@ -26,7 +26,8 @@ public final class SignatureDNIeFilter extends CertificateFilter {
 		this.keyUsageFilter = new KeyUsageFilter(KeyUsageFilter.SIGN_CERT_USAGE);
 	}
 	
-	public boolean matches(final X509Certificate cert) {
+	@Override
+    public boolean matches(final X509Certificate cert) {
 		return this.keyUsageFilter.matches(cert) && this.rfc2254Filter.matches(cert);
 	}
 }

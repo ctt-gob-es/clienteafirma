@@ -40,7 +40,6 @@ public final class GetFilePathAction implements PrivilegedExceptionAction<String
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
-	@Override
 	public String run() throws AOCancelledOperationException, IOException {
         return new FileSelectionDialog(this.title, this.exts, this.desc, this.parent).getPath();
 	}

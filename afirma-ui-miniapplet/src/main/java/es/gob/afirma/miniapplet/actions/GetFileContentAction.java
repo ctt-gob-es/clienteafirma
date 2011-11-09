@@ -43,11 +43,9 @@ public final class GetFileContentAction implements PrivilegedExceptionAction<byt
      * @throws AOCancelledOperationException Cuando se cancela la operacion de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
-	@Override
 	public byte[] run() throws AOCancelledOperationException, IOException {
         final FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.parent);
         final InputStream is = dialog.getFileContent();
-        
         try {
         	return AOUtil.getDataFromInputStream(is);
         } 

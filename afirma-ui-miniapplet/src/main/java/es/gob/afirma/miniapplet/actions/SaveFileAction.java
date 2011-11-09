@@ -17,19 +17,14 @@ import es.gob.afirma.miniapplet.MiniAppletMessages;
  * Acci&oacute;n para almacenar un fichero en disco.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
+public final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
     
-	private String title;
-	
-    private byte[] data;
-    
-    private String[] exts;
-    
-    private String desc;
-    
-    private File fileHint;
-    
-    private Component parent;
+	private final String title;
+    private final byte[] data;
+    private final String[] exts;
+    private final String desc;
+    private final File fileHint;
+    private final Component parent;
         
     /**
      * Crea la acci&oacute;n para la carga de ficheros.
@@ -57,12 +52,8 @@ public class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
      * @throws IOException Cuando se produce un error al almacenar el fichero.
      */
-	@Override
 	public Boolean run() throws AOCancelledOperationException, IOException {
-		
-		File file = this.selectFileToSave();
-		
-    	return Boolean.valueOf(this.saveFile(file, this.data));
+    	return Boolean.valueOf(this.saveFile(this.selectFileToSave(), this.data));
 	}
 	
     /**
@@ -79,11 +70,11 @@ public class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
 			}
 			
 			@Override
-			public boolean accept(File f) {
+			public boolean accept(final File f) {
 				if (f.isDirectory()) {
 					return true;
 				}
-				for (String ext : extensions) {
+				for (final String ext : extensions) {
 					if (f.getName().endsWith(ext)) {
 						return true;
 					}

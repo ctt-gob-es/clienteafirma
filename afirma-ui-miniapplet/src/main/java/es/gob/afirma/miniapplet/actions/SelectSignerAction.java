@@ -39,11 +39,11 @@ public final class SelectSignerAction implements PrivilegedExceptionAction<AOSig
      * Si no se encuentra un manejador compatible, se devuelve {@code null}.
      * @return Manejador de firma.
      */
-	@Override
 	public AOSigner run() {
 		if (this.format != null) {
 			return AOSignerFactory.getSigner(this.format);	
-		} else if (this.data != null) {
+		} 
+		else if (this.data != null) {
 			return AOSignerFactory.getSigner(this.data);
 		}
         return null;

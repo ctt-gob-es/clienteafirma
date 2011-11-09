@@ -13,27 +13,23 @@ import es.gob.afirma.miniapplet.MiniAppletMessages;
  * ejecuci&oacute;n lanza una {@code RuntimeException} con el mensaje explicativo del problema
  * y su posible soluci&oacute;n por parte del usuario.
  */
-public class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
+public final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 
 	private static final String BC_VERSION = "1.46";  //$NON-NLS-1$
 	
-	private String userAgent;
+	private final String userAgent;
 
 	/**
 	 * Crea la acci&oacute;n de verificaci&oacute;n.
 	 * @param userAgent Identificador del navegador Web utilizado.
 	 */
-	public VerifyPlatformAction(String userAgent) {
+	public VerifyPlatformAction(final String userAgent) {
 		this.userAgent = userAgent;
 	}
 
-	@Override
 	public Void run() throws Exception {
-
 		this.verificaSunMSCAPINeeded();
-
 		this.verificaBCVersion();
-
 		return null;
 	}
 
@@ -49,8 +45,8 @@ public class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 			try {
 				AOUtil.classForName("sun.security.mscapi.SunMSCAPI"); //$NON-NLS-1$
 				return;
-
-			} catch(final Exception e) {
+			} 
+			catch(final Exception e) {
 
 				Logger.getLogger("es.gob.afirma").severe("Se requiere instalar SunMSCAPI en Windows 64"); //$NON-NLS-1$ //$NON-NLS-2$
 				String SunmscapOri = MiniAppletMessages.getString("MSCapiJar.uri"); //$NON-NLS-1$
@@ -64,20 +60,17 @@ public class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 		}
 	}
 
-	/**
-	 * Indica si es necesario eliminar BC
-	 */
+	/** Indica si la versi&oacute;n de BouncyCastle es la adecuada para ejecutar el MiniApplet. */
 	private void verificaBCVersion() {
-
-		String bcVersion = null;
 
 		try {	
 			AOUtil.classForName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$
-		} catch(final Exception e) {   
+		} 
+		catch(final Exception e) {   
 			return;
 		}
 
-		bcVersion = Platform.getBouncyCastleVersion();
+		final String bcVersion = Platform.getBouncyCastleVersion();
 
 		if (BC_VERSION.compareTo(bcVersion) > 0) {
 			String javaExtDir = Platform.getJavaExtDir();

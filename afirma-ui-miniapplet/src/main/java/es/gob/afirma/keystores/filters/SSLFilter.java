@@ -42,11 +42,13 @@ public final class SSLFilter extends CertificateFilter {
 		this.signatureDnieCertFilter = new SignatureDNIeFilter();
 	}
 	
-	public boolean matches(final X509Certificate cert) {
+	@Override
+    public boolean matches(final X509Certificate cert) {
 		return this.prepareSerialNumber(this.getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
 	}
 	
-	public X509Certificate[] matches(final X509Certificate[] certs) {
+	@Override
+    public X509Certificate[] matches(final X509Certificate[] certs) {
 		
 		final Set<X509Certificate> filteredCerts = new HashSet<X509Certificate>();
 		for (final X509Certificate cert : certs) {

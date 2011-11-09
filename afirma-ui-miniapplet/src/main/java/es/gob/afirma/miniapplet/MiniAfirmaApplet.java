@@ -56,7 +56,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     /** Ruta recomendada para la apertura de di&aacute;logos se seleccion y guardado de ficheros. */
     private File pathHint = new File(Platform.getUserHome());
 
-    @Override
     public String sign(final String dataB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (dataB64 == null) {
     		throw new NullPointerException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
@@ -75,7 +74,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         return Base64.encodeBytes(AccessController.doPrivileged(signAction));
     }
 
-    @Override
     public String coSign(final String signB64, final String dataB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
@@ -97,8 +95,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	return Base64.encodeBytes(AccessController.doPrivileged(coSignAction));
     }
 
-
-    @Override
     public String counterSign(final String signB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
@@ -118,7 +114,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	return Base64.encodeBytes(AccessController.doPrivileged(counterSignAction));
     }
     
-    @Override
     public String getSignersStructure(final String signB64) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
     		throw new NullPointerException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
@@ -134,7 +129,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     }
 
 
-    @Override
     public boolean saveDataToFile(final String data, final String title, final String fileName, final String extension, final String description) throws PrivilegedActionException, IOException {
         if (data == null) {
             LOGGER.warning("Se ha solicitado guardar en disco un contenido nulo, se ignorara la peticion"); //$NON-NLS-1$
@@ -163,26 +157,25 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	}
     }
 
-    @Override
     public String loadFilePath(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException {
     	
-    	String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+    	final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
         
-        String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+        final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
         		null : new String[] { extensions.trim() });
         
-        String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+        final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
 				description.trim() : (exts != null ? extensions : null));
         
     	try {
     		return AccessController.doPrivileged(new GetFilePathAction(
     				titleDialog, exts, descFiles, this));
-    	} catch (AOCancelledOperationException e) {
+    	} 
+    	catch (final AOCancelledOperationException e) {
     		return null;
     	}
     }
     
-    @Override
     public String getFileContent(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException {
     	
     	String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
@@ -193,47 +186,40 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
 				description.trim() : (exts != null ? extensions : null));
     	
-    	byte[] data;
     	try {
-    		data = AccessController.doPrivileged(new GetFileContentAction(
-    				titleDialog, exts, descFiles, this));
-    	} catch (AOCancelledOperationException e) {
+    	    return Base64.encodeBytes(AccessController.doPrivileged(new GetFileContentAction(
+    				titleDialog, exts, descFiles, this)));
+    	} 
+    	catch (final AOCancelledOperationException e) {
     		return null;
     	}
-
-    	return Base64.encodeBytes(data);
     }
 
-    @Override
 	public String getFileNameContentText(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException {
     	return this.getFileNameContent(title, extensions, description, false);
     }
     
-    @Override
 	public String getFileNameContentBase64(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException {
     	return this.getFileNameContent(title, extensions, description, true);
     }
     
     private String getFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
-
-    	String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
-
-    	String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+    	final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+    	final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
     			null : new String[] { extensions.trim() });
 
-    	String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+    	final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
     			description.trim() : (exts != null ? extensions : null));
 
     	try { 
     		return AccessController.doPrivileged(new GetFileNameContentAction(
         			titleDialog, exts, descFiles, asBase64, this)); 
-    	} catch (AOCancelledOperationException e) {
+    	} 
+    	catch (final AOCancelledOperationException e) {
     		return null;
     	}
     }
 
-    
-    @Override
     public String getTextFromBase64(final String base64Data, final String charset) throws IOException {
     	if (base64Data == null) {
     		return null;
@@ -244,7 +230,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	return new String(Base64.decode(base64Data));
     }
 
-    @Override
     public String getBase64FromText(final String plainText, final String charset) throws IOException {
     	if (plainText == null) {
     		return null;
@@ -264,12 +249,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
     }
 
-    @Override
 	public String getEcoJava() { 
-    	return AccessController.doPrivileged(new GetEcoJavaVersionAction());
+    	return AccessController.doPrivileged(new GetEcoJavaVersionAction()).toString();
     } 
 
-    @Override
     public void verifyPlatform() throws PrivilegedActionException {
     	AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
     }
@@ -282,11 +265,15 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
      */
-    private PrivateKeyEntry selectPrivateKey(Properties params) throws PrivilegedActionException {
-    	SelectPrivateKeyAction action = new SelectPrivateKeyAction(
-    			Platform.getOS(), Platform.getBrowser(this.userAgent), new CertFilterManager(params), this);
-    	
-    	return AccessController.doPrivileged(action);
+    private PrivateKeyEntry selectPrivateKey(final Properties params) throws PrivilegedActionException {
+    	return AccessController.doPrivileged(
+           new SelectPrivateKeyAction(
+                Platform.getOS(), 
+                Platform.getBrowser(this.userAgent), 
+                new CertFilterManager(params), 
+                this
+           )
+        );
     }
     
     /**
@@ -300,7 +287,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
      * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
      */
     private AOSigner selectSigner(String format, byte[] sign) throws AOFormatFileException, PrivilegedActionException {
-    	AOSigner signer = null;
+    	AOSigner signer;
     	String signerErrorMessage;
     	if (format != null) {
     		signer = this.getSigner(format);
@@ -311,10 +298,12 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     				signerErrorMessage = "La firma electronica no es compatible con el formato de firma indicado"; //$NON-NLS-1$
     			}
     		}
-    	} else if (sign != null) {
+    	} 
+    	else if (sign != null) {
     		signer = this.getSigner(sign);
     		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
-    	} else {
+    	} 
+    	else {
     		throw new NullPointerException("No se ha indicado el formato ni la firma que se desea tratar"); //$NON-NLS-1$
     	}
     	if (signer == null) {
@@ -331,8 +320,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
      */
     private AOSigner getSigner(final String format) throws PrivilegedActionException {
-    	SelectSignerAction action = new SelectSignerAction(format);
-    	return AccessController.doPrivileged(action);
+    	return AccessController.doPrivileged(new SelectSignerAction(format));
     }
     
     /**
@@ -343,8 +331,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
      */
     private AOSigner getSigner(final byte[] signature) throws PrivilegedActionException {
-    	SelectSignerAction action = new SelectSignerAction(signature);
-    	return AccessController.doPrivileged(action);
+    	return AccessController.doPrivileged(new SelectSignerAction(signature));
     }
     
     /**
@@ -352,14 +339,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
      * establecida en el sistema. 
      */
     private void configureLookAndFeel() {
-        final String lookandfeel = UIManager.getSystemLookAndFeelClassName();
         try {
-            UIManager.setLookAndFeel(lookandfeel);
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
         catch (final Exception e) {
-            LOGGER.warning("No se ha podido establecer el Look&Feel '" + lookandfeel + //$NON-NLS-1$
-            			   "', las ventanas careceran de decoracion: " //$NON-NLS-1$
-                           + e);
+            LOGGER.warning("No se ha podido establecer el Look&Feel" + e); //$NON-NLS-1$
         }
 
         // Nos aseguramos de que los dialogos salgan decorados

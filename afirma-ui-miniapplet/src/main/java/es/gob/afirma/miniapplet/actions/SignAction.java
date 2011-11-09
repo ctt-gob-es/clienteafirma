@@ -38,7 +38,6 @@ public final class SignAction implements PrivilegedExceptionAction<byte[]> {
 		this.extraParams = extraParams;
 	}
 	
-	@Override
 	public byte[] run() throws Exception {
 		return this.signer.sign(this.data, this.algorithm, this.keyEntry, this.extraParams);
 	}
