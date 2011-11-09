@@ -8,6 +8,7 @@ import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
@@ -31,12 +32,17 @@ public abstract class JAccessibilityDialog extends JDialog {
 	
 	protected static int actualHeight = -1;
 	
+	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
+    private static final String ICON_DIR_PATH = "/resources/images/";
+	
 	/**
 	 * Constructor.
 	 * @param frame ventana padre.
 	 */
 	public JAccessibilityDialog(JFrame frame){
 		super(frame);
+		// Icono de @firma
+        setIconImage(this.loadIcon("afirma_ico.png").getImage());
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,this,null,null,null,null,null,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
@@ -151,4 +157,13 @@ public abstract class JAccessibilityDialog extends JDialog {
 		 }
 		 return resultingJAccessibilityDialog;
 	 }
+	
+	 /**
+     * Carga un icono contenido en el directorio de iconos del proyecto.
+     * @param filename Nombre del icono.
+     * @return Icono.
+     */
+    private ImageIcon loadIcon(final String filename) {
+        return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
+    }
 }

@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
@@ -28,11 +29,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	
 	protected static int actualHeight = -1;
 	
+	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
+    private static final String ICON_DIR_PATH = "/resources/images/";
+	
 	/**
 	 * Constructor con parámetros.
 	 */
 	public JAccessibilityCustomDialog(JDialog dialog, boolean modal){
 		super(dialog, modal);
+		// Icono de @firma
+        setIconImage(this.loadIcon("afirma_ico.png").getImage());
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
@@ -52,6 +58,8 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 */
 	public JAccessibilityCustomDialog(JFrame frame, boolean modal){
 		super(frame, modal);
+		// Icono de @firma
+        setIconImage(this.loadIcon("afirma_ico.png").getImage());
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
@@ -71,6 +79,8 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 */
 	public JAccessibilityCustomDialog(){
 		super();
+		// Icono de @firma
+        setIconImage(this.loadIcon("afirma_ico.png").getImage());
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
@@ -199,6 +209,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		 }
 		 return resultingJAccessibilityCustomDialog;
 	 }
+	
+    /**
+     * Carga un icono contenido en el directorio de iconos del proyecto.
+     * @param filename Nombre del icono.
+     * @return Icono.
+     */
+    private ImageIcon loadIcon(final String filename) {
+        return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
+    }
+    
 	
 
 
