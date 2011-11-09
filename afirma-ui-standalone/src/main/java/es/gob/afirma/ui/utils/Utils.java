@@ -648,5 +648,27 @@ public class Utils {
         }
         return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
     }
+    
+    /**
+	 * Método que sumbraya el mnemónico correspondiente para texto HTML.
+	 *
+	 * @param text	Texto en el que hay que subrayar el carácter.
+	 * @param key	Caracter a subrayar.
+	 *
+	 * @return	Cadena con el texto subrayado.
+	 */
+	public static String remarkMnemonic( String text, final int key) {
+		String newText = text;
+		int pos = text.indexOf(key); //Se obtiene el índice del caracter
+		if (pos == -1) {//Se busca en minúscula
+			char keyChar = (char) key;
+			pos = text.indexOf(String.valueOf(keyChar).toLowerCase());
+		}
+		if (pos != -1) {
+			//Se subraya
+			newText = text.substring(0, pos) + "<u>" + text.charAt(pos) + "</u>" + text.substring(pos + 1);
+		}
+		return newText;
+	}
 		
 }
