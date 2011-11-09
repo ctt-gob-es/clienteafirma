@@ -430,7 +430,7 @@ public class AccessibilityOptionsPane {
 				//listProfiles += Main.preferences.get("user"+(i+1), "error")+"<br>";
 				listProfiles.add(Main.preferences.get("user"+(i+1), "error"));
 			}
-			name = CustomDialog.showInputDialog(this.parent, true, text, KeyEvent.VK_N, listProfiles, "Inserción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(this.parent, true, text, KeyEvent.VK_N, listProfiles, "Perfiles", "Inserción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		} else{
 			name = CustomDialog.showInputDialog(this.parent, true, "Nombre del perfil (debe ser una unica palabra).", KeyEvent.VK_N, "Insercion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		}
