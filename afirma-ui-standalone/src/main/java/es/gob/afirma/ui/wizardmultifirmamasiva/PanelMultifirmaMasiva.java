@@ -489,7 +489,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         		pssCallback = new NullPasswordCallback();
         	else if(store == AOKeyStore.PKCS12){
         		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null,
-            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
         		File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository")); //$NON-NLS-1$
                 if (selectedFile != null) {
                 	lib = selectedFile.getAbsolutePath();
@@ -499,7 +499,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         	}
         	else {
         		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", null,
-            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
         	}
         	keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, this.kssc.toString(),
         			pssCallback, this);

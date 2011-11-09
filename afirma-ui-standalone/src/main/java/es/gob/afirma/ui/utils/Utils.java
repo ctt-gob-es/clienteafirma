@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -562,7 +563,7 @@ public class Utils {
         });
 
         final Object o = CustomDialog.showInputDialog(
-             (Component)parentComponent, true, Messages.getString("CustomDialog.showInputDialog.certificate.message"), //$NON-NLS-1$
+             (Component)parentComponent, true, Messages.getString("CustomDialog.showInputDialog.certificate.message"), KeyEvent.VK_S,  //$NON-NLS-1$
              Messages.getString("CustomDialog.showInputDialog.certificate.title"), //$NON-NLS-1$
              JOptionPane.PLAIN_MESSAGE,
              finalOrderedAliases,
@@ -646,7 +647,7 @@ public class Utils {
             || store == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
         }
-        return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+        return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
     }
     
     /**

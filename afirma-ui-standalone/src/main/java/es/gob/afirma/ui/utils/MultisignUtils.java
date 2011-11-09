@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
@@ -54,7 +55,7 @@ public class MultisignUtils {
         			Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
     				null);*/
         	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
-        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
         	
         	File selectedFile = SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository")); //$NON-NLS-1$
             if (selectedFile != null) {
@@ -68,7 +69,7 @@ public class MultisignUtils {
         			Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
     				null);*/
         	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
-        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
         }
         	
 

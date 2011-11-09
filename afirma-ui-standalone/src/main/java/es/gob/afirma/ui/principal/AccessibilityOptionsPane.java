@@ -8,6 +8,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -422,14 +424,15 @@ public class AccessibilityOptionsPane {
 		String name = null;
 		if (user > 0){
 			String text = "Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración."+"<br>"+"Actualmente existen los siguientes perfiles: "+"<br>";
-			String listProfiles = "";
+			List<String> listProfiles = new ArrayList<String>();
 			for (int i = 0;i<user;i++){
 				//System.out.println(Main.preferences.get("user"+(i+1), "error"));
-				listProfiles += Main.preferences.get("user"+(i+1), "error")+"<br>";
+				//listProfiles += Main.preferences.get("user"+(i+1), "error")+"<br>";
+				listProfiles.add(Main.preferences.get("user"+(i+1), "error"));
 			}
-			name = CustomDialog.showInputDialog(this.parent, true, text, listProfiles, "Inserción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(this.parent, true, text, KeyEvent.VK_N, listProfiles, "Inserción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		} else{
-			name = CustomDialog.showInputDialog(this.parent, true, "Nombre del perfil (debe ser una unica palabra).", "Insercion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
+			name = CustomDialog.showInputDialog(this.parent, true, "Nombre del perfil (debe ser una unica palabra).", KeyEvent.VK_N, "Insercion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
 		}
 		if (name!=null){
 			if (name.trim().length()!=0){

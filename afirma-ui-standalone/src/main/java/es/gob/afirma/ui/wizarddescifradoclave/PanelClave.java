@@ -244,7 +244,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	AOCipherKeyStoreHelper cKs = null;
     	try {
     		cKs = new AOCipherKeyStoreHelper(
-					CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("WizardDescifrado.clave.pass"), Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
+					CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("WizardDescifrado.clave.pass"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
     	} catch (AOCancelledOperationException e) {
     		throw e;
     	} catch (IOException e) {

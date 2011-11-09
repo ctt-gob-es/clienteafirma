@@ -22,6 +22,11 @@ public class UIPasswordCallbackAccessibility extends PasswordCallback {
     private String message = null;
     
     /**
+     * Atajo para el campo de insercion de contrasenia.
+     */
+    private int mnemonic = 0;
+    
+    /**
      * Título del diálogo.
      */
     private String title = null;
@@ -33,7 +38,7 @@ public class UIPasswordCallbackAccessibility extends PasswordCallback {
      *        Texto del di&aacute;logo para solicitar la contrase&ntilde;a
      * @param parent
      *        Componente padre para la modalidad del di&aacute;logo */
-    public UIPasswordCallbackAccessibility(final String prompt, final Component parent, final String message, final String title) {
+    public UIPasswordCallbackAccessibility(final String prompt, final Component parent, final String message, int mnemonic, final String title) {
         super(prompt, false);
         this.parent = parent;
         if (prompt != null) {
@@ -41,12 +46,13 @@ public class UIPasswordCallbackAccessibility extends PasswordCallback {
         } else {
         	this.message = message;
         }
+        this.mnemonic = mnemonic;
         this.title = title;
     }
 
     @Override
     public char[] getPassword() {
     	
-        return CustomDialog.showInputPasswordDialog(parent, true, null, false, message, title, JOptionPane.QUESTION_MESSAGE);
+        return CustomDialog.showInputPasswordDialog(parent, true, null, false, message, mnemonic, title, JOptionPane.QUESTION_MESSAGE);
     }
 }

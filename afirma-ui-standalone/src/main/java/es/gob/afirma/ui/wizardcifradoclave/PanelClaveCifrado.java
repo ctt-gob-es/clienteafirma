@@ -316,7 +316,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
     	AOCipherKeyStoreHelper cKs = null;
     	try {
     		cKs = new AOCipherKeyStoreHelper(
-    				CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("WizardCifrado.almacen.claves.contrasenia"), Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
+    				CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("WizardCifrado.almacen.claves.contrasenia"),  KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
     	} catch (AOCancelledOperationException e) {
     		throw e;
     	} catch (IOException e) {
@@ -498,12 +498,12 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 				try {
 					if (!AOCipherKeyStoreHelper.storeExists()) {
 						cksh = new AOCipherKeyStoreHelper(
-								CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("Cifrado.introducir.pass"), Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
+								CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("Cifrado.introducir.pass"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
 						
 					} else {
 						//cksh = new AOCipherKeyStoreHelper(new UIPasswordCallback(Messages.getString("Cifrado.introducir.pass.almacen"), this).getPassword());
 						PasswordCallback pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Cifrado.introducir.pass.almacen"), this,
-		            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+		            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
 						cksh = new AOCipherKeyStoreHelper(pssCallback.getPassword());
 					}
 				} catch (IOException e) {

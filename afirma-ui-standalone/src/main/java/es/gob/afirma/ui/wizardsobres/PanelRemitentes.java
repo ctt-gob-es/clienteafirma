@@ -494,7 +494,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		else {
 			//pssCallback = new UIPasswordCallback(Messages.getString("Wizard.sobres.almacen.pass")+" "+kStore.getDescription(), this);
 			pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass")+" "+kStore.getDescription(), this,
-        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+        			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
 		}
 		
 		return pssCallback;
