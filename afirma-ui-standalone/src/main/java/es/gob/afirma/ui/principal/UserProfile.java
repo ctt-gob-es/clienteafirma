@@ -237,6 +237,8 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 				aceptarPerformed();
 			}
 		});
+		//Se asigna este botón como botón por defecto de la ventana.
+		this.getRootPane().setDefaultButton(aceptar);
 		panelAceptar.add(aceptar);
 		config(aceptar);
 		
