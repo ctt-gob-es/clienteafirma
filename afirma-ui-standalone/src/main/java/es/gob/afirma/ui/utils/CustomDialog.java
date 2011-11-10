@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -102,6 +103,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * Respuesta al mensaje
 	 */
 	private int answer;
+
 	
 	/**
 	 * Constructor.
@@ -195,6 +197,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
     	}
 		
 		this.setTitle(title);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		
 		
 		this.answer = JOptionPane.NO_OPTION;
@@ -243,7 +246,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         cons.gridx = 0;
         cons.gridy = 0;
         cons.weightx = 1.0;
-        cons.weighty = 3.0;
+        cons.weighty = 2.0;
         //cons.gridheight = 1;
         
         //se añade el panel de información
@@ -497,7 +500,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.setVisible(true);
 		
 		//Control para saber si se ha pulsado el botón cancelar
-		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
+		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JTextField)customDialog.component).getText();
 		}
 		return null;
@@ -577,7 +580,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.setVisible(true);
 		
 		//Control para saber si se ha pulsado el botón cancelar
-		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
+		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JComboBox)customDialog.component).getSelectedItem();
 		}
 		return null;
@@ -704,7 +707,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.setVisible(true);
 		
 		//Control para saber si se ha pulsado el botón cancelar
-		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
+		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JTextField)customDialog.component).getText();
 		}
 		return null;
@@ -785,7 +788,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		customDialog.setVisible(true);
 		
 		//Control para saber si se ha pulsado el botón cancelar
-		if (customDialog.getAnswer()!= JOptionPane.CANCEL_OPTION) {
+		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JPasswordField)customDialog.component).getPassword();
 		}
 		throw new AOCancelledOperationException("La insercion de contrasena ha sido cancelada por el usuario");
