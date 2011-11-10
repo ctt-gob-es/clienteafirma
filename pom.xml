@@ -51,6 +51,7 @@
     <module>afirma-ui-standalone-help-en_UK</module>
     <module>afirma-ui-standalone-help-es_ES</module>
     <module>afirma-ui-core-jse</module>
+    <module>afirma-ui-miniapplet</module>
     <module>afirma-webapp-pdf</module>
   </modules>
 
