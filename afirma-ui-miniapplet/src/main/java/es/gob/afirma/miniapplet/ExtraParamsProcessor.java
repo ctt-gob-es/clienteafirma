@@ -8,6 +8,10 @@ import java.util.logging.Logger;
  * y recogidas desde java en formato <code>Properties<code>. */
 public final class ExtraParamsProcessor {
 
+	private ExtraParamsProcessor() {
+		/* Constructor no publico */
+	}
+	
 	/**
 	 * Transforma la entrada introducida en un properties.
 	 * Las entradas deben estar separadas por salto de l&iacute;nea y tener la forma

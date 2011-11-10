@@ -39,7 +39,7 @@ public final class FileSelectionDialog {
                                final String description, 
                                final Component parent) {
         this.title = title;
-        this.exts = exts;
+        this.exts = (exts != null ? exts.clone() : null);
         this.desc = description;
         this.parent = parent;
     }
@@ -51,7 +51,7 @@ public final class FileSelectionDialog {
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n.
      * @throws IOException Si se produce alg&uacute;n error en la carga del fichero.
      */
-    public InputStream getFileContent() throws AOCancelledOperationException, IOException {
+    public InputStream getFileContent() throws IOException {
     	return new FileInputStream(this.selectFile().getSelectedFile());
     }
     
@@ -61,7 +61,7 @@ public final class FileSelectionDialog {
      * @return Ruta absoluta del fichero seleccionado.
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n.
      */
-    public String getPath() throws AOCancelledOperationException {
+    public String getPath() {
     	return this.selectFile().getSelectedFile().getAbsolutePath();
     }
     

@@ -34,7 +34,7 @@ public final class GetFileNameContentAction implements PrivilegedExceptionAction
      */
     public GetFileNameContentAction(final String title, final String[] exts, final String desc, final boolean asBase64, final Component parent) {
     	this.title = title;
-        this.exts = exts;
+        this.exts = (exts != null ? exts.clone() : null);
         this.desc = desc;
         this.asBase64 = asBase64;
         this.parent = parent;        
@@ -48,7 +48,7 @@ public final class GetFileNameContentAction implements PrivilegedExceptionAction
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
-	public String run() throws AOCancelledOperationException, IOException {
+	public String run() throws IOException {
         final String path = (new FileSelectionDialog(this.title, this.exts, this.desc, this.parent)).getPath();
         final File file = new File(path);
         final FileInputStream is = new FileInputStream(file);

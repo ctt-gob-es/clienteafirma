@@ -38,8 +38,8 @@ public final class SaveFileAction implements PrivilegedExceptionAction<Boolean> 
     public SaveFileAction(final String title, final byte[] data, final String[] exts,
     		final String description, final File fileHint, final Component parent) {
         this.title = title;
-        this.data = data.clone();
-        this.exts = exts.clone();
+        this.data = (data != null ? data.clone() : null);
+        this.exts = (exts != null ? exts.clone() : null);
         this.desc = description;
         this.fileHint = fileHint;
         this.parent = parent;
@@ -90,7 +90,7 @@ public final class SaveFileAction implements PrivilegedExceptionAction<Boolean> 
      * @throws IOException Cuando se produzca un error durante la selecci&oacute;n del fichero.
      * @throws AOCancelledOperationException Cuando el usuario cancele la operaci&oacute;n.
      */
-    private final File selectFileToSave() throws IOException {
+    private File selectFileToSave() throws IOException {
 
     	final JFileChooser fc = new JFileChooser();
     	if (this.title != null) {

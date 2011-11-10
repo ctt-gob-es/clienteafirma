@@ -39,7 +39,7 @@ public final class CounterSignAction implements PrivilegedExceptionAction<byte[]
 	                         final PrivateKeyEntry keyEntry, 
 	                         final Properties extraParams) {
 		this.signer = signer;
-		this.sign = sign;
+		this.sign = (sign != null ? sign.clone() : null);;
 		this.algorithm = algorithm;
 		this.keyEntry = keyEntry;
 		this.extraParams = extraParams;

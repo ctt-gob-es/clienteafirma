@@ -56,7 +56,7 @@ public final class VerifyPlatformAction implements PrivilegedExceptionAction<Voi
 				final String msCapiDes = Platform.getJavaHome() + File.separator + "bin" + File.separator; //$NON-NLS-1$
 
 				throw new IOException (MiniAppletMessages.getString("VerifyPlatformAction.0", //$NON-NLS-1$
-						new String[] {sunmscapOri, sunmscapiDes, msCapiOri, msCapiDes} ));
+						new String[] {sunmscapOri, sunmscapiDes, msCapiOri, msCapiDes} ), e);
 			}
 		}
 	}

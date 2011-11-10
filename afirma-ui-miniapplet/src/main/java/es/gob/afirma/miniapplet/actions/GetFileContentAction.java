@@ -31,7 +31,7 @@ public final class GetFileContentAction implements PrivilegedExceptionAction<byt
     public GetFileContentAction(final String title, final String[] exts, final String description,
     		 final Component parent) {
         this.title = title;
-        this.exts = exts;
+        this.exts = (exts != null ? exts.clone() : null);
         this.desc = description;
         this.parent = parent;
     }
@@ -43,7 +43,7 @@ public final class GetFileContentAction implements PrivilegedExceptionAction<byt
      * @throws AOCancelledOperationException Cuando se cancela la operacion de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
-	public byte[] run() throws AOCancelledOperationException, IOException {
+	public byte[] run() throws IOException {
         final FileSelectionDialog dialog = new FileSelectionDialog(this.title, this.exts, this.desc, this.parent);
         final InputStream is = dialog.getFileContent();
         try {

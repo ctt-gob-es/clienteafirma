@@ -145,12 +145,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         
 		final File fileHint = (fileName != null && fileName.trim().length() > 0 ?
 				new File(this.pathHint, fileName) : this.pathHint);
-				
-        final SaveFileAction saveFileAction = new SaveFileAction(titleDialog, Base64.decode(data),
-        		extensions, descFiles, fileHint, this);
-        
+
     	try {
-    		return AccessController.doPrivileged(saveFileAction).booleanValue();
+    		return AccessController.doPrivileged(new SaveFileAction(titleDialog, Base64.decode(data),
+            		extensions, descFiles, fileHint, this)).booleanValue();
     	} 
     	catch (final AOCancelledOperationException e) {
     		return false;

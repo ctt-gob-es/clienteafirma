@@ -35,8 +35,8 @@ public final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 	                    final PrivateKeyEntry keyEntry, 
 	                    final Properties extraParams) {
 		this.signer = signer;
-		this.sign = sign;
-		this.data = data;
+		this.sign = (sign != null ? sign.clone() : null);
+		this.data = (data != null ? data.clone() : null);
 		this.algorithm = algorithm;
 		this.keyEntry = keyEntry;
 		this.extraParams = extraParams;

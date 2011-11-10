@@ -32,7 +32,7 @@ public final class SignAction implements PrivilegedExceptionAction<byte[]> {
 	                  final PrivateKeyEntry keyEntry, 
 	                  final Properties extraParams) {
 		this.signer = signer;
-		this.data = data;
+		this.data = (data != null ? data.clone() : null);;
 		this.algorithm = algorithm;
 		this.keyEntry = keyEntry;
 		this.extraParams = extraParams;

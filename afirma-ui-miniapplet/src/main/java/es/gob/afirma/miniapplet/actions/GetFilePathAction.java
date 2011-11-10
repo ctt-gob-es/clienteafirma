@@ -28,7 +28,7 @@ public final class GetFilePathAction implements PrivilegedExceptionAction<String
     public GetFilePathAction(final String title, final String[] exts, final String description,
     		 final Component parent) {
         this.title = title;
-        this.exts = exts;
+        this.exts = (exts != null ? exts.clone() : null);
         this.desc = description;
         this.parent = parent;
     }
@@ -40,7 +40,7 @@ public final class GetFilePathAction implements PrivilegedExceptionAction<String
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
-	public String run() throws AOCancelledOperationException, IOException {
+	public String run() throws IOException {
         return new FileSelectionDialog(this.title, this.exts, this.desc, this.parent).getPath();
 	}
 }
