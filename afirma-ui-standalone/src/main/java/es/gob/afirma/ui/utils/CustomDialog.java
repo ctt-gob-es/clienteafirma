@@ -461,7 +461,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.gridx = 1;   
 		c.gridy = 1;
 		c.weightx = 0.0;
-        c.weighty = 1.0;
+        c.weighty = 0.5;
         c.gridwidth = 2;
         c.insets = new Insets(10,10,0,10);  //right padding
         
@@ -538,7 +538,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.gridx = 1;   
 		c.gridy = 1;
 		c.weightx = 0.0;
-		c.weighty = 1.0;
+		c.weighty = 0.5;
         c.gridwidth = 2;
         c.insets = new Insets(0,10,0,10);  //right padding
         
@@ -744,7 +744,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.gridx = 1;   
 		c.gridy = 1;
 		c.weightx = 0.0;
-		c.weighty = 1.0;
+		c.weighty = 0.5;
         //c.weighty = 0.0;
         c.gridwidth = 2;
         c.insets = new Insets(10,10,0,10);  //right padding
