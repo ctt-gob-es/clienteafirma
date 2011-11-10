@@ -58,7 +58,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
     public String sign(final String dataB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (dataB64 == null) {
-    		throw new NullPointerException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
     	}
     	
     	final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
@@ -76,7 +76,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
     public String coSign(final String signB64, final String dataB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
-    		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}
     	
     	final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
@@ -97,7 +97,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
     public String counterSign(final String signB64, final String algorithm, final String format, final String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
-    		throw new NullPointerException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
     	}
     	final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
     	final String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
@@ -116,7 +116,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     
     public String getSignersStructure(final String signB64) throws IOException, AOFormatFileException, PrivilegedActionException {
     	if (signB64 == null) {
-    		throw new NullPointerException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
     	}
     	
     	final byte[] sign = Base64.decode(signB64);
@@ -292,11 +292,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     	if (format != null) {
     		signer = this.getSigner(format);
     		signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
-    		if (signer != null && sign != null) {
-    			if (!signer.isSign(sign)) {
+    		if (signer != null && sign != null &&  !signer.isSign(sign)) {
     				signer = null;
     				signerErrorMessage = "La firma electronica no es compatible con el formato de firma indicado"; //$NON-NLS-1$
-    			}
     		}
     	} 
     	else if (sign != null) {
@@ -304,7 +302,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
     		signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
     	} 
     	else {
-    		throw new NullPointerException("No se ha indicado el formato ni la firma que se desea tratar"); //$NON-NLS-1$
+    		throw new IllegalArgumentException("No se ha indicado el formato ni la firma que se desea tratar"); //$NON-NLS-1$
     	}
     	if (signer == null) {
     		throw new AOFormatFileException(signerErrorMessage);

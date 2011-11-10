@@ -37,7 +37,7 @@ import es.gob.afirma.core.AOFormatFileException;
  *  </dd>
  * </dl>
  */
-public interface MiniAfirma {
+interface MiniAfirma {
 
     /**
      * Firma unos datos seg&uacute;n la configuracion proporcionada.
@@ -243,7 +243,7 @@ public interface MiniAfirma {
      * @return Texto codificado en Base64.
      * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      */
-    public String getBase64FromText(String plainText, String charset) throws IOException;
+    String getBase64FromText(String plainText, String charset) throws IOException;
     
     /**
      * Recupera la versi&oacute;n de Java en uso con el formato "JX", en donde X es un n&uacute;mero
@@ -251,7 +251,7 @@ public interface MiniAfirma {
      * 6 para Java 6 y 7 para cualquier otro. 
      * @return Versi&oacute;n de Java.
      */
-    public String getEcoJava();
+    String getEcoJava();
     
     /**
      * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
