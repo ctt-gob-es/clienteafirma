@@ -18,7 +18,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.util.ArrayList;
 
 import javax.accessibility.AccessibleContext;
 import javax.swing.JButton;
@@ -335,28 +334,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
             		for (int j = 0; j<jTool.getComponentCount();j++){
                 		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
                 		if (jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){
-                			((JToggleButton)(jTool.getComponent(j))).addKeyListener(new KeyListener() {
-        						
-        						@Override
-        						public void keyTyped(KeyEvent e) {
-        							// TODO Auto-generated method stub
-        							
-        						}
-        						
-        						@Override
-        						public void keyReleased(KeyEvent e) {
-        							// TODO Auto-generated method stub
-        							
-        						}
-        						
-        						@Override
-        						public void keyPressed(KeyEvent e) {
-        							// TODO Auto-generated method stub
-        							if (e.getKeyCode() == KeyEvent.VK_SPACE){
-        								callResize();
-        							}
-        						}
-        					});
+                			final JToggleButton boton = ((JToggleButton)jTool.getComponent(j));
                 			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
                 			((JToggleButton)(jTool.getComponent(j))).addMouseListener(new MouseListener() {
         						
@@ -390,6 +368,28 @@ public class JAccessibilityFileChooser extends JFileChooser{
         							callResize();
         						}
         					});
+                			((JToggleButton)(jTool.getComponent(j))).addKeyListener(new KeyListener() {
+        						
+        						@Override
+        						public void keyTyped(KeyEvent e) {
+        							// TODO Auto-generated method stub
+        						}
+        						
+        						@Override
+        						public void keyReleased(KeyEvent e) {
+        							// TODO Auto-generated method stub
+        							if (e.getKeyCode() == KeyEvent.VK_SPACE){
+        								boton.doClick();
+        								callResize();
+        							}
+        						}
+        						
+        						@Override
+        						public void keyPressed(KeyEvent e) {
+        							// TODO Auto-generated method stub
+        						}
+        					});
+                			
                 		}
                 		Utils.remarcar((JComponent)jTool.getComponent(j));
                     	Utils.setFontBold((JComponent)jTool.getComponent(j));
