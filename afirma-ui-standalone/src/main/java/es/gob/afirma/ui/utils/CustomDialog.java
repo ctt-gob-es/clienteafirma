@@ -221,7 +221,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 
         c.gridx = 1;
         c.weightx = 1.0;
-        c.weighty = 2.0;
+        c.weighty = 1.0;
         //c.weighty = 1.0;
         c.gridwidth = 2;
 	       
@@ -243,14 +243,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         cons.gridx = 0;
         cons.gridy = 0;
         cons.weightx = 1.0;
-        cons.weighty = 1.0;
+        cons.weighty = 3.0;
         //cons.gridheight = 1;
         
         //se añade el panel de información
         container.add(this.mainPanel, cons);
         cons.gridy = 1;
         cons.gridx = 0;
-        cons.weighty = 0.5;
+        cons.weighty = 1.0;
         
         //Se añade el panel de botones
         container.add(this.buttonsPanel, cons);
@@ -623,23 +623,29 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.weightx = 0.0;
         c.weighty = 3.0;
         c.gridwidth = 2;
-        c.insets = new Insets(5,10,5,10);  //right padding
+       // c.gridheight = 2;
+        c.insets = new Insets(0,10,5,10);  //right padding
 
         //Se crea un panel de scrolls
         JScrollPane scrPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 		JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrPane.setFocusable(true);
 		
+		//Panel para insertar las etiquetas
 		JPanel panel = new JPanel(new GridLayout(list.size(), 1));
+		GridBagConstraints constraints = new GridBagConstraints();
+    	c.insets = new Insets(0,10,0,10);
 		panel.setVisible(true);
-		scrPane.getViewport().add(panel);
+		//Se inserta el panel asignando unos insets
+		scrPane.getViewport().add(panel, constraints);
 		
 		//Se crean etiquetas con cada elemento que contiene la lista
 		//y se añaden al scroll
         if ((list!= null) && (list.size()>0)) {
         	int index = 1;
         	 for (final String str : list) {
-        		 InfoLabel infoLabel = new InfoLabel(str, true);
+        		 //Etiqueta con un espacio en blanco al principio.
+        		 InfoLabel infoLabel = new InfoLabel("&nbsp;"+str, true);
         		 infoLabel.setFocusable(false);
         		 panel.add(infoLabel);
         		 fullList+=index+": "+str+", ";
@@ -658,9 +664,10 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         //Se añade el scroll al panel principal
 		customDialog.mainPanel.add(scrPane, c);
 		
-		c.insets = new Insets(10,10,5,10);  //right padding
-		c.gridy = 2;
-		c.weighty =1.0;
+		c.insets = new Insets(7,10,0,10);  //right padding
+		c.gridy = 3;
+		c.weighty = 0.5;
+		//c.gridheight = 1;
         
         //campo de texto del diálogo
         customDialog.component = new JTextField("");
