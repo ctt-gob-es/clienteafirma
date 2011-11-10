@@ -453,7 +453,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Se muestra el atajo
 		String text = Utils.remarkMnemonic(customDialog.infoLabel.getText(), mnemonic);
 		customDialog.infoLabel.setText(text);
-		customDialog.infoLabel.setFocusable(false);
+		//customDialog.infoLabel.setFocusable(false);
 				
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
@@ -530,7 +530,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Se muestra el atajo
 		String text = Utils.remarkMnemonic(customDialog.infoLabel.getText(), mnemonic);
 		customDialog.infoLabel.setText(text);
-		customDialog.infoLabel.setFocusable(false);
+		//customDialog.infoLabel.setFocusable(false);
 				
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
@@ -603,16 +603,16 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	public static String showInputDialog(Component componentParent, boolean modal, String message, int mnemonic, List<String> list, String nameListElements, String title, int typeMessage){
 		
 		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage);
-
+		//customDialog.infoLabel.setFocusable(false);
+		
 		//Etiqueta principal
 		customDialog.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se centra el texto
-		//Se asigna un atajo
-		customDialog.infoLabel.setDisplayedMnemonic(mnemonic);
+		
 		//Se muestra el atajo
 		String text = Utils.remarkMnemonic(customDialog.infoLabel.getText(), mnemonic);
 		customDialog.infoLabel.setText(text);
-		customDialog.infoLabel.setFocusable(false);
 		
+
 		//Nombre accesible para el cuadro de texto
 		String fullAccesibleName = message;
 		//Nombre accesible para la lista - scrollPane
@@ -673,7 +673,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//c.gridheight = 1;
         
         //campo de texto del diálogo
-        customDialog.component = new JTextField("");
+		customDialog.component = new JTextField("");
         customDialog.component.addAncestorListener(new RequestFocusListener());
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
@@ -683,8 +683,10 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         //Se le asigna el nombre accesible
         customDialog.component.getAccessibleContext().setAccessibleName(fullAccesibleName.replaceAll("<br>", "") +" ALT + " + String.valueOf((char) mnemonic) + ". ");
         
-       //Se relaciona la etiqueta con el componente
-	   customDialog.infoLabel.setLabelFor(customDialog.component);
+        //Se relaciona la etiqueta con el componente
+	    customDialog.infoLabel.setLabelFor(customDialog.component);
+		//Se asigna un atajo
+		customDialog.infoLabel.setDisplayedMnemonic(mnemonic);
 		
 		//Restricciones botones
 		GridBagConstraints cons = new GridBagConstraints();
@@ -736,7 +738,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Se muestra el atajo
 		String text = Utils.remarkMnemonic(customDialog.infoLabel.getText(), mnemonic);
 		customDialog.infoLabel.setText(text);
-		customDialog.infoLabel.setFocusable(false);
+		//customDialog.infoLabel.setFocusable(false);
 				
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
