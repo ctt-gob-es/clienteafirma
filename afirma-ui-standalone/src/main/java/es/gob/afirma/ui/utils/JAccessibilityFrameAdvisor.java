@@ -1,11 +1,8 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 
@@ -38,18 +35,6 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
         setIconImage(this.loadIcon("afirma_ico.png").getImage());
 		this.resizingAdaptor = new ResizingAdaptor(null, null, null,this,null,null,null,null);
 		this.addComponentListener(this.resizingAdaptor);
-		this.addComponentListener(new ComponentAdapter() {
-		    @Override
-            public void componentResized(ComponentEvent e)
-		    {
-		    	resized(e);
-		    }
-		    @Override
-            public void componentMoved(ComponentEvent e)
-		    {
-		    	resized(e);
-		    }
-		});
 	}
 	
 	/**
@@ -68,47 +53,20 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	 * @param component El componente.
 	 * @return El JAccessibilityFrameAdvisor buscado.
 	 */
-	public static JAccessibilityDialogAdvisor getJAccessibilityDialogAdvisor(Component component)
+	public static JAccessibilityFrameAdvisor getJAccessibilityFrameAdvisor(Component component)
 	{
-		JAccessibilityDialogAdvisor  resultingJAccessibilityDialogAdvisor = null;
-		while (component != null && resultingJAccessibilityDialogAdvisor == null)
+		JAccessibilityFrameAdvisor  resultingJAccessibilityFrameAdvisor = null;
+		while (component != null && resultingJAccessibilityFrameAdvisor == null)
 		{
-	        if (component instanceof JAccessibilityDialogAdvisor){
-	        	resultingJAccessibilityDialogAdvisor = (JAccessibilityDialogAdvisor)component;
+	        if (component instanceof JAccessibilityFrameAdvisor){
+	        	resultingJAccessibilityFrameAdvisor = (JAccessibilityFrameAdvisor)component;
 	        }
 	        else{
 	        	component = component.getParent();
 	        }
 		 }
-		 return resultingJAccessibilityDialogAdvisor;
+		 return resultingJAccessibilityFrameAdvisor;
 	 }
-	
-	/**
-	 * Evento de redimensionado. Almacena el tamaño y posicion de la ventana para su restauracion.
-	 */
-	public void resized(final ComponentEvent e) {
-		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		/*Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-		int maxWidth = (int)rect.getWidth();
-		int maxHeight = (int)rect.getHeight();
-		
-		//Se comprueba el so
-		if (Platform.getOS().equals(Platform.OS.LINUX)){
-			maxHeight = maxHeight - Constants.maximizeVerticalMarginLinux;
-		}
-		
-		//Dimensiones que se van a considerar de maximizado
-	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
-
-	    //Dimensiones actuales del dialogo
-	    Dimension actualSize = getJAccessibilityDialogAdvisor(this).getSize();
-	    if (actualSize.equals(fullScreen)){
-	    	this.setResizable(false);
-	    } else {
-	    	this.setResizable(true);
-	    }*/
-			    
-	}
 	
 	/**
 	 * Obtiene un componente de un contenedor a traves de su nombre

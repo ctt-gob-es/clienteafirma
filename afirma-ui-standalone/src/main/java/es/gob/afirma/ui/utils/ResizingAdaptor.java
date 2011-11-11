@@ -48,7 +48,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	private final JAccessibilityFrame theWindow;
 	private final JAccessibilityDialog theDialog;
 	private final JAccessibilityDialogWizard theDialogWizard;
-	private final JAccessibilityDialogAdvisor theDialogAdvisor;
+	private final JAccessibilityFrameAdvisor theDialogAdvisor;
 	private final JAccessibilityFrameAbout theWindowAbout;
 	private final JAccessibilityFileChooser theFileChooser;
 	private final JAccessibilityCustomDialog theCustomDialog;
@@ -60,7 +60,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param window
 	 *            ventana a redimensionar
 	 */
-	public ResizingAdaptor(JAccessibilityFrame window, JAccessibilityDialog dialog, JAccessibilityDialogWizard dialogWizard,JAccessibilityDialogAdvisor dialogAdvisor,JAccessibilityFrameAbout windowAbout,JAccessibilityFileChooser fileChooser,
+	public ResizingAdaptor(JAccessibilityFrame window, JAccessibilityDialog dialog, JAccessibilityDialogWizard dialogWizard,JAccessibilityFrameAdvisor dialogAdvisor,JAccessibilityFrameAbout windowAbout,JAccessibilityFileChooser fileChooser,
 			JAccessibilityCustomDialog customDialog,JAccessibilityFileChooserToSave fileChooserToSave) {
 		this.theWindow = window;
 		this.theDialog = dialog;
