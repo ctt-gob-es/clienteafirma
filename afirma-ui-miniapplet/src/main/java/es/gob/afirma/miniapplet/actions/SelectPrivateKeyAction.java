@@ -1,15 +1,18 @@
 package es.gob.afirma.miniapplet.actions;
 
 import java.awt.Component;
+import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedExceptionAction;
 import java.util.List;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform.BROWSER;
 import es.gob.afirma.core.misc.Platform.OS;
 import es.gob.afirma.keystores.common.AOKeyStore;
 import es.gob.afirma.keystores.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.CertificateFilter;
 import es.gob.afirma.miniapplet.CertFilterManager;
@@ -58,7 +61,7 @@ public final class SelectPrivateKeyAction implements PrivilegedExceptionAction<P
 		this.parent = parent;
 	}
 	
-	public PrivateKeyEntry run() throws Exception {
+	public PrivateKeyEntry run() throws KeyException, AOKeystoreAlternativeException, AOException {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			this.keyStore, 
 			null, 

@@ -4,6 +4,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSigner;
 
 /**
@@ -42,7 +43,7 @@ public final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 		this.extraParams = extraParams;
 	}
 	
-	public byte[] run() throws Exception {
+	public byte[] run() throws AOException {
 		if (this.data == null) {
 			return this.signer.cosign(this.sign, this.algorithm, this.keyEntry, this.extraParams);
 		}

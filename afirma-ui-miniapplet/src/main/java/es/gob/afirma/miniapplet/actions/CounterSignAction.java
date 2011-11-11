@@ -4,6 +4,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
 
@@ -45,7 +46,7 @@ public final class CounterSignAction implements PrivilegedExceptionAction<byte[]
 		this.extraParams = extraParams;
 	}
 	
-	public byte[] run() throws Exception {
+	public byte[] run() throws AOException {
 		CounterSignTarget target = CounterSignTarget.LEAFS;
 		if (this.extraParams.containsKey(COUNTERSIGN_TARGET_KEY)) {
 			final String targetValue = this.extraParams.getProperty(COUNTERSIGN_TARGET_KEY).trim();

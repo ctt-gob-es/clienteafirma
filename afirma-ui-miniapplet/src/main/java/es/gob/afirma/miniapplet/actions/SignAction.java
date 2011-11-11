@@ -4,6 +4,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
 
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSigner;
 
 /**
@@ -38,7 +39,7 @@ public final class SignAction implements PrivilegedExceptionAction<byte[]> {
 		this.extraParams = extraParams;
 	}
 	
-	public byte[] run() throws Exception {
+	public byte[] run() throws AOException {
 		return this.signer.sign(this.data, this.algorithm, this.keyEntry, this.extraParams);
 	}
 
