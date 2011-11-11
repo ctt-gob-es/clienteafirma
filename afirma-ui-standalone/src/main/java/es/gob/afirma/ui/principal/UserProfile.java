@@ -160,7 +160,9 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
 		users[users.length-1] = Constants.defaultUser;
 		final String[] strings = users;
 		comboPerfiles.setModel(new DefaultComboBoxModel(strings));
-		comboPerfiles.setSelectedIndex(strings.length-1);
+		// Preselecionado el ultimo perfil cargado
+		comboPerfiles.setSelectedItem(Main.preferences.get("ultimo.perfil.cargado","Por defecto"));
+		
 		config(comboPerfiles);
  
 		add(comboPerfiles,c);
@@ -292,6 +294,7 @@ public class UserProfile extends JAccessibilityDialogAdvisor {
      * 
      */
     public void aceptarPerformed(){
+    	Main.preferences.put("ultimo.perfil.cargado", comboPerfiles.getSelectedItem().toString());
     	if (comboPerfiles.getSelectedItem().toString()==Constants.defaultUser){
     		currentUser = Constants.defaultUser;
     	} else {
