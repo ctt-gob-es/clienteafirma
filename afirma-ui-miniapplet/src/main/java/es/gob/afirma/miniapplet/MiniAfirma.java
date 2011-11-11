@@ -56,8 +56,9 @@ interface MiniAfirma {
      * @throws IOException Cuando se produce un error durante la firma electr&oacute;nica.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String sign(String data, String algorithm, String format, String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
+    String sign(String data, String algorithm, String format, String extraParams) throws Exception;
 
     
     /**
@@ -86,8 +87,9 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
      * se puede identificar el formato de la firma.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
+    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws Exception;
 
     
     /**
@@ -111,8 +113,9 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
      * se puede identificar el formato de la firma.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String counterSign(String sign, String algorithm, String format, String extraParams) throws IOException, AOFormatFileException, PrivilegedActionException;
+    String counterSign(String sign, String algorithm, String format, String extraParams) throws Exception;
     
     
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
@@ -132,8 +135,9 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String getSignersStructure(String signB64) throws IOException, AOFormatFileException, PrivilegedActionException ;
+    String getSignersStructure(String signB64) throws Exception ;
 
     
     /**
@@ -149,8 +153,9 @@ interface MiniAfirma {
      * contrario.
      * @throws IOException Cuando ocurre alg&uacute;n error en el guardado del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Error gen&eacute;rico.
      */
-    boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws IOException, PrivilegedActionException;
+    boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws Exception;
 
     
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
@@ -162,8 +167,9 @@ interface MiniAfirma {
      * @return El contenido del fichero codificado en Base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String getFileContent(String title, String extensions, String description) throws IOException, PrivilegedActionException;
+    String getFileContent(String title, String extensions, String description) throws Exception;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; su nombre y su contenido en formato texto unicode. El
@@ -176,8 +182,9 @@ interface MiniAfirma {
      * @return El nombre del fichero y su contenido en unicode.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String getFileNameContentText(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException;
+    String getFileNameContentText(final String title, final String extensions, final String description) throws Exception;
     
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; su nombre y su contenido en base64. El resultado
@@ -190,8 +197,9 @@ interface MiniAfirma {
      * @return El nombre del fichero y su contenido en base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String getFileNameContentBase64(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException;
+    String getFileNameContentBase64(final String title, final String extensions, final String description) throws Exception;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
      * del que se recuperar&aacute; su ruta absoluta. Si no se selecciona
@@ -202,8 +210,9 @@ interface MiniAfirma {
      * @return Nombre del fichero seleccionado.
      * @throws IOException Cuando se produce un error al seleccionar el fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String loadFilePath(String title, String extensions, String description) throws IOException, PrivilegedActionException;
+    String loadFilePath(String title, String extensions, String description) throws Exception;
     
     
     /** Decodifica un texto en Base64. Si se introducen datos nulos se
@@ -221,9 +230,10 @@ interface MiniAfirma {
      *                 <li>UTF-16</li>
      *                </ul>  
      * @return Texto decodificado.
-     * @throws IOException 
+     * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
+     * @throws Exception Error .
      */
-    String getTextFromBase64(String data, String charset) throws IOException;
+    String getTextFromBase64(String data, String charset) throws Exception;
 
     
     /** Codifica un texto plano a Base64. Si se introduce un texto nulo se
@@ -242,8 +252,9 @@ interface MiniAfirma {
      *                </ul>  
      * @return Texto codificado en Base64.
      * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
+     * @throws Exception Error gen&eacute;rico.
      */
-    String getBase64FromText(String plainText, String charset) throws IOException;
+    String getBase64FromText(String plainText, String charset) throws Exception;
     
     /**
      * Recupera la versi&oacute;n de Java en uso con el formato "JX", en donde X es un n&uacute;mero
@@ -260,6 +271,20 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws RuntimeException Cuando se encuentra alguna incopatibilidad en el entorno de
      * ejecuci&oacute;n.
+     * @throws Exception Error gen&eacute;rico.
      */
-    void verifyPlatform() throws PrivilegedActionException;
+    void verifyPlatform() throws Exception;
+    
+    /**
+     * Recupera el error producido durante la &uacute;ltima operaci&oacute;n
+     * realizada por el applet. El texto obtenido consiste en la cadena de
+     * excepciones cualificadas que produjeron el error, separadas por la cadena ": "
+     * y seguidas igualmente por ": " y el mensaje del error. Por ejemplo:
+     * <p>{@code es.gob.afirma.keystores.common.AOCertificatesNotFoundException: 
+     * El almacen no contenia entradas validas}</p>
+     * Si no se produjo ning&uacute;n error durante la
+     * operaci&oacute;n, se devolver&aacute; {@code null}.
+     * @return Mensaje de error.
+     */
+    String getErrorMessage();
 }
