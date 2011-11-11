@@ -11,10 +11,10 @@
 package es.gob.afirma.miniapplet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.PrivilegedActionException;
 
 import es.gob.afirma.core.AOFormatFileException;
-
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
  * del Mini-Applet del Cliente AFirma.
@@ -58,7 +58,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws Exception Error gen&eacute;rico.
      */
-    String sign(String data, String algorithm, String format, String extraParams) throws Exception;
+    String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
 
     
     /**
@@ -89,7 +89,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws Exception Error gen&eacute;rico.
      */
-    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws Exception;
+    String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
 
     
     /**
@@ -115,7 +115,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws Exception Error gen&eacute;rico.
      */
-    String counterSign(String sign, String algorithm, String format, String extraParams) throws Exception;
+    String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
     
     
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
@@ -137,7 +137,7 @@ interface MiniAfirma {
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
      * @throws Exception Error gen&eacute;rico.
      */
-    String getSignersStructure(String signB64) throws Exception ;
+    String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException;
 
     
     /**
@@ -155,7 +155,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws Exception Error gen&eacute;rico.
      */
-    boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws Exception;
+    boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException;
 
     
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
@@ -169,7 +169,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws Exception Error gen&eacute;rico.
      */
-    String getFileContent(String title, String extensions, String description) throws Exception;
+    String getFileContent(String title, String extensions, String description) throws PrivilegedActionException;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; su nombre y su contenido en formato texto unicode. El
@@ -184,7 +184,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws Exception Error gen&eacute;rico.
      */
-    String getFileNameContentText(final String title, final String extensions, final String description) throws Exception;
+    String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException;
     
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; su nombre y su contenido en base64. El resultado
@@ -199,7 +199,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws Exception Error gen&eacute;rico.
      */
-    String getFileNameContentBase64(final String title, final String extensions, final String description) throws Exception;
+    String getFileNameContentBase64(final String title, final String extensions, final String description) throws PrivilegedActionException;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
      * del que se recuperar&aacute; su ruta absoluta. Si no se selecciona
@@ -212,7 +212,7 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws Exception Error gen&eacute;rico.
      */
-    String loadFilePath(String title, String extensions, String description) throws Exception;
+    String loadFilePath(String title, String extensions, String description) throws PrivilegedActionException;
     
     
     /** Decodifica un texto en Base64. Si se introducen datos nulos se
@@ -233,7 +233,7 @@ interface MiniAfirma {
      * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      * @throws Exception Error .
      */
-    String getTextFromBase64(String data, String charset) throws Exception;
+    String getTextFromBase64(String data, String charset) throws IOException;
 
     
     /** Codifica un texto plano a Base64. Si se introduce un texto nulo se
@@ -251,10 +251,10 @@ interface MiniAfirma {
      *                 <li>UTF-16</li>
      *                </ul>  
      * @return Texto codificado en Base64.
-     * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
+     * @throws UnsupportedEncodingException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
      * @throws Exception Error gen&eacute;rico.
      */
-    String getBase64FromText(String plainText, String charset) throws Exception;
+    String getBase64FromText(String plainText, String charset) throws UnsupportedEncodingException;
     
     /**
      * Recupera la versi&oacute;n de Java en uso con el formato "JX", en donde X es un n&uacute;mero
@@ -273,7 +273,7 @@ interface MiniAfirma {
      * ejecuci&oacute;n.
      * @throws Exception Error gen&eacute;rico.
      */
-    void verifyPlatform() throws Exception;
+    void verifyPlatform() throws PrivilegedActionException;
     
     /**
      * Recupera el error producido durante la &uacute;ltima operaci&oacute;n
