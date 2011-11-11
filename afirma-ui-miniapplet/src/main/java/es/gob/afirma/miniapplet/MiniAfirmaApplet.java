@@ -10,7 +10,11 @@
 
 package es.gob.afirma.miniapplet;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedActionException;
@@ -58,291 +62,350 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/** Mensaje del &uacute;ltimo error producido. */
 	private String errorMessage = null;
 
-	public String sign(final String dataB64, final String algorithm, final String format, final String extraParams) throws Exception {
-
+	public String sign(final String dataB64, 
+	                   final String algorithm, 
+	                   final String format, 
+	                   final String extraParams) throws AOFormatFileException, 
+	                                                    PrivilegedActionException, 
+	                                                    IOException {
 		this.cleanErrorMessage();
+		
+        if (dataB64 == null) {
+            final IllegalArgumentException e = new IllegalArgumentException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
+            setErrorMessage(e);
+            throw e;
+        }
 
-		try {
-			if (dataB64 == null) {
-				throw new IllegalArgumentException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
-			}
+        final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+        
+        try {
+            return Base64.encodeBytes(AccessController.doPrivileged(new SignAction(
+                 this.selectSigner((format == null || format.trim().length() < 1 ? null : format.trim()), null), 
+                 Base64.decode(dataB64),
+                 (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim()), 
+                 this.selectPrivateKey(params), 
+                 ExtraParamsProcessor.expandProperties(params)
+            )));
+        }
+        catch (final AOFormatFileException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+        catch (final IOException e) {
+            setErrorMessage(e);
+            throw e;
+        }
 
-			final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
-			final String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
-
-			final AOSigner signer = this.selectSigner(signFormat, null);
-			final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-			final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
-
-			final SignAction signAction = new SignAction(signer, Base64.decode(dataB64),
-					signAlgo, keyEntry, ExtraParamsProcessor.expandProperties(params)); 
-
-			return Base64.encodeBytes(AccessController.doPrivileged(signAction));
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
-		}
 	}
 
-	public String coSign(final String signB64, final String dataB64, final String algorithm, final String format, final String extraParams) throws Exception {
-
+	public String coSign(final String signB64, 
+	                     final String dataB64, 
+	                     final String algorithm, 
+	                     final String format, 
+	                     final String extraParams) throws AOFormatFileException, 
+	                                                      PrivilegedActionException, 
+	                                                      IOException {
 		this.cleanErrorMessage();
 
-		try {
-			if (signB64 == null) {
-				throw new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
-			}
-
-			final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
-			final String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
-
-			final byte[] sign = Base64.decode(signB64);
-			final byte[] data = (dataB64 == null ? null : Base64.decode(dataB64));
-
-			final AOSigner signer = this.selectSigner(signFormat, sign);
-			final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-			final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
-
-			final CoSignAction coSignAction = new CoSignAction(signer, sign, data,
-					signAlgo, keyEntry, ExtraParamsProcessor.expandProperties(params)); 
-
-			return Base64.encodeBytes(AccessController.doPrivileged(coSignAction));
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
+		if (signB64 == null) {
+		    final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
+            setErrorMessage(e);
+            throw e; 
 		}
+
+		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+
+		try {
+		    final byte[] sign = Base64.decode(signB64);
+            return Base64.encodeBytes(AccessController.doPrivileged(new CoSignAction(
+               this.selectSigner((format == null || format.trim().length() < 1 ? null : format.trim()), sign), 
+               sign, 
+               (dataB64 == null ? null : Base64.decode(dataB64)),
+               (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim()), 
+               this.selectPrivateKey(params), 
+               ExtraParamsProcessor.expandProperties(params)
+            )));
+        }
+        catch (final AOFormatFileException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+        catch (final IOException e) {
+            setErrorMessage(e);
+            throw e;
+        } 
+
 	}
 
-	public String counterSign(final String signB64, final String algorithm, final String format, final String extraParams) throws Exception {
-
+	public String counterSign(final String signB64, 
+	                          final String algorithm, 
+	                          final String format, 
+	                          final String extraParams) throws AOFormatFileException, 
+	                                                           PrivilegedActionException, 
+	                                                           IOException {
 		this.cleanErrorMessage();
 
-		try {
-			if (signB64 == null) {
-				throw new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
-			}
-			final String signAlgo = (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim());
-			final String signFormat = (format == null || format.trim().length() < 1 ? null : format.trim());
-
-			final byte[] sign = Base64.decode(signB64);
-
-			final AOSigner signer = this.selectSigner(signFormat, sign);
-			final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-			final PrivateKeyEntry keyEntry = this.selectPrivateKey(params);
-
-			final CounterSignAction counterSignAction = new CounterSignAction(signer, sign,
-					signAlgo, keyEntry, ExtraParamsProcessor.expandProperties(params)); 
-
-			return Base64.encodeBytes(AccessController.doPrivileged(counterSignAction));
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
+		if (signB64 == null) {
+            final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
+            setErrorMessage(e);
+            throw e; 
 		}
+
+		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+
+		try {
+		    final byte[] sign = Base64.decode(signB64);
+            return Base64.encodeBytes(AccessController.doPrivileged(new CounterSignAction(
+               this.selectSigner((format == null || format.trim().length() < 1 ? null : format.trim()), sign), 
+               sign,
+               (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim()), 
+               this.selectPrivateKey(params), 
+               ExtraParamsProcessor.expandProperties(params)
+            )));
+        }
+        catch (final AOFormatFileException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+        catch (final IOException e) {
+            setErrorMessage(e);
+            throw e;
+        } 
+
 	}
 
-	public String getSignersStructure(final String signB64) throws Exception {
+	public String getSignersStructure(final String signB64) throws IOException, PrivilegedActionException, AOFormatFileException {
 
 		this.cleanErrorMessage();
 
-		try {
-			if (signB64 == null) {
-				throw new IllegalArgumentException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
-			}
-
-			final byte[] sign = Base64.decode(signB64);
-			final AOSigner signer = this.getSigner(sign);
-			if (signer == null) {
-				throw new AOFormatFileException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
-			}
-
-			return AOUtil.showTreeAsString(signer.getSignersStructure(sign, false), null, null);
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
+		if (signB64 == null) {
+		    final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
+		    setErrorMessage(e);
+		    throw e;
 		}
+
+		final byte[] sign;
+		final AOSigner signer;
+        try {
+            sign = Base64.decode(signB64);
+            signer = this.getSigner(sign);
+        }
+        catch (final IOException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+		
+		if (signer == null) {
+		    final AOFormatFileException e = new AOFormatFileException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
+		    setErrorMessage(e);
+		    throw e;
+		}
+
+		return AOUtil.showTreeAsString(signer.getSignersStructure(sign, false), null, null);
+
 	}
 
 
-	public boolean saveDataToFile(final String data, final String title, final String fileName, final String extension, final String description) throws Exception {
+	public boolean saveDataToFile(final String data, 
+	                              final String title, 
+	                              final String fileName, 
+	                              final String extension, 
+	                              final String description) throws PrivilegedActionException, IOException {
 
 		this.cleanErrorMessage();
 
-		try {
-			if (data == null) {
-				LOGGER.warning("Se ha solicitado guardar en disco un contenido nulo, se ignorara la peticion"); //$NON-NLS-1$
-				return false;
-			}
-
-			final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
-
-			final String[] extensions = (extension == null || extension.trim().length() < 1 ?
-					null : new String[] { extension.trim() });
-
-			final String descFiles = (extensions != null && description != null && description.trim().length() > 0 ?
-					description.trim() : (extensions != null ? extension : null));
-
-			final File fileHint = (fileName != null && fileName.trim().length() > 0 ?
-					new File(this.pathHint, fileName) : this.pathHint);
-
-			try {
-				return AccessController.doPrivileged(new SaveFileAction(titleDialog, Base64.decode(data),
-						extensions, descFiles, fileHint, this)).booleanValue();
-			} 
-			catch (final AOCancelledOperationException e) {
-				return false;
-			}
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
+		if (data == null) {
+			LOGGER.warning("Se ha solicitado guardar en disco un contenido nulo, se ignorara la peticion"); //$NON-NLS-1$
 			return false;
 		}
+
+		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+
+		final String[] extensions = (extension == null || extension.trim().length() < 1 ?
+				null : new String[] { extension.trim() });
+
+		final String descFiles = (extensions != null && description != null && description.trim().length() > 0 ?
+				description.trim() : (extensions != null ? extension : null));
+
+		final File fileHint = (fileName != null && fileName.trim().length() > 0 ?
+				new File(this.pathHint, fileName) : this.pathHint);
+
+		try {
+			return AccessController.doPrivileged(
+                 new SaveFileAction(
+                        titleDialog, 
+                        Base64.decode(data),
+					    extensions, 
+					    descFiles, 
+					    fileHint, 
+					    this
+				 )).booleanValue();
+		} 
+		catch (final AOCancelledOperationException e) {
+			return false;
+		}
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+        catch (final IOException e) {
+            setErrorMessage(e);
+            throw e;
+        }
 	}
 
-	public String loadFilePath(final String title, final String extensions, final String description) throws Exception {
+	public String loadFilePath(final String title, final String extensions, final String description) throws PrivilegedActionException {
 
 		this.cleanErrorMessage();
 
+		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+
+		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+				null : new String[] { extensions.trim() });
+
+		final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+				description.trim() : (exts != null ? extensions : null));
+
 		try {
-			final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+			return AccessController.doPrivileged(new GetFilePathAction(
+					titleDialog, exts, descFiles, this));
+		} 
+		catch (final AOCancelledOperationException e) {
+			return null;
+		}
+        catch (PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+	}
 
-			final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-					null : new String[] { extensions.trim() });
+	public String getFileContent(final String title, final String extensions, final String description) throws PrivilegedActionException {
 
-			final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
-					description.trim() : (exts != null ? extensions : null));
+		this.cleanErrorMessage();
 
+		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+
+		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+				null : new String[] { extensions.trim() });
+
+		final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+				description.trim() : (exts != null ? extensions : null));
+
+		try {
+			return Base64.encodeBytes(AccessController.doPrivileged(new GetFileContentAction(
+					titleDialog, exts, descFiles, this)));
+		} 
+		catch (final AOCancelledOperationException e) {
+			return null;
+		}
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+	}
+
+	public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException {
+		this.cleanErrorMessage();
+		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
+		return this.getFileNameContent(title, extensions, description, false);
+	}
+
+	public String getFileNameContentBase64(final String title, final String extensions, final String description) throws PrivilegedActionException {
+		this.cleanErrorMessage();
+		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
+        return this.getFileNameContent(title, extensions, description, true);
+	}
+
+	private String getFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
+
+		this.cleanErrorMessage();
+
+		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+				null : new String[] { extensions.trim() });
+
+		final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+				description.trim() : (exts != null ? extensions : null));
+
+		try { 
+			return AccessController.doPrivileged(new GetFileNameContentAction(
+					titleDialog, exts, descFiles, asBase64, this)); 
+		} 
+		catch (final AOCancelledOperationException e) {
+			return null;
+		}
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+	}
+
+	public String getTextFromBase64(final String base64Data, final String charset) throws IOException {
+
+		this.cleanErrorMessage();
+
+		if (base64Data == null) {
+			return null;
+		}
+		try {
+		    if (charset != null && charset.trim().length() > 0) {
+	            return new String(Base64.decode(base64Data), charset);
+	        }
+            return new String(Base64.decode(base64Data));
+        }
+        catch (final IOException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+	}
+
+	public String getBase64FromText(final String plainText, final String charset) throws UnsupportedEncodingException {
+
+		this.cleanErrorMessage();
+
+		if (plainText == null) {
+			return null;
+		}
+		if (charset != null && charset.trim().length() > 0) {
 			try {
-				return AccessController.doPrivileged(new GetFilePathAction(
-						titleDialog, exts, descFiles, this));
-			} 
-			catch (final AOCancelledOperationException e) {
-				return null;
-			}
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
+                return Base64.encodeBytes(plainText.getBytes(charset));
+            }
+            catch (final UnsupportedEncodingException e) {
+                setErrorMessage(e);
+                throw e;
+            }
 		}
+		return Base64.encodeBytes(plainText.getBytes());
 	}
 
-	public String getFileContent(final String title, final String extensions, final String description) throws Exception {
+	public void verifyPlatform() throws PrivilegedActionException {
 
 		this.cleanErrorMessage();
 
 		try {
-			String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+            AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
+        }
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
 
-			String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-					null : new String[] { extensions.trim() });
-
-			String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
-					description.trim() : (exts != null ? extensions : null));
-
-			try {
-				return Base64.encodeBytes(AccessController.doPrivileged(new GetFileContentAction(
-						titleDialog, exts, descFiles, this)));
-			} 
-			catch (final AOCancelledOperationException e) {
-				return null;
-			}
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
-		}
-	}
-
-	public String getFileNameContentText(final String title, final String extensions, final String description) throws Exception {
-
-		this.cleanErrorMessage();
-
-		try {
-			return this.getFileNameContent(title, extensions, description, false);
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
-		}
-	}
-
-	public String getFileNameContentBase64(final String title, final String extensions, final String description) throws Exception {
-
-		this.cleanErrorMessage();
-
-		try {
-			return this.getFileNameContent(title, extensions, description, true);
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
-		}
-	}
-
-	private String getFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws Exception {
-
-		this.cleanErrorMessage();
-
-		try {
-			final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
-			final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-					null : new String[] { extensions.trim() });
-
-			final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
-					description.trim() : (exts != null ? extensions : null));
-
-			try { 
-				return AccessController.doPrivileged(new GetFileNameContentAction(
-						titleDialog, exts, descFiles, asBase64, this)); 
-			} 
-			catch (final AOCancelledOperationException e) {
-				return null;
-			}
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
-		}
-	}
-
-	public String getTextFromBase64(final String base64Data, final String charset) throws Exception {
-
-		this.cleanErrorMessage();
-
-		try {
-			if (base64Data == null) {
-				return null;
-			}
-			if (charset != null && charset.trim().length() > 0) {
-				return new String(Base64.decode(base64Data), charset);
-			}
-			return new String(Base64.decode(base64Data));
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
-		}
-	}
-
-	public String getBase64FromText(final String plainText, final String charset) throws Exception {
-
-		this.cleanErrorMessage();
-
-		try {
-			if (plainText == null) {
-				return null;
-			}
-			if (charset != null && charset.trim().length() > 0) {
-				return Base64.encodeBytes(plainText.getBytes(charset));
-			}
-			return Base64.encodeBytes(plainText.getBytes());
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-			return null;
-		}
-	}
-
-	public void verifyPlatform() throws Exception {
-
-		this.cleanErrorMessage();
-
-		try {
-			AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
-		} catch (final Exception e) {
-			this.setErrorMessage(e);
-		}
 	}
 
 	public String getEcoJava() { 
@@ -352,9 +415,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Override
 	public void init() {
 		this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
-
 		this.configureLookAndFeel();
-
 		LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
 	}
 
@@ -368,14 +429,15 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @param e Excepci&oacute;n que produjo el error.
 	 * @throws Exception Excepci&oacute;n recibida.
 	 */
-	 private void setErrorMessage(Exception e) throws Exception {
-		 this.errorMessage = e.toString();
+	 private void setErrorMessage(final Exception e) {
+		 this.errorMessage = e.getLocalizedMessage();
 		 if (this.errorMessage.startsWith("java.security.PrivilegedActionException:")) { //$NON-NLS-1$
 			 this.errorMessage = this.errorMessage.substring(
 					 "java.security.PrivilegedActionException:".length()).trim(); //$NON-NLS-1$
 		 }
-		 e.printStackTrace();
-		 throw e;
+		 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		 e.printStackTrace(new PrintWriter(baos));
+	     Logger.getLogger("es.gob.afirma.MiniAfirmaApplet").severe(new String(baos.toByteArray())); //$NON-NLS-1$
 	 }
 
 	 /**
@@ -396,10 +458,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 private PrivateKeyEntry selectPrivateKey(final Properties params) throws PrivilegedActionException {
 		 return AccessController.doPrivileged(
 				 new SelectPrivateKeyAction(
-						 Platform.getOS(), 
-						 Platform.getBrowser(this.userAgent), 
-						 new CertFilterManager(params), 
-						 this
+					 Platform.getOS(), 
+					 Platform.getBrowser(this.userAgent), 
+					 new CertFilterManager(params), 
+					 this
 				 )
 		 );
 	 }
@@ -414,7 +476,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	  * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
 	  * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
 	  */
-	 private AOSigner selectSigner(String format, byte[] sign) throws AOFormatFileException, PrivilegedActionException {
+	 private AOSigner selectSigner(final String format, final byte[] sign) throws AOFormatFileException, PrivilegedActionException {
 		 AOSigner signer;
 		 String signerErrorMessage;
 		 if (format != null) {
