@@ -30,7 +30,7 @@ public final class SelectSignerAction implements PrivilegedExceptionAction<AOSig
      * @param data Firma electr&oacute;nica para la que se desea el manejador.
      */
     public SelectSignerAction(final byte[] data) {
-        this.data = (data != null ? data.clone() : null);;
+        this.data = (data != null ? data.clone() : null);
         this.format = null;
     }
     
