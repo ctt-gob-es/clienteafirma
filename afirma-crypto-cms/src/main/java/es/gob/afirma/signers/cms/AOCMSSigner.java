@@ -51,6 +51,7 @@ public final class AOCMSSigner implements AOSigner {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
+    /** {@inheritDoc} */
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
@@ -101,6 +102,7 @@ public final class AOCMSSigner implements AOSigner {
         }
     }
 
+    /** {@inheritDoc} */
     public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
@@ -149,6 +151,7 @@ public final class AOCMSSigner implements AOSigner {
         throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
     }
 
+    /** {@inheritDoc} */
     public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
         // tipos de datos a firmar.
@@ -186,6 +189,7 @@ public final class AOCMSSigner implements AOSigner {
         throw new AOException("Los datos no se corresponden con una firma CMS valida"); //$NON-NLS-1$
     }
 
+    /** {@inheritDoc} */
     public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
@@ -268,6 +272,7 @@ public final class AOCMSSigner implements AOSigner {
         return dataSigned;
     }
 
+    /** {@inheritDoc} */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
         final ReadNodesTree rn = new ReadNodesTree();
         try {
@@ -279,6 +284,7 @@ public final class AOCMSSigner implements AOSigner {
         return null;
     }
 
+    /** {@inheritDoc} */
     public boolean isSign(final byte[] signData) {
         if (signData == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -288,6 +294,7 @@ public final class AOCMSSigner implements AOSigner {
         return ValidateCMSSignedData.isCMSSignedData(signData);
     }
 
+    /** {@inheritDoc} */
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -316,6 +323,7 @@ public final class AOCMSSigner implements AOSigner {
         this.uatrib.put(oid, value);
     }
 
+    /** {@inheritDoc} */
     public byte[] getData(final byte[] signData) throws AOException {
         if (signData == null) {
             throw new IllegalArgumentException("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -326,10 +334,12 @@ public final class AOCMSSigner implements AOSigner {
         return new ObtainContentSignedData().obtainData(signData);
     }
 
+    /** {@inheritDoc} */
     public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".csig";  //$NON-NLS-1$//$NON-NLS-2$
     }
 
+    /** {@inheritDoc} */
     public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
 
         if (signData == null) {
