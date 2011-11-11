@@ -374,6 +374,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			 this.errorMessage = this.errorMessage.substring(
 					 "java.security.PrivilegedActionException:".length()).trim(); //$NON-NLS-1$
 		 }
+		 e.printStackTrace();
 		 throw e;
 	 }
 
