@@ -233,6 +233,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
     }
 
+    /** {@inheritDoc} */
     public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
@@ -1016,6 +1017,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return false;
     }
 
+    /** {@inheritDoc} */
     public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -1092,6 +1094,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return baosSig.toByteArray();
     }
 
+    /** {@inheritDoc} */
     public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
@@ -1271,6 +1274,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return Utils.writeXML(rootSig, originalXMLProperties, null, null);
     }
 
+    /** {@inheritDoc} */
     public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
@@ -1324,6 +1328,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return cosign(baosData.toByteArray(), baosSig.toByteArray(), algorithm, keyEntry, extraParams);
     }
 
+    /** {@inheritDoc} */
     public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
@@ -1698,6 +1703,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
     }
 
+    /** {@inheritDoc} */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
         // recupera la raiz del documento de firmas
@@ -1801,6 +1807,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return arrayNodes;
     }
 
+    /** {@inheritDoc} */
     public boolean isSign(final byte[] sign) {
 
         if (sign == null) {
@@ -1837,6 +1844,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return true;
     }
 
+    /** {@inheritDoc} */
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -1845,6 +1853,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return true;
     }
 
+    /** {@inheritDoc} */
     public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -1873,6 +1882,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         return docAfirma;
     }
 
+    /** {@inheritDoc} */
     public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
