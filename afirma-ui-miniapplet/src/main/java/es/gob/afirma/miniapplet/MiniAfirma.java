@@ -257,9 +257,9 @@ interface MiniAfirma {
     String getBase64FromText(String plainText, String charset) throws UnsupportedEncodingException;
     
     /**
-     * Recupera la versi&oacute;n de Java en uso con el formato "JX", en donde X es un n&uacute;mero
-     * entero que identifica la versi&oacute;n. X ser&aacute; 4 para Java 1.4 o invferior, 5 para Java 5,
-     * 6 para Java 6 y 7 para cualquier otro. 
+     * Recupera la versi&oacute;n de Java en uso con el formato "J<i>x</i>", en donde <i>x</i> es un n&uacute;mero
+     * entero que identifica la versi&oacute;n. <i>x</i> ser&aacute; 4 para Java 1.4 o inferior, 5 para Java 5,
+     * 6 para Java 6 y 7 para Java 7 y superiores. 
      * @return Versi&oacute;n de Java.
      */
     String getEcoJava();

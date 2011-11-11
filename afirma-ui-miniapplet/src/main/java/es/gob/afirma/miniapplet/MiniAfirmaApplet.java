@@ -419,9 +419,11 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	}
 
+	/** {@inheritDoc} */
 	public String getEcoJava() { 
 		return AccessController.doPrivileged(new GetEcoJavaVersionAction()).toString();
 	} 
+	
 
 	@Override
 	public void init() {
