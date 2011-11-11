@@ -62,6 +62,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	/** Mensaje del &uacute;ltimo error producido. */
 	private String errorMessage = null;
 
+	/** {@inheritDoc} */
 	public String sign(final String dataB64, 
 	                   final String algorithm, 
 	                   final String format, 
@@ -102,6 +103,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	}
 
+	/** {@inheritDoc} */
 	public String coSign(final String signB64, 
 	                     final String dataB64, 
 	                     final String algorithm, 
@@ -145,6 +147,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	}
 
+	/** {@inheritDoc} */
 	public String counterSign(final String signB64, 
 	                          final String algorithm, 
 	                          final String format, 
@@ -186,6 +189,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	}
 
+	/** {@inheritDoc} */
 	public String getSignersStructure(final String signB64) throws IOException, PrivilegedActionException, AOFormatFileException {
 
 		this.cleanErrorMessage();
@@ -221,7 +225,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	}
 
-
+	/** {@inheritDoc} */
 	public boolean saveDataToFile(final String data, 
 	                              final String title, 
 	                              final String fileName, 
@@ -270,6 +274,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         }
 	}
 
+	/** {@inheritDoc} */
 	public String loadFilePath(final String title, final String extensions, final String description) throws PrivilegedActionException {
 
 		this.cleanErrorMessage();
@@ -295,6 +300,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         }
 	}
 
+	/** {@inheritDoc} */
 	public String getFileContent(final String title, final String extensions, final String description) throws PrivilegedActionException {
 
 		this.cleanErrorMessage();
@@ -320,12 +326,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         }
 	}
 
+	/** {@inheritDoc} */
 	public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException {
 		this.cleanErrorMessage();
 		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
 		return this.getFileNameContent(title, extensions, description, false);
 	}
 
+	/** {@inheritDoc} */
 	public String getFileNameContentBase64(final String title, final String extensions, final String description) throws PrivilegedActionException {
 		this.cleanErrorMessage();
 		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
@@ -356,6 +364,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         }
 	}
 
+	/** {@inheritDoc} */
 	public String getTextFromBase64(final String base64Data, final String charset) throws IOException {
 
 		this.cleanErrorMessage();
@@ -375,6 +384,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         }
 	}
 
+	/** {@inheritDoc} */
 	public String getBase64FromText(final String plainText, final String charset) throws UnsupportedEncodingException {
 
 		this.cleanErrorMessage();
@@ -394,6 +404,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		return Base64.encodeBytes(plainText.getBytes());
 	}
 
+	/** {@inheritDoc} */
 	public void verifyPlatform() throws PrivilegedActionException {
 
 		this.cleanErrorMessage();
@@ -419,6 +430,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
 	}
 
+	/** {@inheritDoc} */
 	public String getErrorMessage() {
 		return this.errorMessage;
 	}
@@ -440,9 +452,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	     Logger.getLogger("es.gob.afirma.MiniAfirmaApplet").severe(new String(baos.toByteArray())); //$NON-NLS-1$
 	 }
 
-	 /**
-	  * Elimina el mensaje de error establecido.
-	  */
+	 /** Elimina el mensaje de error establecido previamente. */
 	 private void cleanErrorMessage() {
 		 this.errorMessage = null;
 	 }
