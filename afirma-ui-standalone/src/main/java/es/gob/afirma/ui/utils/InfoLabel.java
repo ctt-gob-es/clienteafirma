@@ -1,5 +1,6 @@
 package es.gob.afirma.ui.utils;
 
+
 import javax.swing.JLabel;
 
 import es.gob.afirma.ui.utils.Utils;
@@ -25,8 +26,22 @@ public class InfoLabel extends JLabel{
 	 */
 	public InfoLabel(String text, boolean opaque) {
 		super("<HTML>" + text + "</HTML>");
-		this.setFocusable(true);
+		this.setFocusable(true); //Focusable
 		this.setOpaque(opaque);
+		Utils.remarcar(this);
+	    Utils.setContrastColor(this);
+	    Utils.setFontBold(this);
+	}
+
+	/**
+	 * Constructor sencillo.
+	 * Se utilizará para etiquetas con un componente asociado.
+	 * 
+	 * @param text texto de la etiqueta
+	 */
+	public InfoLabel(String text) {
+		super("<HTML>" + text + "</HTML>");
+		this.setOpaque(false);
 		Utils.remarcar(this);
 	    Utils.setContrastColor(this);
 	    Utils.setFontBold(this);
