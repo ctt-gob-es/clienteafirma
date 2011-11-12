@@ -34,7 +34,6 @@
     <module>afirma-crypto-cades</module>
     <module>afirma-crypto-cades-enveloper</module>
     <module>afirma-crypto-cades-multi</module>
-    <module>afirma-crypto-pdf-itext</module>
     <module>afirma-crypto-pdf</module>
     <module>afirma-crypto-cipher</module>
     <module>afirma-crypto-core-xml</module>
