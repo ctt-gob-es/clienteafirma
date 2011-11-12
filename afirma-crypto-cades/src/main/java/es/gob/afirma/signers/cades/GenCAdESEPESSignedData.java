@@ -111,7 +111,7 @@ public final class GenCAdESEPESSignedData {
             signDate
         );
         
-        final byte[] signature = PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry, preSignature);
+        final byte[] signature = PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry.getPrivateKey(), preSignature);
         
         return CAdESTriPhaseSigner.postSign(
             AOSignConstants.getDigestAlgorithmName(signatureAlgorithm),

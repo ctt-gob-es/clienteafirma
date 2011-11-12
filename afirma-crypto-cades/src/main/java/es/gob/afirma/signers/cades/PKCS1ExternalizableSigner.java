@@ -10,9 +10,9 @@
 
 package es.gob.afirma.signers.cades;
 
+import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.KeyStore.PrivateKeyEntry;
 
 import es.gob.afirma.core.AOException;
 
@@ -36,12 +36,12 @@ public final class PKCS1ExternalizableSigner {
      *  <li><i>SHA384withRSA</i></li>
      *  <li><i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave de privada a usar para la firma
+     * @param privateKey Clave privada a usar para la firma
      * @param data Datos a firmar
      * @return Firma PKCS#1 en binario puro no tratado
      * @throws AOException en caso de cualquier problema durante la firma
      */
-    public static byte[] sign(final String signatureAlgorithm, final PrivateKeyEntry keyEntry, final byte[] data) throws AOException {
+    public static byte[] sign(final String signatureAlgorithm, final PrivateKey privateKey, final byte[] data) throws AOException {
         
         final Signature sig;
         try {
@@ -52,7 +52,7 @@ public final class PKCS1ExternalizableSigner {
         }
 
         try {
-            sig.initSign(keyEntry.getPrivateKey());
+            sig.initSign(privateKey);
         }
         catch (final Exception e) {
             throw new AOException("Error al inicializar la firma con la clave privada", e); //$NON-NLS-1$
