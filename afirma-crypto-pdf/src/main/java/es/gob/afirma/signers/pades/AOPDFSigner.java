@@ -18,7 +18,6 @@ import java.net.URL;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -61,8 +60,8 @@ import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.cades.GenCAdESEPESSignedData;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
-import es.gob.afirma.signers.pkcs7.tsp.CMSTimestamper;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
+import es.gob.afirma.signers.pkcs7.tsp.CMSTimestamper;
 
 /** Manejador de firmas binarias de ficheros Adobe PDF en formato PAdES.
  * <p>La compatibilidad con PAdES no es completa, omiti&eacute;ndose los siguientes aspectos de la normativa:</p>
@@ -80,6 +79,8 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * </p>
  */
 public final class AOPDFSigner implements AOSigner {
+    
+    private static final int CSIZE = 8000;
     
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
@@ -1052,12 +1053,7 @@ public final class AOPDFSigner implements AOSigner {
             }
         }
 
-        Certificate[] chain = ke.getCertificateChain();
-        if (chain == null) {
-            chain = new Certificate[] {
-                ke.getCertificate()
-            };
-        }
+        final X509Certificate[] chain = (X509Certificate[]) ke.getCertificateChain();
 
         sap.setCrypto(null, chain, null, null);
 
@@ -1065,7 +1061,7 @@ public final class AOPDFSigner implements AOSigner {
         if (sap.getSignDate() != null) {
             dic.setDate(new PdfDate(sap.getSignDate()));
         }
-        dic.setName(PdfPKCS7.getSubjectFields((X509Certificate) chain[0]).getField("CN")); //$NON-NLS-1$
+        dic.setName(PdfPKCS7.getSubjectFields(chain[0]).getField("CN")); //$NON-NLS-1$
         if (sap.getReason() != null) {
             dic.setReason(sap.getReason());
         }
@@ -1078,35 +1074,18 @@ public final class AOPDFSigner implements AOSigner {
 
         sap.setCryptoDictionary(dic);
 
-        final int csize = 8000;
         final HashMap<PdfName, Integer> exc = new HashMap<PdfName, Integer>();
-        exc.put(PdfName.CONTENTS, Integer.valueOf(csize * 2 + 2));
+        exc.put(PdfName.CONTENTS, Integer.valueOf(CSIZE * 2 + 2));
 
         sap.preClose(exc);
 
         // ********************************************************************************
-        // **************** CALCULO DEL SIGNED DATA
-        // ***************************************
+        // **************** CALCULO DEL SIGNED DATA ***************************************
         // ********************************************************************************
-
-        // Previo: Cadena de certificados
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = ke.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = ke.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                    (X509Certificate) cert
-                };
-            }
-        }
 
         byte[] pk =
                 new GenCAdESEPESSignedData().generateSignedData(
-                    new P7ContentSignerParameters(inPDF, algorithm, xCerts), 
+                    new P7ContentSignerParameters(inPDF, algorithm, chain), 
                     true, // omitContent
                     new AdESPolicy(extraParams),
                     true, // true -> isSigningCertificateV2, false -> isSigningCertificateV1
@@ -1149,7 +1128,7 @@ public final class AOPDFSigner implements AOSigner {
         // *************** FIN CALCULO DEL SIGNED DATA ************************************
         // ********************************************************************************
 
-        final byte[] outc = new byte[csize];
+        final byte[] outc = new byte[CSIZE];
         final PdfDictionary dic2 = new PdfDictionary();
         System.arraycopy(pk, 0, outc, 0, pk.length);
         dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));

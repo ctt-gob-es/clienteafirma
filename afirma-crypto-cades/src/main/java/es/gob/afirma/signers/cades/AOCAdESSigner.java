@@ -82,7 +82,7 @@ public final class AOCAdESSigner implements AOSigner {
      *  <dt><b><i>mode</i></b></dt>
      *   <dd>
      *    Modo de firma a usar. El valor <code>explicit</code> indica que no se incluyen los datos firmados, sino una
-     *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluiran dentro de
+     *    referencia a estos, mientras que el valor <code>implicit</code> indica que s&iacute; se incluir&aacute;n dentro de
      *    la propia firma los datos firmados
      *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>

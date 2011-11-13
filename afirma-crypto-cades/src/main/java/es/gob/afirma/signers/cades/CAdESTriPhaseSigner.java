@@ -156,7 +156,7 @@ public final class CAdESTriPhaseSigner {
                           final boolean signingCertificateV2,
                           final byte[] messageDigest,
                           final Date signDate) throws AOException {
-        
+                
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
         } 

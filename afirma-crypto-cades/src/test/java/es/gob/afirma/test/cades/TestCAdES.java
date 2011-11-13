@@ -36,9 +36,7 @@ import es.gob.afirma.signers.cades.CAdESValidator;
 
 /**
  * Pruebas del m&oacute;dulo CAdES de Afirma.
- * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
- *
- */
+ * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
 public final class TestCAdES {
     
     private static final String CERT_PATH = "ANF_PF_Activo.pfx"; //$NON-NLS-1$
