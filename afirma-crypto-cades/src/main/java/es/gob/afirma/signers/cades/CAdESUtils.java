@@ -390,41 +390,4 @@ public final class CAdESUtils {
         return contexExpecific;
     }
     
-    /** Obtiene la primera posici&oacute;n en la que se encuentra una determinada secuencia de octetos dentro de otra.
-     * @param data Secuencia de octetos contenedora
-     * @param pattern Secuencia de octetos a localizar
-     * @return Primera posici&oacute;n en la que se encuentra una determinada secuencia de octetos dentro de otra o 
-     *         <code>-1</code> si no se encuentra */
-    public static int indexOf(final byte[] data, final byte[] pattern) {
-        final int[] failure = computeFailure(pattern);
-        int j = 0;
-        for (int i = 0; i < data.length; i++) {
-            while (j > 0 && pattern[j] != data[i]) {
-                j = failure[j - 1];
-            }
-            if (pattern[j] == data[i]) {
-                j++;
-            }
-            if (j == pattern.length) {
-                return i - pattern.length + 1;
-            }
-        }
-        return -1;
-    }
-
-    private static int[] computeFailure(final byte[] pattern) {
-        final int[] failure = new int[pattern.length];
-        int j = 0;
-        for (int i = 1; i < pattern.length; i++) {
-            while (j>0 && pattern[j] != pattern[i]) {
-                j = failure[j - 1];
-            }
-            if (pattern[j] == pattern[i]) {
-                j++;
-            }
-            failure[i] = j;
-        }
-        return failure;
-    }
-
 }
