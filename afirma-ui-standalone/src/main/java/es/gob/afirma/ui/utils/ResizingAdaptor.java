@@ -193,8 +193,14 @@ public class ResizingAdaptor extends ComponentAdapter {
 			relHeight = theWindowAbout.getSize().getHeight() / Constants.ABOUT_WINDOW_INITIAL_HEIGHT;
 			relation = Math.round(relWidth * relHeight * theWindowAbout.getMinimumRelation());
 		} else if (theCustomDialog != null){
-			relWidth = theCustomDialog.getSize().getWidth() / Constants.CUSTOMDIALOG_INITIAL_WIDTH;
-			relHeight = theCustomDialog.getSize().getHeight() / Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
+			//Se comprueba si está activado el modo negrita, fuente grande o si es necesario que la ventana sea grande por defecto
+			if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold() || theCustomDialog.isBigSizeDefault()){
+				relWidth = theCustomDialog.getSize().getWidth() / Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH;
+				relHeight = theCustomDialog.getSize().getHeight() / Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT;
+			} else {
+				relWidth = theCustomDialog.getSize().getWidth() / Constants.CUSTOMDIALOG_INITIAL_WIDTH;
+				relHeight = theCustomDialog.getSize().getHeight() / Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
+			}
 			relation = Math.round(relWidth * relHeight * theCustomDialog.getMinimumRelation());
 		} else if (theFileChooser != null){
 			relWidth = theFileChooser.getDialog().getSize().getWidth() / Constants.FILE_INITIAL_WIDTH;
