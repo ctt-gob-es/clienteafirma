@@ -1,12 +1,17 @@
 package es.gob.afirma.ui.principal;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -97,7 +102,7 @@ public class ContextOptionsPane {
         //Relación entre etiqueta y campo de texto
         etiquetaMotivo.setLabelFor(campoMotivo);
   		//Asignación de mnemónico
-        etiquetaMotivo.setDisplayedMnemonic(KeyEvent.VK_O);
+        etiquetaMotivo.setDisplayedMnemonic(KeyEvent.VK_T);
         
         
         c2.insets = new Insets(13, 13, 0, 13);
@@ -164,8 +169,36 @@ public class ContextOptionsPane {
 
         panel.add(contextPanel, c);
         
+        c.gridy = c.gridy + 1;
+        
+        //Botones
+        JPanel buttonPanel = new JPanel( new FlowLayout(FlowLayout.RIGHT, 1, 1));
+        
+        //Definicion de botones
+        final JButton valores = new JButton();
+        
+        JPanel panelValores = new JPanel(new GridLayout(1, 1));
+        //Boton Valores por defecto
+        valores.setText(Messages.getString("Opciones.accesibilidad.valores"));
+        valores.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				valoresActionPerformed();
+				
+				
+			}
+		});
+        valores.setMnemonic(KeyEvent.VK_O);
+        Utils.remarcar(valores);
+        Utils.setContrastColor(valores);
+        Utils.setFontBold(valores);
+        panelValores.add(valores);
+        buttonPanel.add(panelValores);        
+
+        this.panel.add(buttonPanel, c);
         // Rellenamos el hueco libre con un panel vacio
-        c.gridy = 1;
+        c.gridy = c.gridy + 1;
         c.weighty = 1.0;
         panel.add(new JPanel(), c);
         
@@ -219,5 +252,27 @@ public class ContextOptionsPane {
 			config.setProperty("signerContact", campoDatos.getText().trim());
 		}
 		return config;
+	}
+	
+	/**
+	 * Aplica los valores por defecto.
+	 */
+	void valoresActionPerformed(){
+		Opciones.setUpdate(true);
+		restore(this.panel);
+	}
+	
+	/**
+	 * Aplica el estado por defecto de los componentes de la ventana 
+	 */
+	private void restore(JPanel panel){
+		for (int i=0; i<panel.getComponentCount();i++){
+			if (panel.getComponent(i) instanceof JTextField){
+				((JTextField)panel.getComponent(i)).setText("");
+			} else if (panel.getComponent(i) instanceof JPanel){
+				JPanel interiorPanel = (JPanel)panel.getComponent(i);
+				restore(interiorPanel);
+			}
+		}
 	}
 }

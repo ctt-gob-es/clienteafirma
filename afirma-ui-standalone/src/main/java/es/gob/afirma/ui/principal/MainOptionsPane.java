@@ -1,9 +1,12 @@
 package es.gob.afirma.ui.principal;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -14,6 +17,7 @@ import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -201,7 +205,7 @@ public class MainOptionsPane {
         // Checkbox para habilitar las opciones de configuracion avanzada
         checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
         checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
-        checkAddPolicy.setMnemonic(KeyEvent.VK_O); // Asignación de mnemónico al checkbox
+        checkAddPolicy.setMnemonic(KeyEvent.VK_F); // Asignación de mnemónico al checkbox
         
         Utils.remarcar(checkAddPolicy);
 
@@ -265,6 +269,32 @@ public class MainOptionsPane {
         
         panel.add(policyPanel, c);
                 
+        c.gridy = c.gridy + 1;
+        
+        //Botones
+        JPanel buttonPanel = new JPanel( new FlowLayout(FlowLayout.RIGHT, 1, 1));
+        
+        //Definicion de botones
+        final JButton valores = new JButton();
+        
+        JPanel panelValores = new JPanel(new GridLayout(1, 1));
+        //Boton Valores por defecto
+        valores.setText(Messages.getString("Opciones.accesibilidad.valores"));
+        valores.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				valoresActionPerformed();				
+			}
+		});
+        valores.setMnemonic(KeyEvent.VK_O);
+        Utils.remarcar(valores);
+        Utils.setContrastColor(valores);
+        Utils.setFontBold(valores);
+        panelValores.add(valores);
+        buttonPanel.add(panelValores);        
+
+        this.panel.add(buttonPanel, c);
         // Rellenamos el hueco libre con un panel vacio
         c.gridy = c.gridy + 1;
         c.weighty = 1.0;
@@ -355,5 +385,32 @@ public class MainOptionsPane {
 			config.setProperty("policyIdentifier", textPolicyUrl.getText());
 		}
 		return config;
+	}
+	
+	/**
+	 * Aplica los valores por defecto.
+	 */
+	void valoresActionPerformed(){
+		Opciones.setUpdate(true);
+		restore(this.panel);
+	}
+	
+	/**
+	 * Aplica el estado por defecto de los componentes de la ventana 
+	 */
+	private void restore(JPanel panel){
+		for (int i=0; i<panel.getComponentCount();i++){
+			if (panel.getComponent(i) instanceof JTextField){
+				((JTextField)panel.getComponent(i)).setText("");
+			} else if(panel.getComponent(i) instanceof JCheckBox){
+				((JCheckBox)panel.getComponent(i)).setSelected(false);				
+			} else if (panel.getComponent(i) instanceof JComboBox){
+				((JComboBox)panel.getComponent(i)).setSelectedIndex(0);
+				
+			}else if (panel.getComponent(i) instanceof JPanel){
+				JPanel interiorPanel = (JPanel)panel.getComponent(i);
+				restore(interiorPanel);
+			}
+		}
 	}
 }

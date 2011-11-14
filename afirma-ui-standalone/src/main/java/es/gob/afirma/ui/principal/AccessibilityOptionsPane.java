@@ -244,6 +244,7 @@ public class AccessibilityOptionsPane {
         this.checkWindowAccessibility.setSelected(GeneralConfig.isAvanzados()); 
         this.checkWindowAccessibility.setBounds(12, 20, 340, 23);
         this.checkWindowAccessibility.setMnemonic(KeyEvent.VK_B); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        this.checkWindowAccessibility.setName("accesibilidadVentanas");
         Utils.remarcar(this.checkWindowAccessibility);
         Utils.setContrastColor(this.checkWindowAccessibility);
         Utils.setFontBold(this.checkWindowAccessibility);
@@ -401,12 +402,16 @@ public class AccessibilityOptionsPane {
 	}
 	
 	/**
-	 * Desactiva la seleccion de todos los JcheckBox de la ventana 
+	 * Aplica el estado por defecto de los componentes de la ventana 
 	 */
 	private void restore(JPanel panel){
 		for (int i=0; i<panel.getComponentCount();i++){
 			if (panel.getComponent(i) instanceof JCheckBox){
-				((JCheckBox)panel.getComponent(i)).setSelected(false);
+				if (((JCheckBox)panel.getComponent(i)).getName()!=null){
+					((JCheckBox)panel.getComponent(i)).setSelected(true);
+				} else {
+					((JCheckBox)panel.getComponent(i)).setSelected(false);
+				}
 			} else if (panel.getComponent(i) instanceof JPanel){
 				JPanel interiorPanel = (JPanel)panel.getComponent(i);
 				restore(interiorPanel);
