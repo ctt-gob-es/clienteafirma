@@ -28,6 +28,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	protected static int actualWidth = -1;
 	
 	protected static int actualHeight = -1;
+
+	/**
+	 * Indica si la ventana está maximizada.
+	 */
+	private static boolean isMaximized = false;
+
+	/**
+	 * Indica si el diálogo requiere un tamaño grande por defecto.
+	 */
+	private boolean bigSizeDefault = false;
 	
 	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
     private static final String ICON_DIR_PATH = "/resources/images/";
@@ -45,10 +55,23 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		    public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
+    		    if (isMaximized) {
+		    		setResizableDialog(false);
+		    	 } else {
+		    		setResizableDialog(true);
+		    	 }
+
+
+				
 		    }
 		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
+				if (isMaximized) {
+		    		setResizableDialog(false);
+		    	} else {
+		    		setResizableDialog(true);
+		    	}
 		    }
 		});
 	}
@@ -146,13 +169,15 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    
 	    //Control de posibilidad de redimensionado y habilitado/deshabilitado de botones
 	    if (actualSize.equals(fullScreen)){
-	    	this.setResizable(false);
+	    	//this.setResizable(false);
+	    	isMaximized = true;
 	    	if ((botonMaximizar!=null) && (botonRestaurar!=null)) {
 	    		botonMaximizar.setEnabled (false);
 	    		botonRestaurar.setEnabled (true);
 	    	}
 	    } else {
-	    	this.setResizable(true);
+	    	//this.setResizable(true);
+	    	isMaximized = false;
 	    	if ((botonMaximizar!=null) && (botonRestaurar!=null)) {
 	    		botonMaximizar.setEnabled (true);
 	    		botonRestaurar.setEnabled (false);
@@ -219,7 +244,25 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
         return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
     }
     
-	
+    private void setResizableDialog(boolean isResizable){
+    	this.setResizable(isResizable);
+    }
+    
 
+	/**
+	 * Indica si el diálogo debe tener un tamaño grande por defecto.
+	 * @return boolean
+	 */
+	public boolean isBigSizeDefault() {
+		return bigSizeDefault;
+	}
+
+	/**
+	 * Asigna la variable que indica si el diálogo debe tener un tamaño grande por defecto.
+	 * @param bigSizeDefault
+	 */
+	public void setBigSizeDefault(boolean bigSizeDefault) {
+		this.bigSizeDefault = bigSizeDefault;
+	}
 
 }
