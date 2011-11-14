@@ -97,8 +97,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * Boton de maximizar.
 	 */
 	private JButton maximizeButton = null;
-	
-	
+
 	/**
 	 * Respuesta al mensaje
 	 */
@@ -198,6 +197,11 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
     	if (GeneralConfig.isMaximized()){
     		//Se maximiza
     		this.setBounds(0,0, maxWidth, maxHeight);
+    	} else {
+    		//Se establece el tamaño mínimo en base a las opciones activas
+    		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+    			setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH, Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT));
+    		}	
     	}
 		
 		this.setTitle(title);
@@ -607,9 +611,12 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @return nombre del perfil
 	 */
 	public static String showInputDialog(Component componentParent, boolean modal, String message, int mnemonic, List<String> list, String nameListElements, String title, int typeMessage){
-		
+
 		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, true);
-	
+		customDialog.setBigSizeDefault(true); //Se indica que este tipo de diálogo requiere un tamaño grande por defecto
+		//Se establece un tamaño mínimo por defecto
+		customDialog.setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH, Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT));
+		
 		//Nombre accesible para el cuadro de texto
 		String fullAccesibleName = message;
 		//Nombre accesible para la lista - scrollPane
@@ -877,18 +884,24 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
-		
 		//Dimensiones de restaurado
 		int minWidth = Constants.CUSTOMDIALOG_INITIAL_WIDTH;
 		int minHeight = Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
-		
+		//Se comprueba las opciones de accesibilidad activas
+		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold() || isBigSizeDefault()){
+			minWidth = Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH;
+			minHeight = Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT;
+		}
+		//Se establece el tamaño mínimo
 		setMinimumSize(new Dimension(minWidth, minHeight));
 		
+		//Se situa el diálogo
 		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
 			this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
 		} else {
     		setBounds(getInitialX(minWidth), getInitialY(minHeight), minWidth, minHeight);
 		}
+		
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
 		this.maximizeButton.setEnabled (true);
 		this.restoreButton.setEnabled (false);
