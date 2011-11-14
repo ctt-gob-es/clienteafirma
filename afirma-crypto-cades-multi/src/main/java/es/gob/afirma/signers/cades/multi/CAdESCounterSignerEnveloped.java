@@ -941,6 +941,6 @@ final class CAdESCounterSignerEnveloped {
             throw new AOException("Error obteniendo los atributos firmados: " + ex); //$NON-NLS-1$
         }
 
-        return new DEROctetString(PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry, tmp));
+        return new DEROctetString(PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry.getPrivateKey(), tmp));
     }
 }

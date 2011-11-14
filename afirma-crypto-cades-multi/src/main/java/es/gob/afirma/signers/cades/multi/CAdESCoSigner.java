@@ -495,7 +495,7 @@ final class CAdESCoSigner {
             throw new AOException("Error al obtener los datos a firmar", ex); //$NON-NLS-1$
         }
 
-        return new DEROctetString(PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry, tmp));
+        return new DEROctetString(PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry.getPrivateKey(), tmp));
 
     }
 }
