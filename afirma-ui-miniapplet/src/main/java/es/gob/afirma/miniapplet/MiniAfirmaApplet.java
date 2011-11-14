@@ -444,13 +444,18 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @throws Exception Excepci&oacute;n recibida.
 	 */
 	 private void setErrorMessage(final Exception e) {
-		 this.errorMessage = e.getLocalizedMessage();
+		 this.errorMessage = (e.getLocalizedMessage() != null ? e.getLocalizedMessage() :
+			 (e.getMessage() != null ? e.getMessage() : e.toString()));
 		 if (this.errorMessage.startsWith("java.security.PrivilegedActionException:")) { //$NON-NLS-1$
 			 this.errorMessage = this.errorMessage.substring(
 					 "java.security.PrivilegedActionException:".length()).trim(); //$NON-NLS-1$
 		 }
 		 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		 e.printStackTrace(new PrintWriter(baos));
+		 PrintWriter writer = new PrintWriter(baos);
+		 e.printStackTrace(writer);
+		 writer.flush();
+		 writer.close();
+		 
 	     Logger.getLogger("es.gob.afirma.MiniAfirmaApplet").severe(new String(baos.toByteArray())); //$NON-NLS-1$
 	 }
 

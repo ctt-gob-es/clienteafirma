@@ -56,7 +56,7 @@ interface MiniAfirma {
      * @throws IOException Cuando se produce un error durante la firma electr&oacute;nica.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Error gen&eacute;rico.
+
      */
     String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
 
@@ -87,7 +87,6 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
      * se puede identificar el formato de la firma.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Error gen&eacute;rico.
      */
     String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
 
@@ -113,7 +112,6 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
      * se puede identificar el formato de la firma.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Error gen&eacute;rico.
      */
     String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
     
@@ -135,7 +133,6 @@ interface MiniAfirma {
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
-     * @throws Exception Error gen&eacute;rico.
      */
     String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException;
 
@@ -153,7 +150,6 @@ interface MiniAfirma {
      * contrario.
      * @throws IOException Cuando ocurre alg&uacute;n error en el guardado del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Error gen&eacute;rico.
      */
     boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException;
 
@@ -167,7 +163,6 @@ interface MiniAfirma {
      * @return El contenido del fichero codificado en Base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Error gen&eacute;rico.
      */
     String getFileContent(String title, String extensions, String description) throws PrivilegedActionException;
 
@@ -182,7 +177,6 @@ interface MiniAfirma {
      * @return El nombre del fichero y su contenido en unicode.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Error gen&eacute;rico.
      */
     String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException;
     
@@ -197,7 +191,6 @@ interface MiniAfirma {
      * @return El nombre del fichero y su contenido en base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Error gen&eacute;rico.
      */
     String getFileNameContentBase64(final String title, final String extensions, final String description) throws PrivilegedActionException;
 
@@ -210,7 +203,6 @@ interface MiniAfirma {
      * @return Nombre del fichero seleccionado.
      * @throws IOException Cuando se produce un error al seleccionar el fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws Exception Error gen&eacute;rico.
      */
     String loadFilePath(String title, String extensions, String description) throws PrivilegedActionException;
     
@@ -231,7 +223,6 @@ interface MiniAfirma {
      *                </ul>  
      * @return Texto decodificado.
      * @throws IOException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
-     * @throws Exception Error .
      */
     String getTextFromBase64(String data, String charset) throws IOException;
 
@@ -252,7 +243,6 @@ interface MiniAfirma {
      *                </ul>  
      * @return Texto codificado en Base64.
      * @throws UnsupportedEncodingException Cuando se indica una codificaci&oacute;n no v&aacute;lida.
-     * @throws Exception Error gen&eacute;rico.
      */
     String getBase64FromText(String plainText, String charset) throws UnsupportedEncodingException;
     
@@ -271,7 +261,6 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws RuntimeException Cuando se encuentra alguna incopatibilidad en el entorno de
      * ejecuci&oacute;n.
-     * @throws Exception Error gen&eacute;rico.
      */
     void verifyPlatform() throws PrivilegedActionException;
     
