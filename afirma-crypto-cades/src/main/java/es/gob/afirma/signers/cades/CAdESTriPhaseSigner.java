@@ -60,13 +60,13 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *   El sistema tiene unas capacidades muy limitadas en cuanto a proceso computacional, memoria o comunicaciones por
  *   red. En este caso, el sistema solo realiza una operaci&oacute;n criptogr&aacute;fica, una firma PKCS#1,
  *   mucho menos demandante de potencia de proceso que una firma completa CAdES, y, adicionalmente, no trata el
- *   documento a firmar completo, sino &uacute;icamente una prque&ntilde;a cantidad de datos resultante de un
+ *   documento a firmar completo, sino &uacute;nicamente una peque&ntilde;a cantidad de datos resultante de un
  *   pre-proceso (la pre-firma) realizado por el sistema externo, lo que resulta en un enorme decremento en las necesidades
- *   de memoria y transmisi&oacute;n de datos.
+ *   de memoria y transmisi&oacute;n de datos (esto &uacute;ltimo si decide omitirse la transferencia del fichero a firmar).
  *  </li>
  *  <li>
  *   Por motivos de seguridad, el documento a firmar no puede salir de un sistema externo. Como se ha descrito en el punto
- *   anterior, en este caso el documento jam&aacute;s sale del sistema externo, sino que se transfiere &uacute;nicamente
+ *   anterior, en este caso es posible omitir por completo la salida del documento del sistema externo, y puede transferirse &uacute;nicamente
  *   el resultado de la pre-firma, desde la cual es imposible reconstruir el documento original.
  *  </li>
  * </ul>
@@ -87,7 +87,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  <li>El dispositivo móvil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
  *  <li>El servidor Web solicita el documento a servidor documental.</li>
  *  <li>
- *   El servidor documental entrega el documento al servidor Web.<br>Es importante recalcar que el servidor
+ *   El servidor documental entrega el documento al servidor Web.<br> Es importante recalcar que el servidor
  *   documental no necesita almacenar ning&uacute;n dato de sesi&oacute;n y que este no est&aacute; expuesto a Internet
  *   de forma directa en ning&uacute;n momento.
  *  </li>
@@ -125,6 +125,11 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *   ya firmado y almacenado.
  *  </li>
  * </ul>
+ * <p>
+ *  El esquema podr’a ser igualmente implementado sin servidor documental, pudiendo obtener el Servidor Web el documento 
+ *  desde otro origen, incluyendo el propio dispositivo m&oacute;vil. Igualmente, una vez firmado el documento, su destino 
+ *  puede ser cualquiera, incluyendo de nuevo al propio dispositivo.
+ * </p>
  * <p>
  *  Es conveniente tener en cuenta al usar firmas trif&aacute;sicas que es necesario disponer de un mecanismo
  *  para que el usuario pueda ver en todo momento los documentos que est&aacute; firmando (una copia que refleje
