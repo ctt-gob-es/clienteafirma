@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
+import es.gob.afirma.ui.principal.ContextOptionsPane;
 import es.gob.afirma.ui.principal.MainOptionsPane;
 import es.gob.afirma.ui.principal.UserProfile;
 
@@ -21,9 +22,9 @@ import es.gob.afirma.ui.principal.UserProfile;
  */
 public class GeneralConfig {
 	
-	public static final String OPTION_ADVANCED_VIEW = "advancedView";
-	public static final String OPTION_ALGORITHM = "algoritmo";
-	public static final String OPTION_USE_ALGORITHM_XML = "algoritmoXML";
+	public static final String OPTION_ADVANCED_VIEW = "advancedView"; //$NON-NLS-1$
+	public static final String OPTION_ALGORITHM = "algoritmo"; //$NON-NLS-1$
+	public static final String OPTION_USE_ALGORITHM_XML = "algoritmoXML"; //$NON-NLS-1$
 	
 	/** Opciones de configuraci&oacute;n general. */
 	private static Properties configOptions = new Properties();
@@ -54,19 +55,48 @@ public class GeneralConfig {
 	 * @return Algoritmo de firma.
 	 */
 	public static String getSignAlgorithm() {
-		return configOptions.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, "SHA1withRSA");
+		return configOptions.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM,
+				MainOptionsPane.DEFAULT_DEFAULT_ALGORITHM);
 	}
 
+	public static boolean isSignAlgorithmUsedToXml() {
+		return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_ALGORITHM_XML, "false")); //$NON-NLS-1$
+	}
+	
 	public static boolean isAvanzados() {
-		return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false"));
+		return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false")); //$NON-NLS-1$
 	}
 
+	public static boolean isSignPolicyEstablished() {
+		return Boolean.parseBoolean(configOptions.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false")); //$NON-NLS-1$
+	}
+	
+	public static String getSignPolicyOid() {
+		return configOptions.getProperty(MainOptionsPane.MAIN_POLICY_OID, ""); //$NON-NLS-1$
+	}
+	
+	public static String getSignPolicyUrl() {
+		return configOptions.getProperty(MainOptionsPane.MAIN_POLICY_URL, ""); //$NON-NLS-1$
+	}
+	
+	public static String getSignSubject() {
+		return configOptions.getProperty(ContextOptionsPane.KEY_SUBJECT, ""); //$NON-NLS-1$
+	}
+	
+	public static String getSignProductionPlace() {
+		return configOptions.getProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE, ""); //$NON-NLS-1$
+	}
+	
+	public static String getSignContactInfo() {
+		return configOptions.getProperty(ContextOptionsPane.KEY_CONTACT_INFO, ""); //$NON-NLS-1$
+	}
+	
 	/**
 	 * Indica si el ususario ha activado o desactivado la opcion de maximizar todas las ventanas
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isMaximized() {
-		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, "false"));
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, "false")); //$NON-NLS-1$
 	}
 	
 	/**
@@ -74,7 +104,7 @@ public class GeneralConfig {
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isAccessibility() {
-		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true"));
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true")); //$NON-NLS-1$
 	}
 	
 	/**
@@ -82,7 +112,7 @@ public class GeneralConfig {
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isBigCaret() {
-		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false"));
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false")); //$NON-NLS-1$
 	}
 	
 	/**
@@ -90,7 +120,7 @@ public class GeneralConfig {
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isRemarked() {
-		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false"));
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false")); //$NON-NLS-1$
 	}
 	
 	/**
@@ -98,7 +128,7 @@ public class GeneralConfig {
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isHighContrast() {
-		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, "false"));
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, "false")); //$NON-NLS-1$
 	}
 	
 	/**
@@ -106,7 +136,7 @@ public class GeneralConfig {
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isBigFontSize() {
-		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, "false"));
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, "false")); //$NON-NLS-1$
 	}
 	
 	/**
@@ -114,7 +144,7 @@ public class GeneralConfig {
 	 * @return boolean Indicando el estado de la opcion
 	 */
 	public static boolean isFontBold() {
-		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, "false"));
+		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, "false")); //$NON-NLS-1$
 	}
 	
 	public static void setOption(String optionKey, String optionValue) {
@@ -146,11 +176,10 @@ public class GeneralConfig {
 	 */
 	public static Properties getConfig() {
 		Properties config = new Properties();
-		if(UserProfile.currentUser.equals(Constants.defaultUser)){
-			config.putAll(configOptions);
+		if(UserProfile.currentProfileId == null){
+			config.putAll(ProfileManager.getDefaultConfiguration());
 		} else {
 			config.putAll(configOptions);
-			
 		}
 		return config;
 	}
@@ -162,21 +191,54 @@ public class GeneralConfig {
 	public static void loadConfig(Properties config) {
 		configOptions = new Properties();
 		configOptions.putAll(config);
+		
+		loadSignatureConfig(config);
 	}
 	
 	/**
 	 * Carga la nueva configuraci&oacute;n de firma.
 	 * @param config Configuraci&oacute;n que se desea cargar.
 	 */
-	public static void loadSignatureConfig(Properties config) {
+	private static void loadSignatureConfig(Properties config) {
 		configSignatureOptions = new Properties();
 		configSignatureOptions.putAll(getDefaultSignatureConfig());
-		configSignatureOptions.putAll(config);
+		
+		if (config.contains(MainOptionsPane.MAIN_ALGORITHM_XML)) {
+			configSignatureOptions.setProperty("referencesDigestMethod",
+					config.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM,
+							MainOptionsPane.DEFAULT_DEFAULT_ALGORITHM));
+		}
+		if (config.contains(MainOptionsPane.MAIN_POLICY_ESTABLISHED)) {
+			configSignatureOptions.setProperty("policyQualifier",
+					config.getProperty(MainOptionsPane.MAIN_POLICY_OID, ""));
+			configSignatureOptions.setProperty("policyIdentifier",
+					config.getProperty(MainOptionsPane.MAIN_POLICY_URL, ""));
+		}
+		
+		if (config.contains(ContextOptionsConfig.OPTION_REASON) &&
+				config.getProperty(ContextOptionsConfig.OPTION_REASON).trim().length() > 0) {
+			configSignatureOptions.setProperty("signReason",
+					config.getProperty(ContextOptionsConfig.OPTION_REASON).trim());
+		}
+		if (config.contains(ContextOptionsConfig.OPTION_PRODUCTION_PLACE) &&
+				config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE).trim().length() > 0) {
+			config.setProperty("signatureProductionCity",
+					config.getProperty(ContextOptionsConfig.OPTION_PRODUCTION_PLACE).trim());
+		}
+		if (config.contains(ContextOptionsConfig.OPTION_SIGNER_CONTACT) &&
+				config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT).trim().length() > 0) {
+			config.setProperty("signerContact",
+					config.getProperty(ContextOptionsConfig.OPTION_SIGNER_CONTACT).trim());
+		}
 	}
 	
+	/**
+	 * Recupera la relaci&oacute;n de propiedades de firma predefinidas para las operaciones.
+	 * @return Propiedades de firma.
+	 */
 	private static Properties getDefaultSignatureConfig() {
 		Properties defaultConfig = new Properties();
-		defaultConfig.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT);
+		defaultConfig.setProperty("mode", AOSignConstants.SIGN_MODE_IMPLICIT); //$NON-NLS-1$
 		return defaultConfig;
 	}
 }

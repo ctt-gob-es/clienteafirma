@@ -20,6 +20,7 @@ import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.ProfileManager;
 
 /**
  *	Entrada de la aplicacion
@@ -58,8 +59,8 @@ public class Main {
         	logger.log(Level.SEVERE, null, ex);
         }
         
-        if (preferences.get("users", "0").equals("0")){
-        	UserProfile.currentUser=Constants.defaultUser;
+        if (ProfileManager.getProfilesNames().length < 1) {
+        	UserProfile.currentProfileId = null;
         	new PrincipalGUI().main();
         } else {
         	new UserProfile().main();

@@ -15,6 +15,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -35,6 +37,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityFrameAdvisor;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.ProfileManager;
 
 public class UserProfile extends JAccessibilityFrameAdvisor {
 
@@ -46,7 +49,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		return 9;
 	}
     
-    public static String currentUser;
+    public static String currentProfileId;
         
     JComboBox comboPerfiles = new JComboBox();
 	
@@ -124,42 +127,34 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		JLabel label = new JLabel();
 		label.setText(Messages.getString("UserProfile.list.label")); // NOI18N
 		label.setDisplayedMnemonic(KeyEvent.VK_P);
-		label.setLabelFor(comboPerfiles);
+		label.setLabelFor(this.comboPerfiles);
 		
 		add(label,c);
 		c.gridy = c.gridy + 1;
 		
 		// Lista de usuarios
-		int j;
-		if (Main.preferences.get("users", "0").equals("0")){
-			j=1;
-		} else {
-			j =Integer.parseInt(Main.preferences.get("users", "0"))+1; 
+		List<String> profileNames = new ArrayList<String>();
+		profileNames.add(ProfileManager.DEFAULT_PROFILE_NAME);
+		for (String profileName : ProfileManager.getProfilesNames()) {
+			profileNames.add(profileName);
 		}
-		final String[] users = new String[j];
-		final String[] actual_user = new String[j];
-		for (int i = 0;i<=Integer.parseInt(Main.preferences.get("users", "0"))-1;i++){
-	        	actual_user[i] = "user" + (i+1);
-	        	
-	        	users[i]=(Main.preferences.get(actual_user[i], "error"));
-	        	
-	    }
-		users[users.length-1] = Constants.defaultUser;
-		final String[] strings = users;
-		comboPerfiles.setModel(new DefaultComboBoxModel(strings));
-		// Preselecionado el ultimo perfil cargado
-		comboPerfiles.setSelectedItem(Main.preferences.get("ultimo.perfil.cargado","Por defecto"));
 		
-		config(comboPerfiles);
+		this.comboPerfiles.setModel(new DefaultComboBoxModel(profileNames.toArray(new String[0])));
+		// Preselecionado el ultimo perfil cargado
+		if (ProfileManager.getLastProfileName() != null) {
+			this.comboPerfiles.setSelectedItem(ProfileManager.getLastProfileName());
+		}
+		
+		config(this.comboPerfiles);
  
-		add(comboPerfiles,c);
+		add(this.comboPerfiles,c);
 		
 		c.gridy = c.gridy + 1;
 		c.insets = new Insets(0, 0, 0, 0);
 		add(createButtonsPanel(), c);
 		
         //Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(comboPerfiles, "perfil.cargar");
+        HelpUtils.enableHelpKey(this.comboPerfiles, "perfil.cargar");
        
 		
 	}
@@ -235,27 +230,37 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		});	
 	}
     
-    /**
-     * 
-     */
-    public void aceptarPerformed(){
-    	Main.preferences.put("ultimo.perfil.cargado", comboPerfiles.getSelectedItem().toString());
-    	if (comboPerfiles.getSelectedItem().toString()==Constants.defaultUser){
-    		currentUser = Constants.defaultUser;
+    private void aceptarPerformed(){
+    	
+    	final String profileName = this.comboPerfiles.getSelectedItem().toString();
+    	
+    	// Establecemos como ultimo perfil cargado: el por defecto si se selecciono el primer
+    	// elemento de la lista o el seleccionado si es cualquier otro  
+    	ProfileManager.setLastProfileName(
+    			(this.comboPerfiles.getSelectedIndex() == 0) ?
+    					null : profileName);
+    	
+    	if (ProfileManager.DEFAULT_PROFILE_NAME.equals(profileName)){
+    		currentProfileId = null;
+    		GeneralConfig.loadConfig(ProfileManager.getDefaultConfiguration());
     	} else {
-    		currentUser = comboPerfiles.getSelectedItem().toString();
+    		System.out.println("Nombre del perfil seleccionado: " + profileName);
+    		System.out.println("Id del perfil seleccionado: " + ProfileManager.getProfileIdByName(profileName));
+    		
+    		currentProfileId = ProfileManager.getProfileIdByName(profileName);
+    		
+    		
+    		Properties c = ProfileManager.getConfiguration(currentProfileId);
+    		for (String key : c.keySet().toArray(new String[0])) {
+    			System.out.println(key + ": " + c.getProperty(key));
+    		}
+    		
+    		
+    		GeneralConfig.loadConfig(ProfileManager.getConfiguration(profileName));
     	}
-    	Properties config = new Properties();
-    	config.setProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.fontBig", "false"));
-    	config.setProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, Main.preferences.get(UserProfile.currentUser+".accesibility.fontStyle", "false"));
-    	config.setProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST, Main.preferences.get(UserProfile.currentUser+".accesibility.highContrast", "false"));
-    	config.setProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, Main.preferences.get(UserProfile.currentUser+".accesibility.focus", "false"));
-    	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.maximized", "false"));
-    	config.setProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, Main.preferences.get(UserProfile.currentUser+".accesibility.accessibility", "true"));
-    	config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Main.preferences.get(UserProfile.currentUser+".accesibility.cursor", "false"));
-    	GeneralConfig.loadConfig(config);
+    	
     	new PrincipalGUI().main();
-    	dispose();	
+    	dispose();
     }
     
     /**

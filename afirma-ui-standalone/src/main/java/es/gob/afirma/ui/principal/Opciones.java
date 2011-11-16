@@ -36,6 +36,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialog;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.ProfileManager;
 import es.gob.afirma.ui.utils.Utils;
 
 /**
@@ -66,8 +67,11 @@ public class Opciones extends JAccessibilityDialog {
     /** Panel con la configurac&oacute;n de las firmas PDF del aplicativo. */
     private AccessibilityOptionsPane accessibilityOptions;
     
+    /** Panel con las opciones de gestion de perfiles de usuario. */
+    private ProfilesOptionsPane profilesOptions;
+    
     /** Indica si alguna accion del usuario necesita de un refresco de pantalla. */
-    private static Boolean update = false;
+    private static boolean update = false;
     
     /** Panel con las pesta&ntilde;as de opciones. */
     private JTabbedPane mainPanel;
@@ -227,45 +231,54 @@ public class Opciones extends JAccessibilityDialog {
         c.gridy = 0;
                 
         // Panel superior con las opciones de configuracion
-        mainPanel = new JTabbedPane();
+        this.mainPanel = new JTabbedPane();
         
-        mainOptions =  new MainOptionsPane();
-        mainPanel.addTab(Messages.getString("Opciones.general"),
+        this.mainOptions =  new MainOptionsPane();
+        this.mainPanel.addTab(Messages.getString("Opciones.general"),
         		null,
-        		mainOptions.getConfigurationPanel(),
+        		this.mainOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.general"));
-        mainOptions.loadConfig(GeneralConfig.getConfig());
+        this.mainOptions.loadConfig(GeneralConfig.getConfig());
         
-        contextOptions =  new ContextOptionsPane();
+        this.contextOptions =  new ContextOptionsPane();
         
-        mainPanel.addTab(Messages.getString("Opciones.contextoFirma"),
+        this.mainPanel.addTab(Messages.getString("Opciones.contextoFirma"),
         		null,
-        		contextOptions.getConfigurationPanel(),
+        		this.contextOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.contexto"));
         
-        contextOptions.loadConfig(GeneralConfig.getConfig());
+        this.contextOptions.loadConfig(GeneralConfig.getConfig());
         
         //Opciones de accesibilidad
-        accessibilityOptions =  new AccessibilityOptionsPane(this);
+        this.accessibilityOptions =  new AccessibilityOptionsPane(this);
         
-        mainPanel.addTab(Messages.getString("Opciones.accesibilidad"),
+        this.mainPanel.addTab(Messages.getString("Opciones.accesibilidad"),
         		null,
-        		accessibilityOptions.getConfigurationPanel(),
+        		this.accessibilityOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.accesibilidadTip"));
         
-        accessibilityOptions.loadConfig(GeneralConfig.getConfig());
-        Utils.setContrastColor(mainPanel);
-        Utils.setFontBold(mainPanel); //Control letra en negrita
+        this.accessibilityOptions.loadConfig(GeneralConfig.getConfig());
+
+        // Opciones de gestion de perfiles
+        this.profilesOptions =  new ProfilesOptionsPane(this);
+        
+        this.mainPanel.addTab("Perfiles de usuario",
+        		null,
+        		this.profilesOptions.getConfigurationPanel(),
+        		"Gesti\u00F3n de los perfiles de usuario");
+        
+        Utils.setContrastColor(this.mainPanel);
+        Utils.setFontBold(this.mainPanel); //Control letra en negrita
         
         // Definicion de mnemonicos.
         int tabNum = 0;
-        mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pesta�a
-        mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pesta�a
-        mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pesta�a
+        this.mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pestana
+        this.mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pestana
+        this.mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestana
 
         c.weighty = 0.1;
         c.fill = GridBagConstraints.BOTH;
-        getContentPane().add(mainPanel, c);
+        getContentPane().add(this.mainPanel, c);
         
         c.weighty = 0.0;
         c.gridy = 1;
@@ -289,35 +302,35 @@ public class Opciones extends JAccessibilityDialog {
         
 		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
 		//Boton maximizar ventana
-		maximizar.setText(Messages.getString("Wizard.maximizar"));
-	    maximizar.setName("maximizar");
-	    maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
-	    maximizar.setMnemonic(KeyEvent.VK_M);
-	    maximizar.addActionListener(new ActionListener() {
+		this.maximizar.setText(Messages.getString("Wizard.maximizar"));
+	    this.maximizar.setName("maximizar");
+	    this.maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
+	    this.maximizar.setMnemonic(KeyEvent.VK_M);
+	    this.maximizar.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
 	    		maximizarActionPerformed();
 			}
 		});
-	    Utils.remarcar(maximizar);
-        Utils.setContrastColor(maximizar);
-	    Utils.setFontBold(maximizar);
-	    panelMaximizar.add(maximizar);
+	    Utils.remarcar(this.maximizar);
+        Utils.setContrastColor(this.maximizar);
+	    Utils.setFontBold(this.maximizar);
+	    panelMaximizar.add(this.maximizar);
 		
 	    JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
 	    // Boton restaurar
-	    restaurar.setText(Messages.getString("Wizard.restaurar"));
-	    restaurar.setName("restaurar");
-	    restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
-	    restaurar.setMnemonic(KeyEvent.VK_R);
-	    restaurar.addActionListener(new ActionListener() {
+	    this.restaurar.setText(Messages.getString("Wizard.restaurar"));
+	    this.restaurar.setName("restaurar");
+	    this.restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
+	    this.restaurar.setMnemonic(KeyEvent.VK_R);
+	    this.restaurar.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e) {
 	    		restaurarActionPerformed();
 			}
 		});
-	    Utils.remarcar(restaurar);
-        Utils.setContrastColor(restaurar);
-	    Utils.setFontBold(restaurar);
-	    panelRestaurar.add(restaurar);
+	    Utils.remarcar(this.restaurar);
+        Utils.setContrastColor(this.restaurar);
+	    Utils.setFontBold(this.restaurar);
+	    panelRestaurar.add(this.restaurar);
 	    
 	    //Espacio entre botones
 		JPanel panelVacio = new JPanel();
@@ -332,15 +345,11 @@ public class Opciones extends JAccessibilityDialog {
             public void actionPerformed(ActionEvent evt) {
             	
             	Properties config = new Properties();
-            	config.putAll(mainOptions.getConfig());
-            	config.putAll(contextOptions.getConfig());
-            	config.putAll(accessibilityOptions.getConfig());
+            	config.putAll(Opciones.this.mainOptions.getConfig());
+            	config.putAll(Opciones.this.contextOptions.getConfig());
+            	config.putAll(Opciones.this.accessibilityOptions.getConfig());
             	
-            	Properties signatureConfig = new Properties();
-            	signatureConfig.putAll(mainOptions.getSignatureConfig());
-            	signatureConfig.putAll(contextOptions.getSignatureConfig());
-            	
-                aceptarActionPerformed(config, signatureConfig);
+                aceptarActionPerformed(config, Opciones.this.profilesOptions.getProfiles());
             }
         });
         aceptar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
@@ -401,161 +410,14 @@ public class Opciones extends JAccessibilityDialog {
         return bottomPanel;
     }
     
-//    private Component createMainOptionsPanel() {
-//    	
-//        GridBagConstraints c = new GridBagConstraints();
-//        c.fill = GridBagConstraints.HORIZONTAL;
-//        c.weightx = 1.0;
-//        c.insets = new Insets(13, 13, 0, 13);
-//        c.gridy = 0;
-//    	
-//        JPanel mainPanel = new JPanel(new GridBagLayout());
-//        
-//    	// Panel general
-//    	JPanel generalPanel = new JPanel(new GridBagLayout());
-//    	generalPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.general"))); // NOI18N
-//
-//    	GridBagConstraints c2 = new GridBagConstraints();
-//        c2.fill = GridBagConstraints.HORIZONTAL;
-//        c2.insets = new Insets(0, 13, 0, 13);
-//        c2.weightx = 1.0;
-//        c2.gridy = 0;
-//        
-//        // Checkbox para habilitar las opciones de configuracion avanzada
-//        checkHabilitar = new JCheckBox();
-//        checkHabilitar.setText(Messages.getString("Opciones.general.habilitar")); // NOI18N
-//        checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
-//        checkHabilitar.setSelected(GeneralConfig.isAvanzados()); 
-//        checkHabilitar.setBounds(12, 20, 340, 23);
-//        generalPanel.add(checkHabilitar, c2);
-//        
-//        mainPanel.add(generalPanel, c);
-//
-//        c.gridy = 1;
-//        
-//        // Panel criptografï¿½a
-//        JPanel criptografiaPanel = new JPanel(new GridBagLayout());
-//        criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
-//
-//        c2.fill = GridBagConstraints.HORIZONTAL;
-//        c2.insets = new Insets(4, 13, 0, 13);
-//        c2.weightx = 1.0;
-//        c2.gridy = 0;
-//        
-//        // Etiqueta algoritmo de huella digital
-//        JLabel etiquetaAlgoritmo = new JLabel(Messages.getString("Opciones.criptografia.algoritmo.parte"));
-//        criptografiaPanel.add(etiquetaAlgoritmo, c2);
-//        
-//        c2.insets = new Insets(5, 13, 0, 13);
-//        c2.gridy = 1;
-//        
-//        // Combo con los algoritmos de huella digital
-//        comboAlgoritmo = new JComboBox();
-//        comboAlgoritmo.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N
-//        comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N
-//        comboAlgoritmo.setModel(new DefaultComboBoxModel(Arrays.asList("SHA-1","SHA-512","SHA-384","SHA-256").toArray()));
-//        for (int i = 0; i < algoritmoV.size(); i++){
-//            if (algoritmoV.get(i).equals(GeneralConfig.getSignConfig().getSignAlgorithm())){
-//            	comboAlgoritmo.setSelectedIndex(i);
-//            	break;
-//            }
-//        }
-//        criptografiaPanel.add(comboAlgoritmo, c2);
-//        
-//        c2.insets = new Insets(5, 13, 0, 13);
-//        c2.gridy = 2;
-//        
-//        // Checkbox para utilizar XML
-//        checkXML = new JCheckBox();
-//        checkXML.setSelected(GeneralConfig.getSignConfig().isUseAlgorithmInternally());
-//        checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
-//        checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
-//        criptografiaPanel.add(checkXML, c2);
-//        
-//        mainPanel.add(criptografiaPanel, c);
-//        
-//        c.gridy = 2;
-//        
-//        // Panel firmas de documentos PDF
-//        JPanel panelFirmaPDF = new JPanel(new GridBagLayout());
-//        panelFirmaPDF.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.firmas"))); // NOI18N
-//        
-//        c2.fill = GridBagConstraints.HORIZONTAL;
-//        c2.insets = new Insets(4, 13, 0, 13);
-//        c2.weightx = 1.0;
-//        c2.gridy = 0;
-//        
-//        // Etiqueta motivo / razon de la firma
-//        JLabel etiquetaMotivo = new JLabel();
-//        etiquetaMotivo.setText(Messages.getString("Opciones.firmas.motivo")); // NOI18N
-//        panelFirmaPDF.add(etiquetaMotivo, c2);
-//        
-//        c2.insets = new Insets(5, 13, 0, 13);
-//        c2.gridy = 1;
-//        
-//        // Caja de texto para el motivo de la firma
-//        campoMotivo = new JTextField();
-//        campoMotivo.setText(GeneralConfig.getSignConfig().getSignReason());
-//        campoMotivo.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.motivo")); // NOI18N
-//        campoMotivo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.motivo")); // NOI18N
-//        panelFirmaPDF.add(campoMotivo, c2);
-//        
-//        c2.insets = new Insets(13, 13, 0, 13);
-//        c2.gridy = 2;
-//        
-//        // Etiqueta lugar donde se realiza la firma
-//        JLabel etiquetaLugar = new JLabel();
-//        etiquetaLugar.setText(Messages.getString("Opciones.firmas.lugar")); // NOI18N
-//        panelFirmaPDF.add(etiquetaLugar, c2);
-//        
-//        c2.insets = new Insets(5, 13, 0, 13);
-//        c2.gridy = 3;
-//        
-//        // Caja de texto para el lugar donde se realiza la firma
-//        campoLugar = new JTextField();
-//        campoLugar.setText(GeneralConfig.getSignConfig().getSignatureProductionPlace());
-//        campoLugar.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.lugar")); // NOI18N
-//        campoLugar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.lugar")); // NOI18N
-//        panelFirmaPDF.add(campoLugar, c2);
-//        
-//        c2.insets = new Insets(13, 13, 0, 13);
-//        c2.gridy = 4;
-//        
-//        // Etiqueta de los datos de contacto
-//        JLabel etiquetaDatos = new JLabel();
-//        etiquetaDatos.setText(Messages.getString("Opciones.firmas.datos")); // NOI18N
-//        panelFirmaPDF.add(etiquetaDatos, c2);
-//
-//        c2.insets = new Insets(5, 13, 5, 13);
-//        c2.gridy = 5;
-//        
-//        // Caja de texto para los datos de contacto
-//        campoDatos = new JTextField();
-//        campoDatos.setText(GeneralConfig.getSignConfig().getSignContact());
-//        campoDatos.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.firmas.datos")); // NOI18N
-//        campoDatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.datos")); // NOI18N
-//        panelFirmaPDF.add(campoDatos, c2);
-//
-//        mainPanel.add(panelFirmaPDF, c);
-//        
-//		// Accesos rapidos al menu de ayuda
-//        HelpUtils.enableHelpKey(checkHabilitar, "opciones.general");
-//        HelpUtils.enableHelpKey(comboAlgoritmo, "opciones.algoritmo");
-//        HelpUtils.enableHelpKey(checkXML, "opciones.referenciasInternas");
-//        HelpUtils.enableHelpKey(campoMotivo, "opciones.pdf.motivo");
-//        HelpUtils.enableHelpKey(campoLugar, "opciones.pdf.lugar");
-//        HelpUtils.enableHelpKey(campoDatos, "opciones.pdf.datos");
-//    	
-//    	return mainPanel;
-//    }
-    
 	/**
 	 * Cierra la ventana y aplica todas las opciones seleccionadas
 	 * @param config Configuraci&oacute;n actualmente establecida en la ventana de opciones.
+	 * @param remainderProfilesNames Listado de nombres que deben permanecer registrados. 
 	 */
-    private void aceptarActionPerformed(Properties config, Properties signatureConfig) {
+    public void aceptarActionPerformed(Properties config, String[] remainderProfilesNames) {
 
-    	// Guardamos la posicion y tama�o actual de la ventana solo en caso de no estar maximizada por configuracion
+    	// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.optionActualPositionX = this.getX();
 	    	PrincipalGUI.optionActualPositionY = this.getY();
@@ -563,21 +425,29 @@ public class Opciones extends JAccessibilityDialog {
 	    	PrincipalGUI.optionActualHeight = this.getHeight();
     	}
     	
-    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tama�o de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
-    	Boolean needUpdateGUI = ((GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW)))|| (GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) || (GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE)))|| (GeneralConfig.isRemarked() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE)))|| (GeneralConfig.isHighContrast() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST)))|| (GeneralConfig.isBigFontSize() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)))|| (GeneralConfig.isFontBold() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE)))|| update);
+    	// Si se ha cambiado de vista (simple <-> avanzada) o se ha indicado que se desean todas las ventanas maximizadas o se ha indicado que se desean los cursores de texto grandes o se ha indicado que se desea remarcar los elementos con foco o se ha activado la opcion de alto contraste o se ha activado la opcion de tamano de fuente grande o se ha activado la opcion de fuente en negrita, actualizamos la ventana principal
+    	boolean needUpdateGUI = (
+    			(GeneralConfig.isAvanzados() != Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW))) ||
+    			(GeneralConfig.isMaximized() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_SIZE))) ||
+    			(GeneralConfig.isBigCaret() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE))) ||
+    			(GeneralConfig.isRemarked() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE))) ||
+    			(GeneralConfig.isHighContrast() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_HIGHT_CONTRAST))) ||
+    			(GeneralConfig.isBigFontSize() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE))) ||
+    			(GeneralConfig.isFontBold() != Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE))) ||
+    			update);
     	    	
     	// Guardamos el estado actual de la configuracion de la herramienta
     	GeneralConfig.loadConfig(config);
     	
-    	// Guardamos la configuracion de firma establecida
-    	GeneralConfig.loadSignatureConfig(signatureConfig);
+    	// Eliminamos los perfiles que el usuario haya borrado de la lista
+    	this.removeDeletedProfiles(remainderProfilesNames);
     	
     	// Si se ha cambiado la vista de simple a avanzada o viceversa reconstruimos la interfaz
-    	if (needUpdateGUI && mainGui != null) {
+    	if (needUpdateGUI && this.mainGui != null) {
     		update = false;
-    		mainGui.crearPaneles();
-    		mainGui.generarMenuHerramientas();
-    		mainGui.generarMenuAyuda();
+    		this.mainGui.crearPaneles();
+    		this.mainGui.generarMenuHerramientas();
+    		this.mainGui.generarMenuAyuda();
     	}
     	
     	// Cerramos la pantalla    	
@@ -588,7 +458,7 @@ public class Opciones extends JAccessibilityDialog {
      * Cierra la ventana
      */
     private void cancelarActionPerformed() {
-    	// Guardamos la posicion y tama�o actual de la ventana solo en caso de no estar maximizada por configuracion
+    	// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.optionActualPositionX = this.getX();
 	    	PrincipalGUI.optionActualPositionY = this.getY();
@@ -674,6 +544,49 @@ public class Opciones extends JAccessibilityDialog {
                 break;
             }
         }
-	    
+	}
+	
+	/**
+	 * Elimina de la lista de perfiles dados de alta en la aplicaci&oacute;n, todos aquellos
+	 * cuyo nombre no aparezca en este listado.
+	 * @param remainderProfiles Nombres de los listados que no deben borrarse.
+	 */
+	private void removeDeletedProfiles(String[] remainderProfiles) {
+		
+		boolean remain;
+		for (String name : ProfileManager.getProfilesNames()) {
+			remain = false;
+			for (String remainderProfileName : remainderProfiles) {
+				if (name.equals(remainderProfileName)) {
+					remain = true;
+					break;
+				}
+			}
+			if (!remain) {
+				ProfileManager.removeConfiguration(
+						ProfileManager.getProfileIdByName(name));
+			}
+		}
+	}
+	
+	/**
+	 * Recupera la configuraci&oacute;n global establecida en los paneles de opciones.
+	 * @return Propiedades de configuraci&oacute;n.
+	 */
+	public Properties getConfiguration() {
+		Properties config = new Properties();
+		config.putAll(this.mainOptions.getConfig());
+		config.putAll(this.contextOptions.getConfig());
+		config.putAll(this.accessibilityOptions.getConfig());
+		
+		return config;
+	}
+	
+	public Properties getSignConfig() {
+		Properties config = new Properties();
+		config.putAll(this.mainOptions.getSignatureConfig());
+		config.putAll(this.contextOptions.getSignatureConfig());
+		
+		return config;
 	}
 }

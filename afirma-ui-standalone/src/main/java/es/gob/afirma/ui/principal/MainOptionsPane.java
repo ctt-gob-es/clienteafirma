@@ -52,6 +52,9 @@ public class MainOptionsPane {
 	/** Clave para el identificador de la pol&iacute;tica de firma. */
 	public static final String MAIN_POLICY_OID = "main.policyOid";
 	
+	/** Algoritmo por defecto para su uso por defecto en las firmas. */
+	public static final String DEFAULT_DEFAULT_ALGORITHM = "SHA1withRSA";
+	
 	/** Panel sobre el que se montan los componentes. */
 	final private JPanel panel;
 	
@@ -82,7 +85,7 @@ public class MainOptionsPane {
 	 */
 	public MainOptionsPane() {
 		
-    	panel = new JPanel(new GridBagLayout());
+    	this.panel = new JPanel(new GridBagLayout());
         
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -105,21 +108,21 @@ public class MainOptionsPane {
         JPanel panelCheckHabilitar = new JPanel(new GridLayout(1, 1));
         panelCheckHabilitar.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.general"));
         // Checkbox para habilitar las opciones de configuracion avanzada
-        checkHabilitar = new JCheckBox();
-        checkHabilitar.setText(Messages.getString("Opciones.general.habilitar")); // NOI18N
-        checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
-        checkHabilitar.setSelected(GeneralConfig.isAvanzados()); 
-        checkHabilitar.setBounds(12, 20, 340, 23);
-        checkHabilitar.setMnemonic(KeyEvent.VK_B); // Asignación de mnemónico al checkbox
+        this.checkHabilitar = new JCheckBox();
+        this.checkHabilitar.setText(Messages.getString("Opciones.general.habilitar")); // NOI18N
+        this.checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
+        this.checkHabilitar.setSelected(GeneralConfig.isAvanzados()); 
+        this.checkHabilitar.setBounds(12, 20, 340, 23);
+        this.checkHabilitar.setMnemonic(KeyEvent.VK_B); // Asignación de mnemónico al checkbox
         
-        Utils.remarcar(checkHabilitar);
+        Utils.remarcar(this.checkHabilitar);
 
-        Utils.setContrastColor(checkHabilitar);
-        Utils.setFontBold(checkHabilitar);
-        panelCheckHabilitar.add(checkHabilitar);
+        Utils.setContrastColor(this.checkHabilitar);
+        Utils.setFontBold(this.checkHabilitar);
+        panelCheckHabilitar.add(this.checkHabilitar);
         generalPanel.add(panelCheckHabilitar, c2);
         
-        panel.add(generalPanel, c);
+        this.panel.add(generalPanel, c);
         c.gridy = c.gridy + 1;
         
         // Panel criptografï¿½a
@@ -145,20 +148,20 @@ public class MainOptionsPane {
         c2.fill = GridBagConstraints.BOTH;
         
         // Combo con los algoritmos de huella digital
-        comboAlgoritmo = new JComboBox();
-        comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText()+" ALT + R."); // NOI18N
-        comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N
+        this.comboAlgoritmo = new JComboBox();
+        this.comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText()+" ALT + R."); // NOI18N
+        this.comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N
         //comboAlgoritmo.setModel(new DefaultComboBoxModel(Arrays.asList("SHA-1","SHA-512","SHA-384","SHA-256").toArray()));
-        comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoK.toArray()));
+        this.comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoK.toArray()));
 
-        Utils.remarcar(comboAlgoritmo);
+        Utils.remarcar(this.comboAlgoritmo);
 
-        Utils.setContrastColor(comboAlgoritmo);
-        Utils.setFontBold(comboAlgoritmo);
-        criptografiaPanel.add(comboAlgoritmo, c2);
+        Utils.setContrastColor(this.comboAlgoritmo);
+        Utils.setFontBold(this.comboAlgoritmo);
+        criptografiaPanel.add(this.comboAlgoritmo, c2);
         
         //Relación entre etiqueta y combo
-        etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
+        etiquetaAlgoritmo.setLabelFor(this.comboAlgoritmo);
   		//Asignación de mnemónico
         etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_R);
         
@@ -170,21 +173,21 @@ public class MainOptionsPane {
         JPanel panelCheckXML = new JPanel(new GridLayout(1, 1));
         panelCheckXML.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.criptografia"));
         // Checkbox para utilizar XML
-        checkXML = new JCheckBox();
-        checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
-        checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
-        checkXML.setMnemonic(KeyEvent.VK_U);  // Asignación de mnemónico al checkbox
+        this.checkXML = new JCheckBox();
+        this.checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
+        this.checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
+        this.checkXML.setMnemonic(KeyEvent.VK_U);  // Asignación de mnemónico al checkbox
 
-        Utils.remarcar(checkXML);
+        Utils.remarcar(this.checkXML);
 
-        Utils.setContrastColor(checkXML);
-        Utils.setFontBold(checkXML);
-        panelCheckXML.add(checkXML);
+        Utils.setContrastColor(this.checkXML);
+        Utils.setFontBold(this.checkXML);
+        panelCheckXML.add(this.checkXML);
         criptografiaPanel.add(panelCheckXML, c2);
         
         c.weighty = 0.3;
         c.fill = GridBagConstraints.BOTH;
-        panel.add(criptografiaPanel, c);
+        this.panel.add(criptografiaPanel, c);
         c.gridy = c.gridy + 1;
         c.weighty = 0.0;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -203,16 +206,16 @@ public class MainOptionsPane {
         JPanel panelCheckAddPolicy = new JPanel(new GridLayout(1, 1));
         panelCheckAddPolicy.getAccessibleContext().setAccessibleName("Pol\u00EDtica de firma");
         // Checkbox para habilitar las opciones de configuracion avanzada
-        checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
-        checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
-        checkAddPolicy.setMnemonic(KeyEvent.VK_F); // Asignación de mnemónico al checkbox
+        this.checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
+        this.checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
+        this.checkAddPolicy.setMnemonic(KeyEvent.VK_F); // Asignación de mnemónico al checkbox
         
-        Utils.remarcar(checkAddPolicy);
+        Utils.remarcar(this.checkAddPolicy);
 
-        Utils.setContrastColor(checkAddPolicy);
-        Utils.setFontBold(checkAddPolicy);
+        Utils.setContrastColor(this.checkAddPolicy);
+        Utils.setFontBold(this.checkAddPolicy);
         
-        panelCheckAddPolicy.add(checkAddPolicy);
+        panelCheckAddPolicy.add(this.checkAddPolicy);
         policyPanel.add(panelCheckAddPolicy, c2);
         c2.gridy = c2.gridy + 1; 
         
@@ -228,18 +231,18 @@ public class MainOptionsPane {
         policyPanel.add(policyOidLabel, c2);
         c2.gridy = c2.gridy + 1;
         
-        textPolicyOid = new JTextField();
-        textPolicyOid.setEnabled(false);
+        this.textPolicyOid = new JTextField();
+        this.textPolicyOid.setEnabled(false);
         
-        Utils.remarcar(textPolicyOid);
+        Utils.remarcar(this.textPolicyOid);
 
-        Utils.setContrastColor(textPolicyOid);
-        Utils.setFontBold(textPolicyOid);
+        Utils.setContrastColor(this.textPolicyOid);
+        Utils.setFontBold(this.textPolicyOid);
         
         //Relación entre etiqueta y campo de texto
-        policyOidLabel.setLabelFor(textPolicyOid);
+        policyOidLabel.setLabelFor(this.textPolicyOid);
         
-        policyPanel.add(textPolicyOid, c2);
+        policyPanel.add(this.textPolicyOid, c2);
         c2.gridy = c2.gridy + 1;
         
         final JLabel policyUrlLabel = new JLabel("Ruta de la pol\u00EDtica de firma (URL):");
@@ -254,20 +257,20 @@ public class MainOptionsPane {
         policyPanel.add(policyUrlLabel, c2);
         c2.gridy = c2.gridy + 1;
         
-        textPolicyUrl = new JTextField();
-        textPolicyUrl.setEnabled(false);
+        this.textPolicyUrl = new JTextField();
+        this.textPolicyUrl.setEnabled(false);
 
-        Utils.remarcar(textPolicyUrl);
+        Utils.remarcar(this.textPolicyUrl);
 
-        Utils.setContrastColor(textPolicyUrl);
-        Utils.setFontBold(textPolicyUrl);
+        Utils.setContrastColor(this.textPolicyUrl);
+        Utils.setFontBold(this.textPolicyUrl);
         
         //Relación entre etiqueta y campo de texto
-        policyUrlLabel.setLabelFor(textPolicyUrl);
+        policyUrlLabel.setLabelFor(this.textPolicyUrl);
         
-        policyPanel.add(textPolicyUrl, c2);
+        policyPanel.add(this.textPolicyUrl, c2);
         
-        panel.add(policyPanel, c);
+        this.panel.add(policyPanel, c);
                 
         c.gridy = c.gridy + 1;
         
@@ -298,13 +301,13 @@ public class MainOptionsPane {
         // Rellenamos el hueco libre con un panel vacio
         c.gridy = c.gridy + 1;
         c.weighty = 1.0;
-        panel.add(new JPanel(), c);
+        this.panel.add(new JPanel(), c);
         
-        checkAddPolicy.addItemListener(new ItemListener() {
+        this.checkAddPolicy.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				boolean state = (e.getStateChange() == ItemEvent.SELECTED);
-				textPolicyOid.setEnabled(state);
-				textPolicyUrl.setEnabled(state);
+				MainOptionsPane.this.textPolicyOid.setEnabled(state);
+				MainOptionsPane.this.textPolicyUrl.setEnabled(state);
 				//Asignación de mnemónicos según el estado
 				if (state) {
 					policyOidLabel.setDisplayedMnemonic(KeyEvent.VK_I);
@@ -325,31 +328,31 @@ public class MainOptionsPane {
 		});
         
 		// Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(checkHabilitar, "opciones.general");
-        HelpUtils.enableHelpKey(comboAlgoritmo, "opciones.algoritmo");
-        HelpUtils.enableHelpKey(checkXML, "opciones.referenciasInternas");
+        HelpUtils.enableHelpKey(this.checkHabilitar, "opciones.general");
+        HelpUtils.enableHelpKey(this.comboAlgoritmo, "opciones.algoritmo");
+        HelpUtils.enableHelpKey(this.checkXML, "opciones.referenciasInternas");
     }
 	
 	public JPanel getConfigurationPanel() {
-		return panel;
+		return this.panel;
 	}
 	
 	/**
-	 * Introduce la configuraci&oacute;n establecida en el panel en un properties.
+	 * Configura los componentes del panel con las propiedades introducidas.
 	 * @param config Configuraci&oacute;n para cargar en el panel.
 	 */
 	public void loadConfig(Properties config) {
+
+		this.checkHabilitar.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false")));
+		this.checkXML.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ALGORITHM_XML, "false")));
+		this.checkAddPolicy.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false")));
+		this.textPolicyOid.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_OID, ""));
+		this.textPolicyUrl.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_URL, ""));
 		
-		checkHabilitar.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, "false")));
-		checkXML.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_ALGORITHM_XML, "false")));
-		checkAddPolicy.setSelected(Boolean.parseBoolean(config.getProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, "false")));
-		textPolicyOid.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_OID, ""));
-		textPolicyUrl.setText(config.getProperty(MainOptionsPane.MAIN_POLICY_URL, ""));
-		
-		comboAlgoritmo.setSelectedIndex(0);
+		this.comboAlgoritmo.setSelectedIndex(0);
         for (int i = 0; i < algoritmoV.size(); i++){
             if (algoritmoV.get(i).equals(config.getProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM))){
-            	comboAlgoritmo.setSelectedIndex(i);
+            	this.comboAlgoritmo.setSelectedIndex(i);
             	break;
             }
         }
@@ -361,12 +364,12 @@ public class MainOptionsPane {
 	 */
 	public Properties getConfig() {
 		Properties config = new Properties();
-		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, Boolean.toString(checkHabilitar.isSelected()));
-    	config.setProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, algoritmoV.get(comboAlgoritmo.getSelectedIndex()));
-    	config.setProperty(MainOptionsPane.MAIN_ALGORITHM_XML, Boolean.toString(checkXML.isSelected()));
-    	config.setProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, Boolean.toString(checkAddPolicy.isSelected()));
-    	config.setProperty(MainOptionsPane.MAIN_POLICY_OID, textPolicyOid.getText());
-    	config.setProperty(MainOptionsPane.MAIN_POLICY_URL, textPolicyUrl.getText());
+		config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, Boolean.toString(this.checkHabilitar.isSelected()));
+    	config.setProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, algoritmoV.get(this.comboAlgoritmo.getSelectedIndex()));
+    	config.setProperty(MainOptionsPane.MAIN_ALGORITHM_XML, Boolean.toString(this.checkXML.isSelected()));
+    	config.setProperty(MainOptionsPane.MAIN_POLICY_ESTABLISHED, Boolean.toString(this.checkAddPolicy.isSelected()));
+    	config.setProperty(MainOptionsPane.MAIN_POLICY_OID, this.textPolicyOid.getText());
+    	config.setProperty(MainOptionsPane.MAIN_POLICY_URL, this.textPolicyUrl.getText());
     	
     	return config;
 	}
@@ -377,12 +380,12 @@ public class MainOptionsPane {
 	 */
 	public Properties getSignatureConfig() {
 		Properties config = new Properties();
-		if (checkXML.isSelected()) {
-			config.setProperty("referencesDigestMethod", comboAlgoritmo.getSelectedItem().toString());
+		if (this.checkXML.isSelected()) {
+			config.setProperty("referencesDigestMethod", this.comboAlgoritmo.getSelectedItem().toString());
 		}
-		if (checkAddPolicy.isSelected()) {
-			config.setProperty("policyQualifier", textPolicyOid.getText());
-			config.setProperty("policyIdentifier", textPolicyUrl.getText());
+		if (this.checkAddPolicy.isSelected()) {
+			config.setProperty("policyQualifier", this.textPolicyOid.getText());
+			config.setProperty("policyIdentifier", this.textPolicyUrl.getText());
 		}
 		return config;
 	}
