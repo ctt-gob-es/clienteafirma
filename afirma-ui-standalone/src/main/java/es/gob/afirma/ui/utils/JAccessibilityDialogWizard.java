@@ -166,7 +166,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		}
 		
 		//Dimensiones que se van a considerar de maximizado
-	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+		/*Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 
 	    //Dimensiones actuales del dialogo
 	    Dimension actualSize = getJAccessibilityDialogWizard(this).getSize();
@@ -174,7 +174,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	    	this.setResizable(false);
 	    } else {
 	    	this.setResizable(true);
-	    }
+	    }*/
 	    
 	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
 		Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this));
