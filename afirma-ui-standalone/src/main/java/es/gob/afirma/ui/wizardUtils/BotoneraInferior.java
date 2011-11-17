@@ -43,7 +43,9 @@ public class BotoneraInferior extends JPanel {
 	private int posicion;
 	
 	private JButton restaurar = null; 
-	private JButton maximizar = null; 
+	private JButton maximizar = null;
+	private JButton siguiente = null;
+	private JButton finalizar = null;
 	
 	public List<JDialogWizard> getVentanas() {
 		return this.ventanas;
@@ -81,9 +83,9 @@ public class BotoneraInferior extends JPanel {
         // Definicion de botones
         maximizar = new JButton();
         final JButton anterior = new JButton();
-        final JButton siguiente = new JButton();
+        siguiente = new JButton();
         final JButton cancelar = new JButton();
-        final JButton finalizar = new JButton();
+        finalizar = new JButton();
         
         JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
         //Boton maximizar
@@ -167,7 +169,7 @@ public class BotoneraInferior extends JPanel {
         	siguiente.setVisible(true);
         }
         siguiente.setText(Messages.getString("Wizard.siguiente")); // NOI18N
-
+        
         siguiente.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 siguienteActionPerformed(anterior, siguiente, finalizar);
@@ -329,4 +331,21 @@ public class BotoneraInferior extends JPanel {
 			PrincipalGUI.wizardActualHeight = j.getHeight();
     	}
 	}
+
+	/**
+	 * Devuelve el boton de siguiente.
+	 * @return boton de siguiente.
+	 */
+	public JButton getSiguiente() {
+		return siguiente;
+	}
+	
+	/**
+	 * Devuelve el boton de finalizar.
+	 * @return boton de finalizar.
+	 */
+	public JButton getFinalizar() {
+		return finalizar;
+	}
+
 }
