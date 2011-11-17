@@ -3,6 +3,7 @@ package es.gob.afirma.ui.principal;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -104,6 +105,11 @@ public class ProfilesOptionsPane {
         JScrollPane profileManagmentScrollList = new JScrollPane();
         profileManagmentScrollList.setViewportView(this.profileManagmentList);
         
+        //Relacion entre etiqueta y lista de perfiles
+        profileManagmentLabel.setLabelFor(this.profileManagmentList);
+        //Asignacion de mnemonico
+        profileManagmentLabel.setDisplayedMnemonic(KeyEvent.VK_F);
+        
         c2.fill = GridBagConstraints.BOTH;
         c2.weighty = 1.0;
         c2.gridy = 1;
@@ -111,6 +117,7 @@ public class ProfilesOptionsPane {
 
         // Carga las opciones del perfil seleccionado
         final JButton loadProfileButton = new JButton("Cargar");
+        loadProfileButton.setMnemonic(KeyEvent.VK_R);
         loadProfileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -119,20 +126,35 @@ public class ProfilesOptionsPane {
 				}
 			}
 		});
+        //Accesibilidad del bot贸n
+        Utils.remarcar(loadProfileButton);
+        Utils.setContrastColor(loadProfileButton);
+        Utils.setFontBold(loadProfileButton);
+        //Panel del bot贸n cargar -- utilizado para remarcar foco
+        JPanel loadPanel = new JPanel(new GridLayout(1, 1));
+        loadPanel.add(loadProfileButton);
         
         // Elimina un perfil del listado 
         final JButton deleteProfileButton = new JButton("Eliminar");
+        deleteProfileButton.setMnemonic(KeyEvent.VK_E);
         deleteProfileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				deleteAction();
 			}
 		});
+        //Accesibilidad del bot贸n
+        Utils.remarcar(deleteProfileButton);
+        Utils.setContrastColor(deleteProfileButton);
+        Utils.setFontBold(deleteProfileButton);
+        //Panel del bot贸n eliminar -- utilizado para remarcar foco
+        JPanel deletePanel = new JPanel(new GridLayout(1, 1));
+        deletePanel.add(deleteProfileButton);
         
         
         JPanel profilesManagmentButtonsPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-        profilesManagmentButtonsPanel.add(loadProfileButton);
-        profilesManagmentButtonsPanel.add(deleteProfileButton);
+        profilesManagmentButtonsPanel.add(loadPanel);
+        profilesManagmentButtonsPanel.add(deletePanel);
         
         c2.weighty = 0.0;
         c2.gridy = 2;
@@ -146,24 +168,40 @@ public class ProfilesOptionsPane {
         
         // Botones de guardado
         JButton saveProfileButton = new JButton("Guardar");
+        saveProfileButton.setMnemonic(KeyEvent.VK_U);
         saveProfileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveAction();
 			}
 		});
+        //Accesibilidad del bot贸n
+        Utils.remarcar(saveProfileButton);
+        Utils.setContrastColor(saveProfileButton);
+        Utils.setFontBold(saveProfileButton);
+        //Panel del bot贸n Guardar -- utilizado para remarcar foco
+        JPanel savePanel = new JPanel(new GridLayout(1, 1));
+        savePanel.add(saveProfileButton);
         
         JButton saveAsProfileButton = new JButton("Guardar como");
+        saveAsProfileButton.setMnemonic(KeyEvent.VK_D);
         saveAsProfileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveAsAction();
 			}
 		});
+        //Accesibilidad del bot贸n
+        Utils.remarcar(saveAsProfileButton);
+        Utils.setContrastColor(saveAsProfileButton);
+        Utils.setFontBold(saveAsProfileButton);
+        //Panel del bot贸n Guardar como -- utilizado para remarcar foco
+        JPanel saveAsPanel = new JPanel(new GridLayout(1, 1));
+        saveAsPanel.add(saveAsProfileButton);
         
         JPanel saveProfileButtonsPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-        saveProfileButtonsPanel.add(saveProfileButton);
-        saveProfileButtonsPanel.add(saveAsProfileButton);
+        saveProfileButtonsPanel.add(savePanel);
+        saveProfileButtonsPanel.add(saveAsPanel);
         
         c.weighty = 0.0;
         c.gridy = 2;
@@ -184,7 +222,7 @@ public class ProfilesOptionsPane {
 		int confirm = CustomDialog.showConfirmDialog(
 				this.parent,
 				true,
-				"Al aplicar el nuevo perfil se cerraran las opciones de configuraci\u00F3n 緿esea continuar?",
+				"Al aplicar el nuevo perfil se cerraran las opciones de configuraci\u00F3n 锟紻esea continuar?",
 				"Perfiles",
 				JOptionPane.YES_NO_OPTION,
 				JOptionPane.QUESTION_MESSAGE);
@@ -207,7 +245,7 @@ public class ProfilesOptionsPane {
 				int confirm = CustomDialog.showConfirmDialog(
 						this.parent,
 						true,
-						"Se dispone a eliminar el perfil actual. Si hace esto se cargar\u00E1 el perfil por defecto y se cerraran las opciones de configuraci\u00F3n 緿esea continuar?",
+						"Se dispone a eliminar el perfil actual. Si hace esto se cargar\u00E1 el perfil por defecto y se cerraran las opciones de configuraci\u00F3n 锟紻esea continuar?",
 						"Perfiles",
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.QUESTION_MESSAGE);
@@ -233,7 +271,7 @@ public class ProfilesOptionsPane {
 			int confirm = CustomDialog.showConfirmDialog(
 					this.parent,
 					true,
-					"緿esea almacenar la configuraci&oacute;n actual en el perfil \"" + this.getCurrentProfileName() + "\"?",
+					"锟紻esea almacenar la configuraci&oacute;n actual en el perfil \"" + this.getCurrentProfileName() + "\"?",
 					"Perfiles",
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE);
@@ -275,7 +313,7 @@ public class ProfilesOptionsPane {
 			int confirm = CustomDialog.showConfirmDialog(
 					this.parent,
 					true,
-					"El perfil \"" + profileName + "\" ya existe. 緿esea sobreescribirlo?",
+					"El perfil \"" + profileName + "\" ya existe. 锟紻esea sobreescribirlo?",
 					"Perfiles",
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE);
