@@ -2,7 +2,6 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -32,7 +31,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	/**
 	 * Indica si la ventana está maximizada.
 	 */
-	private static boolean isMaximized = false;
+	//private static boolean isMaximized = false;
 
 	/**
 	 * Indica si el diálogo requiere un tamaño grande por defecto.
@@ -55,23 +54,31 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		    public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
-    		    if (isMaximized) {
-		    		setResizableDialog(false);
+		    	
+    		  /*  if (isMaximized) {
+    		    	if (isResizable()) {
+    		    		setResizableDialog(false);
+    		    	}
 		    	 } else {
-		    		setResizableDialog(true);
-		    	 }
+		    		 if (!isResizable()) {
+		    			 setResizableDialog(true);
+		    		 }
+		    	 }*/
 
-
-				
 		    }
 		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
-				if (isMaximized) {
-		    		setResizableDialog(false);
-		    	} else {
-		    		setResizableDialog(true);
-		    	}
+		    	/*if (isMaximized) {
+    		    	if (isResizable()) {
+    		    		setResizableDialog(false);
+    		    	}
+		    	 } else {
+		    		 if (!isResizable()) {
+		    			 setResizableDialog(true);
+		    		 }
+		    	 }*/
+
 		    }
 		});
 	}
@@ -116,6 +123,8 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		    	resized(e);
 		    }
 		});
+		
+		
 	}
 	
 	/**
@@ -138,11 +147,11 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
 		int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
 
-		//Dimensiones que se van a considerar de maximizado
+		/*//Dimensiones que se van a considerar de maximizado
 	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);
 
 	    //Dimensiones actuales del dialogo
-	    Dimension actualSize = this.getSize();
+	    Dimension actualSize = this.getSize();*/
 	    
 	    //Se comprueba las bounds del diálogo actual
 	    if (e.getSource() instanceof CustomDialog) {
@@ -160,11 +169,12 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    	}
 	    	//Si sobrepasaban el limite, se hace un resize a las dimensiones límite indicadas
 	    	if (limitControl) {
-	    		this.setBounds(rect.x, rect.y, rect.width, rect.height);
+	    		//this.setBounds(rect.x, rect.y, rect.width, rect.height);
+	    		this.setSize(rect.width, rect.height);
 	    	}
 	    }
 	    
-	    Component botonMaximizar = getComponentByName("maximizar", this);
+	   /* Component botonMaximizar = getComponentByName("maximizar", this);
 		Component botonRestaurar = getComponentByName("restaurar", this);
 	    
 	    //Control de posibilidad de redimensionado y habilitado/deshabilitado de botones
@@ -182,7 +192,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    		botonMaximizar.setEnabled (true);
 	    		botonRestaurar.setEnabled (false);
 	    	}
-	    }
+	    }*/
 	}
 	
 	/**
@@ -243,11 +253,6 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
     private ImageIcon loadIcon(final String filename) {
         return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
     }
-    
-    private void setResizableDialog(boolean isResizable){
-    	this.setResizable(isResizable);
-    }
-    
 
 	/**
 	 * Indica si el diálogo debe tener un tamaño grande por defecto.
