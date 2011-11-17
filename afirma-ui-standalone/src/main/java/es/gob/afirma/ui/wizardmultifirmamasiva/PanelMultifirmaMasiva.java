@@ -204,6 +204,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 	 */
 	void setVentanas(List<JDialogWizard> ventanas) {
 		Botonera botonera = new Botonera(ventanas, 4);
+		this.getRootPane().setDefaultButton(botonera.getSiguiente());
 		getContentPane().add(botonera, BorderLayout.PAGE_END);
 	}
 	

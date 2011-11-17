@@ -58,6 +58,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 	 */
 	void setVentanas(List<JDialogWizard> ventanas) {
 		Botonera botonera = new Botonera(ventanas, 2);
+		this.getRootPane().setDefaultButton(botonera.getSiguiente());
 		getContentPane().add(botonera, BorderLayout.PAGE_END);
 	}
 	
