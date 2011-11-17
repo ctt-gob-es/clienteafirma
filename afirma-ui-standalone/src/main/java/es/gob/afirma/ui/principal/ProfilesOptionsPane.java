@@ -114,7 +114,9 @@ public class ProfilesOptionsPane {
         loadProfileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				loadAction(profileManagmentList.getSelectedValue().toString());
+				if (profileManagmentList.getSelectedIndex() > -1) {
+					loadAction(profileManagmentList.getSelectedValue().toString());
+				}
 			}
 		});
         
