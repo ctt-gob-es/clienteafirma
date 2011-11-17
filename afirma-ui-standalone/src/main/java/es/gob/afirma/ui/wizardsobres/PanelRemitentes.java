@@ -166,7 +166,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     	// Configuramos el layout
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(20, 20, 0, 20);
+        c.insets = new Insets(10, 20, 0, 20);
         c.gridwidth = 2;
 		c.weightx = 1.0;
 		c.gridx = 0;
@@ -288,7 +288,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		Panel panelVacio = new Panel();
 		panelCentral.add(panelVacio, c);
 		
-		c.insets = new Insets(10, 0, 10, 20);
+		c.insets = new Insets(5, 0, 5, 20);
 		c.weightx = 0.0;
 		c.gridx = 1;
 		
