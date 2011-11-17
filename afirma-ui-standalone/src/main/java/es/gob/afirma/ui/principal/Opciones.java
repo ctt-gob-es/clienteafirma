@@ -275,6 +275,7 @@ public class Opciones extends JAccessibilityDialog {
         this.mainPanel.setMnemonicAt(tabNum, KeyEvent.VK_G); //atajo para la primera pestana
         this.mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pestana
         this.mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestana
+        this.mainPanel.setMnemonicAt(tabNum+3, KeyEvent.VK_P); //atajo para la cuarta pestana
 
         c.weighty = 0.1;
         c.fill = GridBagConstraints.BOTH;
