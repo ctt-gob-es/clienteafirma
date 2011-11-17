@@ -50,6 +50,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
      */
     public void setVentanas(List<JDialogWizard> ventanas) {
     	BotoneraInferior botonera = new BotoneraInferior(ventanas, 0);
+    	this.getRootPane().setDefaultButton(botonera.getSiguiente());
     	getContentPane().add(botonera, BorderLayout.PAGE_END);
     }
     

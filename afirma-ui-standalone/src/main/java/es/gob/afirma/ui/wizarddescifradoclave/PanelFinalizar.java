@@ -45,6 +45,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
      */
     public void setVentanas(List<JDialogWizard> ventanas) {
     	BotoneraInferior botonera = new BotoneraInferior(ventanas, 2);
+    	this.getRootPane().setDefaultButton(botonera.getFinalizar());
     	getContentPane().add(botonera, BorderLayout.PAGE_END);
     }
 	
