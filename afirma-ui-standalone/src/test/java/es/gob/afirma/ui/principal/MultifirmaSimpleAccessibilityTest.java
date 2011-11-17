@@ -106,7 +106,7 @@ public class MultifirmaSimpleAccessibilityTest {
 
 		//Se obtiene la cofiguración general
 		//Se añade el perfil por defecto
-		UserProfile.currentUser=Constants.defaultUser;
+		UserProfile.currentProfileId=Constants.defaultUser;
 		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
 		
@@ -155,7 +155,7 @@ public class MultifirmaSimpleAccessibilityTest {
 		logger.info("testNotEmptyAccessibleName_AdvancedMode()");
 		//Se obtiene la cofiguración general
 		//Se añade el perfil por defecto
-		UserProfile.currentUser=Constants.defaultUser;
+		UserProfile.currentProfileId=Constants.defaultUser;
 		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
 		
