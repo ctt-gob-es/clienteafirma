@@ -179,13 +179,15 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
 		Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this));
 		
-		//Se comprueba el estado de los botones de maximizado y restauracion
-		if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
-			botonMaximizar.setEnabled (false);
-			botonRestaurar.setEnabled (true);
-		} else {
-			botonMaximizar.setEnabled (true);
-			botonRestaurar.setEnabled (false);
+		if (botonMaximizar!=null && botonRestaurar!=null) {
+			//Se comprueba el estado de los botones de maximizado y restauracion
+			if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
+				botonMaximizar.setEnabled (false);
+				botonRestaurar.setEnabled (true);
+			} else {
+				botonMaximizar.setEnabled (true);
+				botonRestaurar.setEnabled (false);
+			}
 		}
 	}
 
