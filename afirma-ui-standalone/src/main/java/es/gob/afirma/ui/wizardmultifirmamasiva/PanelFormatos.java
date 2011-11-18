@@ -71,9 +71,8 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 	 * @param ventanas	Listado con todas las paginas del asistente
 	 */
 	void setVentanas(List<JDialogWizard> ventanas) {
-		Botonera botonera = new Botonera(ventanas, 1);
-		this.getRootPane().setDefaultButton(botonera.getSiguiente());
-		getContentPane().add(botonera, BorderLayout.PAGE_END);
+		this.setBotonera(new Botonera(ventanas, 1));
+    	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
 	
 	PanelFormatos() {
@@ -363,6 +362,17 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 				
 				//mantenemos el tamaÃ±o y posiciÃ³n de la ventana acutual en la ventana siguiente
 				getVentanas().get(indice).setBounds(getVentanas().get(1).getX(), getVentanas().get(1).getY(), getVentanas().get(1).getWidth(), getVentanas().get(1).getHeight());
+				
+				//Se asigna un botón por defecto al wizard
+				if (getVentanas().get(indice) instanceof JAccessibilityDialogWizard) {
+					//Se obtiene el diálogo
+					JAccessibilityDialogWizard wizard = (JAccessibilityDialogWizard)getVentanas().get(indice);
+					//Se comprueba si estamos en la última ventana del wizard
+					if (indice < getVentanas().size()-1) 
+						wizard.getRootPane().setDefaultButton(wizard.getBotonera().getSiguiente());
+					else
+						wizard.getRootPane().setDefaultButton(wizard.getBotonera().getFinalizar());
+				}
 				
 				// Nos saltamos la pagina 2
 				getVentanas().get(indice).setVisibleAndHide(true, getVentanas().get(1));

@@ -67,9 +67,8 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @param ventanas	Listado con todas las paginas del asistente
 	 */
 	void setVentanas(List<JDialogWizard> ventanas) {
-		Botonera botonera = new Botonera(ventanas, 3);
-		this.getRootPane().setDefaultButton(botonera.getSiguiente());
-		getContentPane().add(botonera, BorderLayout.PAGE_END);
+		this.setBotonera(new Botonera(ventanas, 3));
+    	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
 	
     PanelEntrada() {
@@ -279,6 +278,10 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 				JButton siguiente, JButton finalizar) {
 			
 			if (salto) {
+				//Se asigna un botón por defecto al wizard
+				if (getVentanas().get(1) instanceof JAccessibilityDialogWizard) {
+					getVentanas().get(1).getRootPane().setDefaultButton(((JAccessibilityDialogWizard)getVentanas().get(1)).getBotonera().getSiguiente());
+				}
 			    getVentanas().get(1).setVisibleAndHide(true, getVentanas().get(3));
 			}
 			else

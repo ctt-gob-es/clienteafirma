@@ -44,9 +44,10 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
      * @param ventanas	Listado con todas las paginas del asistente
      */
     public void setVentanas(List<JDialogWizard> ventanas) {
-    	BotoneraInferior botonera = new BotoneraInferior(ventanas, 0);
-    	this.getRootPane().setDefaultButton(botonera.getSiguiente());
-    	getContentPane().add(botonera, BorderLayout.PAGE_END);
+    	this.setBotonera(new BotoneraInferior(ventanas, 0));
+    	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
+    	//Se asigna el botón por defecto
+    	this.getRootPane().setDefaultButton(getBotonera().getSiguiente());
     }
 	
     public PanelPresentacion() {
