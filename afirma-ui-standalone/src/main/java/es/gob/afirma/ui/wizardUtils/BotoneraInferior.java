@@ -247,7 +247,18 @@ public class BotoneraInferior extends JPanel {
 		// Mantenemos el tamano y posicion de la ventana acutual en la ventana siguiente
 		this.ventanas.get(this.posicion+1).setBounds(this.ventanas.get(this.posicion).getX(), this.ventanas.get(this.posicion).getY(), this.ventanas.get(this.posicion).getWidth(), this.ventanas.get(this.posicion).getHeight());
 		
+		//Se asigna un botón por defecto al wizard
+		if (this.ventanas.get(indice) instanceof JAccessibilityDialogWizard) {
+			//Se obtiene el diálogo
+			JAccessibilityDialogWizard wizard = (JAccessibilityDialogWizard)this.ventanas.get(indice);
+			//Se comprueba si estamos en la última ventana del wizard
+			if (indice < this.ventanas.size()-1) 
+				wizard.getRootPane().setDefaultButton(wizard.getBotonera().getSiguiente());
+			else
+				wizard.getRootPane().setDefaultButton(wizard.getBotonera().getFinalizar());
+		}
 		this.ventanas.get(indice).setVisibleAndHide(true, this.ventanas.get(this.posicion));
+		
 	}
 
 	/**
@@ -264,7 +275,14 @@ public class BotoneraInferior extends JPanel {
 		// Mantenemos el tamano y posicion de la ventana actual en la ventana anterior
 		this.ventanas.get(this.posicion-1).setBounds(this.ventanas.get(this.posicion).getX(), this.ventanas.get(this.posicion).getY(), this.ventanas.get(this.posicion).getWidth(), this.ventanas.get(this.posicion).getHeight());
 		
+		//Se asigna un botón por defecto al wizard
+		if (this.ventanas.get(indice) instanceof JAccessibilityDialogWizard) {
+			this.ventanas.get(indice).getRootPane().setDefaultButton(((JAccessibilityDialogWizard)this.ventanas.get(indice)).getBotonera().getSiguiente());
+		}
+		
 		this.ventanas.get(indice).setVisibleAndHide(true, this.ventanas.get(this.posicion));
+		
+		
 	}
 	
 	/**
