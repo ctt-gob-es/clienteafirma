@@ -10,6 +10,7 @@ import java.awt.event.ComponentEvent;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.principal.PrincipalGUI;
+import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
@@ -29,6 +30,11 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	public static int actualWidth = -1;
 	
 	public static int actualHeight = -1;
+	
+	/**
+	 * Botonera.
+	 */
+	private BotoneraInferior botonera = null;
 	
 	public JAccessibilityDialogWizard(){
 		super();
@@ -224,4 +230,20 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		 }
 		 return resultingJAccessibilityDialogWizard;
 	 }
+
+	/**
+	 * Devuelve la botonera.
+	 * @return botonera
+	 */
+	public BotoneraInferior getBotonera() {
+		return botonera;
+	}
+
+	/**
+	 * Asigna la botonera.
+	 * @param botonera
+	 */
+	public void setBotonera(BotoneraInferior botonera) {
+		this.botonera=botonera;
+	}
 }
