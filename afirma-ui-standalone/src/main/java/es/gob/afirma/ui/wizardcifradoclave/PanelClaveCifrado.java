@@ -104,9 +104,8 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
      * @param ventanas	Listado con todas las paginas del asistente
      */
     public void setVentanas(List<JDialogWizard> ventanas) {
-    	Botonera botonera = new Botonera(ventanas, 1);
-    	this.getRootPane().setDefaultButton(botonera.getSiguiente());
-    	getContentPane().add(botonera, BorderLayout.PAGE_END);
+    	this.setBotonera(new Botonera(ventanas, 1));
+     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
     
     public PanelClaveCifrado(String algoritmo, String rutaFichero) {
