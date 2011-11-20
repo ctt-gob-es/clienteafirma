@@ -392,9 +392,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** {@inheritDoc} */
 	public String getBase64FromText(final String plainText, final String charset) throws UnsupportedEncodingException {
-
 		this.cleanErrorMessage();
-
 		if (plainText == null) {
 			return null;
 		}
@@ -412,9 +410,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** {@inheritDoc} */
 	public void verifyPlatform() throws PrivilegedActionException {
-
 		this.cleanErrorMessage();
-
 		try {
             AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
         }
@@ -422,7 +418,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
             setErrorMessage(e);
             throw e;
         }
-
 	}
 
 	/** {@inheritDoc} */
@@ -444,8 +439,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/**
-	 * Establece el mensaje de error al indicado en la excepci&oacute;n recibida
-	 * y la relanza.
+	 * Establece el mensaje de error al indicado en la excepci&oacute;n recibida.
 	 * @param e Excepci&oacute;n que produjo el error.
 	 * @throws Exception Excepci&oacute;n recibida.
 	 */
@@ -500,25 +494,24 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	  * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
 	  */
 	 private AOSigner selectSigner(final String format, final byte[] sign) throws AOFormatFileException, PrivilegedActionException {
-		 AOSigner signer;
-		 String signerErrorMessage;
+		 final AOSigner signer;
 		 if (format != null) {
 			 signer = this.getSigner(format);
-			 signerErrorMessage = "El formato de firma indicado no esta soportado"; //$NON-NLS-1$
-			 if (signer != null && sign != null &&  !signer.isSign(sign)) {
-				 signer = null;
-				 signerErrorMessage = "La firma electronica no es compatible con el formato de firma indicado"; //$NON-NLS-1$
+			 if (signer == null) {
+			     throw new AOFormatFileException("El formato de firma indicado no esta soportado"); //$NON-NLS-1$
+			 }
+			 if (sign != null &&  !signer.isSign(sign)) {
+			     throw new AOFormatFileException("La firma electronica no es compatible con el formato de firma indicado"); //$NON-NLS-1$
 			 }
 		 } 
 		 else if (sign != null) {
 			 signer = this.getSigner(sign);
-			 signerErrorMessage = "Los datos introducidos no se corresponden con una firma soportada"; //$NON-NLS-1$
+			 if (signer == null) {
+			     throw new IllegalArgumentException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
+			 }
 		 } 
 		 else {
 			 throw new IllegalArgumentException("No se ha indicado el formato ni la firma que se desea tratar"); //$NON-NLS-1$
-		 }
-		 if (signer == null) {
-			 throw new AOFormatFileException(signerErrorMessage);
 		 }
 		 return signer;
 	 }
