@@ -288,13 +288,19 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 				description.trim() : (exts != null ? extensions : null));
 
 		try {
-			return AccessController.doPrivileged(new GetFilePathAction(
-					titleDialog, exts, descFiles, this));
+			return AccessController.doPrivileged(
+                 new GetFilePathAction(
+					titleDialog, 
+					exts, 
+					descFiles, 
+					this
+				 )
+            );
 		} 
 		catch (final AOCancelledOperationException e) {
 			return null;
 		}
-        catch (PrivilegedActionException e) {
+        catch (final PrivilegedActionException e) {
             setErrorMessage(e);
             throw e;
         }
@@ -548,7 +554,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		 }
 		 catch (final Exception e) {
-			 LOGGER.warning("No se ha podido establecer el Look&Feel" + e); //$NON-NLS-1$
+			 LOGGER.warning("No se ha podido establecer el Look&Feel: " + e); //$NON-NLS-1$
 		 }
 
 		 // Nos aseguramos de que los dialogos salgan decorados

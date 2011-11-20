@@ -76,7 +76,7 @@ public final class VerifyPlatformAction implements PrivilegedExceptionAction<Voi
 
 		if (BC_VERSION.compareTo(bcVersion) > 0) {
 			String javaExtDir = Platform.getJavaExtDir();
-			String systemJavaExtDir = Platform.getSystemJavaExtDir();
+			final String systemJavaExtDir = Platform.getSystemJavaExtDir();
 			if (systemJavaExtDir != null && systemJavaExtDir.length() > 0 ) {
 				javaExtDir = MiniAppletMessages.getString("VerifyPlatformAction.1", //$NON-NLS-1$
 						new String[] {javaExtDir, systemJavaExtDir});
