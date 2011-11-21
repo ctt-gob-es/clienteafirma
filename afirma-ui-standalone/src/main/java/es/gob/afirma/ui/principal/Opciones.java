@@ -342,6 +342,7 @@ public class Opciones extends JAccessibilityDialog {
         JButton aceptar = new JButton();
         aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
         aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
+        this.getRootPane().setDefaultButton(aceptar); //Se asigna el botón por defecto para la ventana
         aceptar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	
