@@ -1,7 +1,6 @@
 package es.gob.afirma.miniapplet.actions;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 import java.util.logging.Logger;
 
@@ -28,7 +27,7 @@ public final class VerifyPlatformAction implements PrivilegedExceptionAction<Voi
 		this.userAgent = userAgent;
 	}
 
-	public Void run() throws IOException, InvalidExternalLibraryException {
+	public Void run() throws InvalidExternalLibraryException {
 		this.verificaSunMSCAPINeeded();
 		this.verificaBCVersion();
 		return null;
@@ -38,9 +37,9 @@ public final class VerifyPlatformAction implements PrivilegedExceptionAction<Voi
 	 * Comprueba si est&aacute; disponible el proveedor de seguridad SunMSCAPI. En caso de no estarlo
 	 * lanza una excepci&oacute;n con la descripci&oacute;n del problema y c&oacute;mo podemos
 	 * solucionarlo. 
-	 * @throws IOException 
+	 * @throws InvalidExternalLibraryException Cuando no se detecte la biblioteca SunMSCAPI.
 	 */
-	private void verificaSunMSCAPINeeded() throws IOException {
+	private void verificaSunMSCAPINeeded() throws InvalidExternalLibraryException {
 
 		if (Platform.getOS().equals(Platform.OS.WINDOWS) && (this.userAgent.indexOf("Win64") != -1 ) && //$NON-NLS-1$
 				(!Platform.getBrowser(this.userAgent).equals(Platform.BROWSER.FIREFOX))) {
@@ -55,8 +54,10 @@ public final class VerifyPlatformAction implements PrivilegedExceptionAction<Voi
 				final String msCapiOri  = MiniAppletMessages.getString("MSCapiDll.uri"); //$NON-NLS-1$
 				final String msCapiDes = Platform.getJavaHome() + File.separator + "bin" + File.separator; //$NON-NLS-1$
 
-				throw new IOException (MiniAppletMessages.getString("VerifyPlatformAction.0", //$NON-NLS-1$
-						new String[] {sunmscapOri, sunmscapiDes, msCapiOri, msCapiDes} ));
+				throw new InvalidExternalLibraryException(
+						"No se tienen instaladas las bibliotecas de SunMSCAPI.", //$NON-NLS-1$
+						"VerifyPlatformAction.0", //$NON-NLS-1$
+						new String[] {sunmscapOri, sunmscapiDes, msCapiOri, msCapiDes} );
 			}
 		}
 	}
@@ -82,7 +83,9 @@ public final class VerifyPlatformAction implements PrivilegedExceptionAction<Voi
 						new String[] {javaExtDir, systemJavaExtDir});
 			}
 
-			throw new InvalidExternalLibraryException("VerifyPlatformAction.2", //$NON-NLS-1$
+			throw new InvalidExternalLibraryException(
+					"Existe una biblioteca en el sistema, externa a la aplicacion, que puede causar un mal funcionamiento de la aplicacion", //$NON-NLS-1$
+					"VerifyPlatformAction.2", //$NON-NLS-1$
 					new String[] {bcVersion, BC_VERSION, javaExtDir});
 		}
 	}

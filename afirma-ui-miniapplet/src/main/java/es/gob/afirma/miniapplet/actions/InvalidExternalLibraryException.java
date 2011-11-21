@@ -12,8 +12,8 @@ public final class InvalidExternalLibraryException extends Exception {
     private final String localizedMessageKey;
     private final String[] localizedMessageParams;
     
-    InvalidExternalLibraryException(final String localizedStringCode, final String[] localizedStringParams) {
-        super("Existe una biblioteca en el sistema, externa a la aplicacion, que puede causar un mal funcionamiento de la aplicacion"); //$NON-NLS-1$
+    InvalidExternalLibraryException(final String message, final String localizedStringCode, final String[] localizedStringParams) {
+        super(message);
         this.localizedMessageKey = localizedStringCode;
         this.localizedMessageParams = (localizedStringParams != null) ? localizedStringParams.clone() : null;
     }

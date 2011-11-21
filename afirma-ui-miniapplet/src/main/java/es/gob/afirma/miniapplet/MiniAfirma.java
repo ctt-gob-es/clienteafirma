@@ -15,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.PrivilegedActionException;
 
 import es.gob.afirma.core.AOFormatFileException;
+import es.gob.afirma.miniapplet.actions.InvalidExternalLibraryException;
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
  * del Mini-Applet del Cliente AFirma.
@@ -259,7 +260,7 @@ interface MiniAfirma {
      * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
      * descripci&oacute;n del problema.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws RuntimeException Cuando se encuentra alguna incopatibilidad en el entorno de
+     * @throws InvalidExternalLibraryException Cuando se encuentra alguna incopatibilidad en el entorno de
      * ejecuci&oacute;n.
      */
     void verifyPlatform() throws PrivilegedActionException;
