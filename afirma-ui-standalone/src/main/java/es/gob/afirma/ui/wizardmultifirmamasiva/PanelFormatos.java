@@ -200,7 +200,7 @@ class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
 		
 		panelCentral.add(panelOperaciones, c);
 		
-        c.insets = new Insets(20, 20, 0, 20);
+        c.insets = new Insets(10, 20, 0, 20);
 		c.weightx = 1.0;
 		c.gridy = 2;
 		
