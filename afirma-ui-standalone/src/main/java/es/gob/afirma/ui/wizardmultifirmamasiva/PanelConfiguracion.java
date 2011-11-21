@@ -109,7 +109,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 	    JPanel panel = new JPanel(new GridBagLayout());
 	    panel.add(respectLabel, c);
 	    
-	    c.insets = new Insets(20, 20, 0, 20);
+	    c.insets = new Insets(10, 20, 0, 20);
 	    panelCentral.add(panel, c); //Se añade el panel con la etiqueta
 	   
 		c.gridy = 1;
@@ -130,7 +130,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     	// Etiqueta con el texto "Para realizar el proceso..."
     	panelCentral.add(labelTextoRealizar, c);
     	
-    	c.insets = new Insets(20, 20, 20, 20);
+    	c.insets = new Insets(15, 20, 10, 20);
 		c.gridy = 3;
     	
     	// Panel que engloba los radiobuttons
@@ -175,7 +175,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         panelCentral.add(panelRadios, c);
         
 		c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(20, 20, 0, 20);
+		c.insets = new Insets(10, 20, 0, 20);
 		c.weightx = 1.0;
 		c.weighty = 1.0;
 		c.gridx = 0;
