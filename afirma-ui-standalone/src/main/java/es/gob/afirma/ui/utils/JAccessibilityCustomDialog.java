@@ -2,6 +2,7 @@ package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -9,6 +10,8 @@ import java.awt.event.ComponentEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+
+import es.gob.afirma.core.misc.Platform;
 
 
 /**
@@ -54,31 +57,10 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		    public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
-		    	
-    		  /*  if (isMaximized) {
-    		    	if (isResizable()) {
-    		    		setResizableDialog(false);
-    		    	}
-		    	 } else {
-		    		 if (!isResizable()) {
-		    			 setResizableDialog(true);
-		    		 }
-		    	 }*/
-
 		    }
 		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
-		    	/*if (isMaximized) {
-    		    	if (isResizable()) {
-    		    		setResizableDialog(false);
-    		    	}
-		    	 } else {
-		    		 if (!isResizable()) {
-		    			 setResizableDialog(true);
-		    		 }
-		    	 }*/
-
 		    }
 		});
 	}
@@ -146,12 +128,6 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		//Se obtienen las dimensiones de maximizado
 		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
 		int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
-
-		/*//Dimensiones que se van a considerar de maximizado
-	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);
-
-	    //Dimensiones actuales del dialogo
-	    Dimension actualSize = this.getSize();*/
 	    
 	    //Se comprueba las bounds del diálogo actual
 	    if (e.getSource() instanceof CustomDialog) {
@@ -172,6 +148,20 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    		//this.setBounds(rect.x, rect.y, rect.width, rect.height);
 	    		this.setSize(rect.width, rect.height);
 	    	}
+	    }
+	    
+	    //Se comprueba el so
+	    if (!Platform.getOS().equals(Platform.OS.LINUX)){
+		    //Dimensiones que se van a considerar de maximizado
+			Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
+
+		    //Dimensiones actuales del dialogo
+		    Dimension actualSize = this.getSize();
+		    if (actualSize.equals(fullScreen)){
+		    	this.setResizable(false);
+		    } else {
+		    	this.setResizable(true);
+		    }
 	    }
 	    
 	   /* Component botonMaximizar = getComponentByName("maximizar", this);
