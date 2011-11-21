@@ -1,4 +1,4 @@
-package es.gob.afirma.miniapplet.actions;
+package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
 import java.io.File;
@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.miniapplet.MiniAppletMessages;
 
 /**
  * Acci&oacute;n para almacenar un fichero en disco.

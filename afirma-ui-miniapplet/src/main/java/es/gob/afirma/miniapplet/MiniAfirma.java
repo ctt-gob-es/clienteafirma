@@ -15,7 +15,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.PrivilegedActionException;
 
 import es.gob.afirma.core.AOFormatFileException;
-import es.gob.afirma.miniapplet.actions.InvalidExternalLibraryException;
 
 /** Contiene los puntos de entrada de las funcionalidades criptogr&aacute;ficas
  * del Mini-Applet del Cliente AFirma.

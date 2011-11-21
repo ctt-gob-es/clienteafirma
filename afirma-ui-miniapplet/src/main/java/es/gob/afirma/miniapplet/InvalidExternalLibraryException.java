@@ -1,6 +1,5 @@
-package es.gob.afirma.miniapplet.actions;
+package es.gob.afirma.miniapplet;
 
-import es.gob.afirma.miniapplet.MiniAppletMessages;
 
 /** Indica que en el sistema hay una biblioteca que puede causar un mal funcionamiento
  * del MiniApplet de Afirma.

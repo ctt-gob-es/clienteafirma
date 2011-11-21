@@ -1,4 +1,4 @@
-package es.gob.afirma.miniapplet.actions;
+package es.gob.afirma.miniapplet;
 
 import java.io.File;
 import java.security.PrivilegedExceptionAction;
@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.miniapplet.MiniAppletMessages;
 
 /**
  * Acci&oacute;n para la comprobaci&oacute;n de la validez de la plataforma. Si falla en su

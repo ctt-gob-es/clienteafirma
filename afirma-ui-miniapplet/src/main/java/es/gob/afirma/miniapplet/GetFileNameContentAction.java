@@ -1,4 +1,4 @@
-package es.gob.afirma.miniapplet.actions;
+package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
 import java.io.File;

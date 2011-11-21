@@ -1,4 +1,4 @@
-package es.gob.afirma.miniapplet.actions;
+package es.gob.afirma.miniapplet;
 
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedExceptionAction;

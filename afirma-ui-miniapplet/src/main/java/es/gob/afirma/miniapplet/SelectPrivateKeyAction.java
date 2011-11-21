@@ -1,4 +1,4 @@
-package es.gob.afirma.miniapplet.actions;
+package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
 import java.security.KeyException;
@@ -15,7 +15,6 @@ import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.CertificateFilter;
-import es.gob.afirma.miniapplet.CertFilterManager;
 
 /**
  * Acci&oacute;n privilegiada para la selecci&oacute;n de una clave privada
