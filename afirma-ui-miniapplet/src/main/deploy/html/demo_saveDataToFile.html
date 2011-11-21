@@ -1,0 +1,50 @@
+
+<html> <!-- Ejemplo básico de lanzador de la aplicación -->
+	<head>
+		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
+		<script type="text/javascript" src="common-js/instalador.js"></script>
+		<script type="text/javascript" src="constantes.js"></script>
+		<script type="text/javascript">
+			function saveDataToFile() {
+				try {
+					
+					var data = document.getElementById("origin").value;
+				
+					clienteFirma.saveDataToFile(
+						clienteFirma.getBase64FromText(data),
+						document.getElementById("title").value,
+						document.getElementById("filename").value,
+						document.getElementById("exts").value,
+						document.getElementById("desc").value);
+						
+				} catch(e) {
+					document.getElementById("console").value = document.getElementById("console").value + "\n" + clienteFirma.getErrorMessage();
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			cargarMiniApplet();
+		</script>
+		<p>Cargamos el MiniApplet</p>
+		
+		<label for="origin">Datos</label><br/>
+		<textarea id="origin" rows="5" cols="60"></textarea><br/><br/>
+		
+		<label for="title">T&iacute;tulo</label><input type="text" id="title" /><br/>
+		
+		<label for="filename">Nombre Fichero</label><input type="text" id="filename" /><br/>
+		
+		<label for="exts">Extensiones</label><input type="text" id="exts" /><br/>
+		
+		<label for="desc">Descripci&oacute;n</label><input type="text" id="desc" /><br/>
+		
+		<input type="button" value="Funcion saveDataToFile" onclick="saveDataToFile();" />
+		
+		<div>
+			<span>Consola</span><br/>
+			<textarea id="console" cols="150" rows="10"></textarea>
+		</div>
+	</body>
+</html>	

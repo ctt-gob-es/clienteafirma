@@ -1,0 +1,85 @@
+
+<html> <!-- Ejemplo básico de lanzador de la aplicación -->
+	<head>
+		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
+		<script type="text/javascript" src="common-js/instalador.js"></script>
+		<script type="text/javascript" src="constantes.js"></script>
+		<script type="text/javascript">
+			function sign() {
+				try {
+					var data = clienteFirma.getFileContent("Seleccione el fichero que desee firmar", null, null);
+					if (data == null) {
+						return;
+					}
+				
+					var signature = clienteFirma.sign(
+						data,
+						document.getElementById("algorithm").value,
+						document.getElementById("format").value,
+						document.getElementById("params").value);
+				
+					clienteFirma.saveDataToFile(
+						signature,
+						"Guardar firma electr\u00F3nica",
+						null,
+						null,
+						null);
+						
+				} catch(e) {
+					showLog(clienteFirma.getErrorMessage());
+				}
+			}
+			
+			function addExtraParam(extraParam) {
+				var paramsList = document.getElementById("params");
+				paramsList.value = paramsList.value + extraParam + "\n";
+				document.getElementById('newParam').value = "";
+			}
+			
+			function showLog(newLog) {
+				document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
+			}
+		</script>
+	</head>
+	<body>
+		<applet id="miniApplet"code="es.gob.afirma.miniapplet.MiniAfirmaApplet.class" codebase="./" archive="miniapplet.jar"
+		width="1" height="1">
+			<param name="userAgent" value=window.navigator.userAgent>
+			<param name="appName" value=window.navigator.appName>
+			<param name="java_arguments" value="-Djnlp.versionEnabled=true -Djnlp.packEnabled=true -Xms512M -Xmx512M">
+			<param name="separate_jvm" value=true>
+		</applet>
+		<script type="text/javascript">
+			clienteFirma = document.getElementById("miniApplet");
+		</script>
+		<p>Cargamos el MiniApplet</p>
+		
+		<div>
+		<label for="format">Formato</label>
+		<select id="format">
+		<option value="CAdES">CAdES</option>
+		</select>
+		</div>
+		
+		<div>
+		<label for="algorithm">Algoritmo</label>
+		<select id="algorithm">
+		<option value="SHA1withRSA">SHA1 con RSA</option>
+		</select>
+		</div>
+		
+		<div>
+		<label for="newParam">ExtraParmas</label>
+		<input id="newParam" type="text" /><input type="button" value="Agregar" onclick="addExtraParam(document.getElementById('newParam').value);" />
+		<br/>
+		<textarea id="params" cols="50" rows="5" readonly></textarea>
+		</div>
+		
+		<input type="button" value="Firmar" onclick="sign();" />
+		
+		<div>
+		<span>Consola</span>
+		<textarea id="console" cols="150" rows="10">
+		</textarea>
+	</body>
+</html>	

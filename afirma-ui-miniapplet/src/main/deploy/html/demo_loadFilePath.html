@@ -1,0 +1,24 @@
+
+<html> <!-- Ejemplo básico de lanzador de la aplicación -->
+	<head>
+		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
+		<script type="text/javascript" src="common-js/instalador.js"></script>
+		<script type="text/javascript" src="constantes.js"></script>
+		<script type="text/javascript">
+			function loadFilePath() {
+				try {
+					alert(clienteFirma.loadFilePath("Seleccione un fichero", null, null));
+				} catch(e) {
+					alert("message: " + clienteFirma.getErrorMessage());
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			cargarMiniApplet();
+		</script>
+		<p>Cargamos el MiniApplet</p>
+		<input type="button" value="Funcion loadFilePath" onclick="loadFilePath();" />
+	</body>
+</html>	

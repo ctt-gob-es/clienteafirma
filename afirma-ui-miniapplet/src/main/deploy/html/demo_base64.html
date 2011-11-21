@@ -1,0 +1,53 @@
+
+<html> <!-- Ejemplo básico de lanzador de la aplicación -->
+	<head>
+		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
+		<script type="text/javascript" src="common-js/instalador.js"></script>
+		<script type="text/javascript" src="constantes.js"></script>
+		<script type="text/javascript">
+			function getTextFromBase64() {
+				try {
+					document.getElementById("result").value =
+						clienteFirma.getTextFromBase64(document.getElementById("origin").value, "utf-8");
+				} catch(e) {
+					document.getElementById("console").value = document.getElementById("console").value + "\n" + clienteFirma.getErrorMessage();
+				}
+			}
+
+			function getBase64FromText() {
+				try {
+					document.getElementById("result").value =
+						clienteFirma.getBase64FromText(document.getElementById("origin").value);
+				} catch(e) {
+					document.getElementById("console").value = document.getElementById("console").value + "\n" + clienteFirma.getErrorMessage();
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			cargarMiniApplet();
+		</script>
+		<p>Cargamos el MiniApplet</p>
+		<table><tr>
+		<td>
+			<label for="origin">Datos</label><br/>
+			<textarea id="origin" rows="5" cols="60"></textarea>
+		</td>
+		<td>
+			<input type="button" value="De texto a base64" onclick="getBase64FromText();" /><br/>
+			<input type="button" value="De base64 a texto" onclick="getTextFromBase64();" />
+		</td>
+		<td>
+			<label for="result">Resultado</label><br/>
+			<textarea id="result" rows="5" cols="60"></textarea>
+		</td>
+		</tr></table>
+		
+		<div>
+		<span>Consola</span><br/>
+		<textarea id="console" cols="150" rows="10">
+		</textarea>
+		</div>
+	</body>
+</html>	

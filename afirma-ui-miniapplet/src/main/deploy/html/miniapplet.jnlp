@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" href="miniapplet.jnlp">
+ <information>
+   <title>Miniapplet del Cliente @firma</title>
+   <vendor>Ministerio de Politica Territorial y Administracion Publica</vendor>
+   <homepage href="http://www.mpt.es" />
+   <description>Miniapplet del Cliente @firma</description>
+ </information>
+ <offline-allowed/>
+ <security>
+   <all-permissions/>
+ </security>
+ <resources>
+   <property name="jnlp.packEnabled" value="true"/>
+   <property name="jnlp.versionEnabled" value="true"/>
+   <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se" java-vm-args="-Xms512M -Xmx512M"/>
+   <jar href="miniapplet.jar" main="true" version="1.0"/>
+ </resources>
+ <applet-desc
+   name="Miniapplet del Cliente @firma"
+   main-class="es.gob.afirma.miniapplet.MiniAfirmaApplet"
+   width="1"
+   height="1" />
+ <update check="background"/>
+</jnlp>

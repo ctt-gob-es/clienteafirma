@@ -1,0 +1,36 @@
+<html>
+<!-- Ejemplo básico de lanzador de la aplicación -->
+<head>
+<script type="text/javascript">
+function sign() {
+	clienteFirma = document.getElementById("miniapplet");
+	var data = document.getElementById("data").value;
+	showLog("Entrada:\n"+ data);
+	data = clienteFirma.getBase64FromText(data,"ISO-8859-15");
+	showLog("EntradaB64:\n" + data);
+	var signature = clienteFirma.sign(data,"SHA1withRSA","CAdES",new Array());
+	showLog("\nSignature: ***********************************\n" + signature);
+}
+		
+function showLog(newLog) {
+	document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
+}
+</script>
+</head>
+<body>
+<p>Cargamos el MiniApplet</p>
+<div><textarea id="data" cols="50" rows="5">Texto a Firmar</textarea></div>
+<input type="button" value="Firmar" onclick="sign();" />
+<div><span>Consola</span>
+<textarea id="console" cols="250" rows="20"></textarea></div>
+<script type='text/javascript'>
+var rutaJar=".";
+document.write('<embed id="miniapplet" archive="' + rutaJar +  '/miniapplet.jar"' +
+'  code="es.gob.afirma.miniapplet.MiniAfirmaApplet.class"'  +  
+'  userAgent="' + window.navigator.userAgent + '"' +
+' type="application/x-java-applet" width="1" height="1" pluginspage="http://www.java.com/es/download/">' +
+'<noembed>Ser requiere versión actualizada de java. Acceda a http://www.java.com/es/download/ </noembed>'+
+'</embed>');
+</script>
+</body>
+</html>

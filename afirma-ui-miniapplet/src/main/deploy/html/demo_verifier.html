@@ -1,0 +1,41 @@
+
+<html> <!-- Ejemplo básico de lanzador de la aplicación -->
+	<head>
+		<script type="text/javascript" src="http://www.java.com/js/deployJava.js"></script>
+		<script type="text/javascript" src="common-js/instalador.js"></script>
+		<script type="text/javascript" src="constantes.js"></script>
+		<script type="text/javascript">
+			function verifyPlatform() {
+				try {
+					clienteFirma.verifyPlatform();
+					showLog("Plataforma compatible");
+						
+				} catch(e) {
+					showLog("Imcompatibilidad con la plataforma:\n" + clienteFirma.getErrorMessage());
+				}
+			}
+			
+			function getEcoJava() {
+				showLog("EcoJava: " + clienteFirma.getEcoJava());
+			}
+			
+			function showLog(newLog) {
+				document.getElementById('console').value = document.getElementById('console').value + "\n" + newLog;
+			}
+		</script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			cargarMiniApplet();
+		</script>
+		<p>Cargamos el MiniApplet</p>
+		
+		<input type="button" value="verifyPlatform" onclick="verifyPlatform();" />
+		<input type="button" value="getEcoJava" onclick="getEcoJava();" />
+		
+		<div>
+		<span>Consola</span>
+		<textarea id="console" cols="150" rows="10">
+		</textarea>
+	</body>
+</html>	
