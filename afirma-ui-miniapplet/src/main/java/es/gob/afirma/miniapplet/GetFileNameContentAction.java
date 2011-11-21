@@ -8,7 +8,6 @@ import java.security.PrivilegedExceptionAction;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
-import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
 
 /**
  * Acci&oacute;n para la recuperaci&oacute;n del nombre y contenido de un fichero.

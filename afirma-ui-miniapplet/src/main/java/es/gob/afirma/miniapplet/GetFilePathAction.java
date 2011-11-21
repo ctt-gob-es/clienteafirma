@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.io.IOException;
 import java.security.PrivilegedExceptionAction;
 
-import es.gob.afirma.miniapplet.ui.FileSelectionDialog;
 
 /**
  * Acci&oacute;n para la recuperaci&oacute;n del nombre de un fichero.
