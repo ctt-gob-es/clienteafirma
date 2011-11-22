@@ -36,7 +36,11 @@
  *   <sup>2</sup> La generaci&oacute;n de los sellos de tiempo para PAdES-T necesita conexi&oacute;n
  *   con una autoridad de sellado de tiempo (TSA).
  *  </p>
- *  <p>Los datos de firma electr—nica empotrados dentro de la estructura PDF equivalen a una firma CAdES con Signing Certificate V2.</p>
+ *  <p>
+ *   No se soporta la generaci&oacite;n del modo PAdES-BASIC (firmas CMS), siempre se incrusta una firma CAdES en el PDF utilizando 
+ *   <i>ETSI.CAdES.detached</i> como valor del sub-filtro de la firma.
+ *  </p> 
+ *  <p>Los datos de firma electr&oacute;nica empotrados dentro de la estructura PDF equivalen a una firma CAdES con Signing Certificate V2.</p>
  *  <p>
  *   En general, no se soportan documentos PDF cifrados con certificados, con algoritmo AES256 o con cualquier otro medio introducido en
  *   versiones de Adobe Acrobat posteriores a la 9.

@@ -64,6 +64,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.tsp.CMSTimestamper;
 
 /** Manejador de firmas binarias de ficheros Adobe PDF en formato PAdES.
+ * <p>Para compatibilidad estricta con PAdES-BES/EPES se utiliza <i>ETSI.CAdES.detached</i> como nombre del subfiltro.</p>
  * <p>La compatibilidad con PAdES no es completa, omiti&eacute;ndose los siguientes aspectos de la normativa:</p>
  * <ul>
  *  <li>Firma separada de ficheros empotrados en el documento PDF.</li>
