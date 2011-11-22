@@ -469,18 +469,25 @@ public class AccessibilityOptionsPane {
 		((Opciones)this.parent).setAplicar(true);
 		if (!isChangeHighContrast){
 			//no se ha modificado el estado del Alto Contraste
+			
+			//se guarda el estado actual de la configuracion de la herramienta
 			Properties config = new Properties();
 			config.putAll(getConfig());
-	    	// Guardamos el estado actual de la configuracion de la herramienta
+			config.putAll(((Opciones)this.parent).getMainOptions().getConfig());
+        	config.putAll(((Opciones)this.parent).getContextOptions().getConfig());
 	    	GeneralConfig.loadConfig(config);
+	    	
+	    	//aplicamos los cambios a la pantalla principal
 			this.mainGui.crearPaneles();
 			this.mainGui.generarMenuHerramientas();
 			this.mainGui.generarMenuAyuda();
 			
+			//aplicamos los cambios a la pantalla de opciones
 			((Opciones)this.parent).initComponents();
 			((Opciones)this.parent).callResize();
 		} else {
 			// Se ha modificado el estado del Alto Contraste por lo que es necesario ocultar y volver a mostrar la ventana de opciones para que cargue el alto contraste
+			
 			((Opciones)this.parent).getAceptar().doClick();
 			mainGui.setAplicar(true);
 			((JMenuItem)mainGui.getMenu().getMenu(0).getMenuComponent(0)).doClick();			

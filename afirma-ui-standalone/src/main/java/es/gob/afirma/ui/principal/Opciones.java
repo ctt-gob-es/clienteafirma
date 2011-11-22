@@ -87,6 +87,14 @@ public class Opciones extends JAccessibilityDialog {
     
     private JButton aceptar = new JButton();
     
+    public MainOptionsPane getMainOptions(){
+    	return this.mainOptions;
+    }
+    
+    public ContextOptionsPane getContextOptions(){
+    	return this.contextOptions;
+    }
+    
     public void setAplicar(boolean aplicar){
     	this.aplicar = aplicar;
     }
@@ -97,7 +105,7 @@ public class Opciones extends JAccessibilityDialog {
     
     public boolean isAplicar(){
     	return this.aplicar;
-    }
+    }    
     
  // Panel inferior
     JPanel bottomPanel = new JPanel(new GridBagLayout());
