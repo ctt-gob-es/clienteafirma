@@ -176,11 +176,7 @@ public class GeneralConfig {
 	 */
 	public static Properties getConfig() {
 		Properties config = new Properties();
-		if(UserProfile.currentProfileId == null){
-			config.putAll(ProfileManager.getDefaultConfiguration());
-		} else {
-			config.putAll(configOptions);
-		}
+		config.putAll(configOptions);
 		return config;
 	}
 	
