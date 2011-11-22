@@ -82,6 +82,8 @@ public final class AOPDFSigner implements AOSigner {
     
     private static final int CSIZE = 8000;
     
+    private static final String PADES_BES_SUBFILTER = "ETSI.CAdES.detached"; //$NON-NLS-1$
+    
     private static final String PDF_FILE_SUFFIX = ".pdf"; //$NON-NLS-1$
     private static final String PDF_FILE_HEADER = "%PDF-"; //$NON-NLS-1$
     
@@ -1057,7 +1059,7 @@ public final class AOPDFSigner implements AOSigner {
 
         sap.setCrypto(null, chain, null, null);
 
-        final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, PdfName.ADBE_PKCS7_DETACHED);
+        final PdfSignature dic = new PdfSignature(PdfName.ADOBE_PPKLITE, new PdfName(PADES_BES_SUBFILTER));
         if (sap.getSignDate() != null) {
             dic.setDate(new PdfDate(sap.getSignDate()));
         }
