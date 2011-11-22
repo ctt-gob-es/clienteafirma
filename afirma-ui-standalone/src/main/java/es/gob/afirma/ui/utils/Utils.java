@@ -366,6 +366,19 @@ public class Utils {
 					}
 				});
 			}
+		} else {
+			if (component instanceof JButton){
+				final JButton button = (JButton) component;
+				button.addFocusListener(new FocusListener() {
+					public void focusLost(FocusEvent e) {
+						((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());						
+					}
+					
+					public void focusGained(FocusEvent e) {
+						((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());							
+					}
+				});
+			}
 		}
 	}
 	

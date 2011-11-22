@@ -8,18 +8,15 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
@@ -81,15 +78,23 @@ public class AccessibilityOptionsPane {
 	
 	public static boolean continueBigStyle = false;
 	
+	/** Pantalla principal de la aplicaci&oacute;n. */
+    private PrincipalGUI mainGui;
+    
+    public JButton aplicar = new JButton();
+    
+    private boolean isChangeHighContrast = false;
+	
 	/**
 	 * Componente padre.
 	 */
 	private JDialog parent = null;
 
 	
-	public AccessibilityOptionsPane(JDialog parent){
+	public AccessibilityOptionsPane(JDialog parent, PrincipalGUI mainGui){
 		this.parent = parent;
 		this.panel = new JPanel(new GridBagLayout());
+		this.mainGui = mainGui;
 		initComponents();
 	}
 	
@@ -168,6 +173,17 @@ public class AccessibilityOptionsPane {
         this.checkHighContrast.setSelected(GeneralConfig.isAvanzados()); 
         this.checkHighContrast.setBounds(12, 20, 340, 23);
         this.checkHighContrast.setMnemonic(KeyEvent.VK_L); // AsignaciÃ³n de mnemÃ³nico al checkbox
+        this.checkHighContrast.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (isChangeHighContrast){
+					isChangeHighContrast = false;
+				} else {
+					isChangeHighContrast = true;
+				}
+			}
+		});
         Utils.remarcar(this.checkHighContrast);
         Utils.setContrastColor(this.checkHighContrast);
         Utils.setFontBold(this.checkHighContrast);
@@ -289,7 +305,8 @@ public class AccessibilityOptionsPane {
         
         //Definicion de botones
         final JButton valores = new JButton();
-        final JButton guardar = new JButton();
+        //final JButton guardar = new JButton();
+       
         
         JPanel panelValores = new JPanel(new GridLayout(1, 1));
         //Boton Valores por defecto
@@ -310,24 +327,43 @@ public class AccessibilityOptionsPane {
         panelValores.add(valores);
         buttonPanel.add(panelValores);
         
-        JPanel panelGuardar = new JPanel(new GridLayout(1, 1));
-        //Boton guardar
-        guardar.setText(Messages.getString("Opciones.accesibilidad.guardar"));
-        guardar.setMnemonic(KeyEvent.VK_U);
-        guardar.addActionListener(new ActionListener() {
+//        JPanel panelGuardar = new JPanel(new GridLayout(1, 1));
+//        //Boton guardar
+//        guardar.setText(Messages.getString("Opciones.accesibilidad.guardar"));
+//        guardar.setMnemonic(KeyEvent.VK_U);
+//        guardar.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				save();
+//				
+//			}
+//		});
+//        Utils.remarcar(guardar);
+//        Utils.setContrastColor(guardar);
+//        Utils.setFontBold(guardar);
+//        
+//        panelGuardar.add(guardar);
+//        buttonPanel.add(panelGuardar);
+        
+        JPanel panelAplicar = new JPanel(new GridLayout(1, 1));
+        //Boton aplicar
+        aplicar.setText(Messages.getString("Opciones.accesibilidad.aplicar"));
+        aplicar.setMnemonic(KeyEvent.VK_I);
+        aplicar.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				save();
+				aplicar();
 				
 			}
 		});
-        Utils.remarcar(guardar);
-        Utils.setContrastColor(guardar);
-        Utils.setFontBold(guardar);
+        Utils.remarcar(aplicar);
+        Utils.setContrastColor(aplicar);
+        Utils.setFontBold(aplicar);
         
-        panelGuardar.add(guardar);
-        buttonPanel.add(panelGuardar);
+        panelAplicar.add(aplicar);
+        buttonPanel.add(panelAplicar);
 
         this.panel.add(buttonPanel, c);
         // Rellenamos el hueco libre con un panel vacio
@@ -343,7 +379,7 @@ public class AccessibilityOptionsPane {
         HelpUtils.enableHelpKey(this.checkWindowSize, "accesibilidad.ventana");
         HelpUtils.enableHelpKey(this.checkCursorSize, "accesibilidad.cursor");
         HelpUtils.enableHelpKey(valores, "accesibilidad.defecto");
-        HelpUtils.enableHelpKey(guardar, "accesibilidad.guardar");
+        //HelpUtils.enableHelpKey(aplicar, "accesibilidad.guardar");
 	}
 	
 	public JPanel getConfigurationPanel() {
@@ -363,7 +399,7 @@ public class AccessibilityOptionsPane {
 		this.checkWindowAccessibility.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true")));
 		this.checkCursorSize.setSelected(Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false")));
 
-		// Comprobamos si est� activada al menos una de las opciones de accesibilidad sobre textos 
+		// Comprobamos si esta activada al menos una de las opciones de accesibilidad sobre textos 
 		if (Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)) || Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE))){
     		isBigStyle = true;
     	}		
@@ -420,62 +456,34 @@ public class AccessibilityOptionsPane {
 	}
 	
 	/**
-	 * Guarda y/o modifica en el preferences la configuracion del usuario.
+	 * Aplica la configuraci&oacute;n de accesibilidad indicada en la pantalla
 	 */
-	private void save(){
-		int user = 0;
-		user = Integer.parseInt(Main.preferences.get("users", "0"));
-		boolean exists = false;
-		String name = null;
-		if (user > 0){
-			String text = "Nombre del perfil (debe ser una única palabra). Si el nombre ya existe será sobreescrita la configuración."+"<br>"+"Actualmente existen los siguientes perfiles: "+"<br>";
-			List<String> listProfiles = new ArrayList<String>();
-			for (int i = 0;i<user;i++){
-				//System.out.println(Main.preferences.get("user"+(i+1), "error"));
-				//listProfiles += Main.preferences.get("user"+(i+1), "error")+"<br>";
-				listProfiles.add(Main.preferences.get("user"+(i+1), "error"));
-			}
-			name = CustomDialog.showInputDialog(this.parent, true, text, KeyEvent.VK_N, listProfiles, "Perfiles", "Inserción de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
-		} else{
-			name = CustomDialog.showInputDialog(this.parent, true, "Nombre del perfil (debe ser una unica palabra).", KeyEvent.VK_N, "Insercion de nombre de perfil de accesibilidad", JOptionPane.INFORMATION_MESSAGE);
-		}
-		if (name!=null){
-			if (name.trim().length()!=0){
-				if (Main.preferences.get("users","0").equals("0")){
-					exists = true;
-					Main.preferences.put("users","1");
-					Main.preferences.put("user"+Main.preferences.get("users", "0"), name.trim());
-				} else {
-					
-					user++;
-					for (int i =0;i<user;i++){
-						if (Main.preferences.get("user"+i, "0").equals(name.trim())){
-							exists = true;
-							Main.preferences.remove(name.trim()+".accesibility.fontBig");
-							Main.preferences.remove(name.trim()+".accesibility.fontStyle");
-							Main.preferences.remove(name.trim()+".accesibility.highContrast");
-							Main.preferences.remove(name.trim()+".accesibility.focus");
-							Main.preferences.remove(name.trim()+".accesibility.maximized");
-							Main.preferences.remove(name.trim()+".accesibility.accessibility");
-							Main.preferences.remove(name.trim()+".accesibility.cursor");
-						}
-					}
-				}
-				if (!exists){
-					exists=false;
-					Main.preferences.put("users", String.valueOf(user));
-					Main.preferences.put("user"+Main.preferences.get("users", "0"), name.trim());
-				}
-				Main.preferences.put(name.trim()+".accesibility.fontBig",String.valueOf(this.checkFontSize.isSelected()));
-				Main.preferences.put(name.trim()+".accesibility.fontStyle",String.valueOf(this.checkFontStyle.isSelected()));
-				Main.preferences.put(name.trim()+".accesibility.highContrast",String.valueOf(this.checkHighContrast.isSelected()));
-				Main.preferences.put(name.trim()+".accesibility.focus",String.valueOf(this.checkFocusVisible.isSelected()));
-				Main.preferences.put(name.trim()+".accesibility.maximized",String.valueOf(this.checkWindowSize.isSelected()));
-				Main.preferences.put(name.trim()+".accesibility.accessibility",String.valueOf(this.checkWindowAccessibility.isSelected()));
-				Main.preferences.put(name.trim()+".accesibility.cursor",String.valueOf(this.checkCursorSize.isSelected()));
-			} else {
-				CustomDialog.showMessageDialog(this.parent, true, "Debe introducir un nombre válido", "Error en el nombre", JOptionPane.ERROR_MESSAGE);
-			}
+	private void aplicar(){
+		// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
+    	if (!GeneralConfig.isMaximized()){
+	    	PrincipalGUI.optionActualPositionX = this.parent.getX();
+	    	PrincipalGUI.optionActualPositionY = this.parent.getY();
+	    	PrincipalGUI.optionActualWidth = this.parent.getWidth();
+	    	PrincipalGUI.optionActualHeight = this.parent.getHeight();
+    	}
+		((Opciones)this.parent).setAplicar(true);
+		if (!isChangeHighContrast){
+			//no se ha modificado el estado del Alto Contraste
+			Properties config = new Properties();
+			config.putAll(getConfig());
+	    	// Guardamos el estado actual de la configuracion de la herramienta
+	    	GeneralConfig.loadConfig(config);
+			this.mainGui.crearPaneles();
+			this.mainGui.generarMenuHerramientas();
+			this.mainGui.generarMenuAyuda();
+			
+			((Opciones)this.parent).initComponents();
+			((Opciones)this.parent).callResize();
+		} else {
+			// Se ha modificado el estado del Alto Contraste por lo que es necesario ocultar y volver a mostrar la ventana de opciones para que cargue el alto contraste
+			((Opciones)this.parent).getAceptar().doClick();
+			mainGui.setAplicar(true);
+			((JMenuItem)mainGui.getMenu().getMenu(0).getMenuComponent(0)).doClick();			
 		}
 	}
 }

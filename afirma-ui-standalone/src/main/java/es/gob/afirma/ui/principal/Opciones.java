@@ -37,6 +37,7 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialog;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.ProfileManager;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.Utils;
 
 /**
@@ -82,13 +83,33 @@ public class Opciones extends JAccessibilityDialog {
     /** Bot&oacute;n para restaurar la ventana una vez maximizada */
     private JButton restaurar = new JButton();
     
+    private boolean aplicar = false;
+    
+    private JButton aceptar = new JButton();
+    
+    public void setAplicar(boolean aplicar){
+    	this.aplicar = aplicar;
+    }
+    
+    public JButton getAceptar(){
+    	return this.aceptar;
+    }
+    
+    public boolean isAplicar(){
+    	return this.aplicar;
+    }
+    
+ // Panel inferior
+    JPanel bottomPanel = new JPanel(new GridBagLayout());
+    
     /**
      * Constructor.
      * @param mainGUI ventana padre
      */
-    public Opciones(PrincipalGUI mainGUI) {
+    public Opciones(PrincipalGUI mainGUI, boolean aplicar) {
     	super(mainGUI);
     	this.mainGui = mainGUI;
+    	this.aplicar = aplicar;
         initComponents();
     }
 
@@ -127,7 +148,8 @@ public class Opciones extends JAccessibilityDialog {
     /**
      * Inicializacion de componentes
      */
-    private void initComponents() {
+    public void initComponents() {
+    	
     	//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
@@ -165,12 +187,14 @@ public class Opciones extends JAccessibilityDialog {
 	    			if (AccessibilityOptionsPane.continueBigStyle){
 	    				if (Platform.getOS().equals(Platform.OS.LINUX)){
 		    				if (PrincipalGUI.optionActualWidth==Constants.OPTION_FONT_INITIAL_WIDTH_LINUX && PrincipalGUI.optionActualHeight==Constants.OPTION_FONT_INITIAL_HEIGHT_LINUX){
+		    					setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
 		    					setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
 			    			} else {
 			    				setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
 			    			}
 		    			} else {
 		    				if (PrincipalGUI.optionActualWidth==Constants.OPTION_FONT_INITIAL_WIDTH && PrincipalGUI.optionActualHeight==Constants.OPTION_FONT_INITIAL_HEIGHT){
+		    					setMinimumSize(new Dimension(Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT));
 		    					setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, Constants.OPTION_INITIAL_WIDTH, Constants.OPTION_INITIAL_HEIGHT);
 			    			} else {
 			    				setBounds(PrincipalGUI.optionActualPositionX, PrincipalGUI.optionActualPositionY, PrincipalGUI.optionActualWidth, PrincipalGUI.optionActualHeight);
@@ -221,6 +245,7 @@ public class Opciones extends JAccessibilityDialog {
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(Messages.getString("Opciones.opciones")); // NOI18N
         //setResizable(false);
+        getContentPane().removeAll();
         getContentPane().setLayout(new GridBagLayout());
         
         GridBagConstraints c = new GridBagConstraints();
@@ -229,6 +254,7 @@ public class Opciones extends JAccessibilityDialog {
         c.weighty = 1.0;
 //        c.insets = new Insets(13, 13, 0, 13);
         c.gridy = 0;
+        c.gridx = 0;
                 
         // Panel superior con las opciones de configuracion
         this.mainPanel = new JTabbedPane();
@@ -250,7 +276,7 @@ public class Opciones extends JAccessibilityDialog {
         this.contextOptions.loadConfig(GeneralConfig.getConfig());
         
         //Opciones de accesibilidad
-        this.accessibilityOptions =  new AccessibilityOptionsPane(this);
+        this.accessibilityOptions =  new AccessibilityOptionsPane(this, mainGui);
         
         this.mainPanel.addTab(Messages.getString("Opciones.accesibilidad"),
         		null,
@@ -276,6 +302,12 @@ public class Opciones extends JAccessibilityDialog {
         this.mainPanel.setMnemonicAt(tabNum+1, KeyEvent.VK_X); //atajo para la segunda pestana
         this.mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestana
         this.mainPanel.setMnemonicAt(tabNum+3, KeyEvent.VK_P); //atajo para la cuarta pestana
+        
+        if (aplicar){
+        	this.mainPanel.setSelectedIndex(2);
+        	this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));        	
+        	aplicar = false;
+        }
 
         c.weighty = 0.1;
         c.fill = GridBagConstraints.BOTH;
@@ -287,14 +319,14 @@ public class Opciones extends JAccessibilityDialog {
     }
 
     private Component createButtonsPanel() {
-    	// Panel inferior
-        JPanel bottomPanel = new JPanel(new GridBagLayout());
-        
+    	
+        bottomPanel.removeAll();
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes al redimensionar
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.ipadx = 0;
 		cons.gridx = 0;
+		cons.gridy = 0;
 		cons.insets = new Insets(11, 0, 13, 0);
 		
 		// Etiqueta para rellenar a la izquierda
@@ -339,7 +371,7 @@ public class Opciones extends JAccessibilityDialog {
 	    
 		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		// Boton aceptar
-        JButton aceptar = new JButton();
+        
         aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
         aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
         this.getRootPane().setDefaultButton(aceptar); //Se asigna el botón por defecto para la ventana

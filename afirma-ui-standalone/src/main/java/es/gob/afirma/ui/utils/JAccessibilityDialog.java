@@ -32,6 +32,8 @@ public abstract class JAccessibilityDialog extends JDialog {
 	
 	protected static int actualHeight = -1;
 	
+	private ResizingAdaptor resizingAdaptor;
+	
 	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
     private static final String ICON_DIR_PATH = "/resources/images/";
 	
@@ -43,8 +45,8 @@ public abstract class JAccessibilityDialog extends JDialog {
 		super(frame);
 		// Icono de @firma
         setIconImage(this.loadIcon("afirma_ico.png").getImage());
-		ResizingAdaptor adaptador = new ResizingAdaptor(null,this,null,null,null,null,null,null);
-		this.addComponentListener(adaptador);
+		resizingAdaptor = new ResizingAdaptor(null,this,null,null,null,null,null,null);
+		this.addComponentListener(resizingAdaptor);
 		this.addComponentListener(new ComponentAdapter() {
 		    public void componentResized(ComponentEvent e)
 		    {
@@ -166,4 +168,8 @@ public abstract class JAccessibilityDialog extends JDialog {
     private ImageIcon loadIcon(final String filename) {
         return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
     }
+    
+    public final void callResize(){
+    	this.resizingAdaptor.adjustWindowFonts();
+	}
 }

@@ -130,6 +130,15 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	private static int linuxMargin = 35;
 	
+	private boolean aplicar = false;
+	
+	public void setAplicar(boolean aplicar){
+		this.aplicar = aplicar;
+	}
+	
+	public JMenuBar getMenu(){
+		return this.menu;
+	}
 	/**
 	 * Tema por defecto de tipo Metal.
 	 */
@@ -418,9 +427,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Seleccion menu opciones: Muestra la ventana modal con las opciones
 	 */
 	private void opcionesActionPerformed() {
-		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this);
+		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, aplicar);
 		ventanaOpciones.setModal(true);
 		ventanaOpciones.setVisible(true);
+		setAplicar(false);
 	}
 
 	/**
