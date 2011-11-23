@@ -35,9 +35,11 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 
 import es.gob.afirma.ui.utils.CustomDialog;
+import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.SelectionDialog;
+import es.gob.afirma.ui.utils.SignedFileManager;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.visor.ui.VisorPanel;
 
@@ -211,7 +213,7 @@ public class Validacion extends JPanel {
      */
     private void browseSignActionPerformed(JTextField campoFichero) {
         File selectedFile = SelectionDialog.showFileOpenDialog(this,
-                Messages.getString("Validacion.chooser.title")); //$NON-NLS-1$
+                Messages.getString("Validacion.chooser.title"), (ExtFilter)SignedFileManager.getCommonSignedFileFilter()); //$NON-NLS-1$
         if (selectedFile != null) {
             campoFichero.setText(selectedFile.getAbsolutePath());
         }
