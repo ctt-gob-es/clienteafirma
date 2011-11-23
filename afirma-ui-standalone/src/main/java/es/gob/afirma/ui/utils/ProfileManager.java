@@ -316,7 +316,7 @@ public class ProfileManager {
 	}
 	
 	/**
-	 * Recupera el listado de nombres de perfiles registrados en la aplicación. 
+	 * Recupera el listado de nombres de perfiles registrados en la aplicaci&oacute;n. 
 	 * @return Nombres de los perfiles.
 	 */
 	public static String[] getProfilesNames() {
@@ -347,5 +347,16 @@ public class ProfileManager {
 	 */
 	public static String getLastProfileName() {
 		return Main.preferences.get(KEY_LAST_PROFILE_NAME, null);
+	}
+	
+	/**
+	 * Recupera el valor de una opci&oacute;n de accesibilidad.
+	 * @param option Nombre de la opci&oacute;n de accesibilidad.
+	 * @param name Nombre del perfil.
+	 * @return Boolean indicando el valor de la opci&oacute;n.
+	 */
+	public static String getAccessibilityOptionValue(String option, String name){
+		Properties properties = getConfiguration(name);
+		return properties.getProperty(option, null);
 	}
 }

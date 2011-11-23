@@ -42,10 +42,13 @@ public class ProfilesOptionsPane {
 	final private JPanel panel;
 
 	/** Etiqueta con el nombre del perfil cargado actualmente. */ 
-	JLabel currentProfileLabel = null;
+	//JLabel currentProfileLabel = null;
+	JLabel currentProfileTitleLabel = null;
 	
 	/** Listado con los perfiles detectados por la aplicaci&oacute;n. */
 	final private JList profileManagmentList;
+	
+	private boolean isBigStyle = false;
 	
 	/**
 	 * Crea la vista y componentes de la pesta&ntilde;a principal de configuraci&oacute;n.
@@ -63,12 +66,16 @@ public class ProfilesOptionsPane {
         c.gridy = 0;
         
         // Perfil cargado
-        JLabel currentProfileTitleLabel = new JLabel("Perfil actual:");
-        this.currentProfileLabel = new JLabel(ProfileManager.getProfileName(this.getCurrentProfileId()));
+        this.currentProfileTitleLabel = new JLabel("Perfil actual: " + ProfileManager.getProfileName(this.getCurrentProfileId()));
+        currentProfileTitleLabel.setFocusable(true);
+        Utils.remarcar(currentProfileTitleLabel);
+        Utils.setContrastColor(currentProfileTitleLabel);
+        Utils.setFontBold(currentProfileTitleLabel);
+        //this.currentProfileLabel = new JLabel(ProfileManager.getProfileName(this.getCurrentProfileId()));
         
         JPanel currentProfilePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         currentProfilePanel.add(currentProfileTitleLabel);
-        currentProfilePanel.add(this.currentProfileLabel);
+        //currentProfilePanel.add(this.currentProfileLabel);
         
         this.panel.add(currentProfilePanel, c);
         
@@ -96,6 +103,7 @@ public class ProfilesOptionsPane {
         // Panel que contiene a la lista de destintatarios
         this.profileManagmentList = new JList(ProfileManager.getProfilesNames());
         DefaultListModel listModel = new DefaultListModel();
+        listModel.addElement(ProfileManager.DEFAULT_PROFILE_NAME);
         for (String name : ProfileManager.getProfilesNames()) {
 			listModel.addElement(name);
 		}
@@ -104,6 +112,8 @@ public class ProfilesOptionsPane {
         
         JScrollPane profileManagmentScrollList = new JScrollPane();
         profileManagmentScrollList.setViewportView(this.profileManagmentList);
+        Utils.remarcar(profileManagmentList);
+        Utils.setFontBold(profileManagmentList);
         
         //Relacion entre etiqueta y lista de perfiles
         profileManagmentLabel.setLabelFor(this.profileManagmentList);
@@ -222,15 +232,29 @@ public class ProfilesOptionsPane {
 		int confirm = CustomDialog.showConfirmDialog(
 				this.parent,
 				true,
-				"Al aplicar el nuevo perfil se cerraran las opciones de configuraci\u00F3n �Desea continuar?",
+				"Al aplicar el nuevo perfil se cerraran las opciones de configuraci\u00F3n. ¿Desea continuar?",
 				"Perfiles",
 				JOptionPane.YES_NO_OPTION,
 				JOptionPane.QUESTION_MESSAGE);
 
-		if (confirm == JOptionPane.YES_OPTION) {
-			this.currentProfileLabel.setText(profileName);
-			UserProfile.currentProfileId = ProfileManager.getProfileIdByName(profileName);
-        	this.parent.aceptarActionPerformed(ProfileManager.getConfiguration(profileName), this.getProfiles());
+		if (confirm == JOptionPane.YES_OPTION) {			
+			// Comprobamos si esta activada al menos una de las opciones de accesibilidad sobre textos 
+			if (Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_SIZE,getCurrentProfileName())) || Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_STYLE,getCurrentProfileName()))){
+	    		isBigStyle = true;
+	    	}
+			// Comprobamos si se van a desactivar las dos opciones de accesibilidad sobre texto 
+	    	if (isBigStyle && (!Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_SIZE,profileName)) && !Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_STYLE,profileName)))){
+				AccessibilityOptionsPane.continueBigStyle = true;
+			}
+	    	if (ProfileManager.DEFAULT_PROFILE_NAME.equals(profileName)){
+	    		this.currentProfileTitleLabel.setText(profileName);
+	    		UserProfile.currentProfileId = null;
+	    		this.parent.aceptarActionPerformed(ProfileManager.getDefaultConfiguration(), this.getProfiles());
+	    	} else {
+	    		this.currentProfileTitleLabel.setText(profileName);
+	    		UserProfile.currentProfileId = ProfileManager.getProfileIdByName(profileName);
+	    		this.parent.aceptarActionPerformed(ProfileManager.getConfiguration(profileName), this.getProfiles());
+	    	}
 		}
 	}
 	
@@ -245,19 +269,29 @@ public class ProfilesOptionsPane {
 				int confirm = CustomDialog.showConfirmDialog(
 						this.parent,
 						true,
-						"Se dispone a eliminar el perfil actual. Si hace esto se cargar\u00E1 el perfil por defecto y se cerraran las opciones de configuraci\u00F3n �Desea continuar?",
+						"Se dispone a eliminar el perfil actual. Si hace esto se cargar\u00E1 el perfil por defecto y se cerraran las opciones de configuraci\u00F3n. ¿Desea continuar?",
 						"Perfiles",
 						JOptionPane.YES_NO_OPTION,
 						JOptionPane.QUESTION_MESSAGE);
 
 				if (confirm == JOptionPane.YES_OPTION) {
 					((DefaultListModel) this.profileManagmentList.getModel()).remove(idx);
-					this.currentProfileLabel.setText(ProfileManager.DEFAULT_PROFILE_NAME);
+					this.currentProfileTitleLabel.setText(ProfileManager.DEFAULT_PROFILE_NAME);
 					UserProfile.currentProfileId = null;
 		        	this.parent.aceptarActionPerformed(ProfileManager.getDefaultConfiguration(), this.getProfiles());
 				}
 			} else {
-				((DefaultListModel) this.profileManagmentList.getModel()).remove(idx);
+				int confirm = CustomDialog.showConfirmDialog(
+						this.parent,
+						true,
+						"Se dispone a eliminar el perfil "+profileName+". Esta acción no se puede deshacer. ¿Desea continuar?",
+						"Perfiles",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE);
+
+				if (confirm == JOptionPane.YES_OPTION) {
+					((DefaultListModel) this.profileManagmentList.getModel()).remove(idx);
+				}
 			}
 		}
 	}
@@ -271,7 +305,7 @@ public class ProfilesOptionsPane {
 			int confirm = CustomDialog.showConfirmDialog(
 					this.parent,
 					true,
-					"�Desea almacenar la configuraci&oacute;n actual en el perfil \"" + this.getCurrentProfileName() + "\"?",
+					"¿Desea almacenar la configuraci&oacute;n actual en el perfil \"" + this.getCurrentProfileName() + "\"?",
 					"Perfiles",
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE);
@@ -313,7 +347,7 @@ public class ProfilesOptionsPane {
 			int confirm = CustomDialog.showConfirmDialog(
 					this.parent,
 					true,
-					"El perfil \"" + profileName + "\" ya existe. �Desea sobreescribirlo?",
+					"El perfil \"" + profileName + "\" ya existe. ¿Desea sobreescribirlo?",
 					"Perfiles",
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE);

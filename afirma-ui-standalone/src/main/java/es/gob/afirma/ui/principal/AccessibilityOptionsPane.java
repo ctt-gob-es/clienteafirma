@@ -74,7 +74,7 @@ public class AccessibilityOptionsPane {
 	/** Casilla de verificacion del tama&ntilde;o del cursor de texto. */ 
 	private JCheckBox checkCursorSize;	
 	
-	public boolean isBigStyle = false;
+	private boolean isBigStyle = false;
 	
 	public static boolean continueBigStyle = false;
 	
