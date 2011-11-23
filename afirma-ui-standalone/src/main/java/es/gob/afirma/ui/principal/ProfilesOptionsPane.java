@@ -314,6 +314,11 @@ public class ProfilesOptionsPane {
 				try {
 					ProfileManager.saveConfiguration(
 							this.getCurrentProfileId(), this.getCurrentProfileName(), this.getCurrentConfig());
+					CustomDialog.showMessageDialog(this.parent,
+							true,
+							"Perfil modificado correctamente.",
+							"Perfiles",
+							JOptionPane.INFORMATION_MESSAGE);
 				} catch (IllegalArgumentException e) {
 					showErrorDialog("Se ha insertado un nombre de fichero no v\u00E1lido. No se guardar&aacute; el perfil.");
 					return;
@@ -367,6 +372,11 @@ public class ProfilesOptionsPane {
 		try {
 			ProfileManager.saveConfiguration(
 					profileId, profileName, this.getCurrentConfig());
+			CustomDialog.showMessageDialog(this.parent,
+					true,
+					"Perfil almacenado correctamente.",
+					"Perfiles",
+					JOptionPane.INFORMATION_MESSAGE);
 		} catch (IllegalArgumentException e) {
 			showErrorDialog("Se ha insertado un nombre de fichero no v\u00E1lido. No se guardar&aacute; el perfil.");
 			return;
