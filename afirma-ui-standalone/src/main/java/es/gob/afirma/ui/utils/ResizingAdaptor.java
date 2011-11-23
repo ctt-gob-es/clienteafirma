@@ -301,33 +301,6 @@ public class ResizingAdaptor extends ComponentAdapter {
 					adjustFontSize(actualContainer.getComponents());
 				}
 			}
-			
-			//imagenes dentro de JLabel
-			/*if (actualComponent instanceof JLabel) {
-				int w = 125;
-				int h = 35;
-				
-				int multiplicando = 2;
-				if (((JLabel)actualComponent).getIcon() != null) {
-					float resizeFactor;
-					if(theWindow != null){
-						resizeFactor = (float) (theWindow.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if(theDialog != null) {
-						resizeFactor = (float) (theDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theDialogWizard != null){
-						resizeFactor = (float) (theDialogWizard.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theDialogAdvisor != null){
-						resizeFactor = (float) (theDialogAdvisor.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theWindowAbout != null){
-						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					}else if (theCustomDialog != null){
-						resizeFactor = (float) (theCustomDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else {
-						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					}
-					resizeImage(resizeFactor, actualComponent, w, h, multiplicando);
-				}
-			} */
 			//Redimensionado de una etiqueta con icono
 			if (actualComponent instanceof IconLabel) {
 				int multiplicando = 4;
@@ -396,20 +369,18 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param multiplicando Valor de multiplicacion para el nuevo tamaño de la imagen. Es mayor cuanto menor sea el tamaño inicial de la imagen
 	 */
 	public final void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
-		if(JAccessibilityDialogWizard.getJAccessibilityDialogWizard(c)==null){
-			if (theFileChooser==null){			
-				ImageIcon image = new ImageIcon();
-				//Se comprueba si el componente es instancia de IconLabel
-				if (c instanceof IconLabel) {
-					IconLabel iconLabel = (IconLabel) c;
-					//Se selecciona la imagen original del icono para hacer el resize
-					image = (ImageIcon)iconLabel.getOriginalIcon();
-				} else {
-					image = (ImageIcon)((JLabel)c).getIcon();
-				}
-				ImageIcon newImage = new ImageIcon(image.getImage().getScaledInstance((int) Math.round(w * multiplicando * factor), (int) Math.round(h * multiplicando * factor), java.awt.Image.SCALE_SMOOTH));
-				((JLabel)c).setIcon(newImage);
+		if (theFileChooser==null){			
+			ImageIcon image = new ImageIcon();
+			//Se comprueba si el componente es instancia de IconLabel
+			if (c instanceof IconLabel) {
+				IconLabel iconLabel = (IconLabel) c;
+				//Se selecciona la imagen original del icono para hacer el resize
+				image = (ImageIcon)iconLabel.getOriginalIcon();
+			} else {
+				image = (ImageIcon)((JLabel)c).getIcon();
 			}
+			ImageIcon newImage = new ImageIcon(image.getImage().getScaledInstance((int) Math.round(w * multiplicando * factor), (int) Math.round(h * multiplicando * factor), java.awt.Image.SCALE_SMOOTH));
+			((JLabel)c).setIcon(newImage);
 		}
 	}
 	
