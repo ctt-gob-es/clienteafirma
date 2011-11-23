@@ -10,12 +10,15 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -737,7 +740,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 */
 	public static char[] showInputPasswordDialog(Component componentParent, boolean modal, final String charSet, final boolean beep, String message, int mnemonic, String title, int typeMessage){
 		
-		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, true);
+		final CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, true);
 
 		//Restricciones para el panel de datos
 		GridBagConstraints c = new GridBagConstraints();
@@ -752,6 +755,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         
         //campo de password del diálogo
         customDialog.component = new JPasswordField("");
+        //((JPasswordField)customDialog.component).setEchoChar((char)0);
         customDialog.component.addAncestorListener(new RequestFocusListener());
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
@@ -759,9 +763,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll("<br>", "") +"  ALT + " + String.valueOf((char) mnemonic) + ". ");
         //Se añade el campo de texto al panel de información general
         customDialog.mainPanel.add(customDialog.component, c);
-        
+
 	   	 if (charSet != null) {
-	   		 ((JPasswordField)customDialog.component).setDocument(new JTextFieldFilter(charSet, beep));
+	   		((JPasswordField)customDialog.component).setDocument(new JTextFieldFilter(charSet, beep));
 	     }
 	   	 
 	    //Etiqueta principal
@@ -772,6 +776,39 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Se muestra el atajo
 		String text = Utils.remarkMnemonic(customDialog.infoLabel.getText(), mnemonic);
 		customDialog.infoLabel.setText(text);
+		
+		//Check de mostrar contraseña o no
+		JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
+		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
+		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
+		showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
+		//Se almacena el caracter por defecto para ocultar la contraseña
+		final char defaultChar = ((JPasswordField)customDialog.component).getEchoChar();
+		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
+		showPassCheckBox.addItemListener(new ItemListener() {
+			@Override
+            public void itemStateChanged(ItemEvent evt) {
+				if (evt.getStateChange() == ItemEvent.SELECTED){
+					//Se muestra la contraseña
+					((JPasswordField)customDialog.component).setEchoChar((char)0);
+					
+				} else if (evt.getStateChange() == ItemEvent.DESELECTED){
+					//Se oculta la contraseña
+					((JPasswordField)customDialog.component).setEchoChar(defaultChar);
+				}
+			}
+		});
+		Utils.remarcar(showPassCheckBox);
+		Utils.setContrastColor(showPassCheckBox);
+		Utils.setFontBold(showPassCheckBox);
+		panelCheckShowPass.add(showPassCheckBox);
+		
+		//Restricciones para el check
+		c.insets = new Insets(0,10,0,10);  //right padding
+		c.gridy = 2;
+
+		//Se añade el check al panel de información general
+        customDialog.mainPanel.add(panelCheckShowPass, c);
 		
 		//Restricciones del panel de botones
 		GridBagConstraints cons = new GridBagConstraints();
