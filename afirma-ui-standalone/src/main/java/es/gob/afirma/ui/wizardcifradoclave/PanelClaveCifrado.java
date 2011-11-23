@@ -501,7 +501,6 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 								CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("Cifrado.introducir.pass"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE));
 						
 					} else {
-						//cksh = new AOCipherKeyStoreHelper(new UIPasswordCallback(Messages.getString("Cifrado.introducir.pass.almacen"), this).getPassword());
 						PasswordCallback pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Cifrado.introducir.pass.almacen"), this,
 		            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
 						cksh = new AOCipherKeyStoreHelper(pssCallback.getPassword());
@@ -520,7 +519,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 				}
 			} while (!gainedAccess);
     		
-    		String alias = JOptionPane.showInputDialog(this, Messages.getString("Cifrado.introducir.alias"), Messages.getString("Cifrado.introducir.alias.titulo"));
+    		String alias = CustomDialog.showInputDialog(this, true, Messages.getString("Cifrado.introducir.alias"), KeyEvent.VK_I, Messages.getString("Cifrado.introducir.alias.titulo"), JOptionPane.QUESTION_MESSAGE);
     		cksh.storeKey(alias + " (" + this.cipherConfig.getConfig().getAlgorithm().getName() + ")", this.cipherKey);
 		} catch(AOCancelledOperationException e) {
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cancelar"),
