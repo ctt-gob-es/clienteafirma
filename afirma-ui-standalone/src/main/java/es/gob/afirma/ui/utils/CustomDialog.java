@@ -782,6 +782,10 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
 		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
 		showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
+		//se asigna un mnemónico que debe ser diferente al del campo de contraseña
+		if (mnemonic != KeyEvent.VK_T) {
+			showPassCheckBox.setMnemonic(KeyEvent.VK_T);
+		}
 		//Se almacena el caracter por defecto para ocultar la contraseña
 		final char defaultChar = ((JPasswordField)customDialog.component).getEchoChar();
 		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
