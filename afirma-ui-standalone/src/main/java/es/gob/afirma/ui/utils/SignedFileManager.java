@@ -87,4 +87,13 @@ public class SignedFileManager {
         return new ExtFilter(new String[] {
             "sig"}, Messages.getString("SignedFileManager.52")); //$NON-NLS-1$ //$NON-NLS-2$
     }
+    
+    /**
+     * Obtiene un filtro de fichero correspondiente para los ficheros más comunes que contienen una firma.
+     * @return filtro
+     */
+    public static final FileFilter getCommonSignedFileFilter() {
+    	FileFilter fileFilter = new ExtFilter(new String[] {"csig", "xsig"}, Messages.getString("SignedFileManager.commonSignedFile"));
+    	return fileFilter;
+    }
 }
