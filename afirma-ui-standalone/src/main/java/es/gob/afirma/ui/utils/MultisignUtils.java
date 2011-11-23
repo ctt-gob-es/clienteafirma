@@ -57,7 +57,7 @@ public class MultisignUtils {
         	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), null,
         			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
         	
-        	File selectedFile = SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository")); //$NON-NLS-1$
+        	File selectedFile = SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository"), (ExtFilter)Utils.getRepositoryFileFilter()); //$NON-NLS-1$
             if (selectedFile != null) {
             	lib = selectedFile.getAbsolutePath();
             } else {

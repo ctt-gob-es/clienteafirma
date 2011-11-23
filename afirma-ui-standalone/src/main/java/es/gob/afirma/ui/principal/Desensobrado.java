@@ -57,6 +57,7 @@ import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.ConfigureCaret;
 import es.gob.afirma.ui.utils.CustomDialog;
+import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
@@ -449,7 +450,7 @@ public class Desensobrado extends JPanel {
     	else if (store==AOKeyStore.PKCS12){
     		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), SwingUtilities.getRoot(this),
         			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"));
-        	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository")); //$NON-NLS-1$
+        	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter)Utils.getRepositoryFileFilter()); //$NON-NLS-1$
             if (selectedFile != null) {
             	lib = selectedFile.getAbsolutePath();
             } else {

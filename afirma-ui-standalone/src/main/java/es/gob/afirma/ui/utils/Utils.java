@@ -53,6 +53,7 @@ import javax.swing.JTree;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -687,5 +688,13 @@ public class Utils {
 		}
 		return newText;
 	}
-		
+	
+	/**
+     * Obtiene un filtro de fichero correspondiente para almacenes de certificados del tipo PCKS#12 y .
+     * @return filtro
+     */
+    public static final FileFilter getRepositoryFileFilter() {
+    	FileFilter fileFilter = new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter"));
+    	return fileFilter;
+    }
 }
