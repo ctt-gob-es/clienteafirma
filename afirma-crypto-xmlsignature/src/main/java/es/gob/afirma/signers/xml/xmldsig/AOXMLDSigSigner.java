@@ -87,40 +87,45 @@ import es.gob.afirma.signers.xml.XMLConstants;
  * <p>
  * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
  * <dl>
- * <dt>uri</dt>
- * <dd>URI en la que se encuentra el documento, necesario en el caso de modo expl&iacute;cito y formato detached</dd>
- * <dt>mode</dt>
- * <dd>Modo de firma a usar (Expl&iacute;cita o Impl&iacute;cita)</dd>
- * <dt>format</dt>
- * <dd>Formato en que se realizar&aacute; la firma</dd>
- * <dt>precalculatedHashAlgorithm</dt>
- * <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
- * <dt>xmlTransforms</dt>
- * <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo</dd>
- * <dt>xmlTransform<i>n</i>Type</dt>
- * <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C)</dd>
- * <dt>xmlTransform<i>n</i>Subtype</dt>
- * <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2)</dd>
- * <dt>xmlTransform<i>n</i>Body</dt>
- * <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
- * <dt>referencesDigestMethod</dt>
- * <dd>Algoritmo de huella digital a usar en las referencias XML</dd>
- * <dt>canonicalizationAlgorithm</dt>
- * <dd>Algoritmo de canonicalizaci&oacute;n<i>n</i></dd>
- * <dt>ignoreStyleSheets</dt>
- * <dd>Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, si se establece a <code>false</code>
- * s&iacute; las firma</dd>
- * <dt>mimeType</dt>
- * <dd>MIME-Type de los datos a firmar</dd>
- * <dt>encoding</dt>
- * <dd>Codificaci&oacute;n de los datos a firmar</dd>
- * <dt>avoidBase64Transforms</dt>
- * <dd>No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, si se establece a <code>false</code>
- * act&uacute;a normalmente (s&iacute; las declara)</dd> <!--
- * <dt>headLess</dt>
- * <dd>Evita cualquier interacci&oacute;n con el usuraio si se establece a <code>true</code>, si se establece a <code>false</code> act&uacute;a
- * normalmente (puede mostrar di&aacute;logos, por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
- * &Uacute;til para los procesos desatendidos y por lotes</dd> -->
+ *  <dt>uri</dt>
+ *   <dd>URI en la que se encuentra el documento, necesario en el caso de modo expl&iacute;cito y formato detached</dd>
+ *  <dt>mode</dt>
+ *   <dd>Modo de firma a usar (Expl&iacute;cita o Impl&iacute;cita)</dd>
+ *  <dt>format</dt>
+ *   <dd>Formato en que se realizar&aacute; la firma</dd>
+ *  <dt>precalculatedHashAlgorithm</dt>
+ *   <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
+ *  <dt>xmlTransforms</dt>
+ *   <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo</dd>
+ *  <dt>xmlTransform<i>n</i>Type</dt>
+ *   <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C)</dd>
+ *  <dt>xmlTransform<i>n</i>Subtype</dt>
+ *   <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2)</dd>
+ *  <dt>xmlTransform<i>n</i>Body</dt>
+ *   <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
+ *  <dt>referencesDigestMethod</dt>
+ *   <dd>Algoritmo de huella digital a usar en las referencias XML</dd>
+ *  <dt>canonicalizationAlgorithm</dt>
+ *   <dd>Algoritmo de canonicalizaci&oacute;n<i>n</i></dd>
+ *  <dt>ignoreStyleSheets</dt>
+ *   <dd>Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, si se establece a <code>false</code> s&iacute; las firma</dd>
+ *  <dt>mimeType</dt>
+ *   <dd>MIME-Type de los datos a firmar</dd>
+ *  <dt>encoding</dt>
+ *   <dd>Codificaci&oacute;n de los datos a firmar</dd>
+ *  <dt>avoidBase64Transforms</dt>
+ *   <dd>
+ *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, si se establece a <code>false</code>
+ *    act&uacute;a normalmente (s&iacute; las declara)
+ *   </dd> 
+ *  <!--
+ *  <dt>headLess</dt>
+ *   <dd>
+ *    Evita cualquier interacci&oacute;n con el usuraio si se establece a <code>true</code>, si se establece a <code>false</code> act&uacute;a
+ *    normalmente (puede mostrar di&aacute;logos, por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
+ *    &Uacute;til para los procesos desatendidos y por lotes
+ *   </dd> 
+ *  -->
  * </dl>
  * <p>
  * Tratamiento de las hojas de estilo en firmas XML:
