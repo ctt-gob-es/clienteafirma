@@ -45,7 +45,7 @@ public final class AOSignConstants {
     public static final String SIGN_FORMAT_XMLDSIG_DETACHED = "XMLDSig Detached"; //$NON-NLS-1$
 
     /** Identificador de la firma XMLdSig Externally Detached. */
-    public static final String SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED = "XMLdSig Externally Detached"; //$NON-NLS-1$
+    public static final String SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED = "XMLDSig Externally Detached"; //$NON-NLS-1$
 
     /** Identificador de la firma XMLDsig Enveloped. */
     public static final String SIGN_FORMAT_XMLDSIG_ENVELOPED = "XMLDSig Enveloped"; //$NON-NLS-1$

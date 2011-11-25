@@ -68,12 +68,12 @@ public final class AOCAdESSigner implements AOSigner {
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
-     *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>SHA256withRSA</i></li>
-     *  <li><i>SHA384withRSA</i></li>
-     *  <li><i>SHA512withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param xParams Par&aacute;metros adicionales para la firma.
@@ -201,12 +201,12 @@ public final class AOCAdESSigner implements AOSigner {
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
-     *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>SHA256withRSA</i></li>
-     *  <li><i>SHA384withRSA</i></li>
-     *  <li><i>SHA512withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param extraParams 
@@ -297,12 +297,12 @@ public final class AOCAdESSigner implements AOSigner {
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
-     *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>SHA256withRSA</i></li>
-     *  <li><i>SHA384withRSA</i></li>
-     *  <li><i>SHA512withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param extraParams 
@@ -372,12 +372,12 @@ public final class AOCAdESSigner implements AOSigner {
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
-     *  <li><i>SHA1withRSA</i></li>
-     *  <li><i>MD5withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>MD2withRSA</i> (no recomendado por vulnerable)</li>
-     *  <li><i>SHA256withRSA</i></li>
-     *  <li><i>SHA384withRSA</i></li>
-     *  <li><i>SHA512withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>MD5withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>MD2withRSA</i> (no recomendado por vulnerable)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
      * @param targetType Tipo de objetivo de la contrafirma
      * @param targets Informaci&oacute;n complementario seg&uacute;n el tipo de objetivo de la contrafirma 

@@ -82,116 +82,7 @@ import es.gob.afirma.signers.xml.Utils.IsInnerlException;
 import es.gob.afirma.signers.xml.Utils.ReferenceIsNotXMLException;
 import es.gob.afirma.signers.xml.XMLConstants;
 
-
-/** Operaciones de firmas en formato XMLDSig.
- * <p>
- * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
- * <dl>
- *  <dt>uri</dt>
- *   <dd>URI en la que se encuentra el documento, necesario en el caso de modo expl&iacute;cito y formato detached</dd>
- *  <dt>mode</dt>
- *   <dd>Modo de firma a usar (Expl&iacute;cita o Impl&iacute;cita)</dd>
- *  <dt>format</dt>
- *   <dd>Formato en que se realizar&aacute; la firma</dd>
- *  <dt>precalculatedHashAlgorithm</dt>
- *   <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
- *  <dt>xmlTransforms</dt>
- *   <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo</dd>
- *  <dt>xmlTransform<i>n</i>Type</dt>
- *   <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C)</dd>
- *  <dt>xmlTransform<i>n</i>Subtype</dt>
- *   <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2)</dd>
- *  <dt>xmlTransform<i>n</i>Body</dt>
- *   <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
- *  <dt>referencesDigestMethod</dt>
- *   <dd>Algoritmo de huella digital a usar en las referencias XML</dd>
- *  <dt>canonicalizationAlgorithm</dt>
- *   <dd>Algoritmo de canonicalizaci&oacute;n<i>n</i></dd>
- *  <dt>ignoreStyleSheets</dt>
- *   <dd>Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, si se establece a <code>false</code> s&iacute; las firma</dd>
- *  <dt>mimeType</dt>
- *   <dd>MIME-Type de los datos a firmar</dd>
- *  <dt>encoding</dt>
- *   <dd>Codificaci&oacute;n de los datos a firmar</dd>
- *  <dt>avoidBase64Transforms</dt>
- *   <dd>
- *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, si se establece a <code>false</code>
- *    act&uacute;a normalmente (s&iacute; las declara)
- *   </dd> 
- *  <!--
- *  <dt>headLess</dt>
- *   <dd>
- *    Evita cualquier interacci&oacute;n con el usuraio si se establece a <code>true</code>, si se establece a <code>false</code> act&uacute;a
- *    normalmente (puede mostrar di&aacute;logos, por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
- *    &Uacute;til para los procesos desatendidos y por lotes
- *   </dd> 
- *  -->
- * </dl>
- * <p>
- * Tratamiento de las hojas de estilo en firmas XML:
- * <ul>
- * <li>Firmas XML Enveloped</li>
- * <ul>
- * <li>Hoja de estilo con ruta relativa</li>
- * <ul>
- * <li>No se firma.</li>
- * </ul>
- * <li>Hola de estilo remota con ruta absoluta</li>
- * <ul>
- * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
- * <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- * </ul>
- * <li>Hoja de estilo empotrada</li>
- * <ul>
- * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
- * </ul>
- * </ul>
- * <li>Firmas XML Externally Detached</li>
- * <ul>
- * <li>Hoja de estilo con ruta relativa</li>
- * <ul>
- * <li>No se firma.</li>
- * </ul>
- * <li>Hola de estilo remota con ruta absoluta</li>
- * <ul>
- * <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- * </ul>
- * <li>Hoja de estilo empotrada</li>
- * <ul>
- * <li>No es necesaria ninguna acci&oacute;n</li>
- * </ul>
- * </ul>
- * <li>Firmas XML Enveloping</li>
- * <ul>
- * <li>Hoja de estilo con ruta relativa</li>
- * <ul>
- * <li>No se firma.</li>
- * </ul>
- * <li>Hola de estilo remota con ruta absoluta</li>
- * <ul>
- * <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- * </ul>
- * <li>Hoja de estilo empotrada</li>
- * <ul>
- * <li>No es necesaria ninguna acci&oacute;n</li>
- * </ul>
- * </ul>
- * <li>Firmas XML Internally Detached</li>
- * <ul>
- * <li>Hoja de estilo con ruta relativa</li>
- * <ul>
- * <li>No se firma.</li>
- * </ul>
- * <li>Hola de estilo remota con ruta absoluta</li>
- * <ul>
- * <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- * </ul>
- * <li>Hoja de estilo empotrada</li>
- * <ul>
- * <li>No es necesaria ninguna acci&oacute;n</li>
- * </ul>
- * </ul> </ul>
- * </p>
+/** Manejador de firmas XML en formato XMLDSig.
  * @version 0.2 */
 @SuppressWarnings("restriction")
 public final class AOXMLDSigSigner implements AOSigner {
@@ -238,8 +129,151 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
     }
 
-    /** {@inheritDoc} */
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    /** Firma datos en formato XMLDSig 1.0 (XML Digital Signature).
+     * <p>
+     *  En el caso de que se firma un fichero con formato XML que contenga hojas de estilo
+     *  XSL, y siempre que no se haya establecido el par&aacute;metro <i>ignoreStyleSheets</i> a
+     *  <i>true</i>, se sigue la siguiente convenci&oacute;n para la firma es estas:
+     * </p>
+     * <ul>
+     *  <li>Firmas XML Enveloped</li>
+     *  <ul>
+     *   <li>Hoja de estilo con ruta relativa</li>
+     *   <ul>
+     *    <li>No se firma.</li>
+     *   </ul>
+     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *   <ul>
+     *    <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original.</li>
+     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota.</li>
+     *   </ul>
+     *   <li>Hoja de estilo empotrada</li>
+     *   <ul>
+     *    <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original.</li>
+     *   </ul>
+     *  </ul>
+     *  <li>Firmas XML Externally Detached</li>
+     *  <ul>
+     *   <li>Hoja de estilo con ruta relativa</li>
+     *   <ul>
+     *    <li>No se firma.</li>
+     *   </ul>
+     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *   <ul>
+     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota.</li>
+     *   </ul>
+     *   <li>Hoja de estilo empotrada</li>
+     *   <ul>
+     *    <li>No es necesaria ninguna acci&oacute;n adicional.</li>
+     *   </ul>
+     *  </ul>
+     *  <li>Firmas XML Enveloping</li>
+     *  <ul>
+     *   <li>Hoja de estilo con ruta relativa</li>
+     *   <ul>
+     *    <li>No se firma.</li>
+     *   </ul>
+     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *   <ul>
+     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota.</li>
+     *   </ul>
+     *   <li>Hoja de estilo empotrada</li>
+     *   <ul>
+     *    <li>No es necesaria ninguna acci&oacute;n adicional.</li>
+     *   </ul>
+     *  </ul>
+     *  <li>Firmas XML Internally Detached</li>
+     *  <ul>
+     *   <li>Hoja de estilo con ruta relativa</li>
+     *   <ul>
+     *    <li>No se firma.</li>
+     *   </ul>
+     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *   <ul>
+     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota.</li>
+     *   </ul>
+     *   <li>Hoja de estilo empotrada</li>
+     *   <ul>
+     *    <li>No es necesaria ninguna acci&oacute;n adicional</li>
+     *   </ul>
+     *  </ul> 
+     * </ul>
+     * @param data Datos que deseamos firmar.
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param xParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>uri</i></b></dt>
+     *   <dd>URI en la que se encuentra el documento, necesario en el caso de modo expl&iacute;cito y formato detached</dd>
+     *  <dt><b><i>mode</i></b></dt>
+     *   <dd>
+     *    Modo de firma a usar. Se admiten los siguientes valores:
+     *    <ul>
+     *     <li>
+     *      &nbsp;&nbsp;&nbsp;<i>explicit</i> (<code>AOSignConstants.SIGN_MODE_EXPLICIT</code>).<br>
+     *      <b>
+     *       Importante: Las firmas XMLDSig expl&iacute;citas no se adec&uacute;a a ninguna normativa,
+     *       y pueden ser rechazadas por sistemas de validaci&oacute;n de firmas.
+     *      </b>
+     *     </li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>implicit</i> (<code>AOSignConstants.SIGN_MODE_IMPLICIT</code>)</li>
+     *   </dd>
+     *  <dt><b><i>format</i></b></dt>
+     *   <dd>
+     *    Formato en que se realizar&aacute; la firma. Se admiten los siguientes valores:
+     *    <ul>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED</code>)</li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Externally Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED</code>)</li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Enveloped</i> (<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED</code>)</li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Enveloping</i> (<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING</code>)</li>
+     *    </ul>
+     *   </dd>
+     *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de huella digital cuando esta se proporciona precalculada</dd>
+     *  <dt><b><i>xmlTransforms</i></b></dt>
+     *   <dd>N&uacute;mero de transformaciones a aplicar al XML antes de firmarlo</dd>
+     *  <dt><b><i>xmlTransform</i>n<i>Type</i></b></dt>
+     *   <dd>Tipo de la transformaci&oacute;n <i>n</i> (debe ser la URL del algoritmo segun define W3C)</dd>
+     *  <dt><b><i>xmlTransform<i>n</i>Subtype</i></b></dt>
+     *   <dd>Subtipo de la transformaci&oacute;n <i>n</i> (por ejemplo, "intersect", "subtract" o "union" para XPATH2)</dd>
+     *  <dt><b><i>xmlTransform<i>n</i>Body</i></b></dt>
+     *   <dd>Cuerpo de la transformaci&oacute;n <i>n</i></dd>
+     *  <dt><b><i>referencesDigestMethod</i></b></dt>
+     *   <dd>Algoritmo de huella digital a usar en las referencias XML</dd>
+     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de canonicalizaci&oacute;n<i>n</i></dd>
+     *  <dt><b><i>ignoreStyleSheets</i></b></dt>
+     *   <dd>Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, si se establece a <code>false</code> s&iacute; las firma</dd>
+     *  <dt><b><i>mimeType</i></b></dt>
+     *   <dd>MIME-Type de los datos a firmar</dd>
+     *  <dt><b><i>encoding</i></b></dt>
+     *   <dd>Codificaci&oacute;n de los datos a firmar</dd>
+     *  <dt><b><i>avoidBase64Transforms</i></b></dt>
+     *   <dd>
+     *    No declara transformaciones Base64 incluso si son necesarias si se establece a <code>true</code>, si se establece a <code>false</code>
+     *    act&uacute;a normalmente (s&iacute; las declara)
+     *   </dd> 
+     *  <dt><b><i>headLess</i></b></dt>
+     *   <dd>
+     *    Evita cualquier interacci&oacute;n con el usuraio si se establece a <code>true</code>, si se establece a <code>false</code> act&uacute;a
+     *    normalmente (puede mostrar di&aacute;logos, por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
+     *    &Uacute;til para los procesos desatendidos y por lotes
+     *   </dd> 
+     * </dl>
+     * @return Firma en formato XMLDSig 1.0
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */  
+    public byte[] sign(final byte[] data, 
+                       final String algorithm, 
+                       final PrivateKeyEntry keyEntry, 
+                       final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
@@ -324,14 +358,15 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                         LOGGER.info("Dereferenciando la hoja de estilo"); //$NON-NLS-1$
                         try {
-                            final Document tmpDoc =
-                                    Utils.dereferenceStyleSheet(TransformerFactory.newInstance()
-                                                                                  .getAssociatedStylesheet(new StreamSource(new ByteArrayInputStream(data)),
-                                                                                                           null,
-                                                                                                           null,
-                                                                                                           null)
-                                                                                  .getSystemId(),
-                                                                headLess);
+                            final Document tmpDoc = Utils.dereferenceStyleSheet(
+                                TransformerFactory.newInstance().getAssociatedStylesheet(
+                                     new StreamSource(new ByteArrayInputStream(data)),
+                                     null,
+                                     null,
+                                     null
+                                 ).getSystemId(),
+                                 headLess
+                            );
 
                             // Cuidado!! Solo rellenamos el Elemento DOM si no
                             // es HTTP o HTTPS, porque si es accesible
@@ -974,9 +1009,9 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     }
 
-    /** Comprueba si la firma es detached
+    /** Comprueba si la firma es detached.
      * @param element
-     *        Elemento que contiene el nodo ra$iacute;z del documento que se
+     *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es detached */
     private boolean isDetached(final Element element) {
@@ -991,7 +1026,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     /** Comprueba si la firma es enveloped
      * @param element
-     *        Elemento que contiene el nodo ra$iacute;z del documento que se
+     *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloped */
     private boolean isEnveloped(final Element element) {
@@ -1006,7 +1041,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
     /** Comprueba si la firma es enveloping
      * @param element
-     *        Elemento que contiene el nodo ra$iacute;z del documento que se
+     *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
     private boolean isEnveloping(final Element element) {
@@ -1422,11 +1457,9 @@ public final class AOXMLDSigSigner implements AOSigner {
         return Utils.writeXML(this.doc.getDocumentElement(), originalXMLProperties, null, null);
     }
 
-    /** Realiza la contrafirma de todos los nodos del arbol
-     * @param root
-     *        Elemento ra&iacute;z del documento xml que contiene las firmas
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
+    /** Realiza la contrafirma de todos los nodos del &aacute;rbol.
+     * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignTree(final Element root,
                                  final PrivateKeyEntry keyEntry,
                                  final String refsDigestMethod,
@@ -1452,11 +1485,9 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
     }
 
-    /** Realiza la contrafirma de todos los nodos hoja del arbol
-     * @param root
-     *        Elemento ra&iacute;z del documento xml que contiene las firmas
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
+    /** Realiza la contrafirma de todos los nodos hoja del &aacute;rbol.
+     * @param root Elemento ra&iacute;z del documento xml que contiene las firmas
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignLeafs(final Element root,
                                   final PrivateKeyEntry keyEntry,
                                   final String refsDigestMethod,
@@ -1497,13 +1528,10 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** Realiza la contrafirma de los nodos indicados en el par&aacute;metro
-     * targets
-     * @param root
-     *        Elemento raiz del documento xml que contiene las firmas
-     * @param tgts
-     *        Array con las posiciones de los nodos a contrafirmar
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
+     * targets.
+     * @param root Elemento raiz del documento xml que contiene las firmas
+     * @param tgts Array con las posiciones de los nodos a contrafirmar
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void countersignNodes(final Element root,
                                   Object[] tgts,
                                   final PrivateKeyEntry keyEntry,
@@ -1601,7 +1629,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** Realiza la contrafirma de los firmantes indicados en el par&aacute;metro
-     * targets
+     * targets.
      * @param root
      *        Elemento ra&iacute;z del documento xml que contiene las firmas
      * @param targets
@@ -1637,11 +1665,9 @@ public final class AOXMLDSigSigner implements AOSigner {
         }
     }
 
-    /** Realiza la contrafirma de la firma pasada por par&aacute;metro
-     * @param signature
-     *        Elemento con el nodo de la firma a contrafirmar
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso */
+    /** Realiza la contrafirma de la firma pasada por par&aacute;metro.
+     * @param signature Elemento con el nodo de la firma a contrafirmar
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     private void cs(final Element signature, final PrivateKeyEntry keyEntry, final String refsDigestMethod, final String canonicalizationAlgorithm) throws AOException {
 
         // obtiene el nodo SignatureValue
@@ -1782,17 +1808,12 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** M&eacute;todo recursivo para la obtenci&oacute;n de la estructura de
-     * &aacute;rbol
-     * @param i
-     *        Inicio de lectura del array de identificadores
-     * @param j
-     *        Inicio de lectura inversa del array de referencias
-     * @param arrayNodes
-     *        Array de objetos AOTreeNode
-     * @param arrayIds
-     *        Array de identificadores
-     * @param arrayRef
-     *        Array de referencias
+     * &aacute;rbol.
+     * @param i Inicio de lectura del array de identificadores
+     * @param j Inicio de lectura inversa del array de referencias
+     * @param arrayNodes Array de objetos AOTreeNode
+     * @param arrayIds Array de identificadores
+     * @param arrayRef Array de referencias
      * @return Array de objetos AOTreeNode */
     private AOTreeNode[] generaArbol(final int i, final int j, final AOTreeNode arrayNodes[], final String arrayIds[], final String arrayRef[]) {
         final int max = arrayIds.length;
@@ -1864,9 +1885,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** Devuelve un nuevo documento con ra&iacute;z "AFIRMA" y conteniendo al
-     * documento pasado por par&aacute;metro
-     * @param docu
-     *        Documento que estar&aacute; contenido en el nuevo documento
+     * documento pasado por par&aacute;metro.
+     * @param docu Documento que estar&aacute; contenido en el nuevo documento
      * @return Documento con ra&iacute;z "AFIRMA"
      * @throws ParserConfigurationException */
     private Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
