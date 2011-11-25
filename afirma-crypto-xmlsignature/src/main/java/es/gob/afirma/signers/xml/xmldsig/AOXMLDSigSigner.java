@@ -108,7 +108,7 @@ public final class AOXMLDSigSigner implements AOSigner {
     private static final String CSURI = "http://uri.etsi.org/01903#CountersignedSignature"; //$NON-NLS-1$
     private static final String AFIRMA = "AFIRMA"; //$NON-NLS-1$
     private static final String XML_SIGNATURE_PREFIX = "ds"; //$NON-NLS-1$
-    private static final String SIGNATURE_NODE_NAME = (XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? "" : XML_SIGNATURE_PREFIX + ":") + SIGNATURE_STR; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ 
+
     private static final String DETACHED_CONTENT_ELEMENT_NAME = "CONTENT"; //$NON-NLS-1$
     private static final String DETACHED_STYLE_ELEMENT_NAME = "STYLE"; //$NON-NLS-1$
 
@@ -202,10 +202,10 @@ public final class AOXMLDSigSigner implements AOSigner {
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
      * <ul>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA</code>)</li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i><br>(<code>AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA</code>)</li>
      * </ul>
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param xParams Par&aacute;metros adicionales para la firma.
@@ -218,22 +218,28 @@ public final class AOXMLDSigSigner implements AOSigner {
      *    Modo de firma a usar. Se admiten los siguientes valores:
      *    <ul>
      *     <li>
-     *      &nbsp;&nbsp;&nbsp;<i>explicit</i> (<code>AOSignConstants.SIGN_MODE_EXPLICIT</code>).<br>
+     *      &nbsp;&nbsp;&nbsp;<i>explicit</i><br>(<code>AOSignConstants.SIGN_MODE_EXPLICIT</code>)<br>
      *      <b>
-     *       Importante: Las firmas XMLDSig expl&iacute;citas no se adec&uacute;a a ninguna normativa,
+     *       <br>Importante: Las firmas XMLDSig expl&iacute;citas no se adec&uacute;an a ninguna normativa,
      *       y pueden ser rechazadas por sistemas de validaci&oacute;n de firmas.
      *      </b>
      *     </li>
-     *     <li>&nbsp;&nbsp;&nbsp;<i>implicit</i> (<code>AOSignConstants.SIGN_MODE_IMPLICIT</code>)</li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>implicit</i><br>(<code>AOSignConstants.SIGN_MODE_IMPLICIT</code>)</li>
+     *    </ul>
+     *   </dd>
+     *  <dt><b><i>xmlSignaturePrefix</i></b></dt>
+     *   <dd>
+     *    Prefijo de espacio de nombres XML para los nodos de firma. Si no se especifica este par&aacute;metro
+     *    se usa el valor por defecto (<i>ds</i>).
      *   </dd>
      *  <dt><b><i>format</i></b></dt>
      *   <dd>
      *    Formato en que se realizar&aacute; la firma. Se admiten los siguientes valores:
      *    <ul>
-     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED</code>)</li>
-     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Externally Detached</i> (<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED</code>)</li>
-     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Enveloped</i> (<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED</code>)</li>
-     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Enveloping</i> (<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING</code>)</li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Detached</i><br>(<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED</code>)</li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Externally Detached</i><br>(<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_EXTERNALLY_DETACHED</code>)</li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Enveloped</i><br>(<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED</code>)</li>
+     *     <li>&nbsp;&nbsp;&nbsp;<i>XMLDSig Enveloping</i><br>(<code>AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING</code>)</li>
      *    </ul>
      *   </dd>
      *  <dt><b><i>precalculatedHashAlgorithm</i></b></dt>
@@ -294,6 +300,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
         }
+        final String xmlSignaturePrefix = extraParams.getProperty("xmlSignaturePrefix", XML_SIGNATURE_PREFIX); //$NON-NLS-1$
         
         URI uri = null;
         try {
@@ -641,7 +648,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         final List<Transform> transformList = new ArrayList<Transform>();
 
         // Primero anadimos las transformaciones a medida
-        Utils.addCustomTransforms(transformList, extraParams, XML_SIGNATURE_PREFIX);
+        Utils.addCustomTransforms(transformList, extraParams, xmlSignaturePrefix);
 
         // Solo canonicalizo si es XML
         if (!isBase64) {
@@ -879,9 +886,13 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 // Transformacion XPATH para eliminar el resto de firmas del
                 // documento
-                transformList.add(fac.newTransform(Transform.XPATH,
-                                                   new XPathFilterParameterSpec("not(ancestor-or-self::" + XML_SIGNATURE_PREFIX + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
-                                                                                Collections.singletonMap(XML_SIGNATURE_PREFIX, XMLSignature.XMLNS))));
+                transformList.add(
+                  fac.newTransform(
+                    Transform.XPATH,
+                    new XPathFilterParameterSpec("not(ancestor-or-self::" + xmlSignaturePrefix + ":Signature)", //$NON-NLS-1$ //$NON-NLS-2$
+                    Collections.singletonMap(xmlSignaturePrefix, XMLSignature.XMLNS))
+                  )
+                );
 
                 // crea la referencia
                 referenceList.add(fac.newReference("", digestMethod, transformList, null, referenceId)); //$NON-NLS-1$
@@ -973,7 +984,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                                         "SignatureValue-" + id); //$NON-NLS-1$
 
             final DOMSignContext signContext = new DOMSignContext(keyEntry.getPrivateKey(), docSignature.getDocumentElement());
-            signContext.putNamespacePrefix(XMLConstants.DSIGNNS, XML_SIGNATURE_PREFIX);
+            signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
             signature.sign(signContext);
         }
         catch (final NoSuchAlgorithmException e) {
@@ -983,14 +994,15 @@ public final class AOXMLDSigSigner implements AOSigner {
             throw new AOException("Error al generar la firma XMLdSig", e); //$NON-NLS-1$
         }
 
+        final String signatureNodeName = (xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":") + SIGNATURE_STR; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         // Si se esta realizando una firma enveloping simple no tiene sentido el
         // nodo raiz,
         // asi que sacamos el nodo de firma a un documento aparte
         if (format.equals(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING)) {
             try {
-                if (docSignature.getElementsByTagName(SIGNATURE_NODE_NAME).getLength() == 1) {
+                if (docSignature.getElementsByTagName(signatureNodeName).getLength() == 1) {
                     final Document newdoc = dbf.newDocumentBuilder().newDocument();
-                    newdoc.appendChild(newdoc.adoptNode(docSignature.getElementsByTagName(SIGNATURE_NODE_NAME).item(0)));
+                    newdoc.appendChild(newdoc.adoptNode(docSignature.getElementsByTagName(signatureNodeName).item(0)));
                     docSignature = newdoc;
                 }
             }
@@ -1135,7 +1147,11 @@ public final class AOXMLDSigSigner implements AOSigner {
     }
 
     /** {@inheritDoc} */
-    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    public byte[] cosign(final byte[] data, 
+                         final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
@@ -1146,6 +1162,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
         final String digestMethodAlgorithm = extraParams.getProperty("referencesDigestMethod", DIGEST_METHOD); //$NON-NLS-1$
         final String canonicalizationAlgorithm = extraParams.getProperty("canonicalizationAlgorithm", CanonicalizationMethod.INCLUSIVE); //$NON-NLS-1$
+        final String xmlSignaturePrefix = extraParams.getProperty("xmlSignaturePrefix", XML_SIGNATURE_PREFIX); //$NON-NLS-1$
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -1164,7 +1181,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el documento contiene una firma simple se inserta como raiz el
             // nodo AFIRMA
-            if (rootSig.getNodeName().equals(SIGNATURE_NODE_NAME)) {
+            if (rootSig.getNodeName().equals((xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 docSig = insertarNodoAfirma(docSig);
                 rootSig = docSig.getDocumentElement();
             }
@@ -1228,7 +1245,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                 // tambien en la nueva
                 List<Transform> currentTransformList;
                 try {
-                    currentTransformList = Utils.getObjectReferenceTransforms(currentElement, XML_SIGNATURE_PREFIX);
+                    currentTransformList = Utils.getObjectReferenceTransforms(currentElement, xmlSignaturePrefix);
                 }
                 catch (final NoSuchAlgorithmException e) {
                     Logger.getLogger("Se ha declarado una transformacion personalizada de un tipo no soportado: " + e); //$NON-NLS-1$
@@ -1295,7 +1312,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             content.add(kif.newX509Data(x509Content));
 
             final DOMSignContext signContext = new DOMSignContext(keyEntry.getPrivateKey(), rootSig);
-            signContext.putNamespacePrefix(XMLConstants.DSIGNNS, XML_SIGNATURE_PREFIX);
+            signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
 
             fac.newXMLSignature(fac.newSignedInfo(cm, sm, referenceList), // SignedInfo
                                 kif.newKeyInfo(content, keyInfoId), // KeyInfo
@@ -1389,6 +1406,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         if ("base64".equalsIgnoreCase(encoding)) { //$NON-NLS-1$
             encoding = XMLConstants.BASE64_ENCODING;
         }
+        final String xmlSignaturePrefix = extraParams.getProperty("xmlSignaturePrefix", XML_SIGNATURE_PREFIX); //$NON-NLS-1$
 
         this.algo = algorithm;
 
@@ -1430,22 +1448,22 @@ public final class AOXMLDSigSigner implements AOSigner {
 
             // si el documento contiene una firma simple se inserta como raiz el
             // nodo AFIRMA
-            if (root.getNodeName().equals(SIGNATURE_NODE_NAME)) {
+            if (root.getNodeName().equals((xmlSignaturePrefix == null || "".equals(xmlSignaturePrefix) ? "" : xmlSignaturePrefix + ":"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 this.doc = insertarNodoAfirma(this.doc);
                 root = this.doc.getDocumentElement();
             }
 
             if (targetType == CounterSignTarget.TREE) {
-                this.countersignTree(root, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm);
+                this.countersignTree(root, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.LEAFS) {
-                this.countersignLeafs(root, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm);
+                this.countersignLeafs(root, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.NODES) {
-                this.countersignNodes(root, targets, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm);
+                this.countersignNodes(root, targets, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
             else if (targetType == CounterSignTarget.SIGNERS) {
-                this.countersignSigners(root, targets, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm);
+                this.countersignSigners(root, targets, keyEntry, digestMethodAlgorithm, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
 
         }
@@ -1463,7 +1481,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     private void countersignTree(final Element root,
                                  final PrivateKeyEntry keyEntry,
                                  final String refsDigestMethod,
-                                 final String canonicalizationAlgorithm) throws AOException {
+                                 final String canonicalizationAlgorithm,
+                                 final String xmlSignaturePrefix) throws AOException {
 
         // obtiene todas las firmas
         final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR); 
@@ -1477,7 +1496,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // y crea sus contrafirmas
         try {
             for (int i = 0; i < numSignatures; i++) {
-                this.cs(nodes[i], keyEntry, refsDigestMethod, canonicalizationAlgorithm);
+                this.cs(nodes[i], keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
         }
         catch (final Exception e) {
@@ -1491,7 +1510,8 @@ public final class AOXMLDSigSigner implements AOSigner {
     private void countersignLeafs(final Element root,
                                   final PrivateKeyEntry keyEntry,
                                   final String refsDigestMethod,
-                                  final String canonicalizationAlgorithm) throws AOException {
+                                  final String canonicalizationAlgorithm,
+                                  final String xmlSignaturePrefix) throws AOException {
 
         // obtiene todas las firmas y las referencias
         final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR); 
@@ -1518,7 +1538,7 @@ public final class AOXMLDSigSigner implements AOSigner {
 
                 // y crea sus contrafirmas
                 if (isLeaf) {
-                    this.cs(signature, keyEntry, refsDigestMethod, canonicalizationAlgorithm);
+                    this.cs(signature, keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
                 }
             }
         }
@@ -1536,7 +1556,8 @@ public final class AOXMLDSigSigner implements AOSigner {
                                   Object[] tgts,
                                   final PrivateKeyEntry keyEntry,
                                   final String refsDigestMethod,
-                                  final String canonicalizationAlgorithm) throws AOException {
+                                  final String canonicalizationAlgorithm,
+                                  final String xmlSignaturePrefix) throws AOException {
 
         if (tgts == null) {
             throw new IllegalArgumentException("La lista de nodos a contrafirmar no puede ser nula"); //$NON-NLS-1$
@@ -1620,7 +1641,7 @@ public final class AOXMLDSigSigner implements AOSigner {
         // y crea sus contrafirmas
         try {
             for (final Element node : nodes) {
-                this.cs(node, keyEntry, refsDigestMethod, canonicalizationAlgorithm);
+                this.cs(node, keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
             }
         }
         catch (final Exception e) {
@@ -1641,7 +1662,8 @@ public final class AOXMLDSigSigner implements AOSigner {
                                     final Object[] targets,
                                     final PrivateKeyEntry keyEntry,
                                     final String refsDigestMethod,
-                                    final String canonicalizationAlgorithm) throws AOException {
+                                    final String canonicalizationAlgorithm,
+                                    final String xmlSignaturePrefix) throws AOException {
 
         // obtiene todas las firmas
         final NodeList signatures = root.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_STR); 
@@ -1661,14 +1683,18 @@ public final class AOXMLDSigSigner implements AOSigner {
         // y crea sus contrafirmas
         final Iterator<Element> i = nodes.iterator();
         while (i.hasNext()) {
-            this.cs(i.next(), keyEntry, refsDigestMethod, canonicalizationAlgorithm);
+            this.cs(i.next(), keyEntry, refsDigestMethod, canonicalizationAlgorithm, xmlSignaturePrefix);
         }
     }
 
     /** Realiza la contrafirma de la firma pasada por par&aacute;metro.
      * @param signature Elemento con el nodo de la firma a contrafirmar
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    private void cs(final Element signature, final PrivateKeyEntry keyEntry, final String refsDigestMethod, final String canonicalizationAlgorithm) throws AOException {
+    private void cs(final Element signature, 
+                    final PrivateKeyEntry keyEntry, 
+                    final String refsDigestMethod, 
+                    final String canonicalizationAlgorithm,
+                    final String xmlSignaturePrefix) throws AOException {
 
         // obtiene el nodo SignatureValue
         final Element signatureValue = (Element) signature.getElementsByTagNameNS(XMLConstants.DSIGNNS, "SignatureValue").item(0); //$NON-NLS-1$
@@ -1722,7 +1748,7 @@ public final class AOXMLDSigSigner implements AOSigner {
                                                           referenceList), kif.newKeyInfo(content, keyInfoId), null, signatureId, signatureValueId);
 
             final DOMSignContext signContext = new DOMSignContext(keyEntry.getPrivateKey(), signature.getOwnerDocument().getDocumentElement());
-            signContext.putNamespacePrefix(XMLConstants.DSIGNNS, XML_SIGNATURE_PREFIX);
+            signContext.putNamespacePrefix(XMLConstants.DSIGNNS, xmlSignaturePrefix);
 
             sign.sign(signContext);
         }
@@ -1849,7 +1875,7 @@ public final class AOXMLDSigSigner implements AOSigner {
             final Element rootNode = signDoc.getDocumentElement();
 
             final ArrayList<Node> signNodes = new ArrayList<Node>();
-            if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
+            if (rootNode.getNodeName().equals((XML_SIGNATURE_PREFIX == null || "".equals(XML_SIGNATURE_PREFIX) ? "" : XML_SIGNATURE_PREFIX + ":"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 signNodes.add(rootNode);
             }
 
