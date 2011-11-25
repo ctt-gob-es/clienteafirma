@@ -61,6 +61,11 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private JPanel buttonsPanel = null;
 	
 	/**
+	 * Panel de botones relacionados con la accesibilidad.
+	 */
+	private JPanel accessibilityButtonsPanel = null;
+	
+	/**
 	 * Panel principal.
 	 */
 	private JPanel mainPanel = null;
@@ -224,18 +229,16 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 0;
         c.gridy = 0;
-       // c.gridwidth = 1;
+        //c.gridwidth = 1;
         c.insets = new Insets(0,10,0,10);  //right padding
         
         //Icono del diálogo
        setIconLabel(typeMessage);
-       // this.iconLabel.setBackground(Color.red);
        this.mainPanel.add(iconLabel, c);
 
         c.gridx = 1;
         c.weightx = 1.0;
         c.weighty = 1.0;
-        //c.weighty = 1.0;
         c.gridwidth = 2;
 	       
         //Etiqueta del diálogo
@@ -254,7 +257,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		this.mainPanel.add(this.infoLabel, c);
 
 		//Panel de botones
-		createButtonsPanel();
+		createMainButtonsPanel();
+		createAccessibilityButtonsPanel();
 		
 		//Restricciones del contenedor general
 		
@@ -264,16 +268,28 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         cons.gridy = 0;
         cons.weightx = 1.0;
         cons.weighty = 2.0;
+        cons.gridwidth = 3;
         //cons.gridheight = 1;
+        
         
         //se añade el panel de información
         container.add(this.mainPanel, cons);
         cons.gridy = 1;
         cons.gridx = 0;
         cons.weighty = 1.0;
+        cons.weightx = 1.0;
+        cons.gridwidth = 2;
         
         //Se añade el panel de botones
         container.add(this.buttonsPanel, cons);
+        
+        cons.gridx = 2;
+        cons.weightx = 0.5;
+        cons.gridwidth = 1;
+
+        //Se añade el panel de botones relacionados con la accesibilidad
+        container.add(this.accessibilityButtonsPanel, cons);
+        
 	}
 
 	/**
@@ -300,17 +316,19 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	}
 	
 	/**
-	 * Se crea el panel de botones.
+	 * Se crea el panel de botones de accesibilidad.
 	 */
-	private void createButtonsPanel() {
-		this.buttonsPanel = new JPanel(new GridBagLayout());
+	private void createAccessibilityButtonsPanel() {
+		this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
 		
 		//Restricciones para el panel de botones
 		GridBagConstraints consButtons = new GridBagConstraints();
-		consButtons.fill = GridBagConstraints.HORIZONTAL;
+		consButtons.fill = GridBagConstraints.NONE;
 		consButtons.gridx = 0;
 		consButtons.gridy = 0;
-		consButtons.insets = new Insets(0,10,0,10);  //right padding
+		consButtons.weightx = 0.5;
+		consButtons.insets = new Insets(0,0,0,0);  //right padding
+		consButtons.anchor=GridBagConstraints.EAST;
 		
 		//Maximize button
 		JPanel maximizePanel = new JPanel();
@@ -323,11 +341,12 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 				}
 			});
 
-        buttonsPanel.add(maximizePanel, consButtons);
+		accessibilityButtonsPanel.add(maximizePanel, consButtons);
 		
 		consButtons.gridx = 1;
-		consButtons.insets = new Insets(0,0,0,30);  //right padding
-		
+		consButtons.weightx = 0;
+		consButtons.insets = new Insets(0,0,0,5);  //right padding
+
 		//Restore button
 		JPanel restorePanel = new JPanel();
 		this.restoreButton = getButton(Messages.getString("Wizard.restaurar"), KeyEvent.VK_R );
@@ -338,21 +357,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	    		restaurarActionPerformed();
 			}
 		});
-        buttonsPanel.add(restorePanel, consButtons);
+		accessibilityButtonsPanel.add(restorePanel, consButtons);
 		
-		consButtons.gridx = 2;
-		consButtons.insets = new Insets(0,0,0,10);  //right padding
-
-		//OK button
-		JPanel okPanel = new JPanel();
-		this.okButton = getButton(Messages.getString("PrincipalGUI.aceptar"), KeyEvent.VK_A);
-	
-		okPanel.add(this.okButton);
-		this.buttonsPanel.add(okPanel, consButtons);
-		
-		this.okButton.addActionListener(this);
-		//Se asigna este botón como botón por defecto de la ventana.
-		this.getRootPane().setDefaultButton(this.okButton);
 		
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized()){
@@ -366,6 +372,34 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
     		//Se deshabilita el botón de restaurar
     		this.restoreButton.setEnabled(false);
     	}
+		
+	}
+
+	/**
+	 * Panel que contiene los botones principales de las alerta.
+	 */
+	void createMainButtonsPanel() {
+		this.buttonsPanel = new JPanel(new GridBagLayout());
+		
+		//Restricciones para el panel de botones
+		GridBagConstraints consButtons = new GridBagConstraints();
+		consButtons.fill = GridBagConstraints.NONE;
+		consButtons.gridx = 0;
+		consButtons.gridy = 0;
+		consButtons.weightx = 0.25;
+		consButtons.insets = new Insets(0,10,0,10);  //right padding
+		consButtons.anchor=GridBagConstraints.EAST;
+		
+		//OK button
+		JPanel okPanel = new JPanel();
+		this.okButton = getButton(Messages.getString("PrincipalGUI.aceptar"), KeyEvent.VK_A);
+	
+		okPanel.add(this.okButton);
+		this.buttonsPanel.add(okPanel, consButtons);
+		
+		this.okButton.addActionListener(this);
+		//Se asigna este botón como botón por defecto de la ventana.
+		this.getRootPane().setDefaultButton(this.okButton);
 		
 	}
 	
@@ -403,7 +437,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Restricciones
 		GridBagConstraints cons = new GridBagConstraints();
 		cons.fill = GridBagConstraints.HORIZONTAL;
-		cons.gridx = 3;
+		cons.gridx = 2;
 		cons.gridy = 0;
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
