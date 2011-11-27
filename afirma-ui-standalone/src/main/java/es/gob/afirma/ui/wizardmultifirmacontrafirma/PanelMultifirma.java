@@ -51,7 +51,7 @@ import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.ui.jse.JSEUtils;
@@ -583,8 +583,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			
 			return signers;
 		}
-		else
-			return null;
+		return null;
 	}
 	
 	private byte[] readFile(String filepath) {

@@ -28,7 +28,7 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.OfficeXMLAnalizer;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.util.tree.AOTreeModel;
