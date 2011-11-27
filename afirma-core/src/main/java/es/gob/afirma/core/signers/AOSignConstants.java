@@ -123,28 +123,6 @@ public final class AOSignConstants {
     public static final String DEFAULT_OID_TO_SIGN = "1.3.6.1.4.1.1466.115.121.1.40"; // Octect //$NON-NLS-1$
                                                                                       // String    
     // ************************************************************
-    // ************* OPCIONES DE MULTIFIRMA ***********************
-    // ************************************************************
-
-    /** Permite definir los objetivos para la contrafirma:
-     * <ul>
-     * <li>SIGNERS: Contrafirma de firmantes concretos.</li>
-     * <li>NODES: Contrafirma de nodos de firma concretos.</li>
-     * <li>TREE: Contrafirma de todo el &aacute;rbol de firma.</li>
-     * <li>LEAFS: Contrafirma de todos los nodos de firma.</li>
-     * </ul> */
-    public static enum CounterSignTarget {
-        /** Contrafirma de firmantes concretos. */
-        SIGNERS,
-        /** Contrafirma de nodos de firma concretos. */
-        NODES,
-        /** Contrafirma de todo el &aacute;rbol de firma. */
-        TREE,
-        /** Contrafirma de todas las hojas del &aacute;rbol de firma. */
-        LEAFS
-    }
-    
-    // ************************************************************
     // ************* ALGORITMOS DE FIRMA **************************
     // ************************************************************
 

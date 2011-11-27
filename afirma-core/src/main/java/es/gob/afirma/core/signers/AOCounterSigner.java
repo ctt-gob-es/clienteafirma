@@ -48,7 +48,7 @@ public interface AOCounterSigner {
      *         Cuando ocurre cualquier problema durante el proceso */
     byte[] countersign(byte[] sign,
                               String algorithm,
-                              AOSignConstants.CounterSignTarget targetType,
+                              CounterSignTarget targetType,
                               Object[] targets,
                               PrivateKeyEntry keyEntry,
                               Properties extraParams) throws AOException;
