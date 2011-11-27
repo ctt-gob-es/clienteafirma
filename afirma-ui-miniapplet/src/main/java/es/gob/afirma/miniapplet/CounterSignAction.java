@@ -5,7 +5,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSigner;
 
 /**

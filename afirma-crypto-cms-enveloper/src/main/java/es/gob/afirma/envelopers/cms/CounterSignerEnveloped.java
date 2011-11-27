@@ -57,7 +57,7 @@ import org.bouncycastle.asn1.x509.X509CertificateStructure;
 
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.AOSignConstants.CounterSignTarget;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.signers.pkcs7.AOAlgorithmID;
 import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.SigUtils;
