@@ -6,6 +6,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Enumeration;
 
 import javax.swing.AbstractButton;
@@ -79,7 +81,7 @@ public class HorizontalTabbedPanel extends Container {
      * @param button Bot&oacute;n que debe insertarse.
      * @param panel Panel que debe mostrarse al pulsar el bot&oacute;n.
      */
-    public void addTab(JToggleButton button, JPanel panel) {
+    public void addTab(final JToggleButton button, JPanel panel) {
     	if(this.firstButton){
     		this.numBotones = 0;
     	}
@@ -99,6 +101,25 @@ public class HorizontalTabbedPanel extends Container {
     	c.gridy = (this.numBotones * 2) + 1;
     	this.toggledButtonsPanel.add(new JPanel(), c);
     	
+    	button.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode()==KeyEvent.VK_ENTER){
+					button.doClick();
+				}
+			}
+		});
         this.buttonGroup.add(button);
         
         //panel.setBackground(Color.BLUE);
