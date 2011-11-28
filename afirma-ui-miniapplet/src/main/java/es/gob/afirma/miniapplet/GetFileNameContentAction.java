@@ -13,7 +13,7 @@ import es.gob.afirma.core.misc.Base64;
  * Acci&oacute;n para la recuperaci&oacute;n del nombre y contenido de un fichero.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public final class GetFileNameContentAction implements PrivilegedExceptionAction<String> {
+final class GetFileNameContentAction implements PrivilegedExceptionAction<String> {
     
 	private static final String SEPARATOR = "|"; //$NON-NLS-1$
 	
@@ -31,7 +31,7 @@ public final class GetFileNameContentAction implements PrivilegedExceptionAction
      * @param asBase64 {@code true}= Base64, {@code false}=Texto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public GetFileNameContentAction(final String title, final String[] exts, final String desc, final boolean asBase64, final Component parent) {
+    GetFileNameContentAction(final String title, final String[] exts, final String desc, final boolean asBase64, final Component parent) {
     	this.title = title;
         this.exts = (exts != null ? exts.clone() : null);
         this.desc = desc;

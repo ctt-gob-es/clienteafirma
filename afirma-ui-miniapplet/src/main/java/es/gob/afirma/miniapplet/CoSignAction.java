@@ -11,7 +11,7 @@ import es.gob.afirma.core.signers.AOSigner;
  * Acci&oacute;n privilegiada para realizar una cofirma electr&oacute;nica.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
+final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 
 	private final AOSigner signer;
 	private final byte[] sign;
@@ -29,7 +29,7 @@ public final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 	 * @param keyEntry Clave privada de firma.
 	 * @param extraParams Datos adicionales para la configuraci&oacute;n de la contrafirma.
 	 */
-	public CoSignAction(final AOSigner signer, 
+	CoSignAction(final AOSigner signer, 
 	                    final byte[] sign, 
 	                    final byte[] data, 
 	                    final String algorithm, 

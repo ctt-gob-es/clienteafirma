@@ -12,7 +12,7 @@ import es.gob.afirma.core.misc.Platform;
  * ejecuci&oacute;n lanza una {@code RuntimeException} con el mensaje explicativo del problema
  * y su posible soluci&oacute;n por parte del usuario.
  */
-public final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
+final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 
 	private static final String BC_VERSION = "1.46";  //$NON-NLS-1$
 	
@@ -22,7 +22,7 @@ public final class VerifyPlatformAction implements PrivilegedExceptionAction<Voi
 	 * Crea la acci&oacute;n de verificaci&oacute;n.
 	 * @param userAgent Identificador del navegador Web utilizado.
 	 */
-	public VerifyPlatformAction(final String userAgent) {
+	VerifyPlatformAction(final String userAgent) {
 		this.userAgent = userAgent;
 	}
 

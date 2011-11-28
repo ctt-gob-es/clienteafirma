@@ -14,7 +14,7 @@ import es.gob.afirma.core.signers.AOSigner;
  * especifique lo contrario.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public final class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
+final class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 
 	private static final String COUNTERSIGN_TARGET_KEY = "target"; //$NON-NLS-1$
 	
@@ -34,7 +34,7 @@ public final class CounterSignAction implements PrivilegedExceptionAction<byte[]
 	 * @param keyEntry Clave privada de firma.
 	 * @param extraParams Datos adicionales para la configuraci&oacute;n de la contrafirma.
 	 */
-	public CounterSignAction(final AOSigner signer, 
+	CounterSignAction(final AOSigner signer, 
 	                         final byte[] sign, 
 	                         final String algorithm, 
 	                         final PrivateKeyEntry keyEntry, 

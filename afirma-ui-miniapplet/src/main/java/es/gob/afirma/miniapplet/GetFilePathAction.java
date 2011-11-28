@@ -9,7 +9,7 @@ import java.security.PrivilegedExceptionAction;
  * Acci&oacute;n para la recuperaci&oacute;n del nombre de un fichero.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public final class GetFilePathAction implements PrivilegedExceptionAction<String> {
+final class GetFilePathAction implements PrivilegedExceptionAction<String> {
     
     private final String title;
     private final String[] exts;
@@ -23,7 +23,7 @@ public final class GetFilePathAction implements PrivilegedExceptionAction<String
      * @param description Descripci&opacute;n del tipo de fichero aceptado por defecto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public GetFilePathAction(final String title, final String[] exts, final String description,
+    GetFilePathAction(final String title, final String[] exts, final String description,
     		 final Component parent) {
         this.title = title;
         this.exts = (exts != null ? exts.clone() : null);

@@ -13,7 +13,7 @@ import es.gob.afirma.keystores.filters.SignatureDNIeFilter;
  *  
  * @author Carlos Gamuci Mill&aacute;n
  */
-public final class CertFilterManager {
+final class CertFilterManager {
 
 	private static final String FILTER_PREFIX_KEY = "filter"; //$NON-NLS-1$
 	private static final String FILTER_TYPE_DNIE = "dnie:"; //$NON-NLS-1$
@@ -29,7 +29,7 @@ public final class CertFilterManager {
 	 * @param propertyFilters Listado de propiedades entre las que identificar las que
 	 * establecen los criterios de filtrado.
 	 */
-	public CertFilterManager(final Properties propertyFilters) {
+	CertFilterManager(final Properties propertyFilters) {
 		
 		final String filterValue = propertyFilters.getProperty(FILTER_PREFIX_KEY);
 		if (filterValue == null) {
@@ -55,7 +55,7 @@ public final class CertFilterManager {
 	 * Devuelve la lista de certificados definidos.
 	 * @return Listado de certificados.
 	 */
-	public List<CertificateFilter> getFilters() {
+	List<CertificateFilter> getFilters() {
 		return (this.filters != null ? new ArrayList<CertificateFilter>(this.filters) : null);
 	}
 	
@@ -65,7 +65,7 @@ public final class CertFilterManager {
 	 * @return {@code true} si debe seleccionarse autom&aacute;ticamente el &uacute;nico certificado
 	 * que supera el filtrado, {@code false} en caso contrario.
 	 */
-	public boolean isMandatoryCertificate() {
+	boolean isMandatoryCertificate() {
 		return this.mandatoryCertificate;
 	}
 	

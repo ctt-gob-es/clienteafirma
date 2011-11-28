@@ -11,7 +11,7 @@ import es.gob.afirma.core.misc.Platform.JREVER;
  * entero que identifica la versi&oacute;n. X ser&aacute; 4 para Java 1.4 o invferior, 5 para Java 5,
  * 6 para Java 6 y 7 para cualquier otro. 
  */
-public class GetEcoJavaVersionAction implements PrivilegedAction<Platform.JREVER> {
+class GetEcoJavaVersionAction implements PrivilegedAction<Platform.JREVER> {
     public Platform.JREVER run() { 
         final String jreVersion = System.getProperty("java.version");  //$NON-NLS-1$ 
         if (    jreVersion.startsWith("0.")  || //$NON-NLS-1$

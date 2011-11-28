@@ -21,7 +21,7 @@ import es.gob.afirma.keystores.filters.CertificateFilter;
  * de firma por el usuario.
  * @author Carlos Gamuci Mill&aacute;n.
  */
-public final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateKeyEntry> {
+final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateKeyEntry> {
 
 	private final AOKeyStore keyStore;
 	private final Component parent;
@@ -35,7 +35,7 @@ public final class SelectPrivateKeyAction implements PrivilegedExceptionAction<P
 	 * @param parent Componente padre sobre el que se montanlos di&aacute;logos que se
 	 * visualizan como parte de la acci&oacute;n.
 	 */
-	public SelectPrivateKeyAction(final OS os, 
+	SelectPrivateKeyAction(final OS os, 
 	                              final BROWSER browser, 
 	                              final CertFilterManager filterManager, 
 	                              final Component parent) {

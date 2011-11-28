@@ -16,7 +16,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
  * Di&aacute;logo para la selecci&oacute;n de un fichero y la devoluci&oacute;n de
  * un flujo de datos con su contenido.
  */
-public final class FileSelectionDialog {
+final class FileSelectionDialog {
 
     private final String title;
     
@@ -34,7 +34,7 @@ public final class FileSelectionDialog {
      * @param description Descripci&oacute;n del tipo de fichero aceptado por defecto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public FileSelectionDialog(final String title, 
+    FileSelectionDialog(final String title, 
                                final String[] exts, 
                                final String description, 
                                final Component parent) {
@@ -51,7 +51,7 @@ public final class FileSelectionDialog {
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n.
      * @throws IOException Si se produce alg&uacute;n error en la carga del fichero.
      */
-    public InputStream getFileContent() throws IOException {
+    InputStream getFileContent() throws IOException {
     	return new FileInputStream(this.selectFile().getSelectedFile());
     }
     
@@ -61,7 +61,7 @@ public final class FileSelectionDialog {
      * @return Ruta absoluta del fichero seleccionado.
      * @throws AOCancelledOperationException Si el usuario cancela la operaci&oacute;n.
      */
-    public String getPath() {
+    String getPath() {
     	return this.selectFile().getSelectedFile().getAbsolutePath();
     }
     

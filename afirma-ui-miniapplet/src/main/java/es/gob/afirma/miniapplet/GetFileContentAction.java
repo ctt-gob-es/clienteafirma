@@ -12,7 +12,7 @@ import es.gob.afirma.core.misc.AOUtil;
  * por el usuario.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
+final class GetFileContentAction implements PrivilegedExceptionAction<byte[]>{
 
     private final String title;
     private final String[] exts;
@@ -26,7 +26,7 @@ public final class GetFileContentAction implements PrivilegedExceptionAction<byt
      * @param description Descripci&opacute;n del tipo de fichero aceptado por defecto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public GetFileContentAction(final String title, final String[] exts, final String description,
+    GetFileContentAction(final String title, final String[] exts, final String description,
     		 final Component parent) {
         this.title = title;
         this.exts = (exts != null ? exts.clone() : null);

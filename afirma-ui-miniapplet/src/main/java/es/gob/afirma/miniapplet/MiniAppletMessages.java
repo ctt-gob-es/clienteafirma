@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 import es.gob.afirma.core.misc.AOUtil;
 
 /** Gestor de mensajes de texto del MiniApplet. */
-public final class MiniAppletMessages {
+final class MiniAppletMessages {
 	private static final String BUNDLE_NAME = "miniappletmessages"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
@@ -20,7 +20,7 @@ public final class MiniAppletMessages {
      * @param key
      *        Clave del texto.
      * @return Recuerso textual. */
-    public static String getString(final String key) {
+    static String getString(final String key) {
         try {
             return RESOURCE_BUNDLE.getString(key);
         }
@@ -36,7 +36,7 @@ public final class MiniAppletMessages {
      * @param text
      *        Texto que se desea insertar.
      * @return Recuerso textual con la subcadena sustituida. */
-    public static String getString(final String key, final String text) {
+    static String getString(final String key, final String text) {
         try {
             return RESOURCE_BUNDLE.getString(key).replace("%0", text); //$NON-NLS-1$
         }
@@ -54,7 +54,7 @@ public final class MiniAppletMessages {
      * @param params
      *        Par&aacute;metros que se desean insertar.
      * @return Recuerso textual con las subcadenas sustituidas. */
-    public static String getString(final String key, final String[] params) {
+    static String getString(final String key, final String[] params) {
 
         String text;
         try {

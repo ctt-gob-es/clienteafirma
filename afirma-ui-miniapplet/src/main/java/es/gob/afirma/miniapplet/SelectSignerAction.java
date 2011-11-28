@@ -9,7 +9,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
  * Acci&oacute;n para la seleccion de un manejador de firma.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public final class SelectSignerAction implements PrivilegedExceptionAction<AOSigner> {
+final class SelectSignerAction implements PrivilegedExceptionAction<AOSigner> {
     
     private final String format;
     private final byte[] data;
@@ -19,7 +19,7 @@ public final class SelectSignerAction implements PrivilegedExceptionAction<AOSig
      * con el formato de firma indicado.
      * @param format Formato de firma.
      */
-    public SelectSignerAction(final String format) {
+    SelectSignerAction(final String format) {
         this.format = format;
         this.data = null;
     }
@@ -29,7 +29,7 @@ public final class SelectSignerAction implements PrivilegedExceptionAction<AOSig
      * con la firma indicada.
      * @param data Firma electr&oacute;nica para la que se desea el manejador.
      */
-    public SelectSignerAction(final byte[] data) {
+    SelectSignerAction(final byte[] data) {
         this.data = (data != null ? data.clone() : null);
         this.format = null;
     }

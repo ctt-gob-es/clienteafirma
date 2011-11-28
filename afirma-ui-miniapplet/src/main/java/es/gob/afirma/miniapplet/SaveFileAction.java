@@ -16,7 +16,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
  * Acci&oacute;n para almacenar un fichero en disco.
  * @author Carlos Gamuci Mill&aacute;n
  */
-public final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
+final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
     
 	private final String title;
     private final byte[] data;
@@ -34,7 +34,7 @@ public final class SaveFileAction implements PrivilegedExceptionAction<Boolean> 
      * @param fileHint Fichero de salida propuesto.
      * @param parent Componente padre sobre el que se mostrar&aacute; el di&aacute;logo.
      */
-    public SaveFileAction(final String title, final byte[] data, final String[] exts,
+    SaveFileAction(final String title, final byte[] data, final String[] exts,
     		final String description, final File fileHint, final Component parent) {
         this.title = title;
         this.data = (data != null ? data.clone() : null);

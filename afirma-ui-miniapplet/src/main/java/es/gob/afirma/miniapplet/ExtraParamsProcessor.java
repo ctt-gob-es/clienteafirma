@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 /** Clase de utilidad para el proceso de propiedades enviadas desde JavaScript
  * y recogidas desde java en formato <code>Properties<code>. */
-public final class ExtraParamsProcessor {
+final class ExtraParamsProcessor {
 
 	private ExtraParamsProcessor() {
 		/* Constructor no publico */
@@ -24,7 +24,7 @@ public final class ExtraParamsProcessor {
 	 * @param entries Listado de pares CLAVE - VALOR.
 	 * @return Properties con las claves indicadas cargadas como par&aacute;metro.
 	 */
-	public static Properties convertToProperties(String entries) {
+	static Properties convertToProperties(final String entries) {
 
 		final Properties params = new Properties();
 		if (entries == null) {
@@ -67,10 +67,10 @@ public final class ExtraParamsProcessor {
 	 * @param params Par&aacute;metros definidos para la operaci&oacute;n.
 	 * @return Propiedades expandidas.
 	 */
-	public static Properties expandProperties(Properties params) {
+	static Properties expandProperties(final Properties params) {
 		
-		Properties p = new Properties();
-		for (String key : params.keySet().toArray(new String[0])) {
+		final Properties p = new Properties();
+		for (final String key : params.keySet().toArray(new String[0])) {
 			p.setProperty(key, params.getProperty(key));
 		}
 		

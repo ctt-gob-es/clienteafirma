@@ -4,7 +4,7 @@ package es.gob.afirma.miniapplet;
 /** Indica que en el sistema hay una biblioteca que puede causar un mal funcionamiento
  * del MiniApplet de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public final class InvalidExternalLibraryException extends Exception {
+final class InvalidExternalLibraryException extends Exception {
 
     private static final long serialVersionUID = 8785012357200277893L;
     
