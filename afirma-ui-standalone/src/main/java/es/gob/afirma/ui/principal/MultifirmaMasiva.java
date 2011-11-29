@@ -167,7 +167,7 @@ public class MultifirmaMasiva extends JPanel {
 		firmar.addActionListener(new ActionListener() {
 			@Override
             public void actionPerformed(ActionEvent evt) {
-				//firmarActionPerformed(comboAlmacen, alerta);
+				firmarActionPerformed(comboAlmacen, alerta);
 			}
 		});
 
