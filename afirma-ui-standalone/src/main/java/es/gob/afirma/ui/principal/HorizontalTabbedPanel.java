@@ -23,12 +23,12 @@ import es.gob.afirma.ui.utils.JAccessibilityFrame;
  * se retira el contenido del espacio de visualizaci&oacute;n y se agrega el contenido
  * asociado a ese bot&oacute;n. 
  */
-public class HorizontalTabbedPanel extends Container {
-	private int numBotones = 0;
+public class HorizontalTabbedPanel extends JPanel {
     /** UID */
+	private int numBotones = 0;
     private static final long serialVersionUID = 2340734316078849777L;
-
     /** Grupo de botones que habilitan los distintos paneles. */
+    
     private ButtonGroup buttonGroup;
     
     /** Panel en donde mostrar el listado de botones. */
