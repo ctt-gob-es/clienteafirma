@@ -163,7 +163,7 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	 * @param mnemonic mnem�nico que se va a asignar al componente
 	 */
 	public void setLabelMnemonics( Container c, String key, int mnemonic ) {
-		 //N�mero de componentes del contenedor
+		 //Número de componentes del contenedor
 	    int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
