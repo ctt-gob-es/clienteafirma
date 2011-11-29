@@ -7,8 +7,7 @@
  * (por ejemplo, "file:///C:/ficheros", "http://www.mpr.es/ficheros",...)	 	*
  * y las rutas relativas no pueden empezar por "/" (por ejemplo,			 	*
  * "afirma/ficheros"). Se debe usar siempre el separador "/", nunca "\". 	 	*
- * El fichero "version.properties" se toma de esta ruta.				 		*
- ******************************************************************************/
+  ******************************************************************************/
 var baseDownloadURL;
 
 /*******************************************************************************

@@ -34,5 +34,3 @@ function cargarMiniApplet()
 
 	clienteFirma = document.getElementById("miniApplet");
 }
-
-
