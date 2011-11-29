@@ -22,8 +22,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -31,12 +29,21 @@ import java.util.Hashtable;
 import javax.help.DefaultHelpBroker;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
+import javax.help.JHelp;
+import javax.help.JHelpContentViewer;
 import javax.help.WindowPresentation;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JViewport;
+import javax.swing.text.html.HTMLDocument;
 
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
@@ -136,8 +143,14 @@ public class HelpUtils {
 		} else {
 			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
 		}
-		
-		
+		//Alto contraste
+		WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
+		JFrame helpwindow = (JFrame) wp.getHelpWindow();
+		if (GeneralConfig.isHighContrast()){
+			checkHelpAccessibility(helpwindow, true);
+		} else {
+			checkHelpAccessibility(helpwindow, false);
+		}
 	}	
 	
 	/**
@@ -159,42 +172,15 @@ public class HelpUtils {
 		} else {
 			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
 		}
-	}
-
-	//TODO: el siguiente metodo se podria borrar
-	/**
-	 * Genera una etiqueta con el icono de ayuda y que apunta a la p&aacute;gina dada.
-	 * @param pagina	P&aacute;gina a mostrar cuando se pulse el bot&oacute;n
-	 * @return			Bot&oacute;n de ayuda
-	 */
-	public static JLabel fechButton(final String pagina) {
-
-		JLabel botonAyuda = new JLabel(IMAGEICONHELP);
-		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
-		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		botonAyuda.addMouseListener(new MouseListener() {
-			public void mousePressed(MouseEvent e) {}
-			public void mouseReleased(MouseEvent e) {}
-			public void mouseEntered(MouseEvent e) {}
-			public void mouseExited(MouseEvent e) {}
-
-			public void mouseClicked(MouseEvent e) {
-				getHelp().setDisplayed(true);
-				getHelp().setCurrentID(pagina);	
-				if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
-					helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
-					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
-				} else if (GeneralConfig.isBigFontSize()){
-					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));	
-				} else if (GeneralConfig.isFontBold()){
-					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
-				} else {
-					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
-				}
-			}
-		});
 		
-		return botonAyuda;
+		//Alto contraste
+		WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
+		JFrame helpwindow = (JFrame) wp.getHelpWindow();
+		if (GeneralConfig.isHighContrast()){
+			checkHelpAccessibility(helpwindow, true);
+		} else {
+			checkHelpAccessibility(helpwindow, false);
+		}
 	}
 
 	/**
@@ -253,6 +239,15 @@ public class HelpUtils {
 				} else {
 					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
 				}
+				
+				//Alto contraste
+				WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
+				JFrame helpwindow = (JFrame) wp.getHelpWindow();
+				if (GeneralConfig.isHighContrast()){
+					checkHelpAccessibility(helpwindow, true);
+				} else {
+					checkHelpAccessibility(helpwindow, false);
+				}
 			}
 		});
 		Utils.remarcar(botonAyuda);
@@ -293,7 +288,89 @@ public class HelpUtils {
 	    		}
 	            /* No hacemos nada para que se abra por la pagina principal */
 	        }
+	        
+	       //Alto contraste
+	        WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
+			JFrame helpwindow = (JFrame) wp.getHelpWindow();
+	        if (GeneralConfig.isHighContrast()){
+				checkHelpAccessibility(helpwindow, true);
+			} else {
+				checkHelpAccessibility(helpwindow, false);
+			}
 	    }
+	}
+
+	/**
+	 * Establece el modo alto contraste para el editorPane que recibe como parámetro.
+	 * @param editorPane panel de edición.
+	 */
+	private static void setHighContrastEditorPane(JEditorPane editorPane, boolean activate){
+		if (editorPane !=null) {
+			//Se establece el color de la la letra a blanco
+			editorPane.setContentType("text/html");
+			String bodyRule ="";
+			if (activate) {
+				bodyRule = "body { color: \"white\"; }";
+			} else {
+				bodyRule = "body { color: \"black\"; }";
+			}
+			HTMLDocument h = (HTMLDocument)(editorPane).getDocument();
+			h.getStyleSheet().addRule(bodyRule);	
+		}
+	}
+
+	/**
+	 * Chequeo de la accesibilidad para la ventana de ayuda.
+	 * @param frame ventana de ayuda.
+	 */
+	private static void checkHelpAccessibility(JFrame frame, boolean activate) {
+		if (frame != null) {
+			Component component = null;
+			 // recorre componentes del frame
+			 for (int i=0; i<frame.getComponentCount(); i++) {
+				 component = frame.getComponent(i);
+				 if (component == null) {
+		              continue;
+				 }
+				 //Se recorren todos los componentes de la ventana de ayuda hasta llegar al editorPane
+				 if (component instanceof JRootPane) {
+					 for(Component component2 : ((JRootPane) component).getComponents()) {
+						 if(component2 instanceof JLayeredPane) {
+							 for(Component component3 : ((JLayeredPane) component2).getComponents()) {
+								 if(component3 instanceof JPanel) {
+									 for(Component component4 : ((JPanel) component3).getComponents()) {
+										 if(component4 instanceof JHelp) {
+											 for(Component component5 : ((JHelp) component4).getComponents()) {
+												 if(component5 instanceof JSplitPane) {
+													 for(Component component6 : ((JSplitPane) component5).getComponents()) {
+														 if(component6 instanceof JHelpContentViewer) {
+															 for(Component component7 : ((JHelpContentViewer) component6).getComponents()) {
+																 if(component7 instanceof JScrollPane) {
+																	 for(Component component8 : ((JScrollPane) component7).getComponents()) {
+																		 if(component8 instanceof JViewport) {
+																			 for(Component component9 : ((JViewport) component8).getComponents()) {
+																				if (component9 instanceof JEditorPane) {
+																					//Se activa el alto contraste para el editor pane
+																					HelpUtils.setHighContrastEditorPane((JEditorPane)component9, activate);
+																				}
+																			 }
+																		 }
+																	 }
+																 }
+															 }
+														 }	 
+													 }
+												 } 
+											 }
+										 }
+									 }
+								 }
+							 }
+						 }
+					 }
+				 }
+			 }
+		}
 	}
 }
 
