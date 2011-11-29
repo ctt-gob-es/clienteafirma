@@ -16,12 +16,16 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, focus);
         if (value instanceof DefaultMutableTreeNode) {
             if (!(((DefaultMutableTreeNode) value).getUserObject() instanceof String)) {
-                if (focus) {
-                    setText("<html><font color=\"white\"><u>" + getText() + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-                }
-                else {
-                    setText("<html><font color=\"blue\"><u>" + getText() + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
-                }
+            	//Comprobación de que el texto no sea nulo o vacío.
+            	String text = getText();
+            	if (text!=null && !text.equalsIgnoreCase("")) {
+	                if (focus) {
+	                    setText("<html><font color=\"white\"><u>" + text + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+	                }
+	                else {
+	                    setText("<html><font color=\"blue\"><u>" + text + "</u></font></html>"); //$NON-NLS-1$ //$NON-NLS-2$
+	                }
+            	}
             }
         }
         return this;
