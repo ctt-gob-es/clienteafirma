@@ -65,9 +65,9 @@ public class JAccessibilityFileChooser extends JFileChooser{
 		super(file);
 		
 		//Se comprueba si se está en el modo Alto contraste
-		if (GeneralConfig.isHighContrast()){
+	/*	if (GeneralConfig.isHighContrast()){
 			setHighContrast((Container)this);
-		}
+		}*/
 		
 		//Asignaci�n de mnemonics
 		
