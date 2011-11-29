@@ -75,7 +75,7 @@ public class MultifirmaSimple extends JPanel {
 		// Combo con los almacenes / repositorios disponibles
 		final JComboBox comboAlmacen = new JComboBox();
 		comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
-		comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")+" ALT + A."); // NOI18N
+		//comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description")+" ALT + A."); // NOI18N
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addAncestorListener(new RequestFocusListener(false));
@@ -122,7 +122,7 @@ public class MultifirmaSimple extends JPanel {
 		));
 		cofirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Multifirma.opcion.cofirma.description.status")));
 		cofirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Multifirma.opcion.cofirma.description.status")));
-		cofirma.getAccessibleContext().setAccessibleName(cofirma.getText() +" "+ Messages.getString("Multifirma.opcion.cofirma.description.status")); // NOI18N
+		//cofirma.getAccessibleContext().setAccessibleName(cofirma.getText() +" "+ Messages.getString("Multifirma.opcion.cofirma.description.status")); // NOI18N
 		cofirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Multifirma.opcion.cofirma.description")); // NOI18N
 		cofirma.setToolTipText(Messages.getString("Multifirma.opcion.cofirma.description.status"));
 		//Se comprueba si el modo es el avanzado o no
@@ -145,7 +145,7 @@ public class MultifirmaSimple extends JPanel {
 		));
 		contrafirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Multifirma.opcion.contrafirma.description.status")));
 		contrafirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Multifirma.opcion.contrafirma.description.status")));
-		contrafirma.getAccessibleContext().setAccessibleName(contrafirma.getText()+" "+ Messages.getString("Multifirma.opcion.contrafirma.description.status")); // NOI18N
+		//contrafirma.getAccessibleContext().setAccessibleName(contrafirma.getText()+" "+ Messages.getString("Multifirma.opcion.contrafirma.description.status")); // NOI18N
 		contrafirma.getAccessibleContext().setAccessibleDescription(Messages.getString("Multifirma.opcion.contrafirma.description")); // NOI18N
 		contrafirma.setToolTipText(Messages.getString("Multifirma.opcion.contrafirma.description.status"));
 		//Se comprueba si el modo es el avanzado o no
@@ -195,7 +195,7 @@ public class MultifirmaSimple extends JPanel {
 		firmar.setMnemonic(KeyEvent.VK_R);
 		firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N
 		firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
-		firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " + Messages.getString("PrincipalGUI.firmar.description.status"));
+		//firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " + Messages.getString("PrincipalGUI.firmar.description.status"));
 		firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
 		firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
 		firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));

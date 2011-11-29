@@ -148,7 +148,7 @@ public class Cifrado extends JPanel {
 		examinar.setMnemonic(KeyEvent.VK_E);
 		examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
 		examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
-		examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
+		//examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
 		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
 		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
@@ -207,7 +207,7 @@ public class Cifrado extends JPanel {
 				comboMecanismoItemStateChanged(comboMecanismo, comboAlgoritmo);
 			}
 		});
-		comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave") +" "+ Messages.getString("Cifrado.origen.clave.combo.description.status") + " ALT + A."); // NOI18N
+		//comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave") +" "+ Messages.getString("Cifrado.origen.clave.combo.description.status") + " ALT + A."); // NOI18N
 		comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N
 		comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Cifrado.origenL.0"),Messages.getString("Cifrado.origenL.1")}));
 		Utils.remarcar(comboMecanismo);
@@ -265,7 +265,7 @@ public class Cifrado extends JPanel {
 		comboAlgoritmo.setToolTipText(Messages.getString("Cifrado.formato.combo.description")); // NOI18N
 		comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.formato.combo.description.status")));
 		comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.formato.combo.description.status")));
-		comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+ Messages.getString("Cifrado.formato.combo.description.status")+" ALT + G."); // NOI18N); // NOI18N
+		//comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+ Messages.getString("Cifrado.formato.combo.description.status")+" ALT + G."); // NOI18N); // NOI18N
 		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.combo.description")); // NOI18N
 		comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
 		Utils.remarcar(comboAlgoritmo);
@@ -327,7 +327,7 @@ public class Cifrado extends JPanel {
 				PrincipalGUI.setNuevoEstado(Messages.getString("Cifrado.statusbar.cipher.action"));
 			}
 		});
-		cifrar.getAccessibleContext().setAccessibleName(cifrar.getText()+ " " + Messages.getString("Cifrado.btncifrar.description.status"));
+		//cifrar.getAccessibleContext().setAccessibleName(cifrar.getText()+ " " + Messages.getString("Cifrado.btncifrar.description.status"));
 		cifrar.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.btncifrar.description")); // NOI18N
 		Utils.remarcar(cifrar);
 		Utils.setContrastColor(cifrar);

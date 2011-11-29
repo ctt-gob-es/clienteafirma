@@ -124,7 +124,7 @@ public class Ensobrado extends JPanel {
                 examinarActionPerformed(campoFichero);
             }
         });
-        examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
+        //examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
 		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
@@ -146,7 +146,7 @@ public class Ensobrado extends JPanel {
         checkAnadir.setToolTipText(Messages.getString("Ensobrado.check.description")); // NOI18N
         checkAnadir.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.check.description.status")));
         checkAnadir.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.check.description.status")));
-        checkAnadir.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.check") + " " + Messages.getString("Ensobrado.check.description.status")); // NOI18N
+        //checkAnadir.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.check") + " " + Messages.getString("Ensobrado.check.description.status")); // NOI18N
         checkAnadir.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.check.description")); // NOI18N
         checkAnadir.addChangeListener(new ChangeListener() {	
 			public void stateChanged(ChangeEvent arg0) {
@@ -192,7 +192,7 @@ public class Ensobrado extends JPanel {
         comboTipos.setToolTipText(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
         comboTipos.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
         comboTipos.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
-        comboTipos.getAccessibleContext().setAccessibleName(etiquetaOpciones.getText() + " " + Messages.getString("Ensobrado.opciones.combo.status") +" ALT + T."); // NOI18N
+        //comboTipos.getAccessibleContext().setAccessibleName(etiquetaOpciones.getText() + " " + Messages.getString("Ensobrado.opciones.combo.status") +" ALT + T."); // NOI18N
         comboTipos.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.opciones.combo.description")); // NOI18N
         cargarComboTipos();
         Utils.remarcar(comboTipos);
@@ -241,7 +241,7 @@ public class Ensobrado extends JPanel {
             	PrincipalGUI.setNuevoEstado(Messages.getString("Ensobrado.btnGenerar.generado"));
             }
         });
-        generar.getAccessibleContext().setAccessibleName(generar.getText() + " " + Messages.getString("Ensobrado.btnGenerar.description.status")); // NOI18N
+        //generar.getAccessibleContext().setAccessibleName(generar.getText() + " " + Messages.getString("Ensobrado.btnGenerar.description.status")); // NOI18N
         generar.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.btnGenerar.description")); // NOI18N
         Utils.remarcar(generar);
         Utils.setContrastColor(generar);

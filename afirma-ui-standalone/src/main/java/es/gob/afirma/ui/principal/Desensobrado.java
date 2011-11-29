@@ -144,7 +144,7 @@ public class Desensobrado extends JPanel {
                 examinarActionPerformed(campoFichero);
             }
         });
-        examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + Messages.getString("PrincipalGUI.Examinar.description.status") ); // NOI18N
+        //examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + Messages.getString("PrincipalGUI.Examinar.description.status") ); // NOI18N
         examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
@@ -188,7 +188,7 @@ public class Desensobrado extends JPanel {
         comboAlmacen.setToolTipText(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N
         comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.almacen.combo.description.status")));
         comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.almacen.combo.description.status")));
-        comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+ " " + Messages.getString("Desensobrado.almacen.combo.description.status") + " ALT + A."); // NOI18N
+        //comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+ " " + Messages.getString("Desensobrado.almacen.combo.description.status") + " ALT + A."); // NOI18N
         comboAlmacen.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.almacen.combo.description")); // NOI18N
         cargarComboAlmacen(comboAlmacen);
         Utils.remarcar(comboAlmacen);
@@ -236,7 +236,7 @@ public class Desensobrado extends JPanel {
         checkIniciar.setToolTipText(Messages.getString("Desensobrado.check.check.description")); // NOI18N
         checkIniciar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.check.check.description.status")));
         checkIniciar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.check.check.description.status")));
-        checkIniciar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check") + " " +Messages.getString("Desensobrado.check.check.description.status")); // NOI18N
+        //checkIniciar.getAccessibleContext().setAccessibleName(Messages.getString("Desensobrado.check.check") + " " +Messages.getString("Desensobrado.check.check.description.status")); // NOI18N
         checkIniciar.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.check.check.description")); // NOI18N
         checkIniciar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo
         Utils.remarcar(checkIniciar);
@@ -281,7 +281,7 @@ public class Desensobrado extends JPanel {
             	extraerActionPerformed(comboAlmacen, campoFichero, checkIniciar);
             }
         });
-        extraer.getAccessibleContext().setAccessibleName(extraer.getText() + " " + Messages.getString("Desensobrado.btnDescifrar.description.status")); // NOI18N
+        //extraer.getAccessibleContext().setAccessibleName(extraer.getText() + " " + Messages.getString("Desensobrado.btnDescifrar.description.status")); // NOI18N
         extraer.getAccessibleContext().setAccessibleDescription(Messages.getString("Desensobrado.btnDescifrar.description")); // NOI18N
         Utils.remarcar(extraer);
         Utils.setContrastColor(extraer);

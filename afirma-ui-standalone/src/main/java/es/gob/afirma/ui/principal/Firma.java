@@ -166,7 +166,7 @@ public class Firma extends JPanel {
         examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
         examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
         examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
-        examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
+        //examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
         examinar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -216,7 +216,7 @@ public class Firma extends JPanel {
         comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
         comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
         comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
-        comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description") + " ALT + A."); // NOI18N
+        //comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description") + " ALT + A."); // NOI18N
 
         Utils.remarcar(comboAlmacen);
         cargarComboAlmacen(comboAlmacen);
@@ -264,7 +264,7 @@ public class Firma extends JPanel {
         comboFormato.setToolTipText(Messages.getString("Firma.formato.description")); // NOI18N
         comboFormato.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status")));
         comboFormato.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status")));
-        comboFormato.getAccessibleContext().setAccessibleName(etiquetaFormato.getText()+" " + Messages.getString("Firma.formato.description") + " ALT + O."); // NOI18N
+        //comboFormato.getAccessibleContext().setAccessibleName(etiquetaFormato.getText()+" " + Messages.getString("Firma.formato.description") + " ALT + O."); // NOI18N
 
         if(GeneralConfig.isAvanzados()) {
             // XAdES Enveloping (Solo en la vista avanzada)
@@ -319,7 +319,7 @@ public class Firma extends JPanel {
         firmar.setMnemonic(KeyEvent.VK_R);
         firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N
         firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
-        firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " + Messages.getString("PrincipalGUI.firmar.description.status"));
+        //firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " + Messages.getString("PrincipalGUI.firmar.description.status"));
         firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
         firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
         firmar.addActionListener(new ActionListener() {

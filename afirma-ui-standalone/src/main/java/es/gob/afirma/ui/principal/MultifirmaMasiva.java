@@ -43,6 +43,8 @@ import es.gob.afirma.ui.wizardmultifirmamasiva.AsistenteMultifirmaMasiva;
 public class MultifirmaMasiva extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	
+	private JCheckBox alerta;
 
 	public MultifirmaMasiva() {
 		initComponents();
@@ -75,7 +77,7 @@ public class MultifirmaMasiva extends JPanel {
 		// Combo con los almacenes / repositorios disponibles
 		final JComboBox comboAlmacen = new JComboBox();
 		comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
-		comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description") + " ALT + A."); // NOI18N
+		//comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description") + " ALT + A."); // NOI18N
 		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
 		comboAlmacen.addAncestorListener(new RequestFocusListener(false));
@@ -112,14 +114,15 @@ public class MultifirmaMasiva extends JPanel {
 		Utils.setFontBold(panelTipos);
 		
 		JPanel panelAlerta = new JPanel(new GridLayout(1,1));
+		panelAlerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones"));
 		// Checkbox alerta sonora
-		final JCheckBox alerta = new JCheckBox();
+		alerta = new JCheckBox();
 		alerta.setSelected(true);
 		alerta.setText(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre")); // NOI18N
 		alerta.setToolTipText(Messages.getString("Ensobrado.check.firmar.description")); // NOI18N
 		alerta.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status")));
 		alerta.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status")));
-		alerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre") +" "+Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
+		//alerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre") +" "+Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
 		alerta.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
 		alerta.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo
 		Utils.remarcar(alerta);
@@ -157,14 +160,14 @@ public class MultifirmaMasiva extends JPanel {
 		firmar.setMnemonic(KeyEvent.VK_R);
 		firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N
 		firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
-		firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " + Messages.getString("PrincipalGUI.firmar.description.status"));
+		//firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " + Messages.getString("PrincipalGUI.firmar.description.status"));
 		firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
 		firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
 		firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
 		firmar.addActionListener(new ActionListener() {
 			@Override
             public void actionPerformed(ActionEvent evt) {
-				firmarActionPerformed(comboAlmacen, alerta);
+				//firmarActionPerformed(comboAlmacen, alerta);
 			}
 		});
 
