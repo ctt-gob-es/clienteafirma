@@ -28,7 +28,7 @@ import es.gob.afirma.ui.utils.Utils;
  *
  */
 public class AccessibilityOptionsPane {
-	
+	 
 	/** Clave para la configuraci&oacute;n de tama&ntilde;o de fuente. */
 	public static final String MAIN_FONT_SIZE = "main.fontSize";
 	
