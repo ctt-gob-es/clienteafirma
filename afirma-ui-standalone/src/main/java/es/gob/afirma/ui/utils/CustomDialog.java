@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -229,17 +230,26 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 0;
         c.gridy = 0;
-        //c.gridwidth = 1;
-        c.insets = new Insets(0,10,0,10);  //right padding
+       /* c.weightx = 0.5;
+        c.weighty = 0.5;*/
+       // c.gridwidth = 1;
+       // c.gridheight = 2;
+        c.insets = new Insets(5,10,0,10);  //right padding
         
         //Icono del diálogo
        setIconLabel(typeMessage);
-       this.mainPanel.add(iconLabel, c);
+
+       JPanel iconPanel = new JPanel(new GridBagLayout());
+      // iconPanel.setBackground(Color.red);
+       iconPanel.add(iconLabel );
+       this.mainPanel.add(iconPanel, c);
 
         c.gridx = 1;
         c.weightx = 1.0;
         c.weighty = 1.0;
         c.gridwidth = 2;
+
+       // c.gridheight = 1;
 	       
         //Etiqueta del diálogo
         if (isInputDialog) {
@@ -253,6 +263,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			//Foco a la etiqueta
 			this.infoLabel.addAncestorListener(new RequestFocusListener());
         }
+
 		//Se añade la etiqueta al panel de información general
 		this.mainPanel.add(this.infoLabel, c);
 
@@ -321,6 +332,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private void createAccessibilityButtonsPanel() {
 		this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
 		
+		//Panel que va a contener los botones de accesibilidad
+		JPanel panel = new JPanel(new GridBagLayout());
+		
 		//Restricciones para el panel de botones
 		GridBagConstraints consButtons = new GridBagConstraints();
 		consButtons.fill = GridBagConstraints.NONE;
@@ -341,7 +355,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 				}
 			});
 
-		accessibilityButtonsPanel.add(maximizePanel, consButtons);
+		panel.add(maximizePanel, consButtons);
 		
 		consButtons.gridx = 1;
 		consButtons.weightx = 0;
@@ -357,8 +371,15 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	    		restaurarActionPerformed();
 			}
 		});
-		accessibilityButtonsPanel.add(restorePanel, consButtons);
 		
+		
+		panel.add(restorePanel, consButtons);
+
+		//Se añade un borde
+		panel.setBorder(BorderFactory.createTitledBorder(""));
+		
+		//Se añade al panel general
+		this.accessibilityButtonsPanel.add(panel);
 		
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized()){
@@ -396,6 +417,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	
 		okPanel.add(this.okButton);
 		this.buttonsPanel.add(okPanel, consButtons);
+		
+		//this.buttonsPanel.setBorder(BorderFactory.createTitledBorder("Main"));
 		
 		this.okButton.addActionListener(this);
 		//Se asigna este botón como botón por defecto de la ventana.
