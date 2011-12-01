@@ -260,12 +260,17 @@ public class ResizingAdaptor extends ComponentAdapter {
 			if(actualComponent instanceof JPanel){
 				Border componentBorder = ((JPanel)actualComponent).getBorder();
 				if(componentBorder instanceof TitledBorder){
-					TitledBorder b = (TitledBorder) componentBorder;
-					float resizeFactor = Math.round(relation / getResizingFactorFrame());
-					if (b.getTitleFont() != null) {
-					    b.setTitleFont(b.getTitleFont().deriveFont((float) (getFontSize()-2 + resizeFactor)));
-					} else {
-					    b.setTitleFont(actualComponent.getFont().deriveFont((float) (getFontSize()-2 + resizeFactor)));
+					//Se comprueba si el panel tiene un nombre asignado
+					String name = actualComponent.getName();
+					//Se hará el resize del título en el caso de que el componente no sea el panel de botones de accesibilidad de los alerts
+					if ((name==null) || ((name!=null) && (!name.equalsIgnoreCase("AccessibilityButtonsPanel")))) {
+						TitledBorder b = (TitledBorder) componentBorder;
+						float resizeFactor = Math.round(relation / getResizingFactorFrame());
+						if (b.getTitleFont() != null) {
+						    b.setTitleFont(b.getTitleFont().deriveFont((float) (getFontSize()-2 + resizeFactor)));
+						} else {
+						    b.setTitleFont(actualComponent.getFont().deriveFont((float) (getFontSize()-2 + resizeFactor)));
+						}
 					}
 				}
 			}
@@ -347,7 +352,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 					} else if (theWindowAbout != null){
 						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}  else if (theCustomDialog != null){
-						resizeFactor = (float) (theCustomDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+						resizeFactor = (float) (theCustomDialog.getHeight() * (Constants.RESIZING_IMAGES_FACTOR + 0.0015));
 					} else if (theFileChooser != null){
 						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else {
@@ -401,6 +406,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 		//Se comprueba si se trata del botón de ayuda
 		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) {
 			imageIcon = HelpUtils.IMAGEICONHELP; //Se carga la imagen original
+		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) {
+			imageIcon = Constants.IMAGEICONMAXIMIZE; //Se carga la imagen original
+		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) {
+			imageIcon = Constants.IMAGEICONRESTORE; //Se carga la imagen original
 		} else {
 			imageIcon = (ImageIcon)button.getIcon(); //Se carga la imagen del componente actual
 		}
