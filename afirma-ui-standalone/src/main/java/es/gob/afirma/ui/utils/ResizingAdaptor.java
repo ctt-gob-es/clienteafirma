@@ -352,7 +352,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 					} else if (theWindowAbout != null){
 						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					}  else if (theCustomDialog != null){
-						resizeFactor = (float) (theCustomDialog.getHeight() * (Constants.RESIZING_IMAGES_FACTOR + 0.0015));
+						resizeFactor = (float) (theCustomDialog.getHeight() * (Constants.RESIZING_IMAGES_FACTOR + 0.0010));
 					} else if (theFileChooser != null){
 						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
 					} else {
