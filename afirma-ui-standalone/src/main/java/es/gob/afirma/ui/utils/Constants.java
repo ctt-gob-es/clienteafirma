@@ -9,6 +9,8 @@
  */
 package es.gob.afirma.ui.utils;
 
+import javax.swing.ImageIcon;
+
 /**
  *	Constantes para contrase&ntilde;as
  */
@@ -187,5 +189,15 @@ public class Constants {
      * Margen a restar para calcular el tamaño de una ventana maximizada para linux.
      */
     public static int maximizeVerticalMarginLinux = 52;
+    
+	 /**
+	 * Variable que almacena el icono original del botón de maximizar.
+	 */
+	public static final ImageIcon IMAGEICONMAXIMIZE = new ImageIcon(Utils.class.getResource("/resources/images/maximize.png"));
+	
+	 /**
+	 * Variable que almacena el icono original del botón de restaurar.
+	 */
+	public static final ImageIcon IMAGEICONRESTORE = new ImageIcon(Utils.class.getResource("/resources/images/restore.png"));
 }
 
