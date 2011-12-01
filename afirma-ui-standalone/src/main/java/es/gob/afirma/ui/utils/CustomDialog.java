@@ -230,7 +230,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 0;
         c.gridy = 0;
-        c.insets = new Insets(5,10,0,10);  //right padding
+        c.insets = new Insets(5,10,0,10);
         
         //Icono del diálogo
        setIconLabel(typeMessage);
@@ -240,6 +240,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
        
        iconPanel.add(iconLabel, consIconPanel);
 
+       c.insets = new Insets(5,0,0,10);  //right padding
        c.gridx = 1;
        c.weightx = 1.0;
        c.weighty = 1.0;
@@ -440,6 +441,10 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
 		
 		this.maximizeButton.setName("maximizar");
+		//Se asigna una dimension por defecto
+		Dimension dimension = new Dimension(20,20);
+		maximizeButton.setPreferredSize(dimension);
+				
 		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
 		maximizePanel.add(this.maximizeButton);
 		
@@ -462,6 +467,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png"));
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
+		
+		this.restoreButton.setPreferredSize(dimension);
 		
 		//this.restoreButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
 		//this.restoreButton.setContentAreaFilled(false); //area del boton invisible
