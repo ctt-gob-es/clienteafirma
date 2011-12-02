@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JToolTip;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -240,7 +241,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
        
        iconPanel.add(iconLabel, consIconPanel);
 
-       c.insets = new Insets(5,0,0,10);  //right padding
+       c.insets = new Insets(0,0,0,10);  //right padding
        c.gridx = 1;
        c.weightx = 1.0;
        c.weighty = 1.0;
@@ -250,14 +251,18 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         	//Se crea una etiqueta sencilla
         	this.infoLabel = new InfoLabel(message);
         	this.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se alinea a la izqda
+        	//this.infoLabel.setVerticalAlignment(JLabel.TOP); //Se alinea arriba el texto
         } else {
         	//Se crea una etiqueta focusable
 			this.infoLabel = new InfoLabel(message, false);
 			this.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 			//Foco a la etiqueta
 			this.infoLabel.addAncestorListener(new RequestFocusListener());
+			//this.infoLabel.setVerticalAlignment(JLabel.TOP); //Se alinea arriba el texto
         }
         
+        //this.infoLabel.setOpaque(true);
+        //this.infoLabel.setBackground(Color.red);
 		//Se añade la etiqueta al panel de información general
 		this.mainPanel.add(this.infoLabel, c);
 
@@ -276,19 +281,20 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         
         cons.gridwidth = 1;
         cons.gridheight = 2;
-        
+
         //Se añade el icono
         container.add(iconPanel, cons);
         
-        cons.weightx = 0.0;
         cons.gridwidth = 2;
         cons.gridheight = 1;
         cons.gridx = 1;
         cons.gridy = 0;
         cons.weighty = 0.0;
+        cons.weightx = 0.0;
         //Se añade el panel de botones relacionados con la accesibilidad
         container.add(this.accessibilityButtonsPanel, cons);
-        
+       // accessibilityButtonsPanel.setBackground(Color.green);
+
         cons.gridwidth = 2;
         cons.gridx = 1;
         cons.gridy = 1;
@@ -297,9 +303,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         
         //se añade el panel de información
         container.add(this.mainPanel, cons);
+        
+        cons.gridx = 0;
         cons.gridy = 2;
-        cons.weighty = 1.0;
+        cons.weighty = 0.5;
         cons.weightx = 1.0;
+        cons.gridwidth = 3;
+        
+        //buttonsPanel.setBackground(Color.green);
         
         //Se añade el panel de botones
         container.add(this.buttonsPanel, cons);
@@ -419,6 +430,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Panel que va a contener los botones de accesibilidad
 		JPanel panel = new JPanel(new GridBagLayout());
 		
+		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		//panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		//panel.setBorder(BorderFactory.createCompoundBorder());
+		//panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+		
 		//Restricciones para los botones
 		GridBagConstraints consButtons = new GridBagConstraints();
 		consButtons.fill = GridBagConstraints.BOTH;
@@ -429,45 +448,17 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		consButtons.insets = new Insets(0,0,0,0);  //right padding
 		//consButtons.anchor=GridBagConstraints.EAST;
 		
-		
-		//Maximize button
-		JPanel maximizePanel = new JPanel();
-
-		ImageIcon imageIconMaximize= new ImageIcon(CustomDialog.class.getResource("/resources/images/maximize.png"));
-		this.maximizeButton = new JButton(imageIconMaximize);
-		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
-
-		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
-		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
-		
-		this.maximizeButton.setName("maximizar");
-		//Se asigna una dimension por defecto
-		Dimension dimension = new Dimension(20,20);
-		maximizeButton.setPreferredSize(dimension);
-				
-		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
-		maximizePanel.add(this.maximizeButton);
-		
-		this.maximizeButton.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
-		    		maximizarActionPerformed();
-				}
-			});
-
-		
-		panel.add(maximizePanel, consButtons);
-		
-		consButtons.gridx = 1;
-		//consButtons.weightx = 0.5;
-		consButtons.insets = new Insets(0,0,0,5);  //right padding
-
 		//Restore button
 		JPanel restorePanel = new JPanel();
 		//this.restoreButton = getButton("r", KeyEvent.VK_R );
 		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png"));
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
+		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
+		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
 		
+		
+		Dimension dimension = new Dimension(20,20);
 		this.restoreButton.setPreferredSize(dimension);
 		
 		//this.restoreButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
@@ -482,6 +473,56 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		
 		panel.add(restorePanel, consButtons);
+		
+		
+		consButtons.gridx = 1;
+		//consButtons.weightx = 0.5;
+		consButtons.insets = new Insets(0,0,0,0);  //right padding
+		
+		//Maximize button
+		JPanel maximizePanel = new JPanel();
+
+		ImageIcon imageIconMaximize= new ImageIcon(CustomDialog.class.getResource("/resources/images/maximize.png"));
+		this.maximizeButton = new JButton(imageIconMaximize);
+		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
+		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description"));
+		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
+
+		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
+		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
+		
+		this.maximizeButton.setName("maximizar");
+		//Se asigna una dimension por defecto
+		this.maximizeButton.setPreferredSize(dimension);
+				
+		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
+		maximizePanel.add(this.maximizeButton);
+		
+		JToolTip tooltip = maximizeButton.createToolTip();
+		tooltip.setTipText(Messages.getString("Wizard.maximizar"));
+		tooltip.setVisible(true);
+		
+		
+		/*this.maximizeButton.addFocusListener(new FocusListener() {
+			public void focusLost(FocusEvent e) {
+				
+				ToolTipManager.sharedInstance().registerComponent(this);
+				ToolTipManager.sharedInstance().setInitialDelay(0) ;
+			}
+			public void focusGained(FocusEvent e) {
+				//Se muestra un borde en el botón cuando este tiene el foco
+				botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
+			}
+		});*/
+		
+		this.maximizeButton.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		maximizarActionPerformed();
+				}
+			});
+
+		
+		panel.add(maximizePanel, consButtons);
 
 		//Se añade al panel general
 		//Restricciones para el panel de botones
@@ -491,6 +532,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.gridy = 0;
 		c.weightx = 1.0;
 		c.weighty = 1.0;
+		//c.insets = new Insets(3,3,0,3);
+		c.insets = new Insets(0,0,0,0); 
 		c.anchor=GridBagConstraints.EAST;
 		this.accessibilityButtonsPanel.add(panel, c);
 		
@@ -650,7 +693,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.weightx = 0.0;
         c.weighty = 0.5;
         c.gridwidth = 2;
-        c.insets = new Insets(10,10,0,10);  //right padding
+        c.insets = new Insets(10,0,0,10);  //right padding
         
         //campo de texto del diálogo
         customDialog.component = new JTextField("");
@@ -725,7 +768,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.weightx = 0.0;
 		c.weighty = 0.5;
         c.gridwidth = 2;
-        c.insets = new Insets(0,10,0,10);  //right padding
+        c.insets = new Insets(0,0,0,10);  //right padding
         
         //campo de texto del diálogo
         customDialog.component = new JComboBox(selectionValues);
@@ -929,7 +972,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.weighty = 0.5;
         //c.weighty = 0.0;
         c.gridwidth = 2;
-        c.insets = new Insets(10,10,0,10);  //right padding
+        c.insets = new Insets(10,0,0,10);  //right padding
         
         //campo de password del diálogo
         customDialog.component = new JPasswordField("");
@@ -978,6 +1021,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 					//Se oculta la contraseña
 					((JPasswordField)customDialog.component).setEchoChar(defaultChar);
 				}
+				
+				//Foco al input
+				customDialog.component.requestFocus();
 			}
 		});
 		Utils.remarcar(showPassCheckBox);
@@ -986,7 +1032,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		panelCheckShowPass.add(showPassCheckBox);
 		
 		//Restricciones para el check
-		c.insets = new Insets(0,10,0,10);  //right padding
+		c.insets = new Insets(0,0,0,10);  //right padding
 		c.gridy = 2;
 
 		//Se añade el check al panel de información general
