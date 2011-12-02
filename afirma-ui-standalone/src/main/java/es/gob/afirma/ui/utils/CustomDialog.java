@@ -251,14 +251,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         	//Se crea una etiqueta sencilla
         	this.infoLabel = new InfoLabel(message);
         	this.infoLabel.setHorizontalAlignment(JLabel.LEFT); //Se alinea a la izqda
-        	//this.infoLabel.setVerticalAlignment(JLabel.TOP); //Se alinea arriba el texto
+        	this.infoLabel.setVerticalAlignment(JLabel.TOP); //Se alinea arriba el texto
         } else {
         	//Se crea una etiqueta focusable
 			this.infoLabel = new InfoLabel(message, false);
 			this.infoLabel.setHorizontalAlignment(JLabel.CENTER); //Se centra el texto
 			//Foco a la etiqueta
 			this.infoLabel.addAncestorListener(new RequestFocusListener());
-			//this.infoLabel.setVerticalAlignment(JLabel.TOP); //Se alinea arriba el texto
+			this.infoLabel.setVerticalAlignment(JLabel.TOP); //Se alinea arriba el texto
         }
         
         //this.infoLabel.setOpaque(true);
