@@ -9,6 +9,7 @@
  */
 package es.gob.afirma.ui.utils;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -17,6 +18,8 @@ import java.io.Serializable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+
+import es.gob.afirma.ui.principal.Main;
 
 /**
  * 
@@ -73,6 +76,9 @@ import javax.swing.JLabel;
 			 //Se pone el texto en estilo normal
 			 lb.setFont(new Font(lb.getFont().getName(),Font.PLAIN, lb.getFont().getSize()));
 		 }
+		 if (Main.isOSHighContrast){
+			 lb.setForeground(Color.WHITE);
+	     }	        
 		 lb.setText(status);
 	 }
 

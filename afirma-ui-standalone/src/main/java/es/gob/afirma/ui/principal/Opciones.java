@@ -22,6 +22,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Properties;
 
 import javax.swing.JButton;
@@ -276,7 +279,7 @@ public class Opciones extends JAccessibilityDialog {
         
         this.contextOptions =  new ContextOptionsPane();
         
-        this.mainPanel.addTab(Messages.getString("Opciones.contextoFirma"),
+        this.mainPanel.addTab (Messages.getString("Opciones.contextoFirma"),
         		null,
         		this.contextOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.contexto"));
@@ -317,6 +320,119 @@ public class Opciones extends JAccessibilityDialog {
         	aplicar = false;
         }
 
+        this.mainPanel.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				int index = ((JTabbedPane)e.getSource()).getSelectedIndex();
+				switch (index) {
+				case 0:
+					HelpUtils.visualize("opciones.configuracion");
+					break;
+				case 1:
+					//HelpUtils.visualize("");
+					break;
+				case 2:
+					HelpUtils.visualize("opciones.accesibilidad");
+					break;
+				case 3:
+					//HelpUtils.visualize("");
+					break;
+				default:
+					break;
+				}
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+        
+        this.mainPanel.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if (e.getKeyCode()==KeyEvent.VK_RIGHT){
+					int index = ((JTabbedPane)e.getSource()).getSelectedIndex();
+					index++;
+					if (index==4){
+						index=0;
+					}
+					switch (index) {
+					case 0:
+						HelpUtils.visualize("opciones.configuracion");
+						break;
+					case 1:
+						//HelpUtils.visualize("");
+						break;
+					case 2:
+						HelpUtils.visualize("opciones.accesibilidad");
+						break;
+					case 3:
+						//HelpUtils.visualize("");
+						break;
+					default:
+						break;
+					}
+				} else if(e.getKeyCode()==KeyEvent.VK_LEFT){
+					int index = ((JTabbedPane)e.getSource()).getSelectedIndex();
+					index--;
+					if (index==-1){
+						index=3;
+					}
+					switch (index) {
+					case 0:
+						HelpUtils.visualize("opciones.configuracion");
+						break;
+					case 1:
+						//HelpUtils.visualize("");
+						break;
+					case 2:
+						HelpUtils.visualize("opciones.accesibilidad");
+						break;
+					case 3:
+						//HelpUtils.visualize("");
+						break;
+					default:
+						break;
+					}
+				}
+			}
+		});
         c.weighty = 0.1;
         c.fill = GridBagConstraints.BOTH;
         getContentPane().add(this.mainPanel, c);

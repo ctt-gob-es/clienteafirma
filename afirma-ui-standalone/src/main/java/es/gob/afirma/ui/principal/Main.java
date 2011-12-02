@@ -34,7 +34,12 @@ public class Main {
 	
 	/** Preferencias generales establecidas para el aplicativo. */
     public static Preferences preferences = Preferences.userRoot().node(Constants.ourNodeName);
+    
+    /** Indica si el SO tiene activado el alto contraste con color negro de fondo */
+    public static boolean isOSHighContrast = false;
 	
+    public static boolean showHelp = false;
+    
     /**
      * Arranca la interfaz de escritorio del Cliente @firma.
      * @param args Par&aacute;metros de entrada.

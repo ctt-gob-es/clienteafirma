@@ -18,6 +18,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import es.gob.afirma.signature.SignValidity;
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.Messages;
@@ -79,7 +80,7 @@ final class SignResultPanel extends JPanel {
         switch (validity.getValidity()) {
             case GENERATED:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.2")); //$NON-NLS-1$
-                if (GeneralConfig.isHighContrast()){
+                if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.25")); //$NON-NLS-1$
                 	this.descTextLabel.getAccessibleContext().setAccessibleName(resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.3_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
                 } else {
@@ -90,7 +91,7 @@ final class SignResultPanel extends JPanel {
                 break;
             case OK:
                 this.resultTextLabel.setText(Messages.getString("SignResultPanel.8")); //$NON-NLS-1$
-                if (GeneralConfig.isHighContrast()){
+                if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
                 	this.descTextLabel.setText(Messages.getString("SignResultPanel.24")); //$NON-NLS-1$
                 	this.descTextLabel.getAccessibleContext().setAccessibleName(resultTextLabel.getText()+". "+Messages.getString("SignResultPanel.9_Lector_pantalla") +". "+ Messages.getString("SignResultPanel.enter_link"));
                 } else {
@@ -117,7 +118,7 @@ final class SignResultPanel extends JPanel {
                 else {
                     errorMessage = Messages.getString("SignResultPanel.6"); //$NON-NLS-1$
                 }
-                if (GeneralConfig.isHighContrast()){
+                if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
                 	this.descTextLabel.setText("<html><p style=\"color:#FFFFFF\">" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
                 } else {
                 	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -136,7 +137,7 @@ final class SignResultPanel extends JPanel {
                 else {
                     errorMessage = Messages.getString("SignResultPanel.12"); //$NON-NLS-1$
                 }
-                if (GeneralConfig.isHighContrast()){
+                if (GeneralConfig.isHighContrast() || Main.isOSHighContrast){
                 	this.descTextLabel.setText("<html><p style=\"color:#FFFFFF\">" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$
                 } else {
                 	this.descTextLabel.setText("<html><p>" + errorMessage + "</p></html>"); //$NON-NLS-1$ //$NON-NLS-2$

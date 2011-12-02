@@ -4,6 +4,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -15,6 +17,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
+import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityFrame;
 
 /**
@@ -126,7 +129,15 @@ public class HorizontalTabbedPanel extends JPanel {
         //panel.setBounds(5, 5, 30, 30);
         
         button.addItemListener(new SelectButtonListener(panel, this.contentsPanel));
-        
+        button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				//System.out.println(button.getName());
+				HelpUtils.visualize(button.getName());
+			}
+		});
         if (this.firstButton) {
             button.doClick();
             this.firstButton = false;

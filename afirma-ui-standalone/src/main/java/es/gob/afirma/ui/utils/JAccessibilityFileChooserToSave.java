@@ -86,24 +86,24 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	 }//constructor
 
 	private void init(){
-		//Se comprueba si se está en el modo Alto contraste
+		//Se comprueba si se esta en el modo Alto contraste
 		if (GeneralConfig.isHighContrast()){
 			setHighContrast((Container)this);
 		}
 		
-		//Asignaci�n de mnemonics
+		//Asignacion de mnemonics
 		
 		//Etiqueta buscar en ...
 		setLabelMnemonics((Container)this, "FileChooser.lookInLabelText", KeyEvent.VK_B);
 		
-		//Bot�n Cancelar
+		//Boton Cancelar
 		setButtonMnemonics((Container)this, "FileChooser.cancelButtonText", KeyEvent.VK_C);
 		
-		//Bot�n Abrir
+		//Boton Abrir
 		setButtonMnemonics((Container)this, "FileChooser.openButtonText", KeyEvent.VK_A);
 		
 		//Toggle buttons
-		//TODO: Revisar puesto que los botones que se hacen accesibles est�n predefinidos
+		//TODO: Revisar puesto que los botones que se hacen accesibles estan predefinidos
 		setToggleButtonMnemonics((Container)this);
 	}
 	
@@ -131,22 +131,22 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	}
 	
 	/**
-	 * Asigna el mnem�nico indicado al bot�n identificado por la clave .
+	 * Asigna el mnem&oacute;nico indicado al bot&oacute;n identificado por la clave .
 	 * @param c contenedor global
-	 * @param key clave del componente al que se le va a asignar el mnem�nico.
-	 * @param mnemonic mnem�nico que se va a asignar al componente
+	 * @param key clave del componente al que se le va a asignar el mnem&oacute;nico.
+	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
 	 */
 	public void setButtonMnemonics( Container c, String key, int mnemonic ) {
-	    int len = c.getComponentCount(); //N�mero de componentes del contenedor
+	    int len = c.getComponentCount(); //Numero de componentes del contenedor
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
 	      Component comp = c.getComponent(i); //Se obtiene un componente
-	      //Se comprueba si es de tipo bot�n
+	      //Se comprueba si es de tipo boton
 	      if (comp instanceof JButton) {
 		        JButton button = (JButton)comp;
 		        //Se comprueba si su texto es el indicado por la clave
 		        if (button.getText() ==  UIManager.get(key)) {
-		        	//Se le asigna el mnem�nico
+		        	//Se le asigna el mnemonico
 		        	button.setMnemonic(mnemonic);
 		        }
 		    } else if (comp instanceof Container) {
@@ -159,11 +159,11 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	/**
 	 * Asigna el mnem�nico indicado a la etiqueta identificada por la clave .
 	 * @param c contenedor global
-	 * @param key clave del componente al que se le va a asignar el mnem�nico.
-	 * @param mnemonic mnem�nico que se va a asignar al componente
+	 * @param key clave del componente al que se le va a asignar el mnem&oacute;nico.
+	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
 	 */
 	public void setLabelMnemonics( Container c, String key, int mnemonic ) {
-		 //Número de componentes del contenedor
+		 //Numero de componentes del contenedor
 	    int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
@@ -184,11 +184,11 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	  }
 	
 	/**
-	 * Asigna un mnem�nico predefinido a ciertos toggleButton contenidos en el componente.
+	 * Asigna un mnem&oacute;nico predefinido a ciertos toggleButton contenidos en el componente.
 	 * @param c contenedor global
 	 */
 	public void setToggleButtonMnemonics( Container c) {
-		 //N�mero de componentes del contenedor
+		 //Numero de componentes del contenedor
 	    int len = c.getComponentCount();
 	  //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
@@ -198,42 +198,42 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 		    	JToggleButton toggleButton = (JToggleButton) comp;
 		    	 //Se almacena su texto asociado
 		    	String text = toggleButton.getText();
-		    	//Se comprueba que no est� vac�o
+		    	//Se comprueba que no esta vacio
 		    	if (text!=null && !text.equalsIgnoreCase("")) {
 		    		
-		    		//Se tratan los botones seg�n su texto
+		    		//Se tratan los botones segun su texto
 			    	if (text.equalsIgnoreCase("<html><center>Equipo</center></html>")) {
-			    		//Se asigna un mnem�nico predefinido
+			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_E);
-			    		//Como el texto del bot�n contiene c�digo HTML se hace lo siguiente para que se muestre el mnem�nico al usuario
+			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
 			    		String newText = text.substring(0, 14) +"<u>"+text.charAt(14)+"</u>"+text.substring(15);
 			    		toggleButton.setText(newText);
 			    		
 			    	} else if (text.equalsIgnoreCase("<html><center>Elementos recientes</center></html>")) {
-			    		//Se asigna un mnem�nico predefinido
+			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_L);
-			    		//Como el texto del bot�n contiene c�digo HTML se hace lo siguiente para que se muestre el mnem�nico al usuario
+			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
 			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
 			    		toggleButton.setText(newText);
 			    		
 			    	} else if (text.equalsIgnoreCase("<html><center>Escritorio</center></html>")) {
-			    		//Se asigna un mnem�nico predefinido
+			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_S);
-			    		//Como el texto del bot�n contiene c�digo HTML se hace lo siguiente para que se muestre el mnem�nico al usuario
+			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
 			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
 			    		toggleButton.setText(newText);
 			    		
 			    	} else if (text.equalsIgnoreCase("<html><center>Mis documentos</center></html>")) {
-			    		//Se asigna un mnem�nico predefinido
+			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_I);
-			    		//Como el texto del bot�n contiene c�digo HTML se hace lo siguiente para que se muestre el mnem�nico al usuario
+			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
 			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
 			    		toggleButton.setText(newText);
 
 			    	} else if (text.equalsIgnoreCase("<html><center>Red</center></html>")) {
-			    		//Se asigna un mnem�nico predefinido
+			    		//Se asigna un mnemonico predefinido
 			    		toggleButton.setMnemonic(KeyEvent.VK_R);
-			    		//Como el texto del bot�n contiene c�digo HTML se hace lo siguiente para que se muestre el mnem�nico al usuario
+			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
 			    		String newText = text.substring(0, 14) +"<u>"+text.charAt(14)+"</u>"+text.substring(15);
 			    		toggleButton.setText(newText);
 			    	}
@@ -249,7 +249,7 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	 * @param c contenedor global
 	 */
 	public void setHighContrast(Container c) {
-		 //N�mero de componentes del contenedor
+		 //Numero de componentes del contenedor
 	    int len = c.getComponentCount();
 	    //Se recorren los elementos que forman el contenedor
 	    for (int i = 0; i < len; i++) {
@@ -303,10 +303,10 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
         
         Container contentPane = dialog.getContentPane();
         
-        if (!GeneralConfig.isAccessibility()){
-        	contentPane.setLayout(new GridLayout());
-        	contentPane.add(this , BorderLayout.CENTER);
-        } else {
+//        if (!GeneralConfig.isAccessibility()){
+//        	contentPane.setLayout(new GridLayout());
+//        	contentPane.add(this , BorderLayout.CENTER);
+//        } else {
         	removeWindowsToolBar();
         	contentPane.setLayout(new GridLayout());
         	
@@ -420,7 +420,7 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
             }
             
             contentPane.add(this , BorderLayout.CENTER);
-        }
+//        }
         
         if (JDialog.isDefaultLookAndFeelDecorated()) {
             boolean supportsWindowDecorations = UIManager
@@ -434,11 +434,11 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
         dialog.pack();
         dialog.setLocationRelativeTo(parent);
         
-        if (GeneralConfig.isAccessibility()) {
+//        if (GeneralConfig.isAccessibility()) {
         	resizingAdaptor = new ResizingAdaptor(null,null,null,null,null,null,null,this);
         	this.theDialog = dialog;
      		dialog.addComponentListener(resizingAdaptor);
-        }
+//        }
         
         return dialog;
 	}
@@ -470,6 +470,7 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 			} else {
 				Utils.remarcar((JComponent)jPanel.getComponent(i));
 				Utils.setFontBold((JComponent)jPanel.getComponent(i));
+				Utils.setContrastColor((JComponent)jPanel.getComponent(i));
 			}
 		}
 	}

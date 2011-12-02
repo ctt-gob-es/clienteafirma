@@ -15,7 +15,6 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
 import es.gob.afirma.ui.principal.ContextOptionsPane;
 import es.gob.afirma.ui.principal.MainOptionsPane;
-import es.gob.afirma.ui.principal.UserProfile;
 
 /**
  * Configuraci&oacute;n global de la aplicaci&oacute;n.
@@ -103,9 +102,9 @@ public class GeneralConfig {
 	 * Indica si el ususario ha activado o desactivado la opcion de desactivar accesibilidad en ventanas de seleci&oacute;n de archivos
 	 * @return boolean Indicando el estado de la opcion
 	 */
-	public static boolean isAccessibility() {
-		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true")); //$NON-NLS-1$
-	}
+//	public static boolean isAccessibility() {
+//		return Boolean.parseBoolean(configOptions.getProperty(AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true")); //$NON-NLS-1$
+//	}
 	
 	/**
 	 * Indica si el ususario ha activado o desactivado la opcion de cursor de texto grande

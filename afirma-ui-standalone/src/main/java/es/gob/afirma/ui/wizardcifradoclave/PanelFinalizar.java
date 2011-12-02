@@ -18,6 +18,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -62,6 +63,10 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
     	
     	// Panel con la imagen lateral
         ImagenLateral panelIzdo = new ImagenLateral();
+        if (Main.isOSHighContrast){
+        	panelIzdo.setOpaque(false);
+        }
+        Utils.setContrastColor(panelIzdo);
         getContentPane().add(panelIzdo, BorderLayout.WEST);
     	
         GridBagConstraints c = new GridBagConstraints();
@@ -76,6 +81,10 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
     	// Panel central
         JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
+        // si el color de fondo ya no es blanco
+        if (Main.isOSHighContrast){
+        	panelCentral.setOpaque(false);
+        }
         panelCentral.setLayout(new GridBagLayout());
         Utils.setContrastColor(panelCentral);
         Utils.setFontBold(panelCentral);

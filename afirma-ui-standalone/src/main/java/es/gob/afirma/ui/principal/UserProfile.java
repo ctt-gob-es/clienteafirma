@@ -79,12 +79,17 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	public UserProfile() {
 		super();
 		initComponents();
+		HelpUtils.visualize("perfiles.usuario");
 	}
 	
 	/**
 	 * Inicializacion de los componentes
 	 */
 	private void initComponents() {
+		
+		if (getBackground().getRGB()==-16777216){
+			Main.isOSHighContrast = true;			
+		}
 		
 		// Dimensiones de la ventana
 		setBounds(this.getInitialX(), this.getInitialY(), Constants.INIT_WINDOW_INITIAL_WIDTH, Constants.INIT_WINDOW_INITIAL_HEIGHT);

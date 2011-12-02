@@ -20,6 +20,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
@@ -89,6 +90,10 @@ public class CabeceraAsistente extends JPanel {
     private void initComponents() {
     	// Configuracion de la ventana
     	setBackground(Color.WHITE);
+    	// si el color de fondo ya no es blanco
+        if (Main.isOSHighContrast){
+        	setOpaque(false);
+        }
     	setPreferredSize(this.dimensiones);
         setBorder(BorderFactory.createEtchedBorder());
         setLayout(new GridBagLayout());

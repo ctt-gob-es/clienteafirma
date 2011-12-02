@@ -9,7 +9,6 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsEnvironment;
@@ -203,6 +202,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Inicializacion de los componentes
 	 */
 	private void initComponents() {
+		if (getBackground().getRGB()==-16777216){
+			Main.isOSHighContrast = true;			
+		}
 		// Dimensiones de la ventana
 		setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
 		// Parametros ventana
@@ -427,6 +429,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Seleccion menu opciones: Muestra la ventana modal con las opciones
 	 */
 	private void opcionesActionPerformed() {
+		HelpUtils.visualize("opciones.configuracion");
 		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, aplicar);
 		ventanaOpciones.setModal(true);
 		ventanaOpciones.setVisible(true);
@@ -540,6 +543,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonFirma.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
+        buttonFirma.setName("firma");
         JPanel panelFirma = new Firma();
         this.htPanel.addTab(buttonFirma, panelFirma);
 	    
@@ -556,6 +560,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonMultifirma.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
+        buttonMultifirma.setName("multifirma");
         JPanel panelMultifirmaSimple = new MultifirmaSimple();
         this.htPanel.addTab(buttonMultifirma, panelMultifirmaSimple);
 	    
@@ -574,6 +579,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         
         buttonMultifirmaMasiva.setEnabled(GeneralConfig.isAvanzados());
+        buttonMultifirmaMasiva.setName("firma.masiva");
         if (buttonMultifirmaMasiva.isEnabled()) {
             buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
         }
@@ -594,6 +600,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonValidacion.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
+        buttonValidacion.setName("validacion");        
         JPanel panelValidacion = new Validacion();
         this.htPanel.addTab(buttonValidacion, panelValidacion);
 
@@ -610,6 +617,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonCifrado.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " +  //$NON-NLS-1$  //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
+        buttonCifrado.setName("cifrado");
         JPanel panelCifrado = new Cifrado();
         this.htPanel.addTab(buttonCifrado, panelCifrado);
 
@@ -626,6 +634,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonDescifrado.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
+        buttonDescifrado.setName("descifrado");
         JPanel panelDescifrado = new Descifrado();
         this.htPanel.addTab(buttonDescifrado, panelDescifrado);
 
@@ -647,7 +656,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         if (buttonEnsobrado.isEnabled()) {
             buttonEnsobrado.setMnemonic(KeyEvent.VK_B);    
         }
-        
+        buttonEnsobrado.setName("ensobrado");
         JPanel panelEnsobrado = new Ensobrado();
         this.htPanel.addTab(buttonEnsobrado, panelEnsobrado);
 
@@ -670,7 +679,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         if (buttonDesensobrado.isEnabled()) {
             buttonDesensobrado.setMnemonic(KeyEvent.VK_N);    
         }
-        
+        buttonDesensobrado.setName("desensobrado");
         JPanel panelDesensobrado = new Desensobrado();
         this.htPanel.addTab(buttonDesensobrado, panelDesensobrado);
         
@@ -804,13 +813,13 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				//set Metal look and feel
 				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 
-				UIManager.put("OptionPane.messageForeground",Color.WHITE);
-				UIManager.put("Button.foreground",Color.WHITE);
-				UIManager.put("ToolTip.foreground",Color.WHITE);
-				UIManager.put("ToolTip.background",Color.BLACK);
-				UIManager.put("Label.foreground",Color.WHITE);
+//				UIManager.put("OptionPane.messageForeground",Color.WHITE);
+//				UIManager.put("Button.foreground",Color.WHITE);
+//				UIManager.put("ToolTip.foreground",Color.WHITE);
+//				UIManager.put("ToolTip.background",Color.BLACK);
+//				UIManager.put("Label.foreground",Color.WHITE);
 				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI");
-				UIManager.put("TableHeader.foreground", Color.WHITE);
+//				UIManager.put("TableHeader.foreground", Color.WHITE);
 				
 
 			} else {
@@ -824,13 +833,13 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				//Se asigna el lookAndFeel que habia por defecto
 				UIManager.setLookAndFeel(defaultLookAndFeel);
 				
-				UIManager.put("OptionPane.messageForeground",Color.BLACK);
-				UIManager.put("Button.foreground",Color.BLACK);
-				UIManager.put("ToolTip.foreground",Color.BLACK);
-				UIManager.put("ToolTip.background",new Color(255,255,225));
-				UIManager.put("Label.foreground",Color.BLACK);
+//				UIManager.put("OptionPane.messageForeground",Color.BLACK);
+//				UIManager.put("Button.foreground",Color.BLACK);
+//				UIManager.put("ToolTip.foreground",Color.BLACK);
+//				UIManager.put("ToolTip.background",new Color(255,255,225));
+//				UIManager.put("Label.foreground",Color.BLACK);
 				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI");
-				UIManager.put("TableHeader.foreground", Color.BLACK);
+//				UIManager.put("TableHeader.foreground", Color.BLACK);
 			}
 			
 		} catch (ClassNotFoundException e1) {

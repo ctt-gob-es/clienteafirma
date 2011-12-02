@@ -57,7 +57,7 @@ public class ProfileManager {
 	
 	private static final String ACCESIBILITY_PREFIX_KEY = ".accesibility."; //$NON-NLS-1$
 	
-	private static final String KEY_ACCESIBILITY_WINDOWS_ACTIVE = ACCESIBILITY_PREFIX_KEY + "active"; //$NON-NLS-1$
+//	private static final String KEY_ACCESIBILITY_WINDOWS_ACTIVE = ACCESIBILITY_PREFIX_KEY + "active"; //$NON-NLS-1$
 	
 	private static final String KEY_ACCESIBILITY_FONT_BIG = ACCESIBILITY_PREFIX_KEY + "fontBig"; //$NON-NLS-1$
 	
@@ -89,7 +89,7 @@ public class ProfileManager {
 		{KEY_CONTEXT_SUBJECT, ContextOptionsPane.KEY_SUBJECT, ""}, //$NON-NLS-1$
 		{KEY_CONTEXT_PLACE, ContextOptionsPane.KEY_PRODUCTION_PLACE, ""}, //$NON-NLS-1$
 		{KEY_CONTEXT_CONTACT, ContextOptionsPane.KEY_CONTACT_INFO, ""}, //$NON-NLS-1$
-		{KEY_ACCESIBILITY_WINDOWS_ACTIVE, AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true"}, //$NON-NLS-1$
+//		{KEY_ACCESIBILITY_WINDOWS_ACTIVE, AccessibilityOptionsPane.MAIN_WINDOWS_ACCESSIBILITY, "true"}, //$NON-NLS-1$
 		{KEY_ACCESIBILITY_CURSOR, AccessibilityOptionsPane.MAIN_CURSOR_SIZE, "false"}, //$NON-NLS-1$
 		{KEY_ACCESIBILITY_FOCUS, AccessibilityOptionsPane.MAIN_FOCUS_VISIBLE, "false"}, //$NON-NLS-1$
 		{KEY_ACCESIBILITY_FONT_BIG, AccessibilityOptionsPane.MAIN_FONT_SIZE, "false"}, //$NON-NLS-1$
