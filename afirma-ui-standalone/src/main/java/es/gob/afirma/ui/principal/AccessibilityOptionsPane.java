@@ -481,6 +481,7 @@ public class AccessibilityOptionsPane {
 	    	//aplicamos los cambios a la pantalla principal
 			this.mainGui.crearPaneles();
 			this.mainGui.generarMenuHerramientas();
+			this.mainGui.generarMenuAccesibilidad();
 			this.mainGui.generarMenuAyuda();
 			
 			//aplicamos los cambios a la pantalla de opciones

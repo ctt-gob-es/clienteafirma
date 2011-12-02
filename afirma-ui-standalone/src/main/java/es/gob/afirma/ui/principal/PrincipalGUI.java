@@ -22,6 +22,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.net.URL;
 import java.security.Provider;
@@ -131,6 +134,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	private boolean aplicar = false;
 	
+	private boolean accesibilidad = false;
+	
 	public void setAplicar(boolean aplicar){
 		this.aplicar = aplicar;
 	}
@@ -224,6 +229,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		menu = new JMenuBar();
 		// Menu de herramientas
 		generarMenuHerramientas();
+		// Menu accesibilidad
+		generarMenuAccesibilidad();
 		// Menu de ayuda
 		generarMenuAyuda();	
 		
@@ -379,6 +386,83 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		return herramientas;
 	}
 	
+	public JMenu generarMenuAccesibilidad(){
+		// Opcion del menu principal - Accesibilidad
+		JMenu accesibilidad = new JMenu();
+		accesibilidad.setMnemonic(KeyEvent.VK_L);
+		accesibilidad.setText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N
+		accesibilidad.setToolTipText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N
+		accesibilidad.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				HelpUtils.visualize("opciones.accesibilidad");
+				Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, true, true);
+				ventanaOpciones.setModal(true);
+				ventanaOpciones.setVisible(true);
+				setAplicar(false);
+			}
+		});
+		accesibilidad.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if (e.getKeyCode()==KeyEvent.VK_ENTER || e.getKeyCode()==KeyEvent.VK_SPACE){
+					
+					HelpUtils.visualize("opciones.accesibilidad");
+					Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, true, true);
+					ventanaOpciones.setModal(true);
+					ventanaOpciones.setVisible(true);
+					setAplicar(false);
+				}
+			}
+		});
+		Utils.setContrastColor(accesibilidad);
+		Utils.setFontBold(accesibilidad);
+		Utils.remarcar(accesibilidad);
+		menu.add(accesibilidad);
+		this.callResize();
+		return accesibilidad;
+	}
+	
 	/**
 	 * Genera el menu de ayuda con las opciones Ayuda, Acerca de.
 	 * @return	Menu de ayuda
@@ -430,7 +514,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 */
 	private void opcionesActionPerformed() {
 		HelpUtils.visualize("opciones.configuracion");
-		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, aplicar);
+		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, aplicar, accesibilidad);
 		ventanaOpciones.setModal(true);
 		ventanaOpciones.setVisible(true);
 		setAplicar(false);

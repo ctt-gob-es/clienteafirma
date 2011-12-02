@@ -88,6 +88,8 @@ public class Opciones extends JAccessibilityDialog {
     
     private boolean aplicar = false;
     
+    private boolean accesibilidad = false;
+    
     private JButton aceptar = new JButton();
     
     public MainOptionsPane getMainOptions(){
@@ -117,10 +119,11 @@ public class Opciones extends JAccessibilityDialog {
      * Constructor.
      * @param mainGUI ventana padre
      */
-    public Opciones(PrincipalGUI mainGUI, boolean aplicar) {
+    public Opciones(PrincipalGUI mainGUI, boolean aplicar, boolean accesibilidad) {
     	super(mainGUI);
     	this.mainGui = mainGUI;
     	this.aplicar = aplicar;
+    	this.accesibilidad = accesibilidad;
         initComponents();
     }
 
@@ -316,8 +319,12 @@ public class Opciones extends JAccessibilityDialog {
         
         if (aplicar){
         	this.mainPanel.setSelectedIndex(2);
-        	this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));        	
+        	if (!accesibilidad){
+        		this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));
+        	}
+        	HelpUtils.visualize("opciones.accesibilidad");
         	aplicar = false;
+        	accesibilidad = false;
         }
 
         this.mainPanel.addMouseListener(new MouseListener() {
@@ -605,6 +612,7 @@ public class Opciones extends JAccessibilityDialog {
     		update = false;
     		this.mainGui.crearPaneles();
     		this.mainGui.generarMenuHerramientas();
+    		this.mainGui.generarMenuAccesibilidad();
     		this.mainGui.generarMenuAyuda();
     	}
     	
