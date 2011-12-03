@@ -255,16 +255,6 @@ interface MiniAfirma {
     String getEcoJava();
     
     /**
-     * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
-     * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
-     * descripci&oacute;n del problema.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws InvalidExternalLibraryException Cuando se encuentra alguna incopatibilidad en el entorno de
-     * ejecuci&oacute;n.
-     */
-    void verifyPlatform() throws PrivilegedActionException;
-    
-    /**
      * Recupera el error producido durante la &uacute;ltima operaci&oacute;n
      * realizada por el applet. El texto obtenido consiste en la cadena de
      * excepciones cualificadas que produjeron el error, separadas por la cadena ": "
