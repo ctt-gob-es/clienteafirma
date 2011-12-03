@@ -398,23 +398,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
-	public void verifyPlatform() throws PrivilegedActionException {
-		this.cleanErrorMessage();
-		try {
-            AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
-        }
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-	}
-
-	/** {@inheritDoc} */
 	public String getEcoJava() { 
 		return AccessController.doPrivileged(new GetEcoJavaVersionAction()).toString();
 	} 
 	
-
 	@Override
 	public void init() {
 		this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
