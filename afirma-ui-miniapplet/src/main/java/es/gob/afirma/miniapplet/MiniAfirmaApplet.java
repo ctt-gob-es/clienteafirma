@@ -397,11 +397,6 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		return Base64.encodeBytes(plainText.getBytes());
 	}
 
-	/** {@inheritDoc} */
-	public String getEcoJava() { 
-		return AccessController.doPrivileged(new GetEcoJavaVersionAction()).toString();
-	} 
-	
 	@Override
 	public void init() {
 		this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
