@@ -256,6 +256,7 @@ public final class AOPDFSigner implements AOSigner {
             throw e;
         }
         catch (final Exception e) {
+            e.printStackTrace();
             throw new AOException("Error firmando el PDF: " + e, e); //$NON-NLS-1$
         }
     }
@@ -1132,6 +1133,11 @@ public final class AOPDFSigner implements AOSigner {
         // ********************************************************************************
 
         final byte[] outc = new byte[CSIZE];
+        if (outc.length < pk.length) {
+            throw new AOException(
+              "La firma generada tiene un tamano (" + pk.length + ") mayor que el permitido (" + outc.length + ")"
+            );
+        }
         final PdfDictionary dic2 = new PdfDictionary();
         System.arraycopy(pk, 0, outc, 0, pk.length);
         dic2.put(PdfName.CONTENTS, new PdfString(outc).setHexWriting(true));
