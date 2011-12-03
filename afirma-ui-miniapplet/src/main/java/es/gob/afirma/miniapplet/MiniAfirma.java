@@ -44,7 +44,7 @@ interface MiniAfirma {
      * La configuraci&oacute;n que se puede proporcionar es el algoritmo,
      * el formato de firma y par&aacute;metros adicionales del formato particular.
      * Estos par&aacute;metros extra se indicar&aacute;n como una cadena de
-     * m&uacute;ltiples l&iacute;neas con la forma {code CLAVE=VALOR}, en donde
+     * m&uacute;ltiples l&iacute;neas con la forma {@code CLAVE=VALOR}, en donde
      * {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado
      * a esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute;
      * de indicar esta en el listado depar&aacute;metros.
@@ -73,7 +73,7 @@ interface MiniAfirma {
      * Es posible configurar la multifirma generada por medio de una serie de par&aacute;metros
      * extra propios de cada formato de firma (consultar la documentaci&oacute;n de cada formato
      * particular). Estos par&aacute;metros extra se indicar&aacute;n como una cadena de
-     * m&uacute;ltiples l&iacute;neas con la forma {code CLAVE=VALOR}, en donde
+     * m&uacute;ltiples l&iacute;neas con la forma {@code CLAVE=VALOR}, en donde
      * {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado
      * a esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute;
      * de indicar esta en el listado depar&aacute;metros.
@@ -99,7 +99,7 @@ interface MiniAfirma {
      * Los par&aacute;metro adicionales permiten configurar m&uacute;ltiples opciones de la
      * contrafirma. Consulte la documentaci&oacute;n de cada formato de firma particular para
      * conocer cu&aacute;les puede utilizar. Estos par&aacute;metros extra se indicar&aacute;n
-     * como una cadena de m&uacute;ltiples l&iacute;neas con la forma {code CLAVE=VALOR}, en
+     * como una cadena de m&uacute;ltiples l&iacute;neas con la forma {@code CLAVE=VALOR}, en
      * donde {@code CLAVE} es el nombre de la propiedad y {@code VALOR} el valor asignado a
      * esta. Para utilizar el valor por defecto de una propiedad se dejar&aacute; de indicar
      * esta en el listado depar&aacute;metros.
@@ -108,7 +108,7 @@ interface MiniAfirma {
      * @param format Formato de firma.
      * @param extraParams Par&aacute;metros adicionales para configurar la operaci&oacute;n.
      * @return Contrafirma resultante en Base64.
-     * @throws IOException Cuando se produzca algun error durante la operaci&oacute;n.
+     * @throws IOException Cuando se produce algun error durante la operaci&oacute;n.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado o no
      * se puede identificar el formato de la firma.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
@@ -129,7 +129,7 @@ interface MiniAfirma {
      * Si no se reconoce el formato de firma, se devuelve {@code null}.
      * @param signB64 Firma en Base64.
      * @return &Aacute;rbol de firmantes.
-     * @throws IOException Cuabndo se produzca un error al decodificar el base64.
+     * @throws IOException Cuabndo se produce un error al decodificar el base64.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      * @throws NullPointerException Cuando se introduce un par&aacute;metro nulo.
