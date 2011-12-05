@@ -48,6 +48,7 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.text.html.HTMLDocument;
@@ -650,6 +651,34 @@ public class HelpUtils {
                                  }
                                  
                              }
+                         } if (panel instanceof JPanel){
+                        	 for(Component component : ((JPanel) panel).getComponents()) {
+                        		 if (component instanceof JTextField){
+                        			 JTextField campo = (JTextField) component;
+                        			 campo.addKeyListener(new KeyListener() {
+										
+										@Override
+										public void keyTyped(KeyEvent e) {
+											// TODO Auto-generated method stub
+											
+										}
+										
+										@Override
+										public void keyReleased(KeyEvent e) {
+											// TODO Auto-generated method stub
+											if (e.getKeyCode()==KeyEvent.VK_ENTER){
+												HelpUtils.setHighContrastEditorPane(editorPane, activate);
+											}
+										}
+										
+										@Override
+										public void keyPressed(KeyEvent e) {
+											// TODO Auto-generated method stub
+											
+										}
+									});
+                        		 }
+                        	 }
                          }
                     }
                 }
