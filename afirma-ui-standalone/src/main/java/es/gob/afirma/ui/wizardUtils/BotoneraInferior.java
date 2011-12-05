@@ -11,10 +11,7 @@ package es.gob.afirma.ui.wizardUtils;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -24,9 +21,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.principal.PrincipalGUI;
-import es.gob.afirma.ui.utils.Constants;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
@@ -42,8 +37,8 @@ public class BotoneraInferior extends JPanel {
 	private List<JDialogWizard> ventanas;
 	private int posicion;
 	
-	private JButton restaurar = null; 
-	private JButton maximizar = null;
+//	private JButton restaurar = null; 
+//	private JButton maximizar = null;
 	private JButton siguiente = null;
 	private JButton finalizar = null;
 	
@@ -81,56 +76,56 @@ public class BotoneraInferior extends JPanel {
         setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 
         // Definicion de botones
-        maximizar = new JButton();
+        //maximizar = new JButton();
         final JButton anterior = new JButton();
         siguiente = new JButton();
         final JButton cancelar = new JButton();
         finalizar = new JButton();
         
-        JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
-        //Boton maximizar
-        maximizar.setText(Messages.getString("Wizard.maximizar"));
-        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
-        maximizar.setName("maximizar");
-        maximizar.setMnemonic(KeyEvent.VK_M);
-        maximizar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				maximizarActionPerformed();
-			}
-		});
-        Utils.remarcar(maximizar);
-        Utils.setContrastColor(maximizar);
-        Utils.setFontBold(maximizar);
-        
-        panelMaximizar.add(maximizar);
-        add(panelMaximizar);
-        
-        JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
-	    // Boton restaurar
-	    restaurar = new JButton();
-	    restaurar.setText(Messages.getString("Wizard.restaurar"));
-	    restaurar.setName("restaurar");
-	    restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
-	    restaurar.setMnemonic(KeyEvent.VK_R);
-	    restaurar.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    		restaurarActionPerformed();
-			}
-		});
-	    Utils.remarcar(restaurar);
-        Utils.setContrastColor(restaurar);
-	    Utils.setFontBold(restaurar);
-	    
-	    panelRestaurar.add(restaurar);
-	    add(panelRestaurar);
-	    
-	    //Control de habilitado de los botones de maximizar y restaurar según la configuración de
-	    //accesibilidad
-	    if (GeneralConfig.isMaximized()){
-        	maximizar.setEnabled(false);
-        } else {
-        	restaurar.setEnabled(false);
-        }
+//        JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
+//        //Boton maximizar
+//        maximizar.setText(Messages.getString("Wizard.maximizar"));
+//        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
+//        maximizar.setName("maximizar");
+//        maximizar.setMnemonic(KeyEvent.VK_M);
+//        maximizar.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				maximizarActionPerformed();
+//			}
+//		});
+//        Utils.remarcar(maximizar);
+//        Utils.setContrastColor(maximizar);
+//        Utils.setFontBold(maximizar);
+//        
+//        panelMaximizar.add(maximizar);
+//        //add(panelMaximizar);
+//        
+//        JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
+//	    // Boton restaurar
+//	    restaurar = new JButton();
+//	    restaurar.setText(Messages.getString("Wizard.restaurar"));
+//	    restaurar.setName("restaurar");
+//	    restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
+//	    restaurar.setMnemonic(KeyEvent.VK_R);
+//	    restaurar.addActionListener(new ActionListener() {
+//	    	public void actionPerformed(ActionEvent e) {
+//	    		restaurarActionPerformed();
+//			}
+//		});
+//	    Utils.remarcar(restaurar);
+//        Utils.setContrastColor(restaurar);
+//	    Utils.setFontBold(restaurar);
+//	    
+//	    panelRestaurar.add(restaurar);
+//	    //add(panelRestaurar);
+//	    
+//	    //Control de habilitado de los botones de maximizar y restaurar según la configuración de
+//	    //accesibilidad
+//	    if (GeneralConfig.isMaximized()){
+//        	maximize.setEnabled(false);
+//        } else {
+//        	restaurar.setEnabled(false);
+//        }
         
         //Espacio entre botones
 		JPanel panelVacio = new JPanel();
@@ -288,53 +283,53 @@ public class BotoneraInferior extends JPanel {
 	/**
 	 * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
 	 */
-	public void maximizarActionPerformed(){
-		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-
-		JAccessibilityDialogWizard.actualPositionX = j.getX();
-		JAccessibilityDialogWizard.actualPositionY = j.getY();
-		JAccessibilityDialogWizard.actualWidth = j.getWidth();
-		JAccessibilityDialogWizard.actualHeight = j.getHeight();
-		
-		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-
-		//Se obtienen las dimensiones de maximizado
-		int maxWidth = (int)rect.getWidth();
-		int maxHeight = (int)rect.getHeight();
-				
-		//Se hace el resize dependiendo del so
-		if (!Platform.getOS().equals(Platform.OS.LINUX)){
-			j.setBounds(0,0, maxWidth, maxHeight);
-		} else {
-			j.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
-		}
-				
-		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
-		this.maximizar.setEnabled(false);
-		this.restaurar.setEnabled(true);
-	}
+//	public void maximizarActionPerformed(){
+//		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
+//
+//		JAccessibilityDialogWizard.actualPositionX = j.getX();
+//		JAccessibilityDialogWizard.actualPositionY = j.getY();
+//		JAccessibilityDialogWizard.actualWidth = j.getWidth();
+//		JAccessibilityDialogWizard.actualHeight = j.getHeight();
+//		
+//		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
+//		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+//
+//		//Se obtienen las dimensiones de maximizado
+//		int maxWidth = (int)rect.getWidth();
+//		int maxHeight = (int)rect.getHeight();
+//				
+//		//Se hace el resize dependiendo del so
+//		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+//			j.setBounds(0,0, maxWidth, maxHeight);
+//		} else {
+//			j.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
+//		}
+//				
+//		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
+////		this.maximizar.setEnabled(false);
+////		this.restaurar.setEnabled(true);
+//	}
 	
 	/**
 	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
 	 */
-	public void restaurarActionPerformed(){
-		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		if (JAccessibilityDialogWizard.actualPositionX != -1 && JAccessibilityDialogWizard.actualPositionY != -1 && JAccessibilityDialogWizard.actualWidth != -1 && JAccessibilityDialogWizard.actualHeight != -1){
-			j.setBounds(JAccessibilityDialogWizard.actualPositionX, JAccessibilityDialogWizard.actualPositionY, JAccessibilityDialogWizard.actualWidth, JAccessibilityDialogWizard.actualHeight);
-		} else {
-			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			if (Platform.getOS().equals(Platform.OS.LINUX)){
-	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
-			} else{
-	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
-			}
-    		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
-		}
-		//Se deshabilita el botón de restaurar puesto que se ha pulsado.
-		this.maximizar.setEnabled(true);
-		this.restaurar.setEnabled(false);
-	}
+//	public void restaurarActionPerformed(){
+//		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
+//		if (JAccessibilityDialogWizard.actualPositionX != -1 && JAccessibilityDialogWizard.actualPositionY != -1 && JAccessibilityDialogWizard.actualWidth != -1 && JAccessibilityDialogWizard.actualHeight != -1){
+//			j.setBounds(JAccessibilityDialogWizard.actualPositionX, JAccessibilityDialogWizard.actualPositionY, JAccessibilityDialogWizard.actualWidth, JAccessibilityDialogWizard.actualHeight);
+//		} else {
+//			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+//			if (Platform.getOS().equals(Platform.OS.LINUX)){
+//	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH_LINUX) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
+//			} else{
+//	            j.setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
+//			}
+//    		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
+//		}
+//		//Se deshabilita el botón de restaurar puesto que se ha pulsado.
+////		this.maximizar.setEnabled(true);
+////		this.restaurar.setEnabled(false);
+//	}
 	
 	/**
 	 * Guarda el tamaño y posicion de la ventana antes de cerrarse

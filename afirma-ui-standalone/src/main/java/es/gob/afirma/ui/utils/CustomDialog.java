@@ -470,6 +470,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	    		restaurarActionPerformed();
 			}
 		});
+		Utils.remarcar(this.restoreButton);
 		
 		
 		panel.add(restorePanel, consButtons);
@@ -495,6 +496,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
 				
+		Utils.remarcar(this.maximizeButton);
 		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
 		maximizePanel.add(this.maximizeButton);
 		

@@ -27,14 +27,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Properties;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolTip;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.utils.Constants;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityDialog;
@@ -80,17 +83,32 @@ public class Opciones extends JAccessibilityDialog {
     /** Panel con las pesta&ntilde;as de opciones. */
     private JTabbedPane mainPanel;
     
-    /** Bot&oacute;n para maximizar la ventana */
-    private JButton maximizar = new JButton();
-    
-    /** Bot&oacute;n para restaurar la ventana una vez maximizada */
-    private JButton restaurar = new JButton();
+//    /** Bot&oacute;n para maximizar la ventana */
+//    private JButton maximizar = new JButton();
+//    
+//    /** Bot&oacute;n para restaurar la ventana una vez maximizada */
+//    private JButton restaurar = new JButton();
     
     private boolean aplicar = false;
     
     private boolean accesibilidad = false;
     
     private JButton aceptar = new JButton();
+    
+    /**
+	 * Panel de botones relacionados con la accesibilidad.
+	 */
+	private JPanel accessibilityButtonsPanel = null;
+	
+	/**
+	 * Boton de restaurar.
+	 */
+	private JButton restoreButton = null;
+	
+	/**
+	 * Boton de maximizar.
+	 */
+	private JButton maximizeButton = null;
     
     public MainOptionsPane getMainOptions(){
     	return this.mainOptions;
@@ -163,6 +181,8 @@ public class Opciones extends JAccessibilityDialog {
      * Inicializacion de componentes
      */
     public void initComponents() {
+    	
+    	createAccessibilityButtonsPanel();
     	
     	//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -238,20 +258,20 @@ public class Opciones extends JAccessibilityDialog {
     	//Se comprueba el estado de los botones de maximizado y restauracion
 		if (!Platform.getOS().equals(Platform.OS.LINUX)){
 			if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
-				this.maximizar.setEnabled (false);
-	    		this.restaurar.setEnabled (true);
+				this.maximizeButton.setEnabled (false);
+	    		this.restoreButton.setEnabled (true);
 			} else {
-				this.maximizar.setEnabled (true);
-	    		this.restaurar.setEnabled (false);
+				this.maximizeButton.setEnabled (true);
+	    		this.restoreButton.setEnabled (false);
 			}
 		} else {
 			
 			if (this.getSize().equals(new Dimension(maxWidth,maxHeight - Constants.maximizeVerticalMarginLinux))){
-				this.maximizar.setEnabled (false);
-	    		this.restaurar.setEnabled (true);
+				this.maximizeButton.setEnabled (false);
+	    		this.restoreButton.setEnabled (true);
 			} else {
-				this.maximizar.setEnabled (true);
-	    		this.restaurar.setEnabled (false);
+				this.maximizeButton.setEnabled (true);
+	    		this.restoreButton.setEnabled (false);
 			}
 		}
     	
@@ -264,11 +284,23 @@ public class Opciones extends JAccessibilityDialog {
         
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
-        c.weightx = 1.0;
-        c.weighty = 1.0;
-//        c.insets = new Insets(13, 13, 0, 13);
+        c.weightx = 0;
+        c.weighty = 0;
+        c.insets = new Insets(0, 13, 0, 13);
         c.gridy = 0;
         c.gridx = 0;
+        c.gridwidth = 2;
+        c.gridheight = 1;
+        
+        getContentPane().add(accessibilityButtonsPanel,c);
+        
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.insets = new Insets(0, 13, 0, 13);
+        c.gridy = c.gridy + 1;
+        c.gridx = 0;
+        c.gridwidth = 1;
+        c.gridheight = 1;
                 
         // Panel superior con las opciones de configuracion
         this.mainPanel = new JTabbedPane();
@@ -445,7 +477,7 @@ public class Opciones extends JAccessibilityDialog {
         getContentPane().add(this.mainPanel, c);
         
         c.weighty = 0.0;
-        c.gridy = 1;
+        c.gridy = c.gridy + 1;
         getContentPane().add(createButtonsPanel(), c);
     }
 
@@ -464,37 +496,37 @@ public class Opciones extends JAccessibilityDialog {
 		JLabel label = new JLabel();
 		bottomPanel.add(label, cons);
         
-		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
-		//Boton maximizar ventana
-		this.maximizar.setText(Messages.getString("Wizard.maximizar"));
-	    this.maximizar.setName("maximizar");
-	    this.maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
-	    this.maximizar.setMnemonic(KeyEvent.VK_M);
-	    this.maximizar.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    		maximizarActionPerformed();
-			}
-		});
-	    Utils.remarcar(this.maximizar);
-        Utils.setContrastColor(this.maximizar);
-	    Utils.setFontBold(this.maximizar);
-	    panelMaximizar.add(this.maximizar);
-		
-	    JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
-	    // Boton restaurar
-	    this.restaurar.setText(Messages.getString("Wizard.restaurar"));
-	    this.restaurar.setName("restaurar");
-	    this.restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
-	    this.restaurar.setMnemonic(KeyEvent.VK_R);
-	    this.restaurar.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    		restaurarActionPerformed();
-			}
-		});
-	    Utils.remarcar(this.restaurar);
-        Utils.setContrastColor(this.restaurar);
-	    Utils.setFontBold(this.restaurar);
-	    panelRestaurar.add(this.restaurar);
+//		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
+//		//Boton maximizar ventana
+//		this.maximizar.setText(Messages.getString("Wizard.maximizar"));
+//	    this.maximizar.setName("maximizar");
+//	    this.maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
+//	    this.maximizar.setMnemonic(KeyEvent.VK_M);
+//	    this.maximizar.addActionListener(new ActionListener() {
+//	    	public void actionPerformed(ActionEvent e) {
+//	    		maximizarActionPerformed();
+//			}
+//		});
+//	    Utils.remarcar(this.maximizar);
+//        Utils.setContrastColor(this.maximizar);
+//	    Utils.setFontBold(this.maximizar);
+//	    panelMaximizar.add(this.maximizar);
+//		
+//	    JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
+//	    // Boton restaurar
+//	    this.restaurar.setText(Messages.getString("Wizard.restaurar"));
+//	    this.restaurar.setName("restaurar");
+//	    this.restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
+//	    this.restaurar.setMnemonic(KeyEvent.VK_R);
+//	    this.restaurar.addActionListener(new ActionListener() {
+//	    	public void actionPerformed(ActionEvent e) {
+//	    		restaurarActionPerformed();
+//			}
+//		});
+//	    Utils.remarcar(this.restaurar);
+//        Utils.setContrastColor(this.restaurar);
+//	    Utils.setFontBold(this.restaurar);
+//	    panelRestaurar.add(this.restaurar);
 	    
 	    //Espacio entre botones
 		JPanel panelVacio = new JPanel();
@@ -541,10 +573,11 @@ public class Opciones extends JAccessibilityDialog {
         
         // Panel en donde se insertan los botones maximizar, aceptar y cancelar
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(panelMaximizar, BorderLayout.CENTER);
-        buttonPanel.add(panelRestaurar, BorderLayout.CENTER);
-        buttonPanel.add(panelVacio, BorderLayout.CENTER);
+        //buttonPanel.add(panelMaximizar, BorderLayout.CENTER);
+        //buttonPanel.add(panelRestaurar, BorderLayout.CENTER);
+       
 		buttonPanel.add(panelAceptar, BorderLayout.CENTER);
+		buttonPanel.add(panelVacio, BorderLayout.CENTER);
 		buttonPanel.add(panelCancelar, BorderLayout.CENTER);
 		
         cons.ipadx = 0;
@@ -650,8 +683,10 @@ public class Opciones extends JAccessibilityDialog {
 		int maxWidth = (int)rect.getWidth();
 		int maxHeight = (int)rect.getHeight();
 		
-		this.maximizar.setEnabled (false);
-		this.restaurar.setEnabled (true);
+//		this.maximizar.setEnabled (false);
+//		this.restaurar.setEnabled (true);
+		this.maximizeButton.setEnabled (false);
+		this.restoreButton.setEnabled (true);
 		
 		//Se hace el resize dependiendo del so
 		if (!Platform.getOS().equals(Platform.OS.LINUX)){
@@ -682,8 +717,10 @@ public class Opciones extends JAccessibilityDialog {
     			setMinimumSize(new Dimension(getSize().width, getSize().height));
     		}
 		}
-		this.maximizar.setEnabled (true);
-		this.restaurar.setEnabled (false);
+//		this.maximizar.setEnabled (true);
+//		this.restaurar.setEnabled (false);
+		this.maximizeButton.setEnabled (true);
+		this.restoreButton.setEnabled (false);
 	}
 	
 	private class OpenHelpActionListener implements ActionListener {
@@ -754,5 +791,139 @@ public class Opciones extends JAccessibilityDialog {
 		config.putAll(this.contextOptions.getSignatureConfig());
 		
 		return config;
+	}
+	
+	/**
+	 * Se crea el panel de botones de accesibilidad.
+	 */
+	private void createAccessibilityButtonsPanel() {
+		this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
+		
+		//Panel que va a contener los botones de accesibilidad
+		JPanel panel = new JPanel(new GridBagLayout());
+		
+		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		//panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		//panel.setBorder(BorderFactory.createCompoundBorder());
+		//panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+		
+		//Restricciones para los botones
+		GridBagConstraints consButtons = new GridBagConstraints();
+		consButtons.fill = GridBagConstraints.BOTH;
+		consButtons.gridx = 0;
+		consButtons.gridy = 0;
+		consButtons.weightx = 1.0;
+		consButtons.weighty = 1.0;
+		consButtons.insets = new Insets(0,0,0,0);  //right padding
+		//consButtons.anchor=GridBagConstraints.EAST;
+		
+		//Restore button
+		JPanel restorePanel = new JPanel();
+		//this.restoreButton = getButton("r", KeyEvent.VK_R );
+		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png"));
+		this.restoreButton = new JButton(imageIconRestore);
+		this.restoreButton.setMnemonic(KeyEvent.VK_R );
+		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
+		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
+		
+		
+		Dimension dimension = new Dimension(20,20);
+		this.restoreButton.setPreferredSize(dimension);
+		
+		//this.restoreButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
+		//this.restoreButton.setContentAreaFilled(false); //area del boton invisible
+		this.restoreButton.setName("restaurar");
+		Utils.remarcar(this.restoreButton);
+		restorePanel.add(this.restoreButton);
+		this.restoreButton.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		restaurarActionPerformed();
+			}
+		});
+		
+		
+		panel.add(restorePanel, consButtons);
+		
+		
+		consButtons.gridx = 1;
+		//consButtons.weightx = 0.5;
+		consButtons.insets = new Insets(0,0,0,0);  //right padding
+		
+		//Maximize button
+		JPanel maximizePanel = new JPanel();
+
+		ImageIcon imageIconMaximize= new ImageIcon(CustomDialog.class.getResource("/resources/images/maximize.png"));
+		this.maximizeButton = new JButton(imageIconMaximize);
+		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
+		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description"));
+		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
+
+		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
+		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
+		
+		this.maximizeButton.setName("maximizar");
+		//Se asigna una dimension por defecto
+		this.maximizeButton.setPreferredSize(dimension);
+				
+		Utils.remarcar(this.maximizeButton);
+		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
+		maximizePanel.add(this.maximizeButton);
+		
+		JToolTip tooltip = maximizeButton.createToolTip();
+		tooltip.setTipText(Messages.getString("Wizard.maximizar"));
+		tooltip.setVisible(true);
+		
+		
+		/*this.maximizeButton.addFocusListener(new FocusListener() {
+			public void focusLost(FocusEvent e) {
+				
+				ToolTipManager.sharedInstance().registerComponent(this);
+				ToolTipManager.sharedInstance().setInitialDelay(0) ;
+			}
+			public void focusGained(FocusEvent e) {
+				//Se muestra un borde en el botón cuando este tiene el foco
+				botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
+			}
+		});*/
+		
+		this.maximizeButton.addActionListener(new ActionListener() {
+		    	public void actionPerformed(ActionEvent e) {
+		    		maximizarActionPerformed();
+				}
+			});
+
+		
+		panel.add(maximizePanel, consButtons);
+
+		//Se añade al panel general
+		//Restricciones para el panel de botones
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.NONE;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
+		//c.insets = new Insets(3,3,0,3);
+		c.insets = new Insets(0,0,0,0); 
+		c.anchor=GridBagConstraints.EAST;
+		this.accessibilityButtonsPanel.add(panel, c);
+		
+		
+		// Habilitado/Deshabilitado de botones restaurar/maximizar
+    	if (GeneralConfig.isMaximized()){
+    		//Se deshabilita el botón de maximizado
+    		this.maximizeButton.setEnabled(false);
+    		//Se habilita el botón de restaurar
+    		this.restoreButton.setEnabled(true);
+    	} else {
+    		//Se habilita el botón de maximizado
+    		this.maximizeButton.setEnabled(true);
+    		//Se deshabilita el botón de restaurar
+    		this.restoreButton.setEnabled(false);
+    	}
+		
 	}
 }

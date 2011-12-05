@@ -407,8 +407,14 @@ public class ResizingAdaptor extends ComponentAdapter {
 		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) {
 			imageIcon = HelpUtils.IMAGEICONHELP; //Se carga la imagen original
 		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) {
+			if (theDialog!=null || theDialogWizard!=null){
+				factor = factor - 0.3; //0.8999999761581421
+			}
 			imageIcon = Constants.IMAGEICONMAXIMIZE; //Se carga la imagen original
 		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) {
+			if (theDialog!=null || theDialogWizard!=null){
+				factor = factor - 0.3; //0.8999999761581421
+			}
 			imageIcon = Constants.IMAGEICONRESTORE; //Se carga la imagen original
 		} else {
 			imageIcon = (ImageIcon)button.getIcon(); //Se carga la imagen del componente actual

@@ -24,6 +24,7 @@ import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
+import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
@@ -45,7 +46,9 @@ class PanelFinalizar extends JAccessibilityDialogWizard {
 	 * @param ventanas	Listado con todas las paginas del asistente
 	 */
 	void setVentanas(List<JDialogWizard> ventanas) {
-		this.setBotonera(new BotoneraInferior(ventanas, 5));
+		this.setBotoneraSuperior(new BotoneraSuperior(ventanas, 5));
+    	this.setBotonera(new BotoneraInferior(ventanas, 5));
+    	getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
 	
