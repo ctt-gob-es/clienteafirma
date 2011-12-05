@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Locale;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -355,9 +354,7 @@ public class Opciones extends JAccessibilityDialog {
         	if (!accesibilidad){
         		this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));
         	}
-        	if (Locale.getDefault().equals("es_ES")){
-        		HelpUtils.visualize("opciones.accesibilidad");
-        	}
+        	HelpUtils.visualize("opciones.accesibilidad");
         	aplicar = false;
         	accesibilidad = false;
         }
@@ -376,17 +373,13 @@ public class Opciones extends JAccessibilityDialog {
 				int index = ((JTabbedPane)e.getSource()).getSelectedIndex();
 				switch (index) {
 				case 0:
-					if (Locale.getDefault().equals("es_ES")){
-						HelpUtils.visualize("opciones.configuracion");
-					}
+					HelpUtils.visualize("opciones.configuracion");
 					break;
 				case 1:
 					//HelpUtils.visualize("");
 					break;
 				case 2:
-					if (Locale.getDefault().equals("es_ES")){
-						HelpUtils.visualize("opciones.accesibilidad");
-					}
+					HelpUtils.visualize("opciones.accesibilidad");
 					break;
 				case 3:
 					//HelpUtils.visualize("");
@@ -440,17 +433,13 @@ public class Opciones extends JAccessibilityDialog {
 					}
 					switch (index) {
 					case 0:
-						if (Locale.getDefault().equals("es_ES")){
-							HelpUtils.visualize("opciones.configuracion");
-						}
+						HelpUtils.visualize("opciones.configuracion");
 						break;
 					case 1:
 						//HelpUtils.visualize("");
 						break;
 					case 2:
-						if (Locale.getDefault().equals("es_ES")){
-							HelpUtils.visualize("opciones.accesibilidad");
-						}
+						HelpUtils.visualize("opciones.accesibilidad");
 						break;
 					case 3:
 						//HelpUtils.visualize("");
@@ -466,17 +455,13 @@ public class Opciones extends JAccessibilityDialog {
 					}
 					switch (index) {
 					case 0:
-						if (Locale.getDefault().equals("es_ES")){
-							HelpUtils.visualize("opciones.configuracion");
-						}
+						HelpUtils.visualize("opciones.configuracion");
 						break;
 					case 1:
 						//HelpUtils.visualize("");
 						break;
 					case 2:
-						if (Locale.getDefault().equals("es_ES")){
-							HelpUtils.visualize("opciones.accesibilidad");
-						}
+						HelpUtils.visualize("opciones.accesibilidad");
 						break;
 					case 3:
 						//HelpUtils.visualize("");
@@ -680,9 +665,7 @@ public class Opciones extends JAccessibilityDialog {
 	    	PrincipalGUI.optionActualHeight = this.getHeight();
     	}
     	dispose();
-    	if (Locale.getDefault().equals("es_ES")){
-    		HelpUtils.visualize(Main.helpIndex);
-    	}
+    	HelpUtils.visualize(Main.helpIndex);
     }
     
     /**

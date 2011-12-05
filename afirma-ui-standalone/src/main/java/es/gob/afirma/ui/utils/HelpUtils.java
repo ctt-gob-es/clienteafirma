@@ -345,22 +345,20 @@ public class HelpUtils {
 	 */
 	private static void setHighContrastEditorPane(JEditorPane editorPane, boolean activate){
 		if (editorPane !=null) {
-			if(editorPane.getDocument() instanceof HTMLDocument){
-				HTMLDocument h = (HTMLDocument)editorPane.getDocument();
-				//Se establece el color de la la letra a blanco
-				editorPane.setContentType("text/html");
-				String bodyRule ="";
-				if (activate) {
-					bodyRule = "body { color: \"white\";}";
-					editorPane.setBackground(Color.BLACK);
-				} else {
-					//h.getStyleSheet().
-					bodyRule = "body { color: \"black\";}";
-					editorPane.setBackground(Color.WHITE);
-				}
-				
-				h.getStyleSheet().addRule(bodyRule);
+			HTMLDocument h = (HTMLDocument)editorPane.getDocument();
+			//Se establece el color de la la letra a blanco
+			editorPane.setContentType("text/html");
+			String bodyRule ="";
+			if (activate) {
+				bodyRule = "body { color: \"white\";}";
+				editorPane.setBackground(Color.BLACK);
+			} else {
+				//h.getStyleSheet().
+				bodyRule = "body { color: \"black\";}";
+				editorPane.setBackground(Color.WHITE);
 			}
+			
+			h.getStyleSheet().addRule(bodyRule);
 			
 			
 //			final StyleContext sc = new StyleContext();

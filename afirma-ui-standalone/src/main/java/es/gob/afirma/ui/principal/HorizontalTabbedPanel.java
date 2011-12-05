@@ -11,14 +11,12 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Enumeration;
-import java.util.Locale;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
-import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.JAccessibilityFrame;
 
@@ -137,10 +135,8 @@ public class HorizontalTabbedPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				//System.out.println(button.getName());
-				if (Locale.getDefault().equals("es_ES")){				
-					HelpUtils.visualize(button.getName());
-					Main.helpIndex=button.getName();
-				}
+				HelpUtils.visualize(button.getName());
+				Main.helpIndex=button.getName();
 			}
 		});
         if (this.firstButton) {
