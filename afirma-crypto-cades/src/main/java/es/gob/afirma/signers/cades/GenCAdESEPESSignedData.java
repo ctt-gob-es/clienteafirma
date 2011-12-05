@@ -71,6 +71,7 @@ public final class GenCAdESEPESSignedData {
      *        Entrada a la clave privada para firma.
      * @param messageDigest
      *        Huella digital a aplicar en la firma.
+     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @return La firma generada codificada en ASN.1 binario.
      * @throws java.security.NoSuchAlgorithmException
      *         Si no se soporta alguno de los algoritmos de firma o huella
@@ -88,7 +89,8 @@ public final class GenCAdESEPESSignedData {
                                      final AdESPolicy policy,
                                      final boolean signingCertificateV2,
                                      final PrivateKeyEntry keyEntry,
-                                     byte[] messageDigest) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
+                                     byte[] messageDigest,
+                                     boolean padesMode) throws NoSuchAlgorithmException, CertificateException, IOException, AOException {
 
         if (parameters == null) {
             throw new IllegalArgumentException("Los parametros no pueden ser nulos"); //$NON-NLS-1$
@@ -108,7 +110,8 @@ public final class GenCAdESEPESSignedData {
             (messageDigest == null && parameters.getContent() != null) ?
                 MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
                     messageDigest,
-            signDate
+            signDate,
+            padesMode
         );
         
         final byte[] signature = PKCS1ExternalizableSigner.sign(signatureAlgorithm, keyEntry.getPrivateKey(), preSignature);
@@ -129,7 +132,8 @@ public final class GenCAdESEPESSignedData {
                 (messageDigest == null && parameters.getContent() != null) ?
                     MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(signatureAlgorithm)).digest(parameters.getContent()) :
                         messageDigest,
-                signDate
+                signDate,
+                padesMode
             )
         );
 

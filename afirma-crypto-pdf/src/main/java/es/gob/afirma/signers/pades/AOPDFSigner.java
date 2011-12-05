@@ -1087,14 +1087,15 @@ public final class AOPDFSigner implements AOSigner {
         // **************** CALCULO DEL SIGNED DATA ***************************************
         // ********************************************************************************
 
-        byte[] pk =
-                new GenCAdESEPESSignedData().generateSignedData(
+        byte[] pk = new GenCAdESEPESSignedData().generateSignedData(
                     new P7ContentSignerParameters(inPDF, algorithm, chain), 
                     true, // omitContent
                     new AdESPolicy(extraParams),
                     true, // true -> isSigningCertificateV2, false -> isSigningCertificateV1
                     ke,
-                    MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())));
+                    MessageDigest.getInstance(AOSignConstants.getDigestAlgorithmName(algorithm)).digest(AOUtil.getDataFromInputStream(sap.getRangeStream())),
+                    true
+        );
 
         //***************** SELLO DE TIEMPO ****************
         final String tsa = extraParams.getProperty("tsaURL"); //$NON-NLS-1$

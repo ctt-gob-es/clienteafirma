@@ -126,7 +126,10 @@ public final class AOCAdESSigner implements AOSigner {
      * </dl>
      * @return Firma en formato CAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    public byte[] sign(final byte[] data, 
+                       final String algorithm, 
+                       final PrivateKeyEntry keyEntry, 
+                       final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
 
@@ -163,12 +166,15 @@ public final class AOCAdESSigner implements AOSigner {
                 omitContent = true;
             }
                         
-            return new GenCAdESEPESSignedData().generateSignedData(csp,
-                                                                   omitContent,
-                                                                   new AdESPolicy(extraParams),
-                                                                   signingCertificateV2,
-                                                                   keyEntry,
-                                                                   messageDigest);
+            return new GenCAdESEPESSignedData().generateSignedData(
+                   csp,
+                   omitContent,
+                   new AdESPolicy(extraParams),
+                   signingCertificateV2,
+                   keyEntry,
+                   messageDigest,
+                   Boolean.parseBoolean(extraParams.getProperty("padesMode", "false")) //$NON-NLS-1$ //$NON-NLS-2$
+            );
 
         }
         catch (final Exception e) {

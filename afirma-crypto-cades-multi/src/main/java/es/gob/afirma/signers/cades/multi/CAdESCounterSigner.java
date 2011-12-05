@@ -905,13 +905,15 @@ final class CAdESCounterSigner {
 
         // authenticatedAttributes
         final ASN1EncodableVector contextExcepcific =
-                CAdESUtils.generateSignerInfo(cert,
-                                         digestAlgorithm,
-                                         si.getEncryptedDigest().getOctets(),
-                                         getGlobalPolicy(),
-                                         isGlobalSigningCertificateV2(),
-                                         null,
-                                         new Date()
+                CAdESUtils.generateSignerInfo(
+                     cert,
+                     digestAlgorithm,
+                     si.getEncryptedDigest().getOctets(),
+                     getGlobalPolicy(),
+                     isGlobalSigningCertificateV2(),
+                     null,
+                     new Date(),
+                     false
                 );
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
         unsignedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));

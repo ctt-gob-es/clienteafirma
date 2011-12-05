@@ -886,7 +886,8 @@ final class CAdESCounterSignerEnveloped {
                  getGlobalPolicy(),
                  isGlobalSigningCertificateV2(),
                  null,
-                 new Date()
+                 new Date(),
+                 false
             );
         this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExcepcific));
         

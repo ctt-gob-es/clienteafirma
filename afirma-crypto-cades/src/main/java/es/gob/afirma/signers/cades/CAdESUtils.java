@@ -68,6 +68,7 @@ public final class CAdESUtils {
      * @param signingCertificateV2
      * @param messageDigest Huella digital de los datos firmados
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
+     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @return Los datos necesarios para generar la firma referente a los datos del usuario.
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
@@ -78,7 +79,8 @@ public final class CAdESUtils {
                                                   final AdESPolicy policy,
                                                   final boolean signingCertificateV2,
                                                   final byte[] messageDigest,
-                                                  final Date signDate) throws NoSuchAlgorithmException,
+                                                  final Date signDate,
+                                                  final boolean padesMode) throws NoSuchAlgorithmException,
                                                                                      IOException,
                                                                                      CertificateEncodingException { 
         
@@ -88,7 +90,14 @@ public final class CAdESUtils {
         // // ATRIBUTOS
 
         // authenticatedAttributes
-        final ASN1EncodableVector contexExpecific = initContexExpecific(digestAlgorithmName, datos, PKCSObjectIdentifiers.data.getId(), messageDigest, signDate);
+        final ASN1EncodableVector contexExpecific = initContexExpecific(
+                digestAlgorithmName, 
+                datos, 
+                PKCSObjectIdentifiers.data.getId(), 
+                messageDigest, 
+                signDate,
+                padesMode
+        );
 
         // Serial Number
         // comentar lo de abajo para version del rfc 3852
@@ -372,7 +381,12 @@ public final class CAdESUtils {
     }
     
     /** Inicializa el contexto. */
-    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, final byte[] datos, final String dataType, final byte[] messageDigest, final Date signDate) throws NoSuchAlgorithmException {
+    static ASN1EncodableVector initContexExpecific(final String digestAlgorithm, 
+                                                   final byte[] datos, 
+                                                   final String dataType, 
+                                                   final byte[] messageDigest, 
+                                                   final Date signDate,
+                                                   final boolean padesMode) throws NoSuchAlgorithmException {
         // authenticatedAttributes
         final ASN1EncodableVector contexExpecific = new ASN1EncodableVector();
 
@@ -381,8 +395,10 @@ public final class CAdESUtils {
             contexExpecific.add(new Attribute(CMSAttributes.contentType, new DERSet(new DERObjectIdentifier(dataType))));
         }
 
-        // fecha de firma
-        contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(signDate))));
+        // fecha de firma, no se anade en modo PAdES
+        if (!padesMode) {
+            contexExpecific.add(new Attribute(CMSAttributes.signingTime, new DERSet(new DERUTCTime(signDate))));
+        }
 
         // MessageDigest
         contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString((messageDigest != null) ? messageDigest : MessageDigest.getInstance(digestAlgorithm).digest(datos)))));

@@ -151,6 +151,7 @@ public final class CAdESTriPhaseSigner {
      * @param signingCertificateV2 <code>true</code> para usar SigningCertificateV2, <code>false</code> para usar V1
      * @param messageDigest Valor de la huella digital del contenido (usar <code>null</code> si se estableci&oacute; <code>content</code>)
      * @param signDate Fecha de la firma (debe establecerse externamente para evitar desincronismos en la firma trif&aacute;sica)
+     * @param padesMode <code>true</code> para generar una firma CAdES compatible PAdES, <code>false</code> para generar una firma CAdES normal
      * @return Atributos CAdES a firmar (prefirma) en formato ASN.1
      * @throws AOException
      */
@@ -160,7 +161,8 @@ public final class CAdESTriPhaseSigner {
                           final AdESPolicy policy,
                           final boolean signingCertificateV2,
                           final byte[] messageDigest,
-                          final Date signDate) throws AOException {
+                          final Date signDate,
+                          final boolean padesMode) throws AOException {
                 
         if (signerCertificateChain == null || signerCertificateChain.length == 0) {
             throw new IllegalArgumentException("La cadena de certificados debe contener al menos una entrada"); //$NON-NLS-1$
@@ -178,7 +180,8 @@ public final class CAdESTriPhaseSigner {
                      policy,
                      signingCertificateV2,
                      messageDigest,
-                     signDate
+                     signDate,
+                     padesMode
                   )
                )
             );

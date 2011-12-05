@@ -240,7 +240,8 @@ final class CAdESCoSigner {
                      policy,
                      signingCertificateV2,
                      null,
-                     new Date()
+                     new Date(),
+                     false
                  );
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -253,7 +254,8 @@ final class CAdESCoSigner {
                      policy,
                      signingCertificateV2,
                      null,
-                     new Date()
+                     new Date(),
+                     false
                 );
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -434,7 +436,8 @@ final class CAdESCoSigner {
                      policy,
                      signingCertificateV2,
                      null, // MessageDigest
-                     new Date()
+                     new Date(),
+                     false
                  );
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
@@ -447,7 +450,8 @@ final class CAdESCoSigner {
                      policy,
                      signingCertificateV2,
                      messageDigest,
-                     new Date()
+                     new Date(),
+                     false
                 );
             this.signedAttr2 = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
             signedAttr = SigUtils.getAttributeSet(new AttributeTable(contextExpecific));
