@@ -9,6 +9,7 @@
  */
 package es.gob.afirma.ui.principal;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -73,6 +74,7 @@ public class Main {
         } else {
         	new UserProfile().main();
         }
+        System.out.println(Locale.getDefault());
     }
 
 }

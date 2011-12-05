@@ -400,7 +400,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		accesibilidadItem.setMnemonic(KeyEvent.VK_U); //Se asigna un atajo al menu
 		accesibilidadItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				HelpUtils.visualize("opciones.accesibilidad");
+				if (Locale.getDefault().equals("es_ES")){
+					HelpUtils.visualize("opciones.accesibilidad");
+				}
 				Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, true, true);
 				ventanaOpciones.setModal(true);
 				ventanaOpciones.setVisible(true);
@@ -465,7 +467,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Seleccion menu opciones: Muestra la ventana modal con las opciones
 	 */
 	private void opcionesActionPerformed() {
-		HelpUtils.visualize("opciones.configuracion");
+		if (Locale.getDefault().equals("es_ES")){
+			HelpUtils.visualize("opciones.configuracion");
+		}
 		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, aplicar, accesibilidad);
 		ventanaOpciones.setModal(true);
 		ventanaOpciones.setVisible(true);
@@ -505,7 +509,9 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Seleccion menu ayuda: Muestra la ventana con el panel de ayuda
 	 */
 	private void ayudaHTMLActionPerformed() {
-		HelpUtils.visualize(true);
+		if (Locale.getDefault().equals("es_ES")){
+			HelpUtils.visualize(true);
+		}
 	}
 	
 	/**

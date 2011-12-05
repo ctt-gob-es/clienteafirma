@@ -17,6 +17,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.swing.BorderFactory;
@@ -79,7 +80,9 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	public UserProfile() {
 		super();
 		initComponents();
-		HelpUtils.visualize("perfiles.usuario");
+		if (Locale.getDefault().equals("es_ES")){
+			HelpUtils.visualize("perfiles.usuario");
+		}
 	}
 	
 	/**
