@@ -40,6 +40,9 @@ public class Main {
 	
     public static boolean showHelp = false;
     
+    /** Almacena el indice a cargar para la ayuda en alto contraste */
+    public static String helpIndex;
+    
     /**
      * Arranca la interfaz de escritorio del Cliente @firma.
      * @param args Par&aacute;metros de entrada.

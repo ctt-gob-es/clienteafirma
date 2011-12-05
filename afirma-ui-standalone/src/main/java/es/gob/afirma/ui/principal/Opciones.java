@@ -665,6 +665,7 @@ public class Opciones extends JAccessibilityDialog {
 	    	PrincipalGUI.optionActualHeight = this.getHeight();
     	}
     	dispose();
+    	HelpUtils.visualize(Main.helpIndex);
     }
     
     /**

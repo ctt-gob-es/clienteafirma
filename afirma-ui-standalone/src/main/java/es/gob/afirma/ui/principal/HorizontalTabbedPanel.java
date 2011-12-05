@@ -136,6 +136,7 @@ public class HorizontalTabbedPanel extends JPanel {
 				// TODO Auto-generated method stub
 				//System.out.println(button.getName());
 				HelpUtils.visualize(button.getName());
+				Main.helpIndex=button.getName();
 			}
 		});
         if (this.firstButton) {

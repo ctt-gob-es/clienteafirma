@@ -35,20 +35,13 @@ import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.JHelp;
 import javax.help.JHelpContentViewer;
-import javax.help.JHelpIndexNavigator;
 import javax.help.JHelpNavigator;
-import javax.help.JHelpTOCNavigator;
 import javax.help.WindowPresentation;
-import javax.help.event.HelpSetEvent;
-import javax.help.event.HelpSetListener;
-import javax.help.plaf.basic.BasicIndexCellRenderer;
 import javax.swing.BorderFactory;
-import javax.swing.CellRendererPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -57,15 +50,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.JViewport;
-import javax.swing.UIManager;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.MetalTheme;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.html.HTMLDocument;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
@@ -568,6 +553,8 @@ public class HelpUtils {
                                     	 if (component9 instanceof JTree) {
                                     		 if (activate){
                                     			 ((JTree)component9).setBackground(Color.black);
+                                    		 } else { 
+                                    			 ((JTree)component9).setBackground(Color.WHITE);
                                     		 }
                                              ((JTree)component9).addMouseListener(new MouseListener() {
      											
@@ -670,16 +657,16 @@ public class HelpUtils {
         }
     }
 	
-	private static void arbolito(JTree a){
-		if(a.getCellRenderer() instanceof DefaultTreeCellRenderer){
-			aaa((DefaultTreeCellRenderer)a.getCellRenderer());
-		}
-	}
-	
-	private static void aaa(DefaultTreeCellRenderer d){
-		System.out.println(d.getComponentCount());
-		d.setForeground(Color.GREEN);
-	}
+//	private static void arbolito(JTree a){
+//		if(a.getCellRenderer() instanceof DefaultTreeCellRenderer){
+//			aaa((DefaultTreeCellRenderer)a.getCellRenderer());
+//		}
+//	}
+//	
+//	private static void aaa(DefaultTreeCellRenderer d){
+//		System.out.println(d.getComponentCount());
+//		d.setForeground(Color.GREEN);
+//	}
 }
 
 
