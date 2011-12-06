@@ -14,7 +14,7 @@ import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /**
  * Filtro de certificados. Se encarga de filtrar los certificados que se le indiquen en base a un
@@ -36,6 +36,7 @@ public class OldFilter extends CertificateFilter {
 	}
 
 
+    @Override
     public boolean matches(X509Certificate cert) {
         if (cert == null) {
             return false;
