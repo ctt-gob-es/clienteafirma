@@ -1136,7 +1136,7 @@ public final class AOPDFSigner implements AOSigner {
         final byte[] outc = new byte[CSIZE];
         if (outc.length < pk.length) {
             throw new AOException(
-              "La firma generada tiene un tamano (" + pk.length + ") mayor que el permitido (" + outc.length + ")"
+              "La firma generada tiene un tamano (" + pk.length + ") mayor que el permitido (" + outc.length + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             );
         }
         final PdfDictionary dic2 = new PdfDictionary();
