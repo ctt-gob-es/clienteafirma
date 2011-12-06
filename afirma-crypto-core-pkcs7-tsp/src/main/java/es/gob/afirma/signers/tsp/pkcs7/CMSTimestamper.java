@@ -1,4 +1,4 @@
-package es.gob.afirma.signers.pkcs7.tsp;
+package es.gob.afirma.signers.tsp.pkcs7;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
