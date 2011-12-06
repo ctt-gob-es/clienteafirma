@@ -3,9 +3,9 @@ package es.gob.afirma.miniapplet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import es.gob.afirma.keystores.filters.SSLFilter;
-import es.gob.afirma.keystores.filters.SignatureDNIeFilter;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
+import es.gob.afirma.miniapplet.keystores.filters.SSLFilter;
+import es.gob.afirma.miniapplet.keystores.filters.SignatureDNIeFilter;
 
 /**
  * Identifica y obtiene los filtros de certificados definidos en las propiedades

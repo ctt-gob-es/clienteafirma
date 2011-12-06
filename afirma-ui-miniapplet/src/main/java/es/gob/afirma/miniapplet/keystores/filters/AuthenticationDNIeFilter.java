@@ -1,4 +1,4 @@
-package es.gob.afirma.keystores.filters;
+package es.gob.afirma.miniapplet.keystores.filters;
 
 import java.security.cert.X509Certificate;
 
