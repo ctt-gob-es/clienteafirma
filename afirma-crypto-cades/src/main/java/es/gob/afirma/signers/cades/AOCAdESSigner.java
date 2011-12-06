@@ -201,7 +201,7 @@ public final class AOCAdESSigner implements AOSigner {
      *  con PKCS#7, las generadas con CAdES no lo son, por lo que, en el momento que se introduzca una estructura CAdES, 
      *  se pierde la compatibilidad PKCS#7 en el global de la firma.
      * </p>
-     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
+     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.multi.cades.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
      * @param data Datos que deseamos a cofirmar.
      * @param sign Firma CAdES o CMS de los datos que se quiere cofirmar.
      * @param algorithm Algoritmo a usar para la firma.
@@ -272,7 +272,7 @@ public final class AOCAdESSigner implements AOSigner {
                          final PrivateKeyEntry keyEntry, 
                          final Properties extraParams) throws AOException {
         try {
-            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCoSigner").newInstance()).cosign(data, sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
+            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign(data, sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
         }
         catch(final Exception e) {
             throw new AOException("Error general en la cofirma: " + e, e); //$NON-NLS-1$
@@ -298,7 +298,7 @@ public final class AOCAdESSigner implements AOSigner {
      *  con PKCS#7, las generadas con CAdES no lo son, por lo que, en el momento que se introduzca una estructura CAdES, 
      *  se pierde la compatibilidad PKCS#7 en el global de la firma.
      * </p>
-     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
+     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.multi.cades.AOCAdESCoSigner</code> en el CLASSPATH</b></p>
      * @param sign Firma CAdES o CMS de los datos que se quiere cofirmar.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -357,7 +357,7 @@ public final class AOCAdESSigner implements AOSigner {
                          final PrivateKeyEntry keyEntry, 
                          final Properties extraParams) throws AOException {
         try {
-            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCoSigner").newInstance()).cosign(sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
+            return ((AOCoSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCoSigner").newInstance()).cosign(sign, algorithm, keyEntry, extraParams); //$NON-NLS-1$
         }
         catch(final Exception e) {
             throw new AOException("Error general en la cofirma: " + e, e); //$NON-NLS-1$
@@ -373,7 +373,7 @@ public final class AOCAdESSigner implements AOSigner {
      *  <li>Los nodos de firma cuyas posiciones se especifican en <code>target</code> (<code>CounterSignTarget.NODES</code>)</li>
      *  <li>Los nodos de firma realizados por los firmantes cuyo <i>Common Name</i> (CN X.500) se indica en <code>target</code> (<code>CounterSignTarget.SIGNERS</code>)</li>
      * </ul>
-     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner</code> en el CLASSPATH</b></p>
+     * <p><b>IMPORTANTE: Este m&eacute;todo requiere la presencia de <code>es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner</code> en el CLASSPATH</b></p>
      * @param sign Firma CAdES o CMS con los nodos a contrafirmar
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -436,7 +436,7 @@ public final class AOCAdESSigner implements AOSigner {
                               final PrivateKeyEntry keyEntry,
                               final Properties extraParams) throws AOException {
         try {
-            return ((AOCounterSigner)AOUtil.classForName("es.gob.afirma.signers.cades.multi.AOCAdESCounterSigner").newInstance()).countersign(sign, algorithm, targetType, targets, keyEntry, extraParams); //$NON-NLS-1$
+            return ((AOCounterSigner)AOUtil.classForName("es.gob.afirma.signers.multi.cades.AOCAdESCounterSigner").newInstance()).countersign(sign, algorithm, targetType, targets, keyEntry, extraParams); //$NON-NLS-1$
         }
         catch(final Exception e) {
             throw new AOException("Error general en la contrafirma: " + e, e); //$NON-NLS-1$
