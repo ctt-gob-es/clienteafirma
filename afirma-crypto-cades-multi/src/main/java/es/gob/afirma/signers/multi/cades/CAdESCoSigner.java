@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.signers.cades.multi;
+package es.gob.afirma.signers.multi.cades;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
