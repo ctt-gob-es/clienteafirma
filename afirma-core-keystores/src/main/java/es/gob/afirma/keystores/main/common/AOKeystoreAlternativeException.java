@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.common;
+package es.gob.afirma.keystores.main.common;
 
 
 /** Indica que ocurri&oacute; un error intentando obtener un <code>KeyStore</code>, pero que se obtuvo uno de un tipo alternativo.

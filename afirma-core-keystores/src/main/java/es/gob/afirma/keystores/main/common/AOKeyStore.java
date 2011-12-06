@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.common;
+package es.gob.afirma.keystores.main.common;
 
 /** Almacenes de claves y certificados soportados. */
 public enum AOKeyStore {

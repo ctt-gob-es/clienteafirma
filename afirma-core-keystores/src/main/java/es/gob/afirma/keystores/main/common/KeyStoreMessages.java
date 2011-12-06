@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.common;
+package es.gob.afirma.keystores.main.common;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

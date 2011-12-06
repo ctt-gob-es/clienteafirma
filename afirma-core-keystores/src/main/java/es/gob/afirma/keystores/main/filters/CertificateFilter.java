@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.filters;
+package es.gob.afirma.keystores.main.filters;
 
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;

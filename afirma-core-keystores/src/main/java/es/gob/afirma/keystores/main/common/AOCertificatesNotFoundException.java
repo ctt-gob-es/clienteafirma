@@ -8,29 +8,21 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.common;
+package es.gob.afirma.keystores.main.common;
 
 import es.gob.afirma.core.AOException;
 
-/** Excepci&oacute;n para notificar un error en la inicializacion o en el acceso
- * a un almac&eacute;n de certificados. */
-public final class AOKeyStoreManagerException extends AOException {
+/** Excepci&oacute;n para notificar que no se han encontrado certificado de
+ * usuario en un almac&eacute;n de certificados. */
+public final class AOCertificatesNotFoundException extends AOException {
 
-    private static final long serialVersionUID = 2896862509190263027L;
+    private static final long serialVersionUID = -6996346324337434742L;
 
     /** Crea la excepci&oacute;n con un mensaje determinado.
      * @param msg
      *        Mensaje descriptivo de la excepci&oacute;n. */
-    public AOKeyStoreManagerException(final String msg) {
+    public AOCertificatesNotFoundException(final String msg) {
         super(msg);
     }
 
-    /** Crea la excepci&oacute;n con un mensaje determinado.
-     * @param msg
-     *        Mensaje descriptivo de la excepci&oacute;n.
-     * @param e
-     *        Excepci&oacute;n que ha causado el lanzamiento de esta. */
-    public AOKeyStoreManagerException(final String msg, final Exception e) {
-        super(msg, e);
-    }
 }

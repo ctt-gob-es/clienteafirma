@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.common;
+package es.gob.afirma.keystores.main.common;
 
 
 /** Agrupaci&oacute;n de los tres atributos principales de un almac&eacute;n de

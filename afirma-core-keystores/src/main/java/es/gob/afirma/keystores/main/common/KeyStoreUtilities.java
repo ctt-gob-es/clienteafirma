@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.common;
+package es.gob.afirma.keystores.main.common;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -36,9 +36,9 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /** Utilidades para le manejo de almacenes de claves y certificados. */
 public final class KeyStoreUtilities {

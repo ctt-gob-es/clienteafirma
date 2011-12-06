@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.callbacks;
+package es.gob.afirma.keystores.main.callbacks;
 
 import javax.security.auth.callback.PasswordCallback;
 

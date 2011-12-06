@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.keystores.common;
+package es.gob.afirma.keystores.main.common;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +22,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 
 /** Obtiene clases de tipo AOKeyStoreManager seg&uacute;n se necesiten,
  * proporcionando adem&aacute;s ciertos m&eacute;todos de utilidad. Contiene
@@ -194,7 +194,7 @@ public final class AOKeyStoreManagerFactory {
         else if (store == AOKeyStore.MOZ_UNI) {
             final AOKeyStoreManager ksmUni;
             try {
-                ksmUni = (AOKeyStoreManager) AOUtil.classForName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
+                ksmUni = (AOKeyStoreManager) AOUtil.classForName("es.gob.afirma.keystores.main.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
             }
             catch(final Exception e) {
                 throw new AOKeystoreAlternativeException(
