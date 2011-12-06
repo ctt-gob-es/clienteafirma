@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.X509Certificate;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,20 +19,21 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
-import es.gob.afirma.signers.pkcs7.tsp.CMSTimestamper;
+import es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper;
 
+/** Pruebas PAdES espac&iacute;ficas para el PlugTest de la ETSI. */
 public final class TestPAdESETSI {
     
     private static final String CERT_PATH = "RequestedKeyCert.p12"; //$NON-NLS-1$
     private static final String CERT_PASS = "1111"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "certificado pruebas plugtests"; //$NON-NLS-1$
-    private static final String POL_PATH = "TARGET-SIGPOL-ETSI4.der";
+    private static final String POL_PATH = "TARGET-SIGPOL-ETSI4.der"; //$NON-NLS-1$
     
     private static final String[] TEST_FILES = {
-        "aaa.pdf",
-        "aaasvd.pdf",
-        "aaaxml.pdf",
-        "SeedValuePKCS1.pdf"
+        "aaa.pdf", //$NON-NLS-1$
+        "aaasvd.pdf", //$NON-NLS-1$
+        "aaaxml.pdf", //$NON-NLS-1$
+        "SeedValuePKCS1.pdf" //$NON-NLS-1$
     };
     
     private static final Properties[] PADES_MODES;
@@ -43,12 +43,12 @@ public final class TestPAdESETSI {
         p1.setProperty("policyIdentifier", "1.2.3.4.5.2"); //$NON-NLS-1$ //$NON-NLS-2$
         try {
             p1.setProperty(
-               "policyIdentifierHash", 
-               new String(Base64.encode(MessageDigest.getInstance("SHA1").digest(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(POL_PATH)))))
+               "policyIdentifierHash",  //$NON-NLS-1$
+               new String(Base64.encode(MessageDigest.getInstance("SHA1").digest(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(POL_PATH))))) //$NON-NLS-1$
            );
         }
         catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("no se ha podido calcular la huella digital de la politica");
+            Logger.getLogger("es.gob.afirma").severe("no se ha podido calcular la huella digital de la politica"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         p1.setProperty("policyIdentifierHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
         p1.setProperty("signReason", "test"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -69,12 +69,12 @@ public final class TestPAdESETSI {
         p4.setProperty("policyIdentifier", "1.2.3.4.5.2"); //$NON-NLS-1$ //$NON-NLS-2$
         try {
             p4.setProperty(
-               "policyIdentifierHash", 
-               new String(Base64.encode(MessageDigest.getInstance("SHA1").digest(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(POL_PATH)))))
+               "policyIdentifierHash",  //$NON-NLS-1$
+               new String(Base64.encode(MessageDigest.getInstance("SHA1").digest(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(POL_PATH))))) //$NON-NLS-1$
            );
         }
         catch(final Exception e) {
-            Logger.getLogger("es.gob.afirma").severe("no se ha podido calcular la huella digital de la politica");
+            Logger.getLogger("es.gob.afirma").severe("no se ha podido calcular la huella digital de la politica"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         p4.setProperty("policyIdentifierHashAlgorithm", "SHA1"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -88,18 +88,18 @@ public final class TestPAdESETSI {
         AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA
     };
     
+    /** Pruebas de firma con los ficheros de prueba y certificado de la ETSI.
+     * @throws Exception */
     @Test
     public void testSignature() throws Exception {
      
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         
         final PrivateKeyEntry pke;
-        final X509Certificate cert;
 
         KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
-        cert = (X509Certificate) ks.getCertificate(CERT_ALIAS);
         
         AOSigner signer = new AOPDFSigner();
         
@@ -129,7 +129,7 @@ public final class TestPAdESETSI {
                     Assert.assertEquals(result, signer.getData(result));
                     Assert.assertEquals(AOSignConstants.SIGN_FORMAT_PDF, signer.getSignInfo(result).getFormat());
                     
-                    final File saveFile = File.createTempFile(file.replace(".pdf", "") + "_" + ((extraParams.getProperty("policyIdentifier") != null) ? "POL_" : "") + ((extraParams.getProperty("tsaURL") != null) ? "TSP_" : "") + algo + "_", ".pdf"); //$NON-NLS-1$
+                    final File saveFile = File.createTempFile(file.replace(".pdf", "") + "_" + ((extraParams.getProperty("policyIdentifier") != null) ? "POL_" : "") + ((extraParams.getProperty("tsaURL") != null) ? "TSP_" : "") + algo + "_", ".pdf"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$
                     final OutputStream os = new FileOutputStream(saveFile);
                     os.write(result);
                     os.flush();
