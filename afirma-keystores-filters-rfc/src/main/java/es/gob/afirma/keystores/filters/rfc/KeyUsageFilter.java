@@ -12,7 +12,7 @@ package es.gob.afirma.keystores.filters.rfc;
 
 import java.security.cert.X509Certificate;
 
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /** Clase que representa un filtro de certificados por los atributos KeyUsage para
  * el di&aacute;logo de selecci&oacute;n. */

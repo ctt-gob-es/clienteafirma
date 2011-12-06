@@ -33,7 +33,7 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
-import es.gob.afirma.signers.xml.xmldsig.AOXMLDSigSigner;
+import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /** Firmas OOXML basadas en una versi&oacute;n fuertemente modificada de las
  * clases <code>es.gob.afirma.be.fedict.eid.applet.service</code>. */

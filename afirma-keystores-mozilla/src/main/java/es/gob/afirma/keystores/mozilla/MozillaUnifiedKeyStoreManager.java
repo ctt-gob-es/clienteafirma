@@ -29,9 +29,9 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 
 /** Representa a un <i>AOKeyStoreManager</i> para acceso a almacenes de claves de
  * Firefox accedidos v&iacute;a NSS en el que se tratan de forma
