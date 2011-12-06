@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-package es.gob.afirma.core.ui.jse;
+package es.gob.afirma.ui.core.jse;
 
 import java.util.ArrayList;
 import java.util.List;
