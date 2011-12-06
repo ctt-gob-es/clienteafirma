@@ -33,7 +33,7 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.be.fedict.eid.applet.service.signer;
+package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,9 +50,9 @@ import javax.xml.transform.TransformerException;
 
 import org.xml.sax.SAXException;
 
-import es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml.AbstractOOXMLSignatureService;
-import es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.AbstractOOXMLSignatureService;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml.OOXMLProvider;
 
 /** Contenedor para la implementaci&oacute;n abstracta del servicio de firma OOXML. */
 public final class AbstractOOXMLSignatureServiceContainer {

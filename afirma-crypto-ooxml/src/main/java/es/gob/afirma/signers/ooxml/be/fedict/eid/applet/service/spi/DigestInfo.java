@@ -16,7 +16,7 @@
  * http://www.gnu.org/licenses/.
  */
 
-package es.gob.afirma.be.fedict.eid.applet.service.spi;
+package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.spi;
 
 import java.io.Serializable;
 

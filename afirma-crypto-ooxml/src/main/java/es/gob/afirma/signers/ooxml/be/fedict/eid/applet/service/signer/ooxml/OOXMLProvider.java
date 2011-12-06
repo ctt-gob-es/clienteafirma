@@ -1,6 +1,7 @@
 /*
  * eID Applet Project.
  * Copyright (C) 2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -18,6 +19,7 @@
 
 /*
  * Copyright (C) 2008-2009 FedICT.
+ * Copyright (C) 2009 Frank Cornelis.
  * This file is part of the eID Applet Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,25 +35,30 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.be.fedict.eid.applet.service.signer;
+package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.security.Provider;
+import java.security.Security;
 
-import org.apache.commons.io.output.ProxyOutputStream;
+/** Security Provider for Office OpenXML.
+ * @author Frank Cornelis */
+public final class OOXMLProvider extends Provider {
 
-/** Output Stream proxy that doesn't close the underlying stream.
- * @author fcorneli */
-class NoCloseOutputStream extends ProxyOutputStream {
+    private static final long serialVersionUID = 1L;
 
-    /** Main constructor.
-     * @param proxy */
-    NoCloseOutputStream(final OutputStream proxy) {
-        super(proxy);
+    private static final String NAME = "OOXMLProvider"; //$NON-NLS-1$
+
+    private OOXMLProvider() {
+        super(NAME, 1.0, "OOXML Security Provider"); //$NON-NLS-1$
+        put("TransformService." + RelationshipTransformService.TRANSFORM_URI, RelationshipTransformService.class.getName()); //$NON-NLS-1$
+        put("TransformService." + RelationshipTransformService.TRANSFORM_URI + " MechanismType", "DOM"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
-    @Override
-    public void close() throws IOException {
-        // empty
+    /** Installs this security provider. */
+    public static void install() {
+        final Provider provider = Security.getProvider(NAME);
+        if (null == provider) {
+            Security.addProvider(new OOXMLProvider());
+        }
     }
 }

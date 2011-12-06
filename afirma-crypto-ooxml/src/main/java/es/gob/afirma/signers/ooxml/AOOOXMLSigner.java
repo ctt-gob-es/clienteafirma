@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import es.gob.afirma.be.fedict.eid.applet.service.signer.AbstractOOXMLSignatureServiceContainer;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.AOInvalidFormatException;
@@ -33,10 +32,11 @@ import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.AbstractOOXMLSignatureServiceContainer;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
 /** Firmas OOXML basadas en una versi&oacute;n fuertemente modificada de las
- * clases <code>es.gob.afirma.be.fedict.eid.applet.service</code>. */
+ * clases <code>es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service</code>. */
 public final class AOOOXMLSigner implements AOSigner {
     
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$

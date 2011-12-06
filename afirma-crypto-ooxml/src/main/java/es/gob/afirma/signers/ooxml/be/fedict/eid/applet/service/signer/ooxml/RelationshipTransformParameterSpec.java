@@ -35,7 +35,7 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml;
+package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml;
 
 import java.util.LinkedList;
 import java.util.List;

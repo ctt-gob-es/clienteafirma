@@ -33,7 +33,7 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.be.fedict.eid.applet.service.signer.ooxml;
+package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.ooxml;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -75,8 +75,8 @@ import org.xml.sax.SAXException;
 import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
-import es.gob.afirma.be.fedict.eid.applet.service.signer.NoCloseInputStream;
-import es.gob.afirma.be.fedict.eid.applet.service.signer.SignatureFacet;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.NoCloseInputStream;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.SignatureFacet;
 
 /** Office OpenXML Signature Facet implementation.
  * @author fcorneli

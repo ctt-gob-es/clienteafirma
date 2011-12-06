@@ -33,7 +33,7 @@
  * limitations under the License.
  */
 
-package es.gob.afirma.be.fedict.eid.applet.service.signer;
+package es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -98,8 +98,8 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
 import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
-import es.gob.afirma.be.fedict.eid.applet.service.spi.DigestInfo;
-import es.gob.afirma.be.fedict.eid.applet.service.spi.SignatureService;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.spi.DigestInfo;
+import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.spi.SignatureService;
 
 /** Abstract base class for an XML Signature Service implementation.
  * @author fcorneli */
