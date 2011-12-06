@@ -13,9 +13,9 @@ import org.junit.Test;
 import junit.framework.Assert;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 
 /** Pruebas espec&iacute;ficas para los almacenes de Mac OS X.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */

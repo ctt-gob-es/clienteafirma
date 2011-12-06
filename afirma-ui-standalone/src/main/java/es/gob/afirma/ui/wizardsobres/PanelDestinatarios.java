@@ -37,11 +37,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import es.gob.afirma.core.AOCancelledOperationException;
-import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.ExtFilter;
 import es.gob.afirma.ui.utils.HelpUtils;

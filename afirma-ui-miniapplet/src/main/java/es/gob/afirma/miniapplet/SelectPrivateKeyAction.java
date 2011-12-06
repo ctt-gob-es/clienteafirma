@@ -9,12 +9,12 @@ import java.util.List;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.Platform.BROWSER;
 import es.gob.afirma.core.misc.Platform.OS;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /**
  * Acci&oacute;n privilegiada para la selecci&oacute;n de una clave privada

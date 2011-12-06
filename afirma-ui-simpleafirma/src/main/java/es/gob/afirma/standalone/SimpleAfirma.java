@@ -36,7 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.signature.SignValidity;
 import es.gob.afirma.signature.SignValidity.SIGN_DETAIL_TYPE;
 import es.gob.afirma.standalone.dnie.DNIeManager;

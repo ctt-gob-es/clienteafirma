@@ -12,7 +12,7 @@ package es.gob.afirma.ui.wizardmultifirmacofirma;
 import java.util.ArrayList;
 import java.util.List;
 
-import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**

@@ -27,7 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
 import es.gob.afirma.ui.utils.HelpUtils;

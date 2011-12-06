@@ -4,6 +4,7 @@ import java.security.cert.X509Certificate;
 
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /**
  * Filtro de certificados que s&oacute;lo admite el certificado de autenticaci&oacute;n del DNIe.

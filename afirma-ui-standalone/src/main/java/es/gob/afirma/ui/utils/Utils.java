@@ -57,11 +57,11 @@ import javax.swing.filechooser.FileFilter;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
 /**

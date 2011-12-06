@@ -251,7 +251,7 @@ interface MiniAfirma {
      * realizada por el applet. El texto obtenido consiste en la cadena de
      * excepciones cualificadas que produjeron el error, separadas por la cadena ": "
      * y seguidas igualmente por ": " y el mensaje del error. Por ejemplo:
-     * <p>{@code es.gob.afirma.keystores.common.AOCertificatesNotFoundException: 
+     * <p>{@code es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException: 
      * El almacen no contenia entradas validas}</p>
      * Si no se produjo ning&uacute;n error durante la
      * operaci&oacute;n, se devolver&aacute; {@code null}.

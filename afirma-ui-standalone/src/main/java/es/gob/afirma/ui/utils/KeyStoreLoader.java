@@ -3,8 +3,8 @@ package es.gob.afirma.ui.utils;
 import java.util.Vector;
 
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.KeyStoreConfiguration;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 
 /**
  * Clase para la recuperaci&oacute;n de los distintos almacenes del sistema

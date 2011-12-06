@@ -13,6 +13,7 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /**
  * Filtro de certificados que selecciona los certificados con un n&uacute;mero de

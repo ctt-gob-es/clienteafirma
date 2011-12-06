@@ -14,7 +14,7 @@ import java.awt.Component;
 
 import javax.swing.SwingWorker;
 
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 
 final class SimpleKeyStoreManagerWorker extends SwingWorker<Void, String> {
 
