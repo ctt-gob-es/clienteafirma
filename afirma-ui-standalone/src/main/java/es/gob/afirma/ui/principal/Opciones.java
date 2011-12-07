@@ -651,6 +651,7 @@ public class Opciones extends JAccessibilityDialog {
     	
     	// Cerramos la pantalla    	
     	dispose();
+    	HelpUtils.visualize(Main.helpIndex);
     }
 
 	/**
