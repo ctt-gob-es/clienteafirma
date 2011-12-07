@@ -1,6 +1,7 @@
 package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
+import java.io.File;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.PrivilegedExceptionAction;
@@ -16,29 +17,53 @@ import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
-/**
- * Acci&oacute;n privilegiada para la selecci&oacute;n de una clave privada
+/** Acci&oacute;n privilegiada para la selecci&oacute;n de una clave privada
  * de firma por el usuario.
- * @author Carlos Gamuci Mill&aacute;n.
- */
+ * @author Carlos Gamuci Mill&aacute;n. */
 final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateKeyEntry> {
 
 	private final AOKeyStore keyStore;
 	private final Component parent;
 	private final CertFilterManager filterManager;
 	
-	/**
-	 * Crea la acci&oacute;n para la seleccion de la clave privada de un certificado.
+	private String library = null;
+	
+	   /** Crea la acci&oacute;n para la selecci&oacute;n de la clave privada de un certificado.
+     * @param type Tipo de almac&eacute;n de certificados y claves privadas a usar.
+     * @param lib Fichero asociado al almac&aacute;n (biblioteca din&aacute;mica en el caso de PKCS#11,
+     *            fichero PFX en el caso de PKCS#12, archivo de llavero en el caso de llavero de Mac OS X, etc.
+     * @param filterManager Manejador de filtros de certificados.
+     * @param parent Componente padre para los di&aacute;logos que se
+     * visualizan como parte de la acci&oacute;n. */
+	SelectPrivateKeyAction(final AOKeyStore type, 
+	                       final String lib,
+	                       final CertFilterManager filterMgr, 
+                           final Component p) {
+	    if (type == null) {
+	        throw new IllegalArgumentException("El tipo de almacen no puede ser nulo"); //$NON-NLS-1$
+	    }
+	    this.keyStore = type;
+	    this.filterManager = filterMgr;
+	    this.parent = p;
+	    if (lib != null) {
+	        final File l = new File(lib);
+	        if (!l.exists() || !l.canRead()) {
+	            throw new IllegalArgumentException("La biblioteca no existe o no se puede leer: " + lib); //$NON-NLS-1$
+	        }
+	    }
+	    this.library = lib;
+	}
+	
+	/** Crea la acci&oacute;n para la selecci&oacute;n de la clave privada de un certificado.
 	 * @param os Sistema operativo actual.
 	 * @param browser Navegador web actual.
 	 * @param filterManager Manejador de filtros de certificados.
-	 * @param parent Componente padre sobre el que se montanlos di&aacute;logos que se
-	 * visualizan como parte de la acci&oacute;n.
-	 */
+	 * @param parent Componente padre para los di&aacute;logos que se
+	 * visualizan como parte de la acci&oacute;n. */
 	SelectPrivateKeyAction(final OS os, 
-	                              final BROWSER browser, 
-	                              final CertFilterManager filterManager, 
-	                              final Component parent) {
+	                       final BROWSER browser, 
+	                       final CertFilterManager filterManager, 
+	                       final Component parent) {
 		if (os == OS.WINDOWS) {
 			if (browser == BROWSER.FIREFOX) {
 				this.keyStore = AOKeyStore.MOZ_UNI;
@@ -63,7 +88,7 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 	public PrivateKeyEntry run() throws KeyException, AOKeystoreAlternativeException, AOException {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			this.keyStore, 
-			null, 
+			this.library, 
 			null,
 			KeyStoreUtilities.getPreferredPCB(this.keyStore, this.parent), 
 			this.parent
