@@ -485,12 +485,13 @@ public class Opciones extends JAccessibilityDialog {
     	
         bottomPanel.removeAll();
 		GridBagConstraints cons = new GridBagConstraints();
-		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes al redimensionar
+		//cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes al redimensionar
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.ipadx = 0;
 		cons.gridx = 0;
 		cons.gridy = 0;
-		cons.insets = new Insets(11, 0, 13, 0);
+		cons.insets = new Insets(0, 0, 0, 120);
+		cons.weighty = 1.0;
 		
 		// Etiqueta para rellenar a la izquierda
 		JLabel label = new JLabel();
@@ -583,6 +584,7 @@ public class Opciones extends JAccessibilityDialog {
         cons.ipadx = 0;
 		cons.weightx = 1.0;
 		cons.gridx = 1;
+		cons.insets = new Insets(0, 0, 0, 0);
 		
 		bottomPanel.add(buttonPanel, cons);
         
