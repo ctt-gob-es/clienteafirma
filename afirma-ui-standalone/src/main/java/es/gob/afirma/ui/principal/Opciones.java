@@ -10,6 +10,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -27,6 +28,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Properties;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -490,12 +492,18 @@ public class Opciones extends JAccessibilityDialog {
 		cons.ipadx = 0;
 		cons.gridx = 0;
 		cons.gridy = 0;
-		cons.insets = new Insets(0, 0, 0, 120);
-		cons.weighty = 1.0;
+		//cons.insets = new Insets(0, 0, 0, 120);
+		cons.weighty = 1.0;		
 		
-		// Etiqueta para rellenar a la izquierda
-		JLabel label = new JLabel();
-		bottomPanel.add(label, cons);
+		JPanel panelVacio2 = new JPanel();
+		panelVacio2.setPreferredSize(new Dimension(1, 1));
+		cons.weightx = 0.8;
+        cons.weighty = 0.2;
+        cons.gridwidth = 1;
+        cons.gridx = 0;
+        cons.insets = new Insets(0, 0, 0, 0);        
+        
+		bottomPanel.add(panelVacio2, cons);
         
 //		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
 //		//Boton maximizar ventana
@@ -582,6 +590,7 @@ public class Opciones extends JAccessibilityDialog {
 		buttonPanel.add(panelCancelar, BorderLayout.CENTER);
 		
         cons.ipadx = 0;
+        cons.weighty = 1.0;
 		cons.weightx = 1.0;
 		cons.gridx = 1;
 		cons.insets = new Insets(0, 0, 0, 0);
