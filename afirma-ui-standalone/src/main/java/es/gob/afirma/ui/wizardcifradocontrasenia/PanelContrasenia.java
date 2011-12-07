@@ -13,7 +13,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -191,13 +195,50 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         //Relación entre etiqueta y campo de contraseña
         etiquetaContraseniaRep.setLabelFor(campoContraseniaRep);
         //Asignación de mnemónico
-        etiquetaContraseniaRep.setDisplayedMnemonic(KeyEvent.VK_N);
+        etiquetaContraseniaRep.setDisplayedMnemonic(KeyEvent.VK_N);       
 
-        c.fill = GridBagConstraints.BOTH;
         c.gridy = 5;
+        c.insets = new Insets(5, 20, 0, 20);        
+        
+        //Check de mostrar contraseña o no
+		JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
+		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
+		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
+		showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
+		showPassCheckBox.setMnemonic(KeyEvent.VK_T);
+		
+		//Se almacena el caracter por defecto para ocultar la contraseña
+		final char defaultChar = campoContrasenia.getEchoChar();
+		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
+		showPassCheckBox.addItemListener(new ItemListener() {
+			@Override
+            public void itemStateChanged(ItemEvent evt) {
+				if (evt.getStateChange() == ItemEvent.SELECTED){
+					//Se muestra la contraseña
+					campoContrasenia.setEchoChar((char)0);
+					campoContraseniaRep.setEchoChar((char)0);
+					
+				} else if (evt.getStateChange() == ItemEvent.DESELECTED){
+					//Se oculta la contraseña
+					campoContrasenia.setEchoChar(defaultChar);
+					campoContraseniaRep.setEchoChar(defaultChar);
+				}
+				
+				//Foco al input
+				campoContrasenia.requestFocus();
+			}
+		});
+		Utils.remarcar(showPassCheckBox);
+		Utils.setContrastColor(showPassCheckBox);
+		Utils.setFontBold(showPassCheckBox);
+		panelCheckShowPass.add(showPassCheckBox);
+		
+		panelCentral.add(panelCheckShowPass, c);        
+        
+		c.fill = GridBagConstraints.BOTH;
+        c.gridy = 6;
         c.weighty = 1.0;
-        c.insets = new Insets(20, 20, 0, 20);
-
+        c.insets = new Insets(20, 20, 0, 20);        
 
         // Etiqueta que contiene el texto "El olvido o perdida..."
         InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto5"), false);

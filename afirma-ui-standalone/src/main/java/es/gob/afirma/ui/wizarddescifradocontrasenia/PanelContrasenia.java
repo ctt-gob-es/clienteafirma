@@ -13,7 +13,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -127,7 +131,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		 c.insets = new Insets(20, 20, 0, 20);
 		 c.weightx = 1.0;
 		 c.gridx = 0;
-		 c.gridy	= 1;
+		 c.gridy = 1;
 		 
 		//Etiqueta con el texto Contrasenia de descifrado
     	JLabel passwordLabel = new JLabel (Messages.getString("WizardDescifrado.contrasenia"));
@@ -158,11 +162,47 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         //Relación entre etiqueta y campo de texto
         passwordLabel.setLabelFor(campoContrasenia);
       	//Asignación de mnemónico
-        passwordLabel.setDisplayedMnemonic(KeyEvent.VK_O);
+        passwordLabel.setDisplayedMnemonic(KeyEvent.VK_O);       
+        
+        c.gridy = 3;
+        c.insets = new Insets(5, 20, 0, 20);        
+        
+        //Check de mostrar contraseña o no
+		JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
+		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
+		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
+		showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
+		showPassCheckBox.setMnemonic(KeyEvent.VK_T);
+		
+		//Se almacena el caracter por defecto para ocultar la contraseña
+		final char defaultChar = campoContrasenia.getEchoChar();
+		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
+		showPassCheckBox.addItemListener(new ItemListener() {
+			@Override
+            public void itemStateChanged(ItemEvent evt) {
+				if (evt.getStateChange() == ItemEvent.SELECTED){
+					//Se muestra la contraseña
+					campoContrasenia.setEchoChar((char)0);
+					
+				} else if (evt.getStateChange() == ItemEvent.DESELECTED){
+					//Se oculta la contraseña
+					campoContrasenia.setEchoChar(defaultChar);
+				}
+				
+				//Foco al input
+				campoContrasenia.requestFocus();
+			}
+		});
+		Utils.remarcar(showPassCheckBox);
+		Utils.setContrastColor(showPassCheckBox);
+		Utils.setFontBold(showPassCheckBox);
+		panelCheckShowPass.add(showPassCheckBox);
+		
+		panelCentral.add(panelCheckShowPass, c);      
         
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(20, 20, 0, 20);
-        c.gridy	= 3;
+        c.gridy	= 4;
         c.weighty = 1.0;
         
         // Etiqueta que contiene el texto "Introduzca la contrasenia con..."
