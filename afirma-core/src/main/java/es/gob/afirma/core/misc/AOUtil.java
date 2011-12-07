@@ -653,9 +653,9 @@ public final class AOUtil {
      */
     public static ClassLoader getCleanClassLoader() {
         ClassLoader classLoader = AOUtil.class.getClassLoader();
-        if (classLoader instanceof URLClassLoader) {
-        	ArrayList<URL> urls = new ArrayList<URL>();
-        	for (URL url : ((URLClassLoader) classLoader).getURLs()) {
+        if (classLoader instanceof URLClassLoader && !classLoader.getClass().toString().contains("sun.plugin2.applet.JNLP2ClassLoader")) { //$NON-NLS-1$
+        	final ArrayList<URL> urls = new ArrayList<URL>();
+        	for (final URL url : ((URLClassLoader) classLoader).getURLs()) {
         		if (url.toString().endsWith(".jar")) { //$NON-NLS-1$
         			urls.add(url);
         		}
