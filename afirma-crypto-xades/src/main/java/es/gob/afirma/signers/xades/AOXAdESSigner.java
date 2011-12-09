@@ -1169,6 +1169,7 @@ public final class AOXAdESSigner implements AOSigner {
         return false;
     }
 
+    /** {@inheritDoc} */
     public byte[] getData(final byte[] sign) throws AOInvalidFormatException {
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -2019,6 +2020,7 @@ public final class AOXAdESSigner implements AOSigner {
         }
     }
 
+    /** {@inheritDoc} */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
         // Obtenemos el arbol del documento
@@ -2122,6 +2124,7 @@ public final class AOXAdESSigner implements AOSigner {
         return arrayNodes.toArray(new AOTreeNode[0]);
     }
 
+    /** {@inheritDoc} */
     public boolean isSign(final byte[] sign) {
 
         if (sign == null) {
@@ -2163,7 +2166,7 @@ public final class AOXAdESSigner implements AOSigner {
     }
 
     /** Comprueba que los nodos de firma proporcionados sean firmas en el formato
-     * dato.
+     * dado.
      * @param signNodes
      *        Listado de nodos de firma.
      * @return Devuelve {@code true} cuando todos los nodos sean firmas en este
@@ -2181,6 +2184,7 @@ public final class AOXAdESSigner implements AOSigner {
         return true;
     }
 
+    /** {@inheritDoc} */
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -2189,6 +2193,7 @@ public final class AOXAdESSigner implements AOSigner {
         return true;
     }
 
+    /** {@inheritDoc} */
     public String getSignedName(final String originalName, final String inText) {
         return originalName + (inText != null ? inText : "") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -2217,6 +2222,7 @@ public final class AOXAdESSigner implements AOSigner {
         return docAfirma;
     }
 
+    /** {@inheritDoc} */
     public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
