@@ -88,77 +88,7 @@ import es.gob.afirma.signers.xml.Utils.ReferenceIsNotXMLException;
 import es.gob.afirma.signers.xml.XMLConstants;
 
 /** Manejador de firmas XML XAdES.
- * Soporta XAdES-BES y XAdES-EPES. &Uacute;nicamente expone los m&eacute;todos declarados en el interfaz implementado <code>AOSigner</code>.
- * 
- * 
- * 
- * 
- * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
- * <p>
- * Tratamiento de las hojas de estilo en firmas XML:
- * <ul>
- *  <li>Firmas XML Enveloped</li>
- *  <ul>
- *   <li>Hoja de estilo con ruta relativa</li>
- *  <ul>
- *   <li>No se firma.</li>
- *  </ul>
- *   <li>Hola de estilo remota con ruta absoluta</li>
- *  <ul>
- *   <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
- *   <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- *  </ul>
- *   <li>Hoja de estilo empotrada</li>
- *  <ul>
- *   <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
- *  </ul>
- * </ul>
- * <li>Firmas XML Externally Detached</li>
- * <ul>
- * <li>Hoja de estilo con ruta relativa</li>
- * <ul>
- * <li>No se firma.</li>
- * </ul>
- * <li>Hola de estilo remota con ruta absoluta</li>
- * <ul>
- * <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- * </ul>
- * <li>Hoja de estilo empotrada</li>
- * <ul>
- * <li>No es necesaria ninguna acci&oacute;n</li>
- * </ul>
- * </ul>
- * <li>Firmas XML Enveloping</li>
- * <ul>
- * <li>Hoja de estilo con ruta relativa</li>
- * <ul>
- * <li>No se firma.</li>
- * </ul>
- * <li>Hola de estilo remota con ruta absoluta</li>
- * <ul>
- * <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- * </ul>
- * <li>Hoja de estilo empotrada</li>
- * <ul>
- * <li>No es necesaria ninguna acci&oacute;n</li>
- * </ul>
- * </ul>
- * <li>Firmas XML Internally Detached</li>
- * <ul>
- * <li>Hoja de estilo con ruta relativa</li>
- * <ul>
- * <li>No se firma.</li>
- * </ul>
- * <li>Hola de estilo remota con ruta absoluta</li>
- * <ul>
- * <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
- * </ul>
- * <li>Hoja de estilo empotrada</li>
- * <ul>
- * <li>No es necesaria ninguna acci&oacute;n</li>
- * </ul>
- * </ul> </ul>
- * </p>
+ * Soporta XAdES-BES y XAdES-EPES. 
  * @version 0.3 */
 public final class AOXAdESSigner implements AOSigner {
     
@@ -205,7 +135,73 @@ public final class AOXAdESSigner implements AOSigner {
         }
     }
 
-    /** Firma datos en formato XAdES.<br/>
+    /** Firma datos en formato XAdES.
+     * <p>
+     * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de estilo XSL asociadas, siguiendo el siguiente criterio:
+     * <ul>
+     *  <li>Firmas XML <i>Enveloped</i></li>
+     *  <ul>
+     *   <li>Hoja de estilo con ruta relativa</li>
+     *  <ul>
+     *   <li>No se firma.</li>
+     *  </ul>
+     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *  <ul>
+     *   <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+     *   <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+     *  </ul>
+     *   <li>Hoja de estilo empotrada</li>
+     *   <ul>
+     *    <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
+     *   </ul>
+     *  </ul>
+     *  <li>Firmas XML <i>Externally Detached</i></li>
+     *  <ul>
+     *   <li>Hoja de estilo con ruta relativa</li>
+     *   <ul>
+     *    <li>No se firma.</li>
+     *   </ul>
+     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *   <ul>
+     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+     *   </ul>
+     *   <li>Hoja de estilo empotrada</li>
+     *   <ul>
+     *    <li>No es necesaria ninguna acci&oacute;n</li>
+     *   </ul>
+     *  </ul>
+     *  <li>Firmas XML <i>Enveloping</i></li>
+     *  <ul>
+     *   <li>Hoja de estilo con ruta relativa</li>
+     *   <ul>
+     *    <li>No se firma.</li>
+     *   </ul>
+     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *   <ul>
+     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+     *   </ul>
+     *   <li>Hoja de estilo empotrada</li>
+     *   <ul>
+     *    <li>No es necesaria ninguna acci&oacute;n</li>
+     *   </ul>
+     *  </ul>
+     *  <li>Firmas XML <i>Internally Detached</i></li>
+     *  <ul>
+     *   <li>Hoja de estilo con ruta relativa</li>
+     *   <ul>
+     *    <li>No se firma.</li>
+     *   </ul>
+     *   <li>Hola de estilo remota con ruta absoluta</li>
+     *   <ul>
+     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+     *   </ul>
+     *   <li>Hoja de estilo empotrada</li>
+     *   <ul>
+     *    <li>No es necesaria ninguna acci&oacute;n</li>
+     *   </ul>
+     *  </ul> 
+     * </ul>
+     * </p>
      * @param data Datos que deseamos firmar.
      * @param algorithm Algoritmo a usar para la firma.
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -306,7 +302,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  <dt><b><i>xadesNamespace</i></b></dt>
      *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd> <!--
      *  <dt><b><i>xmlDSigNamespacePrefix</i></b></dt>
-     *   <dd>Prefijo del espacio de nombres de XMLDSig (normalmente "dsig" o "ds")</dd> -->
+     *   <dd>Prefijo a usar en el espacio de nombres de XMLDSig (normalmente "dsig" o "ds")</dd> -->
      *  <dt><b><i>ignoreStyleSheets</i></b></dt>
      *   <dd>
      *    Ignora las hojas de estilo externas de los XML (no las firma) si se establece a <code>true</code>, 
@@ -1132,7 +1128,7 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Comprueba si la firma es detached
      * @param element
-     *        Elemento que contiene el nodo ra$iacute;z del documento que se
+     *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es detached */
     public boolean isDetached(final Element element) {
@@ -1147,7 +1143,7 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Comprueba si la firma es enveloped
      * @param element
-     *        Elemento que contiene el nodo ra$iacute;z del documento que se
+     *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloped */
     public boolean isEnveloped(final Element element) {
@@ -1162,13 +1158,12 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Comprueba si la firma es enveloping
      * @param element
-     *        Elemento que contiene el nodo ra$iacute;z del documento que se
+     *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
     public boolean isEnveloping(final Element element) {
-        if (element.getLocalName().equals(SIGNATURE_TAG) || (element.getLocalName().equals(AFIRMA) && element.getFirstChild()
-                                                                                                           .getLocalName()
-                                                                                                           .equals(SIGNATURE_TAG))) {
+        if (element.getLocalName().equals(SIGNATURE_TAG) || 
+           (element.getLocalName().equals(AFIRMA) && element.getFirstChild().getLocalName().equals(SIGNATURE_TAG))) {
             return true;
         }
         return false;
@@ -1322,7 +1317,11 @@ public final class AOXAdESSigner implements AOSigner {
         return spi;
     }
 
-    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
+    public byte[] cosign(final byte[] data, 
+                         final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         final Properties xParams) throws AOException {
 
         final String algoUri = XMLConstants.SIGN_ALGOS_URI.get(algorithm);
         if (algoUri == null) {
@@ -1516,9 +1515,9 @@ public final class AOXAdESSigner implements AOSigner {
         }
 
         // Cadena de certificados
-        Certificate[] rawcerts = keyEntry.getCertificateChain();
-        List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
-        for (Certificate c : rawcerts) {
+        final Certificate[] rawcerts = keyEntry.getCertificateChain();
+        final List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
+        for (final Certificate c : rawcerts) {
             if (c instanceof X509Certificate) {
                 certificates.add((X509Certificate)c);
             }
@@ -1537,7 +1536,10 @@ public final class AOXAdESSigner implements AOSigner {
         return Utils.writeXML(rootSig, originalXMLProperties, null, null);
     }
 
-    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    public byte[] cosign(final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         final Properties extraParams) throws AOException {
 
         // nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)
@@ -1595,7 +1597,6 @@ public final class AOXAdESSigner implements AOSigner {
             encoding = XMLConstants.BASE64_ENCODING;
         }
         
-
         if (sign == null) {
             throw new IllegalArgumentException("El objeto de firma no puede ser nulo"); //$NON-NLS-1$
         }
