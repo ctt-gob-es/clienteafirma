@@ -87,8 +87,12 @@ import es.gob.afirma.signers.xml.Utils.IsInnerlException;
 import es.gob.afirma.signers.xml.Utils.ReferenceIsNotXMLException;
 import es.gob.afirma.signers.xml.XMLConstants;
 
-/** Operaciones de firmas en formato XAdES.
- * <p>
+/** Manejador de firmas XML XAdES.
+ * Soporta XAdES-BES y XAdES-EPES. &Uacute;nicamente expone los m&eacute;todos declarados en el interfaz implementado <code>AOSigner</code>.
+ * 
+ * 
+ * 
+ * 
  * Par&aacute;metros adicionales aceptados para las operaciones de firma:<br>
  * <dl>
  *  <dt><b>uri</b></dt>

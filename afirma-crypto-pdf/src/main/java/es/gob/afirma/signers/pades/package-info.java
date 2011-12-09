@@ -48,7 +48,7 @@
  *  <p align="center"><img src="doc-files/package-info-1.png"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias ditectas de primer nivel:</p>
  *  <ul>
- *   <li>Dependencia con el m&oacute;dulo n&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
+ *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo PKCS#7 (<i>afirma-crypto-core-pkcs7</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo CAdES (<i>afirma-crypto-cades</i>) del Cliente.</li>
  *   <li>Dependencia con BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).</li>
