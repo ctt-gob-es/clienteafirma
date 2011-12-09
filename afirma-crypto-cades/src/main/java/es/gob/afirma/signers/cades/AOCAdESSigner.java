@@ -32,7 +32,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
 import es.gob.afirma.signers.pkcs7.ReadNodesTree;
 
 /** Manejador de firmas binarias CADES.
- * Soporta CAdES-BES y CAdES-EPES. &Uacute;nicamente expone los m&eacute;todos declarados en el interfaz implementado <code>AOSigner</code>.
+ * Soporta CAdES-BES, CAdES-EPES y CAdES-T. &Uacute;nicamente expone los m&eacute;todos declarados en el interfaz implementado <code>AOSigner</code>.
  * <p>Un posible ejemplo de uso ser&iacute;a el siguiente:</p>
  * <pre>
  * 

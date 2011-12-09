@@ -33,14 +33,14 @@
  *  </table></p>
  *  <p>
  *   <sup>*</sup> La generaci&oacute;n de CAdES-T puede realizarse a&ntilde;adiendo un sello de tiempo una vez generada la
- *   firma mediante la clase <code>es.gob.afirma.signers.pkcs7.CMSTimestamper</code>, perteneciente al m&oacute;dulo PKCS#7 
- *   del Cliente (<i>es.gob.afirma.signers.pkcs7</i>), para lo cual se necesita conexi&oacute;n
+ *   firma mediante la clase <code>es.gob.afirma.signers.tsp.pkcs7.CMSTimestamper</code>, perteneciente al m&oacute;dulo PKCS#7 TSP 
+ *   del Cliente (<i>afirma-crypto-core-pkcs7-tsp</i>), para lo cual se necesita conexi&oacute;n
  *   con una autoridad de sellado de tiempo (TSA).
  *  </p>
  *  <p align="center"><img src="doc-files/package-info-1.png"></p>
  *  <p>Este m&oacute;dulo presenta las siguientes dependencias directas de primer nivel:</p>
  *  <ul>
- *   <li>Dependencia con el m&oacute;dulo n&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
+ *   <li>Dependencia con el m&oacute;dulo N&uacute;cleo (<i>afirma-core</i>) del Cliente.</li>
  *   <li>Dependencia con el m&oacute;dulo PKCS#7 (<i>afirma-crypto-core-pkcs7</i>) del Cliente.</li>
  *   <li>Dependencia con BouncyCastle 1.46 o superior (Proveedor + TSP + <i>Mail</i>).</li>
  *  </ul>
