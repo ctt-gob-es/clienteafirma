@@ -89,7 +89,22 @@ import es.gob.afirma.signers.xml.XMLConstants;
 
 /** Manejador de firmas XML XAdES.
  * <p>Soporta XAdES-BES y XAdES-EPES.</p>
- * <b>Distintos formatos de firmas XML</b>
+ * <p>
+ *  Debido a errores en algunas versiones del entorno de ejecuci&oacute;n de Java, esta clase puede generar ocasionalmente
+ *  mensajes en consola del tipo: <code>[Fatal Error] :1:1: Content is not allowed in prolog.</code>. Estos
+ *  deben ignorarse, ya que no indican ninguna condici&oacute;n de error ni malfuncionamiento.
+ * </p>
+ * <p>
+ *  Los atributos espec&iacute;ficos XAdES implementados por esta clase (adem&aacute;s de los 
+ *  relativos a las políticas de firma) son:
+ * </p>
+ * <ul>
+ *  <li><i>SigningTime</i></li>
+ *  <li><i>SigningCerticate</i></li>
+ *  <li><i>IssuerSerial</i></li>
+ *  <li><i>SignedDataObjectProperties</i></li>
+ * </ul>
+ * <p><b>Distintos formatos de firmas XML</b></p>
  * <dl>
  *  <dt><i>Detached</i></dt>
  *  <dd>
@@ -207,6 +222,80 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *    Otra variante de firma es la <i>Enveloping</i>, en la que la estructura XML de firma es la &uacute;nica 
  *    en el documento de firma, y esta contiene internamente el contenido firmado (en un nodo propio).
  *   </p>
+ *   <pre>
+ *    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+ *    &lt;ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"&gt;
+ *     &lt;ds:SignedInfo&gt;
+ *      &lt;ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/&gt;
+ *      &lt;ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/&gt;
+ *      &lt;ds:Reference URI="#obj"&gt;
+ *       &lt;ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/&gt;
+ *       &lt;ds:DigestValue/&gt;
+ *      &lt;/ds:Reference&gt;
+ *     &lt;/ds:SignedInfo&gt;
+ *     &lt;ds:SignatureValue/&gt;
+ *     &lt;ds:Object Id="obj"&gt;SFGJKASGFJKASEGUYFGEYGEYRGADFJKASGDFSUYFG=&lt;/ds:Object&gt;
+ *    &lt;/ds:Signature&gt;
+ *   </pre>
+ *   <p>
+ *    En este caso, los datos firmados se encuentran en el nodo <i>Object</i>, referenciados 
+ *    internamente al XML mediante el identificador <i>obj</i>.
+ *   </p>
+ *   <p>
+ *    Al igual que ocurr&iacute;a con el formato <i>Detached</i>, si los datos no son XML, no 
+ *    es posible insertarlos directamente dentro de una estructura XML, por lo que se codifican 
+ *    previamente en Base64.
+ *   </p>
+ *  </dd>
+ *  <dt><i>Enveloped</i></dt>
+ *  <dd>
+ *   <p>
+ *    Este formato de firma XMLDSig est&aacute; pensado para que un contenido XML pueda auto-contener 
+ *    su propia firma digital, insert&aacute;ndola en un nodo propio interno, por lo que, al contrario 
+ *    que en los formatos anteriores, no es posible firmar contenido que no sea XML.
+ *   </p>
+ *   <p>
+ *    Un ejemplo simple del resultado de una firma <i>Enveloped</i> podr&iacute;a ser el siguiente:
+ *   </p>
+ *   <pre>
+ *    &lt;!DOCTYPE Enveloped [
+ *     &lt;!ENTITY ds "http://www.w3.org/2000/09/xmldsig#"&gt;
+ *     &lt;!ENTITY c14n "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"&gt;
+ *     &lt;!ENTITY enveloped "http://www.w3.org/2000/09/xmldsig#enveloped-signature"&gt;
+ *     &lt;!ENTITY xslt "http://www.w3.org/TR/1999/REC-xslt-19991116"&gt;
+ *     &lt;!ENTITY digest "http://www.w3.org/2000/09/xmldsig#sha1"&gt;
+ *    ]&gt;
+ *    &lt;Letter&gt;
+ *     &lt;Return-address&gt;address&lt;/Return-address&gt;
+ *     &lt;To&gt;You&lt;/To&gt;
+ *     &lt;Message&gt;msg body&lt;/Message&gt;
+ *     &lt;From&gt;
+ *      &lt;ds:Signature xmlns:ds="&ds;"&gt;
+ *       &lt;ds:SignedInfo&gt;
+ *        &lt;ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/&gt;
+ *        &lt;ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/&gt;
+ *        &lt;ds:Reference URI=""&gt;
+ *         &lt;ds:Transforms&gt;
+ *          &lt;ds:Transform Algorithm="&enveloped;"&gt;&lt;/ds:Transform&gt;
+ *         &lt;/ds:Transforms&gt;
+ *         &lt;ds:DigestMethod Algorithm="&digest;"/&gt;
+ *         &lt;ds:DigestValue&gt;&lt;/ds:DigestValue&gt;
+ *        &lt;/ds:Reference&gt;
+ *       &lt;/ds:SignedInfo&gt;
+ *       &lt;ds:SignatureValue/&gt;
+ *      &lt;/ds:Signature&gt;
+ *     &lt;/From&gt;
+ *     &lt;Attach&gt;attachement&lt;/Attach&gt;
+ *    &lt;/Letter&gt;
+ *   </pre>
+ *   <p>
+ *    En este caso, el documento original (<i>Letter</i>), contiene internamente la estructura de firma digital
+ *    (<i>Signature</i>).
+ *   </p>
+ *   <p>
+ *    Una peculiaridad de la estructura generada es que esta referenciada mediante una URI vac&iacute;a 
+ *    (<code>URI=""</code>), lo cual indica que la firma aplica a la totalidad del documento original.
+ *   </p>
  *  </dd>
  * @version 0.3 */
 public final class AOXAdESSigner implements AOSigner {
@@ -267,7 +356,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <li>Hola de estilo remota con ruta absoluta</li>
      *  <ul>
      *   <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en el XML original</li>
-     *   <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+     *   <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
      *  </ul>
      *   <li>Hoja de estilo empotrada</li>
      *   <ul>
@@ -282,7 +371,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   </ul>
      *   <li>Hola de estilo remota con ruta absoluta</li>
      *   <ul>
-     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+     *    <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
      *   </ul>
      *   <li>Hoja de estilo empotrada</li>
      *   <ul>
@@ -297,7 +386,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   </ul>
      *   <li>Hola de estilo remota con ruta absoluta</li>
      *   <ul>
-     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+     *    <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
      *   </ul>
      *   <li>Hoja de estilo empotrada</li>
      *   <ul>
@@ -312,7 +401,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   </ul>
      *   <li>Hola de estilo remota con ruta absoluta</li>
      *   <ul>
-     *    <li>Se firma una referencia (canonicalizada) a esta hoja remota</li>
+     *    <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
      *   </ul>
      *   <li>Hoja de estilo empotrada</li>
      *   <ul>
@@ -414,7 +503,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>
      *    Codificaci&oacute;n de los datos a firmar
      *   </dd>
-     *  <dt><b><i>oid</b><dt>
+     *  <dt><b><i>oid</i></b><dt>
      *   <dd>OID que identifica el tipo de datos a firmar</dd>
      *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
@@ -440,6 +529,38 @@ public final class AOXAdESSigner implements AOSigner {
      *    &Uacute;til para los procesos desatendidos y por lotes
      *   </dd>
      * </dl>
+     * <p>
+     *  Respecto al uso de los par&aacute;metros <code>xmlTransform</code>n<code>Type</code>, 
+     *  <code>xmlTransform</code>n<code>Subtype</code> y <code>xmlTransform</code>n<code>Body</code>,
+     *  sus valores van ligados, acept&aacute;ndose las siguientes combinaciones:
+     * </p>
+     * <p>
+     *  Transformaci&oacute;n <b>XPATH</b><br>
+     *  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/TR/1999/REC-xpath-19991116</code><br>
+     *  &nbsp;&nbsp;-<b>Subtipos</b>: No tiene subtipos.<br>
+     *  &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XPATH.<br>
+     *  <br>Transformaci&oacute;n <b>XPATH2</b><br>
+     *  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/2002/06/xmldsig-filter2</code><br>
+     *  &nbsp;&nbsp;-<b>Subtipos</b>:<br>
+     *  &nbsp;&nbsp;&nbsp;&nbsp;<b><i>subtract</i></b>: Resta.<br>
+     *  &nbsp;&nbsp;&nbsp;&nbsp;<b><i>intersect</i></b>: Intersecci&oacute;n<br>
+     *  &nbsp;&nbsp;&nbsp;&nbsp;<b><i>union</i></b>: Uni&oacute;n<br>
+     *  &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XPATH2.<br>
+     *  <br>Transformaci&oacute;n <b>XSLT</b><br>
+     *  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/TR/1999/REC-xslt-19991116</code><br>
+     *  &nbsp;&nbsp;-<b>Subtipos</b>: No tiene subtipos.<br>
+     *  &nbsp;&nbsp;-<b>Cuerpo</b>: Especificado mediante sentencias de tipo XSLT.<br>
+     *  <br>Transformaci&oacute;n <b>BASE64</b><br>
+     *  &nbsp;&nbsp;-<b>Tipo</b>: <code>http://www.w3.org/2000/09/xmldsig#base64</code><br>
+     *  &nbsp;&nbsp;-<b>Subtipos</b>: No tiene subtipos.<br>
+     *  &nbsp;&nbsp;-<b>Cuerpo</b>: No tiene cuerpo.
+     * </p>
+     * <p>
+     *  No es posible especificar transformaciones complejas que incluyan varias sentencias. 
+     *  En su lugar, puede declararse una sucesi&oacute;n de transformaciones simples que produzcan el 
+     *  mismo resultado. Cada una de las transformaciones se aplicar&aacute; de forma ordenada sobre el 
+     *  resultado de la anterior.
+     * </p>
      * @return Firma en formato XAdES
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] sign(final byte[] data, 
