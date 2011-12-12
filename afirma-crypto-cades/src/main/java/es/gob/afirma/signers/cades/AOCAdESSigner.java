@@ -87,7 +87,7 @@ public final class AOCAdESSigner implements AOSigner {
      *   </dd>
      *  <dt><b><i>policyIdentifier</i></b></dt>
      *   <dd>
-     *    Identificadora de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
+     *    Identificador de la pol&iacute;tica de firma. Debe ser un OID (o una URN de tipo OID) que identifique 
      *    &uacute;nivocamente la pol&iacute;tica en formato ASN.1 procesable.
      *   </dd>
      *  <dt><b><i>policyIdentifierHash</i></b></dt>
