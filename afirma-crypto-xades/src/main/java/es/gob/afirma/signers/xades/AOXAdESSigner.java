@@ -88,7 +88,126 @@ import es.gob.afirma.signers.xml.Utils.ReferenceIsNotXMLException;
 import es.gob.afirma.signers.xml.XMLConstants;
 
 /** Manejador de firmas XML XAdES.
- * Soporta XAdES-BES y XAdES-EPES. 
+ * <p>Soporta XAdES-BES y XAdES-EPES.</p>
+ * <b>Distintos formatos de firmas XML</b>
+ * <dl>
+ *  <dt><i>Detached</i></dt>
+ *  <dd>
+ *   <p>
+ *    La firma XML en modo <i>Detached</i> permite tener una firma de forma separada e independiente del
+ *    contenido firmado, pudiendo relacionar firma con contenido firmado mediante una referencia de tipo
+ *    URI. Este tipo de firmas es &uacute;til cuando no se puede modificar el contenido original pero se
+ *    desea constatar su autenticidad, procedencia, etc.<br>
+ *   </p>
+ *   <p>
+ *    Un uso com&uacute;n de este formato es en la descarga de ficheros, pudiendo poner a disposici&oacute;n
+ *    del internauta, junto al contenido a descargar, un peque&ntilde;o fichero de firma para verificar la
+ *    integridad del primero.
+ *   </p>
+ *   <p>
+ *    Un ejemplo de este tipo de firmas ser&iacute;a la siguiente estructura (resumida) XML:
+ *   </p>
+ *   <pre>
+ *   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+ *    &lt;ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"&gt;
+ *     &lt;ds:SignedInfo&gt;
+ *      &lt;ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/&gt;
+ *      &lt;ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/&gt;
+ *      &lt;ds:Reference URI="http://www.mpt.es/contenido"&gt;
+ *       &lt;ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/&gt;
+ *       &lt;ds:DigestValue/&gt;
+ *      &lt;/ds:Reference&gt;
+ *     &lt;/ds:SignedInfo&gt;
+ *     &lt;ds:SignatureValue/&gt;
+ *    &lt;/ds:Signature&gt;
+ *   </pre>
+ *   <p>
+ *    En este ejemplo, los datos firmados se encuentran en un servidor Web accesible p&uacute;blicamente:
+ *    <cite>http://www.mpt.es/contenido</cite>, y se referencia como tal, conformando lo que se denomina
+ *    <i>Externally Detached</i> o "Detached Externa".
+ *   </p>
+ *   <p>
+ *    Cuando se desea firmar un contenido con un formato <i>Detached</i>, pero se quiere eliminar la
+ *    dependencia de la disponibilidad externa del contenido firmado, es posible crear una estructura XML
+ *    que contenga los propios contenidos y la firma, pero cada uno en una subestructura independiente, 
+ *    manteniendo así el concepto de <i>Detached</i> (firma y contenido firmado no se interrelacionan 
+ *    directamente).  Para adecuarse al est&aacute;ndar los nodos de firma y contenido debe encontrarse en el 
+ *    mismo nivel dentro del XML.
+ *   </p>
+ *   <p>
+ *    Un ejemplo de esta estructura XML ser&iacute;a:
+ *   </p>
+ *   <pre>
+ *    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+ *    &lt;internally-detached&gt;
+ *     &lt;ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"&gt;
+ *      &lt;ds:SignedInfo&gt;
+ *       &lt;ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/&gt;
+ *       &lt;ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/&gt;
+ *       &lt;ds:Reference URI="#data"&gt;
+ *         &lt;ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/&gt;
+ *         &lt;ds:DigestValue/&gt;
+ *       &lt;/ds:Reference&gt;
+ *      &lt;/ds:SignedInfo&gt;
+ *      &lt;ds:SignatureValue/&gt;
+ *     &lt;/ds:Signature&gt;
+ *     &lt;document Id="data"&gt;
+ *      &lt;title&gt;title&lt;/title&gt;
+ *      &lt;author&gt;writer&lt;/author&gt;
+ *      &lt;date&gt;today&lt;/date&gt;
+ *      &lt;content&gt;
+ *       &lt;para&gt;First paragraph&lt;/para&gt;
+ *       &lt;para&gt;Second paragraph&lt;/para&gt;
+ *      &lt;/content&gt;
+ *     &lt;/document&gt;
+ *    &lt;/internally-detached&gt;
+ *   </pre>
+ *   <p>
+ *    En este caso, la estructura <i>internally-detached</i> contiene dos subestructuras, la firma (<i>Signature</i>) y el propio
+ *    contenido firmado (<i>document</i>). La forma de relacionar ambos es, como ocurr&iacute;a en el primer ejemplo, con una URI,
+ *    solo que en este caso es interna al documento XML, referenciando el identificador de la subestructura del contenido firmado
+ *    (<i>data</i>).
+ *   </p>
+ *   <p>
+ *    A esta variante de firma <i>Detached</i> se la conoce como <i>Internally Detached</i>, o "Detached Interna".
+ *   </p>
+ *   <p>
+ *    Para unificar las superestructuras creadas dentro de un formato "Detached Interno", el Cliente @firma 
+ *    construye siempre el siguiente esqueleto XML:
+ *   </p>
+ *   <pre>
+ *    &lt;CONTENT Id="id" Encoding="codificacion" MimeType="MimeType" Algorithm="…"&gt;
+ *     &lt;! – CONTENIDO FIRMADO --&gt;
+ *    &lt;/CONTENT&gt;
+ *   </pre>
+ *   <p>
+ *    Es decir, el contenido a firmar, ya sea XML o no-XML, se encapsula dentro de una etiqueta XML llamada
+ *    CONTENT, en la que se indica la codificaci&oacute;n del contenido (UTF-8, Base64, etc.), el tipo de 
+ *    contenido (imagen JPEG, texto, XML, etc.) y el algoritmo utilizado para calcular la huella digital de 
+ *    este (por ejemplo, SHA-1).
+ *   </p>
+ *   <p>
+ *    Como la superestructura es XML, si el contenido tambi&eacute;n es XML la inserci&oacute;n es directa 
+ *    (como en el primer ejemplo de "Detached Interna", pero si no es XML se codifica en Base64 antes de 
+ *    insertarse, resultando una estructura con una forma similar a la siguiente:
+ *   </p>
+ *   <pre>
+ *    &lt;CONTENT Id="id" Encoding="Base64" MimeType="application/octect-stream" Algorithm="…"&gt;
+ *     SFGJKASGFJKASEGUYFGEYGEYRGADFJKASGDFSUYFGAUYEGWEYJGDFYKGYKGWJKEGYFWYJ=
+ *    &lt;/CONTENT&gt;
+ *   </pre>
+ *   <p>
+ *    La larga cadena de caracteres ser&iacute;a una codificaci&oacute;n Base64 del original interpretado en su 
+ *    forma binaria pura.
+ *   </p>
+ *  </dd>
+ *  <dt><i>Enveloping</i></dt>
+ *  <dd>
+ *   <p>
+ *    Otra variante de firma es la <i>Enveloping</i>, en la que la estructura XML de firma es la &uacute;nica 
+ *    en el documento de firma, y esta contiene internamente el contenido firmado (en un nodo propio).
+ *   </p>
+ *  </dd>
  * @version 0.3 */
 public final class AOXAdESSigner implements AOSigner {
     
