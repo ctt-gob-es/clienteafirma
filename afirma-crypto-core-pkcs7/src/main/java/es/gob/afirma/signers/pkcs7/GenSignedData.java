@@ -47,7 +47,6 @@ import org.bouncycastle.asn1.cms.SignerIdentifier;
 import org.bouncycastle.asn1.cms.SignerInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.TBSCertificateStructure;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
@@ -220,7 +219,7 @@ public final class GenSignedData {
 
         // ATRIBUTOS NO FIRMADOS.
 
-        final ASN1Set unSignedAttr = generateUnsignerInfo(uatrib);
+        final ASN1Set unSignedAttr = generateUnsignedInfo(uatrib);
 
         // // FIN ATRIBUTOS
 
@@ -257,7 +256,7 @@ public final class GenSignedData {
      * @param dataType
      *        Identifica el tipo del contenido a firmar.
      * @param timestamp
-     *        Introducir TimeStaming
+     *        Introducir el momento de la firma como atributo firmado (no confundir con un sello de tiempo reconocido)
      * @param atrib
      *        Lista de atributos firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
@@ -296,10 +295,6 @@ public final class GenSignedData {
         // MessageDigest
         contexExpecific.add(new Attribute(CMSAttributes.messageDigest, new DERSet(new DEROctetString(md.clone()))));
 
-        // Serial Number
-        // comentar lo de abajo para version del rfc 3852
-        contexExpecific.add(new Attribute(RFC4519Style.serialNumber, new DERSet(new DERPrintableString(cert.getSerialNumber().toString()))));
-
         // agregamos la lista de atributos a mayores.
         if (atrib.size() != 0) {
 
@@ -327,7 +322,7 @@ public final class GenSignedData {
      *        Lista de atributos no firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos no firmados de la firma. */
-    private ASN1Set generateUnsignerInfo(final Map<String, byte[]> uatrib) {
+    private ASN1Set generateUnsignedInfo(final Map<String, byte[]> uatrib) {
 
         // // ATRIBUTOS
 
