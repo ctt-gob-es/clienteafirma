@@ -30,6 +30,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
 
 
 /** MiniApplet de firma del proyecto Afirma.
@@ -41,10 +42,18 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String APPLET_PARAM_USER_AGENT = "userAgent"; //$NON-NLS-1$
+	
+	private static final String APPLET_PARAM_USER_KEYSTORE = "keystore"; //$NON-NLS-1$
 
 	/** Identificador del navegador Web que carga el applet. */
 	private String userAgent = null;
 
+	/** Tipo de almac&eacute;n de claves del que extraer los certificados. */
+	private AOKeyStore keystoreType = null;
+	
+	/** Ruta de la biblioteca o almac&eacute;n del que extraer los certificados. */
+	private String keystoreLib = null;
+	
 	/** Ruta recomendada para la apertura de di&aacute;logos se seleccion y guardado de ficheros. */
 	private File pathHint = new File(Platform.getUserHome());
 
@@ -400,6 +409,27 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	@Override
 	public void init() {
 		this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
+		
+		String keystoreParam = this.getParameter(APPLET_PARAM_USER_KEYSTORE);
+		if (keystoreParam != null && !keystoreParam.equals("null")) { //$NON-NLS-1$
+			keystoreParam = keystoreParam.trim();
+			int separatorPos = keystoreParam.indexOf(":"); //$NON-NLS-1$
+			try {
+				if (separatorPos == -1) {
+					this.keystoreType = AOKeyStore.valueOf(keystoreParam);
+				} else if (keystoreParam.length() > 1) {
+					this.keystoreType = AOKeyStore.valueOf(keystoreParam.substring(0, separatorPos).trim());
+					if (separatorPos < keystoreParam.length() -1 &&
+							keystoreParam.substring(separatorPos + 1).trim().length() > 0) {
+						this.keystoreLib = keystoreParam.substring(separatorPos + 1).trim();
+					}
+				}
+			} catch (final Exception e) {
+				LOGGER.warning(
+						"Se ha intentado cargar un almacen de certificados no soportado, se cargara el por defecto: " + e); //$NON-NLS-1$
+			}
+		}
+
 		this.configureLookAndFeel();
 		LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
 	}
@@ -436,22 +466,30 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 }
 
 	 /**
-	  * Permite que el usuario seleccione un certificado del almac&eacute;n por defecto y devuelve
-	  * su clave privada.
+	  * Permite que el usuario seleccione un certificado del almac&eacute;n configurado, o
+	  * el por defecto si no se indic&oacute;, y devuelve su clave privada.
 	  * @param params Configuraci&oacute;n general establecida para la operaci&oacute;n.
 	  * @return Clave privada asociada al certificado seleccionado.
 	  * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
 	  * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
 	  */
 	 private PrivateKeyEntry selectPrivateKey(final Properties params) throws PrivilegedActionException {
-		 return AccessController.doPrivileged(
-				 new SelectPrivateKeyAction(
+		 
+		 SelectPrivateKeyAction selectPrivateKeyAction;
+		 if (this.keystoreType == null) {
+			 selectPrivateKeyAction = new SelectPrivateKeyAction(
 					 Platform.getOS(), 
 					 Platform.getBrowser(this.userAgent), 
 					 new CertFilterManager(params), 
-					 this
-				 )
-		 );
+					 this);
+		 } else {
+			 selectPrivateKeyAction = new SelectPrivateKeyAction(
+					 this.keystoreType,
+					 this.keystoreLib,
+					 new CertFilterManager(params),
+					 this);
+		 }
+		 return AccessController.doPrivileged(selectPrivateKeyAction);
 	 }
 
 	 /**
