@@ -194,12 +194,12 @@ public final class AOKeyStoreManagerFactory {
         else if (store == AOKeyStore.MOZ_UNI) {
             final AOKeyStoreManager ksmUni;
             try {
-                ksmUni = (AOKeyStoreManager) AOUtil.classForName("es.gob.afirma.keystores.main.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
+                ksmUni = (AOKeyStoreManager) AOUtil.classForName("es.gob.afirma.keystores.mozilla.MozillaUnifiedKeyStoreManager").newInstance(); //$NON-NLS-1$
             }
             catch(final Exception e) {
                 throw new AOKeystoreAlternativeException(
                      getAlternateKeyStoreType(store),
-                     "Error al obteniendo dinamicamente el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
+                     "Error al obtener dinamicamente el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
                      e
                  );
             }
