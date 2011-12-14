@@ -99,7 +99,7 @@ import es.gob.afirma.signers.xml.XMLConstants;
  *  relativos a las políticas de firma) son:
  * </p>
  * <ul>
- *  <li><i>SigningTime</i></li>
+ *  <li><i>SigningTime</i> (opcional)</li>
  *  <li><i>SigningCerticate</i></li>
  *  <li><i>IssuerSerial</i></li>
  *  <li><i>SignedDataObjectProperties</i></li>
