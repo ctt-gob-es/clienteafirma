@@ -22,6 +22,7 @@ import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
@@ -100,6 +101,8 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion4")+
         		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion5");
         InfoLabel presentationLabel = new InfoLabel(textLabel, false);
+        //Foco al contenido
+        presentationLabel.addAncestorListener(new RequestFocusListener(false));
         panelCentral.add(presentationLabel, c);
 
         getContentPane().add(panelCentral, BorderLayout.CENTER);

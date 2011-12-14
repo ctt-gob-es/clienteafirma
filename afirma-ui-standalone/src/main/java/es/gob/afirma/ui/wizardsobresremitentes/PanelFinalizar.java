@@ -23,6 +23,7 @@ import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
@@ -97,6 +98,8 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 				"<br>"+"<br>" + Messages.getString("Wizard.sobres.final2") ;
 		
 		InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
+		 //Foco al contenido
+        finalizeLabel.addAncestorListener(new RequestFocusListener(false));
 		panelCentral.add(finalizeLabel, c);
 		
 		c.gridy = 1;
