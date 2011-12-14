@@ -10,7 +10,6 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -28,10 +27,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Properties;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolTip;
@@ -313,6 +310,7 @@ public class Opciones extends JAccessibilityDialog {
         		this.mainOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.general"));
         this.mainOptions.loadConfig(GeneralConfig.getConfig());
+        this.mainOptions.getConfigurationPanel().addAncestorListener(new RequestFocusListener(false));
         
         this.contextOptions =  new ContextOptionsPane();
         
@@ -355,6 +353,8 @@ public class Opciones extends JAccessibilityDialog {
         	this.mainPanel.setSelectedIndex(2);
         	if (!accesibilidad){
         		this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));
+        	} else {
+        		 this.accessibilityOptions.getConfigurationPanel().addAncestorListener(new RequestFocusListener(false));
         	}
         	HelpUtils.visualize("opciones.accesibilidad");
         	aplicar = false;
@@ -487,7 +487,7 @@ public class Opciones extends JAccessibilityDialog {
     	
         bottomPanel.removeAll();
 		GridBagConstraints cons = new GridBagConstraints();
-		//cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes al redimensionar
+		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.ipadx = 0;
 		cons.gridx = 0;
@@ -610,7 +610,8 @@ public class Opciones extends JAccessibilityDialog {
 		botonAyuda.addActionListener(new OpenHelpActionListener(this.mainPanel));
 		
         cons.ipadx = 0;
-        cons.weightx = 0.5;
+        cons.weightx = 0.0;
+        cons.weighty = 0.0;
 		cons.gridx = 2;
 		
 		panelAyuda.add(botonAyuda);        
