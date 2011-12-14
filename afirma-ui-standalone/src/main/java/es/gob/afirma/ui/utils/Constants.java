@@ -108,7 +108,7 @@ public class Constants {
     /**
      * Height inicial de los JAccessibilityDialogWizard de la aplicacion en LINUX.
      */
-    public static final int WIZARD_INITIAL_HEIGHT_LINUX = 495;
+    public static final int WIZARD_INITIAL_HEIGHT_LINUX = 520;
     
     /**
      * Width inicial de los JAccessibilityDialogWizard de la aplicacion con variación de fuente.
@@ -128,7 +128,7 @@ public class Constants {
     /**
      * Height inicial de los JAccessibilityDialogWizard de la aplicacion con variación de fuente en LINUX.
      */
-    public static final int WIZARD_FONT_INITIAL_HEIGHT_LINUX = 545;
+    public static final int WIZARD_FONT_INITIAL_HEIGHT_LINUX = 570;
     
     /**
      * Width inicial de los JAccessibilityFileChooser de la aplicacion.
