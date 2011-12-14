@@ -26,6 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -110,7 +111,7 @@ public final class TestXAdES {
     };
     
     // IMPORTANTE: Poner extension ".xml" a los ficheros de prueba con contenido XML
-    private static final String[] TEST_FILES_SIGN = new String[] {
+    private static final String[] TEST_FILES_DATA = new String[] {
             "TEST_PDF_Certified.pdf", //$NON-NLS-1$
             "ANF_PF_Activo.pfx", //$NON-NLS-1$
             "base64.b64", //$NON-NLS-1$
@@ -130,7 +131,7 @@ public final class TestXAdES {
     };
     
     /** Pruebas de cofirma.
-     * @throws Exception */
+     * @throws Exception Cuando ocurre un error */
     @Test
     public void testCoSign() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -186,7 +187,7 @@ public final class TestXAdES {
             Assert.assertTrue(isValidUnsignedProperties(new ByteArrayInputStream(result),null));
 
             Assert.assertNotNull(prueba, result);
-            Assert.assertTrue("El resultado no se recnoce como firma", signer.isSign(result)); //$NON-NLS-1$
+            Assert.assertTrue("El resultado no se reconoce como firma", signer.isSign(result)); //$NON-NLS-1$
           }
         }
 
@@ -195,9 +196,10 @@ public final class TestXAdES {
     /**
      * Prueba con hoja de estilo externa.
      * <b>Necesita GUI</b>
-     * @throws Exception 
+     * @throws Exception Cuando ocurre un error
      */
     @Test
+    @Ignore
     public void testSignExternalStyle() throws Exception {
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -303,7 +305,7 @@ public final class TestXAdES {
         
         for (final Properties extraParams : XADES_MODES) {
             for (final String algo : ALGOS) {
-                for (final String filename : TEST_FILES_SIGN) {
+                for (final String filename : TEST_FILES_DATA) {
                     
                     // Omitimos la firma de binarios en modo enveloped
                     if ("XAdES Enveloped".equals(extraParams.getProperty("format")) && !filename.toLowerCase().endsWith(".xml")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -420,6 +422,4 @@ public final class TestXAdES {
 //            return in;
 //        }
 //    }
-
-        
 }
