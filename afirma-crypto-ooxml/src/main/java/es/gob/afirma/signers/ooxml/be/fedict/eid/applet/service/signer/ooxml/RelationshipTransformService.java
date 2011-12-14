@@ -81,12 +81,10 @@ import org.xml.sax.SAXException;
 import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
-/** JSR105 implementation of the RelationshipTransform transformation.
- * <p>
- * Specs: http://openiso.org/Ecma/376/Part2/12.2.4#26
- * </p>
+/** Implementaci&oacute;n JSR105 de la transformaci&oacute;n RelationshipTransform.
+ * <a href="http://openiso.org/Ecma/376/Part2/12.2.4#26">http://openiso.org/Ecma/376/Part2/12.2.4#26</a>
  * @author Frank Cornelis */
-final class RelationshipTransformService extends TransformService {
+public final class RelationshipTransformService extends TransformService {
     
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
