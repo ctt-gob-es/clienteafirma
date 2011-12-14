@@ -489,7 +489,7 @@ public final class JSEUIManager implements AOUIManager {
                 if (f == null) {
                     return false;
                 }
-                if (f.getName().equalsIgnoreCase(fileName)) {
+                if (f.isDirectory() || f.getName().equalsIgnoreCase(fileName)) {
                     return true;
                 }
                 return false;
