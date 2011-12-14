@@ -1,6 +1,7 @@
 package es.gob.afirma.ui.principal;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
@@ -207,7 +208,15 @@ public class ToggleImageButton extends JToggleButton {
                 this.getToggledIcon().paintIcon(this, g, 0, (this.getHeight() - this.getToggledIcon().getIconHeight()) / 2);
             }
         }
-        this.getParent().repaint();
+       
+        //Repintado del contenedor de todos los botones
+       Container parent = this.getParent().getParent();
+       if (parent!=null) {
+        	parent.repaint();
+        } else {
+        	this.getParent().repaint();
+        }
+        
     }
     
     @Override
