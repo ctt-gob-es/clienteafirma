@@ -67,7 +67,7 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
 /**
  * Clase con utilidades varias
  */
-public class Utils {
+public final class Utils {
 	
 	 private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 	
@@ -145,7 +145,8 @@ public class Utils {
 			if (component instanceof JButton){
 				final JButton button = (JButton) component;
 				button.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 						((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 						} else if (button.getParent() instanceof JToolBar){
@@ -153,7 +154,8 @@ public class Utils {
 						}
 					}
 					
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							if (button.getParent() instanceof JPanel){
 								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
@@ -174,7 +176,8 @@ public class Utils {
 			if (component instanceof JToggleButton){
 				final JToggleButton button = (JToggleButton) component;
 				button.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 						} else if (button.getParent() instanceof JToolBar){
@@ -182,7 +185,8 @@ public class Utils {
 						}
 					}
 					
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							if (button.getParent() instanceof JPanel){
 								((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
@@ -203,10 +207,12 @@ public class Utils {
 			if (component instanceof JTextField){
 				final JTextField textField = (JTextField) component;
 				textField.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						textField.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 					}
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							textField.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -218,11 +224,13 @@ public class Utils {
 			if (component instanceof JComboBox){
 				final JComboBox comboBox = (JComboBox) component;
 				comboBox.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 					}
 					
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							comboBox.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -234,11 +242,13 @@ public class Utils {
 			if (component instanceof JRadioButton){
 				final JRadioButton radioButton = (JRadioButton) component;
 				radioButton.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						((JPanel)radioButton.getParent()).setBorder(BorderFactory.createEmptyBorder());
 					}
 					
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							((JPanel)radioButton.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -250,10 +260,12 @@ public class Utils {
 			if (component instanceof JLabel){
 				final JLabel label = (JLabel) component;
 				label.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						label.setBorder(BorderFactory.createEmptyBorder());
 					}
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							label.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -265,11 +277,13 @@ public class Utils {
 			if (component instanceof JCheckBox){
 				final JCheckBox checkBox = (JCheckBox) component;
 				checkBox.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						((JPanel)checkBox.getParent()).setBorder(BorderFactory.createEmptyBorder());
 					}
 					
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							((JPanel)checkBox.getParent()).setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -281,10 +295,12 @@ public class Utils {
 			if (component instanceof JTextPane){
 				final JTextPane textPane = (JTextPane) component;
 				textPane.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						textPane.setBorder(BorderFactory.createEmptyBorder());
 					}
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							textPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -296,10 +312,12 @@ public class Utils {
 			if (component instanceof JEditorPane){
 				final JEditorPane editorPane = (JEditorPane) component;
 				editorPane.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						editorPane.setBorder(BorderFactory.createEmptyBorder());
 					}
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							editorPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -311,10 +329,12 @@ public class Utils {
 			if (component instanceof JTree){
 				final JTree tree = (JTree) component;
 				tree.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						tree.setBorder(BorderFactory.createEmptyBorder());
 					}
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							tree.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -326,10 +346,12 @@ public class Utils {
 			if (component instanceof JList){
 				final JList list = (JList) component;
 				list.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						list.setBorder(BorderFactory.createEmptyBorder());
 					}
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							list.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -341,24 +363,29 @@ public class Utils {
 			if (component instanceof JMenu){
 				final JMenu menu = (JMenu) component;
 				menu.addMenuListener(new MenuListener() {
-					public void menuSelected(MenuEvent e) {
+					@Override
+                    public void menuSelected(MenuEvent e) {
 						menu.setFont(new Font(menu.getFont().getName(), menu.getFont().getStyle(), menu.getFont().getSize()+5));
 					}
-					public void menuDeselected(MenuEvent e) {
+					@Override
+                    public void menuDeselected(MenuEvent e) {
 						menu.setFont(new Font(menu.getFont().getName(), menu.getFont().getStyle(), menu.getFont().getSize()-5));
 					}
-					public void menuCanceled(MenuEvent e) {
-						
+					@Override
+                    public void menuCanceled(MenuEvent e) {
+						// Vacio
 					}
 				});
 			}
 			if (component instanceof JScrollPane){
 				final JScrollPane scrollPane = (JScrollPane) component;
 				scrollPane.addFocusListener( new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						scrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 					}
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (GeneralConfig.isHighContrast()){
 							scrollPane.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 						} else {
@@ -371,13 +398,15 @@ public class Utils {
 			if (component instanceof JButton){
 				final JButton button = (JButton) component;
 				button.addFocusListener(new FocusListener() {
-					public void focusLost(FocusEvent e) {
+					@Override
+                    public void focusLost(FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 						}
 					}
 					
-					public void focusGained(FocusEvent e) {
+					@Override
+                    public void focusGained(FocusEvent e) {
 						if (button.getParent() instanceof JPanel){
 							((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 						}
@@ -403,7 +432,7 @@ public class Utils {
 				component.setForeground(Color.BLACK);
 			} else if(component instanceof JPanel){
 				if (component.getBorder()!=null){
-					if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){
+					if (component.getBorder().getClass().getName().equals("javax.swing.border.TitledBorder")){ //$NON-NLS-1$
 						if (((TitledBorder)component.getBorder())!=null){
 							((TitledBorder)component.getBorder()).setTitleColor(Color.WHITE);
 						}
@@ -543,7 +572,14 @@ public class Utils {
         }
 
         final Map<String, String> aliassesByFriendlyName =
-                KeyStoreUtilities.getAliasesByFriendlyName(alias, kss, checkPrivateKeys, showExpiredCertificates, certFilters);
+                KeyStoreUtilities.getAliasesByFriendlyName(
+                       alias, 
+                       kss, 
+                       checkPrivateKeys, 
+                       checkValidity,
+                       showExpiredCertificates, 
+                       certFilters
+                );
 
         // Miramos si despues de filtrar las entradas queda alguna o se ha
         // quedado la lista vacia
@@ -563,6 +599,7 @@ public class Utils {
         // mayusculas y min�sculas
         final String[] finalOrderedAliases = aliassesByFriendlyName.values().toArray(new String[0]);
         Arrays.sort(finalOrderedAliases, new Comparator<String>() {
+            @Override
             public int compare(final String o1, final String o2) {
                 if (o1 == null && o2 == null) {
                     return 0;
@@ -694,7 +731,7 @@ public class Utils {
      * @return filtro
      */
     public static final FileFilter getRepositoryFileFilter() {
-    	FileFilter fileFilter = new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter"));
+    	FileFilter fileFilter = new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter")); //$NON-NLS-1$ //$NON-NLS-2$
     	return fileFilter;
     }
 }
