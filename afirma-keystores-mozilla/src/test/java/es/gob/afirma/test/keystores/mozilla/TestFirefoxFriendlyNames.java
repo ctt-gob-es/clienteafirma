@@ -1,4 +1,4 @@
-package es.gob.afirma.test.keystores;
+package es.gob.afirma.test.keystores.mozilla;
 
 import java.security.InvalidKeyException;
 import java.util.Map;
@@ -16,19 +16,16 @@ import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class TestWindowsFriendlyNames {
+public class TestFirefoxFriendlyNames {
     
     /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI. 
      * @throws AOKeystoreAlternativeException 
      * @throws InvalidKeyException */
     @Test
     public void testWindowsFriendlyNames() throws InvalidKeyException, AOKeystoreAlternativeException {
-        if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
-            return;
-        }
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
-               AOKeyStore.WINDOWS, 
+               AOKeyStore.MOZ_UNI, 
                null, 
                "TEST",  //$NON-NLS-1$
                null, 
