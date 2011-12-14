@@ -8,8 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  ******************************************************************************/
 
-/**
- *	M&oacute;dulo de generaci&oacute;n de firmas digitales Open Document Format (ODF),
+/** M&oacute;dulo de generaci&oacute;n de firmas digitales Open Document Format (ODF),
  *  variante de XMLDSig (XML Digital Signature).
  *  <p>
  *   El m&oacute;dulo es compatible con LibreOffice y OpenOffice.org 3.2 y superiores, 
@@ -22,11 +21,12 @@
  *   <li>Dependencia con el m&oacute;dulo XML (<i>afirma-crypto-core-xml</i>) del Cliente.</li>
  *  </ul>
  *  <p>
- *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6 o superior.<br>
+ *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6.0_10 o superior.<br>
  *   Para compatibilidad
  *   con JSE 1.5 es necesario incluir las clases Java contenidas en el "Paquete de compatibilidad
  *   con Java 5" del Ciente e instalar los productos Apache Xalan 2.7.1 o superior y Apache Xerces
- *   2.11.0 o superior como API ENDORSED de Java.<br>
+ *   2.11.0 o superior como API ENDORSED de Java. La inclusi&oacute;n de estas clases proporciona
+ *   compatibilidad con Java 5, pero no con Java 6 en versiones anteriores a la 1.6.0_10.<br>
  *   Consulte la p&aacute;gina 
  *   <a href="http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html">http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>
  *   para informaci&oacute;n ampliada sobre los API ENDORSED de Java.

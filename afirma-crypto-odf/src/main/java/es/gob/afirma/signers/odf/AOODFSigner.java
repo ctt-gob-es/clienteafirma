@@ -114,22 +114,16 @@ public final class AOODFSigner implements AOSigner {
         SUPPORTED_FORMATS.add("application/vnd.oasis.opendocument.presentation"); //$NON-NLS-1$
     }
 
-    /** Firma o cofirma un documento OpenOffice de tipo ODT, ODS y ODG.<br/>
-     * @param data
-     *        Datos a firmar
-     * @param algorithm
-     *        No necesario. Se utiliza siempre el algoritmo SHA1withRSA
-     * @param keyEntry
-     *        Clave privada a usar para firmar
-     * @return Contenido firmado
-     * @throws AOException
-     *         Cuando ocurre cualquier problema durante el proceso
-     * @since 1.6.0_10 */
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties xParams) throws AOException {
-
-        if (algorithm != null && !algorithm.equalsIgnoreCase("SHA1withRSA")) { //$NON-NLS-1$
-            LOGGER.warning("Las firmas ODF s\u00F3lo soportan el algoritmo de firma SHA1withRSA"); //$NON-NLS-1$
-        }
+    /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
+     * @param data Documento ODF a firmar
+     * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @return Documento ODF con la nueva firma a&ntilde;adida
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    public byte[] sign(final byte[] data, 
+                       final String algorithm, 
+                       final PrivateKeyEntry keyEntry, 
+                       final Properties xParams) throws AOException {
 
         final Properties extraParams = (xParams != null) ? xParams : new Properties();
         
@@ -199,20 +193,14 @@ public final class AOODFSigner implements AOSigner {
             final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"); //$NON-NLS-1$
 
             // DigestMethod
-            DigestMethod dm;
+            final DigestMethod dm;
             try {
                 dm = fac.newDigestMethod(digestMethodAlgorithm, null);
             }
             catch (final Exception e) {
-                if (DIGEST_METHOD.equals(digestMethodAlgorithm)) {
-                    throw new AOException("No se ha podido obtener un generador de huellas digitales", e); //$NON-NLS-1$
-                }
-                LOGGER.warning("No se ha podido obtener un generador de huellas digitales para el algoritmo '" + digestMethodAlgorithm //$NON-NLS-1$
-                               + "', se intentara con el algoritmo por defecto '" //$NON-NLS-1$
-                               + DIGEST_METHOD
-                               + "': " //$NON-NLS-1$
-                               + e);
-                dm = fac.newDigestMethod(DIGEST_METHOD, null);
+                throw new AOException(
+                      "No se ha podido obtener un generador de huellas digitales con el algoritmo: " + digestMethodAlgorithm, e //$NON-NLS-1$
+                );
             }
 
             // Transforms
@@ -350,14 +338,6 @@ public final class AOODFSigner implements AOSigner {
             final List<XMLObject> objectList = new ArrayList<XMLObject>();
             objectList.add(fac.newXMLObject(spsList, null, null, null));
 
-            /*
-             * Si se solicito una firma explicita, advertimos no son compatibles
-             * con ODF y se ignorara esta configuracion
-             */
-            if (extraParams.containsKey("mode") && extraParams.getProperty("mode").equals(AOSignConstants.SIGN_MODE_EXPLICIT)) { //$NON-NLS-1$ //$NON-NLS-2$
-                LOGGER.warning("El formato de firma ODF no soporta el modo de firma explicita, " + "se ignorara esta configuracion"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
             // Preparamos el KeyInfo
             final KeyInfoFactory kif = fac.getKeyInfoFactory();
             final List<Object> x509Content = new ArrayList<Object>();
@@ -367,18 +347,26 @@ public final class AOODFSigner implements AOSigner {
 
             // genera la firma
             fac.newXMLSignature(
-            // SignedInfo
-            fac.newSignedInfo(
-            // CanonicalizationMethod
-            fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
-                              // SignatureMethod
-                              fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
-                              referenceList),
-                                // KeyInfo
-                                kif.newKeyInfo(Collections.singletonList(kif.newX509Data(x509Content)), null),
-                                objectList,
-                                signatureId,
-                                null).sign(new DOMSignContext(keyEntry.getPrivateKey(), rootSignatures));
+              // SignedInfo
+              fac.newSignedInfo(
+                // CanonicalizationMethod
+                 fac.newCanonicalizationMethod(
+                   CanonicalizationMethod.INCLUSIVE, 
+                   (C14NMethodParameterSpec) null),
+                   fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
+                   referenceList
+                 ),
+                 // KeyInfo
+                 kif.newKeyInfo(
+                   Collections.singletonList(kif.newX509Data(x509Content)), 
+                   null
+                 ),
+                 objectList,
+                 signatureId,
+                 null
+              ).sign(
+                 new DOMSignContext(keyEntry.getPrivateKey(), rootSignatures)
+            );
 
             // crea un nuevo fichero zip
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -434,16 +422,37 @@ public final class AOODFSigner implements AOSigner {
 
     }
 
-    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
+     * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
+     * @param data Documento ODF a firmar
+     * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @return Documento ODF con la nueva firma a&ntilde;adida
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    public byte[] cosign(final byte[] data, 
+                         final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         final Properties extraParams) throws AOException {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
 
-    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
+    /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
+     * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
+     * @param sign Documento ODF a firmar
+     * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @return Documento ODF con la nueva firma a&ntilde;adida
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
+    public byte[] cosign(final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         final Properties extraParams) throws AOException {
         return sign(sign, algorithm, keyEntry, extraParams);
     }
 
     /** M&eacute;todo no implementado. No es posible realizar contrafirmas de
-     * documentos ODF. Lanza una <code>UnsupportedOperationException</code>. */
+     * documentos ODF. Lanza siempre una <code>UnsupportedOperationException</code>. */
     public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
