@@ -149,17 +149,16 @@ public final class KeyStoreUtilities {
      *        Filtros a aplicar sobre los certificados
      * @return Alias seleccionado por el usuario */
     public static Map<String, String> getAliasesByFriendlyName(final String[] alias,
-                                                                            final List<KeyStore> kss,
-                                                                            final boolean checkPrivateKeys,
-                                                                            final boolean showExpiredCertificates,
-                                                                            final List<CertificateFilter> certFilters) {
+                                                               final List<KeyStore> kss,
+                                                               final boolean checkPrivateKeys,
+                                                               final boolean showExpiredCertificates,
+                                                               final List<CertificateFilter> certFilters) {
     	
         String tmpCN;
         String issuerTmpCN;
 
         X509Certificate tmpCert;
         if (kss == null || kss.size() <= 0) {
-
         	Hashtable<String, String> revisedAlias = new Hashtable<String, String>();
         	for (final String al : alias) {
         		revisedAlias.put(al, al);
@@ -167,7 +166,7 @@ public final class KeyStoreUtilities {
         	return trimAlias(revisedAlias);
         }
 
-        Hashtable<X509Certificate, String> certs = new Hashtable<X509Certificate, String>();
+        final Hashtable<X509Certificate, String> certs = new Hashtable<X509Certificate, String>();
 
         KeyStore ks = null;
         for (final String al : alias.clone()) {
