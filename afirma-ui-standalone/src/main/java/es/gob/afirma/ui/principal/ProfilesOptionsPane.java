@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import es.gob.afirma.ui.utils.CustomDialog;
+import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.ProfileManager;
 import es.gob.afirma.ui.utils.Utils;
 
@@ -260,38 +261,42 @@ public class ProfilesOptionsPane {
 	
 	private void deleteAction() {
 		if (this.profileManagmentList.getSelectedIndex() > -1) {
-			
-			final int idx = this.profileManagmentList.getSelectedIndex();
-			final String profileName = this.profileManagmentList.getSelectedValue().toString();
-			
-			if (UserProfile.currentProfileId != null &&
-					profileName.equals(ProfileManager.getProfileName(UserProfile.currentProfileId))) {
-				int confirm = CustomDialog.showConfirmDialog(
-						this.parent,
-						true,
-						"Se dispone a eliminar el perfil actual. Si hace esto se cargar\u00E1 el perfil por defecto y se cerraran las opciones de configuraci\u00F3n. ¿Desea continuar?",
-						"Perfiles",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE);
-
-				if (confirm == JOptionPane.YES_OPTION) {
-					((DefaultListModel) this.profileManagmentList.getModel()).remove(idx);
-					this.currentProfileTitleLabel.setText(ProfileManager.DEFAULT_PROFILE_NAME);
-					UserProfile.currentProfileId = null;
-		        	this.parent.aceptarActionPerformed(ProfileManager.getDefaultConfiguration(), this.getProfiles());
+			if (!this.profileManagmentList.getSelectedValue().equals(ProfileManager.DEFAULT_PROFILE_NAME)){
+				final int idx = this.profileManagmentList.getSelectedIndex();
+				final String profileName = this.profileManagmentList.getSelectedValue().toString();
+				
+				if (UserProfile.currentProfileId != null &&
+						profileName.equals(ProfileManager.getProfileName(UserProfile.currentProfileId))) {
+					int confirm = CustomDialog.showConfirmDialog(
+							this.parent,
+							true,
+							"Se dispone a eliminar el perfil actual. Si hace esto se cargar\u00E1 el perfil por defecto y se cerraran las opciones de configuraci\u00F3n. ¿Desea continuar?",
+							"Perfiles",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE);
+	
+					if (confirm == JOptionPane.YES_OPTION) {
+						((DefaultListModel) this.profileManagmentList.getModel()).remove(idx);
+						this.currentProfileTitleLabel.setText(ProfileManager.DEFAULT_PROFILE_NAME);
+						UserProfile.currentProfileId = null;
+			        	this.parent.aceptarActionPerformed(ProfileManager.getDefaultConfiguration(), this.getProfiles());
+					}
+				} else {
+					int confirm = CustomDialog.showConfirmDialog(
+							this.parent,
+							true,
+							"Se dispone a eliminar el perfil "+profileName+". Esta acción no se puede deshacer. ¿Desea continuar?",
+							"Perfiles",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE);
+	
+					if (confirm == JOptionPane.YES_OPTION) {
+						((DefaultListModel) this.profileManagmentList.getModel()).remove(idx);
+					}
 				}
 			} else {
-				int confirm = CustomDialog.showConfirmDialog(
-						this.parent,
-						true,
-						"Se dispone a eliminar el perfil "+profileName+". Esta acción no se puede deshacer. ¿Desea continuar?",
-						"Perfiles",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE);
-
-				if (confirm == JOptionPane.YES_OPTION) {
-					((DefaultListModel) this.profileManagmentList.getModel()).remove(idx);
-				}
+				CustomDialog.showMessageDialog(this.parent, true, Messages.getString("ProfileDeleteDefault.text"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+				this.profileManagmentList.requestFocusInWindow();
 			}
 		}
 	}
