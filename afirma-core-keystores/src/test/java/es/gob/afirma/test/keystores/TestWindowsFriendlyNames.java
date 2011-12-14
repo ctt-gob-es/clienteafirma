@@ -38,12 +38,13 @@ public class TestWindowsFriendlyNames {
             System.out.println(al);
         }
         System.out.println();
-        Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
+        final Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
                ksm.getAliases(), 
                ksm.getKeyStores(), 
-               false, 
-               true, 
-               null
+               true, // Check private keys
+               true, // Check validity 
+               true, // Show expired
+               null  // filters
        );
        for (final String key : aliases.keySet()) {
            System.out.println(aliases.get(key));
