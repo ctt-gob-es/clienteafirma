@@ -1443,10 +1443,12 @@ public final class AOXAdESSigner implements AOSigner {
                 // elementRes = null;
                 // }
                 // si el documento es binario se deshace la codificacion en
-                // Base64
+                // Base64 si y solo si esta declarada esta transformacion 
                 else {
-                    //TODO: Deshacer solo el Base64 si existe la transformacion Base64 
-                    return Base64.decode(firstChild.getTextContent());
+                	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
+                	return isBase64TransformationDeclared(rootSig, firstChild.getAttribute("Id")) ? //$NON-NLS-1$
+                				Base64.decode(firstChild.getTextContent()) :
+                					firstChild.getTextContent().getBytes();
                 }
             }
 
@@ -1474,9 +1476,13 @@ public final class AOXAdESSigner implements AOSigner {
                 if (object.getAttribute(MIMETYPE_STR).equals("text/xml")) { //$NON-NLS-1$ 
                     elementRes = (Element) object.getFirstChild();
                 }
+                // si el documento es binario se deshace la codificacion en
+                // Base64 si y solo si esta declarada esta transformacion 
                 else {
-                  //TODO: Deshacer solo el Base64 si existe la transformacion Base64
-                    return Base64.decode(object.getTextContent());
+                	//TODO: Deshacer solo el Base64 si existe la transformacion Base64 (COMPROBAR)
+                	return isBase64TransformationDeclared(rootSig, object.getAttribute("Id")) ? //$NON-NLS-1$
+                				Base64.decode(object.getTextContent()) :
+                					object.getTextContent().getBytes();
                 }
             }
         }
@@ -1496,6 +1502,39 @@ public final class AOXAdESSigner implements AOSigner {
         return baosSig.toByteArray();
     }
 
+    /**
+     * Comprueba si unos datos firmados tienen declarados una transformaci&oacute;n de tipo Base64.
+     * @param rootSig Nodo raiz de la firma.
+     * @param objectId Identificador de los datos.
+     * @return Devuelve {@code true} si la transformaci&oacute;n est&aacute; definida, {@code false}
+     * en caso contrario.
+     */
+    private boolean isBase64TransformationDeclared(Element rootSig, String objectId) {
+    	if (objectId == null || objectId.trim().equals("")) { //$NON-NLS-1$
+    		return false;
+    	}
+    	
+    	Element reference = null;
+		NodeList references = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference"); //$NON-NLS-1$
+		for (int i = 0; i < references.getLength(); i++) {
+			reference = (Element) references.item(i);
+			if (reference.hasAttribute("URI") && ("#" + objectId).equals(reference.getAttribute("URI"))) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				break;
+			}
+			reference = null;
+		}
+		if (reference != null) {
+			NodeList transforms = reference.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
+			for (int i = 0; i < transforms.getLength(); i++) {
+				if (((Element) transforms.item(i)).hasAttribute("Algorithm") && //$NON-NLS-1$
+						XMLConstants.BASE64_ENCODING.equals(((Element) transforms.item(i)).getAttribute("Algorithm"))) { //$NON-NLS-1$
+					return true;
+				}
+			}
+		}
+		return false;
+    }
+    
     private SignatureProductionPlace getSignatureProductionPlace(final String city,
                                                                  final String province,
                                                                  final String postalCode,
