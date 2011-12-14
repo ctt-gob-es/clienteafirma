@@ -198,7 +198,7 @@ public final class KeyStoreUtilities {
                     continue;
                 }
 
-                if (tmpCert == null) {
+                if (tmpCert == null) { //TODO: Revisar si debe pasarse a la siguiente iteracion 
                     LOGGER.warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$
                 }
 
@@ -258,38 +258,39 @@ public final class KeyStoreUtilities {
                     }
                 }
 
+                boolean allFiltersOK = true;
                 if (tmpCert != null && certFilters != null) {
-                    boolean allFiltersOK = true;
                     for (final CertificateFilter cf : certFilters) {
                         if (!cf.matches(tmpCert)) {
                             allFiltersOK = false;
                             break;
                         }
                     }
-                    if (allFiltersOK) {
-                        tmpCN = AOUtil.getCN(tmpCert);
-                        issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
+                }
+                
+                if (allFiltersOK) {
+                	tmpCN = AOUtil.getCN(tmpCert);
+                	issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
 
-                        if (tmpCN != null && issuerTmpCN != null) {
-                            aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        }
+                	if (tmpCN != null && issuerTmpCN != null) {
+                		aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                	}
 
-                        else if (tmpCN != null /* && isValidString(tmpCN) */) {
-                            aliassesByFriendlyName.put(al, tmpCN);
-                        }
-                        else {
-                            // Hacemos un trim() antes de insertar, porque los alias de los certificados de las tarjetas
-                            // CERES terminan con un '\r', que se ve como un caracter extrano
-                            aliassesByFriendlyName.put(al, al.trim());
-                        }
-                    }
-                    else {
-                        // Eliminamos aquellos certificados que no hayan encajado
-                        LOGGER.info(
-                            "El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
-                        );
-                        aliassesByFriendlyName.remove(al);
-                    }
+                	else if (tmpCN != null /* && isValidString(tmpCN) */) {
+                		aliassesByFriendlyName.put(al, tmpCN);
+                	}
+                	else {
+                		// Hacemos un trim() antes de insertar, porque los alias de los certificados de las tarjetas
+                		// CERES terminan con un '\r', que se ve como un caracter extrano
+                		aliassesByFriendlyName.put(al, al.trim());
+                	}
+                }
+                else {
+                	// Eliminamos aquellos certificados que no hayan encajado
+                	LOGGER.info(
+                			"El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
+                	);
+                	aliassesByFriendlyName.remove(al);
                 }
             }
         }
