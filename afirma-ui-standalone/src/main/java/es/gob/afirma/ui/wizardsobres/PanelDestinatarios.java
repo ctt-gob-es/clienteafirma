@@ -72,7 +72,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	
 	@Override
 	public int getMinimumRelation(){
-		return 9;
+		return 8;
 	}
 	
 	/**
@@ -99,7 +99,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
     	setTitulo(Messages.getString("Wizard.sobres.titulo"));
 		
 		// Panel con la cabecera
-        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.sobres.pagina1.titulo", "Wizard.sobres.pagina1.titulo.explicacion", null, true);
+        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.sobres.pagina1.titulo", "Wizard.sobres.pagina1.titulo.explicacion1","Wizard.sobres.pagina1.titulo.explicacion2", null, true);
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);

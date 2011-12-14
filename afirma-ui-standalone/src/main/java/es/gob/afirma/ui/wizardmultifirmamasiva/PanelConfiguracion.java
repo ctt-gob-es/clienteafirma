@@ -83,7 +83,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana"));
     	
     	// Panel con la cabecera
-        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.pagina2.titulo", "Wizard.multifirma.pagina2.titulo.explicacion", null, true);
+        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.pagina2.titulo", "Wizard.multifirma.pagina2.titulo.explicacion1","Wizard.multifirma.pagina2.titulo.explicacion2", null, true);
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);

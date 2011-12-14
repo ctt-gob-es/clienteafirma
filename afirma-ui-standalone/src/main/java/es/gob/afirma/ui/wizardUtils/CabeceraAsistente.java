@@ -37,6 +37,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.InfoLabel;
 import es.gob.afirma.ui.utils.JAccessibilityDialogWizard;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.Utils;
 
 /**
@@ -48,7 +49,8 @@ public class CabeceraAsistente extends JPanel {
 	
 	private String MessagesTitulo;
 	private String MessagesDescripcion;
-	private Dimension dimensiones = new Dimension(607, 135);
+	private String MessagesDescripcion2 = "";
+	private Dimension dimensiones = new Dimension(607, 175);
 	private Boolean bloqueTexto = false;
 	/**
 	 * Botonera.
@@ -111,6 +113,28 @@ public class CabeceraAsistente extends JPanel {
 		
         initComponents();
     }
+	/**
+	 * Genera una cabecera para un asistente. Con un texto de cabecera de dos l&iacute;neas.
+	 * @param MessagesTitulo		Texto para obtener del ResourceMessages el titulo del asistente
+	 * @param MessagesDescripcion	Texto para obtener del ResourceMessages la descripcion del asistente
+	 * @param MessagesDescripcion2	Segunda parte del texto para obtener del ResourceMessages la descripcion del asistente
+	 * @param dimensiones		Dimensiones de la cabecera. Puede tomar el valor null y en tal caso se
+	 * 							asignaran las dimensiones predeterminadas
+	 * @param bloqueTexto		True: La descripcion tiene mas de una linea
+	 * 							False: La descripcion tiene solo una linea
+	 */
+	public CabeceraAsistente(String MessagesTitulo, String MessagesDescripcion, String MessagesDescripcion2, Dimension dimensiones, 
+			Boolean bloqueTexto) {
+		this.MessagesTitulo = MessagesTitulo;
+		this.MessagesDescripcion = MessagesDescripcion;
+		this.MessagesDescripcion2 = MessagesDescripcion2;
+		if (dimensiones != null)
+			this.dimensiones = dimensiones;
+		
+		this.bloqueTexto = bloqueTexto;
+		
+        initComponents();
+    }
 
     /**
      * Inicializa componentes
@@ -128,7 +152,7 @@ public class CabeceraAsistente extends JPanel {
 
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
-		c.insets = new Insets(1, 10, 0, 10);
+		c.insets = new Insets(0, 10, 0, 10);
 		c.weightx = 1.0;
 		c.gridx = 0;
 		c.weighty = 1.0;
@@ -141,6 +165,8 @@ public class CabeceraAsistente extends JPanel {
     	etiquetaTitulo.setFont(new Font(getFont().getFamily(), 1, getFont().getSize()));
     	etiquetaTitulo.setText(Messages.getString(this.MessagesTitulo)); // NOI18N
     	etiquetaTitulo.setFocusable(true);
+    	//Foco al contenido
+    	etiquetaTitulo.addAncestorListener(new RequestFocusListener(false));
     	Utils.remarcar(etiquetaTitulo);
         Utils.setContrastColor(etiquetaTitulo);
     	add(etiquetaTitulo, c);
@@ -148,9 +174,17 @@ public class CabeceraAsistente extends JPanel {
     	c.gridy = 2;
     	c.insets = new Insets(0, 15, 0, 10);
     	c.weighty = 1.0;
+    	c.weightx = 0;
  
     	// Etiqueta HTML con la descripcion de la ventana
-    	InfoLabel etiquetaDescripcion = new InfoLabel(Messages.getString(this.MessagesDescripcion), false);
+    	InfoLabel etiquetaDescripcion;
+    	if (this.MessagesDescripcion2.equals("")){
+    		etiquetaDescripcion = new InfoLabel(Messages.getString(this.MessagesDescripcion), false);
+    	} else {
+    		String text = Messages.getString(this.MessagesDescripcion) + "<br>" + Messages.getString(this.MessagesDescripcion2);
+    		etiquetaDescripcion = new InfoLabel(text, false);
+    		this.MessagesDescripcion2 = "";
+    	}
     	add(etiquetaDescripcion, c);
     }
     
@@ -193,11 +227,11 @@ public class CabeceraAsistente extends JPanel {
 		
 		//Restricciones para los botones
 		GridBagConstraints consButtons = new GridBagConstraints();
-		consButtons.fill = GridBagConstraints.BOTH;
+		consButtons.fill = GridBagConstraints.NONE;
 		consButtons.gridx = 0;
 		consButtons.gridy = 0;
-		consButtons.weightx = 1.0;
-		consButtons.weighty = 1.0;
+		consButtons.weightx = 0;
+		consButtons.weighty = 0;
 		consButtons.insets = new Insets(0,0,0,0);  //right padding
 		//consButtons.anchor=GridBagConstraints.EAST;
 		
@@ -295,8 +329,8 @@ public class CabeceraAsistente extends JPanel {
 		c.fill = GridBagConstraints.NONE;
 		c.gridx = 0;
 		c.gridy = 0;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
+		c.weightx = 0;
+		c.weighty = 0;
 		//c.insets = new Insets(3,3,0,3);
 		c.insets = new Insets(0,0,0,0); 
 		c.anchor=GridBagConstraints.EAST;
