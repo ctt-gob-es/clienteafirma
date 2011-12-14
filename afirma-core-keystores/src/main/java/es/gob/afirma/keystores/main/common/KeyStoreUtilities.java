@@ -152,11 +152,11 @@ public final class KeyStoreUtilities {
      *        Filtros a aplicar sobre los certificados
      * @return Alias seleccionado por el usuario */
     public static Map<String, String> getAliasesByFriendlyName(final String[] alias,
-                                                                            final List<KeyStore> kss,
-                                                                            final boolean checkPrivateKeys,
-                                                                            final boolean checkValidity,
-                                                                            final boolean showExpiredCertificates,
-                                                                            final List<CertificateFilter> certFilters) {
+                                                               final List<KeyStore> kss,
+                                                               final boolean checkPrivateKeys,
+                                                               final boolean checkValidity,
+                                                               final boolean showExpiredCertificates,
+                                                               final List<CertificateFilter> certFilters) {
 
         final String[] trimmedAliases = alias.clone();
 
@@ -198,8 +198,7 @@ public final class KeyStoreUtilities {
                     continue;
                 }
 
-                if (tmpCert == null)
-                 {
+                if (tmpCert == null) {
                     LOGGER.warning("El KeyStore no permite extraer el certificado publico para el siguiente alias: " + al); //$NON-NLS-1$
                 }
 
@@ -209,7 +208,7 @@ public final class KeyStoreUtilities {
                     }
                     catch (final Exception e) {
                         LOGGER.info(
-                                    "Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
+                            "Se ocultara el certificado '" + al + "' por no ser valido: " + e //$NON-NLS-1$ //$NON-NLS-2$
                         );
                         aliassesByFriendlyName.remove(al);
                         continue;
@@ -287,7 +286,7 @@ public final class KeyStoreUtilities {
                     else {
                         // Eliminamos aquellos certificados que no hayan encajado
                         LOGGER.info(
-                        "El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
+                            "El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
                         );
                         aliassesByFriendlyName.remove(al);
                     }
@@ -353,11 +352,11 @@ public final class KeyStoreUtilities {
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
     public static String showCertSelectionDialog(final String[] alias,
-                                                       final List<KeyStore> kss,
-                                                       final Object parentComponent,
-                                                       final boolean checkPrivateKeys,
-                                                       final boolean checkValidity,
-                                                       final boolean showExpiredCertificates) throws AOCertificatesNotFoundException {
+                                                 final List<KeyStore> kss,
+                                                 final Object parentComponent,
+                                                 final boolean checkPrivateKeys,
+                                                 final boolean checkValidity,
+                                                 final boolean showExpiredCertificates) throws AOCertificatesNotFoundException {
         return showCertSelectionDialog(alias,
                                        kss,
                                        parentComponent,
@@ -404,13 +403,13 @@ public final class KeyStoreUtilities {
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
     public static String showCertSelectionDialog(final String[] alias,
-                                                       final List<KeyStore> kss,
-                                                       final Object parentComponent,
-                                                       final boolean checkPrivateKeys,
-                                                       final boolean checkValidity,
-                                                       final boolean showExpiredCertificates,
-                                                       final List<CertificateFilter> certFilters,
-                                                       final boolean mandatoryCertificate) throws AOCertificatesNotFoundException {
+                                                 final List<KeyStore> kss,
+                                                 final Object parentComponent,
+                                                 final boolean checkPrivateKeys,
+                                                 final boolean checkValidity,
+                                                 final boolean showExpiredCertificates,
+                                                 final List<CertificateFilter> certFilters,
+                                                 final boolean mandatoryCertificate) throws AOCertificatesNotFoundException {
         if (alias == null || alias.length == 0) {
             throw new AOCertificatesNotFoundException("El almac\u00E9n no conten\u00EDa entradas"); //$NON-NLS-1$
         }
@@ -535,8 +534,9 @@ public final class KeyStoreUtilities {
                                                                "obtener la PasswordCallBack"); //$NON-NLS-1$
         }
 
-        if (kStore == AOKeyStore.WINDOWS || kStore == AOKeyStore.WINROOT
-            || kStore == AOKeyStore.APPLE) {
+        if (kStore == AOKeyStore.WINDOWS || 
+            kStore == AOKeyStore.WINROOT || 
+            kStore == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.6", kStore.getDescription()), parent); //$NON-NLS-1$
@@ -549,13 +549,14 @@ public final class KeyStoreUtilities {
      *               di&aacute;logos modales (normalmente un <code>java.awt.Comonent</code>)
      * @return Manejador para la solicitud de la clave. */
     public static PasswordCallback getCertificatePC(final AOKeyStore store, final Object parent) {
-        if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
-            || store == AOKeyStore.WINADDRESSBOOK
-            || store == AOKeyStore.WINCA
-            || store == AOKeyStore.SINGLE
-            || store == AOKeyStore.MOZ_UNI
-            || store == AOKeyStore.PKCS11
-            || store == AOKeyStore.APPLE) {
+        if (store == AOKeyStore.WINDOWS || 
+            store == AOKeyStore.WINROOT || 
+            store == AOKeyStore.WINADDRESSBOOK || 
+            store == AOKeyStore.WINCA || 
+            store == AOKeyStore.SINGLE || 
+            store == AOKeyStore.MOZ_UNI || 
+            store == AOKeyStore.PKCS11 || 
+            store == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
         }
         return new UIPasswordCallback(KeyStoreMessages.getString("KeyStoreUtilities.7"), parent); //$NON-NLS-1$
