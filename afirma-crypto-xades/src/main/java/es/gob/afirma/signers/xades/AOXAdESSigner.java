@@ -419,7 +419,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
      *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
      * </ul>
-     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
      * @param xParams Par&aacute;metros adicionales para la firma.
      * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
      * <dl>
@@ -527,6 +527,11 @@ public final class AOXAdESSigner implements AOSigner {
      *    si se establece a <code>false</code> act&uacute;a normalmente (puede mostrar di&aacute;logos, 
      *    por ejemplo, para la dereferenciaci&oacute;n de hojas de estilo enlazadas con rutas relativas).
      *    &Uacute;til para los procesos desatendidos y por lotes
+     *   </dd>
+     *  <dt><b><i>applySystemDate</i></b></dt>
+     *   <dd>
+     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
+     *    del sistema. Por defecto, se encuentra a {@code true}. 
      *   </dd>
      * </dl>
      * <p>
@@ -1597,6 +1602,74 @@ public final class AOXAdESSigner implements AOSigner {
         return spi;
     }
 
+    /** Cofirma datos en formato XAdES.
+     * <p>
+     * Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
+     * ya apunten estas a datos, hojas de estilo o cualquier otro elemento... En cada referencia
+     * firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+     * </p>
+     * @param data Datos que deseamos firmar.
+     * @param sign Documento con las firmas iniciales. 
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param xParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
+     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
+     *   <dd>
+     *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *   </dd>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
+     *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
+     *  <dt><b><i>policyDescription</i></b></dt>
+     *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+     *  <dt><b><i>signerClaimedRole</i></b></dt>
+     *   <dd>Cargo atribuido para el firmante</dd>
+     *  <dt><b><i>signerCertifiedRole</i></b></dt>
+     *   <dd>Cargo confirmado para el firmante</dd>
+     *  <dt><b><i>signatureProductionCity</i></b></dt>
+     *   <dd>Ciudad en la que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionProvince</i></b></dt>
+     *   <dd>Provincia en la que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
+     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionCountry</i></b></dt>
+     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
+     *  <dt><b><i>referencesDigestMethod</i></b></dt>
+     *   <dd>
+     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL, 
+     *    acept&aacute;ndose los siguientes valores:
+     *    <ul>
+     *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
+     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
+     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
+     *     <li><i>http://www.w3.org/2001/04/xmlenc#ripemd160 (RIPEMD-160)</i></li>
+     *    </ul>
+     *   </dd>
+     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
+     *  <dt><b><i>xadesNamespace</i></b></dt>
+     *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd>
+     *   <dt><b><i>applySystemDate</i></b></dt>
+     *   <dd>
+     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
+     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *   </dd>
+     * </dl>
+     * @return Cofirma en formato XAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] cosign(final byte[] data, 
                          final byte[] sign, 
                          final String algorithm, 
@@ -1816,6 +1889,73 @@ public final class AOXAdESSigner implements AOSigner {
         return Utils.writeXML(rootSig, originalXMLProperties, null, null);
     }
 
+    /** Cofirma datos en formato XAdES.
+     * <p>
+     * Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
+     * ya apunten estas a datos, hojas de estilo o cualquier otro elemento... En cada referencia
+     * firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+     * </p>
+     * @param sign Documento con las firmas iniciales. 
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param extraParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
+     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
+     *   <dd>
+     *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *   </dd>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
+     *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
+     *  <dt><b><i>policyDescription</i></b></dt>
+     *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+     *  <dt><b><i>signerClaimedRole</i></b></dt>
+     *   <dd>Cargo atribuido para el firmante</dd>
+     *  <dt><b><i>signerCertifiedRole</i></b></dt>
+     *   <dd>Cargo confirmado para el firmante</dd>
+     *  <dt><b><i>signatureProductionCity</i></b></dt>
+     *   <dd>Ciudad en la que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionProvince</i></b></dt>
+     *   <dd>Provincia en la que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
+     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionCountry</i></b></dt>
+     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
+     *  <dt><b><i>referencesDigestMethod</i></b></dt>
+     *   <dd>
+     *    Algoritmo de huella digital a usar en las referencias XML (referencesDigestMethod). Debe indicarse como una URL, 
+     *    acept&aacute;ndose los siguientes valores:
+     *    <ul>
+     *     <li><i>http://www.w3.org/2000/09/xmldsig#sha1</i> (SHA-1)</li>
+     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha256</i> (SHA-256, valor recomendado)</li>
+     *     <li><i>http://www.w3.org/2001/04/xmlenc#sha512</i> (SHA-512)</li>
+     *     <li><i>http://www.w3.org/2001/04/xmlenc#ripemd160 (RIPEMD-160)</i></li>
+     *    </ul>
+     *   </dd>
+     *  <dt><b><i>canonicalizationAlgorithm</i></b></dt>
+     *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
+     *  <dt><b><i>xadesNamespace</i></b></dt>
+     *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd>
+     *   <dt><b><i>applySystemDate</i></b></dt>
+     *   <dd>
+     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
+     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *   </dd>
+     * </dl>
+     * @return Cofirma en formato XAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] cosign(final byte[] sign, 
                          final String algorithm, 
                          final PrivateKeyEntry keyEntry, 
@@ -1863,6 +2003,70 @@ public final class AOXAdESSigner implements AOSigner {
         return cosign(baosData.toByteArray(), baosSig.toByteArray(), algorithm, keyEntry, extraParams);
     }
 
+    /** Contrafirma firmas en formato XAdES.
+     * <p>
+     * Este m&eacute;todo contrafirma los nodos de firma indicados de un documento de firma.
+     * </p>
+     * @param sign Documento con las firmas iniciales. 
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param targetType Mecanismo de selecci&oacute;n de los nodos de firma que se deben
+     * contrafirmar.
+     * <p>Las distintas opciones son:</p>
+     * <ul>
+     * <li>Todos los nodos del &aacute;rbol de firma</li>
+     * <li>Los nodos hoja del &aacute;rbol de firma</li>
+     * <li>Los nodos de firma cuyas posiciones se especifican en <code>target</code></li>
+     * <li>Los nodos de firma realizados por los firmantes cuyo <i>Common Name</i> se indica en <code>target</code></li>
+     * </ul>
+     * <p>Cada uno de estos tipos se define en {@link es.gob.afirma.core.signers.CounterSignTarget}.
+     * @param targets Listado de nodos o firmantes que se deben contrafirmar seg&uacute;n el
+     * {@code targetType} seleccionado.
+     * @param keyEntry Entrada que apunta a la clave privada a usar para firmar.
+     * @param xParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>encoding</i></b></dt>
+     *   <dd>Fuerza la codificaci&oacute;n del XML de salida (utf-8, iso-8859-1,...)</dd>
+     *  <dt><b><i>policyIdentifier</i></b></dt>
+     *   <dd>Identificador de la pol&iacute;tica de firma (normalmente una URL hacia la pol&iacute;tica en formato XML procesable)</dd>
+     *  <dt><b><i>policyIdentifierHash</i></b></dt>
+     *   <dd>
+     *    Huella digital del documento de pol&iacute;tica de firma (normlamente del mismo fichero en formato XML procesable).
+     *    Si no se indica, es obligatorio que el par&aacute;metro <code>policyIdentifier</code> sea una URL accesible universalmente 
+     *   </dd>
+     *  <dt><b><i>policyIdentifierHashAlgorithm</i></b></dt>
+     *   <dd>Algoritmo usado para el c&aacute;lculo de la huella digital indicada en el par&aacute;metro <code>policyIdentifierHash</code>
+     *  <dt><b><i>policyDescription</i></b></dt>
+     *   <dd>Descripci&oacute;n textual de la pol&iacute;tica</dd>
+     *  <dt><b><i>policyQualifier</i></b></dt>
+     *   <dd>URL hacia el documento (legible por personas, normalmente en formato PDF) descriptivo de la pol&iacute;tica de firma</dd>
+     *  <dt><b><i>signerClaimedRole</i></b></dt>
+     *   <dd>Cargo atribuido para el firmante</dd>
+     *  <dt><b><i>signerCertifiedRole</i></b></dt>
+     *   <dd>Cargo confirmado para el firmante</dd>
+     *  <dt><b><i>signatureProductionCity</i></b></dt>
+     *   <dd>Ciudad en la que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionProvince</i></b></dt>
+     *   <dd>Provincia en la que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionPostalCode</i></b></dt>
+     *   <dd>C&oacute;digo postal en el que se realiza la firma</dd>
+     *  <dt><b><i>signatureProductionCountry</i></b></dt>
+     *   <dd>Pa&iacute;s en el que se realiza la firma</dd>
+     *  <dt><b><i>applySystemDate</i></b></dt>
+     *   <dd>
+     *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
+     *    del sistema. Por defecto, se encuentra a {@code true}. 
+     *   </dd>
+     * </dl>
+     * @return Contrafirma en formato XAdES.
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] countersign(final byte[] sign,
                               final String algorithm,
                               final CounterSignTarget targetType,
