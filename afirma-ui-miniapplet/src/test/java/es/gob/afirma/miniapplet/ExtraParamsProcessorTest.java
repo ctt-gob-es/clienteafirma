@@ -35,7 +35,7 @@ public class ExtraParamsProcessorTest {
 		for (String key : params.keySet().toArray(new String[0])) {
 			System.out.println(key + " = " + params.getProperty(key)); //$NON-NLS-1$
 		}
-		Assert.assertEquals(9, params.size());
+		Assert.assertEquals(11, params.size());
 	}
 
 }
