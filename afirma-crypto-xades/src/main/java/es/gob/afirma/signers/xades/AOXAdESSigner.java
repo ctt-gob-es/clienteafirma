@@ -1604,9 +1604,17 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Cofirma datos en formato XAdES.
      * <p>
-     * Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
-     * ya apunten estas a datos, hojas de estilo o cualquier otro elemento... En cada referencia
-     * firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+     *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
+     *  ya apunten estas a datos, hojas de estilo o cualquier otro elemento. En cada referencia
+     *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+     * </p>
+     * <p>
+     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta 
+     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto 
+     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con 
+     *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
+     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES, 
+     *  el resultado global de la firma se adec&uacute;a al estándar más amplio, XMLDSig en este caso.
      * </p>
      * @param data Datos que deseamos firmar.
      * @param sign Documento con las firmas iniciales. 
@@ -1891,9 +1899,17 @@ public final class AOXAdESSigner implements AOSigner {
 
     /** Cofirma datos en formato XAdES.
      * <p>
-     * Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
-     * ya apunten estas a datos, hojas de estilo o cualquier otro elemento... En cada referencia
-     * firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+     *  Este m&eacute;todo firma todas las referencias a datos declaradas en la firma original,
+     *  ya apunten estas a datos, hojas de estilo o cualquier otro elemento. En cada referencia
+     *  firmada se introduciran las mismas transformaciones que existiesen en la firma original.
+     * </p>
+     * <p>
+     *  A nivel de formato interno, cuando cofirmamos un documento ya firmado previamente, esta 
+     *  firma previa no se modifica. Si tenemos en cuenta que XAdES es en realidad un subconjunto 
+     *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con 
+     *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
+     *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES, 
+     *  el resultado global de la firma se adec&uacute;a al estándar más amplio, XMLDSig en este caso.
      * </p>
      * @param sign Documento con las firmas iniciales. 
      * @param algorithm Algoritmo a usar para la firma.
