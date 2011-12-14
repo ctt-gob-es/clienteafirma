@@ -343,101 +343,12 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Se crea el panel de botones de accesibilidad.
 	 */
-	/*private void createAccessibilityButtonsPanel() {
-		this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
-		//this.accessibilityButtonsPanel = new JPanel(new BorderLayout());
-		
-		//Panel que va a contener los botones de accesibilidad
-		JPanel panel = new JPanel(new GridBagLayout());
-		
-		//Restricciones para los botones
-		GridBagConstraints consButtons = new GridBagConstraints();
-		consButtons.fill = GridBagConstraints.NONE;
-		consButtons.gridx = 0;
-		consButtons.gridy = 0;
-		consButtons.weightx = 0.5;
-		consButtons.insets = new Insets(0,0,0,0);  //right padding
-		consButtons.anchor=GridBagConstraints.EAST;
-		
-		//Maximize button
-		JPanel maximizePanel = new JPanel();
-		this.maximizeButton = getButton(Messages.getString("Wizard.maximizar"), KeyEvent.VK_M );
-		this.maximizeButton.setName("maximizar");
-		maximizePanel.add(this.maximizeButton);
-		this.maximizeButton.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
-		    		maximizarActionPerformed();
-				}
-			});
-
-		panel.add(maximizePanel, consButtons);
-		
-		consButtons.gridx = 1;
-		consButtons.weightx = 0;
-		consButtons.insets = new Insets(0,0,0,5);  //right padding
-
-		//Restore button
-		JPanel restorePanel = new JPanel();
-		this.restoreButton = getButton(Messages.getString("Wizard.restaurar"), KeyEvent.VK_R );
-		this.restoreButton.setName("restaurar");
-		restorePanel.add(this.restoreButton);
-		this.restoreButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    		restaurarActionPerformed();
-			}
-		});
-		
-		
-		panel.add(restorePanel, consButtons);
-
-		//Se añade un borde
-		panel.setName("AccessibilityButtonsPanel");
-		panel.setBorder(BorderFactory.createTitledBorder("Ventana"));
-		
-		//Se añade al panel general
-		//Restricciones para el panel de botones
-		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.NONE;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.weightx = 0.25;
-		//c.insets = new Insets(0,0,0,0); 
-		c.anchor=GridBagConstraints.EAST;
-		//this.accessibilityButtonsPanel.setBackground(Color.red);
-		this.accessibilityButtonsPanel.add(panel, c);
-		
-		// Habilitado/Deshabilitado de botones restaurar/maximizar
-    	if (GeneralConfig.isMaximized()){
-    		//Se deshabilita el botón de maximizado
-    		this.maximizeButton.setEnabled(false);
-    		//Se habilita el botón de restaurar
-    		this.restoreButton.setEnabled(true);
-    	} else {
-    		//Se habilita el botón de maximizado
-    		this.maximizeButton.setEnabled(true);
-    		//Se deshabilita el botón de restaurar
-    		this.restoreButton.setEnabled(false);
-    	}
-		
-	}*/
-	
-	/**
-	 * Se crea el panel de botones de accesibilidad.
-	 */
 	private void createAccessibilityButtonsPanel() {
 		this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
 		
 		//Panel que va a contener los botones de accesibilidad
 		JPanel panel = new JPanel(new GridBagLayout());
-		
-		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-		//panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-		//panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		//panel.setBorder(BorderFactory.createCompoundBorder());
-		//panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-		
+
 		//Restricciones para los botones
 		GridBagConstraints consButtons = new GridBagConstraints();
 		consButtons.fill = GridBagConstraints.BOTH;
@@ -504,19 +415,6 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		tooltip.setTipText(Messages.getString("Wizard.maximizar"));
 		tooltip.setVisible(true);
 		
-		
-		/*this.maximizeButton.addFocusListener(new FocusListener() {
-			public void focusLost(FocusEvent e) {
-				
-				ToolTipManager.sharedInstance().registerComponent(this);
-				ToolTipManager.sharedInstance().setInitialDelay(0) ;
-			}
-			public void focusGained(FocusEvent e) {
-				//Se muestra un borde en el botón cuando este tiene el foco
-				botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
-			}
-		});*/
-		
 		this.maximizeButton.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent e) {
 		    		maximizarActionPerformed();
@@ -573,15 +471,6 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//OK button
 		JPanel okPanel = new JPanel();
 		this.okButton = getButton(Messages.getString("PrincipalGUI.aceptar"), KeyEvent.VK_A);
-		
-		/*okPanel.setName("AccessibilityButtonsPanel");
-		this.buttonsPanel.setBorder(BorderFactory.createTitledBorder("gfjgh"));
-		Insets insets = this.buttonsPanel.getBorder().getBorderInsets(this.buttonsPanel);
-		this.buttonsPanel.setBorder(BorderFactory.createEmptyBorder());
-		
-		consButtons.insets = insets;
-		consButtons.insets.left = consButtons.insets.left +10;
-		consButtons.insets.right = consButtons.insets.right +10;*/
 		
 		okPanel.add(this.okButton);
 		this.buttonsPanel.add(okPanel, consButtons);
