@@ -42,7 +42,7 @@ import org.apache.commons.io.input.ProxyInputStream;
 
 /** Input Stream proxy that doesn't close the underlying input stream.
  * @author fcorneli */
-public class NoCloseInputStream extends ProxyInputStream {
+public final class NoCloseInputStream extends ProxyInputStream {
 
     /** Main constructor.
      * @param proxy */

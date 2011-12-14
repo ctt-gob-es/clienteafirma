@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 /** Digest Information data transfer class.
  * @author Frank Cornelis */
-public class DigestInfo implements Serializable {
+public final class DigestInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

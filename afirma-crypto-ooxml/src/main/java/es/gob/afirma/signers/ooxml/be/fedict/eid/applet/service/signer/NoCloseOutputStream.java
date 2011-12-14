@@ -42,7 +42,7 @@ import org.apache.commons.io.output.ProxyOutputStream;
 
 /** Output Stream proxy that doesn't close the underlying stream.
  * @author fcorneli */
-class NoCloseOutputStream extends ProxyOutputStream {
+final class NoCloseOutputStream extends ProxyOutputStream {
 
     /** Main constructor.
      * @param proxy */

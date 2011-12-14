@@ -92,7 +92,8 @@ public final class RelationshipTransformService extends TransformService {
 
     private final List<String> sourceIds;
 
-    private RelationshipTransformService() {
+    /** Crea el servicio de la transformaci&oacute;n RelationshipTransform. */
+    public RelationshipTransformService() {
         super();
         this.sourceIds = new LinkedList<String>();
     }

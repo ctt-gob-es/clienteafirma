@@ -54,7 +54,7 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 
 /** JSR105 URI dereferencer for Office Open XML documents.
  * @author Frank Cornelis */
-class OOXMLURIDereferencer implements URIDereferencer {
+final class OOXMLURIDereferencer implements URIDereferencer {
 
     private final byte[] ooxml;
 
