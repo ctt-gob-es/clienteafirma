@@ -19,7 +19,7 @@ import es.gob.afirma.core.misc.Base64;
 
 /** Pol&iacute;tica de firma para AdES.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-public class AdESPolicy {
+public final class AdESPolicy {
     
     private String policyIdentifier = null;
     private String policyIdentifierHash = null;
