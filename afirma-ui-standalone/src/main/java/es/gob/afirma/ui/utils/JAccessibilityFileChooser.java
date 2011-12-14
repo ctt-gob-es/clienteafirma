@@ -323,9 +323,9 @@ public class JAccessibilityFileChooser extends JFileChooser{
         	} else {
         		if (PrincipalGUI.fileActualPositionX != -1){
     	    		dialog.setPreferredSize(new Dimension(PrincipalGUI.fileActualWidth, PrincipalGUI.fileActualHeight));
-        		} else {
+        		} /*else {
     	    		dialog.setPreferredSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
-        		}
+        		}*/
         	}
         	dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
             for (int i = 0; i<this.getComponentCount();i++){
