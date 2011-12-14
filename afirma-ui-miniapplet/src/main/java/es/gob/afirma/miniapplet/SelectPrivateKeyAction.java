@@ -58,13 +58,11 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 	                       final BROWSER browser, 
 	                       final CertFilterManager filterManager, 
 	                       final Component parent) {
-		if (os == OS.WINDOWS) {
-			if (browser == BROWSER.FIREFOX) {
-				this.keyStore = AOKeyStore.MOZ_UNI;
-			} 
-			else {
-				this.keyStore = AOKeyStore.WINDOWS;
-			}
+        if (browser == BROWSER.FIREFOX) {
+            this.keyStore = AOKeyStore.MOZ_UNI;
+        } 
+        else if (os == OS.WINDOWS) {
+			this.keyStore = AOKeyStore.WINDOWS;
 		} 
 		else if (os == OS.LINUX || os == OS.SOLARIS) {
 			this.keyStore = AOKeyStore.MOZ_UNI;
