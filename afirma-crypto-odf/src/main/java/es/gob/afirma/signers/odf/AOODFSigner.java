@@ -84,16 +84,8 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 
 
-/** Clase para la firma electr&oacute;nica de ficheros ODF en OpenOffice.org 3 y
- * superiores. Par&aacute;metros adicionales aceptados para las operaciones de
- * firma:<br>
- * <dl>
- * <dt>useOpenOffice31Mode</dt>
- * <dd>Genera firmas compatibles OpenOffice.org 3.1 e inferiores si se establece a <code>true</code>, y firmas compatibles con LibreOffice y
- * OpenOffice 3.2 y superiores si no se establece o se establece a <code>false</code></dd> <!--
- * <dt>referencesDigestMethod</dt>
- * <dd>Algoritmo de huella digital a usar en las referencias XML (en formato URL segun W3C)</dd> -->
- * </dl>
+/** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible con OpenOffice.org 3 y
+ * superiores.
  * @version 0.2 */
 public final class AOODFSigner implements AOSigner {
     
