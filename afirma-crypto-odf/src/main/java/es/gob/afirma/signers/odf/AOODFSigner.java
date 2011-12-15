@@ -424,7 +424,7 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
-     * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
+     * Este m&eacute;todo es completamente equivalente a <code>sign(byte[], String, PrivateKeyEntry, Properties)</code>.
      * @param data No usado, se ignora el valor de este par&aacute;metro
      * @param sign Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
@@ -449,7 +449,7 @@ public final class AOODFSigner implements AOSigner {
     }
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
-     * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
+     * Este m&eacute;todo es completamente equivalente a <code>sign(byte[], String, PrivateKeyEntry, Properties)</code>.
      * @param sign Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar

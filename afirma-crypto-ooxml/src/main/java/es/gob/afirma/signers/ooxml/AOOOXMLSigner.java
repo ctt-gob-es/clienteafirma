@@ -52,7 +52,7 @@ public final class AOOOXMLSigner implements AOSigner {
     }
 
     /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.
-     * @param signData Documento OOXML
+     * @param sign Documento OOXML
      * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso */
     public byte[] getData(final byte[] sign) throws AOException {
 
@@ -174,7 +174,7 @@ public final class AOOOXMLSigner implements AOSigner {
 
     /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
      * electr&oacute;nica.
-     * @param signData Datos que deseamos comprobar.
+     * @param sign Datos que deseamos comprobar.
      * @return Devuelve <code>true</code> si los datos indicados son un documento OOXML susceptible de contener una firma
      * electr&oacute;nica, <code>false</code> en caso contrario. */
     public boolean isSign(final byte[] sign) {
@@ -218,7 +218,7 @@ public final class AOOOXMLSigner implements AOSigner {
     }
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
-     * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
+     * Este m&eacute;todo es completamente equivalente a <code>sign(byte[], String, PrivateKeyEntry, Properties)</code>.
      * @param sign Documento OOXML
      * @param algorithm Algoritmo de firma
      * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
@@ -240,7 +240,7 @@ public final class AOOOXMLSigner implements AOSigner {
     }
 
     /** Agrega una firma electr&oacute;nica a un documento OOXML.
-     * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
+     * Este m&eacute;todo es completamente equivalente a <code>sign(byte[], String, PrivateKeyEntry, Properties)</code>.
      * @param data No usado, se ignora el valor de este par&aacute;metro
      * @param sign Documento OOXML
      * @param algorithm Algoritmo de firma
