@@ -310,8 +310,7 @@ public class Opciones extends JAccessibilityDialog {
         		this.mainOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.general"));
         this.mainOptions.loadConfig(GeneralConfig.getConfig());
-        this.mainOptions.getConfigurationPanel().addAncestorListener(new RequestFocusListener(false));
-        
+
         this.contextOptions =  new ContextOptionsPane();
         
         this.mainPanel.addTab (Messages.getString("Opciones.contextoFirma"),
@@ -349,12 +348,13 @@ public class Opciones extends JAccessibilityDialog {
         this.mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestana
         this.mainPanel.setMnemonicAt(tabNum+3, KeyEvent.VK_P); //atajo para la cuarta pestana
         
+        //Foco a la pestaña seleccionada
+        this.mainPanel.addAncestorListener(new RequestFocusListener(false));
+        
         if (aplicar){
         	this.mainPanel.setSelectedIndex(2);
         	if (!accesibilidad){
         		this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));
-        	} else {
-        		 this.accessibilityOptions.getConfigurationPanel().addAncestorListener(new RequestFocusListener(false));
         	}
         	HelpUtils.visualize("opciones.accesibilidad");
         	aplicar = false;
@@ -610,8 +610,8 @@ public class Opciones extends JAccessibilityDialog {
 		botonAyuda.addActionListener(new OpenHelpActionListener(this.mainPanel));
 		
         cons.ipadx = 0;
-        cons.weightx = 0.0;
-        cons.weighty = 0.0;
+        cons.weightx = 1.0;
+        cons.weighty = 1.0;
 		cons.gridx = 2;
 		
 		panelAyuda.add(botonAyuda);        
