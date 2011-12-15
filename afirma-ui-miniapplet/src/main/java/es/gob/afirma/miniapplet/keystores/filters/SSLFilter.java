@@ -3,9 +3,8 @@ package es.gob.afirma.miniapplet.keystores.filters;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.naming.InvalidNameException;
@@ -13,6 +12,7 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /**
@@ -49,24 +49,33 @@ public final class SSLFilter extends CertificateFilter {
 	}
 	
 	@Override
-    public X509Certificate[] matches(final X509Certificate[] certs) {
+	public String[] matches(String[] aliases, AOKeyStoreManager ksm) {
+
+		X509Certificate[] certs = new X509Certificate[aliases.length];
+		for (int i = 0; i < aliases.length; i++) {
+			certs[i] = ksm.getCertificate(aliases[i]);
+		}
 		
-		final Set<X509Certificate> filteredCerts = new HashSet<X509Certificate>();
-		for (final X509Certificate cert : certs) {
+		X509Certificate cert;
+		X509Certificate cert2;
+		final List<String> filteredCerts = new ArrayList<String>();
+		for (int i = 0; i < aliases.length; i++) {
+			cert = ksm.getCertificate(aliases[i]);
 			try {
 				if (this.matches(cert)) {
 					if (this.isAuthenticationDnieCert(cert)) {
-						for (final X509Certificate cert2 : certs) {
-							if (this.isSignatureDnieCert(cert2) && this.getSubjectSN(cert2) != null &&
+						for (int j = 0; j < aliases.length; j++) {
+							cert2 = ksm.getCertificate(aliases[i]);				
+							if (i != j && this.isSignatureDnieCert(cert2) && this.getSubjectSN(cert2) != null &&
 									this.getSubjectSN(cert2).equalsIgnoreCase(this.getSubjectSN(cert)) &&
 									this.getExpiredDate(cert2).equals(this.getExpiredDate(cert))) {
-								filteredCerts.add(cert2);
+								filteredCerts.add(aliases[j]);
 								break;
 							}
 						}
-					} 
+					}
 					else {
-						filteredCerts.add(cert);
+						filteredCerts.add(aliases[i]);
 					}
 				}
 			} catch (final Exception e) {
@@ -75,7 +84,7 @@ public final class SSLFilter extends CertificateFilter {
 						cert.getSerialNumber() + "': " + e);  //$NON-NLS-1$
 			}
 		}
-		return filteredCerts.toArray(new X509Certificate[filteredCerts.size()]);
+		return filteredCerts.toArray(new String[filteredCerts.size()]);
 	}
 	
 	private boolean isAuthenticationDnieCert(final X509Certificate cert) {
@@ -92,7 +101,7 @@ public final class SSLFilter extends CertificateFilter {
 	 * proceso. Si el certificado no tiene n&uacute;mero de serie, devolver&aacute;
 	 * {@code null}.
 	 * @param cert Certificado.
-	 * @return Numero de serie del subject en hexadecimal.
+	 * @return N&uacute;mero de serie del subject en hexadecimal.
 	 */
 	private String getSubjectSN(final X509Certificate cert) {
 		final String principal = cert.getSubjectX500Principal().getName();
