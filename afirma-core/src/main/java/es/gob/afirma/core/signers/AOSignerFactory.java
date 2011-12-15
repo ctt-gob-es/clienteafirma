@@ -31,13 +31,13 @@ public final class AOSignerFactory {
     
     static {
         SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_CADES,              "es.gob.afirma.signers.cades.AOCAdESSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_CMS,                "es.gob.afirma.signers.cades.AOCMSSigner"); //$NON-NLS-1$
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_CMS,                "es.gob.afirma.signers.cms.AOCMSSigner"); //$NON-NLS-1$
         SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_DETACHED,     "es.gob.afirma.signers.xades.AOXAdESSigner"); //$NON-NLS-1$
         SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPED,    "es.gob.afirma.signers.xades.AOXAdESSigner"); //$NON-NLS-1$
         SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,   "es.gob.afirma.signers.xades.AOXAdESSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,   "es.gob.afirma.signers.xades.AOXMLDSigSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED,  "es.gob.afirma.signers.xades.AOXMLDSigSigner"); //$NON-NLS-1$
-        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, "es.gob.afirma.signers.xades.AOXMLDSigSigner"); //$NON-NLS-1$
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_DETACHED,   "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"); //$NON-NLS-1$
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED,  "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"); //$NON-NLS-1$
+        SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, "es.gob.afirma.signers.xmldsig.AOXMLDSigSigner"); //$NON-NLS-1$
         SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_PDF,                "es.gob.afirma.signers.pades.AOPDFSigner"); //$NON-NLS-1$
         SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_ODF,                "es.gob.afirma.signers.odf.AOODFSigner"); //$NON-NLS-1$
         SIGNERS_CLASSES.put(AOSignConstants.SIGN_FORMAT_OOXML,              "es.gob.afirma.signers.ooxml.AOOOXMLSigner"); //$NON-NLS-1$
