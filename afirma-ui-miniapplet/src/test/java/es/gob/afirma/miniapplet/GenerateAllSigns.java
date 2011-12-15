@@ -51,7 +51,7 @@ public class GenerateAllSigns {
     	{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPING, "XMLDSIG_ENVELOPING", "xsig", "true"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     	{AOSignConstants.SIGN_FORMAT_XMLDSIG_ENVELOPED, "XMLDSIG_ENVELOPED", "xsig", "true"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     	{AOSignConstants.SIGN_FORMAT_ODF, "ODF", "odt", "false"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//    	{AOSignConstants.SIGN_FORMAT_OOXML, "OOXML", "docx", "false"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    	{AOSignConstants.SIGN_FORMAT_OOXML, "OOXML", "docx", "false"}, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     	{AOSignConstants.SIGN_FORMAT_PDF, "PDF", "pdf", "false"} //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     };
 	
