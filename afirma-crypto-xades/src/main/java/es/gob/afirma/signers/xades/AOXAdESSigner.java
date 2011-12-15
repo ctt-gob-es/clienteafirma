@@ -1869,7 +1869,7 @@ public final class AOXAdESSigner implements AOSigner {
             xmlSignature.sign(Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()), keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
         }
         catch (final NoSuchAlgorithmException e) {
-            throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new UnsupportedOperationException("No se soporta el algoritmo de firma '" + algorithm + "': " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (final Exception e) {
             throw new AOException("Error al generar la cofirma", e); //$NON-NLS-1$
