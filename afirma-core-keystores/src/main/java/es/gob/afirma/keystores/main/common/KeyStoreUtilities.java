@@ -21,13 +21,13 @@ import java.security.PrivilegedAction;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -350,14 +350,16 @@ public final class KeyStoreUtilities {
                                                  final boolean checkPrivateKeys,
                                                  final boolean checkValidity,
                                                  final boolean showExpiredCertificates) throws AOCertificatesNotFoundException {
-        return showCertSelectionDialog(alias,
-                                       ksm,
-                                       parentComponent,
-                                       checkPrivateKeys,
-                                       checkValidity,
-                                       showExpiredCertificates,
-                                       new Vector<CertificateFilter>(0),
-                                       false);
+        return showCertSelectionDialog(
+               alias,
+               ksm,
+               parentComponent,
+               checkPrivateKeys,
+               checkValidity,
+               showExpiredCertificates,
+               new ArrayList<CertificateFilter>(0),
+               false
+        );
     }
 
     /** Muestra un di&aacute;logo para que el usuario seleccione entre los
