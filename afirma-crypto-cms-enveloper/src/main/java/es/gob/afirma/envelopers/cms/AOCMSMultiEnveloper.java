@@ -16,7 +16,6 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -120,21 +119,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
             messageDigest = data;
         }
 
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                                                (X509Certificate) cert
-                };
-            }
-        }
-
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
         // tipos de datos a firmar.
         if (this.dataTypeOID == null) {
@@ -166,24 +151,9 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
             this.dataTypeOID = PKCSObjectIdentifiers.data.getId();
         }
 
-        // Array de certificados
-        X509Certificate[] aCertificados = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            aCertificados = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                aCertificados = new X509Certificate[] {
-                                                       (X509Certificate) cert
-                };
-            }
-        }
-
         // Cofirma de la firma usando unicamente el fichero de firmas.
         try {
-            return new CoSignerEnveloped().coSigner(algorithm, aCertificados, sign, this.dataTypeOID, keyEntry, this.atrib, this.uatrib, null);
+            return new CoSignerEnveloped().coSigner(algorithm, (X509Certificate[]) keyEntry.getCertificateChain(), sign, this.dataTypeOID, keyEntry, this.atrib, this.uatrib, null);
         }
         catch (final Exception e) {
             throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
@@ -444,20 +414,7 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
      *        Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
     private P7ContentSignerParameters createContentSignerParementers(final byte[] content, final PrivateKeyEntry ke, final String digestAlgorithm) {
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = ke.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = ke.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                    (X509Certificate) cert
-                };
-            }
-        }
-        return new P7ContentSignerParameters(content, digestAlgorithm, xCerts);
+        return new P7ContentSignerParameters(content, digestAlgorithm, (X509Certificate[]) ke.getCertificateChain());
     }
 
     /** Agrega un nuevo remitente a un envoltorio CMS compatible.
@@ -511,32 +468,16 @@ public byte[] cosign(final byte[] data, final byte[] sign, final String algorith
 
         byte[] newEnvelop;
 
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = ke.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = ke.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                    (X509Certificate) cert
-                };
-            }
-        }
-
-        final X509Certificate[] originatorCertChain = xCerts;
-
         if (contentInfo.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
             final CMSEnvelopedData enveloper = new CMSEnvelopedData();
-            newEnvelop = enveloper.addOriginatorInfo(envelop, originatorCertChain);
+            newEnvelop = enveloper.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
         }
         else if (contentInfo.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
             newEnvelop = new AOCMSSigner().cosign(envelop, AOSignConstants.DEFAULT_SIGN_ALGO, ke, null);
         }
         else if (contentInfo.equals(AOSignConstants.CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             final CMSAuthenticatedEnvelopedData enveloper = new CMSAuthenticatedEnvelopedData();
-            newEnvelop = enveloper.addOriginatorInfo(envelop, originatorCertChain);
+            newEnvelop = enveloper.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
 
         }
         else {

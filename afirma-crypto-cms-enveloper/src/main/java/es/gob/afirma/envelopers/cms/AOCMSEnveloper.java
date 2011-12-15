@@ -17,7 +17,6 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -419,20 +418,7 @@ public class AOCMSEnveloper implements AOEnveloper {
      *        Algoritmo de huella digital.
      * @return Bloque de datos con la informaci&oacute;n del remitente. */
     private P7ContentSignerParameters createContentSignerParementers(final byte[] content, final PrivateKeyEntry ke, final String digestAlgorithm) {
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = ke.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = ke.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                    (X509Certificate) cert
-                };
-            }
-        }
-        return new P7ContentSignerParameters(content, digestAlgorithm, xCerts);
+        return new P7ContentSignerParameters(content, digestAlgorithm, (X509Certificate[]) ke.getCertificateChain());
     }
 
     /** Agrega un nuevo remitente a un envoltorio CMS compatible.
@@ -487,32 +473,16 @@ public class AOCMSEnveloper implements AOEnveloper {
 
         byte[] newEnvelop;
 
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = ke.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = ke.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                    (X509Certificate) cert
-                };
-            }
-        }
-
-        final X509Certificate[] originatorCertChain = xCerts;
-
         if (contentInfo.equals(CMS_CONTENTTYPE_ENVELOPEDDATA)) {
             final CMSEnvelopedData enveloper = new CMSEnvelopedData();
-            newEnvelop = enveloper.addOriginatorInfo(envelop, originatorCertChain);
+            newEnvelop = enveloper.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
         }
         else if (contentInfo.equals(CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
             newEnvelop = new AOCMSSigner().cosign(envelop, AOSignConstants.DEFAULT_SIGN_ALGO, ke, null);
         }
         else if (contentInfo.equals(CMS_CONTENTTYPE_AUTHENVELOPEDDATA)) {
             final CMSAuthenticatedEnvelopedData enveloper = new CMSAuthenticatedEnvelopedData();
-            newEnvelop = enveloper.addOriginatorInfo(envelop, originatorCertChain);
+            newEnvelop = enveloper.addOriginatorInfo(envelop, (X509Certificate[]) ke.getCertificateChain());
 
         }
         else {

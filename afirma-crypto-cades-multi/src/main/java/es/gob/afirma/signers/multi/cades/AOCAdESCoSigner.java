@@ -12,7 +12,6 @@ package es.gob.afirma.signers.multi.cades;
 
 import java.io.ByteArrayInputStream;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 
@@ -46,21 +45,7 @@ public class AOCAdESCoSigner implements AOCoSigner {
             messageDigest = data;
         }
 
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                                                (X509Certificate) cert
-                };
-            }
-        }
-
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
         
         try {
 
@@ -109,35 +94,20 @@ public class AOCAdESCoSigner implements AOCoSigner {
 
         // algoritmo de firma.
         final String typeAlgorithm = algorithm;
-        // Array de certificados
-        X509Certificate[] aCertificados = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            aCertificados = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                aCertificados = new X509Certificate[] {
-                                                       (X509Certificate) cert
-                };
-            }
-        }
 
         // Si la firma que nos introducen es SignedData
         //final boolean signedData = new ValidateCMS().isCMSSignedData(sign);
         final boolean signedData = new CAdESValidator().isCAdESSignedData(sign);
         if (signedData) {
             try {
-                return new CAdESCoSigner().coSigner(typeAlgorithm,
-                                                    aCertificados,
-                                                    new ByteArrayInputStream(sign),
-                                                    new AdESPolicy(extraParams),
-                                                    signingCertificateV2,
-                                                    keyEntry,
-                                                    null // null porque no nos pueden dar un hash
-                                                         // en este metodo, tendría que ser en el
-                                                         // que incluye datos
+                return new CAdESCoSigner().coSigner(
+                    typeAlgorithm,
+                    (X509Certificate[])keyEntry.getCertificateChain(),
+                    new ByteArrayInputStream(sign),
+                    new AdESPolicy(extraParams),
+                    signingCertificateV2,
+                    keyEntry,
+                    null // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos
                 );
             }
             catch (final Exception e) {
@@ -147,14 +117,14 @@ public class AOCAdESCoSigner implements AOCoSigner {
         // Signed And Enveloped.
 
         try {
-            return new CAdESCoSignerEnveloped().coSigner(typeAlgorithm,
-                                                         aCertificados,
-                                                         new ByteArrayInputStream(sign),
-                                                         new AdESPolicy(extraParams),
-                                                         signingCertificateV2,
-                                                         keyEntry,
-                                                         null // null porque no nos pueden dar un hash en este
-                                                              // metodo, tendría que ser en el que incluye datos
+            return new CAdESCoSignerEnveloped().coSigner(
+                 typeAlgorithm,
+                 (X509Certificate[])keyEntry.getCertificateChain(),
+                 new ByteArrayInputStream(sign),
+                 new AdESPolicy(extraParams),
+                 signingCertificateV2,
+                 keyEntry,
+                 null // null porque no nos pueden dar un hash en este metodo, tendría que ser en el que incluye datos            
             );
         }
         catch (final Exception e) {

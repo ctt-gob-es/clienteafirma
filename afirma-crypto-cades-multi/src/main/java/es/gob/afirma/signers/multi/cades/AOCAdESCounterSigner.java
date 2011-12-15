@@ -11,7 +11,6 @@
 package es.gob.afirma.signers.multi.cades;
 
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Properties;
 
@@ -40,21 +39,7 @@ public class AOCAdESCounterSigner implements AOCounterSigner {
 
         final boolean signingCertificateV2 = Boolean.parseBoolean(extraParams.getProperty("signingCertificateV2", Boolean.toString(DEFAULT_USE_SIGNING_CERTIFICATE_V2))); //$NON-NLS-1$
 
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                                                (X509Certificate) cert
-                };
-            }
-        }
-
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, xCerts);
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
         // Datos firmados.
         byte[] dataSigned = null;

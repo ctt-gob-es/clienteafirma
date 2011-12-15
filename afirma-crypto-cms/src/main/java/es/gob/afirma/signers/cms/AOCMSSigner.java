@@ -11,7 +11,6 @@
 package es.gob.afirma.signers.cms;
 
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,21 +62,7 @@ public final class AOCMSSigner implements AOSigner {
             messageDigest = data;
         }
 
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                                                (X509Certificate) cert
-                };
-            }
-        }
-
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -114,21 +99,7 @@ public final class AOCMSSigner implements AOSigner {
             messageDigest = data;
         }
 
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                                                (X509Certificate) cert
-                };
-            }
-        }
-
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, xCerts);
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(data, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
         // tipos de datos a firmar.
         if (this.dataType == null) {
@@ -159,28 +130,13 @@ public final class AOCMSSigner implements AOSigner {
             this.dataType = PKCSObjectIdentifiers.data.getId();
         }
 
-        // Array de certificados
-        X509Certificate[] aCertificados = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            aCertificados = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                aCertificados = new X509Certificate[] {
-                                                       (X509Certificate) cert
-                };
-            }
-        }
-
         // Si la firma que nos introducen es SignedData
         if (ValidateCMSSignedData.isCMSSignedData(sign)) {
             // Cofirma de la firma usando unicamente el fichero de firmas.
             try {
                 // No habra messageDigest porque no nos pueden dar un hash
                 // en este metodo, tendria que ser en el que incluye datos
-                return new CoSigner().coSigner(algorithm, aCertificados, sign, this.dataType, keyEntry, this.atrib, this.uatrib, null);
+                return new CoSigner().coSigner(algorithm, (X509Certificate[])keyEntry.getCertificateChain(), sign, this.dataType, keyEntry, this.atrib, this.uatrib, null);
             }
             catch (final Exception e) {
                 throw new AOException("Error generando la Cofirma PKCS#7", e); //$NON-NLS-1$
@@ -197,21 +153,7 @@ public final class AOCMSSigner implements AOSigner {
                               final PrivateKeyEntry keyEntry,
                               final Properties extraParams) throws AOException {
 
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                                                (X509Certificate) cert
-                };
-            }
-        }
-
-        final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, xCerts);
+        final P7ContentSignerParameters csp = new P7ContentSignerParameters(sign, algorithm, (X509Certificate[]) keyEntry.getCertificateChain());
 
         // tipos de datos a firmar.
         if (this.dataType == null) {

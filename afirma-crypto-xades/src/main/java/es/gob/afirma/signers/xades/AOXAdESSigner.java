@@ -18,7 +18,6 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1324,18 +1323,9 @@ public final class AOXAdESSigner implements AOSigner {
             }
         }
 
-        // Cadena de certificados
-        Certificate[] rawcerts = keyEntry.getCertificateChain();
-        List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
-        for (Certificate c : rawcerts) {
-            if (c instanceof X509Certificate) {
-                certificates.add((X509Certificate)c);
-            }
-        }
-        
         // Genera la firma
         try {
-            xmlSignature.sign(certificates, keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null /* TSA */); //$NON-NLS-1$
+            xmlSignature.sign(Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()), keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null /* TSA */); //$NON-NLS-1$
         }
         catch (final NoSuchAlgorithmException e) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1875,17 +1865,8 @@ public final class AOXAdESSigner implements AOSigner {
                                                      + e);
         }
 
-        // Cadena de certificados
-        final Certificate[] rawcerts = keyEntry.getCertificateChain();
-        final List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
-        for (final Certificate c : rawcerts) {
-            if (c instanceof X509Certificate) {
-                certificates.add((X509Certificate)c);
-            }
-        }
-        
         try {
-            xmlSignature.sign(certificates, keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
+            xmlSignature.sign(Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()), keyEntry.getPrivateKey(), algoUri, referenceList, "Signature-" + UUID.randomUUID().toString(), null/*TSA*/); //$NON-NLS-1$
         }
         catch (final NoSuchAlgorithmException e) {
             throw new UnsupportedOperationException("Los formatos de firma XML no soportan el algoritmo de firma '" + algorithm + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -2497,18 +2478,13 @@ public final class AOXAdESSigner implements AOSigner {
                                                      + e);
         }
         
-        // Cadena de certificados
-        final Certificate[] rawcerts = keyEntry.getCertificateChain();
-        final List<X509Certificate> certificates = new ArrayList<X509Certificate>(rawcerts.length);
-        for (final Certificate c : rawcerts) {
-            if (c instanceof X509Certificate) {
-                certificates.add((X509Certificate)c);
-            }
-        }
-        
         try {
-            xmlSignature.sign(certificates, keyEntry.getPrivateKey(), XMLConstants.SIGN_ALGOS_URI.get(algorithm), referenceList, "Signature-" + UUID.randomUUID() //$NON-NLS-1$
-                                                                                                                               .toString(), null /* TSA */
+            xmlSignature.sign(
+              Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()), 
+              keyEntry.getPrivateKey(), 
+              XMLConstants.SIGN_ALGOS_URI.get(algorithm), 
+              referenceList, "Signature-" + UUID.randomUUID().toString(), //$NON-NLS-1$
+              null /* TSA */
             );
         }
         catch (final NoSuchAlgorithmException e) {
