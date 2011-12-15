@@ -9,7 +9,7 @@
  */
 package es.gob.afirma.ui.principal;
 
-import java.awt.BorderLayout;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -485,68 +485,14 @@ public class Opciones extends JAccessibilityDialog {
         c.gridy = c.gridy + 1;
         getContentPane().add(createButtonsPanel(), c);
     }
-
+    
     private Component createButtonsPanel() {
     	
         bottomPanel.removeAll();
-		GridBagConstraints cons = new GridBagConstraints();
-		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes
-		cons.fill = GridBagConstraints.HORIZONTAL;
-		cons.ipadx = 0;
-		cons.gridx = 0;
-		cons.gridy = 0;
-		//cons.insets = new Insets(0, 0, 0, 120);
-		cons.weighty = 1.0;		
-		
-		JPanel panelVacio2 = new JPanel();
-		panelVacio2.setPreferredSize(new Dimension(1, 1));
-		cons.weightx = 0.8;
-        cons.weighty = 0.2;
-        cons.gridwidth = 1;
-        cons.gridx = 0;
-        cons.insets = new Insets(0, 0, 0, 0);        
-        
-		bottomPanel.add(panelVacio2, cons);
-        
-//		JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
-//		//Boton maximizar ventana
-//		this.maximizar.setText(Messages.getString("Wizard.maximizar"));
-//	    this.maximizar.setName("maximizar");
-//	    this.maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
-//	    this.maximizar.setMnemonic(KeyEvent.VK_M);
-//	    this.maximizar.addActionListener(new ActionListener() {
-//	    	public void actionPerformed(ActionEvent e) {
-//	    		maximizarActionPerformed();
-//			}
-//		});
-//	    Utils.remarcar(this.maximizar);
-//        Utils.setContrastColor(this.maximizar);
-//	    Utils.setFontBold(this.maximizar);
-//	    panelMaximizar.add(this.maximizar);
-//		
-//	    JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
-//	    // Boton restaurar
-//	    this.restaurar.setText(Messages.getString("Wizard.restaurar"));
-//	    this.restaurar.setName("restaurar");
-//	    this.restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
-//	    this.restaurar.setMnemonic(KeyEvent.VK_R);
-//	    this.restaurar.addActionListener(new ActionListener() {
-//	    	public void actionPerformed(ActionEvent e) {
-//	    		restaurarActionPerformed();
-//			}
-//		});
-//	    Utils.remarcar(this.restaurar);
-//        Utils.setContrastColor(this.restaurar);
-//	    Utils.setFontBold(this.restaurar);
-//	    panelRestaurar.add(this.restaurar);
-	    
-	    //Espacio entre botones
-		JPanel panelVacio = new JPanel();
-		panelVacio.setPreferredSize(new Dimension(15, 10));
-	    
+
 		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
+		
 		// Boton aceptar
-        
         aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
         aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
         this.getRootPane().setDefaultButton(aceptar); //Se asigna el botón por defecto para la ventana
@@ -568,6 +514,7 @@ public class Opciones extends JAccessibilityDialog {
         panelAceptar.add(aceptar);
         
         JPanel panelCancelar = new JPanel(new GridLayout(1, 1));
+        
         // Boton cancelar
         JButton	cancelar = new JButton();
         cancelar.setText(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
@@ -583,22 +530,21 @@ public class Opciones extends JAccessibilityDialog {
         Utils.setFontBold(cancelar);
         panelCancelar.add(cancelar);
         
-        // Panel en donde se insertan los botones maximizar, aceptar y cancelar
-        JPanel buttonPanel = new JPanel();
-        //buttonPanel.add(panelMaximizar, BorderLayout.CENTER);
-        //buttonPanel.add(panelRestaurar, BorderLayout.CENTER);
+        
+        // Panel en donde se insertan los botones aceptar y cancelar
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        
+        
+        GridBagConstraints c = new GridBagConstraints();
+        
+        c.anchor = GridBagConstraints.CENTER; //control de la orientacion de componentes
+        c.insets = new Insets(0, 0, 0, 20);
        
-		buttonPanel.add(panelAceptar, BorderLayout.CENTER);
-		buttonPanel.add(panelVacio, BorderLayout.CENTER);
-		buttonPanel.add(panelCancelar, BorderLayout.CENTER);
+		buttonPanel.add(panelAceptar, c);
+		 c.insets = new Insets(0, 0, 0, 0);
+		//buttonPanel.add(panelVacio, c);
+		buttonPanel.add(panelCancelar,c);
 		
-        cons.ipadx = 0;
-        cons.weighty = 1.0;
-		cons.weightx = 1.0;
-		cons.gridx = 1;
-		cons.insets = new Insets(0, 0, 0, 0);
-		
-		bottomPanel.add(buttonPanel, cons);
         
 		JPanel panelAyuda = new JPanel();
         // Boton ayuda
@@ -612,16 +558,32 @@ public class Opciones extends JAccessibilityDialog {
 		}
 		botonAyuda.addActionListener(new OpenHelpActionListener(this.mainPanel));
 		
-        cons.ipadx = 0;
-        cons.weightx = 1.0;
+		GridBagConstraints cons = new GridBagConstraints();
+		//cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes
+		cons.fill = GridBagConstraints.BOTH;
+		//cons.ipadx = 0;
+		cons.gridx = 0;
+		cons.gridy = 0;
+		
+		//cons.ipadx = 0;
         cons.weighty = 1.0;
-		cons.gridx = 2;
+		cons.weightx = 1.0;
+		cons.gridx = 0;
+		cons.insets = new Insets(0, 40, 0, 0);
+		
+		bottomPanel.add(buttonPanel, cons);
+
+        cons.weightx = 0.0;
+        cons.weighty = 1.0;
+		cons.gridx = 1;
+		cons.insets = new Insets(0, 0, 0, 10);
 		
 		panelAyuda.add(botonAyuda);        
         bottomPanel.add(panelAyuda, cons);
         
         return bottomPanel;
     }
+
     
 	/**
 	 * Cierra la ventana y aplica todas las opciones seleccionadas
