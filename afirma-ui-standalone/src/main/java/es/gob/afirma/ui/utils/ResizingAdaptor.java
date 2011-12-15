@@ -226,6 +226,10 @@ public class ResizingAdaptor extends ComponentAdapter {
 						float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theDialogAdvisor != null){
+						
+						if (actualComponent instanceof JComboBox){
+							System.out.println("entrando");
+						}
 						float resizeFactor = Math.round(relation / getResizingFactorFrameAdvisor());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theWindowAbout != null) {
@@ -240,18 +244,40 @@ public class ResizingAdaptor extends ComponentAdapter {
 					}
 				} else {
 					if (theWindow != null) {
+						if (actualComponent instanceof JComboBox){
+							actualComponent.setPreferredSize(new Dimension(100,25));
+						}
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else if (theDialog != null){
+						if (actualComponent instanceof JComboBox){
+							actualComponent.setPreferredSize(new Dimension(100,25));
+						}
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else if (theDialogWizard != null){
+						if (actualComponent instanceof JComboBox){
+							actualComponent.setPreferredSize(new Dimension(100,25));
+						}
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else if (theDialogAdvisor != null){
+						if (actualComponent instanceof JComboBox){
+							System.out.println("entrando2");
+							actualComponent.setPreferredSize(new Dimension(100,25));
+						}
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else if (theWindowAbout != null){
+						if (actualComponent instanceof JComboBox){
+							actualComponent.setPreferredSize(new Dimension(100,25));
+						}
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					}  else if (theCustomDialog != null){
+						if (actualComponent instanceof JComboBox){
+							actualComponent.setPreferredSize(new Dimension(100,25));
+						}
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					} else {
+						if (actualComponent instanceof JComboBox){
+							actualComponent.setPreferredSize(new Dimension(100,25));
+						}
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					}
 				}
@@ -299,6 +325,8 @@ public class ResizingAdaptor extends ComponentAdapter {
 					link= sc.addStyle("link", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
 			        StyleConstants.setFontSize(link, (7 + (int)resizeFactor));
 					((HTMLDocument) editorPanel.getDocument()).setCharacterAttributes(221, 26, link, false);
+				} else if (actualComponent instanceof JComboBox){
+					System.out.println("combo");
 				}
 				else{
 					// Si nos encontramos con un contenedor, redimensionamos sus hijos
