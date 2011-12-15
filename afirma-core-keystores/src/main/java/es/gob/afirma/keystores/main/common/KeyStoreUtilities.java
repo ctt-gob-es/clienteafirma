@@ -129,7 +129,7 @@ public final class KeyStoreUtilities {
 
     private static final int ALIAS_MAX_LENGTH = 120;
 
-    /** Obtiene una hashtable con las descripciones usuales de los alias de
+    /** Obtiene una mapa con las descripciones usuales de los alias de
      * certificados (como claves de estas &uacute;ltimas).
      * @param aliases
      *        Alias de los certificados entre los que el usuario debe
@@ -153,10 +153,10 @@ public final class KeyStoreUtilities {
                                                                final boolean showExpiredCertificates,
                                                                final List<CertificateFilter> certFilters) {
 
-        // Creamos un HashTable con la relacion Alias-Nombre_a_mostrar de los
+        // Creamos un mapa con la relacion Alias-Nombre_a_mostrar de los
         // certificados
     	final String[] trimmedAliases = aliases.clone();
-        final Hashtable<String, String> aliassesByFriendlyName = new Hashtable<String, String>(trimmedAliases.length);
+        final Map<String, String> aliassesByFriendlyName = new Hashtable<String, String>(trimmedAliases.length);
         for (final String trimmedAlias : trimmedAliases) {
             aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
         }
@@ -255,10 +255,10 @@ public final class KeyStoreUtilities {
             
             // Aplicamos los filtros de certificados
             if (certFilters != null) {
-            	Hashtable<String, String> filteredAliases;
+            	Map<String, String> filteredAliases;
                 for (final CertificateFilter cf : certFilters) {
                 	filteredAliases = new Hashtable<String, String>();
-                	for (String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[0]), ksm)) {
+                	for (final String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[0]), ksm)) {
                 		filteredAliases.put(filteredAlias, aliassesByFriendlyName.get(filteredAlias));
                 	}
                 	aliassesByFriendlyName.clear();
@@ -266,7 +266,7 @@ public final class KeyStoreUtilities {
                 }
             }
             
-            for (String alias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
+            for (final String alias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
             	tmpCert = ksm.getCertificate(alias);
             	tmpCN = AOUtil.getCN(tmpCert);
             	issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
@@ -290,14 +290,11 @@ public final class KeyStoreUtilities {
 
         else {
 
-            // Vamos a ver si en vez de un alias nos llega un Principal X.500
-            // completo,
-            // en cuyo caso es muy largo como para mostrase y mostrariamos solo
-            // el
+            // Vamos a ver si en vez de un alias nos llega un Principal X.500 completo,
+            // en cuyo caso es muy largo como para mostrase y mostrariamos solo el
             // CN o una version truncada si no nos cuela como X.500.
             // En este bucle usamos la clave tanto como clave como valor porque
-            // asi se ha inicializado
-            // el HashTable.
+            // asi se ha inicializado el mapa.
             for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
                 final String value = aliassesByFriendlyName.get(al);
                 if (value.length() > ALIAS_MAX_LENGTH) {
