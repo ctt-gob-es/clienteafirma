@@ -13,10 +13,9 @@ package es.gob.afirma.signers.ooxml;
 import java.io.ByteArrayInputStream;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.Security;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -27,9 +26,9 @@ import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOFileUtils;
 import es.gob.afirma.core.misc.OfficeXMLAnalizer;
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.signers.AOSignInfo;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.AbstractOOXMLSignatureServiceContainer;
@@ -298,34 +297,15 @@ public final class AOOOXMLSigner implements AOSigner {
             throw new AOFormatFileException("El fichero introducido no es un documento OOXML"); //$NON-NLS-1$
         }
 
-        // Pasamos la cadena de certificacion a un vector
+        // Pasamos la cadena de certificacion a una lista
         if (keyEntry == null) {
             throw new AOException("No se ha proporcionado una clave valida"); //$NON-NLS-1$
-        }
-
-        X509Certificate[] xCerts = new X509Certificate[0];
-        final Certificate[] certs = keyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            xCerts = (X509Certificate[]) certs;
-        }
-        else {
-            final Certificate cert = keyEntry.getCertificate();
-            if (cert instanceof X509Certificate) {
-                xCerts = new X509Certificate[] {
-                    (X509Certificate) cert
-                };
-            }
-        }
-
-        final Vector<X509Certificate> certChain = new Vector<X509Certificate>(xCerts.length);
-        for (final X509Certificate c : xCerts) {
-            certChain.add(c);
         }
 
         try {
             return new AbstractOOXMLSignatureServiceContainer().sign(
                  new ByteArrayInputStream(ooxmlDocument),
-                 certChain,
+                 Arrays.asList((X509Certificate[])keyEntry.getCertificateChain()),
                  AOSignConstants.getDigestAlgorithmName(algorithm),
                  keyEntry.getPrivateKey(),
                  signNum
