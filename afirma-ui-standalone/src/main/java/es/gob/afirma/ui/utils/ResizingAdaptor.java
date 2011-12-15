@@ -326,7 +326,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 			        StyleConstants.setFontSize(link, (7 + (int)resizeFactor));
 					((HTMLDocument) editorPanel.getDocument()).setCharacterAttributes(221, 26, link, false);
 				} else if (actualComponent instanceof JComboBox){
-					System.out.println("combo");
+					//System.out.println("combo");
 				}
 				else{
 					// Si nos encontramos con un contenedor, redimensionamos sus hijos
