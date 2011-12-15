@@ -557,12 +557,7 @@ public class AOKeyStoreManager {
      *        Clave privada del certificado
      * @return Certificado cuya clave privada es la indicada */
     public X509Certificate getCertificate(final KeyStore.PrivateKeyEntry privateKeyEntry) {
-        final Certificate cert = privateKeyEntry.getCertificate();
-        if (cert instanceof X509Certificate) {
-            return (X509Certificate) cert;
-        }
-        LOGGER.severe("El certificado solicitado no era de tipo X509Certificate, se devolvera null"); //$NON-NLS-1$
-        return null;
+        return (X509Certificate) privateKeyEntry.getCertificate();
     }
 
     /** Obtiene un certificado del keystore activo a partir de su alias.
@@ -593,12 +588,7 @@ public class AOKeyStoreManager {
             LOGGER.warning("No se ha podido recuperar el certificado con alias '" + alias + "', se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
             return null;
         }
-        if (cert instanceof X509Certificate) {
-            return (X509Certificate) cert;
-        }
-
-        LOGGER.warning("El certificado con alias '" + alias + "' no es de tipo X509Certificate, se devolvera null"); //$NON-NLS-1$ //$NON-NLS-2$
-        return null;
+        return (X509Certificate) cert;
 
     }
 
@@ -608,18 +598,7 @@ public class AOKeyStoreManager {
      *        Clave privada del certificado
      * @return Certificados de la cadena de certificaci&oacute;n. */
     public X509Certificate[] getCertificateChain(final KeyStore.PrivateKeyEntry privateKeyEntry) {
-        final Certificate[] certs = privateKeyEntry.getCertificateChain();
-        if (certs != null && (certs instanceof X509Certificate[])) {
-            return (X509Certificate[]) certs;
-        }
-        final Certificate cert = privateKeyEntry.getCertificate();
-        if (cert instanceof X509Certificate) {
-            return new X509Certificate[] {
-                                          (X509Certificate) cert
-            };
-        }
-        LOGGER.severe("No se ha podido obtener la cadena de certificados, se devolvera una cadena vacia"); //$NON-NLS-1$
-        return new X509Certificate[0];
+        return (X509Certificate[]) privateKeyEntry.getCertificateChain();
     }
 
     /** Obtiene la cadena de certificaci&oacute;n de un certificado del keystore
@@ -633,26 +612,16 @@ public class AOKeyStoreManager {
             return null;
         }
         try {
-            final Certificate[] certs = this.ks.getCertificateChain(alias);
-            if (certs != null && (certs instanceof X509Certificate[])) {
-                return (X509Certificate[]) certs;
-            }
-            final Certificate cert = this.ks.getCertificate(alias);
-            if (cert instanceof X509Certificate) {
-                return new X509Certificate[] {
-                                              (X509Certificate) cert
-                };
-            }
+            return (X509Certificate[]) this.ks.getCertificateChain(alias);
         }
         catch (final Exception e) {
-            LOGGER.severe("Error al obtener la cadena de certificados para el alias '" + alias //$NON-NLS-1$
-                                                     + "', se devolvera una cadena vacia: " //$NON-NLS-1$
-                                                     + e);
+            LOGGER.severe(
+              "Error al obtener la cadena de certificados para el alias '" + alias //$NON-NLS-1$
+                 + "', se devolvera una cadena vacia: " //$NON-NLS-1$
+                 + e
+            );
             return new X509Certificate[0];
         }
-        LOGGER.severe("No se ha podido obtener la cadena de certificados para el alias '" + alias //$NON-NLS-1$
-                                                 + "', se devolvera una cadena vacia"); //$NON-NLS-1$
-        return new X509Certificate[0];
     }
 
     /** Obtiene todos los alias de los certificados del almac&eacute;n actual.
