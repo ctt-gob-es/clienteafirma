@@ -26,38 +26,49 @@ public final class XMLConstants {
     /** URI que define el NameSpace de firma XMLdSig (Compatible XAdES). */
     public static final String DSIGNNS = "http://www.w3.org/2000/09/xmldsig#"; //$NON-NLS-1$
     
+    private static final String URL_SHA1_RSA    = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"; //$NON-NLS-1$
+    private static final String URL_MD5_RSA     = "http://www.w3.org/2001/04/xmldsig-more#rsa-md5"; //$NON-NLS-1$
+    private static final String URL_SHA256_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"; //$NON-NLS-1$
+    private static final String URL_SHA384_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"; //$NON-NLS-1$
+    private static final String URL_SHA512_RSA  = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"; //$NON-NLS-1$
+    private static final String URL_SHA1        = "http://www.w3.org/2000/09/xmldsig#sha1"; //$NON-NLS-1$
+    private static final String URL_MD5         = "http://www.w3.org/2001/04/xmldsig-more#md5"; //$NON-NLS-1$
+    private static final String URL_SHA256      = "http://www.w3.org/2001/04/xmlenc#sha256"; //$NON-NLS-1$
+    private static final String URL_SHA384      = "http://www.w3.org/2001/04/xmldsig-more#sha384"; //$NON-NLS-1$
+    private static final String URL_SHA512      = "http://www.w3.org/2001/04/xmlenc#sha512"; //$NON-NLS-1$
+    
     /** URIs de los algoritmos de firma */
     public static final Map<String, String> SIGN_ALGOS_URI = new HashMap<String, String>() {
         private static final long serialVersionUID = 1897588397257599853L;
         {
-            put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$
+            put(AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA, URL_SHA1_RSA); 
             // Introducimos variantes para hacerlo mas robusto
-            put("RSA", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA-1withRSA", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA1withRSAEncryption", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA-1withRSAEncryption", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHAwithRSAEncryption", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHAwithRSA", "http://www.w3.org/2000/09/xmldsig#rsa-sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("RSA", URL_SHA1_RSA); //$NON-NLS-1$ 
+            put("SHA-1withRSA", URL_SHA1_RSA); //$NON-NLS-1$ 
+            put("SHA1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$ 
+            put("SHA-1withRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$ 
+            put("SHAwithRSAEncryption", URL_SHA1_RSA); //$NON-NLS-1$ 
+            put("SHAwithRSA", URL_SHA1_RSA); //$NON-NLS-1$ 
 
-            put(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA, "http://www.w3.org/2001/04/xmldsig-more#rsa-md5"); //$NON-NLS-1$
+            put(AOSignConstants.SIGN_ALGORITHM_MD5WITHRSA, URL_MD5_RSA); 
 
-            put(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"); //$NON-NLS-1$
+            put(AOSignConstants.SIGN_ALGORITHM_SHA256WITHRSA, URL_SHA256_RSA); 
             // Introducimos variantes para hacerlo mas robusto
-            put("SHA-256withRSA", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA256withRSAEncryption", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA-256withRSAEncryption", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("SHA-256withRSA", URL_SHA256_RSA); //$NON-NLS-1$ 
+            put("SHA256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$ 
+            put("SHA-256withRSAEncryption", URL_SHA256_RSA); //$NON-NLS-1$ 
 
-            put(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA, "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"); //$NON-NLS-1$
+            put(AOSignConstants.SIGN_ALGORITHM_SHA384WITHRSA, URL_SHA384_RSA); 
             // Introducimos variantes para hacerlo mas robusto
-            put("SHA-384withRSA", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA384withRSAEncryption", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA-384withRSAEncryption", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("SHA-384withRSA", URL_SHA384_RSA); //$NON-NLS-1$ 
+            put("SHA384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$ 
+            put("SHA-384withRSAEncryption", URL_SHA384_RSA); //$NON-NLS-1$ 
 
-            put(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"); //$NON-NLS-1$
+            put(AOSignConstants.SIGN_ALGORITHM_SHA512WITHRSA, URL_SHA512_RSA); 
             // Introducimos variantes para hacerlo mas robusto
-            put("SHA-512withRSA", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA512withRSAEncryption", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("SHA-512withRSAEncryption", "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("SHA-512withRSA", URL_SHA512_RSA); //$NON-NLS-1$ 
+            put("SHA512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$ 
+            put("SHA-512withRSAEncryption", URL_SHA512_RSA); //$NON-NLS-1$ 
 
         }
     };
@@ -73,23 +84,23 @@ public final class XMLConstants {
             // Introducimos variantes para hacerlo mas robusto
 
             // SHA1
-            put("sha1", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("sha-1", "http://www.w3.org/2000/09/xmldsig#sha1"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("sha1", URL_SHA1); //$NON-NLS-1$ 
+            put("sha-1", URL_SHA1); //$NON-NLS-1$ 
 
             // MD5
-            put("md5", "http://www.w3.org/2001/04/xmldsig-more#md5"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("md5", URL_MD5); //$NON-NLS-1$ 
 
             // SHA256
-            put("sha256", "http://www.w3.org/2001/04/xmlenc#sha256"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("sha-256", "http://www.w3.org/2001/04/xmlenc#sha256"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("sha256", URL_SHA256); //$NON-NLS-1$ 
+            put("sha-256", URL_SHA256); //$NON-NLS-1$ 
 
             // SHA384
-            put("sha384", "http://www.w3.org/2001/04/xmldsig-more#sha384"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("sha-384", "http://www.w3.org/2001/04/xmldsig-more#sha384"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("sha384", URL_SHA384); //$NON-NLS-1$ 
+            put("sha-384", URL_SHA384); //$NON-NLS-1$ 
 
             // SHA512
-            put("sha512", "http://www.w3.org/2001/04/xmlenc#sha512"); //$NON-NLS-1$ //$NON-NLS-2$
-            put("sha-512", "http://www.w3.org/2001/04/xmlenc#sha512"); //$NON-NLS-1$ //$NON-NLS-2$
+            put("sha512", URL_SHA512); //$NON-NLS-1$ 
+            put("sha-512", URL_SHA512); //$NON-NLS-1$ 
         }
     };
     
