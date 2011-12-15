@@ -425,7 +425,8 @@ public final class AOODFSigner implements AOSigner {
 
     /** A&ntilde;ade una firma electr&oacute;nica a un documento ODF.
      * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
-     * @param data Documento ODF a firmar
+     * @param data No usado, se ignora el valor de este par&aacute;metro
+     * @param sign Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
      * @param extraParams Par&aacute;metros adicionales para la firma.
@@ -582,15 +583,11 @@ public final class AOODFSigner implements AOSigner {
         }
     }
 
-    /** Indica si el fichero indicado es una firma v&aacute;lida del tipo de
-     * signer concreto. En el caso concreto del formato ODF, un documento, este
-     * firmado o no, puede considerarse una firma ya que es apto para ser
-     * cofirmado y, de cualquier forma, la contrafirma no es posible sobre este
-     * tipo de fichero.
-     * @param signData
-     *        Firma que deseamos comprobar.
-     * @return Devuelve <code>true</code> si el fichero es una firma reconocida
-     *         por este signer, <code>false</code> en caso contrario. */
+    /** Indica si los datos indicados son un documento ODF susceptible de contener una firma
+     * electr&oacute;nica.
+     * @param signData Datos que deseamos comprobar.
+     * @return Devuelve <code>true</code> si los datos indicados son un documento ODF susceptible de contener una firma
+     * electr&oacute;nica, <code>false</code> en caso contrario. */
     public boolean isSign(final byte[] signData) {
         return isValidDataFile(signData);
     }

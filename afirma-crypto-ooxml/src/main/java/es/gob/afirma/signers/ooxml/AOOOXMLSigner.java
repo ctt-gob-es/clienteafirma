@@ -35,8 +35,7 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service.signer.AbstractOOXMLSignatureServiceContainer;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 
-/** Firmas OOXML basadas en una versi&oacute;n fuertemente modificada de las
- * clases <code>es.gob.afirma.signers.ooxml.be.fedict.eid.applet.service</code>. */
+/** Manejador de firmas electr&oacute;nicas XML de documentos OOXML de Microsoft Office. */
 public final class AOOOXMLSigner implements AOSigner {
     
     static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
@@ -52,6 +51,9 @@ public final class AOOOXMLSigner implements AOSigner {
         }
     }
 
+    /** Si la entrada es un documento OOXML, devuelve el mismo documento sin ninguna modificaci&oacute;n.
+     * @param signData Documento OOXML
+     * @return Documento de entrada si este es OOXML, <code>null</code> en cualquier otro caso */
     public byte[] getData(final byte[] sign) throws AOException {
 
         // Si no es una firma OOXML valida, lanzamos una excepcion
@@ -89,6 +91,7 @@ public final class AOOOXMLSigner implements AOSigner {
                && (zipFile.getEntry("docProps/core.xml") != null || zipFile.getEntry("docProps\\core.xml") != null); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
+    /** { {@inheritDoc} */
     public AOSignInfo getSignInfo(final byte[] sign) throws AOException {
         if (sign == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
@@ -105,6 +108,7 @@ public final class AOOOXMLSigner implements AOSigner {
         return new AOSignInfo(AOSignConstants.SIGN_FORMAT_OOXML);
     }
 
+    /** { {@inheritDoc} */
     public String getSignedName(final String originalName, final String inText) {
         final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
         if (originalName == null) {
@@ -129,6 +133,7 @@ public final class AOOOXMLSigner implements AOSigner {
         return originalName + inTextInt + ".ooxml"; //$NON-NLS-1$
     }
 
+    /** { {@inheritDoc} */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
         if (sign == null) {
             throw new IllegalArgumentException("Los datos de firma introducidos son nulos"); //$NON-NLS-1$
@@ -167,6 +172,11 @@ public final class AOOOXMLSigner implements AOSigner {
         return new AOTreeModel(tree, tree.getChildCount());
     }
 
+    /** Indica si los datos indicados son un documento OOXML susceptible de contener una firma
+     * electr&oacute;nica.
+     * @param signData Datos que deseamos comprobar.
+     * @return Devuelve <code>true</code> si los datos indicados son un documento OOXML susceptible de contener una firma
+     * electr&oacute;nica, <code>false</code> en caso contrario. */
     public boolean isSign(final byte[] sign) {
         if (sign == null) {
             LOGGER.warning("Se ha introducido una firma nula para su comprobacion"); //$NON-NLS-1$
@@ -175,6 +185,9 @@ public final class AOOOXMLSigner implements AOSigner {
         return isOOXMLFile(sign);
     }
 
+    /** Indica si los datos son un documento OOXML susceptible de ser firmado.
+     * @param data Datos a comprobar 
+     * @return <cod>true</code> si los datos son un documento OOXML susceptible de ser firmado, <code>false</code> en caso contrario */
     public boolean isValidDataFile(final byte[] data) {
         if (data == null) {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
@@ -183,16 +196,71 @@ public final class AOOOXMLSigner implements AOSigner {
         return isOOXMLFile(data);
     }
 
-    public byte[] sign(final byte[] data, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
-        return addNewSign(data, algorithm, keyEntry, extraParams);
+    /** Agrega una firma electr&oacute;nica a un documento OOXML.
+     * @param data Documento OOXML
+     * @param algorithm Algoritmo de firma
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada del firmante
+     * @param extraParams No usado, se ignora el valor de este par&aacute;metro
+     * @return Documento OOXML firmado
+     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
+    public byte[] sign(final byte[] data, 
+                       final String algorithm, 
+                       final PrivateKeyEntry keyEntry, 
+                       final Properties extraParams) throws AOException {
+        return signOOXML(data, OOXMLUtil.countOOXMLSignatures(data) + 1, algorithm, keyEntry);
     }
 
-    public byte[] cosign(final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
-        return addNewSign(sign, algorithm, keyEntry, extraParams);
+    /** Agrega una firma electr&oacute;nica a un documento OOXML.
+     * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
+     * @param sign Documento OOXML
+     * @param algorithm Algoritmo de firma
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada del firmante
+     * @param extraParams No usado, se ignora el valor de este par&aacute;metro
+     * @return Documento OOXML firmado
+     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
+    public byte[] cosign(final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry keyEntry, 
+                         final Properties extraParams) throws AOException {
+        return signOOXML(sign, OOXMLUtil.countOOXMLSignatures(sign) + 1, algorithm, keyEntry);
     }
 
-    public byte[] cosign(final byte[] data, final byte[] sign, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
-        return addNewSign(sign, algorithm, keyEntry, extraParams);
+    /** Agrega una firma electr&oacute;nica a un documento OOXML.
+     * Este m&eacute;todo es completamente equivalente a {@link #sign(byte[], String, PrivateKeyEntry, Properties)}.
+     * @param data No usado, se ignora el valor de este par&aacute;metro
+     * @param sign Documento OOXML
+     * @param algorithm Algoritmo de firma
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada del firmante
+     * @param extraParams No usado, se ignora el valor de este par&aacute;metro
+     * @return Documento OOXML firmado
+     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
+    public byte[] cosign(final byte[] data, 
+                         final byte[] sign, 
+                         final String algorithm, 
+                         final PrivateKeyEntry 
+                         keyEntry, final Properties extraParams) throws AOException {
+        return signOOXML(sign, OOXMLUtil.countOOXMLSignatures(sign) + 1, algorithm, keyEntry);
     }
 
     /** M&eacute;todo no implementado. No es posible realizar contrafirmas de
@@ -206,40 +274,24 @@ public final class AOOOXMLSigner implements AOSigner {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros OOXML"); //$NON-NLS-1$
     }
 
-    /** Agrega una nueva firma a un documento OOXML.
-     * @param ooxmlFile Documento OOXML
-     * @param algorithm Algoritmo de firma
-     * @param keyEntry Clave del certificado
-     * @param cert Certificado de firma
-     * @param extraParams Configuraci&oacute;n adicional de firma
-     * @return Documento firmado
-     * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
-    private byte[] addNewSign(final byte[] ooxmlDocument, final String algorithm, final PrivateKeyEntry keyEntry, final Properties extraParams) throws AOException {
-
-        return signOOXML(ooxmlDocument, OOXMLUtil.countOOXMLSignatures(ooxmlDocument) + 1, algorithm, keyEntry, extraParams);
-    }
-
-    /** @param ooxmlDocument Documento OOXML.
+    /** Agrega una firma electr&oacute;nica a un documento OOXML.
+     * @param ooxmlDocument Documento OOXML.
      * @param signNum N&uacute;mero de la firma que se va a realizar
      * @param algorithm Algoritmo de firma
-     * @param keyEntry Clave del certificado
-     * @param cert Certificado de firma
-     * @param extraParams Configuraci&oacute;n adicional de firma
-     * @return Documento firmado
+     * <p>Se aceptan los siguientes algoritmos en el par&aacute;metro <code>algorithm</code>:</p>
+     * <ul>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     *  <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param keyEntry Entrada que apunta a la clave privada del firmante
+     * @return Documento OOXML firmado
      * @throws AOException Cuando ocurre alg&uacute;n error durante el proceso de firma */
     private byte[] signOOXML(final byte[] ooxmlDocument,
                              final int signNum,
                              final String algorithm,
-                             final PrivateKeyEntry keyEntry,
-                             final Properties extraParams) throws AOException {
-
-
-         // Si se solicito una firma explicita, advertimos no son compatibles con
-         // OOXML y se ignorara esta configuracion
-
-        if (extraParams != null && extraParams.containsKey("mode") && extraParams.getProperty("mode").equals(AOSignConstants.SIGN_MODE_EXPLICIT)) { //$NON-NLS-1$ //$NON-NLS-2$
-            LOGGER.warning("El formato de firma OOXML no soporta el modo de firma explicita, " + "se ignorara esta configuracion"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+                             final PrivateKeyEntry keyEntry) throws AOException {
 
         // Comprobamos si es un documento OOXML valido.
         if (!OfficeXMLAnalizer.isOOXMLDocument(ooxmlDocument)) {
@@ -271,11 +323,13 @@ public final class AOOOXMLSigner implements AOSigner {
         }
 
         try {
-            return new AbstractOOXMLSignatureServiceContainer().sign(new ByteArrayInputStream(ooxmlDocument),
-                                                                     certChain,
-                                                                     AOSignConstants.getDigestAlgorithmName(algorithm),
-                                                                     keyEntry.getPrivateKey(),
-                                                                     signNum);
+            return new AbstractOOXMLSignatureServiceContainer().sign(
+                 new ByteArrayInputStream(ooxmlDocument),
+                 certChain,
+                 AOSignConstants.getDigestAlgorithmName(algorithm),
+                 keyEntry.getPrivateKey(),
+                 signNum
+            );
         }
         catch (final Exception e) {
             throw new AOException("Error durante la firma OOXML", e); //$NON-NLS-1$
