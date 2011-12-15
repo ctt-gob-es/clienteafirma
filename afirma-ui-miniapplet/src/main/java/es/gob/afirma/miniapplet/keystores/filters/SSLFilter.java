@@ -16,8 +16,10 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /**
- * Filtro de certificados que selecciona los certificados con un n&uacute;mero de
- * serie concreto (esto deber&iacute; devolver com&uacute;nmente un &uacute;nico certificado).s&oacute;lo admite el certificado de firma del DNIe.
+ * Filtro que selecciona los certificados con un n&uacute;mero de serie concreto. 
+ * Un filtrado de este tipo devuelve com&uacute;nmente un &uacute;nico certificado.
+ * Si se indica el n&uacute;mero de serie del certificado del DNIe, se devuelve el
+ * certificado de firma.
  * @author Carlos Gamuci Mill&aacute;n.
  */
 public final class SSLFilter extends CertificateFilter {
@@ -33,9 +35,9 @@ public final class SSLFilter extends CertificateFilter {
 	private final SignatureDNIeFilter signatureDnieCertFilter;
 	
 	/**
-	 * Contruye el filtro a partir del n&uacute;mero de serie del certificado que
-	 * deseamos obtener.
-	 * @param serialNumber N&uacute;mero de serie del certificado
+	 * Contruye el filtro a partir del n&uacute;mero de serie en hexadecimal del certificado
+	 * que deseamos obtener.
+	 * @param serialNumber N&uacute;mero de serie del certificado en hexadecimal.
 	 */
 	public SSLFilter(final String serialNumber) {
 		this.serialNumber = this.prepareSerialNumber(serialNumber);
@@ -65,7 +67,7 @@ public final class SSLFilter extends CertificateFilter {
 				if (this.matches(cert)) {
 					if (this.isAuthenticationDnieCert(cert)) {
 						for (int j = 0; j < aliases.length; j++) {
-							cert2 = ksm.getCertificate(aliases[i]);				
+							cert2 = ksm.getCertificate(aliases[j]);				
 							if (i != j && this.isSignatureDnieCert(cert2) && this.getSubjectSN(cert2) != null &&
 									this.getSubjectSN(cert2).equalsIgnoreCase(this.getSubjectSN(cert)) &&
 									this.getExpiredDate(cert2).equals(this.getExpiredDate(cert))) {
@@ -151,9 +153,10 @@ public final class SSLFilter extends CertificateFilter {
 	}
 	
 	/**
-	 * Prepara una numero de serie en hexadecimal para que tenga un formato
-	 * @param serialNumber Numero de serie en hexadecimal.
-	 * @return Numero de serie preparado.
+	 * Prepara un n&uacute;mero de serie en hexadecimal para que tenga
+	 * un formato concreto.
+	 * @param serialNumber N&uacute;mero de serie en hexadecimal.
+	 * @return N&uacute;mero de serie preparado.
 	 */
 	private String prepareSerialNumber(final String sn) {
 		final String preparedSn = sn.trim().replace(" ", "").replace("#", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
