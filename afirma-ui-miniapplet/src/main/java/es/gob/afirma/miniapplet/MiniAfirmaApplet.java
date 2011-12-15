@@ -413,7 +413,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		String keystoreParam = this.getParameter(APPLET_PARAM_USER_KEYSTORE);
 		if (keystoreParam != null && !keystoreParam.equals("null")) { //$NON-NLS-1$
 			keystoreParam = keystoreParam.trim();
-			int separatorPos = keystoreParam.indexOf(":"); //$NON-NLS-1$
+			int separatorPos = keystoreParam.indexOf(':');
 			try {
 				if (separatorPos == -1) {
 					this.keystoreType = AOKeyStore.valueOf(keystoreParam);

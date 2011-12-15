@@ -209,8 +209,7 @@ public final class GenSignedData {
 
         // ATRIBUTOS FIRMADOS
         final ASN1Set signedAttr =
-                generateSignerInfo(signerCertificateChain[0],
-                                   digestAlgorithm,
+                generateSignedInfo(digestAlgorithm,
                                    parameters.getContent(),
                                    dataType,
                                    applyTimestamp,
@@ -245,10 +244,7 @@ public final class GenSignedData {
 
     }
 
-    /** M&eacute;todo que genera la parte que contiene la informaci&oacute;n del
-     * Usuario. Se generan los atributos que se necesitan para generar la firma.
-     * @param cert
-     *        Certificado necesario para la firma.
+    /** M&eacute;todo que genera los atributos firmados.
      * @param digestAlgorithm
      *        Algoritmo Firmado.
      * @param datos
@@ -262,8 +258,7 @@ public final class GenSignedData {
      *        del archivo de firma.
      * @return Los atributos firmados de la firma.
      * @throws java.security.NoSuchAlgorithmException */
-    private ASN1Set generateSignerInfo(final X509Certificate cert,
-                                       String digestAlgorithm,
+    private ASN1Set generateSignedInfo(final String digestAlgorithm,
                                        final byte[] datos,
                                        final String dataType,
                                        final boolean timestamp,
@@ -302,10 +297,9 @@ public final class GenSignedData {
             while (it.hasNext()) {
                 final Map.Entry<String, byte[]> e = it.next();
                 contexExpecific.add(new Attribute(
-                // el oid
-                                                  new DERObjectIdentifier((e.getKey()).toString()),
-                                                  // el array de bytes en formato string
-                                                  new DERSet(new DERPrintableString(e.getValue()))));
+                  new DERObjectIdentifier((e.getKey()).toString()), // el oid
+                  new DERSet(new DERPrintableString(e.getValue())) // el array de bytes en formato string
+                ));
             }
 
         }
