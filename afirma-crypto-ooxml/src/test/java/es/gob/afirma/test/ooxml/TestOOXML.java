@@ -45,9 +45,9 @@ public final class TestOOXML {
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 
-    private static final String CERT_PATH2 = "CATCERT GENCAT SAFP PF Identidad y Firma Reconocida de Clase 1 Caducado.pfx"; //$NON-NLS-1$
-    private static final String CERT_PASS2 = "1234"; //$NON-NLS-1$
-    private static final String CERT_ALIAS2 = "{71e526c4-0f27-4f32-8be0-90df52dcbc53}"; //$NON-NLS-1$
+    private static final String CERT_PATH2 = "ANF_PJ_Activo.pfx"; //$NON-NLS-1$
+    private static final String CERT_PASS2 = "12341234"; //$NON-NLS-1$
+    private static final String CERT_ALIAS2 = "anf usuario activo"; //$NON-NLS-1$
     
     private static final String CERT_PATH3 = "CAMERFIRMA_PF_SW_Clave_usuario_Activo.p12"; //$NON-NLS-1$
     private static final String CERT_PASS3 = "1111"; //$NON-NLS-1$
@@ -155,7 +155,6 @@ public final class TestOOXML {
                 Assert.assertEquals("Datos", ((AOTreeNode) tree.getRoot()).getUserObject()); //$NON-NLS-1$
                 AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) ((AOTreeNode) tree.getRoot()).getChildAt(0).getUserObject();
                 
-                Assert.assertNotNull(simpleSignInfo.getSigningTime());
                 Assert.assertEquals(cert, simpleSignInfo.getCerts()[0]);
                 
                 //System.out.println(prueba + ": OK"); //$NON-NLS-1$
