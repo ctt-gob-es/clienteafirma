@@ -488,7 +488,7 @@ public class Desensobrado extends JPanel {
 
     private PrivateKeyEntry getPrivateKeyEntry(AOKeyStoreManager keyStoreManager, JComboBox comboAlmacen) throws AOException, KeyException {
     	// Seleccionamos un certificado
-    	String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), SwingUtilities.getRoot(this), true, true, true,
+    	String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager, SwingUtilities.getRoot(this), true, true, true,
     			new Vector<CertificateFilter>(0), false);
 
     	// Comprobamos si se ha cancelado la seleccion

@@ -60,6 +60,7 @@ import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.ui.principal.Main;
@@ -534,11 +535,10 @@ public final class Utils {
      * @param alias
      *        Alias de los certificados entre los que el usuario debe
      *        seleccionar uno
-     * @param kss
-     *        Listado de KeyStores de donde se han sacadon los alias (debe
-     *        ser <code>null</code> si se quiere usar el m&eacute;todo para
-     *        seleccionar otra cosa que no sean certificados X.509 (como
-     *        claves de cifrado)
+     * @param ksm
+     *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
+     *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
+     *        otra cosa que no sean certificados X.509 (como claves de cifrado)
      * @param parentComponent
      *        Componente padre (para ls amodalidad)
      * @param checkPrivateKeys
@@ -561,7 +561,7 @@ public final class Utils {
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
     public static String showCertSelectionDialog(final String[] alias,
-                                                       final List<KeyStore> kss,
+                                                       final AOKeyStoreManager ksm,
                                                        final Object parentComponent,
                                                        final boolean checkPrivateKeys,
                                                        final boolean checkValidity,
@@ -575,9 +575,8 @@ public final class Utils {
         final Map<String, String> aliassesByFriendlyName =
                 KeyStoreUtilities.getAliasesByFriendlyName(
                        alias, 
-                       kss, 
-                       checkPrivateKeys, 
-                       checkValidity,
+                       ksm, 
+                       checkPrivateKeys,
                        showExpiredCertificates, 
                        certFilters
                 );
@@ -635,9 +634,9 @@ public final class Utils {
 
         for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
             if (aliassesByFriendlyName.get(al).equals(certName)) {
-                if (checkValidity && kss != null) {
+                if (checkValidity && ksm != null) {
                     boolean rejected = false;
-                    for (final KeyStore ks : kss) {
+                    for (final KeyStore ks : ksm.getKeyStores()) {
                         try {
                             if (!ks.containsAlias(al)) {
                                 continue;

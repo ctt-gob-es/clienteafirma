@@ -506,7 +506,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         			pssCallback, this);
 
         	// Seleccionamos un certificado
-        	String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), this, true, true, true,
+        	String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager, this, true, true, true,
         			new Vector<CertificateFilter>(0), false);
 
         	// Comprobamos si se ha cancelado la seleccion

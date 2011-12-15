@@ -60,7 +60,7 @@ public class CertificateDestiny {
 		try {
 			// Seleccionamos un certificado
 			String selectedcert = Utils.showCertSelectionDialog(
-			        keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), dialogo, false, true, true, 
+			        keyStoreManager.getAliases(), keyStoreManager, dialogo, false, true, true, 
 			        new Vector<CertificateFilter>(0), false);
 
 			// Comprobamos si se ha cancelado la seleccion

@@ -104,7 +104,7 @@ public class MultisignUtils {
         PrivateKeyEntry privateKeyEntry = null;
         
         // Seleccionamos un certificado
-        String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), padre, true, true, true,
+        String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager, padre, true, true, true,
         		new Vector<CertificateFilter>(0), false);
 
         // Comprobamos si se ha cancelado la seleccion

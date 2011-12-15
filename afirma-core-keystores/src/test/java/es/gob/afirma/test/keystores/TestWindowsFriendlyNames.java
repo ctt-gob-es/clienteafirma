@@ -56,7 +56,7 @@ public class TestWindowsFriendlyNames {
         		KEYSTORE_TYPE,
                 tmpFile.getAbsolutePath(), 
                "TEST",  //$NON-NLS-1$
-               null, 
+               pc, 
                null
         );
 //        for(final String al : ksm.getAliases()) {
@@ -65,14 +65,13 @@ public class TestWindowsFriendlyNames {
         System.out.println();
         final Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
                ksm.getAliases(), 
-               ksm.getKeyStores(), 
+               ksm, 
                true, // Check private keys
-               true, // Check validity 
                true, // Show expired
                null  // filters
        );
        for (final String key : aliases.keySet()) {
-           System.out.println(key + ": " + aliases.get(key)); //$NON-NLS-1$
+           System.out.println(key + "\n\t" + aliases.get(key)); //$NON-NLS-1$
        }
     }
 

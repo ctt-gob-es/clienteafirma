@@ -131,37 +131,31 @@ public final class KeyStoreUtilities {
 
     /** Obtiene una hashtable con las descripciones usuales de los alias de
      * certificados (como claves de estas &uacute;ltimas).
-     * @param alias
+     * @param aliases
      *        Alias de los certificados entre los que el usuario debe
      *        seleccionar uno
-     * @param kss
-     *        Listado de KeyStores de donde se han sacadon los alias (debe
-     *        ser <code>null</code> si se quiere usar el m&eacute;todo para
-     *        seleccionar otra cosa que no sean certificados X.509 (como
-     *        claves de cifrado)
+     * @param ksm
+     *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
+     *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
+     *        otra cosa que no sean certificados X.509 (como claves de cifrado)
      * @param checkPrivateKeys
      *        Indica si se debe comprobar que el certificado tiene clave
      *        privada o no, para no mostrar aquellos que carezcan de ella
-     * @param checkValidity
-     *        Indica si se debe comprobar la validez temporal de un
-     *        certificado al ser seleccionado
      * @param showExpiredCertificates
      *        Indica si se deben o no mostrar los certificados caducados o
      *        aun no v&aacute;lidos
      * @param certFilters
      *        Filtros a aplicar sobre los certificados
      * @return Alias seleccionado por el usuario */
-    public static Map<String, String> getAliasesByFriendlyName(final String[] alias,
-                                                               final List<KeyStore> kss,
+    public static Map<String, String> getAliasesByFriendlyName(final String[] aliases,
+                                                               final AOKeyStoreManager ksm,
                                                                final boolean checkPrivateKeys,
-                                                               final boolean checkValidity,
                                                                final boolean showExpiredCertificates,
                                                                final List<CertificateFilter> certFilters) {
 
-        final String[] trimmedAliases = alias.clone();
-
         // Creamos un HashTable con la relacion Alias-Nombre_a_mostrar de los
         // certificados
+    	final String[] trimmedAliases = aliases.clone();
         final Hashtable<String, String> aliassesByFriendlyName = new Hashtable<String, String>(trimmedAliases.length);
         for (final String trimmedAlias : trimmedAliases) {
             aliassesByFriendlyName.put(trimmedAlias, trimmedAlias);
@@ -171,14 +165,14 @@ public final class KeyStoreUtilities {
         String issuerTmpCN;
 
         X509Certificate tmpCert;
-        if (kss != null && kss.size() > 0) {
+        if (ksm != null && ksm.getKeyStores().size() > 0) {
 
             KeyStore ks = null;
             for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
                 tmpCert = null;
 
                 // Seleccionamos el KeyStore en donde se encuentra el alias
-                for (final KeyStore tmpKs : kss) {
+                for (final KeyStore tmpKs : ksm.getKeyStores()) {
                     try {
                         tmpCert = (X509Certificate) tmpKs.getCertificate(al);
                     }
@@ -257,42 +251,41 @@ public final class KeyStoreUtilities {
                         );
                     }
                 }
-
-                boolean allFiltersOK = true;
-                if (tmpCert != null && certFilters != null) {
-                    for (final CertificateFilter cf : certFilters) {
-                        if (!cf.matches(tmpCert)) {
-                            allFiltersOK = false;
-                            break;
-                        }
-                    }
-                }
-                
-                if (allFiltersOK) {
-                	tmpCN = AOUtil.getCN(tmpCert);
-                	issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
-
-                	if (tmpCN != null && issuerTmpCN != null) {
-                		aliassesByFriendlyName.put(al, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            }
+            
+            // Aplicamos los filtros de certificados
+            if (certFilters != null) {
+            	Hashtable<String, String> filteredAliases;
+                for (final CertificateFilter cf : certFilters) {
+                	filteredAliases = new Hashtable<String, String>();
+                	for (String filteredAlias : cf.matches(aliassesByFriendlyName.keySet().toArray(new String[0]), ksm)) {
+                		filteredAliases.put(filteredAlias, aliassesByFriendlyName.get(filteredAlias));
                 	}
-
-                	else if (tmpCN != null /* && isValidString(tmpCN) */) {
-                		aliassesByFriendlyName.put(al, tmpCN);
-                	}
-                	else {
-                		// Hacemos un trim() antes de insertar, porque los alias de los certificados de las tarjetas
-                		// CERES terminan con un '\r', que se ve como un caracter extrano
-                		aliassesByFriendlyName.put(al, al.trim());
-                	}
-                }
-                else {
-                	// Eliminamos aquellos certificados que no hayan encajado
-                	LOGGER.info(
-                			"El certificado '" + al + "' no se mostrara por no cumplir los filtros de uso" //$NON-NLS-1$ //$NON-NLS-2$
-                	);
-                	aliassesByFriendlyName.remove(al);
+                	aliassesByFriendlyName.clear();
+                	aliassesByFriendlyName.putAll(filteredAliases);
                 }
             }
+            
+            for (String alias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
+            	tmpCert = ksm.getCertificate(alias);
+            	tmpCN = AOUtil.getCN(tmpCert);
+            	issuerTmpCN = AOUtil.getCN(tmpCert.getIssuerX500Principal().getName());
+
+            	if (tmpCN != null && issuerTmpCN != null) {
+            		aliassesByFriendlyName.put(alias, tmpCN + " (" + issuerTmpCN + ", " + tmpCert.getSerialNumber() + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            	}
+
+            	else if (tmpCN != null /* && isValidString(tmpCN) */) {
+            		aliassesByFriendlyName.put(alias, tmpCN);
+            	}
+            	else {
+            		// Hacemos un trim() antes de insertar, porque los alias de los
+            		// certificados de las tarjetas CERES terminan con un '\r', que se
+            		// ve como un caracter extrano
+            		aliassesByFriendlyName.put(alias, alias.trim());
+            	}
+            }
+            
         }
 
         else {
@@ -331,11 +324,10 @@ public final class KeyStoreUtilities {
      * @param alias
      *        Alias de los certificados entre los que el usuario debe
      *        seleccionar uno
-     * @param kss
-     *        Listado de KeyStores de donde se han sacadon los alias (debe
-     *        ser <code>null</code> si se quiere usar el m&eacute;todo para
-     *        seleccionar otra cosa que no sean certificados X.509 (como
-     *        claves de cifrado)
+     * @param ksm
+     *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
+     *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
+     *        otra cosa que no sean certificados X.509 (como claves de cifrado)
      * @param parentComponent
      *        Componente padre (para ls amodalidad)
      * @param checkPrivateKeys
@@ -353,13 +345,13 @@ public final class KeyStoreUtilities {
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
     public static String showCertSelectionDialog(final String[] alias,
-                                                 final List<KeyStore> kss,
+                                                 final AOKeyStoreManager ksm,
                                                  final Object parentComponent,
                                                  final boolean checkPrivateKeys,
                                                  final boolean checkValidity,
                                                  final boolean showExpiredCertificates) throws AOCertificatesNotFoundException {
         return showCertSelectionDialog(alias,
-                                       kss,
+                                       ksm,
                                        parentComponent,
                                        checkPrivateKeys,
                                        checkValidity,
@@ -377,13 +369,12 @@ public final class KeyStoreUtilities {
      * @param alias
      *        Alias de los certificados entre los que el usuario debe
      *        seleccionar uno
-     * @param kss
-     *        Listado de KeyStores de donde se han sacadon los alias (debe
-     *        ser <code>null</code> si se quiere usar el m&eacute;todo para
-     *        seleccionar otra cosa que no sean certificados X.509 (como
-     *        claves de cifrado)
+     * @param ksm
+     *        Gestor de los almac&eacute;nes de certificados a los que pertenecen los alias.
+     *        Debe ser {@code null} si se quiere usar el m&eacute;todo para seleccionar
+     *        otra cosa que no sean certificados X.509 (como claves de cifrado)
      * @param parentComponent
-     *        Componente padre (para ls amodalidad)
+     *        Componente padre (para la modalidad)
      * @param checkPrivateKeys
      *        Indica si se debe comprobar que el certificado tiene clave
      *        privada o no, para no mostrar aquellos que carezcan de ella
@@ -404,7 +395,7 @@ public final class KeyStoreUtilities {
      * @throws AOCertificatesNotFoundException
      *         Si no hay certificados que mostrar al usuario */
     public static String showCertSelectionDialog(final String[] alias,
-                                                 final List<KeyStore> kss,
+                                                 final AOKeyStoreManager ksm,
                                                  final Object parentComponent,
                                                  final boolean checkPrivateKeys,
                                                  final boolean checkValidity,
@@ -416,7 +407,7 @@ public final class KeyStoreUtilities {
         }
 
         final Map<String, String> aliassesByFriendlyName =
-                KeyStoreUtilities.getAliasesByFriendlyName(alias, kss, checkPrivateKeys, checkValidity, showExpiredCertificates, certFilters);
+                KeyStoreUtilities.getAliasesByFriendlyName(alias, ksm, checkPrivateKeys, showExpiredCertificates, certFilters);
 
         // Miramos si despues de filtrar las entradas queda alguna o se ha
         // quedado la lista vacia
@@ -471,9 +462,9 @@ public final class KeyStoreUtilities {
 
         for (final String al : aliassesByFriendlyName.keySet().toArray(new String[aliassesByFriendlyName.size()])) {
             if (aliassesByFriendlyName.get(al).equals(certName)) {
-                if (checkValidity && kss != null) {
+                if (checkValidity && ksm != null) {
                     boolean rejected = false;
-                    for (final KeyStore ks : kss) {
+                    for (final KeyStore ks : ksm.getKeyStores()) {
                         try {
                             if (!ks.containsAlias(al)) {
                                 continue;

@@ -446,7 +446,7 @@ public class Firma extends JPanel {
             }
 
             // Seleccionamos un certificado
-            String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager.getKeyStores(), SwingUtilities.getRoot(this), true, true, true, new Vector<CertificateFilter>(0),
+            String selectedcert = Utils.showCertSelectionDialog(keyStoreManager.getAliases(), keyStoreManager, SwingUtilities.getRoot(this), true, true, true, new Vector<CertificateFilter>(0),
                     false);
 
             // Comprobamos si se ha cancelado la seleccion

@@ -28,22 +28,7 @@ public abstract class CertificateFilter {
      * @return <code>true</code> si el certificado se adec&uacute;a al filtro, <code>false</code> en caso contrario
      */
     public abstract boolean matches(final X509Certificate cert);
-    
-    /** Obtiene los certificados de un listado que cumplen con un determinado criterio. Por defecto,
-     * el establecido en el m&eacute;todo {@link #matches(X509Certificate)}. 
-     * @param certs Listado de certificados.
-     * @return Certificados que cumplen el criterio.
-     */
-    public X509Certificate[] matches(final X509Certificate[] certs) {
-    	final List<X509Certificate> filteredCerts = new ArrayList<X509Certificate>();
-    	for (final X509Certificate cert : certs) {
-    		if (matches(cert)) {
-    			filteredCerts.add(cert);
-    		}
-    	}
-    	return filteredCerts.toArray(new X509Certificate[filteredCerts.size()]);
-    }
-    
+        
     /** Obtiene los alias de certificados de un listado que cumplen con un determinado criterio. Por defecto,
      * el establecido en el m&eacute;todo {@link #matches(X509Certificate)}. 
      * @param aliases Listado de alias de certificados.

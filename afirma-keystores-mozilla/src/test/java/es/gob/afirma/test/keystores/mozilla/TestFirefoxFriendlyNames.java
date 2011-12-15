@@ -30,21 +30,18 @@ public class TestFirefoxFriendlyNames {
                null, 
                null
         );
-        for(final String al : ksm.getAliases()) {
-            System.out.println(al);
-        }
+
         System.out.println();
         final Map<String, String> aliases = KeyStoreUtilities.getAliasesByFriendlyName(
                ksm.getAliases(), 
-               ksm.getKeyStores(), 
+               ksm, 
                true, // Check private keys
-               true, // Check validity 
                true, // Show expired
                null  // filters
        );
-       for (final String key : aliases.keySet()) {
-           System.out.println(aliases.get(key));
-       }
+        for (final String key : aliases.keySet()) {
+            System.out.println(key + "\n\t" + aliases.get(key)); //$NON-NLS-1$
+        }
     }
 
 }
