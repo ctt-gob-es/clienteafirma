@@ -2,6 +2,7 @@ package es.gob.afirma.test.keystores;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.security.InvalidKeyException;
 import java.util.Map;
@@ -32,14 +33,15 @@ public class TestWindowsFriendlyNames {
 	
     /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI. 
      * @throws AOKeystoreAlternativeException 
-     * @throws InvalidKeyException */
+     * @throws InvalidKeyException 
+     * @throws IOException */
     @Test
-    public void testWindowsFriendlyNames() throws InvalidKeyException, AOKeystoreAlternativeException, Exception {
+    public void testWindowsFriendlyNames() throws InvalidKeyException, AOKeystoreAlternativeException, IOException {
         if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
             return;
         }
         
-        byte[] p12file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(KEYSTORE_PATH)); //$NON-NLS-1$
+        byte[] p12file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(KEYSTORE_PATH));
         Assert.assertTrue("No se ha podido leer el P12", p12file.length > 0); //$NON-NLS-1$
         File tmpFile = File.createTempFile("temp", "afirma"); //$NON-NLS-1$ //$NON-NLS-2$
         tmpFile.deleteOnExit();
