@@ -61,7 +61,14 @@
 			<mapID target="accesibilidad.ventana" url="html/es_ES/opciones_accesibilidad.html#ventana" />
 			<mapID target="accesibilidad.cursor" url="html/es_ES/opciones_accesibilidad.html#cursor" />
 			<mapID target="accesibilidad.defecto" url="html/es_ES/opciones_accesibilidad.html#defecto" />
-			<mapID target="accesibilidad.guardar" url="html/es_ES/opciones_accesibilidad.html#guardar" />
+			<mapID target="accesibilidad.aplicar" url="html/es_ES/opciones_accesibilidad.html#aplicar" />
+		<mapID target="opciones.perfil" url="html/es_ES/opciones_perfil.html" />			
+			<mapID target="Operfil.cargado" url="html/es_ES/opciones_perfil.html#cargado" />
+			<mapID target="Operfil.perfiles" url="html/es_ES/opciones_perfil.html#perfiles" />
+			<mapID target="Operfil.cargar" url="html/es_ES/opciones_perfil.html#cargar" />
+			<mapID target="Operfil.eliminar" url="html/es_ES/opciones_perfil.html#eliminar" />
+			<mapID target="Operfil.guardar" url="html/es_ES/opciones_perfil.html#guardar" />
+			<mapID target="Operfil.modificar" url="html/es_ES/opciones_perfil.html#modificar" />
 		<mapID target="firma" url="html/es_ES/firma.html" />
 		   	<mapID target="firma.fichero" url="html/es_ES/firma.html#firma.fichero" />
 			<mapID target="firma.almacen" url="html/es_ES/firma.html#firma.almacen" />

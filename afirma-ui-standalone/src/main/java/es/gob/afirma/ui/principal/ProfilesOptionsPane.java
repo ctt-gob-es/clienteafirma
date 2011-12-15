@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import es.gob.afirma.ui.utils.CustomDialog;
+import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.ProfileManager;
 import es.gob.afirma.ui.utils.Utils;
@@ -218,6 +219,14 @@ public class ProfilesOptionsPane {
         c.gridy = 2;
                 
         this.panel.add(saveProfileButtonsPanel, c);
+        
+      //Accesos rapidos al menu de ayuda
+        HelpUtils.enableHelpKey(this.currentProfileTitleLabel, "Operfil.cargado");
+        HelpUtils.enableHelpKey(this.profileManagmentList, "Operfil.perfiles");
+        HelpUtils.enableHelpKey(loadProfileButton, "Operfil.cargar");
+        HelpUtils.enableHelpKey(deleteProfileButton, "Operfil.eliminar");
+        HelpUtils.enableHelpKey(saveProfileButton, "Operfil.guardar");
+        HelpUtils.enableHelpKey(saveAsProfileButton, "Operfil.modificar");
     }
 
 	/**

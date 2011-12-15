@@ -58,6 +58,9 @@ public class Opciones extends JAccessibilityDialog {
     /** &Iacute;ndice de la pesta&ntilde;a de opciones de accesibilidad. */
     private static final int ACCESIBILITY_OPTIONS_IDX = 2;
     
+    /** &Iacute;ndice de la pesta&ntilde;a de opciones de perfiles de usuario. */
+    private static final int PROFILE_OPTIONS_IDX = 3;
+    
     /** &Iacute;ndice de la pesta&ntilde;a de opciones del formato de firma PDF. */
     private static final int PDF_OPTIONS_IDX = 1;
 	
@@ -755,6 +758,9 @@ public class Opciones extends JAccessibilityDialog {
             case PDF_OPTIONS_IDX:
                 HelpUtils.showHelp("");
                 break;
+            case PROFILE_OPTIONS_IDX:
+            	HelpUtils.showHelp("opciones.perfil");
+            	break;
             case GENERAL_OPTIONS_IDX:
             default:
                 HelpUtils.showHelp("opciones.configuracion");

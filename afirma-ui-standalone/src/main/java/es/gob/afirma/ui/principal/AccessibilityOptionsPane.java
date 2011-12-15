@@ -380,7 +380,7 @@ public class AccessibilityOptionsPane {
         HelpUtils.enableHelpKey(this.checkWindowSize, "accesibilidad.ventana");
         HelpUtils.enableHelpKey(this.checkCursorSize, "accesibilidad.cursor");
         HelpUtils.enableHelpKey(valores, "accesibilidad.defecto");
-        //HelpUtils.enableHelpKey(aplicar, "accesibilidad.guardar");
+        HelpUtils.enableHelpKey(aplicar, "accesibilidad.aplicar");
 	}
 	
 	public JPanel getConfigurationPanel() {

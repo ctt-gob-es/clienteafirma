@@ -52,6 +52,7 @@
 		<indexitem text="Uso de la interfaz" target="uso.interfaz" />		
 		<indexitem text="Opciones de configuración" target="opciones.configuracion" />
 		<indexitem text="Opciones de accesibilidad" target="opciones.accesibilidad" />
+		<indexitem text="Opciones de perfiles de usuario" target="opciones.perfil" />
 		<indexitem text="Firma electrónica" target="firma" />
 		<indexitem text="Multifirma" target="multifirma" >
 			<indexitem text="Cofirma" target="multifirma.cofirma" />
