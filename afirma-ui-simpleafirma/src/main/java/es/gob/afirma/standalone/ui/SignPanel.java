@@ -726,7 +726,7 @@ public final class SignPanel extends JPanel {
 
             if (alias == null) {
                 try {
-                    alias = KeyStoreUtilities.showCertSelectionDialog(ksm.getAliases(), ksm.getKeyStores(),
+                    alias = KeyStoreUtilities.showCertSelectionDialog(ksm.getAliases(), ksm,
                                                                 SignPanel.this,
                                                                 true,
                                                                 true,
