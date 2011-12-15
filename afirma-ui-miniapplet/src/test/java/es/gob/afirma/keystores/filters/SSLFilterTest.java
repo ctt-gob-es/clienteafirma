@@ -13,15 +13,25 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
 import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
 import es.gob.afirma.miniapplet.keystores.filters.SSLFilter;
 
+/**
+ * Prueba el filtrado de certificado a partir de un numero de serie en hexadecimal. No prueba la
+ * condicion de, si se indica el numero de serie del certificado de autenticacion de un DNIe
+ * se seleccione en lugar el certificado de firma de ese DNIe. 
+ */
 public class SSLFilterTest {
 
-	private static final AOKeyStore KEYSTORE_TYPE = AOKeyStore.PKCS12; //$NON-NLS-1$
+	private static final AOKeyStore KEYSTORE_TYPE = AOKeyStore.PKCS12;
     private static final String CERT_PATH = "src" + File.separator + "test" + File.separator + "resources" + File.separator + "ANF_PF_Activo.pfx"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     private static final String CERT_PASS = "12341234"; //$NON-NLS-1$
     private static final String CERT_SN = "03 ea"; //$NON-NLS-1$
     
     private static final String CERT_ALIAS = "anf usuario activo"; //$NON-NLS-1$
 	
+	/**
+	 * Comprobaci&oacute;n del filtrado.
+	 * @throws InvalidKeyException Clave no v&aacute;lida.
+	 * @throws AOKeystoreAlternativeException Cuando no se puede abrir el almacen de claves.
+	 */
 	@Test
 	public void match() throws InvalidKeyException, AOKeystoreAlternativeException {
 		
