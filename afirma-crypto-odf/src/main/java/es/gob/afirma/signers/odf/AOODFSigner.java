@@ -118,6 +118,15 @@ public final class AOODFSigner implements AOSigner {
      * @param data Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param xParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>useOpenOffice31Mode</i></b></dt>
+     *   <dd>
+     *    Un valor <code>true</code> fuerza la generaci&oacute;n de firmas en formato OpenOffice.org 3.1. Las firmas en formato
+     *    OpenOffice.org 3.1 no son compatibles ni con versiones anteriores ni con posteriores, incluyendo LibreOffice.
+     *   </dd>
+     * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] sign(final byte[] data, 
@@ -427,6 +436,15 @@ public final class AOODFSigner implements AOSigner {
      * @param data Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param extraParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>useOpenOffice31Mode</i></b></dt>
+     *   <dd>
+     *    Un valor <code>true</code> fuerza la generaci&oacute;n de firmas en formato OpenOffice.org 3.1. Las firmas en formato
+     *    OpenOffice.org 3.1 no son compatibles ni con versiones anteriores ni con posteriores, incluyendo LibreOffice.
+     *   </dd>
+     * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] cosign(final byte[] data, 
@@ -442,6 +460,15 @@ public final class AOODFSigner implements AOSigner {
      * @param sign Documento ODF a firmar
      * @param algorithm Se ignora el valor de este par&aacute;metro, se utiliza siempre el algoritmo SHA1withRSA
      * @param keyEntry Entrada que apunta a la clave privada a usar para firmar
+     * @param extraParams Par&aacute;metros adicionales para la firma.
+     * <p>Se aceptan los siguientes valores en el par&aacute;metro <code>xParams</code>:</p>
+     * <dl>
+     *  <dt><b><i>useOpenOffice31Mode</i></b></dt>
+     *   <dd>
+     *    Un valor <code>true</code> fuerza la generaci&oacute;n de firmas en formato OpenOffice.org 3.1. Las firmas en formato
+     *    OpenOffice.org 3.1 no son compatibles ni con versiones anteriores ni con posteriores, incluyendo LibreOffice.
+     *   </dd>
+     * </dl>
      * @return Documento ODF con la nueva firma a&ntilde;adida
      * @throws AOException Cuando ocurre cualquier problema durante el proceso */
     public byte[] cosign(final byte[] sign, 
@@ -462,6 +489,7 @@ public final class AOODFSigner implements AOSigner {
         throw new UnsupportedOperationException("No es posible realizar contrafirmas de ficheros ODF"); //$NON-NLS-1$
     }
 
+    /** { {@inheritDoc} */
     public AOTreeModel getSignersStructure(final byte[] sign, final boolean asSimpleSignInfo) {
 
         try {
@@ -575,6 +603,9 @@ public final class AOODFSigner implements AOSigner {
         return isValidDataFile(signData);
     }
 
+    /** Indica si los datos son un documento ODF susceptible de ser firmado.
+     * @param data Datos a comprobar 
+     * @return <cod>true</code> si los datos son un documento ODF susceptible de ser firmado, <code>false</code> en caso contrario */
     public boolean isValidDataFile(final byte[] data) {
 
         // Si el mimetype del fichero no se ajusta a alguno de los MimeTypes
@@ -595,6 +626,7 @@ public final class AOODFSigner implements AOSigner {
         return mimetype != null && SUPPORTED_FORMATS.contains(mimetype);
     }
 
+    /** { {@inheritDoc} */
     public String getSignedName(final String originalName, final String inText) {
 
         final String inTextInt = (inText != null ? inText : ""); //$NON-NLS-1$
@@ -637,6 +669,9 @@ public final class AOODFSigner implements AOSigner {
         }
     }
 
+    /** Si la entrada es un documento ODF, devuelve el mismo documento sin ninguna modificaci&oacute;n.
+     * @param signData Documento ODF
+     * @return Documento de entrada si este es ODF, <code>null</code> en cualquier otro caso */
     public byte[] getData(final byte[] signData) throws AOInvalidFormatException {
 
         // Si no es una firma ODF valida, lanzamos una excepcion
@@ -648,6 +683,7 @@ public final class AOODFSigner implements AOSigner {
         return signData;
     }
 
+    /** { {@inheritDoc} */
     public AOSignInfo getSignInfo(final byte[] signData) throws AOException {
         if (signData == null) {
             throw new IllegalArgumentException("No se han introducido datos para analizar"); //$NON-NLS-1$
