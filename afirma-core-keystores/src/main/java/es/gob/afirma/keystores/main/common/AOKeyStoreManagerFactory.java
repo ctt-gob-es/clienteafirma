@@ -71,16 +71,17 @@ public final class AOKeyStoreManagerFactory {
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 
         // Fichero P7, X509, P12/PFX o Java JKS, en cualquier sistema operativo
-        if (store == AOKeyStore.PKCS12 || store == AOKeyStore.JAVA
-            || store == AOKeyStore.SINGLE
-            || store == AOKeyStore.JAVACE
-            || store == AOKeyStore.JCEKS) {
+        if (store == AOKeyStore.PKCS12 || 
+            store == AOKeyStore.JAVA   || 
+            store == AOKeyStore.SINGLE || 
+            store == AOKeyStore.JAVACE || 
+            store == AOKeyStore.JCEKS) {
+            
             String storeFilename = null;
             if (lib != null && !"".equals(lib) && new File(lib).exists()) { //$NON-NLS-1$
                 storeFilename = lib;
             }
             if (storeFilename == null) {
-
                 String desc = null;
                 String[] exts = null;
                 if (store == AOKeyStore.PKCS12) {
@@ -107,7 +108,6 @@ public final class AOKeyStoreManagerFactory {
                     };
                     desc = KeyStoreMessages.getString("AOKeyStoreManagerFactory.3"); //$NON-NLS-1$
                 }
-
                 storeFilename = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.4") + " " + store.getDescription(), exts, desc, parentComponent); //$NON-NLS-1$ //$NON-NLS-2$
                 if (storeFilename == null) {
                     throw new AOCancelledOperationException("No se ha seleccionado el almacen de certificados"); //$NON-NLS-1$
@@ -125,12 +125,15 @@ public final class AOKeyStoreManagerFactory {
                 throw new InvalidKeyException("La contrasena del almacen es incorrecta: " + e); //$NON-NLS-1$
             }
             catch (final Exception e) {
-                throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
-                                                         "No se ha podido abrir el almacen de tipo " + store.getDescription(), //$NON-NLS-1$
-                                                         e);
+                throw new AOKeystoreAlternativeException(
+                   getAlternateKeyStoreType(store),
+                   "No se ha podido abrir el almacen de tipo " + store.getDescription(), //$NON-NLS-1$
+                   e
+                );
             }
             return ksm;
         }
+        
         // Token PKCS#11, en cualquier sistema operativo
         else if (store == AOKeyStore.PKCS11) {
             String p11Lib = null;
@@ -152,7 +155,12 @@ public final class AOKeyStoreManagerFactory {
                     exts = new String[] { "so" }; //$NON-NLS-1$
                     extsDesc = extsDesc + " (*.so)"; //$NON-NLS-1$
                 }
-                p11Lib = AOUIFactory.getLoadFileName(KeyStoreMessages.getString("AOKeyStoreManagerFactory.7"), exts, extsDesc, parentComponent); //$NON-NLS-1$
+                p11Lib = AOUIFactory.getLoadFileName(
+                     KeyStoreMessages.getString("AOKeyStoreManagerFactory.7"),  //$NON-NLS-1$
+                     exts, 
+                     extsDesc, 
+                     parentComponent
+                );
             }
             if (p11Lib == null) {
                 throw new AOCancelledOperationException("No se ha seleccionado el controlador PKCS#11"); //$NON-NLS-1$
@@ -166,7 +174,11 @@ public final class AOKeyStoreManagerFactory {
                 throw e;
             }
             catch (final Exception e) {
-                throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el modulo PKCS#11", e); //$NON-NLS-1$
+                throw new AOKeystoreAlternativeException(
+                     getAlternateKeyStoreType(store), 
+                     "Error al inicializar el modulo PKCS#11", //$NON-NLS-1$ 
+                     e
+                );
             }
             return ksm;
         }
@@ -175,8 +187,10 @@ public final class AOKeyStoreManagerFactory {
         // Solaris, HP-UX o Mac OS X)
         // o Google Chrome en Windows, que tambien usa el almacen de CAPI
         else if (Platform.getOS().equals(Platform.OS.WINDOWS) &&
-                (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT
-                        || store == AOKeyStore.WINADDRESSBOOK || store == AOKeyStore.WINCA)) {
+                (store == AOKeyStore.WINDOWS || 
+                 store == AOKeyStore.WINROOT || 
+                 store == AOKeyStore.WINADDRESSBOOK || 
+                 store == AOKeyStore.WINCA)) {
             try {
                 ksm.init(store, null, new NullPasswordCallback(), null);
             }
@@ -184,9 +198,11 @@ public final class AOKeyStoreManagerFactory {
                 throw e;
             }
             catch (final Exception e) {
-                throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
-                                                         "Error al inicializar el almacen " + store.getDescription(), //$NON-NLS-1$
-                                                         e);
+                throw new AOKeystoreAlternativeException(
+                     getAlternateKeyStoreType(store),
+                     "Error al inicializar el almacen " + store.getDescription(), //$NON-NLS-1$
+                     e
+                );
             }
             return ksm;
         }
@@ -210,9 +226,11 @@ public final class AOKeyStoreManagerFactory {
                 throw e;
             }
             catch (final Exception e) {
-                throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store),
-                        "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
-                        e);
+                throw new AOKeystoreAlternativeException(
+                    getAlternateKeyStoreType(store),
+                    "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
+                    e
+                );
             }
             return ksmUni;
         }
@@ -240,10 +258,14 @@ public final class AOKeyStoreManagerFactory {
             return ksm;
         }
 
-        throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "La plataforma de navegador '" + store.getDescription() //$NON-NLS-1$
-                                                                                  + "' mas sistema operativo '" //$NON-NLS-1$
-                                                                                  + Platform.getOS()
-                                                                                  + "' no esta soportada"); //$NON-NLS-1$
+        throw new AOKeystoreAlternativeException(
+             getAlternateKeyStoreType(store), 
+             "La plataforma de navegador '"  //$NON-NLS-1$
+               + store.getDescription() 
+               + "' mas sistema operativo '" //$NON-NLS-1$
+               + Platform.getOS()
+               + "' no esta soportada" //$NON-NLS-1$
+        ); 
     }
 
     /** @return <code>AOKeyStore</code> alternativo o <code>null</code> si no hay alternativo */
