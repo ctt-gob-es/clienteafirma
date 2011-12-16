@@ -226,10 +226,6 @@ public class ResizingAdaptor extends ComponentAdapter {
 						float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theDialogAdvisor != null){
-						
-						if (actualComponent instanceof JComboBox){
-							System.out.println("entrando");
-						}
 						float resizeFactor = Math.round(relation / getResizingFactorFrameAdvisor());
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theWindowAbout != null) {
@@ -243,41 +239,23 @@ public class ResizingAdaptor extends ComponentAdapter {
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					}
 				} else {
-					if (theWindow != null) {
-						if (actualComponent instanceof JComboBox){
-							actualComponent.setPreferredSize(new Dimension(100,25));
-						}
+					if (actualComponent instanceof JComboBox){
+						// TODO Workaround buscar solucion mejor
+						actualComponent.setPreferredSize(new Dimension(100,25));
+					}
+					if (theWindow != null) {						
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else if (theDialog != null){
-						if (actualComponent instanceof JComboBox){
-							actualComponent.setPreferredSize(new Dimension(100,25));
-						}
+					} else if (theDialog != null){						
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else if (theDialogWizard != null){
-						if (actualComponent instanceof JComboBox){
-							actualComponent.setPreferredSize(new Dimension(100,25));
-						}
+					} else if (theDialogWizard != null){						
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else if (theDialogAdvisor != null){
-						if (actualComponent instanceof JComboBox){
-							System.out.println("entrando2");
-							actualComponent.setPreferredSize(new Dimension(100,25));
-						}
+					} else if (theDialogAdvisor != null){						
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else if (theWindowAbout != null){
-						if (actualComponent instanceof JComboBox){
-							actualComponent.setPreferredSize(new Dimension(100,25));
-						}
+					} else if (theWindowAbout != null){						
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					}  else if (theCustomDialog != null){
-						if (actualComponent instanceof JComboBox){
-							actualComponent.setPreferredSize(new Dimension(100,25));
-						}
+					}  else if (theCustomDialog != null){						
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else {
-						if (actualComponent instanceof JComboBox){
-							actualComponent.setPreferredSize(new Dimension(100,25));
-						}
+					} else {						
 						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 					}
 				}

@@ -21,6 +21,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -29,9 +31,10 @@ import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JToolTip;
+import javax.swing.JWindow;
 import javax.swing.WindowConstants;
 
 import es.gob.afirma.core.misc.Platform;
@@ -781,6 +784,10 @@ public class Opciones extends JAccessibilityDialog {
 	private void createAccessibilityButtonsPanel() {
 		this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
 		
+		//Para el tooltip
+		final JWindow tip = new JWindow();
+		final JLabel tipText = new JLabel();
+		
 		//Panel que va a contener los botones de accesibilidad
 		JPanel panel = new JPanel(new GridBagLayout());
 		
@@ -811,7 +818,18 @@ public class Opciones extends JAccessibilityDialog {
 		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
 		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
 		
-		
+		this.restoreButton.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				Utils.showToolTip(false, tip, restoreButton, tipText);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				Utils.showToolTip(true, tip, restoreButton, tipText);
+			}
+		});
 		Dimension dimension = new Dimension(20,20);
 		this.restoreButton.setPreferredSize(dimension);
 		
@@ -852,24 +870,20 @@ public class Opciones extends JAccessibilityDialog {
 				
 		Utils.remarcar(this.maximizeButton);
 		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
-		maximizePanel.add(this.maximizeButton);
+		maximizePanel.add(this.maximizeButton);	
 		
-		JToolTip tooltip = maximizeButton.createToolTip();
-		tooltip.setTipText(Messages.getString("Wizard.maximizar"));
-		tooltip.setVisible(true);
-		
-		
-		/*this.maximizeButton.addFocusListener(new FocusListener() {
+		this.maximizeButton.addFocusListener(new FocusListener() {
+			
+			@Override
 			public void focusLost(FocusEvent e) {
-				
-				ToolTipManager.sharedInstance().registerComponent(this);
-				ToolTipManager.sharedInstance().setInitialDelay(0) ;
+				Utils.showToolTip(false, tip, maximizeButton, tipText);
 			}
+			
+			@Override
 			public void focusGained(FocusEvent e) {
-				//Se muestra un borde en el botón cuando este tiene el foco
-				botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
+				Utils.showToolTip(true, tip, maximizeButton, tipText);
 			}
-		});*/
+		});
 		
 		this.maximizeButton.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent e) {

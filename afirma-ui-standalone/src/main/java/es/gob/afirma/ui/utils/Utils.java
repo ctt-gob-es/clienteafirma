@@ -12,6 +12,8 @@ package es.gob.afirma.ui.utils;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.IllegalComponentStateException;
+import java.awt.Point;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -50,6 +52,8 @@ import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.JWindow;
+import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -733,5 +737,35 @@ public final class Utils {
     public static final FileFilter getRepositoryFileFilter() {
     	FileFilter fileFilter = new ExtFilter(new String[] {"p12", "pfx"}, Messages.getString("Repository.filefilter")); //$NON-NLS-1$ //$NON-NLS-2$
     	return fileFilter;
+    }
+    
+    /**
+     * Muestra u oculta un tooltip relacionado con un bot&oacute;n.
+     * @param show Boolean que indica si se muestra el tooltip
+     * @param tip JWindow que muestra el contenido del tooltip
+     * @param boton JButton al que se relaciona el tooltip
+     * @param tipText JLabel que muestra el contenido del tooltip
+     */
+    public static void showToolTip(boolean show, JWindow tip, JButton boton, JLabel tipText){    	
+    	tipText.setText(boton.getToolTipText());
+    	tip.setBackground((Color)UIManager.get("ToolTip.background"));
+    	tipText.setBackground((Color)UIManager.get("ToolTip.background"));
+    	tipText.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK), BorderFactory.createEmptyBorder(0,3,0,3)));
+    	tipText.setFont((Font)UIManager.get("ToolTip.font"));
+    	tipText.setOpaque(true);
+    	tip.add(tipText);
+    	Point p = new Point();
+    	try{
+    		p = boton.getLocationOnScreen();
+    	} catch(IllegalComponentStateException e){
+    		
+    	}
+    	int factor = 0;
+    	if (boton.getSize().getHeight()>34){
+    		factor = (int)(boton.getSize().getHeight()*0.5);
+    	}
+    	tip.setLocation((int)p.getX(),(int)p.getY()+30+factor);
+		tip.pack();
+		tip.setVisible(show);
     }
 }

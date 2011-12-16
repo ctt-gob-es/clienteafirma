@@ -10,6 +10,8 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -30,7 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JToolTip;
+import javax.swing.JWindow;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -346,6 +348,10 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private void createAccessibilityButtonsPanel() {
 		this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
 		
+		//Para el tooltip
+		final JWindow tip = new JWindow();
+		final JLabel tipText = new JLabel();
+		
 		//Panel que va a contener los botones de accesibilidad
 		JPanel panel = new JPanel(new GridBagLayout());
 
@@ -368,7 +374,18 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
 		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
 		
-		
+		this.restoreButton.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				Utils.showToolTip(false, tip, restoreButton, tipText);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				Utils.showToolTip(true, tip, restoreButton, tipText);
+			}
+		});
 		Dimension dimension = new Dimension(20,20);
 		this.restoreButton.setPreferredSize(dimension);
 		
@@ -410,10 +427,20 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		Utils.remarcar(this.maximizeButton);
 		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
 		maximizePanel.add(this.maximizeButton);
+
+		this.maximizeButton.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				Utils.showToolTip(false, tip, maximizeButton, tipText);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				Utils.showToolTip(true, tip, maximizeButton, tipText);
+			}
+		});
 		
-		JToolTip tooltip = maximizeButton.createToolTip();
-		tooltip.setTipText(Messages.getString("Wizard.maximizar"));
-		tooltip.setVisible(true);
 		
 		this.maximizeButton.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent e) {
@@ -1144,4 +1171,5 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         }
 
     }
+    
 }
