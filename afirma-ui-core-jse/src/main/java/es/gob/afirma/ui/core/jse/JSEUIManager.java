@@ -112,6 +112,7 @@ public final class JSEUIManager implements AOUIManager {
 
     }
 
+    /** {@inheritDoc} */
     public Object showInputDialog(final Object parentComponent,
                                   final Object message,
                                   final String title,
@@ -209,6 +210,7 @@ public final class JSEUIManager implements AOUIManager {
 
     }
     
+    /** {@inheritDoc} */
     public int showConfirmDialog(Object parentComponent, Object message, String title, int optionType, int messageType) {
         Component parent = null;
         if (parentComponent instanceof Component) {
@@ -217,34 +219,42 @@ public final class JSEUIManager implements AOUIManager {
         return JOptionPane.showConfirmDialog(parent, message, title, optionType);
     }
 
+    /** {@inheritDoc} */
     public int getPlainMessageCode() {
         return JOptionPane.PLAIN_MESSAGE;
     }
 
+    /** {@inheritDoc} */
     public int getYesNoOptionCode() {
         return JOptionPane.YES_NO_OPTION;
     }
 
+    /** {@inheritDoc} */
     public int getWarningMessageCode() {
         return JOptionPane.WARNING_MESSAGE;
     }
 
+    /** {@inheritDoc} */
     public int getYesOptionCode() {
         return JOptionPane.YES_OPTION;
     }
 
+    /** {@inheritDoc} */
     public int getNoOptionCode() {
         return JOptionPane.NO_OPTION;
     }
 
+    /** {@inheritDoc} */
     public int getOkCancelOptionCode() {
         return JOptionPane.OK_CANCEL_OPTION;
     }
 
+    /** {@inheritDoc} */
     public int getOkOptionCode() {
         return JOptionPane.OK_OPTION;
     }
 
+    /** {@inheritDoc} */
     public int getInformationMessageCode() {
         return JOptionPane.INFORMATION_MESSAGE;
     }

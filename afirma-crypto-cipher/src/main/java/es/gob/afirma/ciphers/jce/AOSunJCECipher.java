@@ -129,10 +129,12 @@ public final class AOSunJCECipher implements AOCipher {
             new AOCipherConfig(AOCipherAlgorithm.PBEWITHMD5ANDDES, AOCipherBlockMode.CBC, AOCipherPadding.PKCS5PADDING)
     };
 
+    /** {@inheritDoc} */
     public AOCipherConfig[] getSupportedConfigs() {
         return SUPPORTED_CONFIGS.clone();
     }
 
+    /** {@inheritDoc} */
     public byte[] cipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key cipherKey) throws AOException, KeyException {
 
         if (data == null || algorithmConfig == null || cipherKey == null || data.length == 0) {
@@ -169,6 +171,7 @@ public final class AOSunJCECipher implements AOCipher {
         }
     }
 
+    /** {@inheritDoc} */
     public byte[] decipher(final byte[] data, final AOCipherConfig algorithmConfig, final Key decipherKey) throws AOException, KeyException {
 
         if (data == null || algorithmConfig == null || decipherKey == null) {
@@ -206,6 +209,7 @@ public final class AOSunJCECipher implements AOCipher {
         }
     }
 
+    /** {@inheritDoc} */
     public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws KeyException {
         if (base64Key == null || base64Key.length() < 1) {
             throw new IllegalArgumentException("La clave a descodificar no puede ser nula ni vacia"); //$NON-NLS-1$
@@ -222,6 +226,7 @@ public final class AOSunJCECipher implements AOCipher {
         }
     }
 
+    /** {@inheritDoc} */
     public Key decodePassphrase(final char[] passphrase, final AOCipherConfig algorithmConfig, final Object[] params) throws AOException {
 
         if (passphrase == null || passphrase.length < 1) {
@@ -241,6 +246,7 @@ public final class AOSunJCECipher implements AOCipher {
         }
     }
 
+    /** {@inheritDoc} */
     public Key generateKey(final AOCipherConfig algorithmConfig) throws NoSuchAlgorithmException, AOException {
         try {
             return KeyGenerator.getInstance(algorithmConfig.getAlgorithm().getName(), PROVIDER).generateKey();
