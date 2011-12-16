@@ -44,6 +44,9 @@
  *    Dependencia din&aacute;mica con el m&oacute;dulo Núcleo UI JSE (<i>afirma-ui-core-jse</i>) del Cliente.
  *    Este puede sustituirse por cualquier otra clase que implemente el interfaz <code>es.gob.afirma.core.ui.AOUIManager</code>.
  *   </li>
+ *   <li>
+ *    Dependencia din&aacute;mica desde el n&uacute;cleo con la biblioteca JMIMEMagic.
+ *   </li>
  *  </ul>
  *  <p>
  *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.6 o superior.<br>
