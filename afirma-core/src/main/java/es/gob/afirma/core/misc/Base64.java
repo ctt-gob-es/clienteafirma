@@ -47,9 +47,7 @@ import java.util.logging.Logger;
  *   explicitly inline.</li>
  *  <li>v2.3.2 - Reduced memory footprint! Finally refined the "guessing" of how big the
  *   final encoded data will be so that the code doesn't have to create two output
- *   arrays: an oversized initial one and then a final, exact-sized one. Big win
- *   when using the {@link #encodeBytesToBytes(byte[])} family of methods (and not
- *   using the gzip options which uses a different mechanism with streams and stuff).</li>
+ *   arrays: an oversized initial one and then a final, exact-sized one.</li>
  *  <li>v2.3.1 - Added {@link #encodeBytesToBytes(byte[], int, int, int)} and some
  *   similar helper methods to be more efficient with memory by not returning a
  *   String but just a byte array.</li>

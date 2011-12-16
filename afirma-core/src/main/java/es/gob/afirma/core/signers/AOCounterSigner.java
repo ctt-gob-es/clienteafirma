@@ -28,8 +28,9 @@ public interface AOCounterSigner {
      * <li>Los nodos de firma cuyas posiciones se especifican en <code>target</code></li>
      * <li>Los nodos de firma realizados por los firmantes cuyo <i>Common Name</i> se indica en <code>target</code></li>
      * </ul>
-     * Los algoritmos y tipos de objetivo de la contrafirma disponibles se
-     * declaran en {@link es.gob.afirma.misc.AOConstants}.
+     * Los algoritmos disponibles para la contrafirma se
+     * declaran en {@link es.gob.afirma.core.signers.AOSignConstants}, mientras que los tipos de objetivo
+     * se declaran en {@link es.gob.afirma.core.signers.CounterSignTarget}.
      * @param sign
      *        Flujo de lectura de los datos a firmar
      * @param algorithm

@@ -14,6 +14,16 @@
  *   del Cliente @firma, incoporando igualmente los interfaces base que pueden ser implementados
  *   de forma concreta por distintos m&oacute;dulos.
  *  </p>
+ *  <p align="center"><br><img src="doc-files/package-info-1.png"></p>
+ *  <p>Este m&oacute;dulo presenta las siguientes dependencias din&aacute;micas de primer nivel:</p>
+ *  <ul>
+ *   <li>
+ *    Dependencia din&aacute;mica con el m&oacute;dulo Núcleo UI JSE (<i>afirma-ui-core-jse</i>) del Cliente.
+ *   </li>
+ *   <li>
+ *    Dependencia din&aacute;mica con la biblioteca JMIMEMagic.
+ *   </li>
+ *  </ul>
  *  <p>
  *   Este m&oacute;dulo es compatible con cualquier entorno JSE 1.5 o superior y con Android 3 o superior.<br> 
  *  </p>
