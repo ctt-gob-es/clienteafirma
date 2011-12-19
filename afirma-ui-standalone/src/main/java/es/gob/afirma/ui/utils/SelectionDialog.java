@@ -160,15 +160,15 @@ public class SelectionDialog {
                 	//Path al fichero
                 	String filePath = file.getAbsolutePath();
                 	//Comprobación del número de caracteres para acortar o no el path que se muestra en la alerta de sobreescritura de fichero
-                	if (filePath.length() >15) {
-                		//Se obtiene el índice del final del primer directorio
-                		int indexFirstDirectory = filePath.indexOf("/",1);
+                	if (filePath.length() >20) {
+                		//Se obtiene el índice del final del primer directorio                		
+                		int indexFirstDirectory = filePath.indexOf(File.separator,1);                		
                 		//Se almacena el primer directorio o unidad en windows
                 		String filePathTemp= filePath.substring(0, indexFirstDirectory + 1);
-                		//Se almacena el path sin incluir el nombre del fichero
-                		String subSequence = filePath.substring(0,filePath.lastIndexOf("/"));
-                		//Se almacena el índice del comienzo del último directorio
-                		int indexLastDirectory = subSequence.lastIndexOf("/");
+                		//Se almacena el path sin incluir el nombre del fichero                		
+                		String subSequence = filePath.substring(0,filePath.lastIndexOf(File.separator));                		
+                		//Se almacena el índice del comienzo del último directorio                		
+                		int indexLastDirectory = subSequence.lastIndexOf(File.separator);                		
                 		//Si el primer directorio y el último no son el mismo
                 		if (indexFirstDirectory<indexLastDirectory){
                 			//Se añaden unos puntos suspensivos al primer directorio
