@@ -35,7 +35,6 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -85,8 +84,10 @@ import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
 import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
+import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.SimpleAfirma;
@@ -94,7 +95,6 @@ import es.gob.afirma.standalone.VisorFirma;
 
 /** Panel de selecci&oacute;n y firma del fichero objetivo.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s */
-@SuppressWarnings("restriction")
 public final class SignPanel extends JPanel {
 
     private static final long serialVersionUID = -4828575650695534417L;
@@ -106,6 +106,7 @@ public final class SignPanel extends JPanel {
     private static final String FILE_ICON_XML = "/resources/icon_xml.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_SIGN = "/resources/icon_sign.svg"; //$NON-NLS-1$
+    private static final String FILE_ICON_FACTURAE = "/resources/icon_sign.svg"; //$NON-NLS-1$
 
     AOSigner signer;
     byte[] dataToSign = null;
@@ -128,16 +129,6 @@ public final class SignPanel extends JPanel {
     boolean cosign = false;
 
     File currentFile = null;
-
-    private boolean isXML(final byte[] data) {
-        try {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(data));
-        }
-        catch (final Exception e) {
-            return false;
-        }
-        return true;
-    }
 
     /** Carga el fichero a firmar.
      * @param filename Nombre (ruta completa incuida) del fichero a firmar
@@ -186,13 +177,20 @@ public final class SignPanel extends JPanel {
         String iconTooltip;
         this.cosign = false;
         // Comprobamos si es un fichero PDF
-        if (new AOPDFSigner().isValidDataFile(data)) {
+        if (DataAnalizerUtil.isPDF(data)) {
             iconPath = FILE_ICON_PDF;
             iconTooltip = Messages.getString("SignPanel.0"); //$NON-NLS-1$
             fileDescription = Messages.getString("SignPanel.9"); //$NON-NLS-1$
             this.signer = new AOPDFSigner();
         }
-        // Comprobamos si es un fichero de firma (los PDF pasaran por la condicion anterior)
+        // Comprobamos si es una factura electronica
+        else if (DataAnalizerUtil.isFacturae(data)) {
+            iconPath = FILE_ICON_FACTURAE;
+            iconTooltip = Messages.getString("SignPanel.17"); //$NON-NLS-1$
+            fileDescription = Messages.getString("SignPanel.20"); //$NON-NLS-1$
+            this.signer = new AOFacturaESigner();
+        }
+        // Comprobamos si es un fichero de firma (los PDF y las facturas pasaran por la condicion anterior)
         else if ((this.signer = AOSignerFactory.getSigner(data)) != null) {
             AOSignInfo info = null;
             try {
@@ -207,7 +205,7 @@ public final class SignPanel extends JPanel {
             this.cosign = true;
         }
         // Comprobamos si es un fichero XML
-        else if (isXML(data)) {
+        else if (DataAnalizerUtil.isXML(data)) {
             iconPath = FILE_ICON_XML;
             iconTooltip = Messages.getString("SignPanel.8"); //$NON-NLS-1$
             fileDescription = Messages.getString("SignPanel.10"); //$NON-NLS-1$

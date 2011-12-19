@@ -5,7 +5,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import es.gob.afirma.core.misc.AOUtil;
-import es.gob.afirma.signature.FacturaeHelper;
+import es.gob.afirma.standalone.DataAnalizerUtil;
 
 /** Pruebas de la gesti&oacute;n de facturas electr&oacute;nicas.
  * IMPORTANTE: Los ficheros de pruebas que sean facturas electr&oacute;nicas deben contener
@@ -36,7 +36,7 @@ public final class TestFacturaeHelper {
     public void testFacturaeHelper() throws Exception {
         for (final String f : TEST_FILES) {
             final byte[] file = AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream(f));
-            Assert.assertEquals(FacturaeHelper.isFacturae(file), f.contains("factura")); //$NON-NLS-1$
+            Assert.assertEquals(DataAnalizerUtil.isFacturae(file), f.contains("factura")); //$NON-NLS-1$
         }
         
     }
