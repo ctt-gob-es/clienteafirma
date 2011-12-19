@@ -76,7 +76,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         // Panel con el contenido
         JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
-        System.out.println("asd"+getBackground());
+
         // si el color de fondo ya no es blanco
         if (Main.isOSHighContrast){
         	panelCentral.setOpaque(false);
