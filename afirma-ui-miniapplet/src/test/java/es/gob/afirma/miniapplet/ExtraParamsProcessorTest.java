@@ -1,3 +1,13 @@
+/* Copyright (C) 2011 [Gobierno de Espana]
+ * This file is part of "Cliente @Firma".
+ * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
+ *   - the GNU General Public License as published by the Free Software Foundation; 
+ *     either version 2 of the License, or (at your option) any later version.
+ *   - or The European Software License; either versión 1.1 or (at your option) any later version.
+ * Date: 11/01/11
+ * You may contact the copyright holder at: soporte.afirma5@mpt.es
+ */
+
 package es.gob.afirma.miniapplet;
 
 import java.util.Properties;
@@ -7,7 +17,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 /** Pruebas del paso de propiedades desde JavaScript a Java. */
-public class ExtraParamsProcessorTest {
+public final class ExtraParamsProcessorTest {
 
     /** Prueba del paso de propiedades desde String con l&iacute;neas delimitadas por <code>\n</code> a <code>Properties</code> de Java. */
 	@Test
@@ -29,10 +39,10 @@ public class ExtraParamsProcessorTest {
 				"cla=ve9=valor\n" + //$NON-NLS-1$
 				"clave0\n"; //$NON-NLS-1$
 
-		Properties params = ExtraParamsProcessor.convertToProperties(entries);
+		final Properties params = ExtraParamsProcessor.convertToProperties(entries);
 		Assert.assertNotNull(params);
 
-		for (String key : params.keySet().toArray(new String[0])) {
+		for (final String key : params.keySet().toArray(new String[0])) {
 			System.out.println(key + " = " + params.getProperty(key)); //$NON-NLS-1$
 		}
 		Assert.assertEquals(11, params.size());
