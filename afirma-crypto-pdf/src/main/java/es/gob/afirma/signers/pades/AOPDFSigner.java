@@ -102,7 +102,7 @@ public final class AOPDFSigner implements AOSigner {
             throw new UnsupportedOperationException("Se necesita iText version " + ITEXT_VERSION + ", pero se ha encontrado la version: " + itextVersion); //$NON-NLS-1$ //$NON-NLS-2$
         }
         final String bcVersion = Platform.getBouncyCastleVersion();
-        if (BC_VERSION.compareTo(bcVersion) > 0) {
+        if (bcVersion != null && BC_VERSION.compareTo(bcVersion) > 0) {
             throw new UnsupportedOperationException("Se necesita BouncyCastle version igual o superior a " + BC_VERSION + ", pero se ha encontrado la version: " + bcVersion); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
