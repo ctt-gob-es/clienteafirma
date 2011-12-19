@@ -98,6 +98,7 @@ public final class RelationshipTransformService extends TransformService {
         this.sourceIds = new LinkedList<String>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public void init(final TransformParameterSpec params) throws InvalidAlgorithmParameterException {
         if (!(params instanceof RelationshipTransformParameterSpec)) {
@@ -109,6 +110,7 @@ public final class RelationshipTransformService extends TransformService {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void init(final XMLStructure parent, final XMLCryptoContext context) throws InvalidAlgorithmParameterException {
 
@@ -141,6 +143,7 @@ public final class RelationshipTransformService extends TransformService {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void marshalParams(final XMLStructure parent, final XMLCryptoContext context) throws MarshalException {
         final DOMStructure domParent = (DOMStructure) parent;
@@ -156,10 +159,12 @@ public final class RelationshipTransformService extends TransformService {
         }
     }
 
+    /** {@inheritDoc} */
     public AlgorithmParameterSpec getParameterSpec() {
         return null;
     }
 
+    /** {@inheritDoc} */
     public Data transform(final Data data, final XMLCryptoContext context) throws TransformException {
 
         final OctetStreamData octetStreamData = (OctetStreamData) data;
@@ -261,10 +266,12 @@ public final class RelationshipTransformService extends TransformService {
         return documentBuilderFactory.newDocumentBuilder().parse(inputSource);
     }
 
+    /** {@inheritDoc} */
     public Data transform(final Data data, final XMLCryptoContext context, final OutputStream os) throws TransformException {
         return null;
     }
 
+    /** {@inheritDoc} */
     public boolean isFeatureSupported(final String feature) {
         return false;
     }

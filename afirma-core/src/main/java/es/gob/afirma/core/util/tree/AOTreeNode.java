@@ -366,10 +366,12 @@ public final class AOTreeNode {
             this.stack.push(v.elements());
         }
 
+        /** {@inheritDoc} */
         public boolean hasMoreElements() {
             return (!this.stack.empty() && (this.stack.peek()).hasMoreElements());
         }
 
+        /** {@inheritDoc} */
         public AOTreeNode nextElement() {
             final Enumeration<AOTreeNode> enumer = this.stack.peek();
             final AOTreeNode node = enumer.nextElement();
