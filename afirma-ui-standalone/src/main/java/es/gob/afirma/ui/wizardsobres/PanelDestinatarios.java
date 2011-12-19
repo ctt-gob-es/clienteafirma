@@ -68,7 +68,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 
 	static Logger logger = Logger.getLogger(PanelDestinatarios.class.getName());
 	
-	private List<CertificateDestiny> listaCertificados = new ArrayList<CertificateDestiny>();
+	List<CertificateDestiny> listaCertificados = new ArrayList<CertificateDestiny>();
 	
 	@Override
 	public int getMinimumRelation(){
@@ -80,7 +80,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	 * @param ventanas	Listado con todas las paginas del asistente
 	 */
 	public void setVentanas(List<JDialogWizard> ventanas) {
-		this.setBotonera(new Botonera(ventanas, 1));
+		this.setBotonera(new Botonera(ventanas, Integer.valueOf(1)));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
 	
@@ -89,7 +89,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	}
 	
 	// Lista con los destinatarios
-	private JList listaDestinatarios = new JList();
+	JList listaDestinatarios = new JList();
 	
 	/**
 	 * Inicializacion de componentes
@@ -168,12 +168,13 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		anadir.setToolTipText(Messages.getString("wizard.aniadir.description"));
 		anadir.setText(Messages.getString("wizard.aniadir"));
 		anadir.setAutoscrolls(true);
-		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón
+		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al boton
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				anadirActionPerformed(comboDestinatarios, (DefaultListModel) listaDestinatarios.getModel(), 
+			@Override
+            public void actionPerformed(ActionEvent evt) {
+				anadirActionPerformed(comboDestinatarios, (DefaultListModel) PanelDestinatarios.this.listaDestinatarios.getModel(), 
 						eliminar);
 			}
 		});
@@ -209,18 +210,18 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		panelCentral.add(panelLista, c);
 		
 		// Lista con los destinatarios
-		listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description"));
-		listaDestinatarios.setModel(new DefaultListModel());
-		listaDestinatarios.getAccessibleContext().setAccessibleName(destLabel.getText() + " "+ listaDestinatarios.getToolTipText());
-		listaDestinatarios.getAccessibleContext().setAccessibleDescription(listaDestinatarios.getToolTipText());
-		Utils.remarcar(listaDestinatarios);
-        Utils.setContrastColor(listaDestinatarios);
-		Utils.setFontBold(listaDestinatarios);
+		this.listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description"));
+		this.listaDestinatarios.setModel(new DefaultListModel());
+		this.listaDestinatarios.getAccessibleContext().setAccessibleName(destLabel.getText() + " "+ this.listaDestinatarios.getToolTipText());
+		this.listaDestinatarios.getAccessibleContext().setAccessibleDescription(this.listaDestinatarios.getToolTipText());
+		Utils.remarcar(this.listaDestinatarios);
+        Utils.setContrastColor(this.listaDestinatarios);
+		Utils.setFontBold(this.listaDestinatarios);
 
-		panelLista.setViewportView(listaDestinatarios);
+		panelLista.setViewportView(this.listaDestinatarios);
 		
 		//Relación entre etiqueta y lista
-		destLabel.setLabelFor(listaDestinatarios);
+		destLabel.setLabelFor(this.listaDestinatarios);
 		//Asignación de mnemónico
 		destLabel.setDisplayedMnemonic(KeyEvent.VK_T);
 
@@ -246,8 +247,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
 		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				eliminarActionPerformed((DefaultListModel) listaDestinatarios.getModel(), eliminar);
+			@Override
+            public void actionPerformed(ActionEvent evt) {
+				eliminarActionPerformed((DefaultListModel) PanelDestinatarios.this.listaDestinatarios.getModel(), eliminar);
 			}
 		});
 		Utils.remarcar(eliminar);
@@ -275,7 +277,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	 * A&ntilde;ade un destinatario del origen seleccionado en el combo
 	 * @param listaModel Modelo de la lista de destinatarios
 	 */
-	private void anadirActionPerformed(JComboBox comboDestinatarios, DefaultListModel listaModel, JButton eliminar) {
+	void anadirActionPerformed(JComboBox comboDestinatarios, DefaultListModel listaModel, JButton eliminar) {
 		AOKeyStoreManager keyStoreManager = null;
 		KeyStoreConfiguration kc = (KeyStoreConfiguration) comboDestinatarios.getSelectedItem();
 		try {
@@ -327,7 +329,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 			}
 			if (copiar) {
 				listaModel.addElement(certDest.getAlias());
-				listaCertificados.add(certDest);
+				this.listaCertificados.add(certDest);
 				eliminar.setEnabled(true);
 				eliminar.setMnemonic(KeyEvent.VK_E); //Se asigna un atajo al botón ya que ha sido habilitado
 			} else 
@@ -341,11 +343,11 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	 * @param listaModel	Modelo de la lista de destinatarios
 	 * @param eliminar 		Boton eliminar
 	 */
-	private void eliminarActionPerformed(DefaultListModel listaModel, JButton eliminar) {
-		for (int i=0; i<listaCertificados.size(); i++)
-			if (listaCertificados.get(i).getAlias().equals(listaDestinatarios.getSelectedValue())) {
-				listaCertificados.remove(listaCertificados.get(i));
-				listaModel.remove(listaDestinatarios.getSelectedIndex());
+	void eliminarActionPerformed(DefaultListModel listaModel, JButton eliminar) {
+		for (int i=0; i<this.listaCertificados.size(); i++)
+			if (this.listaCertificados.get(i).getAlias().equals(this.listaDestinatarios.getSelectedValue())) {
+				this.listaCertificados.remove(this.listaCertificados.get(i));
+				listaModel.remove(this.listaDestinatarios.getSelectedIndex());
 				break;
 			}
 
@@ -392,13 +394,13 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 			
-			Boolean continuar = true;
+			Boolean continuar = Boolean.TRUE;
 			continuar = verificarCertificados();
 			
 			// Cargamos el listado de certificados
-			((PanelRemitentes) getVentanas().get(2)).setListaCertificados(listaCertificados);
+			((PanelRemitentes) getVentanas().get(2)).setListaCertificados(PanelDestinatarios.this.listaCertificados);
 			
-			if (continuar == true) {
+			if (continuar.booleanValue()) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
 			}
 		}
@@ -409,12 +411,11 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	 * @return	True o false segun la verificacion
 	 */
 	public Boolean verificarCertificados() {
-		DefaultListModel listModel = (DefaultListModel) listaDestinatarios.getModel();
+		final DefaultListModel listModel = (DefaultListModel) this.listaDestinatarios.getModel();
 		if (listModel.isEmpty()){
 			CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-            return false;
+            return Boolean.FALSE;
         }
-		
-		return true;
+		return Boolean.TRUE;
 	}
 }

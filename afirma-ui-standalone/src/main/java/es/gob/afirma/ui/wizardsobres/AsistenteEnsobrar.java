@@ -25,7 +25,7 @@ public class AsistenteEnsobrar {
 	/**
 	 * Tipo de ensobrado
 	 */
-	private Integer tipo = 0;
+	private Integer tipo = Integer.valueOf(0);
 	
 	/**
 	 * Ruta del fichero a ensobrar
