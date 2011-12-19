@@ -157,9 +157,31 @@ public class SelectionDialog {
             if (JFileChooser.APPROVE_OPTION == fileChooser.showSaveDialog(parentComponent)) {
                 file = fileChooser.getSelectedFile();
                 if (file.exists()) {
+                	//Path al fichero
+                	String filePath = file.getAbsolutePath();
+                	//Comprobación del número de caracteres para acortar o no el path que se muestra en la alerta de sobreescritura de fichero
+                	if (filePath.length() >15) {
+                		//Se obtiene el índice del final del primer directorio
+                		int indexFirstDirectory = filePath.indexOf("/",1);
+                		//Se almacena el primer directorio o unidad en windows
+                		String filePathTemp= filePath.substring(0, indexFirstDirectory + 1);
+                		//Se almacena el path sin incluir el nombre del fichero
+                		String subSequence = filePath.substring(0,filePath.lastIndexOf("/"));
+                		//Se almacena el índice del comienzo del último directorio
+                		int indexLastDirectory = subSequence.lastIndexOf("/");
+                		//Si el primer directorio y el último no son el mismo
+                		if (indexFirstDirectory<indexLastDirectory){
+                			//Se añaden unos puntos suspensivos al primer directorio
+                			filePathTemp = filePathTemp +"...";
+                			//Se añade el último directorio y el nombre del fichero
+                			filePathTemp = filePathTemp + filePath.substring(indexLastDirectory, filePath.length());
+                			//Se sustituye el path completo por el path acortado
+                			filePath = filePathTemp;
+                		}
+                	}
                     selectedOption =
                     		CustomDialog.showConfirmDialog(parentComponent, true,
-                                Messages.getString("SelectionDialog.saveDialog.overwrite.adv", file.getAbsolutePath()), Messages.getString("SelectionDialog.saveDialog.title"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                                Messages.getString("SelectionDialog.saveDialog.overwrite.adv", filePath), Messages.getString("SelectionDialog.saveDialog.title"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                     if (selectedOption == JOptionPane.CANCEL_OPTION) {
                         Logger.getLogger("es.gob.afirma").info("Se ha cancelado la operacion de guardado."); //$NON-NLS-1$ //$NON-NLS-2$
                         return null;
