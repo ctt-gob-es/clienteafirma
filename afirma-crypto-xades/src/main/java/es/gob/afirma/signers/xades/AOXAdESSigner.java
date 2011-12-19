@@ -1660,7 +1660,7 @@ public final class AOXAdESSigner implements AOSigner {
      *   <dd>Algoritmo de canonicalizaci&oacute;n</dd>
      *  <dt><b><i>xadesNamespace</i></b></dt>
      *   <dd>URL de definici&oacute;n del espacio de nombres de XAdES (y por extensi&oacute;n, versi&oacute;n de XAdES)</dd>
-     *   <dt><b><i>applySystemDate</i></b></dt>
+     *  <dt><b><i>applySystemDate</i></b></dt>
      *   <dd>
      *    Indica si se debe introducir en la firma el atributo <i>signingTime</i> con la fecha actual
      *    del sistema. Por defecto, se encuentra a {@code true}. 
