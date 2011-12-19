@@ -21,6 +21,8 @@ import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,8 +30,9 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToolTip;
+import javax.swing.JWindow;
 
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
@@ -142,42 +145,6 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
         
         final JPanel bottonPanel = new JPanel(true);
         bottonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
-
-//        JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
-//        //Boton maximizar
-//        maximizar.setText(Messages.getString("Wizard.maximizar"));
-//        maximizar.setName("maximizar");
-//        maximizar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.maximizar") + ". " + Messages.getString("Wizard.maximizar.description"));
-//        maximizar.setMnemonic(KeyEvent.VK_M);
-//        maximizar.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				maximizarActionPerformed();
-//			}
-//		});
-//        Utils.remarcar(maximizar);
-//        Utils.setContrastColor(maximizar);
-//        Utils.setFontBold(maximizar);
-//        
-//        panelMaximizar.add(maximizar);
-//        bottonPanel.add(panelMaximizar);
-//        
-//        JPanel panelRestaurar = new JPanel(new GridLayout(1, 1));
-//	    // Boton restaurar
-//	    restaurar.setText(Messages.getString("Wizard.restaurar"));
-//	    restaurar.setName("restaurar");
-//	    restaurar.getAccessibleContext().setAccessibleName(Messages.getString("Wizard.restaurar") + ". " + Messages.getString("Wizard.restaurar.description"));
-//	    restaurar.setMnemonic(KeyEvent.VK_R);
-//	    restaurar.addActionListener(new ActionListener() {
-//	    	public void actionPerformed(ActionEvent e) {
-//	    		restaurarActionPerformed();
-//			}
-//		});
-//	    Utils.remarcar(restaurar);
-//        Utils.setContrastColor(restaurar);
-//	    Utils.setFontBold(restaurar);
-//	    
-//	    panelRestaurar.add(restaurar);
-//	    bottonPanel.add(panelRestaurar);
         
 	    //Espacio entre botones
 		JPanel panelVacio = new JPanel();
@@ -320,6 +287,10 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 	private void createAccessibilityButtonsPanel() {
 		this.accessibilityButtonsPanel = new JPanel(new GridBagLayout());
 		
+		//Para el tooltip
+		final JWindow tip = new JWindow();
+		final JLabel tipText = new JLabel();
+		
 		//Panel que va a contener los botones de accesibilidad
 		JPanel panel = new JPanel(new GridBagLayout());
 		
@@ -350,7 +321,18 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
 		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
 		
-		
+		this.restoreButton.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				Utils.showToolTip(false, tip, restoreButton, tipText);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				Utils.showToolTip(true, tip, restoreButton, tipText);
+			}
+		});
 		Dimension dimension = new Dimension(20,20);
 		this.restoreButton.setPreferredSize(dimension);
 		
@@ -391,24 +373,20 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 				
 		Utils.remarcar(this.maximizeButton);
 		//maximizePanel.add(this.maximizeButton, consMaximizePanel);
-		maximizePanel.add(this.maximizeButton);
+		maximizePanel.add(this.maximizeButton);		
 		
-		JToolTip tooltip = maximizeButton.createToolTip();
-		tooltip.setTipText(Messages.getString("Wizard.maximizar"));
-		tooltip.setVisible(true);
-		
-		
-		/*this.maximizeButton.addFocusListener(new FocusListener() {
+		this.maximizeButton.addFocusListener(new FocusListener() {
+			
+			@Override
 			public void focusLost(FocusEvent e) {
-				
-				ToolTipManager.sharedInstance().registerComponent(this);
-				ToolTipManager.sharedInstance().setInitialDelay(0) ;
+				Utils.showToolTip(false, tip, maximizeButton, tipText);
 			}
+			
+			@Override
 			public void focusGained(FocusEvent e) {
-				//Se muestra un borde en el botón cuando este tiene el foco
-				botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
+				Utils.showToolTip(true, tip, maximizeButton, tipText);
 			}
-		});*/
+		});
 		
 		this.maximizeButton.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent e) {

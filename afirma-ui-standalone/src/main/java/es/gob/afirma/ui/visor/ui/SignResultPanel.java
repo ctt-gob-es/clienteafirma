@@ -22,6 +22,7 @@ import es.gob.afirma.ui.principal.Main;
 import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.GeneralConfig;
 import es.gob.afirma.ui.utils.Messages;
+import es.gob.afirma.ui.utils.RequestFocusListener;
 import es.gob.afirma.ui.utils.Utils;
 
 final class SignResultPanel extends JPanel {
@@ -44,6 +45,7 @@ final class SignResultPanel extends JPanel {
         this.resultTextLabel.setFont(this.getFont().deriveFont(Font.PLAIN, 26));
         this.resultTextLabel.setLabelFor(this.descTextLabel);
 
+        this.descTextLabel.addAncestorListener(new RequestFocusListener(false));
         Utils.remarcar(this.resultTextLabel);
         Utils.setContrastColor(this.resultTextLabel);
         Utils.setFontBold(this.resultTextLabel);
