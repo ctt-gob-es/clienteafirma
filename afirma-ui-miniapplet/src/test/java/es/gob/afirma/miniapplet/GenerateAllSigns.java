@@ -21,6 +21,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.CounterSignTarget;
 
+/** Generadoe de conjuntos completos de firmas. */
 public class GenerateAllSigns {
 
 	private static final boolean applyAlgos = false; 

@@ -49,7 +49,7 @@ public class SSLFilterTest {
 
 		System.out.println("Alias filtrados:"); //$NON-NLS-1$
 		for (String alias : filter.matches(manager.getAliases(), manager)) {
-			System.out.println(alias); //$NON-NLS-1$
+			System.out.println(alias);
 			Assert.assertEquals("El certificado recuperado no es el esperado", CERT_ALIAS, alias); //$NON-NLS-1$
 		}
 	}
