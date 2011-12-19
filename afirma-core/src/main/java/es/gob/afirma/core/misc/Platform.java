@@ -297,6 +297,7 @@ public final class Platform {
             return ((Double) getVersionMethod.invoke(bouncyCastleProviderObject)).toString();
         } 
         catch (final Exception e) {
+        	e.printStackTrace();
             return null;
         }
     }
