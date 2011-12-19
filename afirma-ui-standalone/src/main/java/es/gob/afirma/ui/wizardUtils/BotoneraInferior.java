@@ -34,7 +34,7 @@ public class BotoneraInferior extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private Dimension dimensiones = new Dimension(603, 47);
-	private List<JDialogWizard> ventanas;
+	List<JDialogWizard> ventanas;
 	private int posicion;
 	
 //	private JButton restaurar = null; 
@@ -78,9 +78,9 @@ public class BotoneraInferior extends JPanel {
         // Definicion de botones
         //maximizar = new JButton();
         final JButton anterior = new JButton();
-        siguiente = new JButton();
+        this.siguiente = new JButton();
         final JButton cancelar = new JButton();
-        finalizar = new JButton();
+        this.finalizar = new JButton();
         
 //        JPanel panelMaximizar = new JPanel(new GridLayout(1, 1));
 //        //Boton maximizar
@@ -144,8 +144,9 @@ public class BotoneraInferior extends JPanel {
         anterior.setText(Messages.getString("Wizard.anterior")); // NOI18N
 
         anterior.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
-                anteriorActionPerformed(anterior, siguiente, finalizar);
+                anteriorActionPerformed(anterior, BotoneraInferior.this.siguiente, BotoneraInferior.this.finalizar);
             }
         });
         Utils.remarcar(anterior);
@@ -158,23 +159,24 @@ public class BotoneraInferior extends JPanel {
         JPanel panelSiguiente = new JPanel(new GridLayout(1, 1));
         // Boton siguiente
         if (this.ventanas.size() == 1 || paginas == this.posicion)
-        	siguiente.setVisible(false);
+        	this.siguiente.setVisible(false);
         else {
-        	siguiente.setMnemonic(KeyEvent.VK_S); //Mnem�nico para el bot�n de siguiente
-        	siguiente.setVisible(true);
+        	this.siguiente.setMnemonic(KeyEvent.VK_S); //Mnem�nico para el bot�n de siguiente
+        	this.siguiente.setVisible(true);
         }
-        siguiente.setText(Messages.getString("Wizard.siguiente")); // NOI18N
+        this.siguiente.setText(Messages.getString("Wizard.siguiente")); // NOI18N
         
-        siguiente.addActionListener(new ActionListener() {
+        this.siguiente.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
-                siguienteActionPerformed(anterior, siguiente, finalizar);
+                siguienteActionPerformed(anterior, BotoneraInferior.this.siguiente, BotoneraInferior.this.finalizar);
             }
         });
-        Utils.remarcar(siguiente);
-        Utils.setContrastColor(siguiente);
-        Utils.setFontBold(siguiente);
+        Utils.remarcar(this.siguiente);
+        Utils.setContrastColor(this.siguiente);
+        Utils.setFontBold(this.siguiente);
         
-        panelSiguiente.add(siguiente);
+        panelSiguiente.add(this.siguiente);
         add(panelSiguiente);
 
         // Espacio entre botones
@@ -192,6 +194,7 @@ public class BotoneraInferior extends JPanel {
         }
         cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N
         cancelar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	saveSizePosition();
             	for (JDialogWizard ventana : BotoneraInferior.this.ventanas)
@@ -208,25 +211,26 @@ public class BotoneraInferior extends JPanel {
         JPanel panelFinalizar = new JPanel(new GridLayout(1, 1));
         // Boton finalizar
         if (this.ventanas.size() == 1 || paginas == this.posicion) {
-            finalizar.setMnemonic(KeyEvent.VK_F); //Mnemonico para el boton de finalizar
-            finalizar.setVisible(true);
+            this.finalizar.setMnemonic(KeyEvent.VK_F); //Mnemonico para el boton de finalizar
+            this.finalizar.setVisible(true);
         } else 
-        	finalizar.setVisible(false);
+        	this.finalizar.setVisible(false);
 
-        finalizar.setText(Messages.getString("Wizard.finalizar")); // NOI18N
+        this.finalizar.setText(Messages.getString("Wizard.finalizar")); // NOI18N
 
-        finalizar.addActionListener(new ActionListener() {
+        this.finalizar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	saveSizePosition();
             	for (JDialogWizard ventana : BotoneraInferior.this.ventanas)
             		ventana.dispose();
             }
         });
-        Utils.remarcar(finalizar);
-        Utils.setContrastColor(finalizar);
-        Utils.setFontBold(finalizar);
+        Utils.remarcar(this.finalizar);
+        Utils.setContrastColor(this.finalizar);
+        Utils.setFontBold(this.finalizar);
         
-        panelFinalizar.add(finalizar);
+        panelFinalizar.add(this.finalizar);
         add(panelFinalizar);
 	}
 
@@ -350,7 +354,7 @@ public class BotoneraInferior extends JPanel {
 	 * @return boton de siguiente.
 	 */
 	public JButton getSiguiente() {
-		return siguiente;
+		return this.siguiente;
 	}
 	
 	/**
@@ -358,7 +362,7 @@ public class BotoneraInferior extends JPanel {
 	 * @return boton de finalizar.
 	 */
 	public JButton getFinalizar() {
-		return finalizar;
+		return this.finalizar;
 	}
 
 }
