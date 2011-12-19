@@ -72,13 +72,12 @@ public final class AOSignerFactory {
                 }
                 catch(final Exception e) {
                     LOGGER.severe("No se ha podido instanciar un manejador para el formato de firma '" + format + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
-                    e.printStackTrace();
                     continue;
                 }
-                final AOSigner signer = SIGNERS.get(format);
-                if (signer != null && signer.isSign(signData)) {
-                    return signer;
-                }
+            }
+            final AOSigner signer = SIGNERS.get(format);
+            if (signer != null && signer.isSign(signData)) {
+                return signer;
             }
         }
         return null;
