@@ -2647,7 +2647,6 @@ public final class AOXAdESSigner implements AOSigner {
      * @return Devuelve {@code true} cuando todos los nodos sean firmas en este
      *         formato. */
     private boolean checkSignNodes(final List<Node> signNodes) {
-
         String xadesNamespace;
         for (final Node signNode : signNodes) {
             xadesNamespace = Utils.guessXAdESNamespaceURL(signNode);
@@ -2655,7 +2654,6 @@ public final class AOXAdESSigner implements AOSigner {
                 return false;
             }
         }
-
         return true;
     }
 

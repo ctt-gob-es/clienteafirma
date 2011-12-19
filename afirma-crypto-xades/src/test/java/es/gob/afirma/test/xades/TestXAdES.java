@@ -43,7 +43,7 @@ import es.gob.afirma.signers.xml.Utils;
 
 
 /**
- * Pruebas del m&oacute;dulo CAdES de Afirma.
+ * Pruebas del m&oacute;dulo XAdES de Afirma.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  *
  */
@@ -137,11 +137,11 @@ public final class TestXAdES {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
 
-        KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
+        final KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
         ks.load(ClassLoader.getSystemResourceAsStream(CERT_PATH), CERT_PASS.toCharArray());
         pke = (PrivateKeyEntry) ks.getEntry(CERT_ALIAS, new KeyStore.PasswordProtection(CERT_PASS.toCharArray()));
 
-        AOSigner signer = new AOXAdESSigner();
+        final AOSigner signer = new AOXAdESSigner();
         
         final Properties p = new Properties();
         p.put("mode", "implicit"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -171,7 +171,7 @@ public final class TestXAdES {
             
             final byte[] result = signer.cosign(data, algo, pke, p);
                 
-            File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+            final File f = File.createTempFile(algo + "-" + filename.replace(".xml", "") + "-", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
             java.io.FileOutputStream fos = new java.io.FileOutputStream(f);
             fos.write(result);
             try { fos.flush(); fos.close(); } catch (Exception e) { 
