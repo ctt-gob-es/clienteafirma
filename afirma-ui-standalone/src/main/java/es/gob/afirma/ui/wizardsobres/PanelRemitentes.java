@@ -412,7 +412,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			} 
 	       	catch (KeyException e) {
 	       		//Control de la excepcion generada al introducir mal la contrasena para el certificado
-	            JOptionPane.showMessageDialog(this, Messages.getString("Wizard.sobres.error.certificados.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+	       		CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.certificados.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 	            return;
 	        }catch(AOException e){
 	    		logger.warning("Error al obtener la clave del certificado: "+e);

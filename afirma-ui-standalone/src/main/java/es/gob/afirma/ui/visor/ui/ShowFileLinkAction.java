@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.misc.MimeHelper;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.SelectionDialog;
 
@@ -49,12 +50,7 @@ final class ShowFileLinkAction {
                 Desktop.getDesktop().open(tmp);
             }
             catch(final Exception e) {
-                JOptionPane.showMessageDialog(
-                        null,
-                        Messages.getString("ShowFileLinkAction.2") + " '" + ext + "'",  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-                        Messages.getString("ShowFileLinkAction.0"), //$NON-NLS-1$
-                        JOptionPane.ERROR_MESSAGE
-                );
+            	CustomDialog.showMessageDialog(null, true, Messages.getString("ShowFileLinkAction.2") + " '" + ext + "'", Messages.getString("ShowFileLinkAction.0"), JOptionPane.ERROR_MESSAGE);
             }
         }
         else {

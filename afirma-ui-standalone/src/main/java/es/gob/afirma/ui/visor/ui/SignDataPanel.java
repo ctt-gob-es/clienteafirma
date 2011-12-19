@@ -47,6 +47,7 @@ import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.windows.WinRegistryWrapper;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.visor.crypto.CertAnalyzer;
@@ -161,12 +162,7 @@ final class SignDataPanel extends JPanel {
                         Desktop.getDesktop().open(signFile);
                     }
                     catch (final Exception e) {
-                        JOptionPane.showMessageDialog(
-                                SignDataPanel.this,
-                                Messages.getString("SignDataPanel.7"), //$NON-NLS-1$
-                                Messages.getString("SignDataPanel.8"), //$NON-NLS-1$
-                                JOptionPane.ERROR_MESSAGE
-                        );
+                    	CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.7"), Messages.getString("SignDataPanel.8"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
             });
@@ -233,7 +229,7 @@ final class SignDataPanel extends JPanel {
 						    SignDataPanel.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 							try {
 								certInfo.getCertVerifier().checkCertificate(new X509Certificate[] { cert }, true);
-								JOptionPane.showMessageDialog(SignDataPanel.this, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+								CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.19"), Messages.getString("SignDataPanel.20"), JOptionPane.INFORMATION_MESSAGE);
 							}
 							catch(final Exception e) {
 								e.printStackTrace();
@@ -333,12 +329,7 @@ final class SignDataPanel extends JPanel {
             Desktop.getDesktop().open(tmp);
         }
         catch(final Exception e) {
-            JOptionPane.showMessageDialog(
-                    SignDataPanel.this,
-                    Messages.getString("SignDataPanel.23"), //$NON-NLS-1$
-                    Messages.getString("SignDataPanel.8"), //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
-            );
+        	CustomDialog.showMessageDialog(SignDataPanel.this, true, Messages.getString("SignDataPanel.23"), Messages.getString("SignDataPanel.8"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
