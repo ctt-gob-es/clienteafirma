@@ -364,7 +364,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 
 	/**
 	 * Modifica el interfaz cambiando el arbol por un listado dependiendo
-	 * de la opciï¿½n seleccionada
+	 * de la opci&oacute;n seleccionada
 	 * @param etiqueta 		Etiqueta superior al arbol/listado
 	 * @param panelArbol 	Panel del arbol
 	 * @param panelLista	Panel de la lista	

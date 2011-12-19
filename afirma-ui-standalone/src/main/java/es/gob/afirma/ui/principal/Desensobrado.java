@@ -326,7 +326,7 @@ public class Desensobrado extends JPanel {
     
     /**
      * Carga el combo almacen respecto al sistema operativo en el que se encuentra 
-     * la aplicaciï¿½n
+     * la aplicaci&oacute;
      * @param comboAlmacen	Combo donde se cargan los tipos de almacen
      */
     private void cargarComboAlmacen(JComboBox comboAlmacen) {

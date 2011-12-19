@@ -248,7 +248,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @return	True o false si se ha podido leer bien el fichero
 	 */
 	public boolean checkFicheroEntrada(String ficheroFirma) {
-		// Comprobaciï¿½n de la ruta de fichero de entrada.
+		// Comprobacion de la ruta de fichero de entrada.
 		if (ficheroFirma == null || ficheroFirma.equals("") || !new File(ficheroFirma).exists() && !new File(ficheroFirma).isFile()){
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.datos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;

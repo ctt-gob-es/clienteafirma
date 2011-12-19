@@ -526,7 +526,7 @@ public class Firma extends JPanel {
             }
 
             // En el caso de firma CAdES, preguntamos al usuario si desea incluir el documento que
-            // se firma en la propia firma. El documento se incluirï¿½ en la firma, salvo que se indique
+            // se firma en la propia firma. El documento se incluira en la firma, salvo que se indique
             // los contrario
             String modoFirma = AOSignConstants.SIGN_MODE_IMPLICIT;
             if (formato.equals(AOSignConstants.SIGN_FORMAT_CADES)){ 

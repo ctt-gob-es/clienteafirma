@@ -125,7 +125,7 @@ public class MainOptionsPane {
         this.panel.add(generalPanel, c);
         c.gridy = c.gridy + 1;
         
-        // Panel criptografï¿½a
+        // Panel criptografia
         JPanel criptografiaPanel = new JPanel(new GridBagLayout());
         criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
         Utils.setContrastColor(criptografiaPanel);

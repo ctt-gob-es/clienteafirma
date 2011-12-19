@@ -294,7 +294,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	 * @return	True o false segun la verificacion
 	 */
 	boolean verificarFicheros() {
-		//comprobaciï¿½n de la ruta de fichero de entrada.
+		//comprobacion de la ruta de fichero de entrada.
 		String directorio = campoDirectorio.getText();
 		if (directorio == null || directorio.equals("")) {
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.origen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);

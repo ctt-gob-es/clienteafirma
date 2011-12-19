@@ -242,7 +242,7 @@ public class ProfilesOptionsPane {
 		int confirm = CustomDialog.showConfirmDialog(
 				this.parent,
 				true,
-				"Al aplicar el nuevo perfil se cerraran las opciones de configuraci\u00F3n. ¿Desea continuar?",
+				"Al aplicar el nuevo perfil se cerraran las opciones de configuraci\u00F3n. \u00BFDesea continuar?",
 				"Perfiles",
 				JOptionPane.YES_NO_OPTION,
 				JOptionPane.QUESTION_MESSAGE);
@@ -279,7 +279,7 @@ public class ProfilesOptionsPane {
 					int confirm = CustomDialog.showConfirmDialog(
 							this.parent,
 							true,
-							"Se dispone a eliminar el perfil actual. Si hace esto se cargar\u00E1 el perfil por defecto y se cerraran las opciones de configuraci\u00F3n. ¿Desea continuar?",
+							"Se dispone a eliminar el perfil actual. Si hace esto se cargar\u00E1 el perfil por defecto y se cerraran las opciones de configuraci\u00F3n. \u00BFDesea continuar?",
 							"Perfiles",
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.QUESTION_MESSAGE);
@@ -294,7 +294,7 @@ public class ProfilesOptionsPane {
 					int confirm = CustomDialog.showConfirmDialog(
 							this.parent,
 							true,
-							"Se dispone a eliminar el perfil "+profileName+". Esta acción no se puede deshacer. ¿Desea continuar?",
+							"Se dispone a eliminar el perfil "+profileName+". Esta acci\u00F3n no se puede deshacer. \u00BFDesea continuar?",
 							"Perfiles",
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.QUESTION_MESSAGE);
@@ -319,7 +319,7 @@ public class ProfilesOptionsPane {
 			int confirm = CustomDialog.showConfirmDialog(
 					this.parent,
 					true,
-					"¿Desea almacenar la configuraci&oacute;n actual en el perfil \"" + this.getCurrentProfileName() + "\"?",
+					"\u00BFDesea almacenar la configuraci\u00F3n actual en el perfil \"" + this.getCurrentProfileName() + "\"?",
 					"Perfiles",
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE);
@@ -334,7 +334,7 @@ public class ProfilesOptionsPane {
 							"Perfiles",
 							JOptionPane.INFORMATION_MESSAGE);
 				} catch (IllegalArgumentException e) {
-					showErrorDialog("Se ha insertado un nombre de fichero no v\u00E1lido. No se guardar&aacute; el perfil.");
+					showErrorDialog("Se ha insertado un nombre de fichero no v\u00E1lido. No se guardar\u00E1 el perfil.");
 					return;
 				}
 			}
@@ -366,7 +366,7 @@ public class ProfilesOptionsPane {
 			int confirm = CustomDialog.showConfirmDialog(
 					this.parent,
 					true,
-					"El perfil \"" + profileName + "\" ya existe. ¿Desea sobreescribirlo?",
+					"El perfil \"" + profileName + "\" ya existe. \u00BFDesea sobreescribirlo?",
 					"Perfiles",
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE);
@@ -392,7 +392,7 @@ public class ProfilesOptionsPane {
 					"Perfiles",
 					JOptionPane.INFORMATION_MESSAGE);
 		} catch (IllegalArgumentException e) {
-			showErrorDialog("Se ha insertado un nombre de fichero no v\u00E1lido. No se guardar&aacute; el perfil.");
+			showErrorDialog("Se ha insertado un nombre de fichero no v\u00E1lido. No se guardar\u00E1 el perfil.");
 			return;
 		}
 		

@@ -157,7 +157,7 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		JPanel panelExaminarFirma = new JPanel(new GridLayout(1, 1));
 		// Boton examinar (fichero firma)
         JButton examinarFirma = new JButton();
-        examinarFirma.setMnemonic(KeyEvent.VK_X); //mnemï¿½nico diferente al botï¿½n "Examinar" anterior
+        examinarFirma.setMnemonic(KeyEvent.VK_X); //mnemonico diferente al boton "Examinar" anterior
         examinarFirma.setText(Messages.getString("PrincipalGUI.Examinar"));
         examinarFirma.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
         examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());

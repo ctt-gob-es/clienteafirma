@@ -497,7 +497,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	} catch(Exception e){
-    		logger.warning("Ocurrio un error durante el proceso de aï¿½adir un nuevo remitente: "+e);
+    		logger.warning("Ocurrio un error durante el proceso de a&ntilde;dir un nuevo remitente: "+e);
     		CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
