@@ -141,6 +141,11 @@ public class Constants {
     public static final int FILE_INITIAL_HEIGHT = 300;
     
     /**
+     * Width inicial de los JAccessibilityFileChooser de la aplicacion con fuente grande o negrita.
+     */
+    public static final int FILE_FONT_INITIAL_WIDTH = 630;
+    
+    /**
      * Width inicial de los JAccessibilityCustomDialog de la aplicacion.
      */
     public static final int CUSTOMDIALOG_INITIAL_WIDTH = 505;

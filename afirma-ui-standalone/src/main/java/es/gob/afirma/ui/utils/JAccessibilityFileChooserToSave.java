@@ -342,11 +342,13 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
         	} else {
         		if (PrincipalGUI.fileActualPositionX != -1){
     	    		dialog.setPreferredSize(new Dimension(PrincipalGUI.fileActualWidth, PrincipalGUI.fileActualHeight));
-        		} else {
-    	    		dialog.setPreferredSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
         		}
         	}
-        	dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        	if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
+        		dialog.setMinimumSize(new Dimension(Constants.FILE_FONT_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        	} else {
+        		dialog.setMinimumSize(new Dimension(Constants.FILE_INITIAL_WIDTH, Constants.FILE_INITIAL_HEIGHT));
+        	}
             for (int i = 0; i<this.getComponentCount();i++){
             	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){
             		jTool = (JToolBar)this.getComponent(i);
