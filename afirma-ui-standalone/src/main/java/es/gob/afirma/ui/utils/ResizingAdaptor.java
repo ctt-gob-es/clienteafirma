@@ -216,28 +216,30 @@ public class ResizingAdaptor extends ComponentAdapter {
 			Component actualComponent = components[i];
 			if (isResizable(actualComponent)) {
 				if (relation > 10) {
+					float resizeFactor = 0;
 					if (theWindow != null) {
-						float resizeFactor = Math.round(relation / getResizingFactorFrame());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+						resizeFactor = Math.round(relation / getResizingFactorFrame());
+						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theDialog != null){
-						float resizeFactor = Math.round(relation / getResizingFactorDialog());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+						resizeFactor = Math.round(relation / getResizingFactorDialog());
+						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theDialogWizard != null){
-						float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+						resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
+						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theDialogAdvisor != null){
-						float resizeFactor = Math.round(relation / getResizingFactorFrameAdvisor());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+						resizeFactor = Math.round(relation / getResizingFactorFrameAdvisor());
+						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theWindowAbout != null) {
-						float resizeFactor = Math.round(relation / getResizingFactorFrameAbout());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+						resizeFactor = Math.round(relation / getResizingFactorFrameAbout());
+						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					} else if (theCustomDialog != null) {
-						float resizeFactor = Math.round(relation / getResizingFactorCustomDialog());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+						resizeFactor = Math.round(relation / getResizingFactorCustomDialog());
+						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					}else {
-						float resizeFactor = Math.round(relation / getResizingFactorFileChooser());
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
+						resizeFactor = Math.round(relation / getResizingFactorFileChooser());
+						//actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 					}
+					actualComponent.setFont(actualComponent.getFont().deriveFont((float) (getFontSize() + resizeFactor)));
 				} else {
 					if (actualComponent instanceof JComboBox){
 						// TODO Workaround buscar solucion mejor
@@ -314,24 +316,8 @@ public class ResizingAdaptor extends ComponentAdapter {
 				int multiplicando = 4;
 				IconLabel iconLabel = (IconLabel)actualComponent;
 				if (iconLabel.getOriginalIcon() != null) {
-					float resizeFactor;
-					if(theWindow != null){
-						resizeFactor = (float) (theWindow.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if(theDialog != null) {
-						resizeFactor = (float) (theDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theDialogWizard != null){
-						resizeFactor = (float) (theDialogWizard.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theDialogAdvisor != null){
-						resizeFactor = (float) (theDialogAdvisor.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theWindowAbout != null){
-						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					}else if (theCustomDialog != null){
-						resizeFactor = (float) (theCustomDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theFileChooser != null){
-						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else {
-						resizeFactor = (float) (theFileChooserToSave.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					}
+					float resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR);
+
 					//Se obtienen las dimensiones del icono original
 					 int w = iconLabel.getOriginalIcon().getIconWidth();
 					 int h = iconLabel.getOriginalIcon().getIconHeight();
@@ -343,28 +329,45 @@ public class ResizingAdaptor extends ComponentAdapter {
 			//imagenes dentro de JButton
 			if (actualComponent instanceof JButton) {
 				if (((JButton)actualComponent).getIcon() != null) {
-					float resizeFactor;
-					if(theWindow != null){
-						resizeFactor = (float) (theWindow.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if(theDialog != null) {
-						resizeFactor = (float) (theDialog.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theDialogWizard != null){
-						resizeFactor = (float) (theDialogWizard.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theDialogAdvisor != null){
-						resizeFactor = (float) (theDialogAdvisor.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					} else if (theWindowAbout != null){
-						resizeFactor = (float) (theWindowAbout.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
-					}  else if (theCustomDialog != null){
-						resizeFactor = (float) (theCustomDialog.getHeight() * (Constants.RESIZING_IMAGES_FACTOR + 0.0010));
-					} else if (theFileChooser != null){
-						resizeFactor = (float) (theFileChooser.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+					float resizeFactor = 0;
+					if (theCustomDialog != null) {
+						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR + 0.0010);
 					} else {
-						resizeFactor = (float) (theFileChooserToSave.getHeight() * Constants.RESIZING_IMAGES_FACTOR);
+						resizeFactor = getImageResizeFactor(Constants.RESIZING_IMAGES_FACTOR);
 					}
+
 					resizeImageButton(resizeFactor, actualComponent);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Devuelve el factor final de redimensionado de imagen.
+	 * @param height altura
+	 * @param factor factor
+	 * @return factor final de redimensionado
+	 */
+	private float getImageResizeFactor(double factor){
+		float resizeFactor = 0;
+		if(theWindow != null){
+			resizeFactor = (float) (theWindow.getHeight() * factor);
+		} else if(theDialog != null) {
+			resizeFactor = (float) (theDialog.getHeight() * factor);
+		} else if (theDialogWizard != null){
+			resizeFactor = (float) (theDialogWizard.getHeight() * factor);
+		} else if (theDialogAdvisor != null){
+			resizeFactor = (float) (theDialogAdvisor.getHeight() * factor);
+		} else if (theWindowAbout != null){
+			resizeFactor = (float) (theWindowAbout.getHeight() * factor);
+		}  else if (theCustomDialog != null){
+			resizeFactor = (float) (theCustomDialog.getHeight() * factor);
+		} else if (theFileChooser != null){
+			resizeFactor = (float) (theFileChooser.getHeight() * factor);
+		} else {
+			resizeFactor = (float) (theFileChooserToSave.getHeight() * factor);
+		}
+		return resizeFactor;
 	}
 	
 	/**
@@ -406,34 +409,37 @@ public class ResizingAdaptor extends ComponentAdapter {
 		JButton button = (JButton) c;
 		ImageIcon imageIcon = null;
 		
+		//Se almacena el factor
+		double factorAux = factor;
+		
 		//Se comprueba si se trata del botón de ayuda
 		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) {
 			imageIcon = HelpUtils.IMAGEICONHELP; //Se carga la imagen original
 		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) {
 			if (theDialog!=null){
-				factor = factor - 0.4; //0.8999999761581421
+				factorAux = factorAux - 0.4; //0.8999999761581421
 			}
 			if (theDialogWizard!=null){
-				factor = factor - 0.3; //0.8999999761581421
+				factorAux = factorAux - 0.3; //0.8999999761581421
 			}
 			imageIcon = Constants.IMAGEICONMAXIMIZE; //Se carga la imagen original
 		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("restaurar"))) {
 			if (theDialog!=null){
-				factor = factor - 0.4; //0.8999999761581421
+				factorAux = factorAux - 0.4; //0.8999999761581421
 			}
 			if (theDialogWizard!=null){
-				factor = factor - 0.3; //0.8999999761581421
+				factorAux = factorAux - 0.3; //0.8999999761581421
 			}
 			imageIcon = Constants.IMAGEICONRESTORE; //Se carga la imagen original
 		} else {
 			imageIcon = (ImageIcon)button.getIcon(); //Se carga la imagen del componente actual
 		}
 		//Se redimensionan las imágenes
-		ImageIcon newImage = new ImageIcon(imageIcon.getImage().getScaledInstance((int) Math.round(25 * 2 * factor),
-				(int) Math.round(25 * 2 * factor), java.awt.Image.SCALE_SMOOTH));
+		ImageIcon newImage = new ImageIcon(imageIcon.getImage().getScaledInstance((int) Math.round(25 * 2 * factorAux),
+				(int) Math.round(25 * 2 * factorAux), java.awt.Image.SCALE_SMOOTH));
 		button.setIcon(newImage);
 
-		button.setPreferredSize(new Dimension((int) Math.round(25 * 2 * factor),(int) Math.round(25 * 2 * factor)));
+		button.setPreferredSize(new Dimension((int) Math.round(25 * 2 * factorAux),(int) Math.round(25 * 2 * factorAux)));
 		}
 	}
 	
@@ -472,43 +478,15 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 */
 	private boolean isResizable(Component a){
 
-		if(a instanceof JButton)
+		if ((a instanceof JButton) || (a instanceof JToggleButton) || (a instanceof JLabel) || (a instanceof JMenuItem)
+				|| (a instanceof JComboBox) || (a instanceof JTextField) || (a instanceof JPanel) || (a instanceof JTabbedPane)
+				|| (a instanceof JRadioButton) || (a instanceof JCheckBox) || (a instanceof JTextPane) || (a instanceof JEditorPane)
+				|| (a instanceof JTree) || (a instanceof JList) || (a instanceof JFileChooser) || (a instanceof JTable)
+				|| (a instanceof JTableHeader) || (a instanceof FilePane)){
 			return true;
-		else if(a instanceof JToggleButton)
-			return true;
-		else if(a instanceof JLabel)
-			return true;
-		else if(a instanceof JMenuItem)
-			return true;
-		else if(a instanceof JComboBox)
-			return true;
-		else if(a instanceof JTextField)
-			return true;
-		else if(a instanceof JPanel)
-			return true;
-		else if(a instanceof JTabbedPane)
-			return true;
-		else if(a instanceof JRadioButton)
-			return true;
-		else if(a instanceof JCheckBox)
-			return true;
-		else if(a instanceof JTextPane)
-			return true;
-		else if(a instanceof JEditorPane)
-			return true;
-		else if(a instanceof JTree)
-			return true;
-		else if(a instanceof JList)
-			return true;
-		else if(a instanceof JFileChooser)
-			return true;
-		else if(a instanceof JTable)
-			return true;
-		else if(a instanceof JTableHeader)
-			return true;
-		else if(a instanceof FilePane)
-			return true;
-		return false;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
