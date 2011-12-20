@@ -85,23 +85,26 @@ public final class Utils {
 		String os = System.getProperty("os.name").toLowerCase();
 		Runtime rt = Runtime.getRuntime();
 		try {
-			if (os.indexOf( "win" ) >= 0) 
+			if (os.indexOf( "win" ) >= 0) {
 				rt.exec("cmd.exe /C \""+filepath+"\"");
-			else if (os.indexOf( "mac" ) >= 0)
+			}
+			else if (os.indexOf( "mac" ) >= 0){
 				rt.exec( "open " + filepath);
+			}
 			else {
 				//prioritized 'guess' of users' preference
 				List<String> browsers = new ArrayList<String>(Arrays.asList("epiphany", "firefox", "mozilla", "konqueror",
 						"netscape","opera","links","lynx"));
 
 				StringBuffer cmd = new StringBuffer();
-				for (String browser : browsers)
+				for (String browser : browsers){
 					cmd.append( (browsers.get(0).equals(browser)  ? "" : " || " ) + browser +" \"" + filepath + "\" ");
+				}
 
 				rt.exec(new String[] { "sh", "-c", cmd.toString() });
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.info(e.getMessage());
 			PrincipalGUI.setNuevoEstado(Messages.getString("Validacion.error.valide"));
 		}
 	}
