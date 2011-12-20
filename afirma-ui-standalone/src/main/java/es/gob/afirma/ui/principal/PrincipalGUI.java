@@ -612,7 +612,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonMultifirmaMasiva.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
         buttonMultifirmaMasiva.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
+                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description")); //$NON-NLS-1$
         
         buttonMultifirmaMasiva.setEnabled(GeneralConfig.isAvanzados());
         buttonMultifirmaMasiva.setName("firma.masiva");
