@@ -3,7 +3,6 @@ package es.gob.afirma.ui.utils;
 
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -12,7 +11,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -24,19 +22,14 @@ import java.awt.event.MouseListener;
 import java.io.File;
 
 import javax.accessibility.AccessibleContext;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
 
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
 /**
@@ -44,7 +37,7 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
  * @author lmerayo
  *
  */
-public class JAccessibilityFileChooserToSave extends JFileChooser{
+public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	
 	/**
 	 * Serial version ID.
@@ -56,7 +49,10 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	private JToolBar jTool;
 	private ResizingAdaptor resizingAdaptor;
 	private JDialog dialog;
-	
+
+	/**
+	 * Relación mínima.
+	 */
 	public int getMinimumRelation(){
 		return 9;
 	}
@@ -85,6 +81,9 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 
 	 }//constructor
 
+	/**
+	 * Inicializa el diálogo haciendo accesibles sus componentes.
+	 */
 	private void init(){
 		//Se comprueba si se esta en el modo Alto contraste
 		if (GeneralConfig.isHighContrast()){
@@ -94,7 +93,7 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 		//Asignacion de mnemonics
 		
 		//Etiqueta buscar en ...
-		setLabelMnemonics((Container)this, "FileChooser.lookInLabelText", KeyEvent.VK_B);
+		setLabelMnemonics((Container)this, "FileChooser.lookInLabelText", KeyEvent.VK_U);
 		
 		//Boton Cancelar
 		setButtonMnemonics((Container)this, "FileChooser.cancelButtonText", KeyEvent.VK_C);
@@ -106,183 +105,11 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 		//TODO: Revisar puesto que los botones que se hacen accesibles estan predefinidos
 		setToggleButtonMnemonics((Container)this);
 	}
-	
-	/**
-	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
-	 * @return int Posici&oacute;n X
-	 */
-    public int getInitialX() {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		return (screenSize.width - 426) / 2 ;
-	}
-    
-    /**
-	 * Posici&oacute;n Y inicial de la ventana dependiendo del sistema operativo y de la
-	 * resoluci&oacute;n de pantalla.
-	 * @return int Posici&oacute;n Y
-	 */
-	public int getInitialY() {
-        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        if (Platform.getOS().equals(Platform.OS.MACOSX)){
-        	return (screenSize.height - 485) / 2;
-        } else {
-        	return (screenSize.height - 456) / 2;
-        }
-	}
-	
-	/**
-	 * Asigna el mnem&oacute;nico indicado al bot&oacute;n identificado por la clave .
-	 * @param c contenedor global
-	 * @param key clave del componente al que se le va a asignar el mnem&oacute;nico.
-	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
-	 */
-	public void setButtonMnemonics( Container c, String key, int mnemonic ) {
-	    int len = c.getComponentCount(); //Numero de componentes del contenedor
-	    //Se recorren los elementos que forman el contenedor
-	    for (int i = 0; i < len; i++) {
-	      Component comp = c.getComponent(i); //Se obtiene un componente
-	      //Se comprueba si es de tipo boton
-	      if (comp instanceof JButton) {
-		        JButton button = (JButton)comp;
-		        //Se comprueba si su texto es el indicado por la clave
-		        if (button.getText() ==  UIManager.get(key)) {
-		        	//Se le asigna el mnemonico
-		        	button.setMnemonic(mnemonic);
-		        }
-		    } else if (comp instanceof Container) {
-		    	//Llamada recursiva
-		    	setButtonMnemonics((Container)comp, key, mnemonic);
-		    }
-	    }//for
-	  }
-	
-	/**
-	 * Asigna el mnem�nico indicado a la etiqueta identificada por la clave .
-	 * @param c contenedor global
-	 * @param key clave del componente al que se le va a asignar el mnem&oacute;nico.
-	 * @param mnemonic mnem&oacute;nico que se va a asignar al componente
-	 */
-	public void setLabelMnemonics( Container c, String key, int mnemonic ) {
-		 //Numero de componentes del contenedor
-	    int len = c.getComponentCount();
-	    //Se recorren los elementos que forman el contenedor
-	    for (int i = 0; i < len; i++) {
-	      Component comp = c.getComponent(i);  //Se obtiene un componente
-	      //Se comprueba si es de tipo etiqueta
-	      if (comp instanceof JLabel) {
-	        JLabel label = (JLabel)comp;
-	        //Se comprueba si su texto es el indicado por la clave
-	        if (label.getText() ==  UIManager.get(key)) {
-	        	//Se le asigna el mnem�nico
-	        	label.setDisplayedMnemonic(mnemonic);
-		    }
-	      } else if (comp instanceof Container) {
-	    	  	//Llamada recursiva
-		    	setLabelMnemonics((Container)comp, key, mnemonic);
-		    }
-	    }//for
-	  }
-	
-	/**
-	 * Asigna un mnem&oacute;nico predefinido a ciertos toggleButton contenidos en el componente.
-	 * @param c contenedor global
-	 */
-	public void setToggleButtonMnemonics( Container c) {
-		 //Numero de componentes del contenedor
-	    int len = c.getComponentCount();
-	  //Se recorren los elementos que forman el contenedor
-	    for (int i = 0; i < len; i++) {
-	      Component comp = c.getComponent(i); //Se obtiene un componente
-	      //Se comprueba si es de tipo JToggleButton
-	      if (comp instanceof JToggleButton) {
-		    	JToggleButton toggleButton = (JToggleButton) comp;
-		    	 //Se almacena su texto asociado
-		    	String text = toggleButton.getText();
-		    	//Se comprueba que no esta vacio
-		    	if (text!=null && !text.equalsIgnoreCase("")) {
-		    		
-		    		//Se tratan los botones segun su texto
-			    	if (text.equalsIgnoreCase("<html><center>Equipo</center></html>")) {
-			    		//Se asigna un mnemonico predefinido
-			    		toggleButton.setMnemonic(KeyEvent.VK_E);
-			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 14) +"<u>"+text.charAt(14)+"</u>"+text.substring(15);
-			    		toggleButton.setText(newText);
-			    		
-			    	} else if (text.equalsIgnoreCase("<html><center>Elementos recientes</center></html>")) {
-			    		//Se asigna un mnemonico predefinido
-			    		toggleButton.setMnemonic(KeyEvent.VK_L);
-			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
-			    		toggleButton.setText(newText);
-			    		
-			    	} else if (text.equalsIgnoreCase("<html><center>Escritorio</center></html>")) {
-			    		//Se asigna un mnemonico predefinido
-			    		toggleButton.setMnemonic(KeyEvent.VK_S);
-			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
-			    		toggleButton.setText(newText);
-			    		
-			    	} else if (text.equalsIgnoreCase("<html><center>Mis documentos</center></html>")) {
-			    		//Se asigna un mnemonico predefinido
-			    		toggleButton.setMnemonic(KeyEvent.VK_I);
-			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 15) +"<u>"+text.charAt(15)+"</u>"+text.substring(16);
-			    		toggleButton.setText(newText);
 
-			    	} else if (text.equalsIgnoreCase("<html><center>Red</center></html>")) {
-			    		//Se asigna un mnemonico predefinido
-			    		toggleButton.setMnemonic(KeyEvent.VK_R);
-			    		//Como el texto del boton contiene codigo HTML se hace lo siguiente para que se muestre el mnemonico al usuario
-			    		String newText = text.substring(0, 14) +"<u>"+text.charAt(14)+"</u>"+text.substring(15);
-			    		toggleButton.setText(newText);
-			    	}
-		    	}
-		    } else if (comp instanceof Container) {
-		    	//Llamada recursiva
-		    	setToggleButtonMnemonics((Container)comp);
-		    }
-	    }//for
-	  }
 	/**
-	 * Define el modo alto contraste para los componentes de la ventana.
-	 * @param c contenedor global
+	 * Crea la ventana de diálogo.
+	 * @param Component parent
 	 */
-	public void setHighContrast(Container c) {
-		 //Numero de componentes del contenedor
-	    int len = c.getComponentCount();
-	    //Se recorren los elementos que forman el contenedor
-	    for (int i = 0; i < len; i++) {
-	      Component comp = c.getComponent(i);  //Se obtiene un componente
-	      //Se comprueba si es de tipo etiqueta
-	      if (comp instanceof JLabel) {
-	        JLabel label = (JLabel)comp;
-	        if (GeneralConfig.isHighContrast()){
-	        	label.setForeground(Color.WHITE);
-	        } else {
-	        	label.setForeground(Color.BLACK);
-	        }
-	      } else if(comp instanceof JToggleButton){
-	    	  JToggleButton toggleButton = (JToggleButton)comp;
-	    	  if (GeneralConfig.isHighContrast()){
-	    		  toggleButton.setForeground(Color.WHITE);
-	    	  } else {
-	    		  toggleButton.setForeground(Color.BLACK);
-	    	  }
-	      } else if (comp instanceof JComboBox){
-	    	  JComboBox comboBox = (JComboBox)comp;
-	    	  if (GeneralConfig.isHighContrast()){
-	    		  comboBox.setBackground(Color.WHITE);
-	    	  } else {
-	    		  comboBox.setBackground(Color.BLACK);  
-	    	  }
-	      } else if (comp instanceof Container) {
-	    	  	//Llamada recursiva
-	    	  setHighContrast((Container)comp);
-		    }
-	    }//for
-	  }
-	
 	@Override
 	protected JDialog createDialog(Component parent) throws HeadlessException {
 		String title = getUI().getDialogTitle(this);
@@ -448,6 +275,7 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
 	/**
 	 * Elimina la barra de accesos a carpetas de windows de la ventana
 	 */
+	@Override
 	public void removeWindowsToolBar(){
 		
 		for (int i=0; i<this.getComponentCount();i++){
@@ -460,31 +288,27 @@ public class JAccessibilityFileChooserToSave extends JFileChooser{
         }
 
 	}
-	
+
 	/**
-	 * Aplica la configuraci&oacute;n de accesibilidad a los componentes del panel
-	 * @param jPanel Panel con los componentes. Puede contener m&aacute;s paneles
+	 * Devuelve el diálogo.
+	 * return diálogo
 	 */
-	public void accessibility(JPanel jPanel){		
-		for (int i=0;i<jPanel.getComponentCount();i++){
-			if (jPanel.getComponent(i) instanceof JPanel){
-				accessibility((JPanel)jPanel.getComponent(i));
-			} else {
-				Utils.remarcar((JComponent)jPanel.getComponent(i));
-				Utils.setFontBold((JComponent)jPanel.getComponent(i));
-				Utils.setContrastColor((JComponent)jPanel.getComponent(i));
-			}
-		}
-	}
-	
+	@Override
 	public JDialog getDialog(){
 		return this.theDialog;
 	}
-	
+
+	/**
+	 * Ajuste de fuentes.
+	 */
+	@Override
 	public final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
 	
+	/**
+	 * Se almacena la posición actual.
+	 */
 	private void resized(){
 		if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.fileActualPositionX = dialog.getX();
