@@ -25,11 +25,14 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import es.gob.afirma.keystores.main.common.KeyStoreConfiguration;
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
+import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.KeyStoreLoader;
 import es.gob.afirma.ui.utils.Messages;
@@ -214,6 +217,10 @@ public class MultifirmaMasiva extends JPanel {
 	 * @param alerta		Checkbox para emitir un pitido al finalizar la operacion
 	 */
 	void firmarActionPerformed(JComboBox comboAlmacen, JCheckBox alerta) {
+		
+		 //Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
+    	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"), JOptionPane.INFORMATION_MESSAGE);
+    	
 		KeyStoreConfiguration kssc = (KeyStoreConfiguration)comboAlmacen.getSelectedItem();
 		
 		// Se muestra el asistente
