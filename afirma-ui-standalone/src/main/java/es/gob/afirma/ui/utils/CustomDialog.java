@@ -689,7 +689,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.insets = new Insets(0,0,0,10);  //right padding
         
         //campo de texto del diálogo
-        customDialog.component = new JComboBox(selectionValues);
+        customDialog.component = new JComboBox(selectionValues.clone());
         customDialog.component.addAncestorListener(new RequestFocusListener());
         if (initialSelectionValue != null) {
         	((JComboBox)customDialog.component).setSelectedItem(initialSelectionValue);

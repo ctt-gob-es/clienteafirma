@@ -78,7 +78,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         private String[] exts; 
         
         ExtensionsFileFilter(String[] extensions) {
-            this.exts = extensions;
+            this.exts = extensions.clone();
         }
         
         @Override

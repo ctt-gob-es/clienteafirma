@@ -117,7 +117,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	 */
 	public Boolean cargarDatos(String signPath, byte[] sign) {
 		this.rutaFichero = signPath;
-		this.signData = sign;
+		this.signData = sign.clone();
 
 		// Generamos el modelo del arbol a partir del fichero
 		FileInputStream fis = null;

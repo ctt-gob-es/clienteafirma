@@ -24,7 +24,7 @@ final class ShowFileLinkAction {
 
     ShowFileLinkAction(final String text, final byte[] data) {
         this.text = text;
-        this.data = data;
+        this.data = data.clone();
     }
 
     void action() {
