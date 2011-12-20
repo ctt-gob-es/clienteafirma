@@ -360,6 +360,9 @@ public class Desensobrado extends JPanel {
     		campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
     	}
     	else {
+    		//Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
+        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado"), JOptionPane.INFORMATION_MESSAGE);
+        	
     		byte[] envelopData = null;
     		try{
     			File file = new File(envelopPath);

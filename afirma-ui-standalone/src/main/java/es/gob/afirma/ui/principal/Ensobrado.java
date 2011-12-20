@@ -318,6 +318,9 @@ public class Ensobrado extends JPanel {
     		campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
     	}
         else {
+        	//Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
+        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"), JOptionPane.INFORMATION_MESSAGE);
+        	
         	if (checkAnadir.isSelected()) 
         		// Se muestra el asistente de anadir nuevos remitentes
         		new AsistenteRemitentes(campoFichero.getText());
