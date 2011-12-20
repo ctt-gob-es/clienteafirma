@@ -1,8 +1,6 @@
 package es.gob.afirma.ui.utils;
 
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -11,7 +9,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
-import es.gob.afirma.core.misc.Platform;
 
 
 /**
@@ -20,15 +17,29 @@ import es.gob.afirma.core.misc.Platform;
  *
  */
 public abstract class JAccessibilityCustomDialog extends JDialog {
-	
+	/**
+	 * uid.
+	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Posicion X actual.
+	 */
 	protected static int actualPositionX = -1;
 	
+	/**
+	 * Posicion Y actual.
+	 */
 	protected static int actualPositionY = -1;
 	
+	/**
+	 * Ancho actual.
+	 */
 	protected static int actualWidth = -1;
 	
+	/**
+	 * Alto actual.
+	 */
 	protected static int actualHeight = -1;
 
 	/**
@@ -191,7 +202,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 * @param container Contenedor donde se encuentra el componente a buscar
 	 * @return
 	 */
-	private Component getComponentByName(String name, Container container){
+	/*private Component getComponentByName(String name, Container container){
 		if(name.equals(container.getName())){
 			return container;
 		}
@@ -212,7 +223,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 			}
 		}
 		return null;
-	}
+	}*/
 	
 	
 	/**

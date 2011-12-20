@@ -75,12 +75,18 @@ public class AccessibilityOptionsPane {
 	private JCheckBox checkCursorSize;	
 	
 	private boolean isBigStyle = false;
-	
+
+	/**
+	 * Control de estilo grande.
+	 */
 	public static boolean continueBigStyle = false;
 	
 	/** Pantalla principal de la aplicaci&oacute;n. */
     private PrincipalGUI mainGui;
     
+    /**
+     * Boton aplicar cambios.
+     */
     public JButton aplicar = new JButton();
     
     private boolean isChangeHighContrast = false;
@@ -90,14 +96,21 @@ public class AccessibilityOptionsPane {
 	 */
 	private JDialog parent = null;
 
-	
+	/**
+	 * Constructor.
+	 * @param parent componente padre
+	 * @param mainGui principalGUI
+	 */
 	public AccessibilityOptionsPane(JDialog parent, PrincipalGUI mainGui){
 		this.parent = parent;
 		this.panel = new JPanel(new GridBagLayout());
 		this.mainGui = mainGui;
 		initComponents();
 	}
-	
+
+	/**
+	 * Inicialización de componentes.
+	 */
 	private void initComponents(){
 		this.panel.removeAll();
 		GridBagConstraints c = new GridBagConstraints();
@@ -382,7 +395,11 @@ public class AccessibilityOptionsPane {
         HelpUtils.enableHelpKey(valores, "accesibilidad.defecto");
         HelpUtils.enableHelpKey(aplicar, "accesibilidad.aplicar");
 	}
-	
+
+	/**
+	 * Devuelve el panel de configuraciones.
+	 * @return panel de configuraciones.
+	 */
 	public JPanel getConfigurationPanel() {
 		return this.panel;
 	}

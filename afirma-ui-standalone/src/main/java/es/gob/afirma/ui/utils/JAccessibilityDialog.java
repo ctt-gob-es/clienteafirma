@@ -22,16 +22,34 @@ import es.gob.afirma.core.misc.Platform;
  */
 public abstract class JAccessibilityDialog extends JDialog {
 	
+	/**
+	 * uid.
+	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Posicion X actual.
+	 */
 	protected static int actualPositionX = -1;
 	
+	/**
+	 * Posicion Y actual.
+	 */
 	protected static int actualPositionY = -1;
 	
+	/**
+	 * Ancho actual.
+	 */
 	protected static int actualWidth = -1;
 	
+	/**
+	 * Alto actual.
+	 */
 	protected static int actualHeight = -1;
 	
+	/**
+	 * Componente de redimensionado.
+	 */
 	private ResizingAdaptor resizingAdaptor;
 	
 	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
@@ -168,7 +186,10 @@ public abstract class JAccessibilityDialog extends JDialog {
     private ImageIcon loadIcon(final String filename) {
         return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
     }
-    
+   
+    /**
+     * Ajuste de fuentes.
+     */
     public final void callResize(){
     	this.resizingAdaptor.adjustWindowFonts();
 	}

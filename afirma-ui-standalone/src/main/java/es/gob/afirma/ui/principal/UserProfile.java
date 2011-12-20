@@ -39,16 +39,27 @@ import es.gob.afirma.ui.utils.JAccessibilityFrameAdvisor;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.ProfileManager;
 
+/**
+ * Ventana de selección de perfiles.
+ * @author inteco
+ *
+ */
 public class UserProfile extends JAccessibilityFrameAdvisor {
 
 	private static final long serialVersionUID = 1L;	
-	
+
+	/**
+	 * Devuelve la relación mínima para el redimensionado de elementos.
+	 */
 	@Override
 	public int getMinimumRelation() {
 		// TODO Auto-generated method stub
 		return 9;
 	}
-    
+   
+	/**
+	 * Perfil actual.
+	 */
     public static String currentProfileId;
         
     JComboBox comboPerfiles = new JComboBox();
@@ -75,7 +86,10 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 			return (screenSize.height - 320) / 2;
 		}
 	}
-	
+
+	/**
+	 * Constructor.
+	 */
 	public UserProfile() {
 		super();
 		initComponents();
@@ -163,7 +177,11 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
        
 		
 	}
-	
+
+	/**
+	 * Método que genera el panel de botones.
+	 * @return panel de botones.
+	 */
 	private Component createButtonsPanel() {
     	// Panel inferior
         JPanel bottomPanel = new JPanel(new GridBagLayout());
@@ -234,7 +252,10 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 			}
 		});	
 	}
-    
+   
+	/**
+	 * Acción aceptar.
+	 */
     private void aceptarPerformed(){
     	
     	final String profileName = this.comboPerfiles.getSelectedItem().toString();

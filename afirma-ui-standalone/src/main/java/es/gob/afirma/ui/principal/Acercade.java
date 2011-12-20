@@ -43,6 +43,9 @@ public class Acercade extends JAccessibilityFrameAbout {
 
 	private static final long serialVersionUID = 1L;	
 
+	/**
+	 * Relación mínima para el redimensionado de elementos.
+	 */
 	@Override
 	public int getMinimumRelation() {
 		return 9;
@@ -72,7 +75,10 @@ public class Acercade extends JAccessibilityFrameAbout {
 		}
 		return (screenSize.height - 320) / 2;
 	}
-	
+
+	/**
+	 * Constructor.
+	 */
 	public Acercade() {
 		initComponents();
 	}
@@ -186,6 +192,10 @@ public class Acercade extends JAccessibilityFrameAbout {
 		dispose();
 	}
 
+	/**
+	 * Devuelve la version.
+	 * @return version.
+	 */
 	public String getVersion() {
 
 		Properties p = new Properties();
@@ -206,7 +216,10 @@ public class Acercade extends JAccessibilityFrameAbout {
 		}
 		return version.toString();
 	}
-	
+
+	/**
+	 * Muestra el componente AcercaDe.
+	 */
 	public static void main() {
 		EventQueue.invokeLater(new Runnable() {
 			@Override

@@ -22,14 +22,29 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  */
 public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	
+	/**
+	 * uid.
+	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Posicion X actual.
+	 */
 	public static int actualPositionX = -1;
 	
+	/**
+	 * Posicion Y actual.
+	 */
 	public static int actualPositionY = -1;
 	
+	/**
+	 * Ancho actual.
+	 */
 	public static int actualWidth = -1;
 	
+	/**
+	 * Alto actual.
+	 */
 	public static int actualHeight = -1;
 	
 	/**
@@ -42,6 +57,9 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 */
 	private BotoneraSuperior botoneraSuperior = null;
 	
+	/**
+	 * Constructor.
+	 */
 	public JAccessibilityDialogWizard(){
 		super();
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,this,null,null,null,null,null);
@@ -136,7 +154,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 * Obtiene un componente de un contenedor a traves de su nombre
 	 * @param name Nombre del componente a buscar
 	 * @param container Contenedor donde se encuentra el componente a buscar
-	 * @return
+	 * @return componente
 	 */
 	private Component getComponentByName(String name, Container container){
 		if(name.equals(container.getName())){
@@ -161,11 +179,12 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		return null;
 	}
 	
-	@Override
+	
 	/**
 	 * Evento de redimensionado. Comprueba el tama&ntilde;o de la ventana para habilitar o deshabilitar el bot&oacute;n
 	 *  de Maximizar ventana
 	 */
+	@Override
 	public void componentResized(ComponentEvent e) {
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
