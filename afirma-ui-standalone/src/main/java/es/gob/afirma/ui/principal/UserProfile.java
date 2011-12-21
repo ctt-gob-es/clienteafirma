@@ -204,7 +204,9 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		aceptar.setText("Aceptar");
 		aceptar.setMnemonic(KeyEvent.VK_A);
 		aceptar.addActionListener(new ActionListener() {
-			
+			/**
+			 * Accion del boton aceptar.
+			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				aceptarPerformed();
@@ -253,6 +255,9 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	 */
 	public void main() {	
 		EventQueue.invokeLater(new Runnable() {
+			/**
+			 * Se muestra.
+			 */
 			public void run() {
 				setVisible(true);
 			}
@@ -263,7 +268,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	 * Acción aceptar.
 	 */
     private void aceptarPerformed(){
-    	
+  
     	final String profileName = this.comboPerfiles.getSelectedItem().toString();
     	
     	// Establecemos como ultimo perfil cargado: el por defecto si se selecciono el primer
@@ -304,9 +309,15 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
     	if (component instanceof JLabel){
 			final JLabel label = (JLabel) component;
 			label.addFocusListener(new FocusListener() {
+				/**
+				 * Evento que se lanza cuando un componente pierde el foco.
+				 */
 				public void focusLost(FocusEvent e) {
 					label.setBorder(BorderFactory.createEmptyBorder());
 				}
+				/**
+				 * Evento que se lanza cuando un componente tiene el foco.
+				 */
 				public void focusGained(FocusEvent e) {
 					label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
@@ -316,9 +327,15 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
     	if (component instanceof JComboBox){
 			final JComboBox combo = (JComboBox) component;
 			combo.addFocusListener(new FocusListener() {
+				/**
+				 * Evento que se lanza cuando un componente pierde el foco.
+				 */
 				public void focusLost(FocusEvent e) {
 					combo.setBorder(BorderFactory.createEmptyBorder());
 				}
+				/**
+				 * Evento que se lanza cuando un componente tiene el foco.
+				 */
 				public void focusGained(FocusEvent e) {
 					combo.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
@@ -327,9 +344,15 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
     	if (component instanceof JButton){
 			final JButton button = (JButton) component;
 			button.addFocusListener(new FocusListener() {
+				/**
+				 * Evento que se lanza cuando un componente pierde el foco.
+				 */
 				public void focusLost(FocusEvent e) {
 					((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
-				}		
+				}
+				/**
+				 * Evento que se lanza cuando un componente tiene el foco.
+				 */
 				public void focusGained(FocusEvent e) {
 					((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}

@@ -32,16 +32,20 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
  *
- * Panel explicativo de finalizaci�n
+ * Panel explicativo de finalizacion.
  */
 public class PanelFinalizar extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Constructor.
+	 */
 	public PanelFinalizar() {
         initComponents();
     }
-	
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 8;

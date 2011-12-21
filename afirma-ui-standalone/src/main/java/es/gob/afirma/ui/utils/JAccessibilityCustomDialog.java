@@ -65,10 +65,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
+			/**
+			 * Evento que se lanza cuando el componente se redimensiona.
+			 */
 		    public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
+		    /**
+			 * Evento que se lanza cuando el componente se mueve.
+			 */
 		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
@@ -86,10 +92,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
+			/**
+			 * Evento que se lanza cuando el componente se redimensiona.
+			 */
 		    public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
+		    /**
+			 * Evento que se lanza cuando el componente se mueve.
+			 */
 		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
@@ -107,10 +119,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 		ResizingAdaptor adaptador = new ResizingAdaptor(null,null,null,null,null,null,this,null);
 		this.addComponentListener(adaptador);
 		this.addComponentListener(new ComponentAdapter() {
+			/**
+			 * Evento que se lanza cuando el componente se redimensiona.
+			 */
 		    public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
+		    /**
+			 * Evento que se lanza cuando el componente se mueve.
+			 */
 		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);

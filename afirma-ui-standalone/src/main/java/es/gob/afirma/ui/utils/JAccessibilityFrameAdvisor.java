@@ -13,22 +13,38 @@ import javax.swing.JFrame;
  *
  */
 public abstract class JAccessibilityFrameAdvisor extends JFrame {
-
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-	
+	/**
+	 * Posicion actual de la ventana en el eje X.
+	 */
 	protected static int actualPositionX = -1;
-	
+	/**
+	 * Posicion actual de la ventana en el eje Y.
+	 */
 	protected static int actualPositionY = -1;
-	
+	/**
+	 * Ancho actual de la ventana.
+	 */
 	protected static int actualWidth = -1;
-	
+	/**
+	 * Alto actual de la ventana.
+	 */
 	protected static int actualHeight = -1;
 	
 	/** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
     private static final String ICON_DIR_PATH = "/resources/images/";
 	
+    /**
+     * Adaptador de redimensionado.,
+     */
 	private ResizingAdaptor resizingAdaptor;
 	
+	/**
+	 * Constructor.
+	 */
 	public JAccessibilityFrameAdvisor(){
 		super();
 		// Icono de @firma
@@ -44,6 +60,9 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	 */
 	public abstract int getMinimumRelation();
 	
+	/**
+	 * Ajuste de fuentes.
+	 */
 	public final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}

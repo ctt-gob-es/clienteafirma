@@ -42,13 +42,25 @@ import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
+/**
+ * Panel de entrada para el wizard de multifima masiva.
+ * @author inteco
+ *
+ */
 class PanelEntrada extends JAccessibilityDialogWizard {
-
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
 
-	// Indica si el asistente se ha saltado la pagina anterior
+	/**
+	 * Indica si el asistente se ha saltado la pagina anterior.
+	 */
 	private Boolean salto = false;
 	
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -70,20 +82,28 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		this.setBotonera(new Botonera(ventanas, 3));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
-	
+	/**
+	 * Constructor.
+	 */
     PanelEntrada() {
         initComponents();
     }
     
-    // Caja de texto donde se guarda el directorio
+    /**
+     * Caja de texto donde se guarda el directorio.
+     */
     private JTextField campoDirectorio = new JTextField();
-    // Caja de texto para escribir las extensiones
+    /**
+     * Caja de texto para escribir las extensiones.
+     */
     private JTextField campoExtensiones = new JTextField();
-    // Checkbox con el texto "Incluir subdirectorios..."
+    /**
+     * Checkbox con el texto "Incluir subdirectorios...".
+     */
     private JCheckBox checkIncluir = new JCheckBox();
     
     /**
-     * Inicializacion de componentes
+     * Inicializacion de componentes.
      */
     private void initComponents() {
     	// Titulo de la ventana
@@ -152,6 +172,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + examinar.getToolTipText());
         examinar.getAccessibleContext().setAccessibleDescription(examinar.getToolTipText());
         examinar.addActionListener(new ActionListener() {
+        	/**
+        	 * Accion del boton examinar.
+        	 */
             public void actionPerformed(ActionEvent evt) {
                 examinarActionPerformed();
             }
@@ -245,13 +268,21 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	 * Botonera con funciones para la pagina panel de multifirma - cofirma
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
@@ -272,7 +303,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
 			}
 		}
-		
+		/**
+		 * Accion para el boton anterior.
+		 */
 		@Override
 		protected void anteriorActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {

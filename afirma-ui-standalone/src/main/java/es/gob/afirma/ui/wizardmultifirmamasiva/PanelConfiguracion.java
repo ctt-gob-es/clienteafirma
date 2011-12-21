@@ -33,11 +33,19 @@ import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-
+/**
+ * Panel de configuracion para el wizard de multifirma masiva.
+ * @author inteco
+ *
+ */
 class PanelConfiguracion extends JAccessibilityDialogWizard {
-	
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-	
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -60,18 +68,28 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 		this.setBotonera(new Botonera(ventanas, 2));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
-	
+	/**
+	 * Constructor.
+	 */
     PanelConfiguracion() {
         initComponents();      
     }
 
-    //Etiqueta con el texto "Para realizar el proceso..."
+    /**
+     * Etiqueta con el texto "Para realizar el proceso...".
+     */
     private InfoLabel labelTextoRealizar = new InfoLabel(Messages.getString("Wizard.multifirma.ventana2.explicacion2"), false);
-    // Checkbox con texto "Respetar el formato..."
+    /**
+     * Checkbox con texto "Respetar el formato...".
+     */
 	private JCheckBox checkRespectar = new JCheckBox();
-	// Panel que engloba los radiobuttons
+	/**
+	 * Panel que engloba los radiobuttons.
+	 */
 	private JPanel panelRadios = new JPanel();
-    // Radio buton "Contrafirmar unicamente"
+    /**
+     * Radio buton "Contrafirmar unicamente".
+     */
 	private JRadioButton radioUltimos = new JRadioButton();
     
     
@@ -197,13 +215,21 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 	 * Botonera con funciones para la pagina panel de multifirma - cofirma
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {

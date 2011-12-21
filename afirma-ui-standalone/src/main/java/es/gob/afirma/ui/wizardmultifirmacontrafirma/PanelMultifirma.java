@@ -179,11 +179,15 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			private static final long serialVersionUID = 1L;
 			
 			String[] strings = signers;
-
+			/**
+			 * Devuelve el tamaño.
+			 */
 			public int getSize() { 
 				return this.strings.length; 
 			}
-
+			/**
+			 * Devuelve el elemento contenido en la posicion indicada.
+			 */
 			public Object getElementAt(int i) { 
 				return this.strings[i]; 
 			}
@@ -267,6 +271,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		c.fill = GridBagConstraints.BOTH;
 		
 		this.comboFirmas.addItemListener(new ItemListener() {
+			/**
+			 * Evento que se lanza cuando el componente cambia de estado.
+			 */
 			public void itemStateChanged(ItemEvent evt) {
 				comboOpcionesItemStateChanged(etiqueta, panelArbol, panelLista);
 			}
@@ -330,9 +337,15 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		this.arbolFirmas.setRowHeight(25);
 		this.arbolFirmas.setCellRenderer(renderer);
 		this.arbolFirmas.addTreeExpansionListener(new TreeExpansionListener() {
+			/**
+			 * Evento que se lanza cuando la rama se contrae.
+			 */
 			public void treeCollapsed(TreeExpansionEvent event) {
 				((JTree)event.getSource()).expandPath(event.getPath());
 			}
+			/**
+			 * Evento que se lanza cuando la rama se expande.
+			 */
 			public void treeExpanded(TreeExpansionEvent event) {}
 		}); 
 		this.arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
@@ -406,13 +419,21 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	 * Botonera con funciones para la pagina panel de multifirma - cofirma
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {

@@ -268,12 +268,16 @@ public class HelpUtils {
 		final JLabel tipText = new JLabel();
 		
 		botonAyuda.addFocusListener(new FocusListener() {
-			
+			/**
+			 * Evento que se lanza cuando un componente pierde el foco.
+			 */
 			@Override
 			public void focusLost(FocusEvent e) {
 				Utils.showToolTip(false, tip, botonAyuda, tipText);
 			}
-			
+			/**
+			 * Evento que se lanza cuando un componente tiene el foco.
+			 */
 			@Override
 			public void focusGained(FocusEvent e) {
 				Utils.showToolTip(true, tip, botonAyuda, tipText);
@@ -283,10 +287,16 @@ public class HelpUtils {
 		//Foco para el modo alto contraste
 		if (GeneralConfig.isHighContrast()) {
 			botonAyuda.addFocusListener(new FocusListener() {
+				/**
+				 * Evento que se lanza cuando un componente pierde el foco.
+				 */
 				public void focusLost(FocusEvent e) {
 					//Se quita el borde del botón al perder el foco
 					botonAyuda.setBorder(BorderFactory.createEmptyBorder());
 				}
+				/**
+				 * Evento que se lanza cuando un componente tiene el foco.
+				 */
 				public void focusGained(FocusEvent e) {
 					//Se muestra un borde en el botón cuando este tiene el foco
 					botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));

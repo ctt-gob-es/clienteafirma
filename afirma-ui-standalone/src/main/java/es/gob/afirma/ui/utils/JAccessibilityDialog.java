@@ -66,10 +66,16 @@ public abstract class JAccessibilityDialog extends JDialog {
 		resizingAdaptor = new ResizingAdaptor(null,this,null,null,null,null,null,null);
 		this.addComponentListener(resizingAdaptor);
 		this.addComponentListener(new ComponentAdapter() {
+			/**
+			 * Evento que se lanza cuando se redimensiona el componente.
+			 */
 		    public void componentResized(ComponentEvent e)
 		    {
 		    	resized(e);
 		    }
+		    /**
+			 * Evento que se lanza cuando se mueve el componente.
+			 */
 		    public void componentMoved(ComponentEvent e)
 		    {
 		    	resized(e);
