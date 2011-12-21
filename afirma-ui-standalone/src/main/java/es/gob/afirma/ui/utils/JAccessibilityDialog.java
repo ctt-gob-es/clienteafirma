@@ -30,22 +30,22 @@ public abstract class JAccessibilityDialog extends JDialog {
 	/**
 	 * Posicion X actual.
 	 */
-	protected static int actualPositionX = -1;
+	private static int actualPositionX = -1;
 	
 	/**
 	 * Posicion Y actual.
 	 */
-	protected static int actualPositionY = -1;
+	private static int actualPositionY = -1;
 	
 	/**
 	 * Ancho actual.
 	 */
-	protected static int actualWidth = -1;
+	private static int actualWidth = -1;
 	
 	/**
 	 * Alto actual.
 	 */
-	protected static int actualHeight = -1;
+	private static int actualHeight = -1;
 	
 	/**
 	 * Componente de redimensionado.
@@ -198,5 +198,58 @@ public abstract class JAccessibilityDialog extends JDialog {
      */
     public final void callResize(){
     	this.resizingAdaptor.adjustWindowFonts();
+	}
+    
+    /**
+     * Getter para la variable ActualPositionX.
+     * @return ActualPositionX
+     */
+	public static int getActualPositionX() {
+		return actualPositionX;
+	}
+	/**
+     * Setter para la variable ActualPositionX.
+     */
+	public static void setActualPositionX(int actualPositionX) {
+		JAccessibilityDialog.actualPositionX = actualPositionX;
+	}
+	/**
+     * Getter para la variable ActualPositionY.
+     * @return ActualPositionY
+     */
+	public static int getActualPositionY() {
+		return actualPositionY;
+	}
+	/**
+     * Setter para la variable ActualPositionY.
+     */
+	public static void setActualPositionY(int actualPositionY) {
+		JAccessibilityDialog.actualPositionY = actualPositionY;
+	}
+	/**
+     * Getter para la variable ActualWidth.
+     * @return ActualWidth
+     */
+	public static int getActualWidth() {
+		return actualWidth;
+	}
+	/**
+     * Setter para la variable ActualWidth.
+     */
+	public static void setActualWidth(int actualWidth) {
+		JAccessibilityDialog.actualWidth = actualWidth;
+	}
+	/**
+     * Getter para la variable ActualHeight.
+     * @return ActualHeight
+     */
+	public static int getActualHeight() {
+		return actualHeight;
+	}
+	/**
+     * Setter para la variable ActualHeight.
+     */
+	public static void setActualHeight(int actualHeight) {
+		JAccessibilityDialog.actualHeight = actualHeight;
 	}
 }

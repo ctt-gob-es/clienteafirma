@@ -655,10 +655,10 @@ class Opciones extends JAccessibilityDialog {
 	 * Cambia el tama&ntilde;o de la ventana al tama&ntilde;o m&aacute;ximo de pantalla menos el tama&ntilde;o de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
-		actualPositionX = this.getX();
-		actualPositionY = this.getY();
-		actualWidth = this.getWidth();
-		actualHeight = this.getHeight();
+		setActualPositionX(this.getX());
+		setActualPositionY(this.getY());
+		setActualWidth(this.getWidth());
+		setActualHeight(this.getHeight());
 		
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -685,8 +685,8 @@ class Opciones extends JAccessibilityDialog {
 	 */
 	public void restaurarActionPerformed(){
 		
-		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-			this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
+		if (getActualPositionX() != -1 && getActualPositionY() != -1 && getActualWidth() != -1 && getActualHeight() != -1){
+			this.setBounds(getActualPositionX(), getActualPositionY(), getActualWidth(), getActualHeight());
 		} else {
 			if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			if (Platform.getOS().equals(Platform.OS.LINUX)){
