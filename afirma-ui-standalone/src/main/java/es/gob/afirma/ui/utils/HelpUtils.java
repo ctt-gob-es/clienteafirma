@@ -75,15 +75,15 @@ public class HelpUtils {
 	/**
 	 * Controlador de ayuda.
 	 */
-	private static HelpBroker helpBroker = null;
+	static HelpBroker helpBroker = null;
 	/**
-	 * Conjunto de información de ayuda.
+	 * Conjunto de informacion de ayuda.
 	 */
 	private static HelpSet helpset = null;
 	/**
-	 * Variable que almacena el icono original del botón de ayuda.
+	 * Variable que almacena el icono original del boton de ayuda.
 	 */
-	public static final ImageIcon IMAGEICONHELP = new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png"));
+	public static final ImageIcon IMAGEICONHELP = new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png")); //$NON-NLS-1$
  
 	/**
 	 * Devuelve la ayuda.
@@ -102,11 +102,11 @@ public class HelpUtils {
 		if (helpBroker == null) {
 			try {
 				// Cargamos el archivo de datos de la ayuda
-				URL hsURL = HelpBroker.class.getResource("/help/help_set-es_ES.hs");
+				URL hsURL = HelpBroker.class.getResource("/help/help_set-es_ES.hs"); //$NON-NLS-1$
 				
 				// Creamos la ventana de ayuda
-				HelpSet helpset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
-				helpBroker = helpset.createHelpBroker();
+				HelpSet helpset1 = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
+				helpBroker = helpset1.createHelpBroker();
 				
 				helpBroker.initPresentation();
 				WindowPresentation wp = ((DefaultHelpBroker)helpBroker).getWindowPresentation();
@@ -116,7 +116,7 @@ public class HelpUtils {
 				helpwindow.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 				
 				// Introducimos el icono en la ventana
-				Image icon = Toolkit.getDefaultToolkit().createImage(HelpUtils.class.getClassLoader().getResource("resources/images/afirma_ico.png"));
+				Image icon = Toolkit.getDefaultToolkit().createImage(HelpUtils.class.getClassLoader().getResource("resources/images/afirma_ico.png")); //$NON-NLS-1$
 				helpwindow.setIconImage(icon);	
 							
 				
@@ -139,7 +139,7 @@ public class HelpUtils {
 	public static void change(String language) {
 		try {
 			// Carga el nuevo archivos de datos para ese idioma
-			URL hsURL = HelpBroker.class.getResource("/help/help_set-" + language + ".hs");
+			URL hsURL = HelpBroker.class.getResource("/help/help_set-" + language + ".hs"); //$NON-NLS-1$ //$NON-NLS-2$
 			helpset = new HelpSet(HelpBroker.class.getClassLoader(), hsURL);
 			helpBroker = helpset.createHelpBroker();
 			Enumeration<String> enumeration = components.keys();
@@ -175,7 +175,7 @@ public class HelpUtils {
 		}
 		//Alto contraste
 		WindowPresentation wp = ((DefaultHelpBroker)getHelp()).getWindowPresentation();
-		Window helpwindow = (Window) wp.getHelpWindow();
+		Window helpwindow = wp.getHelpWindow();
 		if (Main.isOSHighContrast || GeneralConfig.isHighContrast()){
 			checkHelpAccessibility(helpwindow, true);
 		} else {
@@ -202,7 +202,7 @@ public class HelpUtils {
 		
 		//Alto contraste
 		WindowPresentation wp = ((DefaultHelpBroker)getHelp()).getWindowPresentation();
-		Window helpwindow = (Window) wp.getHelpWindow();
+		Window helpwindow = wp.getHelpWindow();
 		if (Main.isOSHighContrast || GeneralConfig.isHighContrast()){
 			checkHelpAccessibility(helpwindow, true);
 		} else {
@@ -218,7 +218,7 @@ public class HelpUtils {
 		
 		getHelp().setDisplayed(show);
 				
-		getHelp().setCurrentID("introduccion");
+		getHelp().setCurrentID("introduccion"); //$NON-NLS-1$
 		if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
 			helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
 			helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
@@ -232,7 +232,7 @@ public class HelpUtils {
 		
 		//Alto contraste
 		WindowPresentation wp = ((DefaultHelpBroker)getHelp()).getWindowPresentation();
-		Window helpwindow = (Window) wp.getHelpWindow();
+		Window helpwindow = wp.getHelpWindow();
 		if (Main.isOSHighContrast || GeneralConfig.isHighContrast()){
 			checkHelpAccessibility(helpwindow, true);
 		} else {
@@ -248,11 +248,11 @@ public class HelpUtils {
 	public static JButton helpButton(final String pagina) {
 
 		final JButton botonAyuda = new JButton(IMAGEICONHELP);
-		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido"));
+		botonAyuda.setToolTipText(Messages.getString("ayudaHTML.contenido")); //$NON-NLS-1$
 		botonAyuda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		if (!pagina.equals("perfiles.usuario")){
-			botonAyuda.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido")));
-			botonAyuda.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido")));
+		if (!pagina.equals("perfiles.usuario")){ //$NON-NLS-1$
+			botonAyuda.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido"))); //$NON-NLS-1$
+			botonAyuda.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("ayudaHTML.contenido"))); //$NON-NLS-1$
 		}
 		botonAyuda.setMnemonic(KeyEvent.VK_H); //Se le asigna un mnemonico al boton de ayuda
 		botonAyuda.getAccessibleContext().setAccessibleName(botonAyuda.getToolTipText());
@@ -290,15 +290,17 @@ public class HelpUtils {
 				/**
 				 * Evento que se lanza cuando un componente pierde el foco.
 				 */
-				public void focusLost(FocusEvent e) {
-					//Se quita el borde del botón al perder el foco
+				@Override
+                public void focusLost(FocusEvent e) {
+					//Se quita el borde del boton al perder el foco
 					botonAyuda.setBorder(BorderFactory.createEmptyBorder());
 				}
 				/**
 				 * Evento que se lanza cuando un componente tiene el foco.
 				 */
-				public void focusGained(FocusEvent e) {
-					//Se muestra un borde en el botón cuando este tiene el foco
+				@Override
+                public void focusGained(FocusEvent e) {
+					//Se muestra un borde en el boton cuando este tiene el foco
 					botonAyuda.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 1));
 				}
 			});
@@ -309,27 +311,32 @@ public class HelpUtils {
 			/**
 			 * Accion para el boton de ayuda.
 			 */
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				getHelp().setDisplayed(true);
 				getHelp().setCurrentID(pagina);
 				if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
 					helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
 					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, helpBroker.getFont().getSize()));
-				} else if (GeneralConfig.isBigFontSize()){
+				} 
+				else if (GeneralConfig.isBigFontSize()){
 					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 16));	
-				} else if (GeneralConfig.isFontBold()){
+				} 
+				else if (GeneralConfig.isFontBold()){
 					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.BOLD, 11));
-				} else {
+				} 
+				else {
 					helpBroker.setFont(new Font(helpBroker.getFont().getName(), Font.PLAIN, 11));
 				}
 				
 				//Alto contraste
 				WindowPresentation wp = ((DefaultHelpBroker)getHelp()).getWindowPresentation();
-				Window helpwindow = (Window) wp.getHelpWindow();
+				Window helpwindow = wp.getHelpWindow();
 				if (Main.isOSHighContrast || GeneralConfig.isHighContrast()){
 					//helpwindow.setBackground(Color.BLACK);
 					checkHelpAccessibility(helpwindow, true);
-				} else {
+				} 
+				else {
 					//helpwindow.setBackground(Color.WHITE);
 					checkHelpAccessibility(helpwindow, false);
 				}
@@ -376,7 +383,7 @@ public class HelpUtils {
 	        
 	       //Alto contraste
 	        WindowPresentation wp = ((DefaultHelpBroker)getHelp()).getWindowPresentation();
-			Window helpwindow = (Window) wp.getHelpWindow();
+			Window helpwindow = wp.getHelpWindow();
 	        if (Main.isOSHighContrast || GeneralConfig.isHighContrast()){
 				checkHelpAccessibility(helpwindow, true);
 			} else {
@@ -387,19 +394,20 @@ public class HelpUtils {
 
 	/**
 	 * Establece el modo alto contraste para el editorPane que recibe como parámetro.
-	 * @param editorPane panel de edición.
+	 * @param editorPane panel de edicion.
 	 */
-	private static void setHighContrastEditorPane(JEditorPane editorPane, boolean activate){
+	static void setHighContrastEditorPane(JEditorPane editorPane, boolean activate){
 		if (editorPane !=null) {
 			if (editorPane.getDocument() instanceof HTMLDocument){
 				HTMLDocument h = (HTMLDocument)editorPane.getDocument();
 				//Se establece el color de la la letra a blanco
-				editorPane.setContentType("text/html");
+				editorPane.setContentType("text/html"); //$NON-NLS-1$
 				String bodyRule ="";
 				if (activate) {
 					bodyRule = "body { color: \"white\";}";
 					editorPane.setBackground(Color.BLACK);
-				} else {
+				} 
+				else {
 					//h.getStyleSheet().
 					bodyRule = "body { color: \"black\";}";
 					editorPane.setBackground(Color.WHITE);
@@ -424,7 +432,7 @@ public class HelpUtils {
 	 * Chequeo de la accesibilidad para la ventana de ayuda.
 	 * @param frame ventana de ayuda.
 	 */
-	private static void checkHelpAccessibility(Window frame, boolean activate) {
+	static void checkHelpAccessibility(Window frame, boolean activate) {
 		JTabbedPane jtp = new JTabbedPane();
 		if (frame != null) {
 			Component component = null;
@@ -511,9 +519,10 @@ public class HelpUtils {
 													 */
 													private static final long serialVersionUID = 1L;
 													/**
-													 * Obtiene una celda con su configuración de alto contraste aplicada.
+													 * Obtiene una celda con su configuracion de alto contraste aplicada.
 													 */
-													public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
+													@Override
+                                                    public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
 														//DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
 														super.getTreeCellRendererComponent(pTree,pValue,pIsSelected,pIsExpanded,pIsLeaf,pRow,pHasFocus);
 														if (activate){
@@ -535,9 +544,10 @@ public class HelpUtils {
 													 */
 													private static final long serialVersionUID = 1L;
 													/**
-													 * Devuelve la celda tras aplicarle la configuración de accesibilidad para el contraste.
+													 * Devuelve la celda tras aplicarle la configuracion de accesibilidad para el contraste.
 													 */
-													public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
+													@Override
+                                                    public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
  														//DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
  														super.getTreeCellRendererComponent(pTree,pValue,pIsSelected,pIsExpanded,pIsLeaf,pRow,pHasFocus);
  														if(activate){
@@ -579,7 +589,7 @@ public class HelpUtils {
      											}
      											
      											/**
-     											 * Captura de evento de raton. Puntero del ratón fuera del componente.
+     											 * Captura de evento de raton. Puntero del raton fuera del componente.
      											 */
      											@Override
      											public void mouseExited(MouseEvent e) {
@@ -588,7 +598,7 @@ public class HelpUtils {
      											}
      											
      											/**
-     											 * Captura de evento de raton. Puntero del ratón dentro del componente.
+     											 * Captura de evento de raton. Puntero del raton dentro del componente.
      											 */
      											@Override
      											public void mouseEntered(MouseEvent e) {

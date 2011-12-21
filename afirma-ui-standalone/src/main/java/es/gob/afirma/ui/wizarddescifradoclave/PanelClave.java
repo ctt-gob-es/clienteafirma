@@ -274,7 +274,7 @@ public class PanelClave extends JAccessibilityDialogWizard {
 
 		private static final long serialVersionUID = 1L;
 
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 
@@ -282,10 +282,10 @@ public class PanelClave extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 
-			Boolean continuar = true;
+			boolean continuar = true;
 			continuar = descifrarFichero();
 
-			if (continuar.equals(true)) {
+			if (continuar) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
 			} else {
 				//Si ha ocurrido algun error durante el proceso de cifrado mediante clave

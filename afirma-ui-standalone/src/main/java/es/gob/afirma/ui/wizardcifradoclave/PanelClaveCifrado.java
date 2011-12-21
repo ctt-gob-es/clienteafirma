@@ -384,7 +384,7 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
 
 		private static final long serialVersionUID = 1L;
 
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 

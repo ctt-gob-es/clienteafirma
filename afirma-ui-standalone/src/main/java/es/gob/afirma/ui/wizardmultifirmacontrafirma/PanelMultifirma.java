@@ -128,7 +128,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	 * @param sign Firma
 	 * @return	{@code true} si se ha cargado correctamente.
 	 */
-	public Boolean cargarDatos(String signPath, byte[] sign) {
+	public boolean cargarDatos(String signPath, byte[] sign) {
 		this.rutaFichero = signPath;
 		this.signData = sign.clone();
 
@@ -136,7 +136,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		FileInputStream fis = null;
 		javax.swing.tree.DefaultTreeModel modeloArbolSwing;
 		try {
-			AOTreeModel modeloArbol = (AOTreeModel) AOSignerFactory.getSigner(this.signData).getSignersStructure(this.signData, false);
+			AOTreeModel modeloArbol = AOSignerFactory.getSigner(this.signData).getSignersStructure(this.signData, false);
 			modeloArbolSwing = JSEUtils.convertToSwingModel(modeloArbol);
 
 			this.arbolFirmas.setModel(modeloArbolSwing);
@@ -182,13 +182,15 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			/**
 			 * Devuelve el tamaño.
 			 */
-			public int getSize() { 
+			@Override
+            public int getSize() { 
 				return this.strings.length; 
 			}
 			/**
 			 * Devuelve el elemento contenido en la posicion indicada.
 			 */
-			public Object getElementAt(int i) { 
+			@Override
+            public Object getElementAt(int i) { 
 				return this.strings[i]; 
 			}
 		};
@@ -196,7 +198,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		// Asignamos el modelo
 		this.listaFirmantes.setModel(this.modeloLista);
 
-		return Boolean.TRUE;
+		return true;
 	}
 
 	/**
@@ -232,11 +234,11 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	 */
 	private void initComponents() {
 		// Titulo de la ventana
-    	setTitulo(Messages.getString("Wizard.multifirma.simple.contrafirma.titulo"));
+    	setTitulo(Messages.getString("Wizard.multifirma.simple.contrafirma.titulo")); //$NON-NLS-1$
 		
 		// Panel con la cabecera
-		CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana2.titulo", 
-				"Wizard.multifirma.simple.contrafirma.ventana2.titulo.description", null, true);
+		CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana2.titulo",  //$NON-NLS-1$
+				"Wizard.multifirma.simple.contrafirma.ventana2.titulo.description", null, true); //$NON-NLS-1$
 		Utils.setContrastColor(panelSuperior);
 		Utils.setFontBold(panelSuperior);
 		getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -274,7 +276,8 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			/**
 			 * Evento que se lanza cuando el componente cambia de estado.
 			 */
-			public void itemStateChanged(ItemEvent evt) {
+			@Override
+            public void itemStateChanged(ItemEvent evt) {
 				comboOpcionesItemStateChanged(etiqueta, panelArbol, panelLista);
 			}
 		});
@@ -285,7 +288,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				Messages.getString("Wizard.multifirma.simple.contrafirma.ventana2.combo.firmas.opcion4")} //$NON-NLS-1$
 		));
 		
-		this.comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N
+		this.comboFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.comboFirmas.description")); // NOI18N //$NON-NLS-1$
 		this.comboFirmas.getAccessibleContext().setAccessibleName(etiquetaFirmas.getText() + " " +this.comboFirmas.getToolTipText() + "ALT + F.");
 		this.comboFirmas.getAccessibleContext().setAccessibleDescription(this.comboFirmas.getToolTipText());
 		Utils.remarcar(this.comboFirmas);
@@ -340,13 +343,15 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			/**
 			 * Evento que se lanza cuando la rama se contrae.
 			 */
-			public void treeCollapsed(TreeExpansionEvent event) {
+			@Override
+            public void treeCollapsed(TreeExpansionEvent event) {
 				((JTree)event.getSource()).expandPath(event.getPath());
 			}
 			/**
 			 * Evento que se lanza cuando la rama se expande.
 			 */
-			public void treeExpanded(TreeExpansionEvent event) {}
+			@Override
+            public void treeExpanded(TreeExpansionEvent event) {}
 		}); 
 		this.arbolFirmas.setToolTipText(Messages.getString("Wizard.multifirma.simple.contrafirma.arbolFirmas.description")); // NOI18N
 		this.arbolFirmas.getAccessibleContext().setAccessibleName(etiqueta.getText() + " " + this.arbolFirmas.getToolTipText() + "ALT + R.");
@@ -399,7 +404,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	 * @param panelArbol 	Panel del arbol
 	 * @param panelLista	Panel de la lista	
 	 */
-	private void comboOpcionesItemStateChanged(JLabel etiqueta, 
+	void comboOpcionesItemStateChanged(JLabel etiqueta, 
 			JScrollPane panelArbol, JScrollPane panelLista) {
 		// Mostramos el listado para Firmantes seleccionados
 		if (this.comboFirmas.getSelectedIndex() == 1){
@@ -428,7 +433,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		 * @param ventanas Lista de ventanas que componen el wizard.
 		 * @param posicion posicion de la ventana donde se inserta esta botonera.
 		 */
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 		/**
@@ -467,22 +472,22 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			MultisignUtils msUtils = new MultisignUtils();
 			AOKeyStoreManager keyStoreManager = msUtils.getAOKeyStoreManager(this.kssc,this);
 			
-			byte[] signData = readFile(this.rutaFichero);
+			byte[] signData1 = readFile(this.rutaFichero);
 			
 			// Recuperamos la clave del certificado
 			PrivateKeyEntry keyEntry = msUtils.getPrivateKeyEntry(this.kssc, keyStoreManager, this);
-			AOSigner signer = AOSignerFactory.getSigner(signData);
+			AOSigner signer = AOSignerFactory.getSigner(signData1);
 
 			if (signer == null) {
-				throw new AOFormatFileException("El cliente no dispone de ning\u00FAn manejador que soporte\r\nel fichero de firma indicado");
+				throw new AOFormatFileException("El cliente no dispone de ningun manejador que soporte\r\nel fichero de firma indicado"); //$NON-NLS-1$
 			}
-			if (!signer.isSign(signData)) {
-				throw new AOInvalidFormatException("El fichero '" + this.rutaFichero
-						+ "' no es un fichero de firma soportado.");
+			if (!signer.isSign(signData1)) {
+				throw new AOInvalidFormatException("El fichero '" + this.rutaFichero //$NON-NLS-1$
+						+ "' no es un fichero de firma soportado."); //$NON-NLS-1$
 			}
 			
 			// Firmamos
-			signedData = counterSignOperation(signer, signData, keyEntry);
+			signedData = counterSignOperation(signer, signData1, keyEntry);
 
 			if (signedData == null)
 				return false;
@@ -495,13 +500,13 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 				return false;
 			}
 		} catch (AOCancelledOperationException e){
-		    logger.warning("Operacion cancelada por el usuario: " + e);
+		    logger.info("Operacion cancelada por el usuario: " + e); //$NON-NLS-1$
 		    return false;
-		} catch (Exception e){
-		    e.printStackTrace();
+		} 
+		catch (final Exception e){
 			logger.severe(e.toString());
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error"), 
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error"),  //$NON-NLS-1$
+					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
 		}
 		
@@ -511,13 +516,13 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	/**
 	 * Cofirma de un fichero de datos.
 	 * @param signer Manejador de firma.
-	 * @param signData Firma que queremos contrafirmar.
+	 * @param signData1 Firma que queremos contrafirmar.
 	 * @param keyEntry Clave de firma.
 	 * @return Contenido de la firma.
 	 * @throws FileNotFoundException No se encuentra el fichero de datos.
-	 * @throws AOException Ocurrio un error durante el proceso de firma.
+	 * @throws AOException Error durante el proceso de firma.
 	 */
-	private byte[] counterSignOperation(AOSigner signer, byte[] signData, PrivateKeyEntry keyEntry) throws FileNotFoundException, AOException {
+	private byte[] counterSignOperation(AOSigner signer, byte[] signData1, PrivateKeyEntry keyEntry) throws FileNotFoundException, AOException {
 
 		// Realizamos la cofirma
 		byte[] signedData = null;
@@ -528,16 +533,25 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			switch (this.comboFirmas.getSelectedIndex()){
 				// NODOS SELECCIONADOS
 				case 0: {
-					Integer[] nodosSeleccionados = getSelectedSignNodes();
+					int[] nodosSeleccionados = getSelectedSignNodes();
 					if (nodosSeleccionados == null) {
-						CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.lista"), 
-								Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+						CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.lista"),  //$NON-NLS-1$
+								Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 						return null;
 					}
-					else {
-						signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.NODES,
-								nodosSeleccionados, keyEntry, prop);
-					}
+				    final Integer[] nodos = new Integer[nodosSeleccionados.length];
+				    int i = 0;
+				    for (int value : nodosSeleccionados) {
+				        nodos[i++] = Integer.valueOf(value);
+				    }
+					signedData = signer.countersign(
+                        signData1, 
+                        GeneralConfig.getSignAlgorithm(), 
+                        CounterSignTarget.NODES,
+						nodos, 
+						keyEntry, 
+						prop
+					);
 					break;
 				}
 				// FIRMANTES SELECCIONADOS
@@ -549,20 +563,20 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 						return null;
 					}
 					else {
-						signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.SIGNERS,
+						signedData = signer.countersign(signData1, GeneralConfig.getSignAlgorithm(), CounterSignTarget.SIGNERS,
 								nodosSeleccionados, keyEntry, prop);
 					}
 					break;
 				}
 				// EL ARBOL DE FIRMAS
 				case 2:{
-					signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.TREE,
+					signedData = signer.countersign(signData1, GeneralConfig.getSignAlgorithm(), CounterSignTarget.TREE,
 							null, keyEntry, prop);
 					break;
 				}
 				// FIRMA DE HOJAS
 				case 3:{
-					signedData = signer.countersign(signData, GeneralConfig.getSignAlgorithm(), CounterSignTarget.LEAFS,
+					signedData = signer.countersign(signData1, GeneralConfig.getSignAlgorithm(), CounterSignTarget.LEAFS,
 							null, keyEntry, prop);
 					break;
 				}
@@ -573,12 +587,12 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 			e.printStackTrace();
 			return null;
 		} catch (UnsupportedOperationException e) {
-			logger.warning("La firma seleccionada no soporta la operacion de contrafirma: "+e);
+			logger.warning("La firma seleccionada no soporta la operacion de contrafirma: "+e); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.firma.soporte"), 
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return null;
 		} catch (Exception e){
-			logger.warning("Ocurrio un error al contrafirmar el fichero de firma: "+e);
+			logger.warning("Error al contrafirmar el fichero de firma: "+e);
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.contrafirmar"), 
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return null;
@@ -591,19 +605,18 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 	 * Recuperamos el listado de nodos de firma seleccionados.
 	 * @return &Iacute;ndices de los nodos de firma seleccionados.
 	 */
-	private Integer[] getSelectedSignNodes() {
+	private int[] getSelectedSignNodes() {
 		if (this.arbolFirmas.getSelectionRows() != null) {
 			int[] nodesIndexes = this.arbolFirmas.getSelectionRows();
 			// El array de nodos debe ir ordenado para asegurar que se firman los nodos correctos
 			Arrays.sort(nodesIndexes);
-			Integer[] nodesIndexesI = new Integer[nodesIndexes.length];
+			int[] nodesIndexesI = new int[nodesIndexes.length];
 			for (int i=0; i<nodesIndexes.length; i++) {
-				nodesIndexesI[i] = Integer.valueOf(nodesIndexes[i]);
+				nodesIndexesI[i] = nodesIndexes[i];
 			}
 			return nodesIndexesI;
 		}
-		else
-			return null;
+		return null;
 	}
 	
 	/**
@@ -630,20 +643,23 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		try {
 			fileIn = AOUtil.loadFile(AOUtil.createURI(filepath));
 			data = AOUtil.getDataFromInputStream(fileIn);
-		} catch (FileNotFoundException e) {
+		} 
+		catch (FileNotFoundException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"), 
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.encontrar"),  //$NON-NLS-1$
+					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return null;
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"), 
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.simple.error.fichero.leer"),  //$NON-NLS-1$
+					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return null;
 		}
 		catch (AOException e) {
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		} finally {
+		} 
+		finally {
 			if (fileIn != null) {
 				try { fileIn.close(); } catch (Exception e) {}
 			}

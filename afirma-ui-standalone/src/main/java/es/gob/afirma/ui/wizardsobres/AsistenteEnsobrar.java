@@ -25,7 +25,7 @@ public class AsistenteEnsobrar {
 	/**
 	 * Tipo de ensobrado
 	 */
-	private Integer tipo = Integer.valueOf(0);
+	private int tipo = 0;
 	
 	/**
 	 * Ruta del fichero a ensobrar
@@ -37,7 +37,7 @@ public class AsistenteEnsobrar {
 	 * @param rutafichero
 	 * @param tipo
 	 */
-    public AsistenteEnsobrar(String rutafichero, Integer tipo) {
+    public AsistenteEnsobrar(String rutafichero, int tipo) {
         this.rutaFichero = rutafichero;
         this.tipo = tipo;
         initComponents();
@@ -60,7 +60,7 @@ public class AsistenteEnsobrar {
     	ventanas.add(panelDestinatarios);
     	    	
     	// Pagina 3: Panel seleccion remitentes y ensobrado
-    	PanelRemitentes panelRemitentes = new PanelRemitentes(rutaFichero, tipo);
+    	PanelRemitentes panelRemitentes = new PanelRemitentes(this.rutaFichero, this.tipo);
     	ventanas.add(panelRemitentes);
     	
     	// Pagina 4: 

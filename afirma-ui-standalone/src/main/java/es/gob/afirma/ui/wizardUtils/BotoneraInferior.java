@@ -39,8 +39,8 @@ public class BotoneraInferior extends JPanel {
 	
 //	private JButton restaurar = null; 
 //	private JButton maximizar = null;
-	private JButton siguiente = null;
-	private JButton finalizar = null;
+	JButton siguiente = null;
+	JButton finalizar = null;
 	
 	public List<JDialogWizard> getVentanas() {
 		return this.ventanas;
@@ -51,7 +51,7 @@ public class BotoneraInferior extends JPanel {
 	 * @param ventanas	Listado que contiene todas las ventanas en orden de aparicion
 	 * @param posicion	Numero de la pagina
 	 */
-	public BotoneraInferior(List<JDialogWizard> ventanas, Integer posicion) {
+	public BotoneraInferior(List<JDialogWizard> ventanas, int posicion) {
 		this.ventanas = ventanas;
 		this.posicion = posicion;
 		initParamenters();
@@ -119,7 +119,7 @@ public class BotoneraInferior extends JPanel {
 //	    panelRestaurar.add(restaurar);
 //	    //add(panelRestaurar);
 //	    
-//	    //Control de habilitado de los botones de maximizar y restaurar según la configuración de
+//	    //Control de habilitado de los botones de maximizar y restaurar según la configuracion de
 //	    //accesibilidad
 //	    if (GeneralConfig.isMaximized()){
 //        	maximize.setEnabled(false);
@@ -141,7 +141,7 @@ public class BotoneraInferior extends JPanel {
         	 anterior.setMnemonic(KeyEvent.VK_A); //Mnem�nico para el bot�n de anterior
         	anterior.setEnabled(true);
         }
-        anterior.setText(Messages.getString("Wizard.anterior")); // NOI18N
+        anterior.setText(Messages.getString("Wizard.anterior")); // NOI18N //$NON-NLS-1$
 
         anterior.addActionListener(new ActionListener() {
             @Override
@@ -164,7 +164,7 @@ public class BotoneraInferior extends JPanel {
         	this.siguiente.setMnemonic(KeyEvent.VK_S); //Mnem�nico para el bot�n de siguiente
         	this.siguiente.setVisible(true);
         }
-        this.siguiente.setText(Messages.getString("Wizard.siguiente")); // NOI18N
+        this.siguiente.setText(Messages.getString("Wizard.siguiente")); // NOI18N //$NON-NLS-1$
         
         this.siguiente.addActionListener(new ActionListener() {
             @Override
@@ -192,7 +192,7 @@ public class BotoneraInferior extends JPanel {
         	cancelar.setMnemonic(KeyEvent.VK_C); //Mnem�nico para el bot�n de cancelar
         	cancelar.setVisible(true);
         }
-        cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N
+        cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N //$NON-NLS-1$
         cancelar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -216,7 +216,7 @@ public class BotoneraInferior extends JPanel {
         } else 
         	this.finalizar.setVisible(false);
 
-        this.finalizar.setText(Messages.getString("Wizard.finalizar")); // NOI18N
+        this.finalizar.setText(Messages.getString("Wizard.finalizar")); // NOI18N //$NON-NLS-1$
 
         this.finalizar.addActionListener(new ActionListener() {
             @Override
@@ -236,17 +236,17 @@ public class BotoneraInferior extends JPanel {
 
 	/**
 	 * Muestra el dialogo siguiente
-	 * @param finalizar Boton finalizar
-	 * @param siguiente Boton siguiente
+	 * @param finalizar1 Boton finalizar
+	 * @param siguiente1 Boton siguiente
 	 * @param anterior 	Boton anterior
 	 */
-	protected void siguienteActionPerformed(JButton anterior, JButton siguiente, JButton finalizar) {
+	protected void siguienteActionPerformed(JButton anterior, JButton siguiente1, JButton finalizar1) {
 		int indice = this.posicion + 1;
 		
 		// Mantenemos el tamano y posicion de la ventana acutual en la ventana siguiente
 		this.ventanas.get(this.posicion+1).setBounds(this.ventanas.get(this.posicion).getX(), this.ventanas.get(this.posicion).getY(), this.ventanas.get(this.posicion).getWidth(), this.ventanas.get(this.posicion).getHeight());
 		
-		//Se asigna un botón por defecto al wizard
+		//Se asigna un boton por defecto al wizard
 		if (this.ventanas.get(indice) instanceof JAccessibilityDialogWizard) {
 			//Se obtiene el diálogo
 			JAccessibilityDialogWizard wizard = (JAccessibilityDialogWizard)this.ventanas.get(indice);
@@ -262,19 +262,19 @@ public class BotoneraInferior extends JPanel {
 
 	/**
 	 * Muestra el dialogo anterior
-	 * @param finalizar Boton finalizar
-	 * @param siguiente Boton siguiente
+	 * @param finalizar1 Boton finalizar
+	 * @param siguiente1 Boton siguiente
 	 * @param anterior 	Boton anterior
 	 */
-	protected void anteriorActionPerformed(JButton anterior, JButton siguiente, 
-			JButton finalizar) {
+	protected void anteriorActionPerformed(JButton anterior, JButton siguiente1, 
+			JButton finalizar1) {
 		// Nos movemos al indice anterior
 		int indice = this.posicion - 1;
 		
 		// Mantenemos el tamano y posicion de la ventana actual en la ventana anterior
 		this.ventanas.get(this.posicion-1).setBounds(this.ventanas.get(this.posicion).getX(), this.ventanas.get(this.posicion).getY(), this.ventanas.get(this.posicion).getWidth(), this.ventanas.get(this.posicion).getHeight());
 		
-		//Se asigna un botón por defecto al wizard
+		//Se asigna un boton por defecto al wizard
 		if (this.ventanas.get(indice) instanceof JAccessibilityDialogWizard) {
 			this.ventanas.get(indice).getRootPane().setDefaultButton(((JAccessibilityDialogWizard)this.ventanas.get(indice)).getBotonera().getSiguiente());
 		}
@@ -284,9 +284,9 @@ public class BotoneraInferior extends JPanel {
 		
 	}
 	
-	/**
-	 * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
-	 */
+//	/**
+//	 * Cambia el tamano de la ventana al tamano maximo de pantalla menos el tamano de la barra de tareas de windows
+//	 */
 //	public void maximizarActionPerformed(){
 //		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
 //
@@ -309,14 +309,14 @@ public class BotoneraInferior extends JPanel {
 //			j.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
 //		}
 //				
-//		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
+//		//Se deshabilita el boton de maximizar puesto que se ha pulsado.
 ////		this.maximizar.setEnabled(false);
 ////		this.restaurar.setEnabled(true);
 //	}
 	
-	/**
-	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
-	 */
+//	/**
+//	 * Restaura el tamano de la ventana a la posicion anterior al maximizado
+//	 */
 //	public void restaurarActionPerformed(){
 //		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
 //		if (JAccessibilityDialogWizard.actualPositionX != -1 && JAccessibilityDialogWizard.actualPositionY != -1 && JAccessibilityDialogWizard.actualWidth != -1 && JAccessibilityDialogWizard.actualHeight != -1){
@@ -330,16 +330,16 @@ public class BotoneraInferior extends JPanel {
 //			}
 //    		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
 //		}
-//		//Se deshabilita el botón de restaurar puesto que se ha pulsado.
+//		//Se deshabilita el boton de restaurar puesto que se ha pulsado.
 ////		this.maximizar.setEnabled(true);
 ////		this.restaurar.setEnabled(false);
 //	}
 	
 	/**
-	 * Guarda el tamaño y posicion de la ventana antes de cerrarse
+	 * Guarda el tamano y posicion de la ventana antes de cerrarse
 	 */
 	public void saveSizePosition(){
-		// Guardamos la posición y tamaño actual de la ventana sólo en caso de no estar maximizada por configuración
+		// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 			JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
 			PrincipalGUI.wizardActualPositionX = j.getX();

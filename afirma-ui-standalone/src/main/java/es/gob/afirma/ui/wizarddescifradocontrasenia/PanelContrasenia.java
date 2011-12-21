@@ -147,20 +147,20 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		
         // Caja de texto donde se guarda la contrasenia
 		 this.campoContrasenia.setToolTipText(Messages.getString("WizardDescifrado.contrasenia.contrasenia.description")); // NOI18N //$NON-NLS-1$
-		 campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + campoContrasenia.getToolTipText() + "ALT + O.");
-	     campoContrasenia.getAccessibleContext().setAccessibleDescription(campoContrasenia.getToolTipText());
+		 this.campoContrasenia.getAccessibleContext().setAccessibleName(passwordLabel.getText() + " " + this.campoContrasenia.getToolTipText() + "ALT + O.");
+	     this.campoContrasenia.getAccessibleContext().setAccessibleDescription(this.campoContrasenia.getToolTipText());
 	     this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
 	     if (GeneralConfig.isBigCaret()) {
 				Caret caret = new ConfigureCaret();
-				campoContrasenia.setCaret(caret);
+				this.campoContrasenia.setCaret(caret);
 			}
-	     Utils.remarcar(campoContrasenia);
-	     Utils.setContrastColor(campoContrasenia);
-	     Utils.setFontBold(campoContrasenia);
+	     Utils.remarcar(this.campoContrasenia);
+	     Utils.setContrastColor(this.campoContrasenia);
+	     Utils.setFontBold(this.campoContrasenia);
 	     panelCentral.add(this.campoContrasenia, c);
     	
         //Relación entre etiqueta y campo de texto
-        passwordLabel.setLabelFor(campoContrasenia);
+        passwordLabel.setLabelFor(this.campoContrasenia);
       	//Asignación de mnemónico
         passwordLabel.setDisplayedMnemonic(KeyEvent.VK_O);       
         
@@ -175,22 +175,22 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		showPassCheckBox.setMnemonic(KeyEvent.VK_T);
 		
 		//Se almacena el caracter por defecto para ocultar la contraseña
-		final char defaultChar = campoContrasenia.getEchoChar();
+		final char defaultChar = this.campoContrasenia.getEchoChar();
 		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
 		showPassCheckBox.addItemListener(new ItemListener() {
 			@Override
             public void itemStateChanged(ItemEvent evt) {
 				if (evt.getStateChange() == ItemEvent.SELECTED){
 					//Se muestra la contraseña
-					campoContrasenia.setEchoChar((char)0);
+					PanelContrasenia.this.campoContrasenia.setEchoChar((char)0);
 					
 				} else if (evt.getStateChange() == ItemEvent.DESELECTED){
 					//Se oculta la contraseña
-					campoContrasenia.setEchoChar(defaultChar);
+					PanelContrasenia.this.campoContrasenia.setEchoChar(defaultChar);
 				}
 				
 				//Foco al input
-				campoContrasenia.requestFocus();
+				PanelContrasenia.this.campoContrasenia.requestFocus();
 			}
 		});
 		Utils.remarcar(showPassCheckBox);
@@ -212,7 +212,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoContrasenia, "descifrado.wizard.password");
+        HelpUtils.enableHelpKey(this.campoContrasenia, "descifrado.wizard.password");
     }
 
     /**
@@ -222,7 +222,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 
 		private static final long serialVersionUID = 1L;
 
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 
@@ -230,10 +230,10 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 
-			Boolean continuar = true;
+			boolean continuar = true;
 			continuar = descifrarFichero();
 
-			if (continuar.equals(true)) {
+			if (continuar) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
 			} else {
 				//Si ha ocurrido algun error durante el proceso de descifrado mediante contrasenia
@@ -248,7 +248,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	 * @return	true o false indicando si se ha descifrado correctamente
 	 */
 	public boolean descifrarFichero() {
-		char[] contrasenia = campoContrasenia.getPassword();
+		char[] contrasenia = this.campoContrasenia.getPassword();
 		
 		if (contrasenia == null || new String(contrasenia).trim().equals("")){
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
@@ -263,43 +263,42 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 			logger.warning("No se ha indicado un fichero de datos: " + ex);
 			ex.printStackTrace();
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero"),
-					Messages.getString("Descifrado.btndescifrar"),JOptionPane.WARNING_MESSAGE);
+					Messages.getString("Descifrado.btndescifrar"),JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
 			return false;
 		} catch (FileNotFoundException ex) {
-			logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-			ex.printStackTrace();
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"), 
+			logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$ 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return false;
 		} catch (Exception ex) {
-			logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ //$NON-NLS-2$
-			ex.printStackTrace();
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"), 
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			logger.warning("Error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$ 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.fichero2"),  //$NON-NLS-1$
+					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
 		}
 
 		byte[] result = null;
 		try {
-			Key tmpKey = cipherConfig.getCipher().decodePassphrase(contrasenia, cipherConfig.getConfig(), null);
-			result = cipherConfig.getCipher().decipher(fileContent, cipherConfig.getConfig(), tmpKey);
-		} catch (InvalidKeyException e) {
-			logger.severe("Contrasena no valida: " + e);
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.contrasenia"), 
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			Key tmpKey = this.cipherConfig.getCipher().decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
+			result = this.cipherConfig.getCipher().decipher(fileContent, this.cipherConfig.getConfig(), tmpKey);
+		} 
+		catch (InvalidKeyException e) {
+			logger.severe("Contrasena no valida: " + e); //$NON-NLS-1$
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.error.contrasenia"),  //$NON-NLS-1$
+					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
-		} catch (Exception ex) {
-			logger.severe("Error al descifrar: " + ex);
-			ex.printStackTrace();
+		} 
+		catch (final Exception ex) {
+			logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$
 			CustomDialog.showMessageDialog(this, true,
-					Messages.getString("Descifrado.msg.error.operacion"), Messages.getString("error"),
+					Messages.getString("Descifrado.msg.error.operacion"), Messages.getString("error"), //$NON-NLS-1$ //$NON-NLS-2$
 					JOptionPane.ERROR_MESSAGE);
 
 			return false;
 		}
 
 		if (result == null) {
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Descifrado.msg.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 			return false;
 		}
 
@@ -323,9 +322,9 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	 * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto.
 	 */
 	private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
-		if (rutaFichero == null) 
+		if (this.rutaFichero == null) 
 			throw new NullPointerException("No se ha indicado un fichero de entrada");
-		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
+		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
 	}
 
 	/**
@@ -333,6 +332,6 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	 * @return Campo de contrasenia.
 	 */
 	public JPasswordField getCampoContrasenia() {
-		return campoContrasenia;
+		return this.campoContrasenia;
 	}
 }

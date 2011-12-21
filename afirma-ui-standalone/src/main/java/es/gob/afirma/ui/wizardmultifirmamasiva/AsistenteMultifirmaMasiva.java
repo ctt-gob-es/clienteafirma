@@ -29,9 +29,9 @@ public class AsistenteMultifirmaMasiva {
     /**
 	 * Indica si debe emitir un beep al finalizar
 	 */
-    private Boolean beep;
+    private boolean beep;
 
-    public AsistenteMultifirmaMasiva(KeyStoreConfiguration kssc, Boolean beep) {
+    public AsistenteMultifirmaMasiva(KeyStoreConfiguration kssc, boolean beep) {
         this.kssc = kssc;
         this.beep = beep;
         initComponents();
@@ -62,7 +62,7 @@ public class AsistenteMultifirmaMasiva {
     	ventanas.add(contenidoPantalla3);
     	
     	// Pagina 5: Panel multifirma masiva
-    	PanelMultifirmaMasiva panelMultifirma = new PanelMultifirmaMasiva(kssc, beep);
+    	PanelMultifirmaMasiva panelMultifirma = new PanelMultifirmaMasiva(this.kssc, this.beep);
     	ventanas.add(panelMultifirma);
     	
     	// Pagina 6: Dialogo finalizar

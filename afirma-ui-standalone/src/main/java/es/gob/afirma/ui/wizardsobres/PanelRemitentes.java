@@ -110,7 +110,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     /**
      * Tipo de ensobrado
      */
-	private Integer tipo;
+	private int tipo;
 	
 	/**
 	 * Ruta donde se encuentra el fichero a ensobrar
@@ -159,7 +159,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * @param rutafichero
 	 * @param tipo
 	 */
-	public PanelRemitentes(String rutafichero, Integer tipo) {
+	public PanelRemitentes(String rutafichero, int tipo) {
 		this.rutafichero = rutafichero;
 		this.tipo = tipo;
 		initComponents();
@@ -404,11 +404,11 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
             return;
         }  catch (AOKeystoreAlternativeException e) {
         	//Control de la excepcion generada al introducir una contraseoa vacia para el almacen
-        	CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+        	CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
              return;
         } catch (Exception e) {
 			logger.severe("No se ha podido abrir el almacen de certificados: "+e);
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.certificados.almacen"), 
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.error.certificados.almacen"),  //$NON-NLS-1$
 					Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -544,7 +544,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 
 		private static final long serialVersionUID = 1L;
 
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 
@@ -552,10 +552,10 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 			
-			Boolean continuar = true;
+			boolean continuar = true;
 			continuar = ensobrar();
 			
-			if (continuar == true) {
+			if (continuar) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
 			}
 		}
@@ -565,11 +565,11 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * Ensobra el fichero dado
 	 * @return	True o false si la operacion ha sido satisfactoria
 	 */
-	public Boolean ensobrar() {
-		if (this.tipo.equals(SOBRE_AUTENTICADO) || this.tipo.equals(SOBRE_FIRMADO)) {
+	public boolean ensobrar() {
+		if (this.tipo == SOBRE_AUTENTICADO || this.tipo == SOBRE_FIRMADO) {
             DefaultListModel listModel = (DefaultListModel) this.listaRemitentes.getModel();
             if (listModel.isEmpty()) {
-            	CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.error.remitente"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            	CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.error.remitente"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
                 return false;
             }
         }
@@ -589,16 +589,17 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     		byte[] envelopedData = null;
     		byte[] contentData = readFile(this.rutafichero);
     		try {
-    			if (this.tipo.equals(SOBRE_AUTENTICADO)) {
+    			if (this.tipo == SOBRE_AUTENTICADO) {
     				envelopedData = enveloper.createCMSAuthenticatedEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
-    			} else if (this.tipo.equals(SOBRE_FIRMADO)) {
+    			} 
+    			else if (this.tipo == SOBRE_FIRMADO) {
     				envelopedData = enveloper.createCMSSignedAndEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
-    			} else if (this.tipo.equals(SOBRE_SIMPLE)) {
+    			} 
+    			else if (this.tipo == SOBRE_SIMPLE) {
     				envelopedData = enveloper.createCMSEnvelopedData(contentData, this.privateKeyEntry, cipherConfig, certs);
     			}
-    		} catch (Exception e) {
-    			System.err.println("ERROR");
-    			e.printStackTrace();
+    		} 
+    		catch (final Exception e) {
     			return false;
     		}
 
@@ -626,7 +627,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
     	}  catch(Exception e){
-    		logger.warning("Ocurrio un error durante la desenvoltura: "+e);
+    		logger.warning("Error durante la desenvoltura: "+e);
     		CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.error.desenvoltura"), 
     				Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
     		return false;
@@ -655,7 +656,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		try {
 			privateKeyEntry = keyStoreManager.getKeyEntry(seleccionado, Utils.getCertificatePC(kconf.getType(), this));
 		} catch (KeyException e) {
-			throw new KeyException("Ocurrio un error al extraer la clave del certificado", e);
+			throw new KeyException("Error al extraer la clave del certificado", e);
 		} catch (AOCancelledOperationException e) {
 			// Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
 			// Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
@@ -683,10 +684,10 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 			data = AOUtil.getDataFromInputStream(fileIn);
 
 		} catch (AOException e) {
-			throw new IOException("Ocurrio un error al cargar el fichero de datos", e);
+			throw new IOException("Error al cargar el fichero de datos", e);
 		} finally {
 			if (fileIn != null) {
-				try { fileIn.close(); } catch (Exception e) {}
+				try { fileIn.close(); } catch (Exception e) { /* Ignorada */ }
 			}
 		}
 		

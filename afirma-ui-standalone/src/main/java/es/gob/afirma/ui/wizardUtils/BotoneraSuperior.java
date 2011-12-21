@@ -48,7 +48,7 @@ public class BotoneraSuperior extends JPanel {
 	/**
 	 * Boton de restaurar.
 	 */
-	private JButton restoreButton = null;
+	JButton restoreButton = null;
 	
 	/**
 	 * Boton de maximizar.
@@ -188,22 +188,22 @@ public class BotoneraSuperior extends JPanel {
 		//Restore button
 		JPanel restorePanel = new JPanel();
 		//this.restoreButton = getButton("r", KeyEvent.VK_R );
-		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png"));
+		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png")); //$NON-NLS-1$
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
-		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
+		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description")); //$NON-NLS-1$
 		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
 		
 		this.restoreButton.addFocusListener(new FocusListener() {
 			
 			@Override
 			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, restoreButton, tipText);
+				Utils.showToolTip(false, tip, BotoneraSuperior.this.restoreButton, tipText);
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, restoreButton, tipText);
+				Utils.showToolTip(true, tip, BotoneraSuperior.this.restoreButton, tipText);
 			}
 		});
 		Dimension dimension = new Dimension(20,20);
@@ -236,16 +236,16 @@ public class BotoneraSuperior extends JPanel {
 		//Maximize button
 		JPanel maximizePanel = new JPanel();
 
-		ImageIcon imageIconMaximize= new ImageIcon(CustomDialog.class.getResource("/resources/images/maximize.png"));
+		ImageIcon imageIconMaximize= new ImageIcon(CustomDialog.class.getResource("/resources/images/maximize.png")); //$NON-NLS-1$
 		this.maximizeButton = new JButton(imageIconMaximize);
 		this.maximizeButton.setMnemonic(KeyEvent.VK_M );
-		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description"));
+		this.maximizeButton.setToolTipText(Messages.getString("Wizard.maximizar.description")); //$NON-NLS-1$
 		this.maximizeButton.getAccessibleContext().setAccessibleName(this.maximizeButton.getToolTipText());
 
 		//this.maximizeButton.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
 		//this.maximizeButton.setContentAreaFilled(false); //area del boton invisible
 		
-		this.maximizeButton.setName("maximizar");
+		this.maximizeButton.setName("maximizar"); //$NON-NLS-1$
 		//Se asigna una dimension por defecto
 		this.maximizeButton.setPreferredSize(dimension);
 				
@@ -262,12 +262,12 @@ public class BotoneraSuperior extends JPanel {
 			
 			@Override
 			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, maximizeButton, tipText);
+				Utils.showToolTip(false, tip, BotoneraSuperior.this.maximizeButton, tipText);
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, maximizeButton, tipText);
+				Utils.showToolTip(true, tip, BotoneraSuperior.this.maximizeButton, tipText);
 			}
 		});
 		

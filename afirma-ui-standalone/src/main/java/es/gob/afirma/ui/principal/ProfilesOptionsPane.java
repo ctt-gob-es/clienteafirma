@@ -48,7 +48,7 @@ final class ProfilesOptionsPane {
 	JLabel currentProfileTitleLabel = null;
 	
 	/** Listado con los perfiles detectados por la aplicaci&oacute;n. */
-	final private JList profileManagmentList;
+	final JList profileManagmentList;
 	
 	private boolean isBigStyle = false;
 	
@@ -268,7 +268,7 @@ final class ProfilesOptionsPane {
 		}
 	}
 	
-	private void deleteAction() {
+	void deleteAction() {
 		if (this.profileManagmentList.getSelectedIndex() > -1) {
 			if (!this.profileManagmentList.getSelectedValue().equals(ProfileManager.DEFAULT_PROFILE_NAME)){
 				final int idx = this.profileManagmentList.getSelectedIndex();

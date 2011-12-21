@@ -88,9 +88,8 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
 		if (Platform.getOS().equals(Platform.OS.MACOSX)){
 			return (screenSize.height - 340) / 2;
-		}else{
-			return (screenSize.height - 320) / 2;
 		}
+		return (screenSize.height - 320) / 2;
 	}
 
 	/**
@@ -99,7 +98,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	public UserProfile() {
 		super();
 		initComponents();
-		HelpUtils.visualize("perfiles.usuario");
+		HelpUtils.visualize("perfiles.usuario"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -116,12 +115,12 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		
 		// Parametros ventana
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
-		setTitle(Messages.getString("UserProfile.title")); // NOI18N
+		setTitle(Messages.getString("UserProfile.title")); // NOI18N //$NON-NLS-1$
 		getContentPane().setLayout(new BorderLayout(11, 7));
 		setMinimumSize(getSize());
 
 		// Icono de @firma
-		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
+		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage()); //$NON-NLS-1$
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -142,7 +141,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		c.gridwidth = 1;
 
 		// Cuerpo del mensaje
-		InfoLabel text = new InfoLabel("<p>"+Messages.getString("UserProfile.welcome")+"</p>"+"<p>"+Messages.getString("UserProfile.body1")+"</p>"+"<p>"+Messages.getString("UserProfile.body2")+"</p>"+"<p>"+Messages.getString("UserProfile.body3")+"</p>", false);
+		InfoLabel text = new InfoLabel("<p>" + Messages.getString("UserProfile.welcome") + "</p>" + "<p>" + Messages.getString("UserProfile.body1")+"</p>"+"<p>"+Messages.getString("UserProfile.body2") + "</p>" + "<p>" + Messages.getString("UserProfile.body3") + "</p>", false);  //$NON-NLS-2$ //$NON-NLS-5$ //$NON-NLS-8$//$NON-NLS-11$
 		config(text);
 		
 		add(text,c);
@@ -150,7 +149,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		
         // Etiqueta de la lista de usuarios
 		JLabel label = new JLabel();
-		label.setText(Messages.getString("UserProfile.list.label")); // NOI18N
+		label.setText(Messages.getString("UserProfile.list.label")); // NOI18N //$NON-NLS-1$
 		label.setDisplayedMnemonic(KeyEvent.VK_P);
 		label.setLabelFor(this.comboPerfiles);
 		
@@ -245,7 +244,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
         bottomPanel.add(panelAyuda, cons);
         
       //Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(aceptar, "perfil.aceptar");
+        HelpUtils.enableHelpKey(aceptar, "perfil.aceptar"); //$NON-NLS-1$
         
         return bottomPanel;
     }
@@ -258,7 +257,8 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 			/**
 			 * Se muestra.
 			 */
-			public void run() {
+			@Override
+            public void run() {
 				setVisible(true);
 			}
 		});	
@@ -267,7 +267,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	/**
 	 * Acción aceptar.
 	 */
-    private void aceptarPerformed(){
+    void aceptarPerformed(){
   
     	final String profileName = this.comboPerfiles.getSelectedItem().toString();
     	
@@ -280,15 +280,13 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
     	if (ProfileManager.DEFAULT_PROFILE_NAME.equals(profileName)){
     		currentProfileId = null;
     		GeneralConfig.loadConfig(ProfileManager.getDefaultConfiguration());
-    	} else {
-    		System.out.println("Nombre del perfil seleccionado: " + profileName);
-    		System.out.println("Id del perfil seleccionado: " + ProfileManager.getProfileIdByName(profileName));
-    		
+    	} 
+    	else {
+   		
     		currentProfileId = ProfileManager.getProfileIdByName(profileName);
     		
-    		
     		Properties c = ProfileManager.getConfiguration(currentProfileId);
-    		for (String key : c.keySet().toArray(new String[0])) {
+    		for (final String key : c.keySet().toArray(new String[0])) {
     			System.out.println(key + ": " + c.getProperty(key));
     		}
     		
@@ -312,13 +310,15 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 				/**
 				 * Evento que se lanza cuando un componente pierde el foco.
 				 */
-				public void focusLost(FocusEvent e) {
+				@Override
+                public void focusLost(FocusEvent e) {
 					label.setBorder(BorderFactory.createEmptyBorder());
 				}
 				/**
 				 * Evento que se lanza cuando un componente tiene el foco.
 				 */
-				public void focusGained(FocusEvent e) {
+				@Override
+                public void focusGained(FocusEvent e) {
 					label.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
 			});
@@ -330,13 +330,15 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 				/**
 				 * Evento que se lanza cuando un componente pierde el foco.
 				 */
-				public void focusLost(FocusEvent e) {
+				@Override
+                public void focusLost(FocusEvent e) {
 					combo.setBorder(BorderFactory.createEmptyBorder());
 				}
 				/**
 				 * Evento que se lanza cuando un componente tiene el foco.
 				 */
-				public void focusGained(FocusEvent e) {
+				@Override
+                public void focusGained(FocusEvent e) {
 					combo.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
 			});
@@ -347,13 +349,15 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 				/**
 				 * Evento que se lanza cuando un componente pierde el foco.
 				 */
-				public void focusLost(FocusEvent e) {
+				@Override
+                public void focusLost(FocusEvent e) {
 					((JPanel)button.getParent()).setBorder(BorderFactory.createEmptyBorder());
 				}
 				/**
 				 * Evento que se lanza cuando un componente tiene el foco.
 				 */
-				public void focusGained(FocusEvent e) {
+				@Override
+                public void focusGained(FocusEvent e) {
 					((JPanel)button.getParent()).setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 				}
 			});

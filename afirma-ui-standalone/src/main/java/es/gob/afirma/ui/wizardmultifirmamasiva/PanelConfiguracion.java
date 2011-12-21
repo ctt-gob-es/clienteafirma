@@ -55,9 +55,9 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 	 * Muestra/oculta el panel de los radio buttons y su explicacion
 	 * @param visible
 	 */
-	void setMostrar(Boolean visible) {
-		labelTextoRealizar.setVisible(visible);
-		panelRadios.setVisible(visible);
+	void setMostrar(boolean visible) {
+		this.labelTextoRealizar.setVisible(visible);
+		this.panelRadios.setVisible(visible);
 	}
 	
 	/**
@@ -78,11 +78,11 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     /**
      * Etiqueta con el texto "Para realizar el proceso...".
      */
-    private InfoLabel labelTextoRealizar = new InfoLabel(Messages.getString("Wizard.multifirma.ventana2.explicacion2"), false);
+    private InfoLabel labelTextoRealizar = new InfoLabel(Messages.getString("Wizard.multifirma.ventana2.explicacion2"), false); //$NON-NLS-1$
     /**
      * Checkbox con texto "Respetar el formato...".
      */
-	private JCheckBox checkRespectar = new JCheckBox();
+	JCheckBox checkRespectar = new JCheckBox();
 	/**
 	 * Panel que engloba los radiobuttons.
 	 */
@@ -90,7 +90,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     /**
      * Radio buton "Contrafirmar unicamente".
      */
-	private JRadioButton radioUltimos = new JRadioButton();
+	JRadioButton radioUltimos = new JRadioButton();
     
     
     /**
@@ -98,10 +98,10 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
      */
     private void initComponents() {
     	// Titulo de la ventana
-    	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana"));
+    	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana")); //$NON-NLS-1$
     	
     	// Panel con la cabecera
-        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.pagina2.titulo", "Wizard.multifirma.pagina2.titulo.explicacion1","Wizard.multifirma.pagina2.titulo.explicacion2", null, true);
+        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.pagina2.titulo", "Wizard.multifirma.pagina2.titulo.explicacion1","Wizard.multifirma.pagina2.titulo.explicacion2", null, true); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -133,29 +133,29 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 		c.gridy = 1;
 		
     	// Checkbox con texto "Respetar el formato..."
-    	checkRespectar.setText(Messages.getString("Wizard.multifirma.ventana2.check.respetar"));
-        checkRespectar.getAccessibleContext().setAccessibleName(checkRespectar.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.check.respetar.description")); 
-        checkRespectar.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.check.respetar.description"));
-        checkRespectar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al checkbox
+    	this.checkRespectar.setText(Messages.getString("Wizard.multifirma.ventana2.check.respetar"));
+        this.checkRespectar.getAccessibleContext().setAccessibleName(this.checkRespectar.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.check.respetar.description")); 
+        this.checkRespectar.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.check.respetar.description"));
+        this.checkRespectar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al checkbox
         
-        Utils.remarcar(checkRespectar);
-        Utils.setContrastColor(checkRespectar);
-        Utils.setFontBold(checkRespectar);
-        panelCentral.add(checkRespectar, c);
+        Utils.remarcar(this.checkRespectar);
+        Utils.setContrastColor(this.checkRespectar);
+        Utils.setFontBold(this.checkRespectar);
+        panelCentral.add(this.checkRespectar, c);
         
         c.gridy = 2;
         
     	// Etiqueta con el texto "Para realizar el proceso..."
-    	panelCentral.add(labelTextoRealizar, c);
+    	panelCentral.add(this.labelTextoRealizar, c);
     	
     	c.insets = new Insets(15, 20, 10, 20);
 		c.gridy = 3;
     	
     	// Panel que engloba los radiobuttons
-    	panelRadios.setBorder(BorderFactory.createTitledBorder(Messages.getString("Wizard.multifirma.ventana2.panel")));
-    	Utils.setContrastColor(panelRadios);
-    	Utils.setFontBold(panelRadios);
-    	panelRadios.setLayout(new GridBagLayout());
+    	this.panelRadios.setBorder(BorderFactory.createTitledBorder(Messages.getString("Wizard.multifirma.ventana2.panel")));
+    	Utils.setContrastColor(this.panelRadios);
+    	Utils.setFontBold(this.panelRadios);
+    	this.panelRadios.setLayout(new GridBagLayout());
     	
     	GridBagConstraints cons = new GridBagConstraints();
     	cons.fill = GridBagConstraints.HORIZONTAL;
@@ -171,26 +171,26 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         Utils.remarcar(radioTodos);
         Utils.setContrastColor(radioTodos);
         Utils.setFontBold(radioTodos);
-        panelRadios.add(radioTodos, cons);
+        this.panelRadios.add(radioTodos, cons);
         
         cons.gridy = 1;
         
         // Radio buton "Contrafirmar unicamente"
-        radioUltimos.setText(Messages.getString("Wizard.multifirma.ventana2.panel.radio2")); 
-        radioUltimos.getAccessibleContext().setAccessibleName(radioUltimos.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description")); 
-        radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description"));
-        radioUltimos.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botón de radio
-        Utils.remarcar(radioUltimos);
-        Utils.setContrastColor(radioUltimos);
-        Utils.setFontBold(radioUltimos);
-        panelRadios.add(radioUltimos, cons);
+        this.radioUltimos.setText(Messages.getString("Wizard.multifirma.ventana2.panel.radio2"));  //$NON-NLS-1$
+        this.radioUltimos.getAccessibleContext().setAccessibleName(this.radioUltimos.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description"));  //$NON-NLS-2$
+        this.radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description")); //$NON-NLS-1$
+        this.radioUltimos.setMnemonic(KeyEvent.VK_N); //Se asigna un atajo al botón de radio
+        Utils.remarcar(this.radioUltimos);
+        Utils.setContrastColor(this.radioUltimos);
+        Utils.setFontBold(this.radioUltimos);
+        this.panelRadios.add(this.radioUltimos, cons);
         
         // Grupo de radiobuttons
         ButtonGroup grupoRadios = new ButtonGroup();
         grupoRadios.add(radioTodos);
-        grupoRadios.add(radioUltimos);
+        grupoRadios.add(this.radioUltimos);
         
-        panelCentral.add(panelRadios, c);
+        panelCentral.add(this.panelRadios, c);
         
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(10, 20, 0, 20);
@@ -206,9 +206,9 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(checkRespectar,"multifirma.masiva.wizard.contrafirma.respetar");
+        HelpUtils.enableHelpKey(this.checkRespectar,"multifirma.masiva.wizard.contrafirma.respetar");
         HelpUtils.enableHelpKey(radioTodos,"multifirma.masiva.wizard.contrafirma.opciones");
-        HelpUtils.enableHelpKey(radioUltimos,"multifirma.masiva.wizard.contrafirma.opciones");    
+        HelpUtils.enableHelpKey(this.radioUltimos,"multifirma.masiva.wizard.contrafirma.opciones");    
     }
     
 	/**
@@ -224,7 +224,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 		 * @param ventanas Lista de ventanas que componen el wizard.
 		 * @param posicion posicion de la ventana donde se inserta esta botonera.
 		 */
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 		/**
@@ -235,10 +235,10 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
 				JButton siguiente, JButton finalizar) {
 
 			// Cargamos el tipo de contrafirma
-			((PanelMultifirmaMasiva) getVentanas().get(4)).setTipoContrafirma(radioUltimos.isSelected());
+			((PanelMultifirmaMasiva) getVentanas().get(4)).setTipoContrafirma(PanelConfiguracion.this.radioUltimos.isSelected());
 			
 			// Cargamos el valor del check respetar
-			((PanelMultifirmaMasiva) getVentanas().get(4)).setRespetar(checkRespectar.isSelected());
+			((PanelMultifirmaMasiva) getVentanas().get(4)).setRespetar(PanelConfiguracion.this.checkRespectar.isSelected());
 			
 			super.siguienteActionPerformed(anterior, siguiente, finalizar);
 		}

@@ -78,7 +78,8 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			//Se hace el resize dependiendo del so
 			if (!Platform.getOS().equals(Platform.OS.LINUX)){
 				this.setBounds(0,0, maxWidth, maxHeight);
-			} else {
+			} 
+			else {
 				this.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
 			}
 			
@@ -131,7 +132,8 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
 						 setBounds((screenSize.width - Constants.WIZARD_FONT_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_FONT_INITIAL_HEIGHT) / 2, Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT);
 				         setMinimumSize(new Dimension(Constants.WIZARD_FONT_INITIAL_WIDTH, Constants.WIZARD_FONT_INITIAL_HEIGHT));
-					} else {
+					} 
+					else {
 			          setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
 			          setMinimumSize(new Dimension(Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT));
 					}
@@ -160,19 +162,17 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		if(name.equals(container.getName())){
 			return container;
 		}
-		else {
-			Component[] componentes = container.getComponents();
-			for(int i = 0; i < componentes.length; i++){
-				if(componentes[i] instanceof Container){
-					Component res = getComponentByName(name, (Container) componentes[i]);
-					if(res != null){
-						return res;
-					}
+		Component[] componentes = container.getComponents();
+		for(int i = 0; i < componentes.length; i++){
+			if(componentes[i] instanceof Container){
+				Component res = getComponentByName(name, (Container) componentes[i]);
+				if(res != null){
+					return res;
 				}
-				else{
-					if(componentes[i].getName().equals(name)){
-						return componentes[i];
-					}
+			}
+			else{
+				if(componentes[i].getName().equals(name)){
+					return componentes[i];
 				}
 			}
 		}
@@ -208,16 +208,17 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 		    }
 		}
 	    
-		//Control de activación y desactivación de los botones de maximizado y restaurado
-	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this));
-		Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this));
+		//Control de activacion y desactivacion de los botones de maximizado y restaurado
+	    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialogWizard(this)); //$NON-NLS-1$
+		Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialogWizard(this)); //$NON-NLS-1$
 		
 		if (botonMaximizar!=null && botonRestaurar!=null) {
 			//Se comprueba el estado de los botones de maximizado y restauracion
 			if (this.getSize().equals(new Dimension(maxWidth,maxHeight))){
 				botonMaximizar.setEnabled (false);
 				botonRestaurar.setEnabled (true);
-			} else {
+			} 
+			else {
 				botonMaximizar.setEnabled (true);
 				botonRestaurar.setEnabled (false);
 			}
@@ -263,7 +264,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 * @return botonera
 	 */
 	public BotoneraInferior getBotonera() {
-		return botonera;
+		return this.botonera;
 	}
 	
 	/**
@@ -271,7 +272,7 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	 * @return botonera
 	 */
 	public BotoneraSuperior getBotoneraSuperior() {
-		return botoneraSuperior;
+		return this.botoneraSuperior;
 	}
 
 	/**

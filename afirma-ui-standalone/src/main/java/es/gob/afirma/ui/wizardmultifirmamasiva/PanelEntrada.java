@@ -56,7 +56,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	/**
 	 * Indica si el asistente se ha saltado la pagina anterior.
 	 */
-	private Boolean salto = false;
+	private boolean salto = false;
 	
 	/**
 	 * Relacion minima para el redimensionado de componentes.
@@ -70,7 +70,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	 * Registra un salto dentro del asistente de la pagina 2 a la 3.
 	 * @param salto	Indica si se ha realizado un salto
 	 */
-	void setSalto(Boolean salto) {
+	void setSalto(boolean salto) {
 		this.salto = salto;
 	}
 	
@@ -107,10 +107,10 @@ class PanelEntrada extends JAccessibilityDialogWizard {
      */
     private void initComponents() {
     	// Titulo de la ventana
-    	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana"));
+    	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana")); //$NON-NLS-1$
     	
     	// Panel con la cabecera
-        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.ventana3.titulo", "Wizard.multifirma.ventana3.titulo.descripcion", null, true);
+        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.ventana3.titulo", "Wizard.multifirma.ventana3.titulo.descripcion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -129,7 +129,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
     	
     	// Etiqueta con el texto "Directorio con los..."
     	JLabel etiquetaFirma = new JLabel();
-    	etiquetaFirma.setText(Messages.getString("Wizard.multifirma.ventana3.directorio"));
+    	etiquetaFirma.setText(Messages.getString("Wizard.multifirma.ventana3.directorio")); //$NON-NLS-1$
     	Utils.setContrastColor(etiquetaFirma);
     	Utils.setFontBold(etiquetaFirma);
         panelCentral.add(etiquetaFirma, c);
@@ -141,20 +141,20 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		c.gridy = 1;
         
         // Caja de texto donde se guarda el directorio de entrada
-        campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.directorio.description"));
-        campoDirectorio.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + campoDirectorio.getToolTipText() + "ALT + D.");
-        campoDirectorio.getAccessibleContext().setAccessibleDescription(campoDirectorio.getToolTipText());
+        this.campoDirectorio.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.directorio.description")); //$NON-NLS-1$
+        this.campoDirectorio.getAccessibleContext().setAccessibleName(etiquetaFirma.getText() + " " + this.campoDirectorio.getToolTipText() + "ALT + D.");
+        this.campoDirectorio.getAccessibleContext().setAccessibleDescription(this.campoDirectorio.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoDirectorio.setCaret(caret);
+			this.campoDirectorio.setCaret(caret);
 		}
-        Utils.remarcar(campoDirectorio);
-        Utils.setContrastColor(campoDirectorio);
-        Utils.setFontBold(campoDirectorio);
-        panelCentral.add(campoDirectorio, c);
+        Utils.remarcar(this.campoDirectorio);
+        Utils.setContrastColor(this.campoDirectorio);
+        Utils.setFontBold(this.campoDirectorio);
+        panelCentral.add(this.campoDirectorio, c);
         
         //Relación entre etiqueta y campo de texto
-        etiquetaFirma.setLabelFor(campoDirectorio);
+        etiquetaFirma.setLabelFor(this.campoDirectorio);
   		//Asignación de mnemónico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_D);
         
@@ -167,14 +167,15 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         // Boton examinar
         JButton examinar = new JButton();
         examinar.setMnemonic(KeyEvent.VK_E);
-        examinar.setText(Messages.getString("PrincipalGUI.Examinar"));
-        examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        examinar.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
+        examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
         examinar.getAccessibleContext().setAccessibleName(examinar.getText() + " " + examinar.getToolTipText());
         examinar.getAccessibleContext().setAccessibleDescription(examinar.getToolTipText());
         examinar.addActionListener(new ActionListener() {
         	/**
         	 * Accion del boton examinar.
         	 */
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarActionPerformed();
             }
@@ -193,15 +194,15 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         
 		JPanel panelCheckIncluir = new JPanel(new GridLayout(1, 1));
         // Checkbox con el texto "Incluir subdirectorios..."
-        checkIncluir.setText(Messages.getString("Wizard.multifirma.ventana3.check.incluir"));
-        checkIncluir.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description"));
-        checkIncluir.getAccessibleContext().setAccessibleName(checkIncluir.getText() + " " + checkIncluir.getToolTipText());
-        checkIncluir.getAccessibleContext().setAccessibleDescription(checkIncluir.getToolTipText());
-        checkIncluir.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
-        Utils.remarcar(checkIncluir);
-        Utils.setContrastColor(checkIncluir);
-        Utils.setFontBold(checkIncluir);
-        panelCheckIncluir.add(checkIncluir);
+        this.checkIncluir.setText(Messages.getString("Wizard.multifirma.ventana3.check.incluir")); //$NON-NLS-1$
+        this.checkIncluir.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.check.incluir.description")); //$NON-NLS-1$
+        this.checkIncluir.getAccessibleContext().setAccessibleName(this.checkIncluir.getText() + " " + this.checkIncluir.getToolTipText());
+        this.checkIncluir.getAccessibleContext().setAccessibleDescription(this.checkIncluir.getToolTipText());
+        this.checkIncluir.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al checkbox
+        Utils.remarcar(this.checkIncluir);
+        Utils.setContrastColor(this.checkIncluir);
+        Utils.setFontBold(this.checkIncluir);
+        panelCheckIncluir.add(this.checkIncluir);
         panelCentral.add(panelCheckIncluir, c);
         
         c.insets = new Insets(20, 20, 0, 20);
@@ -209,7 +210,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         
         // Etiqueta con el texto "Aplicar solo a los..."
         JLabel etiquetaAplicar = new JLabel();
-        etiquetaAplicar.setText(Messages.getString("Wizard.multifirma.ventana3.aplicar"));
+        etiquetaAplicar.setText(Messages.getString("Wizard.multifirma.ventana3.aplicar")); //$NON-NLS-1$
         Utils.setContrastColor(etiquetaAplicar);
         Utils.setFontBold(etiquetaAplicar);
         panelCentral.add(etiquetaAplicar, c);
@@ -218,20 +219,20 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		c.gridy = 4;
         
         // Caja de texto para escribir las extensiones
-        campoExtensiones.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.aplicar.description"));
-        campoExtensiones.getAccessibleContext().setAccessibleName(etiquetaAplicar.getText() + " " + campoExtensiones.getToolTipText() + "ALT + P.");
-        campoExtensiones.getAccessibleContext().setAccessibleDescription(etiquetaAplicar.getToolTipText());
+        this.campoExtensiones.setToolTipText(Messages.getString("Wizard.multifirma.ventana3.aplicar.description"));
+        this.campoExtensiones.getAccessibleContext().setAccessibleName(etiquetaAplicar.getText() + " " + this.campoExtensiones.getToolTipText() + "ALT + P.");
+        this.campoExtensiones.getAccessibleContext().setAccessibleDescription(etiquetaAplicar.getToolTipText());
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoExtensiones.setCaret(caret);
+			this.campoExtensiones.setCaret(caret);
 		}
-        Utils.remarcar(campoExtensiones);
-        Utils.setContrastColor(campoExtensiones);
-        Utils.setFontBold(campoExtensiones);
-        panelCentral.add(campoExtensiones, c);
+        Utils.remarcar(this.campoExtensiones);
+        Utils.setContrastColor(this.campoExtensiones);
+        Utils.setFontBold(this.campoExtensiones);
+        panelCentral.add(this.campoExtensiones, c);
         
         //Relación entre etiqueta y campo de texto
-        etiquetaAplicar.setLabelFor(campoExtensiones);
+        etiquetaAplicar.setLabelFor(this.campoExtensiones);
   		//Asignación de mnemónico
         etiquetaAplicar.setDisplayedMnemonic(KeyEvent.VK_P);
     
@@ -249,18 +250,18 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoDirectorio,"multifirma.masiva.wizard.firma.directorios");
-        HelpUtils.enableHelpKey(checkIncluir,"multifirma.masiva.wizard.firma.incluir");
-        HelpUtils.enableHelpKey(campoExtensiones,"multifirma.masiva.wizard.firma.extension");
+        HelpUtils.enableHelpKey(this.campoDirectorio,"multifirma.masiva.wizard.firma.directorios"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkIncluir,"multifirma.masiva.wizard.firma.incluir"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.campoExtensiones,"multifirma.masiva.wizard.firma.extension"); //$NON-NLS-1$
     }
 
     /**
      * Comprueba que el fichero seleccionado es valido y guarda su nombre en el campo de texto
      */
-    private void examinarActionPerformed() {
-    	File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title"));    	
+    void examinarActionPerformed() {
+    	File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title"));    	 //$NON-NLS-1$
     	if (selectedFile != null) {
-    		campoDirectorio.setText(selectedFile.getAbsolutePath());
+    		this.campoDirectorio.setText(selectedFile.getAbsolutePath());
     	}
     }
     
@@ -277,7 +278,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		 * @param ventanas Lista de ventanas que componen el wizard.
 		 * @param posicion posicion de la ventana donde se inserta esta botonera.
 		 */
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 		/**
@@ -287,18 +288,18 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 			
-			Boolean continuar = true;
+			boolean continuar = true;
 			continuar = verificarFicheros();
 			
-			if (continuar == true) {
+			if (continuar) {
 				// Carga las extensiones
-				((PanelMultifirmaMasiva) getVentanas().get(4)).setExtensiones(campoExtensiones.getText());
+				((PanelMultifirmaMasiva) getVentanas().get(4)).setExtensiones(PanelEntrada.this.campoExtensiones.getText());
 				
 				// Carga el directorio de entrada
-				((PanelMultifirmaMasiva) getVentanas().get(4)).setDirectorioEntrada(campoDirectorio.getText());
+				((PanelMultifirmaMasiva) getVentanas().get(4)).setDirectorioEntrada(PanelEntrada.this.campoDirectorio.getText());
 				
 				// Indica si se deben incluir los subdirectorios
-				((PanelMultifirmaMasiva) getVentanas().get(4)).setIncluir(checkIncluir.isSelected());
+				((PanelMultifirmaMasiva) getVentanas().get(4)).setIncluir(PanelEntrada.this.checkIncluir.isSelected());
 				
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
 			}
@@ -310,7 +311,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 		protected void anteriorActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 			
-			if (salto) {
+			if (PanelEntrada.this.salto) {
 				//Se asigna un botón por defecto al wizard
 				if (getVentanas().get(1) instanceof JAccessibilityDialogWizard) {
 					getVentanas().get(1).getRootPane().setDefaultButton(((JAccessibilityDialogWizard)getVentanas().get(1)).getBotonera().getSiguiente());
@@ -328,12 +329,13 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	 */
 	boolean verificarFicheros() {
 		//comprobacion de la ruta de fichero de entrada.
-		String directorio = campoDirectorio.getText();
-		if (directorio == null || directorio.equals("")) {
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.origen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		String directorio = this.campoDirectorio.getText();
+		if (directorio == null || directorio.equals("")) { //$NON-NLS-1$
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.origen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
-		} else if (!new File(directorio).exists() || !new File(directorio).isDirectory()) {
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.origen2"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+		} 
+		else if (!new File(directorio).exists() || !new File(directorio).isDirectory()) {
+			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.origen2"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
 		

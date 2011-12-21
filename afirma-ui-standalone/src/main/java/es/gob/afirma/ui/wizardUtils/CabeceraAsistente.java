@@ -62,7 +62,7 @@ public class CabeceraAsistente extends JPanel {
 	/**
 	 * Boton de restaurar.
 	 */
-	private JButton restoreButton = null;
+	JButton restoreButton = null;
 	
 	/**
 	 * Boton de maximizar.
@@ -125,7 +125,7 @@ public class CabeceraAsistente extends JPanel {
 	 * 							False: La descripcion tiene solo una linea
 	 */
 	public CabeceraAsistente(String MessagesTitulo, String MessagesDescripcion, String MessagesDescripcion2, Dimension dimensiones, 
-			Boolean bloqueTexto) {
+			boolean bloqueTexto) {
 		this.MessagesTitulo = MessagesTitulo;
 		this.MessagesDescripcion = MessagesDescripcion;
 		this.MessagesDescripcion2 = MessagesDescripcion2;
@@ -243,7 +243,7 @@ public class CabeceraAsistente extends JPanel {
 		//Restore button
 		JPanel restorePanel = new JPanel();
 		//this.restoreButton = getButton("r", KeyEvent.VK_R );
-		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png"));
+		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png")); //$NON-NLS-1$
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
 		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));

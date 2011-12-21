@@ -230,7 +230,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 		 * @param ventanas lista de ventanas que contiene el wizard.
 		 * @param posicion posicion de la ventana que contiene la botonera.
 		 */
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 

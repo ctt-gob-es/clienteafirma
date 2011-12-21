@@ -260,7 +260,7 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 
         private static final long serialVersionUID = 1L;
 
-        public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+        public Botonera(List<JDialogWizard> ventanas, int posicion) {
             super(ventanas, posicion);
         }
 
@@ -268,12 +268,13 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         protected void siguienteActionPerformed(JButton anterior,
                 JButton siguiente, JButton finalizar) {
 
-            Boolean continuar = true;
+            boolean continuar = true;
             continuar = cifrarFichero();
 
-            if (continuar.equals(true)) {
+            if (continuar) {
                 super.siguienteActionPerformed(anterior, siguiente, finalizar);
-            } else {
+            } 
+            else {
 				//Si ha ocurrido algun error durante el proceso de cifrado mediante contrasenia
 				//el foco vuelve al campo de insercion de contrasenia
 				getCampoContrasenia().requestFocusInWindow();

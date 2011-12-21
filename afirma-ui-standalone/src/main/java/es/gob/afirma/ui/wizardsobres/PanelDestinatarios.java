@@ -89,7 +89,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	 * @param ventanas	Listado con todas las paginas del asistente
 	 */
 	public void setVentanas(List<JDialogWizard> ventanas) {
-		this.setBotonera(new Botonera(ventanas, Integer.valueOf(1)));
+		this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
 	/**
@@ -154,7 +154,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		
 		// Combo con las listas de destinatarios
 		final JComboBox comboDestinatarios = new JComboBox();
-		comboDestinatarios.setToolTipText(Messages.getString("Wizard.sobres.pagina1.comboDestinatarios.description"));
+		comboDestinatarios.setToolTipText(Messages.getString("Wizard.sobres.pagina1.comboDestinatarios.description")); //$NON-NLS-1$
 		comboDestinatarios.getAccessibleContext().setAccessibleName(etiquetaAnadir.getText() + " " + comboDestinatarios.getToolTipText() + "ALT + D.");
 		comboDestinatarios.getAccessibleContext().setAccessibleDescription(comboDestinatarios.getToolTipText());
 		cargarCombo(comboDestinatarios);
@@ -178,8 +178,8 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		// Boton anadir destinatarios
 		JButton anadir = new JButton();
 		final JButton eliminar = new JButton();
-		anadir.setToolTipText(Messages.getString("wizard.aniadir.description"));
-		anadir.setText(Messages.getString("wizard.aniadir"));
+		anadir.setToolTipText(Messages.getString("wizard.aniadir.description")); //$NON-NLS-1$
+		anadir.setText(Messages.getString("wizard.aniadir")); //$NON-NLS-1$
 		anadir.setAutoscrolls(true);
 		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al boton
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
@@ -207,7 +207,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		
 		 // Etiqueta con el texto "Destinatarios"
         JLabel destLabel = new JLabel();
-        destLabel.setText(Messages.getString("wizard.sobres.listaDestinatarios"));
+        destLabel.setText(Messages.getString("wizard.sobres.listaDestinatarios")); //$NON-NLS-1$
         Utils.setContrastColor(destLabel);
         Utils.setFontBold(destLabel);
 		panelCentral.add(destLabel, c);
@@ -226,7 +226,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		panelCentral.add(panelLista, c);
 		
 		// Lista con los destinatarios
-		this.listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description"));
+		this.listaDestinatarios.setToolTipText(Messages.getString("wizard.listaDestinatarios.description")); //$NON-NLS-1$
 		this.listaDestinatarios.setModel(new DefaultListModel());
 		this.listaDestinatarios.getAccessibleContext().setAccessibleName(destLabel.getText() + " "+ this.listaDestinatarios.getToolTipText());
 		this.listaDestinatarios.getAccessibleContext().setAccessibleDescription(this.listaDestinatarios.getToolTipText());
@@ -257,9 +257,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		
 		JPanel panelEliminar = new JPanel(new GridLayout(1, 1));
 		// Boton eliminar destinatarios
-		eliminar.setToolTipText(Messages.getString("wizard.eliminar.description"));
+		eliminar.setToolTipText(Messages.getString("wizard.eliminar.description")); //$NON-NLS-1$
 		eliminar.setEnabled(false);
-		eliminar.setText(Messages.getString("wizard.sobres.eliminar.destinatario"));
+		eliminar.setText(Messages.getString("wizard.sobres.eliminar.destinatario")); //$NON-NLS-1$
 		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
 		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
@@ -405,7 +405,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 
 		private static final long serialVersionUID = 1L;
 
-		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
+		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
 
@@ -413,13 +413,13 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
 			
-			Boolean continuar = Boolean.TRUE;
+			boolean continuar = true;
 			continuar = verificarCertificados();
 			
 			// Cargamos el listado de certificados
 			((PanelRemitentes) getVentanas().get(2)).setListaCertificados(PanelDestinatarios.this.listaCertificados);
 			
-			if (continuar.booleanValue()) {
+			if (continuar) {
 				super.siguienteActionPerformed(anterior, siguiente, finalizar);
 			}
 		}
@@ -429,12 +429,12 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 	 * Comprueba que se ha seleccionado algun certificado
 	 * @return	True o false segun la verificacion
 	 */
-	public Boolean verificarCertificados() {
+	public boolean verificarCertificados() {
 		final DefaultListModel listModel = (DefaultListModel) this.listaDestinatarios.getModel();
 		if (listModel.isEmpty()){
-			CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-            return Boolean.FALSE;
+			CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.error.destinatario"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+            return false;
         }
-		return Boolean.TRUE;
+		return true;
 	}
 }
