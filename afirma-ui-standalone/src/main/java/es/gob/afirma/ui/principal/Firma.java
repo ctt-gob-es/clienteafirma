@@ -79,7 +79,7 @@ import es.gob.afirma.ui.utils.Utils;
 /**
  * Clase que muestra los elementos necesarios para realizar una firma.
  */
-public final class Firma extends JPanel {
+final class Firma extends JPanel {
 
     private static final long serialVersionUID = 1L;
 

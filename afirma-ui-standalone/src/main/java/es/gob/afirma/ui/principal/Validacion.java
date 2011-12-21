@@ -47,7 +47,7 @@ import es.gob.afirma.ui.visor.ui.VisorPanel;
  *
  * Clase que muestra el panel de validacion VALIDe
  */
-public class Validacion extends JPanel {
+class Validacion extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -194,7 +194,7 @@ public class Validacion extends JPanel {
         JPanel panelAyuda = new JPanel();
         // Boton ayuda
         JButton botonAyuda = HelpUtils.helpButton("validacion"); //$NON-NLS-1$
-        botonAyuda.setName("helpButton");
+        botonAyuda.setName("helpButton"); //$NON-NLS-1$
         panelAyuda.add(botonAyuda);
         panelBotones.add(panelAyuda, cons);
 		

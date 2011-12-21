@@ -54,7 +54,7 @@ import es.gob.afirma.ui.wizardcifradocontrasenia.AsistenteCifradoContrasenia;
 /**
  * Clase Cifrado que contiene el interfaz de cifrado.
  */
-public final class Cifrado extends JPanel {
+final class Cifrado extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -151,7 +151,7 @@ public final class Cifrado extends JPanel {
 		//examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
 		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N //$NON-NLS-1$
 		examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
-		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
+		examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status"))); //$NON-NLS-1$
 		examinar.addActionListener(new ActionListener() {
 			@Override
             public void actionPerformed(ActionEvent evt) {
@@ -185,7 +185,7 @@ public final class Cifrado extends JPanel {
 		
 		// Etiqueta mecanismo cifrado
 		JLabel etiquetaMecanismo = new JLabel();
-		etiquetaMecanismo.setText(Messages.getString("Cifrado.origen.clave")); // NOI18N
+		etiquetaMecanismo.setText(Messages.getString("Cifrado.origen.clave")); // NOI18N //$NON-NLS-1$
 		Utils.setContrastColor(etiquetaMecanismo);
 		Utils.setFontBold(etiquetaMecanismo);
 		add(etiquetaMecanismo, c);
@@ -221,7 +221,7 @@ public final class Cifrado extends JPanel {
 			//Opciones para el lector de pantalla
 			etiquetaMecanismo.setFocusable(true);
 			Utils.remarcar(etiquetaMecanismo);
-			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")
+			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") //$NON-NLS-2$
 			+ Messages.getString("Cifrado.origenL.0") + " "+ Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
 		} 
 		else {
@@ -251,8 +251,8 @@ public final class Cifrado extends JPanel {
 		
 		// Etiqueta algoritmos de cifrado
 		JLabel etiquetaAlgoritmo = new JLabel();
-		etiquetaAlgoritmo.setText(Messages.getString("Cifrado.formato")); // NOI18N
-		etiquetaAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.description")); // NOI18N
+		etiquetaAlgoritmo.setText(Messages.getString("Cifrado.formato")); // NOI18N //$NON-NLS-1$
+		etiquetaAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.description")); // NOI18N //$NON-NLS-1$
 		Utils.setContrastColor(etiquetaAlgoritmo);
 		Utils.setFontBold(etiquetaAlgoritmo);
 		add(etiquetaAlgoritmo, c);
@@ -264,8 +264,8 @@ public final class Cifrado extends JPanel {
 		
 		// Combo algoritmos de cifrado
 		comboAlgoritmo.setToolTipText(Messages.getString("Cifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
-		comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.formato.combo.description.status")));
-		comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.formato.combo.description.status")));
+		comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.formato.combo.description.status"))); //$NON-NLS-1$
+		comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.formato.combo.description.status"))); //$NON-NLS-1$
 		//comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+ Messages.getString("Cifrado.formato.combo.description.status")+" ALT + G."); // NOI18N); // NOI18N
 		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
 		comboAlgoritmo.setModel(new DefaultComboBoxModel(this.algoritmoLc.toArray()));
@@ -280,9 +280,10 @@ public final class Cifrado extends JPanel {
 			//Opciones para el lector de pantalla
 			etiquetaAlgoritmo.setFocusable(true);
 			Utils.remarcar(etiquetaAlgoritmo);
-			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")
+			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") //$NON-NLS-2$
 			+ Messages.getString("Cifrado.origenLc.0")+ " "+ Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
-		} else {
+		} 
+		else {
 			//Para la vista avanzada se asigna mnemonico puesto que esta opcion estara habilitada
 			//Relacion entre etiqueta y combo
 			etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
@@ -363,10 +364,10 @@ public final class Cifrado extends JPanel {
 		add(panelBotones, c);
 		
 		// Accesos rapidos al menu de ayuda
-		HelpUtils.enableHelpKey(campoFichero, "cifrado.fichero");
-		HelpUtils.enableHelpKey(examinar, "cifrado.fichero");
-		HelpUtils.enableHelpKey(comboMecanismo, "cifrado.mecanismo");
-		HelpUtils.enableHelpKey(comboAlgoritmo, "cifrado.algoritmo");
+		HelpUtils.enableHelpKey(campoFichero, "cifrado.fichero"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(examinar, "cifrado.fichero"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(comboMecanismo, "cifrado.mecanismo"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(comboAlgoritmo, "cifrado.algoritmo"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -386,17 +387,19 @@ public final class Cifrado extends JPanel {
 		
 		// Sacamos la ruta del archivo
 		if (campoFichero.getText() == null || campoFichero.getText().equals("")) { //$NON-NLS-1$
-			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
 			campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
 		}
 		else {
 			// Se selecciona el primer elemento del combo
-			if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) 
+			if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
 				// Se muestra el asistente de cifrado con contrasena
 				new AsistenteCifradoContrasenia(algoritmo,campoFichero.getText());
-			else 
+			}
+			else { 
 				// Se muestra el asistente de cifrado con clave
 				new AsistenteCifradoClave(algoritmo,campoFichero.getText());
+			}
 		}
 	}
 

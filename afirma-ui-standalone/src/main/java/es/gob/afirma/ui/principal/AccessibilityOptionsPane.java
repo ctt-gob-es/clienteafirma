@@ -89,7 +89,7 @@ public final class AccessibilityOptionsPane {
      */
     public JButton aplicar = new JButton();
     
-    private boolean isChangeHighContrast = false;
+    boolean isChangeHighContrast = false;
 	
 	/**
 	 * Componente padre.
@@ -120,8 +120,8 @@ public final class AccessibilityOptionsPane {
         c.gridy = 0;
         
     	// Panel texto
-    	JPanel textPanel = new JPanel(new GridBagLayout());
-    	textPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.texto"))); // NOI18N
+    	final JPanel textPanel = new JPanel(new GridBagLayout());
+    	textPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.texto"))); // NOI18N //$NON-NLS-1$
     	Utils.setContrastColor(textPanel);
     	Utils.setFontBold(textPanel);
     	
@@ -132,10 +132,10 @@ public final class AccessibilityOptionsPane {
         c2.gridy = 0;
         
         JPanel panelFontSize = new JPanel(new GridLayout(1, 1));
-        panelFontSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.texto"));
+        panelFontSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.texto")); //$NON-NLS-1$
         // Checkbox para habilitar la opcion de configuracion del tama&ntilde;o de fuente
         this.checkFontSize = new JCheckBox();
-        this.checkFontSize.setText(Messages.getString("Opciones.accesibilidad.texto.tamano")); // NOI18N
+        this.checkFontSize.setText(Messages.getString("Opciones.accesibilidad.texto.tamano")); // NOI18N //$NON-NLS-1$
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkFontSize.setSelected(GeneralConfig.isAvanzados()); 
         this.checkFontSize.setBounds(12, 20, 340, 23);
@@ -148,10 +148,10 @@ public final class AccessibilityOptionsPane {
         textPanel.add(panelFontSize, c2);
         
         JPanel panelFontStyle = new JPanel(new GridLayout(1, 1));
-        panelFontStyle.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.texto"));
+        panelFontStyle.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.texto")); //$NON-NLS-1$
         //Checkbox para habilitar la opcion de configuracion del estilo de fuente
         this.checkFontStyle = new JCheckBox();
-        this.checkFontStyle.setText(Messages.getString("Opciones.accesibilidad.texto.estilo")); // NOI18N
+        this.checkFontStyle.setText(Messages.getString("Opciones.accesibilidad.texto.estilo")); // NOI18N //$NON-NLS-1$
         //checkFontStyle.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkFontStyle.setSelected(GeneralConfig.isAvanzados()); 
         this.checkFontStyle.setBounds(12, 20, 340, 23);
@@ -168,7 +168,7 @@ public final class AccessibilityOptionsPane {
     	
     	// Panel Color
     	JPanel colorPanel = new JPanel(new GridBagLayout());
-    	colorPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.color"))); // NOI18N
+    	colorPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.color"))); // NOI18N //$NON-NLS-1$
     	Utils.setContrastColor(colorPanel);
     	Utils.setFontBold(colorPanel);
     	
@@ -178,10 +178,10 @@ public final class AccessibilityOptionsPane {
         c2.gridy = c2.gridy + 1;
         
         JPanel panelHighContrast = new JPanel(new GridLayout(1, 1));
-        panelHighContrast.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.color"));
+        panelHighContrast.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.color")); //$NON-NLS-1$
         // Checkbox para habilitar la opcion de configuracion de alto contraste
         this.checkHighContrast = new JCheckBox();
-        this.checkHighContrast.setText(Messages.getString("Opciones.accesibilidad.color.contraste")); // NOI18N
+        this.checkHighContrast.setText(Messages.getString("Opciones.accesibilidad.color.contraste")); // NOI18N //$NON-NLS-1$
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkHighContrast.setSelected(GeneralConfig.isAvanzados()); 
         this.checkHighContrast.setBounds(12, 20, 340, 23);
@@ -192,7 +192,8 @@ public final class AccessibilityOptionsPane {
 			public void actionPerformed(ActionEvent e) {
 				if (AccessibilityOptionsPane.this.isChangeHighContrast){
 					AccessibilityOptionsPane.this.isChangeHighContrast = false;
-				} else {
+				} 
+				else {
 					AccessibilityOptionsPane.this.isChangeHighContrast = true;
 				}
 			}
@@ -209,7 +210,7 @@ public final class AccessibilityOptionsPane {
         
     	// Panel Foco
     	JPanel focusPanel = new JPanel(new GridBagLayout());
-    	focusPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.foco"))); // NOI18N
+    	focusPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.foco"))); // NOI18N //$NON-NLS-1$
     	Utils.setContrastColor(focusPanel);
     	Utils.setFontBold(focusPanel);
     	
@@ -219,10 +220,10 @@ public final class AccessibilityOptionsPane {
         c2.gridy = c2.gridy + 1;
         
         JPanel panelFocusVisible = new JPanel(new GridLayout(1, 1));
-        panelFocusVisible.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.foco"));
+        panelFocusVisible.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.foco")); //$NON-NLS-1$
         // Checkbox para habilitar la opcion de configuracion de la visibilidad del foco
         this.checkFocusVisible = new JCheckBox();
-        this.checkFocusVisible.setText(Messages.getString("Opciones.accesibilidad.foco.remarcar")); // NOI18N
+        this.checkFocusVisible.setText(Messages.getString("Opciones.accesibilidad.foco.remarcar")); // NOI18N //$NON-NLS-1$
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkFocusVisible.setSelected(GeneralConfig.isAvanzados()); 
         this.checkFocusVisible.setBounds(12, 20, 340, 23);
@@ -239,7 +240,7 @@ public final class AccessibilityOptionsPane {
     	
     	// Panel Ventana
     	JPanel windowPanel = new JPanel(new GridBagLayout());
-    	windowPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.ventana"))); // NOI18N
+    	windowPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.ventana"))); // NOI18N //$NON-NLS-1$
     	Utils.setContrastColor(windowPanel);
     	Utils.setFontBold(windowPanel);
     	
@@ -249,10 +250,10 @@ public final class AccessibilityOptionsPane {
         c2.gridy = c2.gridy + 1;
         
         JPanel panelWindowSize = new JPanel(new GridLayout(1, 1));
-        panelWindowSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.ventana"));
+        panelWindowSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.ventana")); //$NON-NLS-1$
         // Checkbox para habilitar la opcion de configuracion de ventanas maximizadas
         this.checkWindowSize = new JCheckBox();
-        this.checkWindowSize.setText(Messages.getString("Opciones.accesibilidad.ventana.tamano")); // NOI18N
+        this.checkWindowSize.setText(Messages.getString("Opciones.accesibilidad.ventana.tamano")); // NOI18N //$NON-NLS-1$
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkWindowSize.setSelected(GeneralConfig.isAvanzados()); 
         this.checkWindowSize.setBounds(12, 20, 340, 23);
@@ -287,7 +288,7 @@ public final class AccessibilityOptionsPane {
     	
     	// Panel Cursor
     	JPanel cursorPanel = new JPanel(new GridBagLayout());
-    	cursorPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.cursor"))); // NOI18N
+    	cursorPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.accesibilidad.cursor"))); // NOI18N //$NON-NLS-1$
     	Utils.setContrastColor(cursorPanel);
     	Utils.setFontBold(cursorPanel);
     	
@@ -297,10 +298,10 @@ public final class AccessibilityOptionsPane {
         c2.gridy = c2.gridy + 1;
         
         JPanel panelCursorSize = new JPanel(new GridLayout(1, 1));
-        panelCursorSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.cursor"));
+        panelCursorSize.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.accesibilidad.cursor")); //$NON-NLS-1$
         // Checkbox para habilitar la opcion de configuracion del tama&ntilde;o del cursor
         this.checkCursorSize = new JCheckBox();
-        this.checkCursorSize.setText(Messages.getString("Opciones.accesibilidad.cursor.tamano")); // NOI18N
+        this.checkCursorSize.setText(Messages.getString("Opciones.accesibilidad.cursor.tamano")); // NOI18N //$NON-NLS-1$
         //checkFontSize.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
         this.checkCursorSize.setSelected(GeneralConfig.isAvanzados()); 
         this.checkCursorSize.setBounds(12, 20, 340, 23);
@@ -324,7 +325,7 @@ public final class AccessibilityOptionsPane {
         
         JPanel panelValores = new JPanel(new GridLayout(1, 1));
         //Boton Valores por defecto
-        valores.setText(Messages.getString("Opciones.accesibilidad.valores"));
+        valores.setText(Messages.getString("Opciones.accesibilidad.valores")); //$NON-NLS-1$
         valores.addActionListener(new ActionListener() {
 			
 			@Override

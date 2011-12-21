@@ -43,11 +43,11 @@ import es.gob.afirma.ui.wizardmultifirmamasiva.AsistenteMultifirmaMasiva;
 /**
  * Clase para realizar una multifirma masiva
  */
-public class MultifirmaMasiva extends JPanel {
+final class MultifirmaMasiva extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private JCheckBox alerta;
+	JCheckBox alerta;
 
 	public MultifirmaMasiva() {
 		initComponents();
@@ -67,7 +67,7 @@ public class MultifirmaMasiva extends JPanel {
 
 		// Etiqueta almacen / repositorio de certificados
 		JLabel etiquetaAlmacen = new JLabel();
-		etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N
+		etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N //$NON-NLS-1$
 		Utils.setContrastColor(etiquetaAlmacen);
 		Utils.setFontBold(etiquetaAlmacen);
 		add(etiquetaAlmacen, c);
@@ -79,10 +79,10 @@ public class MultifirmaMasiva extends JPanel {
 
 		// Combo con los almacenes / repositorios disponibles
 		final JComboBox comboAlmacen = new JComboBox();
-		comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
+		comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N //$NON-NLS-1$
 		//comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description") + " ALT + A."); // NOI18N
-		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
-		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status")));
+		comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status"))); //$NON-NLS-1$
+		comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description.status"))); //$NON-NLS-1$
 		comboAlmacen.addAncestorListener(new RequestFocusListener(false));
 		cargarComboAlmacen(comboAlmacen);
 		Utils.remarcar(comboAlmacen);
@@ -112,26 +112,26 @@ public class MultifirmaMasiva extends JPanel {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		// Panel que engloba los tipos de multifirma
 		JPanel panelTipos = new JPanel(new GridLayout());
-		panelTipos.setBorder(BorderFactory.createTitledBorder(Messages.getString("PrincipalGUI.multifirma.panel.opciones"))); // NOI18N
+		panelTipos.setBorder(BorderFactory.createTitledBorder(Messages.getString("PrincipalGUI.multifirma.panel.opciones"))); // NOI18N //$NON-NLS-1$
 		Utils.setContrastColor(panelTipos);
 		Utils.setFontBold(panelTipos);
 		
 		JPanel panelAlerta = new JPanel(new GridLayout(1,1));
-		panelAlerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones"));
+		panelAlerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones")); //$NON-NLS-1$
 		// Checkbox alerta sonora
-		alerta = new JCheckBox();
-		alerta.setSelected(true);
-		alerta.setText(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre")); // NOI18N
-		alerta.setToolTipText(Messages.getString("Ensobrado.check.firmar.description")); // NOI18N
-		alerta.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status")));
-		alerta.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status")));
+		this.alerta = new JCheckBox();
+		this.alerta.setSelected(true);
+		this.alerta.setText(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre")); // NOI18N //$NON-NLS-1$
+		this.alerta.setToolTipText(Messages.getString("Ensobrado.check.firmar.description")); // NOI18N //$NON-NLS-1$
+		this.alerta.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status"))); //$NON-NLS-1$
+		this.alerta.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description.status"))); //$NON-NLS-1$
 		//alerta.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre") +" "+Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
-		alerta.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N
-		alerta.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo
-		Utils.remarcar(alerta);
-		Utils.setContrastColor(alerta);
-		Utils.setFontBold(alerta);
-		panelAlerta.add(alerta);
+		this.alerta.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.multifirma.panel.opciones.timbre.description")); // NOI18N //$NON-NLS-1$
+		this.alerta.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo
+		Utils.remarcar(this.alerta);
+		Utils.setContrastColor(this.alerta);
+		Utils.setFontBold(this.alerta);
+		panelAlerta.add(this.alerta);
 		panelTipos.add(panelAlerta);
 		
 		add(panelTipos, c);
@@ -161,16 +161,16 @@ public class MultifirmaMasiva extends JPanel {
 		// Boton firmar
 		JButton firmar = new JButton();
 		firmar.setMnemonic(KeyEvent.VK_R);
-		firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N
-		firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
+		firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N //$NON-NLS-1$
+		firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
 		//firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " + Messages.getString("PrincipalGUI.firmar.description.status"));
-		firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
-		firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
-		firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
+		firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
+		firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
+		firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status"))); //$NON-NLS-1$
 		firmar.addActionListener(new ActionListener() {
 			@Override
             public void actionPerformed(ActionEvent evt) {
-				firmarActionPerformed(comboAlmacen, alerta);
+				firmarActionPerformed(comboAlmacen, MultifirmaMasiva.this.alerta);
 			}
 		});
 
@@ -193,8 +193,8 @@ public class MultifirmaMasiva extends JPanel {
 				
 		JPanel panelAyuda = new JPanel();
 		// Boton ayuda
-		JButton botonAyuda = HelpUtils.helpButton("firma.masiva");
-		botonAyuda.setName("helpButton");
+		JButton botonAyuda = HelpUtils.helpButton("firma.masiva"); //$NON-NLS-1$
+		botonAyuda.setName("helpButton"); //$NON-NLS-1$
 		
 		panelAyuda.add(botonAyuda);
 		panelBotones.add(panelAyuda, cons);
@@ -207,24 +207,24 @@ public class MultifirmaMasiva extends JPanel {
 		add(panelBotones, c);
 		
 		// Accesos rapidos al menu de ayuda
-		HelpUtils.enableHelpKey(comboAlmacen,"multifirma.masiva.almacen");
-		HelpUtils.enableHelpKey(alerta,"multifirma.masiva.alerta");
+		HelpUtils.enableHelpKey(comboAlmacen,"multifirma.masiva.almacen"); //$NON-NLS-1$
+		HelpUtils.enableHelpKey(this.alerta,"multifirma.masiva.alerta"); //$NON-NLS-1$
 	}
 
 	/**
 	 * Firma masivamente haciendo uso del almacen / repositorio
 	 * @param comboAlmacen 	Combo con los almacenes / repositorios de certificados
-	 * @param alerta		Checkbox para emitir un pitido al finalizar la operacion
+	 * @param alerta1		Checkbox para emitir un pitido al finalizar la operacion
 	 */
-	void firmarActionPerformed(JComboBox comboAlmacen, JCheckBox alerta) {
+	void firmarActionPerformed(JComboBox comboAlmacen, JCheckBox alerta1) {
 		
 		 //Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
-    	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"), JOptionPane.INFORMATION_MESSAGE);
+    	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
     	
 		KeyStoreConfiguration kssc = (KeyStoreConfiguration)comboAlmacen.getSelectedItem();
 		
 		// Se muestra el asistente
-		new AsistenteMultifirmaMasiva(kssc, alerta.isSelected());
+		new AsistenteMultifirmaMasiva(kssc, alerta1.isSelected());
 	}
 
 	/**

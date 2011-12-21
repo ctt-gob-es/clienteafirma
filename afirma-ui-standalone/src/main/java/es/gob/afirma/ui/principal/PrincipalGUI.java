@@ -181,20 +181,18 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		return (screenSize.height - 320) / 2;
 	}
 		
-	public PrincipalGUI() {
+	PrincipalGUI() {
 		super();
 		initComponents();
 		iniciarProveedores();
 		this.addComponentListener(new ComponentAdapter() {
             @Override
-		    public void componentResized(ComponentEvent e)
-		    {
-		    	resized(e);
+		    public void componentResized(ComponentEvent e) {
+		    	resized();
 		    }
             @Override
-		    public void componentMoved(ComponentEvent e)
-		    {
-		    	resized(e);
+		    public void componentMoved(ComponentEvent e) {
+		    	resized();
 		    }
 		});
 		
@@ -385,7 +383,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		return herramientas;
 	}
 	
-	public JMenu generarMenuAccesibilidad(){
+	JMenu generarMenuAccesibilidad(){
 		// Opcion del menu principal - Accesibilidad
 		JMenu access = new JMenu();
 		access.setMnemonic(KeyEvent.VK_L);
@@ -398,12 +396,12 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		
 		// Subopcion menu Ayuda - Ayuda
 		JMenuItem accesibilidadItem = new JMenuItem();
-		accesibilidadItem.setText(Messages.getString("PrincipalGUI.accesibilidad.contenido")); // NOI18N
+		accesibilidadItem.setText(Messages.getString("PrincipalGUI.accesibilidad.contenido")); // NOI18N //$NON-NLS-1$
 		accesibilidadItem.setMnemonic(KeyEvent.VK_U); //Se asigna un atajo al menu
 		accesibilidadItem.addActionListener(new ActionListener() {
 			@Override
             public void actionPerformed(ActionEvent evt) {
-				HelpUtils.visualize("opciones.accesibilidad");
+				HelpUtils.visualize("opciones.accesibilidad"); //$NON-NLS-1$
 				Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, true, true);
 				ventanaOpciones.setModal(true);
 				ventanaOpciones.setVisible(true);
@@ -435,7 +433,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 		// Subopcion menu Ayuda - Ayuda
 		JMenuItem ayudaHTML = new JMenuItem();
-		ayudaHTML.setText(Messages.getString("ayudaHTML.contenido")); // NOI18N
+		ayudaHTML.setText(Messages.getString("ayudaHTML.contenido")); // NOI18N //$NON-NLS-1$
 		ayudaHTML.setMnemonic(KeyEvent.VK_U); //Se asigna un atajo al menu
 		ayudaHTML.addActionListener(new ActionListener() {
 			@Override
@@ -469,7 +467,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	/**
 	 * Seleccion menu opciones: Muestra la ventana modal con las opciones
 	 */
-	private void opcionesActionPerformed() {
+	void opcionesActionPerformed() {
 		HelpUtils.visualize("opciones.configuracion"); //$NON-NLS-1$
 		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, this.aplicar, this.accesibilidad);
 		ventanaOpciones.setModal(true);
@@ -481,7 +479,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Seleccion idiomas: Cambia el idioma de la aplicaci�n
 	 * @param locale	Nuevo Locale
 	 */
-	private void cambiarIdioma(Locale locale) {
+	void cambiarIdioma(Locale locale) {
 		Locale.setDefault(locale);
 		HelpUtils.change(locale.toString());
 		this.getContentPane().removeAll();
@@ -584,7 +582,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonFirma.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
-        buttonFirma.setName("firma");
+        buttonFirma.setName("firma"); //$NON-NLS-1$
         JPanel panelFirma = new Firma();
         this.htPanel.addTab(buttonFirma, panelFirma);
 	    
@@ -601,7 +599,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonMultifirma.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
-        buttonMultifirma.setName("multifirma");
+        buttonMultifirma.setName("multifirma"); //$NON-NLS-1$
         JPanel panelMultifirmaSimple = new MultifirmaSimple();
         this.htPanel.addTab(buttonMultifirma, panelMultifirmaSimple);
 	    
@@ -620,7 +618,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description")); //$NON-NLS-1$
         
         buttonMultifirmaMasiva.setEnabled(GeneralConfig.isAvanzados());
-        buttonMultifirmaMasiva.setName("firma.masiva");
+        buttonMultifirmaMasiva.setName("firma.masiva"); //$NON-NLS-1$
         if (buttonMultifirmaMasiva.isEnabled()) {
             buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
         }
@@ -641,7 +639,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonValidacion.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion") + " " + //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
-        buttonValidacion.setName("validacion");        
+        buttonValidacion.setName("validacion");         //$NON-NLS-1$
         JPanel panelValidacion = new Validacion();
         this.htPanel.addTab(buttonValidacion, panelValidacion);
 
@@ -658,7 +656,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonCifrado.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " +  //$NON-NLS-1$  //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
-        buttonCifrado.setName("cifrado");
+        buttonCifrado.setName("cifrado"); //$NON-NLS-1$
         JPanel panelCifrado = new Cifrado();
         this.htPanel.addTab(buttonCifrado, panelCifrado);
 
@@ -675,7 +673,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonDescifrado.getAccessibleContext().setAccessibleName(
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
-        buttonDescifrado.setName("descifrado");
+        buttonDescifrado.setName("descifrado"); //$NON-NLS-1$
         JPanel panelDescifrado = new Descifrado();
         this.htPanel.addTab(buttonDescifrado, panelDescifrado);
 
@@ -697,7 +695,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         if (buttonEnsobrado.isEnabled()) {
             buttonEnsobrado.setMnemonic(KeyEvent.VK_B);    
         }
-        buttonEnsobrado.setName("ensobrado");
+        buttonEnsobrado.setName("ensobrado"); //$NON-NLS-1$
         JPanel panelEnsobrado = new Ensobrado();
         this.htPanel.addTab(buttonEnsobrado, panelEnsobrado);
 
@@ -720,7 +718,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         if (buttonDesensobrado.isEnabled()) {
             buttonDesensobrado.setMnemonic(KeyEvent.VK_N);    
         }
-        buttonDesensobrado.setName("desensobrado");
+        buttonDesensobrado.setName("desensobrado"); //$NON-NLS-1$
         JPanel panelDesensobrado = new Desensobrado();
         this.htPanel.addTab(buttonDesensobrado, panelDesensobrado);
         
@@ -820,7 +818,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * la ventana.
 	 * 
 	 */
-	public void resized(ComponentEvent e) {
+	public void resized() {
 		//Tamaño de la ventana
 		Dimension screenSize = this.getSize();
 	    bar.setPreferredSize(new Dimension((int) screenSize.getWidth()*10/100,(int) screenSize.getHeight()*5/100));
@@ -853,14 +851,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				MetalLookAndFeel.setCurrentTheme(theme);
 				
 				//set Metal look and feel
-				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel"); //$NON-NLS-1$
 
 //				UIManager.put("OptionPane.messageForeground",Color.WHITE);
 //				UIManager.put("Button.foreground",Color.WHITE);
 //				UIManager.put("ToolTip.foreground",Color.WHITE);
 //				UIManager.put("ToolTip.background",Color.BLACK);
 //				UIManager.put("Label.foreground",Color.WHITE);
-				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI");
+				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI");  //$NON-NLS-1$//$NON-NLS-2$
 //				UIManager.put("TableHeader.foreground", Color.WHITE);
 				
 
@@ -880,7 +878,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 //				UIManager.put("ToolTip.foreground",Color.BLACK);
 //				UIManager.put("ToolTip.background",new Color(255,255,225));
 //				UIManager.put("Label.foreground",Color.BLACK);
-				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI");
+				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$ //$NON-NLS-2$
 //				UIManager.put("TableHeader.foreground", Color.BLACK);
 			}
 			

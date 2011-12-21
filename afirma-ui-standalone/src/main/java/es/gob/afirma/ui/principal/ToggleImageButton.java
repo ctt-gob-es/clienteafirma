@@ -16,7 +16,7 @@ import es.gob.afirma.ui.utils.GeneralConfig;
  * ToggleButton cuyo aspecto viene dado por una imagen. La imagen puede cambiar seg&uacute;n
  * este seleccionado o no el bot&oacute;n.
  */
-public class ToggleImageButton extends JToggleButton {
+class ToggleImageButton extends JToggleButton {
 
     /** SerialVersion UID */
     private static final long serialVersionUID = 6154127450477253680L;

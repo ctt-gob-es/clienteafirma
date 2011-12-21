@@ -48,29 +48,33 @@ public class Main {
      * @param args Par&aacute;metros de entrada.
      */
     public static void main(String[] args) {
-		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) {
+		if (System.getProperty("java.version").compareTo("1.6.0_18") < 0) { //$NON-NLS-1$
 				CustomDialog.showMessageDialog(
 					null, true,
-					Messages.getString("main.requerido")+
-					System.getProperty("java.version")+".<br>"+
-					Messages.getString("main.porfavor"),
-					Messages.getString("main.cliente"),
+					Messages.getString("main.requerido")+ //$NON-NLS-1$
+					System.getProperty("java.version") + ".<br>" + //$NON-NLS-1$
+					Messages.getString("main.porfavor"), //$NON-NLS-1$
+					Messages.getString("main.cliente"), //$NON-NLS-1$
 				JOptionPane.ERROR_MESSAGE);
 			System.exit(-5);
 		}
 		try {
-        	if (Platform.getOS().equals(Platform.OS.LINUX))
+        	if (Platform.getOS().equals(Platform.OS.LINUX)){
         		UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        	else
+        	}
+        	else {
         		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
+        	}
+        } 
+		catch (final Exception ex) {
         	logger.log(Level.SEVERE, null, ex);
         }
         
         if (ProfileManager.getProfilesNames().length < 1) {
         	UserProfile.currentProfileId = null;
         	new PrincipalGUI().main();
-        } else {
+        } 
+        else {
         	new UserProfile().main();
         }
     }

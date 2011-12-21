@@ -13,7 +13,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.io.Serializable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -28,10 +27,10 @@ import es.gob.afirma.ui.principal.Main;
  * Componente para generar una barra de estado
  * 
  */
- public class JStatusBar extends JComponent implements Serializable {
+ public class JStatusBar extends JComponent {
 
 	 private static final long serialVersionUID = 1L;
-	 private Integer leftMargin = 0;
+	 private int leftMargin = 0;
 	 
 	 /**
 	  * Genera una barra de estado
@@ -39,7 +38,7 @@ import es.gob.afirma.ui.principal.Main;
 	 public JStatusBar() {
 		 setPreferredSize(new Dimension(10, 20));
 		 setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		 setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),BorderFactory.createEmptyBorder(0, leftMargin, 0, 0)));	
+		 setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),BorderFactory.createEmptyBorder(0, this.leftMargin, 0, 0)));	
 	 }
 
 	 /**
@@ -88,17 +87,17 @@ import es.gob.afirma.ui.principal.Main;
 	  */
 	 public String getStatus() {
 		 JLabel lb = (JLabel) getComponent(0);
-		 if (lb.getText() != null)
+		 if (lb.getText() != null) {
 			 return lb.getText();
-		 else
-			 return null;
+		 }
+		 return null;
 	 }
 	 
 	 /**
 	  * Establece el margen izquierdo del texto
 	  * @param leftMargin	Margen izquierdo
 	  */
-	 public void setLeftMargin(Integer leftMargin) {
+	 public void setLeftMargin(int leftMargin) {
 		 setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLoweredBevelBorder(),BorderFactory.createEmptyBorder(0, leftMargin, 0, 0)));
 	 }
  }

@@ -32,7 +32,7 @@ import es.gob.afirma.ui.utils.Utils;
 /**
  * Manejador de la configuraci&oacute;n principal de la interfaz.
  */
-public class ProfilesOptionsPane {
+final class ProfilesOptionsPane {
 
 	/** Nombre del perfil actual. */
 	private String currentProfileName = null;
@@ -69,14 +69,14 @@ public class ProfilesOptionsPane {
         
         // Perfil cargado
         this.currentProfileTitleLabel = new JLabel("Perfil actual: " + ProfileManager.getProfileName(this.getCurrentProfileId()));
-        currentProfileTitleLabel.setFocusable(true);
-        Utils.remarcar(currentProfileTitleLabel);
-        Utils.setContrastColor(currentProfileTitleLabel);
-        Utils.setFontBold(currentProfileTitleLabel);
+        this.currentProfileTitleLabel.setFocusable(true);
+        Utils.remarcar(this.currentProfileTitleLabel);
+        Utils.setContrastColor(this.currentProfileTitleLabel);
+        Utils.setFontBold(this.currentProfileTitleLabel);
         //this.currentProfileLabel = new JLabel(ProfileManager.getProfileName(this.getCurrentProfileId()));
         
         JPanel currentProfilePanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        currentProfilePanel.add(currentProfileTitleLabel);
+        currentProfilePanel.add(this.currentProfileTitleLabel);
         //currentProfilePanel.add(this.currentProfileLabel);
         
         this.panel.add(currentProfilePanel, c);
@@ -114,8 +114,8 @@ public class ProfilesOptionsPane {
         
         JScrollPane profileManagmentScrollList = new JScrollPane();
         profileManagmentScrollList.setViewportView(this.profileManagmentList);
-        Utils.remarcar(profileManagmentList);
-        Utils.setFontBold(profileManagmentList);
+        Utils.remarcar(this.profileManagmentList);
+        Utils.setFontBold(this.profileManagmentList);
         
         //Relacion entre etiqueta y lista de perfiles
         profileManagmentLabel.setLabelFor(this.profileManagmentList);
@@ -133,16 +133,16 @@ public class ProfilesOptionsPane {
         loadProfileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (profileManagmentList.getSelectedIndex() > -1) {
-					loadAction(profileManagmentList.getSelectedValue().toString());
+				if (ProfilesOptionsPane.this.profileManagmentList.getSelectedIndex() > -1) {
+					loadAction(ProfilesOptionsPane.this.profileManagmentList.getSelectedValue().toString());
 				}
 			}
 		});
-        //Accesibilidad del botón
+        //Accesibilidad del boton
         Utils.remarcar(loadProfileButton);
         Utils.setContrastColor(loadProfileButton);
         Utils.setFontBold(loadProfileButton);
-        //Panel del botón cargar -- utilizado para remarcar foco
+        //Panel del boton cargar -- utilizado para remarcar foco
         JPanel loadPanel = new JPanel(new GridLayout(1, 1));
         loadPanel.add(loadProfileButton);
         
@@ -155,11 +155,11 @@ public class ProfilesOptionsPane {
 				deleteAction();
 			}
 		});
-        //Accesibilidad del botón
+        //Accesibilidad del boton
         Utils.remarcar(deleteProfileButton);
         Utils.setContrastColor(deleteProfileButton);
         Utils.setFontBold(deleteProfileButton);
-        //Panel del botón eliminar -- utilizado para remarcar foco
+        //Panel del boton eliminar -- utilizado para remarcar foco
         JPanel deletePanel = new JPanel(new GridLayout(1, 1));
         deletePanel.add(deleteProfileButton);
         
@@ -187,11 +187,11 @@ public class ProfilesOptionsPane {
 				saveAction();
 			}
 		});
-        //Accesibilidad del botón
+        //Accesibilidad del boton
         Utils.remarcar(saveProfileButton);
         Utils.setContrastColor(saveProfileButton);
         Utils.setFontBold(saveProfileButton);
-        //Panel del botón Guardar -- utilizado para remarcar foco
+        //Panel del boton Guardar -- utilizado para remarcar foco
         JPanel savePanel = new JPanel(new GridLayout(1, 1));
         savePanel.add(saveProfileButton);
         
@@ -203,11 +203,11 @@ public class ProfilesOptionsPane {
 				saveAsAction();
 			}
 		});
-        //Accesibilidad del botón
+        //Accesibilidad del boton
         Utils.remarcar(saveAsProfileButton);
         Utils.setContrastColor(saveAsProfileButton);
         Utils.setFontBold(saveAsProfileButton);
-        //Panel del botón Guardar como -- utilizado para remarcar foco
+        //Panel del boton Guardar como -- utilizado para remarcar foco
         JPanel saveAsPanel = new JPanel(new GridLayout(1, 1));
         saveAsPanel.add(saveAsProfileButton);
         
@@ -221,12 +221,12 @@ public class ProfilesOptionsPane {
         this.panel.add(saveProfileButtonsPanel, c);
         
       //Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(this.currentProfileTitleLabel, "Operfil.cargado");
-        HelpUtils.enableHelpKey(this.profileManagmentList, "Operfil.perfiles");
-        HelpUtils.enableHelpKey(loadProfileButton, "Operfil.cargar");
-        HelpUtils.enableHelpKey(deleteProfileButton, "Operfil.eliminar");
-        HelpUtils.enableHelpKey(saveProfileButton, "Operfil.guardar");
-        HelpUtils.enableHelpKey(saveAsProfileButton, "Operfil.modificar");
+        HelpUtils.enableHelpKey(this.currentProfileTitleLabel, "Operfil.cargado"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.profileManagmentList, "Operfil.perfiles"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(loadProfileButton, "Operfil.cargar"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(deleteProfileButton, "Operfil.eliminar"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(saveProfileButton, "Operfil.guardar"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(saveAsProfileButton, "Operfil.modificar"); //$NON-NLS-1$
     }
 
 	/**
@@ -237,7 +237,7 @@ public class ProfilesOptionsPane {
 		return this.panel;
 	}
 	
-	private void loadAction(String profileName) {
+	void loadAction(String profileName) {
 		
 		int confirm = CustomDialog.showConfirmDialog(
 				this.parent,
@@ -250,10 +250,10 @@ public class ProfilesOptionsPane {
 		if (confirm == JOptionPane.YES_OPTION) {			
 			// Comprobamos si esta activada al menos una de las opciones de accesibilidad sobre textos 
 			if (Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_SIZE,getCurrentProfileName())) || Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_STYLE,getCurrentProfileName()))){
-	    		isBigStyle = true;
+	    		this.isBigStyle = true;
 	    	}
 			// Comprobamos si se van a desactivar las dos opciones de accesibilidad sobre texto 
-	    	if (isBigStyle && (!Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_SIZE,profileName)) && !Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_STYLE,profileName)))){
+	    	if (this.isBigStyle && (!Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_SIZE,profileName)) && !Boolean.parseBoolean(ProfileManager.getAccessibilityOptionValue(AccessibilityOptionsPane.MAIN_FONT_STYLE,profileName)))){
 				AccessibilityOptionsPane.continueBigStyle = true;
 			}
 	    	if (ProfileManager.DEFAULT_PROFILE_NAME.equals(profileName)){
@@ -304,7 +304,7 @@ public class ProfilesOptionsPane {
 					}
 				}
 			} else {
-				CustomDialog.showMessageDialog(this.parent, true, Messages.getString("ProfileDeleteDefault.text"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+				CustomDialog.showMessageDialog(this.parent, true, Messages.getString("ProfileDeleteDefault.text"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
 				this.profileManagmentList.requestFocusInWindow();
 			}
 		}
@@ -313,7 +313,7 @@ public class ProfilesOptionsPane {
 	/**
 	 * Guarda y/o modifica en el preferences la configuracion del usuario.
 	 */
-	private void saveAction(){
+	void saveAction(){
 
 		if (this.getCurrentProfileId() != null) {
 			int confirm = CustomDialog.showConfirmDialog(
@@ -346,7 +346,7 @@ public class ProfilesOptionsPane {
 	/**
 	 * Guarda y/o modifica en el preferences la configuracion del usuario.
 	 */
-	private void saveAsAction(){
+	void saveAsAction(){
 
 		String profileName = CustomDialog.showInputDialog(
 				this.parent,

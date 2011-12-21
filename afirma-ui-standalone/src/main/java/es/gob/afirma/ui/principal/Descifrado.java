@@ -51,7 +51,7 @@ import es.gob.afirma.ui.wizarddescifradocontrasenia.AsistenteDescifradoContrasen
 /**
  * Clase Descifrado que se encarga de descifrar un fichero cifrado.
  */
-public final class Descifrado extends JPanel {
+final class Descifrado extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 

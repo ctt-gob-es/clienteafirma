@@ -27,7 +27,7 @@ import es.gob.afirma.ui.utils.JAccessibilityFrame;
  * se retira el contenido del espacio de visualizaci&oacute;n y se agrega el contenido
  * asociado a ese bot&oacute;n. 
  */
-public class HorizontalTabbedPanel extends JPanel {
+final class HorizontalTabbedPanel extends JPanel {
     /** UID */
 	private int numBotones = 0;
     private static final long serialVersionUID = 2340734316078849777L;
@@ -111,12 +111,12 @@ public class HorizontalTabbedPanel extends JPanel {
 			
 			@Override
 			public void keyTyped(KeyEvent e) {
-				
+				// No implementado
 			}
 			
 			@Override
 			public void keyReleased(KeyEvent e) {
-				
+				// No implementado
 			}
 			
 			@Override

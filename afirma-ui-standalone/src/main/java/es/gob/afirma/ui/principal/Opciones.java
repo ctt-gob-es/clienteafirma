@@ -51,7 +51,7 @@ import es.gob.afirma.ui.utils.Utils;
 /**
  * Clase que muestra el panel de opciones.
  */
-public class Opciones extends JAccessibilityDialog {
+class Opciones extends JAccessibilityDialog {
 
 	private static final long serialVersionUID = 1L;
 
@@ -113,25 +113,25 @@ public class Opciones extends JAccessibilityDialog {
 	/**
 	 * Boton de maximizar.
 	 */
-	private JButton maximizeButton = null;
+	JButton maximizeButton = null;
     
-    public MainOptionsPane getMainOptions(){
+    MainOptionsPane getMainOptions(){
     	return this.mainOptions;
     }
     
-    public ContextOptionsPane getContextOptions(){
+    ContextOptionsPane getContextOptions(){
     	return this.contextOptions;
     }
     
-    public void setAplicar(boolean aplicar){
+    void setAplicar(boolean aplicar){
     	this.aplicar = aplicar;
     }
     
-    public JButton getAceptar(){
+    JButton getAceptar(){
     	return this.aceptar;
     }
     
-    public boolean isAplicar(){
+    boolean isAplicar(){
     	return this.aplicar;
     }    
     
@@ -142,7 +142,7 @@ public class Opciones extends JAccessibilityDialog {
      * Constructor.
      * @param mainGUI ventana padre
      */
-    public Opciones(PrincipalGUI mainGUI, boolean aplicar, boolean accesibilidad) {
+    Opciones(PrincipalGUI mainGUI, boolean aplicar, boolean accesibilidad) {
     	super(mainGUI);
     	this.mainGui = mainGUI;
     	this.aplicar = aplicar;
@@ -150,7 +150,7 @@ public class Opciones extends JAccessibilityDialog {
         initComponents();
     }
 
-	public static void setUpdate(boolean update) {
+	static void setUpdate(boolean update) {
 		Opciones.update = update;
 	}
 
@@ -173,19 +173,18 @@ public class Opciones extends JAccessibilityDialog {
 	 * resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n Y
 	 */
-	public int getInitialY() {
+	int getInitialY() {
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if (Platform.getOS().equals(Platform.OS.MACOSX)){
         	return (screenSize.height - 485) / 2;
-        } else {
-        	return (screenSize.height - 456) / 2;
-        }
+        } 
+        return (screenSize.height - 456) / 2;
 	}
 	
     /**
      * Inicializacion de componentes
      */
-    public void initComponents() {
+    void initComponents() {
     	
     	createAccessibilityButtonsPanel();
     	
@@ -282,7 +281,7 @@ public class Opciones extends JAccessibilityDialog {
     	
     	// Configuracion de la ventana
     	setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(Messages.getString("Opciones.opciones")); // NOI18N
+        setTitle(Messages.getString("Opciones.opciones")); // NOI18N //$NON-NLS-1$
         //setResizable(false);
         getContentPane().removeAll();
         getContentPane().setLayout(new GridBagLayout());
@@ -311,15 +310,15 @@ public class Opciones extends JAccessibilityDialog {
         this.mainPanel = new JTabbedPane();
         
         this.mainOptions =  new MainOptionsPane();
-        this.mainPanel.addTab(Messages.getString("Opciones.general"),
+        this.mainPanel.addTab(Messages.getString("Opciones.general"), //$NON-NLS-1$
         		null,
         		this.mainOptions.getConfigurationPanel(),
-        		Messages.getString("Opciones.general"));
+        		Messages.getString("Opciones.general")); //$NON-NLS-1$
         this.mainOptions.loadConfig(GeneralConfig.getConfig());
 
         this.contextOptions =  new ContextOptionsPane();
         
-        this.mainPanel.addTab (Messages.getString("Opciones.contextoFirma"),
+        this.mainPanel.addTab (Messages.getString("Opciones.contextoFirma"), //$NON-NLS-1$
         		null,
         		this.contextOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.contexto")); //$NON-NLS-1$
@@ -332,14 +331,15 @@ public class Opciones extends JAccessibilityDialog {
         this.mainPanel.addTab(Messages.getString("Opciones.accesibilidad"), //$NON-NLS-1$
         		null,
         		this.accessibilityOptions.getConfigurationPanel(),
-        		Messages.getString("Opciones.accesibilidadTip"));
+        		Messages.getString("Opciones.accesibilidadTip")); //$NON-NLS-1$
         
         this.accessibilityOptions.loadConfig(GeneralConfig.getConfig());
 
         // Opciones de gestion de perfiles
         this.profilesOptions =  new ProfilesOptionsPane(this);
         
-        this.mainPanel.addTab("Perfiles de usuario",
+        this.mainPanel.addTab(
+                "Perfiles de usuario",
         		null,
         		this.profilesOptions.getConfigurationPanel(),
         		"Gesti\u00F3n de los perfiles de usuario");
@@ -376,18 +376,18 @@ public class Opciones extends JAccessibilityDialog {
 			}
 			
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed(final MouseEvent e) {
 				// TODO Auto-generated method stub
 				int index = ((JTabbedPane)e.getSource()).getSelectedIndex();
 				switch (index) {
 				case 0:
-					HelpUtils.visualize("opciones.configuracion");
+					HelpUtils.visualize("opciones.configuracion"); //$NON-NLS-1$
 					break;
 				case 1:
 					//HelpUtils.visualize("");
 					break;
 				case 2:
-					HelpUtils.visualize("opciones.accesibilidad");
+					HelpUtils.visualize("opciones.accesibilidad"); //$NON-NLS-1$
 					break;
 				case 3:
 					//HelpUtils.visualize("");
@@ -441,13 +441,13 @@ public class Opciones extends JAccessibilityDialog {
 					}
 					switch (index) {
 					case 0:
-						HelpUtils.visualize("opciones.configuracion");
+						HelpUtils.visualize("opciones.configuracion"); //$NON-NLS-1$
 						break;
 					case 1:
 						//HelpUtils.visualize("");
 						break;
 					case 2:
-						HelpUtils.visualize("opciones.accesibilidad");
+						HelpUtils.visualize("opciones.accesibilidad"); //$NON-NLS-1$
 						break;
 					case 3:
 						//HelpUtils.visualize("");
@@ -500,6 +500,7 @@ public class Opciones extends JAccessibilityDialog {
         this.aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
         this.getRootPane().setDefaultButton(this.aceptar); //Se asigna el botón por defecto para la ventana
         this.aceptar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	
             	Properties config = new Properties();
@@ -510,7 +511,7 @@ public class Opciones extends JAccessibilityDialog {
                 aceptarActionPerformed(config, Opciones.this.profilesOptions.getProfiles());
             }
         });
-        this.aceptar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
+        this.aceptar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.aceptar")); // NOI18N //$NON-NLS-1$
         Utils.remarcar(this.aceptar);
         Utils.setContrastColor(this.aceptar);
         Utils.setFontBold(this.aceptar);
@@ -520,14 +521,15 @@ public class Opciones extends JAccessibilityDialog {
         
         // Boton cancelar
         JButton	cancelar = new JButton();
-        cancelar.setText(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
+        cancelar.setText(Messages.getString("PrincipalGUI.cancelar")); // NOI18N //$NON-NLS-1$
         cancelar.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al boton cancelar
         cancelar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 cancelarActionPerformed();
             }
         });
-        cancelar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.cancelar")); // NOI18N
+        cancelar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.cancelar")); // NOI18N //$NON-NLS-1$
         Utils.remarcar(cancelar);
         Utils.setContrastColor(cancelar);
         Utils.setFontBold(cancelar);
@@ -637,7 +639,7 @@ public class Opciones extends JAccessibilityDialog {
 	/**
      * Cierra la ventana
      */
-    private void cancelarActionPerformed() {
+    void cancelarActionPerformed() {
     	// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.optionActualPositionX = this.getX();
@@ -887,7 +889,8 @@ public class Opciones extends JAccessibilityDialog {
 		});
 		
 		this.maximizeButton.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
+		    	@Override
+                public void actionPerformed(ActionEvent e) {
 		    		maximizarActionPerformed();
 				}
 			});

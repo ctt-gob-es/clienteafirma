@@ -70,7 +70,7 @@ import es.gob.afirma.ui.utils.Utils;
 /**
  * Clase que se encarga de desensobrar el contenido de un fichero.
  */
-public final class Desensobrado extends JPanel {
+final class Desensobrado extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -375,28 +375,32 @@ public final class Desensobrado extends JPanel {
     		}
 
     		
-    		//Se carga el almacén y el certificado
+    		//Se carga el almacen y el certificado
     		PrivateKeyEntry privateKeyEntry = null;
     		try {
     			AOKeyStoreManager keyStoreManager = getKeyStoreManager((KeyStoreConfiguration) comboAlmacen.getSelectedItem());
     		    privateKeyEntry = getPrivateKeyEntry(keyStoreManager, comboAlmacen);
-    		} catch (AOCancelledOperationException e) {
+    		} 
+    		catch (AOCancelledOperationException e) {
     			logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
     			return;
-    		} catch (KeyException e) {
-            	//Control de la excepcion generada al introducir mal la contraseña para el almacén
-    			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+    		} 
+    		catch (KeyException e) {
+            	//Control de la excepcion generada al introducir mal la contrasena para el almacen
+    			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
-            } catch (AOKeystoreAlternativeException e) {
-            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+            } 
+    		catch (AOKeystoreAlternativeException e) {
+            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
            	 	return;
-            } catch (AOException e) {
-    			logger.severe("Error al abrir el almacen de claves del usuario: "+e); //$NON-NLS-1$
+            } 
+    		catch (AOException e) {
+    			logger.severe("Error al abrir el almacen de claves del usuario: " + e); //$NON-NLS-1$
     			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
     			return;
     		} 
             catch (final Exception e) {
-    			logger.severe("Error al recuperar el certificado del usuario: "+e); //$NON-NLS-1$
+    			logger.severe("Error al recuperar el certificado del usuario: " + e); //$NON-NLS-1$
     			CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
     			return;
     		}

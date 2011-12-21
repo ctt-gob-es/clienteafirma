@@ -39,12 +39,12 @@ import es.gob.afirma.ui.wizardcifradocontrasenia.PanelContrasenia;
 /**
  * Muestra el panel de acerca de
  */
-public final class Acercade extends JAccessibilityFrameAbout {
+final class Acercade extends JAccessibilityFrameAbout {
 
 	private static final long serialVersionUID = 1L;	
 
 	/**
-	 * Relación mínima para el redimensionado de elementos.
+	 * Relacion minima para el redimensionado de elementos.
 	 */
 	@Override
 	public int getMinimumRelation() {
@@ -144,15 +144,15 @@ public final class Acercade extends JAccessibilityFrameAbout {
 		c.gridy = 1;
 		
 		// Version del interfaz y Version de la aplicacion
-		String version = Messages.getString("version.interfaz") + "  " + Main.VERSION + "<br>"
-		+ Messages.getString("version") + "  " + getVersion();
+		String version = Messages.getString("version.interfaz") + "  " + Main.VERSION + "<br>" //$NON-NLS-1$
+		+ Messages.getString("version") + "  " + getVersion(); //$NON-NLS-1$
 		InfoLabel versionInterfaz = new InfoLabel(version, false);
 		getContentPane().add(versionInterfaz, c);
 
 		c.insets = new Insets(15, 20, 0, 20);
 		c.gridy = 2;
 		// Parrafo con el texto Cliente @firma... y con el texto El Ministerio de Politica...
-		String desc = Messages.getString("acercade.descripcion2") + "<br><br>" + Messages.getString("acercade.descripcion"); 
+		String desc = Messages.getString("acercade.descripcion2") + "<br><br>" + Messages.getString("acercade.descripcion");  //$NON-NLS-1$ //$NON-NLS-3$
 		InfoLabel descLabel = new InfoLabel(desc, false);
 		getContentPane().add(descLabel, c);
 		

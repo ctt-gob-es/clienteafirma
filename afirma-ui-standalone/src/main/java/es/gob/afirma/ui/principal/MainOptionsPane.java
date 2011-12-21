@@ -35,22 +35,22 @@ import es.gob.afirma.ui.utils.Utils;
 public class MainOptionsPane {
 
 	/** Clave para la configuraci&oacute;n de vista. */
-	public static final String MAIN_ADVANCED_VIEW = "main.advancedView";
+	public static final String MAIN_ADVANCED_VIEW = "main.advancedView"; //$NON-NLS-1$
 	
 	/** Clave para el algoritmo de firma por defecto. */
-	public static final String MAIN_DEFAULT_ALGORITHM = "main.defaultAlgorithm";
+	public static final String MAIN_DEFAULT_ALGORITHM = "main.defaultAlgorithm"; //$NON-NLS-1$
 	
 	/** Clave para el algoritmo de firma por defecto. */
-	public static final String MAIN_ALGORITHM_XML = "main.check.XMLAlgorithm";
+	public static final String MAIN_ALGORITHM_XML = "main.check.XMLAlgorithm"; //$NON-NLS-1$
 
 	/** Clave para la activaci&oacute;n de la pol&iacute;tica de firma. */
-	public static final String MAIN_POLICY_ESTABLISHED = "main.check.policy";
+	public static final String MAIN_POLICY_ESTABLISHED = "main.check.policy"; //$NON-NLS-1$
 	
 	/** Clave para la ruta de la pol&iacute;tica de firma. */
-	public static final String MAIN_POLICY_URL = "main.policyUrl";
+	public static final String MAIN_POLICY_URL = "main.policyUrl"; //$NON-NLS-1$
 	
 	/** Clave para el identificador de la pol&iacute;tica de firma. */
-	public static final String MAIN_POLICY_OID = "main.policyOid";
+	public static final String MAIN_POLICY_OID = "main.policyOid"; //$NON-NLS-1$
 	
 	/** Algoritmo por defecto para su uso por defecto en las firmas. */
 	public static final String DEFAULT_DEFAULT_ALGORITHM = "SHA1withRSA";
@@ -95,7 +95,7 @@ public class MainOptionsPane {
         
     	// Panel general
     	JPanel generalPanel = new JPanel(new GridBagLayout());
-    	generalPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.general"))); // NOI18N
+    	generalPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.general"))); // NOI18N //$NON-NLS-1$
     	Utils.setContrastColor(generalPanel);
     	Utils.setFontBold(generalPanel);
 
@@ -106,14 +106,14 @@ public class MainOptionsPane {
         c2.gridy = 0;
         
         JPanel panelCheckHabilitar = new JPanel(new GridLayout(1, 1));
-        panelCheckHabilitar.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.general"));
+        panelCheckHabilitar.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.general")); //$NON-NLS-1$
         // Checkbox para habilitar las opciones de configuracion avanzada
         this.checkHabilitar = new JCheckBox();
-        this.checkHabilitar.setText(Messages.getString("Opciones.general.habilitar")); // NOI18N
-        this.checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N
+        this.checkHabilitar.setText(Messages.getString("Opciones.general.habilitar")); // NOI18N //$NON-NLS-1$
+        this.checkHabilitar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.general.habilitar")); // NOI18N //$NON-NLS-1$
         this.checkHabilitar.setSelected(GeneralConfig.isAvanzados()); 
         this.checkHabilitar.setBounds(12, 20, 340, 23);
-        this.checkHabilitar.setMnemonic(KeyEvent.VK_B); // Asignación de mnemónico al checkbox
+        this.checkHabilitar.setMnemonic(KeyEvent.VK_B); // Asignacion de mnemonico al checkbox
         
         Utils.remarcar(this.checkHabilitar);
 
@@ -127,7 +127,7 @@ public class MainOptionsPane {
         
         // Panel criptografia
         JPanel criptografiaPanel = new JPanel(new GridBagLayout());
-        criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N
+        criptografiaPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.criptografia"))); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(criptografiaPanel);
         Utils.setFontBold(criptografiaPanel);
 
@@ -137,7 +137,7 @@ public class MainOptionsPane {
         c2.gridy = 0;
         
         // Etiqueta algoritmo de huella digital
-        JLabel etiquetaAlgoritmo = new JLabel(Messages.getString("Opciones.criptografia.algoritmo.parte"));
+        JLabel etiquetaAlgoritmo = new JLabel(Messages.getString("Opciones.criptografia.algoritmo.parte")); //$NON-NLS-1$
         Utils.setContrastColor(etiquetaAlgoritmo);
         Utils.setFontBold(etiquetaAlgoritmo);
         criptografiaPanel.add(etiquetaAlgoritmo, c2);
@@ -150,7 +150,7 @@ public class MainOptionsPane {
         // Combo con los algoritmos de huella digital
         this.comboAlgoritmo = new JComboBox();
         this.comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText()+" ALT + R."); // NOI18N
-        this.comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N
+        this.comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.algoritmo.parte")); // NOI18N //$NON-NLS-1$
         //comboAlgoritmo.setModel(new DefaultComboBoxModel(Arrays.asList("SHA-1","SHA-512","SHA-384","SHA-256").toArray()));
         this.comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoK.toArray()));
 
@@ -160,9 +160,9 @@ public class MainOptionsPane {
         Utils.setFontBold(this.comboAlgoritmo);
         criptografiaPanel.add(this.comboAlgoritmo, c2);
         
-        //Relación entre etiqueta y combo
+        //Relacion entre etiqueta y combo
         etiquetaAlgoritmo.setLabelFor(this.comboAlgoritmo);
-  		//Asignación de mnemónico
+  		//Asignacion de mnemonico
         etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_R);
         
         c2.insets = new Insets(5, 13, 0, 13);
@@ -171,12 +171,12 @@ public class MainOptionsPane {
         c2.fill = GridBagConstraints.HORIZONTAL;
         
         JPanel panelCheckXML = new JPanel(new GridLayout(1, 1));
-        panelCheckXML.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.criptografia"));
+        panelCheckXML.getAccessibleContext().setAccessibleName(Messages.getString("Opciones.criptografia")); //$NON-NLS-1$
         // Checkbox para utilizar XML
         this.checkXML = new JCheckBox();
-        this.checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
-        this.checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N
-        this.checkXML.setMnemonic(KeyEvent.VK_U);  // Asignación de mnemónico al checkbox
+        this.checkXML.setText(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N //$NON-NLS-1$
+        this.checkXML.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.criptografia.utilizar")); // NOI18N //$NON-NLS-1$
+        this.checkXML.setMnemonic(KeyEvent.VK_U);  // Asignacion de mnemonico al checkbox
 
         Utils.remarcar(this.checkXML);
 
@@ -208,7 +208,7 @@ public class MainOptionsPane {
         // Checkbox para habilitar las opciones de configuracion avanzada
         this.checkAddPolicy = new JCheckBox("Configurar pol\u00EDtica de firma");
         this.checkAddPolicy.getAccessibleContext().setAccessibleDescription("Habilitar para incorporar una po\u00EDtica a sus firmas.");
-        this.checkAddPolicy.setMnemonic(KeyEvent.VK_F); // Asignación de mnemónico al checkbox
+        this.checkAddPolicy.setMnemonic(KeyEvent.VK_F); // Asignacion de mnemonico al checkbox
         
         Utils.remarcar(this.checkAddPolicy);
 
@@ -239,7 +239,7 @@ public class MainOptionsPane {
         Utils.setContrastColor(this.textPolicyOid);
         Utils.setFontBold(this.textPolicyOid);
         
-        //Relación entre etiqueta y campo de texto
+        //Relacion entre etiqueta y campo de texto
         policyOidLabel.setLabelFor(this.textPolicyOid);
         
         policyPanel.add(this.textPolicyOid, c2);
@@ -265,7 +265,7 @@ public class MainOptionsPane {
         Utils.setContrastColor(this.textPolicyUrl);
         Utils.setFontBold(this.textPolicyUrl);
         
-        //Relación entre etiqueta y campo de texto
+        //Relacion entre etiqueta y campo de texto
         policyUrlLabel.setLabelFor(this.textPolicyUrl);
         
         policyPanel.add(this.textPolicyUrl, c2);
@@ -304,11 +304,12 @@ public class MainOptionsPane {
         this.panel.add(new JPanel(), c);
         
         this.checkAddPolicy.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
+			@Override
+            public void itemStateChanged(ItemEvent e) {
 				boolean state = (e.getStateChange() == ItemEvent.SELECTED);
 				MainOptionsPane.this.textPolicyOid.setEnabled(state);
 				MainOptionsPane.this.textPolicyUrl.setEnabled(state);
-				//Asignación de mnemónicos según el estado
+				//Asignacion de mnemonicos según el estado
 				if (state) {
 					policyOidLabel.setDisplayedMnemonic(KeyEvent.VK_I);
 					policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText() + "ALT + I.");
@@ -320,9 +321,9 @@ public class MainOptionsPane {
 				} else {
 					//Se eliminan los atajos porque los cuadros de texto están deshabilitados
 					policyOidLabel.setDisplayedMnemonic(0);
-					policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText()+". Este cuadro de texto está deshabilitado por defecto.");
+					policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText()+". Este cuadro de texto esta deshabilitado por defecto.");
 					policyUrlLabel.setDisplayedMnemonic(0);
-					policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText()+". Este cuadro de texto está deshabilitado por defecto.");
+					policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText()+". Este cuadro de texto esta deshabilitado por defecto.");
 				}
 			}
 		});
@@ -401,17 +402,17 @@ public class MainOptionsPane {
 	/**
 	 * Aplica el estado por defecto de los componentes de la ventana 
 	 */
-	private void restore(JPanel panel){
-		for (int i=0; i<panel.getComponentCount();i++){
-			if (panel.getComponent(i) instanceof JTextField){
-				((JTextField)panel.getComponent(i)).setText("");
-			} else if(panel.getComponent(i) instanceof JCheckBox){
-				((JCheckBox)panel.getComponent(i)).setSelected(false);				
-			} else if (panel.getComponent(i) instanceof JComboBox){
-				((JComboBox)panel.getComponent(i)).setSelectedIndex(0);
+	private void restore(JPanel panel1){
+		for (int i=0; i<panel1.getComponentCount();i++){
+			if (panel1.getComponent(i) instanceof JTextField){
+				((JTextField)panel1.getComponent(i)).setText("");
+			} else if(panel1.getComponent(i) instanceof JCheckBox){
+				((JCheckBox)panel1.getComponent(i)).setSelected(false);				
+			} else if (panel1.getComponent(i) instanceof JComboBox){
+				((JComboBox)panel1.getComponent(i)).setSelectedIndex(0);
 				
-			}else if (panel.getComponent(i) instanceof JPanel){
-				JPanel interiorPanel = (JPanel)panel.getComponent(i);
+			}else if (panel1.getComponent(i) instanceof JPanel){
+				JPanel interiorPanel = (JPanel)panel1.getComponent(i);
 				restore(interiorPanel);
 			}
 		}
