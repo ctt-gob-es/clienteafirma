@@ -136,7 +136,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
     	this.checkRespectar.setText(Messages.getString("Wizard.multifirma.ventana2.check.respetar"));
         this.checkRespectar.getAccessibleContext().setAccessibleName(this.checkRespectar.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.check.respetar.description")); 
         this.checkRespectar.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.check.respetar.description"));
-        this.checkRespectar.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al checkbox
+        this.checkRespectar.setMnemonic(KeyEvent.VK_T); //Se asigna un atajo al checkbox
         
         Utils.remarcar(this.checkRespectar);
         Utils.setContrastColor(this.checkRespectar);

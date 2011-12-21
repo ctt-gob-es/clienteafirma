@@ -181,7 +181,7 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		anadir.setToolTipText(Messages.getString("wizard.aniadir.description")); //$NON-NLS-1$
 		anadir.setText(Messages.getString("wizard.aniadir")); //$NON-NLS-1$
 		anadir.setAutoscrolls(true);
-		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al boton
+		anadir.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al boton
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {

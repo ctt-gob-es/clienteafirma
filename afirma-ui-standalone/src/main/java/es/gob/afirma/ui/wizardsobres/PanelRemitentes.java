@@ -252,7 +252,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		anadir.setToolTipText(Messages.getString("Wizard.sobres.aniadir.originante.description"));
 		anadir.setText(Messages.getString("wizard.aniadir")); 
 		anadir.setAutoscrolls(true);
-		anadir.setMnemonic(KeyEvent.VK_R); //Se asigna un atajo al botón
+		anadir.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al botón
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {

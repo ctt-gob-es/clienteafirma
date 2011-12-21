@@ -363,11 +363,6 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		// Panel del arbol (firmantes seleccionados)
 		panelArbol.setViewportView(this.arbolFirmas);
 		panelCentral.add(panelArbol, c);
-		
-		//Relación entre etiqueta y arbol
-		etiqueta.setLabelFor(this.arbolFirmas);
-  		//Asignación de mnemónico
-		etiqueta.setDisplayedMnemonic(KeyEvent.VK_R);
 
 		/*
 		 * Para las opciones del combo:
@@ -384,10 +379,10 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		panelLista.setViewportView(this.listaFirmantes);
 		panelCentral.add(panelLista, c);
 		
-		//Relación entre etiqueta y lista
-		etiqueta.setLabelFor(this.listaFirmantes);
+		//Relación entre etiqueta y arbol
+		etiqueta.setLabelFor(this.arbolFirmas);
   		//Asignación de mnemónico
-		etiqueta.setDisplayedMnemonic(KeyEvent.VK_R);
+		etiqueta.setDisplayedMnemonic(KeyEvent.VK_B);
 
 		getContentPane().add(panelCentral, BorderLayout.CENTER);
 

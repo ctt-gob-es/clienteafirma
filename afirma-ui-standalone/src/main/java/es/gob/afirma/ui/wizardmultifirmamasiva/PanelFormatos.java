@@ -250,7 +250,7 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
 		//Relacion entre etiqueta y combo
 		this.etiquetaFormato.setLabelFor(this.comboFormatos);
 		//Asignacion de mnemonico
-		this.etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_R);
+		this.etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_T);
 		
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(10, 20, 15, 20);
