@@ -36,11 +36,11 @@ import es.gob.afirma.core.AOFormatFileException;
  *   En caso de necesitarse un fichero externo (biblioteca, almac&eacute;n en archivo, etc.) o una contrase&ntilde;a, estos se solicitan al usuario mediante di&aacute;logos gr&aacute;ficos
  *  </dd>
  * </dl>
+ * @version 1.01
  */
 interface MiniAfirma {
 
-    /**
-     * Firma unos datos seg&uacute;n la configuracion proporcionada.
+    /** Firma unos datos seg&uacute;n la configuracion proporcionada.
      * La configuraci&oacute;n que se puede proporcionar es el algoritmo,
      * el formato de firma y par&aacute;metros adicionales del formato particular.
      * Estos par&aacute;metros extra se indicar&aacute;n como una cadena de
@@ -56,13 +56,10 @@ interface MiniAfirma {
      * @throws IOException Cuando se produce un error durante la firma electr&oacute;nica.
      * @throws AOFormatFileException Cuando se indica un formato de firma no soportado.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-
      */
     String sign(String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
-
     
-    /**
-     * Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
+    /** Realiza la firma paralela (cofirma) de unos datos. La cofirma de una firma requiere
      * que los datos est&eacute;n contenidos en la firma original o que se indiquen de
      * forma externa. Si no se proporcionasen los datos, &uacute;nicamente se realizar&aacute;
      * la cofirma si el algoritmo de firma indicado conincide con el de la firma ya existente.
@@ -89,10 +86,8 @@ interface MiniAfirma {
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
     String coSign(String sign, String data, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
-
     
-    /**
-     * Realiza una firma en cascada (Contrafirma) sobre una firma. Se contrafirman todos los
+    /** Realiza una firma en cascada (Contrafirma) sobre una firma. Se contrafirman todos los
      * nodos hoja salvo que mediante {@code extraParams} se indique el par&aacute;metro
      * "{@code target=tree}", en cuyo caso se contrafirmar&aacute;n todos los nodos del
      * &aacute;rbol.
@@ -115,7 +110,6 @@ interface MiniAfirma {
      */
     String counterSign(String sign, String algorithm, String format, String extraParams) throws AOFormatFileException, PrivilegedActionException, IOException;
     
-    
     /** Devuelve la estructura de firmantes de una firma electr&oacute;nica. Los
      * firmantes se separan por '\n' y comienzan por tantos '\t' como el nivel
      * en el que est&aacute;n.<br>
@@ -136,9 +130,7 @@ interface MiniAfirma {
      */
     String getSignersStructure(String signB64) throws IOException, PrivilegedActionException, AOFormatFileException;
 
-    
-    /**
-     * Muestra un di&aacute;logo modal que permite al usuario seleccionar
+    /** Muestra un di&aacute;logo modal que permite al usuario seleccionar
      * el directorio y el nombre de fichero para el guardado de datos.
      * @param data Datos en Base64 que se desean guardar
      * @param title T&iacute;tulo para el di&aacute;logo.
@@ -153,7 +145,6 @@ interface MiniAfirma {
      */
     boolean saveDataToFile(String data, String title, String fileName, String extension, String description) throws PrivilegedActionException, IOException;
 
-    
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
      * que se devolver&aacute; el contenido en Base64. Si el usuario cancela la operaci&oacute;n
      * de selecci&oacute;n del fichero se devuelve {@code null}.
@@ -177,11 +168,28 @@ interface MiniAfirma {
      * @return El nombre del fichero y su contenido en unicode.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     */
+     * @deprecated */
+    @Deprecated
     String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException;
     
+    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de m&uacute;ltiples ficheros de los
+     * que se devolver&aacute; sus nombres y sus contenidos en formato texto unicode. El
+     * resultado devuelto es un array en el que cada elemento contiene, por cada fichero seleccionado,
+     * su nombre y su contenido separados por el car&aacute;cter '|'. 
+     * Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
+     * del fichero se devuelve {@code null}.
+     * @param title T&iacute;tulo para el di&aacute;logo.
+     * @param extensions Extensiones de b&uacute;squeda.
+     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
+     * @return Array con los nombres del ficheros y sus contenidos en unicode.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @deprecated */
+    @Deprecated
+    String[] getMultiFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException;
+    
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
-     * que se devolver&aacute; su nombre y su contenido en base64. El resultado
+     * que se devolver&aacute; su nombre y su contenido en Base64. El resultado
      * devuelto es una cadena con el nombre y el contenido separados por el
      * car&aacute;cter '|'. Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
      * del fichero se devuelve {@code null}.
@@ -192,8 +200,22 @@ interface MiniAfirma {
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
      */
-    String getFileNameContentBase64(final String title, final String extensions, final String description) throws PrivilegedActionException;
+    String getFileNameContentBase64(final String title, final String extensions, final String description) throws IOException, PrivilegedActionException;
 
+    /** Muestra un di&aacute;logo modal para la selecci&oacute;n de m&uacute;ltiples ficheros de los
+     * que se devolver&aacute; sus nombres y sus contenidos en Base64. El
+     * resultado devuelto es un array en el que cada elemento contiene, por cada fichero seleccionado,
+     * su nombre y su contenido (en Base64) separados por el car&aacute;cter '|'. 
+     * Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
+     * del fichero se devuelve {@code null}.
+     * @param title T&iacute;tulo para el di&aacute;logo.
+     * @param extensions Extensiones de b&uacute;squeda.
+     * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
+     * @return Array con los nombres del ficheros y sus contenidos en Base64.
+     * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad. */
+    String[] getMultiFileNameContentBase64(final String title, final String extensions,final String description) throws IOException, PrivilegedActionException;
+    
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero
      * del que se recuperar&aacute; su ruta absoluta. Si no se selecciona
      * ning&uacute;n fichero, se devuelve {@code null}.

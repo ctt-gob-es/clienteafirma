@@ -33,8 +33,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
 
 
-/** MiniApplet de firma del proyecto Afirma.
- */
+/** MiniApplet de firma del proyecto Afirma. */
 public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	private static final long serialVersionUID = -4364574240099120486L;
@@ -330,8 +329,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         }
 	}
 
-	/** {@inheritDoc} */
-	public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException {
+	/** {@inheritDoc} 
+	 * @deprecated */
+	@Deprecated
+    public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException {
 		this.cleanErrorMessage();
 		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
 		return this.getFileNameContent(title, extensions, description, false);
@@ -475,14 +476,15 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	  */
 	 private PrivateKeyEntry selectPrivateKey(final Properties params) throws PrivilegedActionException {
 		 
-		 SelectPrivateKeyAction selectPrivateKeyAction;
+		 final SelectPrivateKeyAction selectPrivateKeyAction;
 		 if (this.keystoreType == null) {
 			 selectPrivateKeyAction = new SelectPrivateKeyAction(
 					 Platform.getOS(), 
 					 Platform.getBrowser(this.userAgent), 
 					 new CertFilterManager(params), 
 					 this);
-		 } else {
+		 } 
+		 else {
 			 selectPrivateKeyAction = new SelectPrivateKeyAction(
 					 this.keystoreType,
 					 this.keystoreLib,
@@ -492,8 +494,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		 return AccessController.doPrivileged(selectPrivateKeyAction);
 	 }
 
-	 /**
-	  * Devuelve un manejador de firma compatible con un formato de firma o, de no establecerse, con
+	 /** Devuelve un manejador de firma compatible con un formato de firma o, de no establecerse, con
 	  * una firma electr&oacute;nica concreta.
 	  * @param format Formato de firma.
 	  * @param sign Firma electr&oacute;nica.
@@ -525,8 +526,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		 return signer;
 	 }
 
-	 /**
-	  * Recupera un manejador de firma compatible con el formato indicado. Si no se encuentra uno
+	 /** Recupera un manejador de firma compatible con el formato indicado. Si no se encuentra uno
 	  * compatible, se devuelve {@code null}.
 	  * @param format Nombre de un formato de firma.
 	  * @return Manejador de firma.
@@ -536,8 +536,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		 return AccessController.doPrivileged(new SelectSignerAction(format));
 	 }
 
-	 /**
-	  * Recupera un manejador de firma compatible con la firma indicada. Si no se encuentra uno
+	 /** Recupera un manejador de firma compatible con la firma indicada. Si no se encuentra uno
 	  * compatible, se devuelve {@code null}.
 	  * @param signature Firma electr&oacute;nica.
 	  * @return Manejador de firma.
@@ -547,8 +546,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		 return AccessController.doPrivileged(new SelectSignerAction(signature));
 	 }
 
-	 /**
-	  * Configura la apariencia de los di&aacute;logos Java siguiendo la configuraci&oacute;n
+	 /** Configura la apariencia de los di&aacute;logos Java siguiendo la configuraci&oacute;n
 	  * establecida en el sistema. 
 	  */
 	 private void configureLookAndFeel() {
@@ -563,4 +561,42 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		 javax.swing.JDialog.setDefaultLookAndFeelDecorated(true);
 		 javax.swing.JFrame.setDefaultLookAndFeelDecorated(true);
 	 }
+
+	 /** {@inheritDoc} 
+	  * @deprecated */
+	 @Deprecated
+	 public String[] getMultiFileNameContentText(final String title, 
+	                                             final String extensions, 
+	                                             final String description) throws IOException, PrivilegedActionException {
+	        return this.getMultiFileNameContent(title, extensions, description, false);
+	 }
+	 
+	 /** {@inheritDoc} */
+	 public String[] getMultiFileNameContentBase64(final String title, 
+	                                               final String extensions, 
+	                                               final String description) throws IOException, PrivilegedActionException {
+	        return this.getMultiFileNameContent(title, extensions, description, true);
+	 }
+	 
+	 private String[] getMultiFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
+	        this.cleanErrorMessage();
+	        final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+	        final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+	                null : new String[] { extensions.trim() });
+	        final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
+	                description.trim() : (exts != null ? extensions : null));
+	        try { 
+	            return AccessController.doPrivileged(new GetMultiFileNameContentAction(
+	                    titleDialog, exts, descFiles, asBase64, this)); 
+	        } 
+	        catch (final AOCancelledOperationException e) {
+	            return null;
+	        }
+	        catch (final PrivilegedActionException e) {
+	            setErrorMessage(e);
+	            throw e;
+	        }
+     }
+
+
 }
