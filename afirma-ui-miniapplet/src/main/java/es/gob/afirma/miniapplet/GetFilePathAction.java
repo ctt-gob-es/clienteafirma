@@ -41,13 +41,13 @@ final class GetFilePathAction implements PrivilegedExceptionAction<String> {
     }
     
     /**
-     * Muestra un di&aacute;logo modal para la carga de un fichero y recuperar la ruta
+     * Muestra un di&aacute;logo modal para la carga de un fichero y recuperar la ruta absoluta
      * del mismo.
-     * @return Nombre del fichero.
+     * @return Ruta absoluta del fichero.
      * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n de selecci&oacute;n.
      * @throws IOException Cuando se produce un error al leer el fichero.
      */
 	public String run() throws IOException {
-        return new FileSelectionDialog(this.title, this.exts, this.desc, this.parent).getPath();
+        return new FileSelectionDialog(this.title, this.exts, this.desc, false, this.parent).getPath();
 	}
 }

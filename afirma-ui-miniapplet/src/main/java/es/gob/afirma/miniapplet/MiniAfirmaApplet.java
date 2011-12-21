@@ -358,7 +358,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try { 
 			return AccessController.doPrivileged(new GetFileNameContentAction(
-					titleDialog, exts, descFiles, asBase64, this)); 
+					titleDialog, exts, descFiles, false, asBase64, this))[0]; 
 		} 
 		catch (final AOCancelledOperationException e) {
 			return null;
@@ -567,7 +567,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 @Deprecated
 	 public String[] getMultiFileNameContentText(final String title, 
 	                                             final String extensions, 
-	                                             final String description) throws IOException, PrivilegedActionException {
+	                                             final String description) throws PrivilegedActionException {
 	        return this.getMultiFileNameContent(title, extensions, description, false);
 	 }
 	 
@@ -586,8 +586,8 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	        final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
 	                description.trim() : (exts != null ? extensions : null));
 	        try { 
-	            return AccessController.doPrivileged(new GetMultiFileNameContentAction(
-	                    titleDialog, exts, descFiles, asBase64, this)); 
+	            return AccessController.doPrivileged(new GetFileNameContentAction(
+	                    titleDialog, exts, descFiles, true, asBase64, this)); 
 	        } 
 	        catch (final AOCancelledOperationException e) {
 	            return null;
