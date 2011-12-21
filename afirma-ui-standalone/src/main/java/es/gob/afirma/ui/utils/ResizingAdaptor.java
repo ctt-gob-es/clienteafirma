@@ -244,22 +244,8 @@ public class ResizingAdaptor extends ComponentAdapter {
 					if (actualComponent instanceof JComboBox){
 						// TODO Workaround buscar solucion mejor
 						actualComponent.setPreferredSize(new Dimension(100,25));
-					}
-					if (theWindow != null) {						
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else if (theDialog != null){						
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else if (theDialogWizard != null){						
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else if (theDialogAdvisor != null){						
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else if (theWindowAbout != null){						
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					}  else if (theCustomDialog != null){						
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					} else {						
-						actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
-					}
+					}											
+					actualComponent.setFont(actualComponent.getFont().deriveFont((float) getFontSize()));
 				}
 			} 
 			//Caso de borde con texto
