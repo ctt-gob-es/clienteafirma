@@ -114,6 +114,11 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * Respuesta al mensaje
 	 */
 	private int answer;
+	
+	/**
+	 * Texto para el botón 
+	 */
+	private static String cancellText = Messages.getString("PrincipalGUI.cancelar");
 
 	
 	/**
@@ -584,7 +589,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			customDialog.noButton.addActionListener(customDialog);
 			//Botón Cancelar
 			//cons.gridx = 4;
-			cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+			cancelButton = customDialog.getButton(cancellText, KeyEvent.VK_C);
 			JPanel cancelPanel = new JPanel();
 			cancelPanel.add(cancelButton);
 			customDialog.buttonsPanel.add(cancelPanel, cons);
@@ -592,7 +597,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		}
 		else {
 			//Botón Cancelar
-			cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+			cancelButton = customDialog.getButton(cancellText, KeyEvent.VK_C);
 			JPanel cancelPanel = new JPanel();
 			cancelPanel.add(cancelButton);
 			customDialog.buttonsPanel.add(cancelPanel, cons);
@@ -634,7 +639,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
-        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll("<br>", "") +".  ALT + " + String.valueOf((char) mnemonic) + ". ");
+        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +".  ALT + " + String.valueOf((char) mnemonic) + ". ");
        //Se añade el campo de texto al panel de información general
         customDialog.mainPanel.add(customDialog.component, c);
         
@@ -655,7 +660,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
 		//Cancel button
-		cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		cancelButton = customDialog.getButton(cancellText, KeyEvent.VK_C);
 		JPanel cancelPanel = new JPanel();
 		cancelPanel.add(cancelButton);
 		customDialog.buttonsPanel.add(cancelPanel, cons);
@@ -712,7 +717,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
-        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll("<br>", "") +".  ALT + " + String.valueOf((char) mnemonic) + ". ");
+        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +".  ALT + " + String.valueOf((char) mnemonic) + ". ");
        //Se añade el campo de texto al panel de información general
         customDialog.mainPanel.add(customDialog.component, c);
         
@@ -733,7 +738,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
 		//Cancel button
-		cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		cancelButton = customDialog.getButton(cancellText, KeyEvent.VK_C);
 		JPanel cancelPanel = new JPanel();
 		cancelPanel.add(cancelButton);
 		customDialog.buttonsPanel.add(cancelPanel, cons);
@@ -842,7 +847,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
        //Se añade el campo de texto al panel de información general
         customDialog.mainPanel.add(customDialog.component, c);
         //Se le asigna el nombre accesible
-        customDialog.component.getAccessibleContext().setAccessibleName(fullAccesibleName.replaceAll("<br>", "") +" ALT + " + String.valueOf((char) mnemonic) + ". ");
+        customDialog.component.getAccessibleContext().setAccessibleName(fullAccesibleName.replaceAll(Constants.HTML_SALTO_LINEA, "") +" ALT + " + String.valueOf((char) mnemonic) + ". ");
         
         //Etiqueta principal
         //Se relaciona la etiqueta con el componente
@@ -861,7 +866,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
 		//Cancel button
-		cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		cancelButton = customDialog.getButton(cancellText, KeyEvent.VK_C);
 		JPanel cancelPanel = new JPanel();
 		cancelPanel.add(cancelButton);
 		customDialog.buttonsPanel.add(cancelPanel, cons);
@@ -914,7 +919,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
-        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll("<br>", "") +"  ALT + " + String.valueOf((char) mnemonic) + ". ");
+        customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +"  ALT + " + String.valueOf((char) mnemonic) + ". ");
         //Se añade el campo de texto al panel de información general
         customDialog.mainPanel.add(customDialog.component, c);
 
@@ -983,7 +988,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//cons.anchor = GridBagConstraints.CENTER;
 
 		//Cancel button
-		cancelButton = customDialog.getButton(Messages.getString("PrincipalGUI.cancelar"), KeyEvent.VK_C);
+		cancelButton = customDialog.getButton(cancellText, KeyEvent.VK_C);
 		JPanel cancelPanel = new JPanel();
 		cancelPanel.add(cancelButton);
 		customDialog.buttonsPanel.add(cancelPanel, cons);
@@ -1018,7 +1023,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.setContrastColor(button);
         Utils.setFontBold(button);
         //Se comprueba si el botón es el de cancelar
-        if (text.equalsIgnoreCase(Messages.getString("PrincipalGUI.cancelar"))) {
+        if (text.equalsIgnoreCase(cancellText)) {
         	//Se asigna la tecla escape a dicho botón
         	String cancelKey = "cancel";
     		this.getRootPane().getInputMap (JComponent.WHEN_IN_FOCUSED_WINDOW).put (KeyStroke.getKeyStroke (KeyEvent.VK_ESCAPE, 0), cancelKey);

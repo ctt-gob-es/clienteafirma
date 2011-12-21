@@ -204,5 +204,10 @@ public class Constants {
 	 * Variable que almacena el icono original del botón de restaurar.
 	 */
 	public static final ImageIcon IMAGEICONRESTORE = new ImageIcon(Utils.class.getResource("/resources/images/restore.png"));
+	
+	/**
+	 * C&oacute;digo HTML para el salto de l&iacute;nea
+	 */
+	public static final String HTML_SALTO_LINEA = "<br>";
 }
 
