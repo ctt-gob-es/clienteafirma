@@ -58,7 +58,9 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
     	//Se asigna el botón por defecto
     	this.getRootPane().setDefaultButton(getBotonera().getSiguiente());
     }
-	
+	/**
+	 * Constructor.
+	 */
     public PanelPresentacion() {
         initComponents();
     }
