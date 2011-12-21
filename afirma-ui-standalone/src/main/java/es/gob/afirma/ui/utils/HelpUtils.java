@@ -306,6 +306,9 @@ public class HelpUtils {
 
 		//Accion para desplegar la pantalla de ayuda
 		botonAyuda.addActionListener(new ActionListener() {
+			/**
+			 * Accion para el boton de ayuda.
+			 */
 			public void actionPerformed(ActionEvent evt) {
 				getHelp().setDisplayed(true);
 				getHelp().setCurrentID(pagina);
@@ -531,7 +534,9 @@ public class HelpUtils {
 													 * UID.
 													 */
 													private static final long serialVersionUID = 1L;
-
+													/**
+													 * Devuelve la celda tras aplicarle la configuración de accesibilidad para el contraste.
+													 */
 													public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
  														//DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
  														super.getTreeCellRendererComponent(pTree,pValue,pIsSelected,pIsExpanded,pIsLeaf,pRow,pHasFocus);
