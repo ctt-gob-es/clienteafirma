@@ -63,11 +63,19 @@ import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-
+/**
+ * Panel multifirma masiva para el wizard de multifirma masiva.
+ * @author inteco
+ *
+ */
 class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
-
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Log.
+	 */
 	static Logger logger = Logger.getLogger(PanelMultifirmaMasiva.class.getName());
 	
 	/**
@@ -80,7 +88,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         ExtensionsFileFilter(String[] extensions) {
             this.exts = extensions.clone();
         }
-        
+        /**
+         * Accion aceptar.
+         */
         @Override
         public boolean accept(File file) {
             if (file.isDirectory()) {
@@ -110,7 +120,9 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             return ""; //$NON-NLS-1$
         }
     }
-	
+    /**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -437,13 +449,21 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 	 * Botonera con funciones para la pagina panel de multifirma - cofirma
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {

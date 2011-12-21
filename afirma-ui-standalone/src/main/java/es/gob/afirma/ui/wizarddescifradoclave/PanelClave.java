@@ -60,9 +60,13 @@ import es.gob.afirma.util.AOBase64;
  * Clase que muestra el contenido principal del descifrado de una clave.
  */
 public class PanelClave extends JAccessibilityDialogWizard {
-
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Log.
+	 */
 	static Logger logger = Logger.getLogger(PanelClave.class.getName());
 	
 	/**
@@ -75,10 +79,14 @@ public class PanelClave extends JAccessibilityDialogWizard {
 	 */
 	private String rutaFichero = "";
 	
-	// Campo donde se guarda la contrasenia
+	/**
+	 * Campo donde se guarda la contrasenia.
+	 */
     private JTextField campoClave = new JTextField();
 
-	
+    /**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -92,7 +100,11 @@ public class PanelClave extends JAccessibilityDialogWizard {
     	this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
-    
+    /**
+     * Constructor.
+     * @param algoritmo
+     * @param rutaFichero
+     */
 	public PanelClave(String algoritmo, String rutaFichero) {
 		this.cipherConfig = new CipherConfig(algoritmo);
 		this.rutaFichero = rutaFichero;
@@ -271,13 +283,21 @@ public class PanelClave extends JAccessibilityDialogWizard {
 	 * Botonera con funciones para la pagina panel de cifrado
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {

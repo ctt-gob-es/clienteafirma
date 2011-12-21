@@ -56,9 +56,13 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * Clase que muestra el contenido principal del descifrado de una contrasenia.
  */
 public class PanelContrasenia extends JAccessibilityDialogWizard {
-
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Log.
+	 */
 	static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
 	
 	/**
@@ -71,10 +75,14 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	 */
 	private CipherConfig cipherConfig;
 	
-	// Campo donde se guarda la contrasenia
+	/**
+	 * Campo donde se guarda la contrasenia.
+	 */
     private JPasswordField campoContrasenia = new JPasswordField();
 
-
+    /**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -88,11 +96,17 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
     	this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
-	
+	/**
+	 * Constructor.
+	 */
 	public PanelContrasenia() {
         initComponents();
     }
-
+	/**
+	 * Constructor.
+	 * @param algoritmo
+	 * @param rutaFichero
+	 */
 	public PanelContrasenia(String algoritmo, String rutaFichero) {
 		this.cipherConfig = new CipherConfig(algoritmo);
 		this.rutaFichero = rutaFichero;
@@ -219,13 +233,21 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	 * Botonera con funciones para la pagina panel de cifrado
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {

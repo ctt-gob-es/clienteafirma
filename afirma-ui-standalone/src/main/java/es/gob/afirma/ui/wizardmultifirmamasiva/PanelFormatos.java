@@ -44,14 +44,24 @@ import es.gob.afirma.ui.utils.Utils;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
-
+/**
+ * Panel de formatos para el wizard de multifirma masiva.
+ * @author inteco
+ *
+ */
 final class PanelFormatos extends JAccessibilityDialogWizard implements ItemListener {
-
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Log.
+	 */
 	static Logger logger = Logger.getLogger(PanelFormatos.class.getName());
 	
-	// Listado con las constantes de los formatos del combo
+	/**
+	 * Listado con las constantes de los formatos del combo.
+	 */
 	private List<String> formatosV = new ArrayList<String>(Arrays.asList(
 			AOSignConstants.SIGN_FORMAT_XADES_DETACHED,
 			AOSignConstants.SIGN_FORMAT_XADES_ENVELOPING,
@@ -61,6 +71,9 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
 			AOSignConstants.SIGN_FORMAT_ODF,
 			AOSignConstants.SIGN_FORMAT_OOXML));
 	
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 8;
@@ -74,7 +87,9 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
 		this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
-	
+	/**
+	 * Constructor.
+	 */
 	PanelFormatos() {
 		initComponents();
 	}
@@ -335,13 +350,21 @@ final class PanelFormatos extends JAccessibilityDialogWizard implements ItemList
 	 * Botonera con funciones para la pagina panel de multifirma - cofirma
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {

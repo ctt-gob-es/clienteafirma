@@ -56,9 +56,13 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * Dialogo con la pagina 2: Clave de cifrado
  */
 public class PanelContrasenia extends JAccessibilityDialogWizard {
-
+	/**
+	 * UID.
+	 */
     private static final long serialVersionUID = 1L;
-
+    /**
+     * Log.
+     */
     static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
 
     /**
@@ -76,12 +80,18 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
      */
     private Key cipherKey;
     
-    // Campo donde se guarda la contrasenia
+    /**
+     * Campo donde se guarda la contrasenia.
+     */
     private JPasswordField campoContrasenia = new JPasswordField();
 
-    // Campo donde se guarda la contrasenia repetida
+    /**
+     * Campo donde se guarda la contrasenia repetida.
+     */
     private JPasswordField campoContraseniaRep = new JPasswordField();
-
+    /**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
     @Override
     public int getMinimumRelation(){
         return 8;
@@ -95,7 +105,11 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
-
+    /**
+     * Constructor.
+     * @param algoritmo
+     * @param rutaFichero
+     */
     public PanelContrasenia(String algoritmo, String rutaFichero) {
         this.cipherConfig = new CipherConfig(algoritmo);
         this.rutaFichero = rutaFichero;
@@ -257,13 +271,21 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
      * Botonera con funciones para la pagina panel de cifrado
      */
     private class Botonera extends BotoneraInferior {
-
+    	/**
+    	 * UID.
+    	 */
         private static final long serialVersionUID = 1L;
-
+        /**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
         public Botonera(List<JDialogWizard> ventanas, int posicion) {
             super(ventanas, posicion);
         }
-
+        /**
+		 * Accion para el boton siguiente.
+		 */
         @Override
         protected void siguienteActionPerformed(JButton anterior,
                 JButton siguiente, JButton finalizar) {

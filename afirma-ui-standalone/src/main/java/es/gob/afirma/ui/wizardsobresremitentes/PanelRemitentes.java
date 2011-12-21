@@ -75,11 +75,17 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * a partir de una seleccion de certificados de remitentes.
  */
 public class PanelRemitentes extends JAccessibilityDialogWizard {
-
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Log.
+	 */
 	static Logger logger = Logger.getLogger(PanelRemitentes.class.getName());
-	
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -113,16 +119,23 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
-	
+	/**
+	 * Constructor.
+	 * @param rutafichero
+	 */
 	public PanelRemitentes(String rutafichero) {
 		this.rutafichero = rutafichero;
 		initComponents();
 	}
 
-	// Lista de remitentes
+	/**
+	 * Lista de remitentes.
+	 */
 	private JList listaRemitentes = new JList();
 	
-    // Etiqueta con el texto "Anadir remitente desde..."
+    /**
+     * Etiqueta con el texto "Anadir remitente desde...".
+     */
     private JLabel etiquetaAnadir = new JLabel();
 	
 	/**
@@ -177,6 +190,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		comboRepositorios.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " " + comboRepositorios.getToolTipText() + " ALT + D.");
 		comboRepositorios.getAccessibleContext().setAccessibleDescription(comboRepositorios.getToolTipText());
 		comboRepositorios.addActionListener(new ActionListener() {
+			/**
+			 * Accion combo de repositorios.
+			 */
 			@Override
             public void actionPerformed(ActionEvent arg0) {
 				PanelRemitentes.this.listaCertificadosRe.clear();
@@ -211,6 +227,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
+			/**
+			 * Accion boton anadir.
+			 */
 			@Override
             public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboRepositorios, eliminar, anadir);
@@ -285,6 +304,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
 		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
+			/**
+			 * Accion boton eliminar.
+			 */
 			@Override
             public void actionPerformed(ActionEvent evt) {
 				eliminarActionPerformed(comboRepositorios, eliminar, anadir);
@@ -433,13 +455,21 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 * Botonera con funciones para la pagina panel de multifirma - cofirma
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {

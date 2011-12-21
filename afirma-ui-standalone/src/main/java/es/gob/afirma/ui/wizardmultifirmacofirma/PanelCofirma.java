@@ -60,11 +60,17 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * Clase que muestra el contenido principal de multifirmas - cofirma.
  */
 public class PanelCofirma extends JAccessibilityDialogWizard {
-
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Log.
+	 */
 	static Logger logger = Logger.getLogger(PanelCofirma.class.getName());
-
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -83,15 +89,22 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 		this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
-
+	/**
+	 * Constructor.
+	 * @param kssc
+	 */
 	public PanelCofirma(KeyStoreConfiguration kssc) {
 		this.kssc = kssc;
 		initComponents();
 	}
 
-	// Campo donde se guarda el nombre del fichero de datos
+	/**
+	 * Campo donde se guarda el nombre del fichero de datos.
+	 */
 	private JTextField campoDatos = new JTextField();
-	// Campo donde se guarda el nombre del fichero de firma
+	/**
+	 * Campo donde se guarda el nombre del fichero de firma.
+	 */
 	private JTextField campoFirma = new JTextField();
 
 	/**
@@ -163,6 +176,9 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         examinarFirma.getAccessibleContext().setAccessibleName(examinarFirma.getText() + " " + examinarFirma.getToolTipText());
         examinarFirma.getAccessibleContext().setAccessibleDescription(examinarFirma.getToolTipText());
         examinarFirma.addActionListener(new ActionListener() {
+        	/**
+        	 * Accion boton examinar.
+        	 */
             @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarFirmaActionPerformed();
@@ -221,6 +237,9 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
         examinarDatos.getAccessibleContext().setAccessibleName(examinarDatos.getText() + " " + examinarDatos.getToolTipText());
         examinarDatos.getAccessibleContext().setAccessibleDescription(examinarDatos.getToolTipText());
         examinarDatos.addActionListener(new ActionListener() {
+        	/**
+        	 * Accion examinar datos.
+        	 */
             @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarDatosActionPerformed();
@@ -276,13 +295,21 @@ public class PanelCofirma extends JAccessibilityDialogWizard {
 	 * Botonera con funciones para la pagina panel de multifirma - cofirma
 	 */
 	private class Botonera extends BotoneraInferior {
-
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
-
+		/**
+		 * Constructor.
+		 * @param ventanas Lista de ventanas que componen el wizard.
+		 * @param posicion posicion de la ventana donde se inserta esta botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, int posicion) {
 			super(ventanas, posicion);
 		}
-
+		/**
+		 * Accion para el boton siguiente.
+		 */
 		@Override
 		protected void siguienteActionPerformed(JButton anterior,
 				JButton siguiente, JButton finalizar) {
