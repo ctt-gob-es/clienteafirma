@@ -76,15 +76,32 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * a partir de una seleccion de certificados de remitentes.
  */
 public class PanelRemitentes extends JAccessibilityDialogWizard {
-
+	
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * Log.
+	 */
 	static Logger logger = Logger.getLogger(PanelRemitentes.class.getName());
 
-	public static int SOBRE_AUTENTICADO = 0; 
+	/**
+	 * Constante sobre autenticado.
+	 */
+	public static int SOBRE_AUTENTICADO = 0;
+	/**
+	 * Constante sobre firmado.
+	 */
     public static int SOBRE_FIRMADO = 1;
+    /**
+	 * Constante sobre simple.
+	 */
     public static int SOBRE_SIMPLE = 2;
     
+    /**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
     @Override
 	public int getMinimumRelation(){
 		return 8;
@@ -120,6 +137,10 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 	 */
 	private PrivateKeyEntry privateKeyEntry;
 	
+	/**
+	 * Asignacion de la lista de certificados.
+	 * @param listaCertificados
+	 */
 	public void setListaCertificados(List<CertificateDestiny> listaCertificados) {
 		this.listaCertificados = listaCertificados;
 	}
@@ -133,15 +154,24 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
 	
+	/**
+	 * Constructor.
+	 * @param rutafichero
+	 * @param tipo
+	 */
 	public PanelRemitentes(String rutafichero, Integer tipo) {
 		this.rutafichero = rutafichero;
 		this.tipo = tipo;
 		initComponents();
 	}
 
-	// Lista de remitentes
+	/**
+	 * Lista de remitentes.
+	 */
 	private JList listaRemitentes = new JList();
-	 // Etiqueta con el texto "Anadir remitente desde..."
+	 /**
+	  * Etiqueta con el texto "Anadir remitente desde...".
+	  */
 	private JLabel etiquetaAnadir = new JLabel();
 	
 	/**
@@ -226,6 +256,10 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
+			/**
+			 * Accion del boton aniadir.
+			 * @param evt evento.
+			 */
 			@Override
             public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboRepositorios, eliminar, anadir);
@@ -299,6 +333,9 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
 		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
+			/**
+			 * Accion del boton eliminar.
+			 */
 			@Override
             public void actionPerformed(ActionEvent evt) {
 				eliminarActionPerformed(comboRepositorios, eliminar, anadir);
@@ -631,7 +668,13 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 		
 		return privateKeyEntry;
 	}
-	
+	/**
+	 * Lectura de fichero.
+	 * @param filepath
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	private byte[] readFile(String filepath) throws FileNotFoundException, IOException {
 		byte[] data = null;
 		InputStream fileIn = null;

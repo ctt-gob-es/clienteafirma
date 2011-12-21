@@ -58,14 +58,23 @@ import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
- * Panel de entrada del archivo
+ * Panel de entrada del archivo.
  */
 public class PanelEntrada extends JAccessibilityDialogWizard {
 
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Log.
+	 */
 	static Logger logger = Logger.getLogger(PanelEntrada.class.getName());
 	
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -84,7 +93,11 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
     	this.setBotonera(new Botonera(ventanas, 1));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
-	
+
+    /**
+     * Constructor.
+     * @param kssc configuracion.
+     */
     public PanelEntrada(KeyStoreConfiguration kssc) {
     	this.kssc = kssc;
         initComponents();
@@ -207,8 +220,16 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
 	 */
 	private class Botonera extends BotoneraInferior {
 
+		/**
+		 * UID.
+		 */
 		private static final long serialVersionUID = 1L;
 
+		/**
+		 * Contructor.
+		 * @param ventanas lista de ventanas que contiene el wizard.
+		 * @param posicion posicion de la ventana que contiene la botonera.
+		 */
 		public Botonera(List<JDialogWizard> ventanas, Integer posicion) {
 			super(ventanas, posicion);
 		}

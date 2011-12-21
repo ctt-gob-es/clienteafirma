@@ -63,13 +63,22 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * a partir de una seleccion de certificados de destinatarios.
  */
 public class PanelDestinatarios extends JAccessibilityDialogWizard {
-
+	
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-
+	/**
+	 * log.
+	 */
 	static Logger logger = Logger.getLogger(PanelDestinatarios.class.getName());
-	
+	/**
+	 * Lista de certificados.
+	 */
 	List<CertificateDestiny> listaCertificados = new ArrayList<CertificateDestiny>();
-	
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 8;
@@ -83,12 +92,16 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		this.setBotonera(new Botonera(ventanas, Integer.valueOf(1)));
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
 	}
-	
+	/**
+	 * Constructor.
+	 */
 	public PanelDestinatarios() {
 		initComponents();
 	}
 	
-	// Lista con los destinatarios
+	/**
+	 * Lista con los destinatarios.
+	 */
 	JList listaDestinatarios = new JList();
 	
 	/**
@@ -172,6 +185,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
 		anadir.getAccessibleContext().setAccessibleDescription(anadir.getToolTipText());
 		anadir.addActionListener(new ActionListener() {
+			/**
+			 * Accion del boton anadir.
+			 */
 			@Override
             public void actionPerformed(ActionEvent evt) {
 				anadirActionPerformed(comboDestinatarios, (DefaultListModel) PanelDestinatarios.this.listaDestinatarios.getModel(), 
@@ -247,6 +263,9 @@ public class PanelDestinatarios extends JAccessibilityDialogWizard {
 		eliminar.getAccessibleContext().setAccessibleName(eliminar.getText() + " " + eliminar.getToolTipText());
 		eliminar.getAccessibleContext().setAccessibleDescription(eliminar.getToolTipText());
 		eliminar.addActionListener(new ActionListener() {
+			/**
+			 * Accion del boton eliminar.
+			 */
 			@Override
             public void actionPerformed(ActionEvent evt) {
 				eliminarActionPerformed((DefaultListModel) PanelDestinatarios.this.listaDestinatarios.getModel(), eliminar);

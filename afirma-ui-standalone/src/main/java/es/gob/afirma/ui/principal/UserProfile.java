@@ -46,6 +46,9 @@ import es.gob.afirma.ui.utils.ProfileManager;
  */
 public class UserProfile extends JAccessibilityFrameAdvisor {
 
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;	
 
 	/**
@@ -61,7 +64,10 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	 * Perfil actual.
 	 */
     public static String currentProfileId;
-        
+    
+    /**
+     * Combo perfiles.
+     */
     JComboBox comboPerfiles = new JComboBox();
 	
 	/**

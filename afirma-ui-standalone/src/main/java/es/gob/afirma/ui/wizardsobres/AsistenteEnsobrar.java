@@ -32,6 +32,11 @@ public class AsistenteEnsobrar {
 	 */
 	private String rutaFichero;
 	
+	/**
+	 * Constructor.
+	 * @param rutafichero
+	 * @param tipo
+	 */
     public AsistenteEnsobrar(String rutafichero, Integer tipo) {
         this.rutaFichero = rutafichero;
         this.tipo = tipo;

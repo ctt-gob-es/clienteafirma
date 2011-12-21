@@ -31,12 +31,18 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
  *
- * Panel explicativo de presentacion
+ * Panel explicativo de presentacion.
  */
 public class PanelPresentacion extends JAccessibilityDialogWizard {
 
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-	
+
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -54,7 +60,10 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
     	//Se asigna el botón por defecto
     	this.getRootPane().setDefaultButton(getBotonera().getSiguiente());
     }
-	
+
+    /**
+     * Constructor.
+     */
     public PanelPresentacion() {
         initComponents();
     }

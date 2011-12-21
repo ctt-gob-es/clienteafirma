@@ -33,8 +33,17 @@ import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
 public class BotoneraSuperior extends JPanel {
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * Dimensiones.
+	 */
 	private Dimension dimensiones = new Dimension(603, 70);
+	/**
+	 * Lista de ventanas del wizard.
+	 */
 	private List<JDialogWizard> ventanas;
 	/**
 	 * Boton de restaurar.
@@ -46,6 +55,10 @@ public class BotoneraSuperior extends JPanel {
 	 */
 	private JButton maximizeButton = null;
 	
+	/**
+	 * Devuelve la lista de ventanas del wizard.
+	 * @return lista de ventanas del wizard.
+	 */
 	public List<JDialogWizard> getVentanas() {
 		return this.ventanas;
 	}

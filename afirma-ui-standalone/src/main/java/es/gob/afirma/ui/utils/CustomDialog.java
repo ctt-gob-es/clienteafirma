@@ -376,11 +376,16 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		this.restoreButton.addFocusListener(new FocusListener() {
 			
+			/**
+			 * Evento que se produce cuando el componente pierde el foco.
+			 */
 			@Override
 			public void focusLost(FocusEvent e) {
 				Utils.showToolTip(false, tip, restoreButton, tipText);
 			}
-			
+			/**
+			 * Evento que se produce cuando el componente tiene el foco.
+			 */
 			@Override
 			public void focusGained(FocusEvent e) {
 				Utils.showToolTip(true, tip, restoreButton, tipText);
@@ -394,6 +399,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		this.restoreButton.setName("restaurar");
 		restorePanel.add(this.restoreButton);
 		this.restoreButton.addActionListener(new ActionListener() {
+			/**
+			 * Accion del boton.
+			 */
 	    	public void actionPerformed(ActionEvent e) {
 	    		restaurarActionPerformed();
 			}
@@ -429,12 +437,16 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		maximizePanel.add(this.maximizeButton);
 
 		this.maximizeButton.addFocusListener(new FocusListener() {
-			
+			/**
+			 * Evento que se produce cuando el componente pierde el foco.
+			 */
 			@Override
 			public void focusLost(FocusEvent e) {
 				Utils.showToolTip(false, tip, maximizeButton, tipText);
 			}
-			
+			/**
+			 * Evento que se produce cuando el componente tiene el foco.
+			 */
 			@Override
 			public void focusGained(FocusEvent e) {
 				Utils.showToolTip(true, tip, maximizeButton, tipText);
@@ -443,6 +455,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		
 		this.maximizeButton.addActionListener(new ActionListener() {
+				/**
+				 * Accion del boton.
+				 */
 		    	public void actionPerformed(ActionEvent e) {
 		    		maximizarActionPerformed();
 				}
@@ -929,6 +944,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		final char defaultChar = ((JPasswordField)customDialog.component).getEchoChar();
 		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
 		showPassCheckBox.addItemListener(new ItemListener() {
+			/**
+			 * Evento que se produce cuando el componente cambia de estado.
+			 */
 			@Override
             public void itemStateChanged(ItemEvent evt) {
 				if (evt.getStateChange() == ItemEvent.SELECTED){
@@ -1133,9 +1151,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
      * tactika.com/realhome/realhome.html</a>
      * @author Real Gagnon */
     private static final class JTextFieldFilter extends PlainDocument {
-
+    	/**
+    	 * UID.
+    	 */
         private static final long serialVersionUID = -5746396042117084830L;
 
+        /**
+         * Caracteres aceptados.
+         */
         private String acceptedChars = null;
 
         /** Crea un nuevo filtro para campo de entrada de texto.
@@ -1154,6 +1177,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 
         private boolean beep = false;
 
+        /**
+         * Insercion de texto.
+         */
         @Override
         public void insertString(final int offset, final String str, final AttributeSet attr) throws BadLocationException {
             if (str == null) {

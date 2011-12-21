@@ -67,15 +67,27 @@ import es.gob.afirma.ui.principal.PrincipalGUI;
  * Clase con utilidades relacionadas con la ayuda de la aplicacion
  */
 public class HelpUtils {
-	
+
+	/**
+	 * Mapa de componentes y su indice en la ayuda.
+	 */
 	private static Hashtable<String, Component> components = new Hashtable<String, Component>();
+	/**
+	 * Controlador de ayuda.
+	 */
 	private static HelpBroker helpBroker = null;
+	/**
+	 * Conjunto de información de ayuda.
+	 */
 	private static HelpSet helpset = null;
 	/**
 	 * Variable que almacena el icono original del botón de ayuda.
 	 */
 	public static final ImageIcon IMAGEICONHELP = new ImageIcon(HelpUtils.class.getResource("/resources/images/help.png"));
  
+	/**
+	 * Devuelve la ayuda.
+	 */
 	static {
 		getHelp();
 		
@@ -171,7 +183,10 @@ public class HelpUtils {
 		}
 	}	
 	
-	
+	/**
+	 * Visualiza la pagina de ayuda indicada.
+	 * @param pagina id de pagina
+	 */
 	public static void visualize(String pagina){
 		getHelp().setCurrentID(pagina);
 		if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
@@ -194,8 +209,10 @@ public class HelpUtils {
 			checkHelpAccessibility(helpwindow, false);
 		}
 	}
+
 	/**
-	 * Visualiza la ayuda en la pagina de "Introduccion"
+	 * Visualiza la ayuda en la pagina de "Introduccion".
+	 * @param show indica si se mostrara o no
 	 */
 	public static void visualize(boolean show) {
 		
@@ -227,10 +244,6 @@ public class HelpUtils {
 	 * Genera el bot&oacute;n de ayuda que apuntar&aacute; a la p&aacute;gina dada.
 	 * @param pagina P&aacute;gina a mostrar cuando se puelse el bot&oacute;n de ayuda.
 	 * @return bot&oacute;n de ayuda
-	 */
-	/**
-	 * @param pagina
-	 * @return
 	 */
 	public static JButton helpButton(final String pagina) {
 
@@ -384,6 +397,10 @@ public class HelpUtils {
 		}
 	}
 
+	/**
+	 * Establece las opciones de accesibilidad para la ayuda.
+	 * @param activate Indica si está activado el alto contraste.
+	 */
 	public static void checkHelpAccessibility(boolean activate){
 		WindowPresentation wp = ((DefaultHelpBroker)getHelp()).getWindowPresentation();
 		JFrame helpwindow = (JFrame) wp.getHelpWindow();
@@ -454,6 +471,12 @@ public class HelpUtils {
 			 }
 		}
 	}
+	/**
+	 * Establece el alto contraste para el indice de la ayuda.
+	 * @param tabbedPane pestañas del indice.
+	 * @param editorPane panel donde se muestra la ayuda.
+	 * @param activate indica si el modo alto contraste está activado o no.
+	 */
 	private static void setHighContrastComponentTabbedPane(JTabbedPane tabbedPane, final JEditorPane editorPane, final boolean activate){
         if (tabbedPane != null) {
             for(Component componentTabbed : tabbedPane.getComponents()) {
@@ -470,6 +493,13 @@ public class HelpUtils {
                                     		 
                                     		 if(cr instanceof BasicIndexCellRenderer){
                                     			 ((JTree) component9).setCellRenderer(new BasicIndexCellRenderer() {
+													/**
+													 * UID.
+													 */
+													private static final long serialVersionUID = 1L;
+													/**
+													 * Obtiene una celda con su configuración de alto contraste aplicada.
+													 */
 													public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
 														//DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
 														super.getTreeCellRendererComponent(pTree,pValue,pIsSelected,pIsExpanded,pIsLeaf,pRow,pHasFocus);
@@ -487,7 +517,12 @@ public class HelpUtils {
                                     		 }
                                     		 else /*if(cr instanceof BasicTOCCellRenderer)*/{
                                     			 ((JTree) component9).setCellRenderer(new DefaultTreeCellRenderer() {
- 													public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
+ 													/**
+													 * UID.
+													 */
+													private static final long serialVersionUID = 1L;
+
+													public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
  														//DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
  														super.getTreeCellRendererComponent(pTree,pValue,pIsSelected,pIsExpanded,pIsLeaf,pRow,pHasFocus);
  														if(activate){
@@ -510,30 +545,44 @@ public class HelpUtils {
                                     		 }
                                              ((JTree)component9).addMouseListener(new MouseListener() {
      											
+                                            	/**
+                                            	 * Captura de evento de raton. Liberar boton.
+                                            	 */
      											@Override
      											public void mouseReleased(MouseEvent e) {
      												// TODO Auto-generated method stub
      												HelpUtils.setHighContrastEditorPane(editorPane, activate);
      											}
      											
+     											/**
+     											 * Captura de evento de raton. Presionar boton.
+     											 */
      											@Override
      											public void mousePressed(MouseEvent e) {
      												// TODO Auto-generated method stub
      												
      											}
      											
+     											/**
+     											 * Captura de evento de raton. Puntero del ratón fuera del componente.
+     											 */
      											@Override
      											public void mouseExited(MouseEvent e) {
      												// TODO Auto-generated method stub
      												
      											}
      											
+     											/**
+     											 * Captura de evento de raton. Puntero del ratón dentro del componente.
+     											 */
      											@Override
      											public void mouseEntered(MouseEvent e) {
      												// TODO Auto-generated method stub
      												
      											}
-     											
+     											/**
+     											 * Captura de evento de raton. Hacer click.
+     											 */
      											@Override
      											public void mouseClicked(MouseEvent e) {
      												// TODO Auto-generated method stub
@@ -542,18 +591,26 @@ public class HelpUtils {
      										});
                                             ((JTree)component9).addKeyListener(new KeyListener() {
 												
+                                            	/**
+                                            	 * Tecla presionada.
+                                            	 */
 												@Override
 												public void keyTyped(KeyEvent e) {
 													// TODO Auto-generated method stub
 													
 												}
-												
+												/**
+												 * Tecla liberada.
+												 */
 												@Override
 												public void keyReleased(KeyEvent e) {
 													// TODO Auto-generated method stub
 													HelpUtils.setHighContrastEditorPane(editorPane, activate);
 												}
 												
+												/**
+												 * Se ha pulsado una tecla.
+												 */
 												@Override
 												public void keyPressed(KeyEvent e) {
 													// TODO Auto-generated method stub
@@ -569,13 +626,18 @@ public class HelpUtils {
                         		 if (component instanceof JTextField){
                         			 JTextField campo = (JTextField) component;
                         			 campo.addKeyListener(new KeyListener() {
-										
+
+                                     	/**
+                                     	 * Tecla presionada.
+                                     	 */
 										@Override
 										public void keyTyped(KeyEvent e) {
 											// TODO Auto-generated method stub
 											
 										}
-										
+										/**
+										 * Tecla liberada.
+										 */
 										@Override
 										public void keyReleased(KeyEvent e) {
 											// TODO Auto-generated method stub
@@ -583,7 +645,9 @@ public class HelpUtils {
 												HelpUtils.setHighContrastEditorPane(editorPane, activate);
 											}
 										}
-										
+										/**
+										 * Se ha pulsado una tecla.
+										 */
 										@Override
 										public void keyPressed(KeyEvent e) {
 											// TODO Auto-generated method stub

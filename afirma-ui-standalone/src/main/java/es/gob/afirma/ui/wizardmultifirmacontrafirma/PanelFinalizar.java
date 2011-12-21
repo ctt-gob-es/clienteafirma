@@ -30,12 +30,18 @@ import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
- * Panel explicativo de finalizaci�n
+ * Panel explicativo de finalizacion.
  */
 public class PanelFinalizar extends JAccessibilityDialogWizard {
 
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
-	
+
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -51,7 +57,10 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
     	getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
-	
+
+    /**
+     * Constructor.
+     */
     public PanelFinalizar() {
         initComponents();
     }

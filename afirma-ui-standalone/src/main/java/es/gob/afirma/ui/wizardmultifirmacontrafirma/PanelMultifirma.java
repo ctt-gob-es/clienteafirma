@@ -70,13 +70,26 @@ import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
-
+/**
+ * Panel para el wizard de multifirma.
+ * @author inteco
+ *
+ */
 public class PanelMultifirma extends JAccessibilityDialogWizard {
 
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * log.
+	 */
 	static Logger logger = Logger.getLogger(PanelMultifirma.class.getName());
 
+	/**
+	 * Relacion minima para el redimensionado de componentes.
+	 */
 	@Override
 	public int getMinimumRelation(){
 		return 9;
@@ -194,6 +207,10 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
 		}
 	}
 
+	/**
+	 * Constructor.
+	 * @param kssc configuracion.
+	 */
 	public PanelMultifirma(KeyStoreConfiguration kssc) {
 		this.kssc = kssc;
 		initComponents();

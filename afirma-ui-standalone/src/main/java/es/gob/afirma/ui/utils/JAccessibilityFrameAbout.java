@@ -11,10 +11,19 @@ import javax.swing.JFrame;
  */
 public abstract class JAccessibilityFrameAbout extends JFrame {
 
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Adaptador de redimensionado.
+	 */
 	private ResizingAdaptor resizingAdaptor;
-	
+
+	/**
+	 * Constructor.
+	 */
 	public JAccessibilityFrameAbout(){
 		super();
 		this.resizingAdaptor = new ResizingAdaptor(null, null, null,null,this,null,null,null);
@@ -27,7 +36,10 @@ public abstract class JAccessibilityFrameAbout extends JFrame {
 	 * @return int Relación mínima
 	 */
 	public abstract int getMinimumRelation();
-	
+
+	/**
+	 * Ajuste de fuentes.
+	 */
 	public final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
