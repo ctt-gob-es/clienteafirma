@@ -190,22 +190,22 @@ final class Descifrado extends JPanel {
             	comboMecanismoItemStateChanged(comboMecanismo, comboAlgoritmo);
             }
         });
-        comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Descifrado.origenL.0"),Messages.getString("Descifrado.origenL.1")})); //$NON-NLS-1$
+        comboMecanismo.setModel(new DefaultComboBoxModel(new String[]{Messages.getString("Descifrado.origenL.0"),Messages.getString("Descifrado.origenL.1")})); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.remarcar(comboMecanismo);
         Utils.setContrastColor(comboMecanismo);
         Utils.setFontBold(comboMecanismo);
         add(comboMecanismo, c);
         
-        // En la vista simple, no se permitirá configurar el origen de la clave
+        // En la vista simple, no se permitira configurar el origen de la clave
  		if(!GeneralConfig.isAvanzados()) {
  			comboMecanismo.setEnabled(false); //Se deshabilita la opcion
  			//Opciones para el lector de pantalla
 			etiquetaMecanismo.setFocusable(true);
 			Utils.remarcar(etiquetaMecanismo);
-			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") 
+			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")  //$NON-NLS-2$
 			+ Messages.getString("Cifrado.origenL.0") + " "+ Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
  		} else {
- 			//Para la vista avanzada se asigna mnemonico puesto que esta opcion estará habilitada
+ 			//Para la vista avanzada se asigna mnemonico puesto que esta opcion estara habilitada
  			//Relacion entre etiqueta y combo
  			etiquetaMecanismo.setLabelFor(comboMecanismo);
  			//Asignacion de mnemonico
@@ -255,16 +255,16 @@ final class Descifrado extends JPanel {
         Utils.setFontBold(comboAlgoritmo);
 		add(comboAlgoritmo, c);
 		
-		// En la vista simple, no se permitirá configurar el algoritmo de descifrado
+		// En la vista simple, no se permitira configurar el algoritmo de descifrado
 		if(!GeneralConfig.isAvanzados()) {
 			comboAlgoritmo.setEnabled(false); //Se deshabilita la opcion
 			//Opciones para el lector de pantalla
 			etiquetaAlgoritmo.setFocusable(true);
 			Utils.remarcar(etiquetaAlgoritmo);
-			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") 
+			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion")  //$NON-NLS-2$
 			+ Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
 		} else {
-			//Para la vista avanzada se asigna mnemonico puesto que esta opcion estará habilitada
+			//Para la vista avanzada se asigna mnemonico puesto que esta opcion estara habilitada
 			//Relacion entre etiqueta y combo
 			etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
 			//Asignacion de mnemonico
@@ -328,8 +328,8 @@ final class Descifrado extends JPanel {
         
 		JPanel panelAyuda = new JPanel();
 		// Boton ayuda
-		JButton botonAyuda = HelpUtils.helpButton("descifrado");
-		botonAyuda.setName("helpButton");
+		JButton botonAyuda = HelpUtils.helpButton("descifrado"); //$NON-NLS-1$
+		botonAyuda.setName("helpButton"); //$NON-NLS-1$
         
 		cons.ipadx = 15;
 		cons.weightx = 0.0;
@@ -347,10 +347,10 @@ final class Descifrado extends JPanel {
 		add(panelBotones, c);
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoFichero, "descifrado.fichero");
-        HelpUtils.enableHelpKey(examinar, "descifrado.fichero");
-        HelpUtils.enableHelpKey(comboMecanismo, "descifrado.mecanismo");
-        HelpUtils.enableHelpKey(comboAlgoritmo, "descifrado.algoritmo");
+        HelpUtils.enableHelpKey(campoFichero, "descifrado.fichero"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(examinar, "descifrado.fichero"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(comboMecanismo, "descifrado.mecanismo"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(comboAlgoritmo, "descifrado.algoritmo"); //$NON-NLS-1$
     }
 
 	/**
@@ -359,7 +359,7 @@ final class Descifrado extends JPanel {
      * @param campoFichero	Campo donde se guarda el nombre del fichero seleccionado
      */
     void examinarActionPerformed(JTextField campoFichero) {
-    	File selectedFile = SelectionDialog.showFileOpenDialog(this,Messages.getString("Seleccione.fichero.descifrar") );
+    	File selectedFile = SelectionDialog.showFileOpenDialog(this,Messages.getString("Seleccione.fichero.descifrar") ); //$NON-NLS-1$
     	if (selectedFile != null) 
     		campoFichero.setText(selectedFile.getAbsolutePath());
     }
@@ -371,7 +371,7 @@ final class Descifrado extends JPanel {
 	 */
     void comboMecanismoItemStateChanged(JComboBox comboMecanismo, JComboBox comboAlgoritmo) {
         String mecanismo = MECANISMOS.get(comboMecanismo.getSelectedIndex());
-        if (mecanismo.equals("PASSWORD"))
+        if (mecanismo.equals("PASSWORD")) //$NON-NLS-1$
         	comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LC.toArray()));
         else
         	comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LR.toArray()));
@@ -385,25 +385,29 @@ final class Descifrado extends JPanel {
 	 */
     void descifrarActionPerformed(JComboBox comboMecanismo, JComboBox comboAlgoritmo, 
     		JTextField campoFichero) {
-        String algoritmo = "";
+        final String algoritmo;
         String mecanismo = MECANISMOS.get(comboMecanismo.getSelectedIndex());
-        if (mecanismo.equals("PASSWORD"))
+        if (mecanismo.equals("PASSWORD")) { //$NON-NLS-1$
             algoritmo = ALGORITMO_VC.get(comboAlgoritmo.getSelectedIndex());
-        else
+        }
+        else {
             algoritmo = ALGORITMO_VR.get(comboAlgoritmo.getSelectedIndex());
+        }
         
         // Sacamos la ruta del archivo
-        if (campoFichero.getText() == null || campoFichero.getText().equals("")) {
-        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Descifrado.msg.error.fichero"), Messages.getString("Descifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+        if (campoFichero.getText() == null || campoFichero.getText().equals("")) { //$NON-NLS-1$
+        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Descifrado.msg.error.fichero"), Messages.getString("Descifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
         	campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
         }
         else
         	// Se selecciona el primer elemento del combo
-            if (mecanismo.equals("PASSWORD")) 
+            if (mecanismo.equals("PASSWORD")) { //$NON-NLS-1$
                 // Se muestra el asistente de descifrado con contrasena
             	new AsistenteDescifradoContrasenia(algoritmo,campoFichero.getText());
-            else 
+            }
+            else { 
                 // Se muestra el asistente de descifrado con clave
                 new AsistenteDescifradoClave(algoritmo,campoFichero.getText());
+            }
     }
 }
