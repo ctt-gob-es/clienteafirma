@@ -42,6 +42,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -51,6 +52,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.JViewport;
+import javax.swing.JWindow;
 import javax.swing.text.html.HTMLDocument;
 
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
@@ -247,6 +249,23 @@ public class HelpUtils {
 		
 		botonAyuda.setBorder(null); //Eliminar Borde, ayuda a centrar el iconod el boton
 		botonAyuda.setContentAreaFilled(false); //area del boton invisible
+		
+		//Para el tooltip
+		final JWindow tip = new JWindow();
+		final JLabel tipText = new JLabel();
+		
+		botonAyuda.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				Utils.showToolTip(false, tip, botonAyuda, tipText);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				Utils.showToolTip(true, tip, botonAyuda, tipText);
+			}
+		});
 		
 		//Foco para el modo alto contraste
 		if (GeneralConfig.isHighContrast()) {
