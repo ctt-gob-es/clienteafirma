@@ -49,7 +49,7 @@ import es.gob.afirma.ui.wizardsobres.AsistenteEnsobrar;
 import es.gob.afirma.ui.wizardsobresremitentes.AsistenteRemitentes;
 
 
-public class Ensobrado extends JPanel {
+public final class Ensobrado extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -58,9 +58,9 @@ public class Ensobrado extends JPanel {
     }
 
     // Checkbox con texto "Anadir nuevos remitentes al sobre
-    private JCheckBox checkAnadir = new JCheckBox();
+    JCheckBox checkAnadir = new JCheckBox();
     // Combo de tipos de sobre digital
-    private JComboBox comboTipos = new JComboBox();
+    JComboBox comboTipos = new JComboBox();
     
     /**
      * Inicializacion de los componentes
@@ -88,11 +88,11 @@ public class Ensobrado extends JPanel {
 
         // Campo donde se guarda el nombre del archivo a ensobrar
         final JTextField campoFichero = new JTextField();
-        campoFichero.setToolTipText(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N
-        campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion")));
-		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion")));
+        campoFichero.setToolTipText(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N //$NON-NLS-1$
+        campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion"))); //$NON-NLS-1$
+		campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.buscar.caja.descripcion"))); //$NON-NLS-1$
 		campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + O."); // NOI18N
-        campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N
+        campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.buscar.caja.descripcion")); // NOI18N //$NON-NLS-1$
         campoFichero.addAncestorListener(new RequestFocusListener(false));
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
@@ -102,9 +102,9 @@ public class Ensobrado extends JPanel {
         Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
-		//Relación entre etiqueta y campo de texto
+		//Relacion entre etiqueta y campo de texto
 		etiquetaFichero.setLabelFor(campoFichero);
-		//Asignación de mnemónico
+		//Asignacion de mnemonico
 		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_O);
 		
 		c.insets = new Insets(0, 10, 0, 13);
@@ -120,6 +120,7 @@ public class Ensobrado extends JPanel {
         examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
         examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
         examinar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarActionPerformed(campoFichero);
             }
@@ -140,26 +141,27 @@ public class Ensobrado extends JPanel {
 		c.gridy	= 2;
         
         // Checkbox con texto "Anadir nuevos remitentes al sobre
-		checkAnadir.setVisible(false); // Ocultada hasta comprobar la funcionalidad
-        checkAnadir.setMnemonic(KeyEvent.VK_G);
-        checkAnadir.setText(Messages.getString("Ensobrado.check")); // NOI18N
-        checkAnadir.setToolTipText(Messages.getString("Ensobrado.check.description")); // NOI18N
-        checkAnadir.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.check.description.status")));
-        checkAnadir.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.check.description.status")));
+		this.checkAnadir.setVisible(false); // Ocultada hasta comprobar la funcionalidad
+        this.checkAnadir.setMnemonic(KeyEvent.VK_G);
+        this.checkAnadir.setText(Messages.getString("Ensobrado.check")); // NOI18N //$NON-NLS-1$
+        this.checkAnadir.setToolTipText(Messages.getString("Ensobrado.check.description")); // NOI18N //$NON-NLS-1$
+        this.checkAnadir.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.check.description.status"))); //$NON-NLS-1$
+        this.checkAnadir.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.check.description.status"))); //$NON-NLS-1$
         //checkAnadir.getAccessibleContext().setAccessibleName(Messages.getString("Ensobrado.check") + " " + Messages.getString("Ensobrado.check.description.status")); // NOI18N
-        checkAnadir.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.check.description")); // NOI18N
-        checkAnadir.addChangeListener(new ChangeListener() {	
-			public void stateChanged(ChangeEvent arg0) {
-				if (checkAnadir.isSelected())
-					comboTipos.setEnabled(false);
+        this.checkAnadir.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.check.description")); // NOI18N //$NON-NLS-1$
+        this.checkAnadir.addChangeListener(new ChangeListener() {	
+			@Override
+            public void stateChanged(ChangeEvent arg0) {
+				if (Ensobrado.this.checkAnadir.isSelected())
+					Ensobrado.this.comboTipos.setEnabled(false);
 				else
-					comboTipos.setEnabled(true);
+					Ensobrado.this.comboTipos.setEnabled(true);
 			}
 		});
-        Utils.remarcar(checkAnadir);
-        Utils.setContrastColor(checkAnadir);
-        Utils.setFontBold(checkAnadir);
-        add(checkAnadir, c);
+        Utils.remarcar(this.checkAnadir);
+        Utils.setContrastColor(this.checkAnadir);
+        Utils.setFontBold(this.checkAnadir);
+        add(this.checkAnadir, c);
 
         //Espacio en blanco
         JPanel emptyPanel01 = new JPanel();
@@ -189,20 +191,20 @@ public class Ensobrado extends JPanel {
 		c.fill = GridBagConstraints.BOTH;
         
         // Combo con el almacen o repositorio de certificados
-        comboTipos.setToolTipText(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
-        comboTipos.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
-        comboTipos.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
+        this.comboTipos.setToolTipText(Messages.getString("Ensobrado.opciones.combo")); // NOI18N
+        this.comboTipos.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
+        this.comboTipos.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.opciones.combo.status")));
         //comboTipos.getAccessibleContext().setAccessibleName(etiquetaOpciones.getText() + " " + Messages.getString("Ensobrado.opciones.combo.status") +" ALT + T."); // NOI18N
-        comboTipos.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.opciones.combo.description")); // NOI18N
+        this.comboTipos.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.opciones.combo.description")); // NOI18N
         cargarComboTipos();
-        Utils.remarcar(comboTipos);
-        Utils.setContrastColor(comboTipos);
-        Utils.setFontBold(comboTipos);
-        add(comboTipos, c);
+        Utils.remarcar(this.comboTipos);
+        Utils.setContrastColor(this.comboTipos);
+        Utils.setFontBold(this.comboTipos);
+        add(this.comboTipos, c);
         
-      //Relación entre etiqueta y combo
-        etiquetaOpciones.setLabelFor(comboTipos);
-		//Asignación de mnemónico
+      //Relacion entre etiqueta y combo
+        etiquetaOpciones.setLabelFor(this.comboTipos);
+		//Asignacion de mnemonico
         etiquetaOpciones.setDisplayedMnemonic(KeyEvent.VK_T);
         
         c.weighty = 1.0;
@@ -218,7 +220,7 @@ public class Ensobrado extends JPanel {
 		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
-		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientación de componentes al redimensionar
+		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes al redimensionar
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.ipadx = 15;
 		cons.gridx = 0;
@@ -231,18 +233,19 @@ public class Ensobrado extends JPanel {
         // Boton generar
         JButton generar = new JButton();
         generar.setMnemonic(KeyEvent.VK_G);
-        generar.setText(Messages.getString("Ensobrado.btnGenerar")); // NOI18N
-        generar.setToolTipText(Messages.getString("Ensobrado.btnGenerar.description")); // NOI18N
-        generar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.btnGenerar.description.status")));
-        generar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.btnGenerar.description.status")));
+        generar.setText(Messages.getString("Ensobrado.btnGenerar")); // NOI18N //$NON-NLS-1$
+        generar.setToolTipText(Messages.getString("Ensobrado.btnGenerar.description")); // NOI18N //$NON-NLS-1$
+        generar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.btnGenerar.description.status"))); //$NON-NLS-1$
+        generar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.btnGenerar.description.status"))); //$NON-NLS-1$
         generar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	generarActionPerformed(campoFichero);
-            	PrincipalGUI.setNuevoEstado(Messages.getString("Ensobrado.btnGenerar.generado"));
+            	PrincipalGUI.setNuevoEstado(Messages.getString("Ensobrado.btnGenerar.generado")); //$NON-NLS-1$
             }
         });
         //generar.getAccessibleContext().setAccessibleName(generar.getText() + " " + Messages.getString("Ensobrado.btnGenerar.description.status")); // NOI18N
-        generar.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.btnGenerar.description")); // NOI18N
+        generar.getAccessibleContext().setAccessibleDescription(Messages.getString("Ensobrado.btnGenerar.description")); // NOI18N //$NON-NLS-1$
         Utils.remarcar(generar);
         Utils.setContrastColor(generar);
         Utils.setFontBold(generar);
@@ -278,10 +281,10 @@ public class Ensobrado extends JPanel {
 		add(panelBotones, c);
         
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoFichero, "ensobrado.fichero");
-        HelpUtils.enableHelpKey(examinar, "ensobrado.fichero");
-        HelpUtils.enableHelpKey(checkAnadir,"ensobrado.anadirremitentes");
-        HelpUtils.enableHelpKey(comboTipos,"ensobrado.firmarsobre");
+        HelpUtils.enableHelpKey(campoFichero, "ensobrado.fichero"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(examinar, "ensobrado.fichero"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkAnadir,"ensobrado.anadirremitentes"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.comboTipos,"ensobrado.firmarsobre"); //$NON-NLS-1$
     }
 
 	/**
@@ -289,11 +292,11 @@ public class Ensobrado extends JPanel {
      */
     private void cargarComboTipos() {
     	List<String> opciones = new ArrayList<String>();
-    	opciones.add(Messages.getString("Ensobrado.combo.autenticado"));
-    	opciones.add(Messages.getString("Ensobrado.combo.firmado"));
-    	opciones.add(Messages.getString("Ensobrado.combo.simple"));
+    	opciones.add(Messages.getString("Ensobrado.combo.autenticado")); //$NON-NLS-1$
+    	opciones.add(Messages.getString("Ensobrado.combo.firmado")); //$NON-NLS-1$
+    	opciones.add(Messages.getString("Ensobrado.combo.simple")); //$NON-NLS-1$
     	
-    	comboTipos.setModel(new DefaultComboBoxModel(opciones.toArray()));
+    	this.comboTipos.setModel(new DefaultComboBoxModel(opciones.toArray()));
 	}
 
 	/**
@@ -302,7 +305,7 @@ public class Ensobrado extends JPanel {
 	 * @param campoFichero	Campo en el que se escribe el nombre del fichero seleccionado
 	 */
     private void examinarActionPerformed(JTextField campoFichero) {  
-    	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.ensobrar"));
+    	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Seleccione.fichero.ensobrar")); //$NON-NLS-1$
     	if (selectedFile != null) {
     		campoFichero.setText(selectedFile.getAbsolutePath());
     	}
@@ -312,21 +315,21 @@ public class Ensobrado extends JPanel {
      * Ensobra el archivo seleccionado con las opciones indicadas
      * @param campoFichero	Campo con el nombre del fichero a ensobrar
      */
-    private void generarActionPerformed (JTextField campoFichero) {
+    void generarActionPerformed (JTextField campoFichero) {
     	if(campoFichero.getText() == null || campoFichero.getText().equals("")) {
-    		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Ensobrado.msg.error.fichero"), Messages.getString("Ensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE);
+    		CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Ensobrado.msg.error.fichero"), Messages.getString("Ensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
     		campoFichero.requestFocusInWindow(); //Foco al campo que contiene el path al fichero
     	}
         else {
         	//Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
-        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"), JOptionPane.INFORMATION_MESSAGE);
+        	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$
         	
-        	if (checkAnadir.isSelected()) 
+        	if (this.checkAnadir.isSelected()) 
         		// Se muestra el asistente de anadir nuevos remitentes
         		new AsistenteRemitentes(campoFichero.getText());
         	else 
 	        	 // Se muestra el asistente
-	            new AsistenteEnsobrar(campoFichero.getText(), comboTipos.getSelectedIndex());                       
+	            new AsistenteEnsobrar(campoFichero.getText(), this.comboTipos.getSelectedIndex());                       
         }
     }
 }

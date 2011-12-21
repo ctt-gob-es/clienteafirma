@@ -53,7 +53,7 @@ public class CabeceraAsistente extends JPanel {
 	private String MessagesDescripcion;
 	private String MessagesDescripcion2 = "";
 	private Dimension dimensiones = new Dimension(607, 175);
-	private Boolean bloqueTexto = false;
+	private boolean bloqueTexto = false;
 	/**
 	 * Botonera.
 	 */
@@ -67,7 +67,7 @@ public class CabeceraAsistente extends JPanel {
 	/**
 	 * Boton de maximizar.
 	 */
-	private JButton maximizeButton = null;
+	JButton maximizeButton = null;
 
 	/**
 	 * Genera una cabecera para un asistente
@@ -104,8 +104,7 @@ public class CabeceraAsistente extends JPanel {
 	 * @param bloqueTexto		True: La descripcion tiene mas de una linea
 	 * 							False: La descripcion tiene solo una linea
 	 */
-	public CabeceraAsistente(String MessagesTitulo, String MessagesDescripcion, Dimension dimensiones, 
-			Boolean bloqueTexto) {
+	public CabeceraAsistente(final String MessagesTitulo, final String MessagesDescripcion, final Dimension dimensiones, final boolean bloqueTexto) {
 		this.MessagesTitulo = MessagesTitulo;
 		this.MessagesDescripcion = MessagesDescripcion;
 		if (dimensiones != null)
@@ -203,7 +202,7 @@ public class CabeceraAsistente extends JPanel {
 	 * @return botonera
 	 */
 	public BotoneraSuperior getBotoneraSuperior() {
-		return botoneraSuperior;
+		return this.botoneraSuperior;
 	}
 	/**
 	 * Se crea el panel de botones de accesibilidad.
@@ -254,12 +253,12 @@ public class CabeceraAsistente extends JPanel {
 			
 			@Override
 			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, restoreButton, tipText);
+				Utils.showToolTip(false, tip, CabeceraAsistente.this.restoreButton, tipText);
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, restoreButton, tipText);
+				Utils.showToolTip(true, tip, CabeceraAsistente.this.restoreButton, tipText);
 			}
 		});
 		Dimension dimension = new Dimension(20,20);
@@ -318,17 +317,18 @@ public class CabeceraAsistente extends JPanel {
 			
 			@Override
 			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, maximizeButton, tipText);
+				Utils.showToolTip(false, tip, CabeceraAsistente.this.maximizeButton, tipText);
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, maximizeButton, tipText);
+				Utils.showToolTip(true, tip, CabeceraAsistente.this.maximizeButton, tipText);
 			}
 		});
 		
 		this.maximizeButton.addActionListener(new ActionListener() {
-		    	public void actionPerformed(ActionEvent e) {
+		    	@Override
+                public void actionPerformed(ActionEvent e) {
 		    		maximizarActionPerformed();
 				}
 			});

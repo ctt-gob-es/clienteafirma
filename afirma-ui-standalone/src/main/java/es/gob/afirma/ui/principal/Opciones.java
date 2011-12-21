@@ -108,7 +108,7 @@ public class Opciones extends JAccessibilityDialog {
 	/**
 	 * Boton de restaurar.
 	 */
-	private JButton restoreButton = null;
+	JButton restoreButton = null;
 	
 	/**
 	 * Boton de maximizar.
@@ -150,7 +150,7 @@ public class Opciones extends JAccessibilityDialog {
         initComponents();
     }
 
-	public static void setUpdate(Boolean update) {
+	public static void setUpdate(boolean update) {
 		Opciones.update = update;
 	}
 
@@ -297,7 +297,7 @@ public class Opciones extends JAccessibilityDialog {
         c.gridwidth = 2;
         c.gridheight = 1;
         
-        getContentPane().add(accessibilityButtonsPanel,c);
+        getContentPane().add(this.accessibilityButtonsPanel,c);
         
         c.weightx = 1.0;
         c.weighty = 1.0;
@@ -322,14 +322,14 @@ public class Opciones extends JAccessibilityDialog {
         this.mainPanel.addTab (Messages.getString("Opciones.contextoFirma"),
         		null,
         		this.contextOptions.getConfigurationPanel(),
-        		Messages.getString("Opciones.contexto"));
+        		Messages.getString("Opciones.contexto")); //$NON-NLS-1$
         
         this.contextOptions.loadConfig(GeneralConfig.getConfig());
         
         //Opciones de accesibilidad
-        this.accessibilityOptions =  new AccessibilityOptionsPane(this, mainGui);
+        this.accessibilityOptions =  new AccessibilityOptionsPane(this, this.mainGui);
         
-        this.mainPanel.addTab(Messages.getString("Opciones.accesibilidad"),
+        this.mainPanel.addTab(Messages.getString("Opciones.accesibilidad"), //$NON-NLS-1$
         		null,
         		this.accessibilityOptions.getConfigurationPanel(),
         		Messages.getString("Opciones.accesibilidadTip"));
@@ -357,14 +357,14 @@ public class Opciones extends JAccessibilityDialog {
         //Foco a la pestaña seleccionada
         this.mainPanel.addAncestorListener(new RequestFocusListener(false));
         
-        if (aplicar){
+        if (this.aplicar){
         	this.mainPanel.setSelectedIndex(2);
-        	if (!accesibilidad){
+        	if (!this.accesibilidad){
         		this.accessibilityOptions.aplicar.addAncestorListener(new RequestFocusListener(false));
         	}
         	HelpUtils.visualize("opciones.accesibilidad");
-        	aplicar = false;
-        	accesibilidad = false;
+        	this.aplicar = false;
+        	this.accesibilidad = false;
         }
 
         this.mainPanel.addMouseListener(new MouseListener() {
@@ -463,13 +463,13 @@ public class Opciones extends JAccessibilityDialog {
 					}
 					switch (index) {
 					case 0:
-						HelpUtils.visualize("opciones.configuracion");
+						HelpUtils.visualize("opciones.configuracion"); //$NON-NLS-1$
 						break;
 					case 1:
 						//HelpUtils.visualize("");
 						break;
 					case 2:
-						HelpUtils.visualize("opciones.accesibilidad");
+						HelpUtils.visualize("opciones.accesibilidad"); //$NON-NLS-1$
 						break;
 					case 3:
 						//HelpUtils.visualize("");
@@ -491,15 +491,15 @@ public class Opciones extends JAccessibilityDialog {
     
     private Component createButtonsPanel() {
     	
-        bottomPanel.removeAll();
+        this.bottomPanel.removeAll();
 
 		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		
 		// Boton aceptar
-        aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
-        aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
-        this.getRootPane().setDefaultButton(aceptar); //Se asigna el botón por defecto para la ventana
-        aceptar.addActionListener(new ActionListener() {
+        this.aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
+        this.aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
+        this.getRootPane().setDefaultButton(this.aceptar); //Se asigna el botón por defecto para la ventana
+        this.aceptar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
             	
             	Properties config = new Properties();
@@ -510,11 +510,11 @@ public class Opciones extends JAccessibilityDialog {
                 aceptarActionPerformed(config, Opciones.this.profilesOptions.getProfiles());
             }
         });
-        aceptar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
-        Utils.remarcar(aceptar);
-        Utils.setContrastColor(aceptar);
-        Utils.setFontBold(aceptar);
-        panelAceptar.add(aceptar);
+        this.aceptar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
+        Utils.remarcar(this.aceptar);
+        Utils.setContrastColor(this.aceptar);
+        Utils.setFontBold(this.aceptar);
+        panelAceptar.add(this.aceptar);
         
         JPanel panelCancelar = new JPanel(new GridLayout(1, 1));
         
@@ -574,7 +574,7 @@ public class Opciones extends JAccessibilityDialog {
 		cons.gridx = 0;
 		cons.insets = new Insets(0, 40, 0, 0);
 		
-		bottomPanel.add(buttonPanel, cons);
+		this.bottomPanel.add(buttonPanel, cons);
 
         cons.weightx = 0.0;
         cons.weighty = 1.0;
@@ -582,9 +582,9 @@ public class Opciones extends JAccessibilityDialog {
 		cons.insets = new Insets(0, 0, 0, 10);
 		
 		panelAyuda.add(botonAyuda);        
-        bottomPanel.add(panelAyuda, cons);
+        this.bottomPanel.add(panelAyuda, cons);
         
-        return bottomPanel;
+        return this.bottomPanel;
     }
 
     
@@ -812,22 +812,22 @@ public class Opciones extends JAccessibilityDialog {
 		//Restore button
 		JPanel restorePanel = new JPanel();
 		//this.restoreButton = getButton("r", KeyEvent.VK_R );
-		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png"));
+		ImageIcon imageIconRestore= new ImageIcon(CustomDialog.class.getResource("/resources/images/restore.png")); //$NON-NLS-1$
 		this.restoreButton = new JButton(imageIconRestore);
 		this.restoreButton.setMnemonic(KeyEvent.VK_R );
-		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description"));
+		this.restoreButton.setToolTipText(Messages.getString("Wizard.restaurar.description")); //$NON-NLS-1$
 		this.restoreButton.getAccessibleContext().setAccessibleName(this.restoreButton.getToolTipText());
 		
 		this.restoreButton.addFocusListener(new FocusListener() {
 			
 			@Override
 			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, restoreButton, tipText);
+				Utils.showToolTip(false, tip, Opciones.this.restoreButton, tipText);
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, restoreButton, tipText);
+				Utils.showToolTip(true, tip, Opciones.this.restoreButton, tipText);
 			}
 		});
 		Dimension dimension = new Dimension(20,20);
@@ -839,7 +839,8 @@ public class Opciones extends JAccessibilityDialog {
 		Utils.remarcar(this.restoreButton);
 		restorePanel.add(this.restoreButton);
 		this.restoreButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
+	    	@Override
+            public void actionPerformed(ActionEvent e) {
 	    		restaurarActionPerformed();
 			}
 		});
@@ -876,12 +877,12 @@ public class Opciones extends JAccessibilityDialog {
 			
 			@Override
 			public void focusLost(FocusEvent e) {
-				Utils.showToolTip(false, tip, maximizeButton, tipText);
+				Utils.showToolTip(false, tip, Opciones.this.maximizeButton, tipText);
 			}
 			
 			@Override
 			public void focusGained(FocusEvent e) {
-				Utils.showToolTip(true, tip, maximizeButton, tipText);
+				Utils.showToolTip(true, tip, Opciones.this.maximizeButton, tipText);
 			}
 		});
 		

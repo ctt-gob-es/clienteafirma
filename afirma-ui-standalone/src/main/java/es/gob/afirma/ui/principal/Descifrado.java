@@ -51,20 +51,20 @@ import es.gob.afirma.ui.wizarddescifradocontrasenia.AsistenteDescifradoContrasen
 /**
  * Clase Descifrado que se encarga de descifrar un fichero cifrado.
  */
-public class Descifrado extends JPanel {
+public final class Descifrado extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
     // Origen de la clave
-    final static List<String> mecanismos = new ArrayList<String>(Arrays.asList("PASSWORD","USERINPUT"));  //$NON-NLS-1$//$NON-NLS-2$
+    private static final List<String> MECANISMOS = new ArrayList<String>(Arrays.asList("PASSWORD","USERINPUT"));  //$NON-NLS-1$//$NON-NLS-2$
 
     // Algoritmos para mecanismo contrasena de cifrado
-    final static List<String> algoritmoLc = new ArrayList<String>(Arrays.asList("Contrase\u00F1a con SHA1 y 3DES","Contrase\u00F1a con SHA1 y RC2","Contrase\u00F1a con MD5 y DES"));
-    final static List<String> algoritmoVc = new ArrayList<String>(Arrays.asList("PBEWithSHA1AndDESede","PBEWithSHA1AndRC2_40","PBEWithMD5AndDES"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+    private static final List<String> ALGORITMO_LC = new ArrayList<String>(Arrays.asList("Contrase\u00F1a con SHA1 y 3DES","Contrase\u00F1a con SHA1 y RC2","Contrase\u00F1a con MD5 y DES"));
+    private static final List<String> ALGORITMO_VC = new ArrayList<String>(Arrays.asList("PBEWithSHA1AndDESede","PBEWithSHA1AndRC2_40","PBEWithMD5AndDES"));  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
 
     // Algoritmos para mecanismo clave de cifrado
-    final static List<String> algoritmoLr = new ArrayList<String>(Arrays.asList("Advanced Encryption Standard (AES)","Alleged RC4","Blowfish","Data Encryption Standard (DES)","Triple DES (3DES)","RC2"));
-    final static List<String> algoritmoVr = new ArrayList<String>(Arrays.asList("AES","ARCFOUR","Blowfish","DES","DESede","RC2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+    private static final List<String> ALGORITMO_LR = new ArrayList<String>(Arrays.asList("Advanced Encryption Standard (AES)","Alleged RC4","Blowfish","Data Encryption Standard (DES)","Triple DES (3DES)","RC2"));
+    private static final List<String> ALGORITMO_VR = new ArrayList<String>(Arrays.asList("AES","ARCFOUR","Blowfish","DES","DESede","RC2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
     public Descifrado() {
         initComponents();
@@ -86,7 +86,7 @@ public class Descifrado extends JPanel {
 		
     	// Etiqueta fichero a descrifrar
         JLabel etiquetaFichero = new JLabel();
-        etiquetaFichero.setText(Messages.getString("Descifrado.buscar")); // NOI18N
+        etiquetaFichero.setText(Messages.getString("Descifrado.buscar")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaFichero);
         Utils.setFontBold(etiquetaFichero);
 		add(etiquetaFichero, c);
@@ -97,11 +97,11 @@ public class Descifrado extends JPanel {
 
         // Caja con el nombre del archivo seleccionado
         final JTextField campoFichero = new JTextField();
-        campoFichero.setToolTipText(Messages.getString("Descifrado.buscar.caja.description")); // NOI18N
+        campoFichero.setToolTipText(Messages.getString("Descifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.buscar.caja.description")));
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.buscar.caja.description")));
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" ALT + E."); // NOI18N
-		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N
+		campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.buscar.caja.description")); // NOI18N //$NON-NLS-1$
 		campoFichero.addAncestorListener(new RequestFocusListener(false));
      
         if (GeneralConfig.isBigCaret()) {
@@ -113,9 +113,9 @@ public class Descifrado extends JPanel {
         Utils.setFontBold(campoFichero);
 		add(campoFichero, c);
 		
-		//Relación entre etiqueta y campo de texto
+		//Relacion entre etiqueta y campo de texto
 		etiquetaFichero.setLabelFor(campoFichero);
-		//Asignación de mnemónico
+		//Asignacion de mnemonico
 		etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_E);
 		
 		c.insets = new Insets(0, 10, 0, 13);
@@ -126,17 +126,18 @@ public class Descifrado extends JPanel {
         // Boton examinar
         JButton examinar = new JButton();
         examinar.setMnemonic(KeyEvent.VK_X);
-        examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
-        examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+        examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N //$NON-NLS-1$
+        examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N //$NON-NLS-1$
         examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description")));
         examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description")));
         examinar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 examinarActionPerformed(campoFichero);
             }
         });
         //examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description"));
-		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+		examinar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N //$NON-NLS-1$
 		
         Utils.remarcar(examinar);
         Utils.setContrastColor(examinar);
@@ -162,9 +163,9 @@ public class Descifrado extends JPanel {
 		c.gridx = 0;
 		c.gridy	= 3;
         
-        // Etiqueta mecanismos de descifrado
+        // Etiqueta MECANISMOS de descifrado
         JLabel etiquetaMecanismo = new JLabel();
-        etiquetaMecanismo.setText(Messages.getString("Descifrado.origen.clave")); // NOI18N
+        etiquetaMecanismo.setText(Messages.getString("Descifrado.origen.clave")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaMecanismo);
         Utils.setFontBold(etiquetaMecanismo);
         add(etiquetaMecanismo, c);
@@ -174,16 +175,17 @@ public class Descifrado extends JPanel {
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.BOTH;
         
-        // Combo mecanismos de cifrado
+        // Combo MECANISMOS de cifrado
         final JComboBox comboMecanismo = new JComboBox();
         final JComboBox comboAlgoritmo = new JComboBox();
-        comboMecanismo.setToolTipText(Messages.getString("Descifrado.origen.clave.combo.description")); // NOI18N
+        comboMecanismo.setToolTipText(Messages.getString("Descifrado.origen.clave.combo.description")); // NOI18N //$NON-NLS-1$
 
 		//comboMecanismo.getAccessibleContext().setAccessibleName(Messages.getString("Cifrado.origen.clave") +" "+ Messages.getString("Descifrado.origen.clave.combo.description")+" ALT + A."); // NOI18N
-		comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N
+		comboMecanismo.getAccessibleContext().setAccessibleDescription(Messages.getString("Cifrado.origen.clave.combo.description")); // NOI18N //$NON-NLS-1$
         comboMecanismo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.origen.clave.combo.description")));
         comboMecanismo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.origen.clave.combo.description")));
         comboMecanismo.addItemListener(new ItemListener() {
+            @Override
             public void itemStateChanged(ItemEvent evt) {
             	comboMecanismoItemStateChanged(comboMecanismo, comboAlgoritmo);
             }
@@ -196,17 +198,17 @@ public class Descifrado extends JPanel {
         
         // En la vista simple, no se permitirá configurar el origen de la clave
  		if(!GeneralConfig.isAvanzados()) {
- 			comboMecanismo.setEnabled(false); //Se deshabilita la opción
+ 			comboMecanismo.setEnabled(false); //Se deshabilita la opcion
  			//Opciones para el lector de pantalla
 			etiquetaMecanismo.setFocusable(true);
 			Utils.remarcar(etiquetaMecanismo);
 			etiquetaMecanismo.getAccessibleContext().setAccessibleName(etiquetaMecanismo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") 
-			+ Messages.getString("Cifrado.origenL.0") + " "+ Messages.getString("Cifrado.origen.clave.combo.disabled"));
+			+ Messages.getString("Cifrado.origenL.0") + " "+ Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
  		} else {
- 			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
- 			//Relación entre etiqueta y combo
+ 			//Para la vista avanzada se asigna mnemonico puesto que esta opcion estará habilitada
+ 			//Relacion entre etiqueta y combo
  			etiquetaMecanismo.setLabelFor(comboMecanismo);
- 			//Asignación de mnemónico
+ 			//Asignacion de mnemonico
  			etiquetaMecanismo.setDisplayedMnemonic(KeyEvent.VK_A);
  		}
 		
@@ -229,7 +231,7 @@ public class Descifrado extends JPanel {
         
         // Etiqueta algoritmos de descifrado
         JLabel etiquetaAlgoritmo = new JLabel();
-        etiquetaAlgoritmo.setText(Messages.getString("Descifrado.formato")); // NOI18N
+        etiquetaAlgoritmo.setText(Messages.getString("Descifrado.formato")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaAlgoritmo);
         Utils.setFontBold(etiquetaAlgoritmo);
 		add(etiquetaAlgoritmo, c);
@@ -240,13 +242,13 @@ public class Descifrado extends JPanel {
 		c.fill = GridBagConstraints.BOTH;
         
         // Combo con los algoritmos de descifrado
-        comboAlgoritmo.setModel(new DefaultComboBoxModel(new String[] { "Triple Data Encryption Standard (3DES)", "Item 2", "Item 3", "Item 4" }));
-        comboAlgoritmo.setToolTipText(Messages.getString("Descifrado.formato.combo.description")); // NOI18N
+        comboAlgoritmo.setModel(new DefaultComboBoxModel(new String[] { "Triple Data Encryption Standard (3DES)", "Item 2", "Item 3", "Item 4" })); //$NON-NLS-1$
+        comboAlgoritmo.setToolTipText(Messages.getString("Descifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
         comboAlgoritmo.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.formato.combo.description")));
         comboAlgoritmo.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.formato.combo.description")));
         //comboAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() +" "+ Messages.getString("Descifrado.formato.combo.description")+" ALT + G."); // NOI18N); // NOI18N
-		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N
-        comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
+		comboAlgoritmo.getAccessibleContext().setAccessibleDescription(Messages.getString("Descifrado.formato.combo.description")); // NOI18N //$NON-NLS-1$
+        comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LC.toArray()));
         
         Utils.remarcar(comboAlgoritmo);
         Utils.setContrastColor(comboAlgoritmo);
@@ -255,17 +257,17 @@ public class Descifrado extends JPanel {
 		
 		// En la vista simple, no se permitirá configurar el algoritmo de descifrado
 		if(!GeneralConfig.isAvanzados()) {
-			comboAlgoritmo.setEnabled(false); //Se deshabilita la opción
+			comboAlgoritmo.setEnabled(false); //Se deshabilita la opcion
 			//Opciones para el lector de pantalla
 			etiquetaAlgoritmo.setFocusable(true);
 			Utils.remarcar(etiquetaAlgoritmo);
 			etiquetaAlgoritmo.getAccessibleContext().setAccessibleName(etiquetaAlgoritmo.getText() + " " + Messages.getString("Cifrado.origen.clave.combo.defaultOpcion") 
-			+ Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled"));
+			+ Messages.getString("Cifrado.origenLc.0") + " " + Messages.getString("Cifrado.origen.clave.combo.disabled")); //$NON-NLS-1$ //$NON-NLS-3$
 		} else {
-			//Para la vista avanzada se asigna mnemónico puesto que esta opción estará habilitada
-			//Relación entre etiqueta y combo
+			//Para la vista avanzada se asigna mnemonico puesto que esta opcion estará habilitada
+			//Relacion entre etiqueta y combo
 			etiquetaAlgoritmo.setLabelFor(comboAlgoritmo);
-			//Asignación de mnemónico
+			//Asignacion de mnemonico
 			etiquetaAlgoritmo.setDisplayedMnemonic(KeyEvent.VK_G);
 		}
         
@@ -282,7 +284,7 @@ public class Descifrado extends JPanel {
 		JPanel panelBotones = new JPanel(new GridBagLayout());
 		
 		GridBagConstraints cons = new GridBagConstraints();
-		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientación de componentes al redimensionar
+		cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes al redimensionar
 		cons.fill = GridBagConstraints.HORIZONTAL;
 		cons.ipadx = 15;
 		cons.gridx = 0;
@@ -295,14 +297,15 @@ public class Descifrado extends JPanel {
         // Boton descifrar
         JButton descifrar = new JButton();
         descifrar.setMnemonic(KeyEvent.VK_R);
-        descifrar.setText(Messages.getString("Descifrado.btndescifrar")); // NOI18N
-        descifrar.setToolTipText(Messages.getString("Descifrado.btndescifrar.description")); // NOI18N
+        descifrar.setText(Messages.getString("Descifrado.btndescifrar")); // NOI18N //$NON-NLS-1$
+        descifrar.setToolTipText(Messages.getString("Descifrado.btndescifrar.description")); // NOI18N //$NON-NLS-1$
         descifrar.setMaximumSize(null);
         descifrar.setMinimumSize(null);
         descifrar.setPreferredSize(null);
         descifrar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.btnDescifrar.description")));
         descifrar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.btnDescifrar.description")));
         descifrar.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 descifrarActionPerformed(comboMecanismo, comboAlgoritmo, campoFichero);
             }
@@ -355,23 +358,23 @@ public class Descifrado extends JPanel {
      * El nombre del fichero seleccionado se guardara en el campo.
      * @param campoFichero	Campo donde se guarda el nombre del fichero seleccionado
      */
-    private void examinarActionPerformed(JTextField campoFichero) {
+    void examinarActionPerformed(JTextField campoFichero) {
     	File selectedFile = SelectionDialog.showFileOpenDialog(this,Messages.getString("Seleccione.fichero.descifrar") );
     	if (selectedFile != null) 
     		campoFichero.setText(selectedFile.getAbsolutePath());
     }
     
     /**
-	 * Cambio de seleccion en el combo de los mecanismos
-	 * @param comboMecanismo	Combo que contiene el listado de mecanismos de cifrado
+	 * Cambio de seleccion en el combo de los MECANISMOS
+	 * @param comboMecanismo	Combo que contiene el listado de MECANISMOS de cifrado
 	 * @param comboAlgoritmo	Combo que contiene el listado de algoritmos
 	 */
-    private void comboMecanismoItemStateChanged(JComboBox comboMecanismo, JComboBox comboAlgoritmo) {
-        String mecanismo = mecanismos.get(comboMecanismo.getSelectedIndex());
+    void comboMecanismoItemStateChanged(JComboBox comboMecanismo, JComboBox comboAlgoritmo) {
+        String mecanismo = MECANISMOS.get(comboMecanismo.getSelectedIndex());
         if (mecanismo.equals("PASSWORD"))
-        	comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLc.toArray()));
+        	comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LC.toArray()));
         else
-        	comboAlgoritmo.setModel(new DefaultComboBoxModel(algoritmoLr.toArray()));
+        	comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LR.toArray()));
     }
 
     /**
@@ -383,11 +386,11 @@ public class Descifrado extends JPanel {
     private void descifrarActionPerformed(JComboBox comboMecanismo, JComboBox comboAlgoritmo, 
     		JTextField campoFichero) {
         String algoritmo = "";
-        String mecanismo = mecanismos.get(comboMecanismo.getSelectedIndex());
+        String mecanismo = MECANISMOS.get(comboMecanismo.getSelectedIndex());
         if (mecanismo.equals("PASSWORD"))
-            algoritmo = algoritmoVc.get(comboAlgoritmo.getSelectedIndex());
+            algoritmo = ALGORITMO_VC.get(comboAlgoritmo.getSelectedIndex());
         else
-            algoritmo = algoritmoVr.get(comboAlgoritmo.getSelectedIndex());
+            algoritmo = ALGORITMO_VR.get(comboAlgoritmo.getSelectedIndex());
         
         // Sacamos la ruta del archivo
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) {

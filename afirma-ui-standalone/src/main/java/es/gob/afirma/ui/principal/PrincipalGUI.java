@@ -223,7 +223,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		getContentPane().add(this.htPanel, BorderLayout.CENTER);
 		
 		// Menu
-		menu = new JMenuBar();
+		this.menu = new JMenuBar();
 		// Menu de herramientas
 		generarMenuHerramientas();
 		// Menu accesibilidad
@@ -231,7 +231,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Menu de ayuda
 		generarMenuAyuda();	
 		
-		setJMenuBar(menu);
+		setJMenuBar(this.menu);
 		
 		// Panel superior
 		JPanel arriba = new JPanel();
@@ -266,7 +266,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * @return	Menu de herramientas
 	 */
 	public JMenu generarMenuHerramientas() {
-		menu.removeAll();
+		this.menu.removeAll();
 		// Opcion del menu principal - Herramientas
 		JMenu herramientas = new JMenu();
 		herramientas.setMnemonic(KeyEvent.VK_S);
@@ -275,7 +275,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         Utils.setContrastColor(herramientas);
 		Utils.setFontBold(herramientas);
 		Utils.remarcar(herramientas);
-		menu.add(herramientas);
+		this.menu.add(herramientas);
 		
 		// Subopcion menu Herramientas - Opciones
 		JMenuItem opciones = new JMenuItem();
@@ -351,7 +351,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				}
 
 				opcionIdioma.addItemListener(new ItemListener() {
-					public void itemStateChanged(ItemEvent e) {
+					@Override
+                    public void itemStateChanged(ItemEvent e) {
 						if (e.getStateChange() == ItemEvent.SELECTED)
 							cambiarIdioma(locale);
 					}
@@ -369,10 +370,11 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
 		// Subopcion menu Herramientas - Salir
 		JMenuItem salir = new JMenuItem();
-		salir.setText(Messages.getString("PrincipalGUI.salir")); // NOI18N
+		salir.setText(Messages.getString("PrincipalGUI.salir")); // NOI18N //$NON-NLS-1$
 		salir.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo al menu
 		salir.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				salirActionPerformed();
 			}
 		});
@@ -385,21 +387,22 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	
 	public JMenu generarMenuAccesibilidad(){
 		// Opcion del menu principal - Accesibilidad
-		JMenu accesibilidad = new JMenu();
-		accesibilidad.setMnemonic(KeyEvent.VK_L);
-		accesibilidad.setText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N
-		accesibilidad.setToolTipText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N
-		Utils.setContrastColor(accesibilidad);
-		Utils.setFontBold(accesibilidad);
-		Utils.remarcar(accesibilidad);
-		menu.add(accesibilidad);
+		JMenu access = new JMenu();
+		access.setMnemonic(KeyEvent.VK_L);
+		access.setText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N //$NON-NLS-1$
+		access.setToolTipText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N //$NON-NLS-1$
+		Utils.setContrastColor(access);
+		Utils.setFontBold(access);
+		Utils.remarcar(access);
+		this.menu.add(access);
 		
 		// Subopcion menu Ayuda - Ayuda
 		JMenuItem accesibilidadItem = new JMenuItem();
 		accesibilidadItem.setText(Messages.getString("PrincipalGUI.accesibilidad.contenido")); // NOI18N
 		accesibilidadItem.setMnemonic(KeyEvent.VK_U); //Se asigna un atajo al menu
 		accesibilidadItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				HelpUtils.visualize("opciones.accesibilidad");
 				Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, true, true);
 				ventanaOpciones.setModal(true);
@@ -409,10 +412,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		});
 		Utils.setContrastColor(accesibilidadItem);
 		Utils.setFontBold(accesibilidadItem);
-		accesibilidad.add(accesibilidadItem);
+		access.add(accesibilidadItem);
 		
 		this.callResize();
-		return accesibilidad;
+		return access;
 	}
 	
 	/**
@@ -423,19 +426,20 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		// Opcion del menu principal - Ayuda
 		JMenu ayuda = new JMenu();
 		ayuda.setMnemonic(KeyEvent.VK_Y);
-		ayuda.setText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N
-		ayuda.setToolTipText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N
+		ayuda.setText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N //$NON-NLS-1$
+		ayuda.setToolTipText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N //$NON-NLS-1$
 		Utils.setContrastColor(ayuda);
 		Utils.setFontBold(ayuda);
 		Utils.remarcar(ayuda);
-		menu.add(ayuda);
+		this.menu.add(ayuda);
 
 		// Subopcion menu Ayuda - Ayuda
 		JMenuItem ayudaHTML = new JMenuItem();
 		ayudaHTML.setText(Messages.getString("ayudaHTML.contenido")); // NOI18N
 		ayudaHTML.setMnemonic(KeyEvent.VK_U); //Se asigna un atajo al menu
 		ayudaHTML.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				ayudaHTMLActionPerformed();
 			}
 		});
@@ -445,10 +449,11 @@ public class PrincipalGUI extends JAccessibilityFrame {
 		
 		// Subopcion menu Ayuda - Acerca de
 		JMenuItem acerca = new JMenuItem();
-		acerca.setText(Messages.getString("ayuda.contenido")); // NOI18N
+		acerca.setText(Messages.getString("ayuda.contenido")); // NOI18N //$NON-NLS-1$
 		acerca.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al menu
 		acerca.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			@Override
+            public void actionPerformed(ActionEvent evt) {
 				acercaActionPerformed();
 			}
 		});
@@ -465,8 +470,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 * Seleccion menu opciones: Muestra la ventana modal con las opciones
 	 */
 	private void opcionesActionPerformed() {
-		HelpUtils.visualize("opciones.configuracion");
-		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, aplicar, accesibilidad);
+		HelpUtils.visualize("opciones.configuracion"); //$NON-NLS-1$
+		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, this.aplicar, this.accesibilidad);
 		ventanaOpciones.setModal(true);
 		ventanaOpciones.setVisible(true);
 		setAplicar(false);
@@ -490,7 +495,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	/**
 	 * Seleccion menu salir: Cierra la aplicaci�n
 	 */
-	private void salirActionPerformed() {
+	void salirActionPerformed() {
 		System.exit(0);
 	}
 
@@ -504,7 +509,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	/**
 	 * Seleccion menu ayuda: Muestra la ventana con el panel de ayuda
 	 */
-	private void ayudaHTMLActionPerformed() {
+	void ayudaHTMLActionPerformed() {
 		HelpUtils.visualize(true);
 	}
 	
@@ -519,8 +524,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
 	    // la ventana principal con el tamaño adecuado
 	    if (this.getExtendedState()==MAXIMIZED_BOTH){
-	    	maximizedWidth = this.getSize().getWidth();
-			maximizedHight = this.getSize().getHeight();
+	    	this.maximizedWidth = this.getSize().getWidth();
+			this.maximizedHight = this.getSize().getHeight();
 	    }
 	    if (GeneralConfig.isMaximized()){
 	    	if (Platform.getOS().equals(Platform.OS.LINUX)) {
@@ -542,8 +547,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    		this.setExtendedState(MAXIMIZED_BOTH);
 	    	}
 		} else {
-			if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-				if (actualWidth == maximizedWidth && actualHeight == maximizedHight){
+			if (this.actualPositionX != -1 && this.actualPositionY != -1 && this.actualWidth != -1 && this.actualHeight != -1){
+				if (this.actualWidth == this.maximizedWidth && this.actualHeight == this.maximizedHight){
 					this.setExtendedState(MAXIMIZED_BOTH);
 				} else{
 					this.setExtendedState(0);
@@ -802,7 +807,8 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	 */
 	public void main() {
 		EventQueue.invokeLater(new Runnable() {
-			public void run() {
+			@Override
+            public void run() {
 				setVisible(true);
 			}
 		});
@@ -822,10 +828,10 @@ public class PrincipalGUI extends JAccessibilityFrame {
 	    
 	    //Se guarda la posición en el caso de que no se haya maximizado por configuración
 		if (!GeneralConfig.isMaximized()){
-			actualPositionX = this.getX();
-			actualPositionY = this.getY();
-			actualWidth = this.getWidth();
-			actualHeight = this.getHeight();
+			this.actualPositionX = this.getX();
+			this.actualPositionY = this.getY();
+			this.actualWidth = this.getWidth();
+			this.actualHeight = this.getHeight();
 		}
 	}
 	
@@ -862,12 +868,12 @@ public class PrincipalGUI extends JAccessibilityFrame {
 				
 				//Se comprueba si el lookAndFeel por defecto es el que se habia modificado para el modo
 				//Alto contraste
-				if (defaultLookAndFeel instanceof MetalLookAndFeel) {
+				if (this.defaultLookAndFeel instanceof MetalLookAndFeel) {
 					MetalLookAndFeel.setCurrentTheme(this.defaultTheme); //Se asigna el tema por defecto
 				}
 				
 				//Se asigna el lookAndFeel que habia por defecto
-				UIManager.setLookAndFeel(defaultLookAndFeel);
+				UIManager.setLookAndFeel(this.defaultLookAndFeel);
 				
 //				UIManager.put("OptionPane.messageForeground",Color.BLACK);
 //				UIManager.put("Button.foreground",Color.BLACK);

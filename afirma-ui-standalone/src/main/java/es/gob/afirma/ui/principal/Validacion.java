@@ -211,7 +211,7 @@ public class Validacion extends JPanel {
      * Modifica el valor de la caja con el nombre del archivo seleccionado
      * @param campoFichero  Campo en el que se escribe el nombre del fichero seleccionado
      */
-    private void browseSignActionPerformed(JTextField campoFichero) {
+    void browseSignActionPerformed(JTextField campoFichero) {
         File selectedFile = SelectionDialog.showFileOpenDialog(this,
                 Messages.getString("Validacion.chooser.title"), (ExtFilter)SignedFileManager.getCommonSignedFileFilter()); //$NON-NLS-1$
         if (selectedFile != null) {
@@ -224,7 +224,7 @@ public class Validacion extends JPanel {
      * de una firma.
      * @param signPath Ruta del fichero de firma.
      */
-    private void validateActionPerformance(String signPath) {
+    void validateActionPerformance(String signPath) {
         if (signPath == null || signPath.trim().length() <= 0) {
         	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Validacion.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;

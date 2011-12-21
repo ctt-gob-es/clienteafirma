@@ -39,7 +39,7 @@ import es.gob.afirma.ui.wizardcifradocontrasenia.PanelContrasenia;
 /**
  * Muestra el panel de acerca de
  */
-public class Acercade extends JAccessibilityFrameAbout {
+public final class Acercade extends JAccessibilityFrameAbout {
 
 	private static final long serialVersionUID = 1L;	
 
@@ -117,11 +117,11 @@ public class Acercade extends JAccessibilityFrameAbout {
     	}
 		
 		// Icono de @firma
-		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
+		setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage()); //$NON-NLS-1$
 		
 		// Configuracion de la ventana Acerca de
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setTitle(Messages.getString("ayuda.contenido")); // NOI18N
+		setTitle(Messages.getString("ayuda.contenido")); // NOI18N //$NON-NLS-1$
 		setResizable(true);
 		getContentPane().setLayout(new GridBagLayout());
 
@@ -164,7 +164,7 @@ public class Acercade extends JAccessibilityFrameAbout {
 		JPanel panelAceptar = new JPanel(new GridLayout(1, 1));
 		// Boton aceptar
 		JButton aceptar = new JButton();
-		aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
+		aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N //$NON-NLS-1$
 		aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
 		aceptar.getAccessibleContext().setAccessibleName(aceptar.getText());
 		aceptar.addActionListener(new java.awt.event.ActionListener() {

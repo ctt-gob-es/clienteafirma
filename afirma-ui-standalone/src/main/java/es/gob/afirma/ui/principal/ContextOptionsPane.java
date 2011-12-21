@@ -26,16 +26,16 @@ import es.gob.afirma.ui.utils.Utils;
 /**
  * Panel con la configuraci&oacute;n de contexto de las firmas de la interfaz.
  */
-public class ContextOptionsPane {
+public final class ContextOptionsPane {
 
 	/** Clave para el algoritmo de firma por defecto. */
-	public static final String KEY_SUBJECT = "context.subject";
+	public static final String KEY_SUBJECT = "context.subject"; //$NON-NLS-1$
 	
 	/** Clave para el algoritmo de firma por defecto. */
-	public static final String KEY_PRODUCTION_PLACE = "context.productionPlace";
+	public static final String KEY_PRODUCTION_PLACE = "context.productionPlace"; //$NON-NLS-1$
 	
 	/** Clave para el algoritmo de firma por defecto. */
-	public static final String KEY_CONTACT_INFO = "context.contactInfo";
+	public static final String KEY_CONTACT_INFO = "context.contactInfo"; //$NON-NLS-1$
 	
 	
 	/** Panel sobre el que se montan los componentes. */
@@ -55,7 +55,7 @@ public class ContextOptionsPane {
 	 */
 	public ContextOptionsPane() {
 		
-    	panel = new JPanel(new GridBagLayout());
+    	this.panel = new JPanel(new GridBagLayout());
         
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -66,7 +66,7 @@ public class ContextOptionsPane {
         
         // Panel firmas de documentos
         JPanel contextPanel = new JPanel(new GridBagLayout());
-        contextPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.firmas"))); // NOI18N
+        contextPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.firmas"))); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(contextPanel);
         Utils.setFontBold(contextPanel);
         
@@ -78,7 +78,7 @@ public class ContextOptionsPane {
         
         // Etiqueta motivo / razon de la firma
         JLabel etiquetaMotivo = new JLabel();
-        etiquetaMotivo.setText(Messages.getString("Opciones.firmas.motivo")); // NOI18N
+        etiquetaMotivo.setText(Messages.getString("Opciones.firmas.motivo")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaMotivo);
         Utils.setFontBold(etiquetaMotivo);
         contextPanel.add(etiquetaMotivo, c2);
@@ -87,20 +87,20 @@ public class ContextOptionsPane {
         c2.gridy = 1;
         
         // Caja de texto para el motivo de la firma
-        campoMotivo = new JTextField();
-        campoMotivo.getAccessibleContext().setAccessibleName(etiquetaMotivo.getText() + " ALT + O."); // NOI18N
-        campoMotivo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.motivo")); // NOI18N
+        this.campoMotivo = new JTextField();
+        this.campoMotivo.getAccessibleContext().setAccessibleName(etiquetaMotivo.getText() + " ALT + O."); // NOI18N
+        this.campoMotivo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.motivo")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoMotivo.setCaret(caret);
+			this.campoMotivo.setCaret(caret);
 		}
-        Utils.remarcar(campoMotivo);
-        Utils.setContrastColor(campoMotivo);
-        Utils.setFontBold(campoMotivo);
-        contextPanel.add(campoMotivo, c2);
+        Utils.remarcar(this.campoMotivo);
+        Utils.setContrastColor(this.campoMotivo);
+        Utils.setFontBold(this.campoMotivo);
+        contextPanel.add(this.campoMotivo, c2);
         
         //Relación entre etiqueta y campo de texto
-        etiquetaMotivo.setLabelFor(campoMotivo);
+        etiquetaMotivo.setLabelFor(this.campoMotivo);
   		//Asignación de mnemónico
         etiquetaMotivo.setDisplayedMnemonic(KeyEvent.VK_T);
         
@@ -110,7 +110,7 @@ public class ContextOptionsPane {
         
         // Etiqueta lugar donde se realiza la firma
         JLabel etiquetaLugar = new JLabel();
-        etiquetaLugar.setText(Messages.getString("Opciones.firmas.lugar")); // NOI18N
+        etiquetaLugar.setText(Messages.getString("Opciones.firmas.lugar")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaLugar);
         Utils.setFontBold(etiquetaLugar);
         contextPanel.add(etiquetaLugar, c2);
@@ -119,20 +119,20 @@ public class ContextOptionsPane {
         c2.gridy = 3;
         
         // Caja de texto para el lugar donde se realiza la firma
-        campoLugar = new JTextField();
-        campoLugar.getAccessibleContext().setAccessibleName(etiquetaLugar.getText() + " ALT + L."); // NOI18N
-        campoLugar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.lugar")); // NOI18N
+        this.campoLugar = new JTextField();
+        this.campoLugar.getAccessibleContext().setAccessibleName(etiquetaLugar.getText() + " ALT + L."); // NOI18N
+        this.campoLugar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.lugar")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoLugar.setCaret(caret);
+			this.campoLugar.setCaret(caret);
 		}
-        Utils.remarcar(campoLugar);
-        Utils.setContrastColor(campoLugar);
-        Utils.setFontBold(campoLugar);
-        contextPanel.add(campoLugar, c2);
+        Utils.remarcar(this.campoLugar);
+        Utils.setContrastColor(this.campoLugar);
+        Utils.setFontBold(this.campoLugar);
+        contextPanel.add(this.campoLugar, c2);
         
         //Relación entre etiqueta y campo de texto
-        etiquetaLugar.setLabelFor(campoLugar);
+        etiquetaLugar.setLabelFor(this.campoLugar);
   		//Asignación de mnemónico
         etiquetaLugar.setDisplayedMnemonic(KeyEvent.VK_L);
         
@@ -141,7 +141,7 @@ public class ContextOptionsPane {
         
         // Etiqueta de los datos de contacto
         JLabel etiquetaDatos = new JLabel();
-        etiquetaDatos.setText(Messages.getString("Opciones.firmas.datos")); // NOI18N
+        etiquetaDatos.setText(Messages.getString("Opciones.firmas.datos")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaDatos);
         Utils.setFontBold(etiquetaDatos);
         contextPanel.add(etiquetaDatos, c2);
@@ -150,24 +150,24 @@ public class ContextOptionsPane {
         c2.gridy = 5;
         
         // Caja de texto para los datos de contacto
-        campoDatos = new JTextField();
-        campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " ALT + D."); // NOI18N
-        campoDatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.datos")); // NOI18N
+        this.campoDatos = new JTextField();
+        this.campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " ALT + D."); // NOI18N
+        this.campoDatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.datos")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
 			Caret caret = new ConfigureCaret();
-			campoDatos.setCaret(caret);
+			this.campoDatos.setCaret(caret);
 		}
-        Utils.remarcar(campoDatos);
-        Utils.setContrastColor(campoDatos);
-        Utils.setFontBold(campoDatos);
-        contextPanel.add(campoDatos, c2);
+        Utils.remarcar(this.campoDatos);
+        Utils.setContrastColor(this.campoDatos);
+        Utils.setFontBold(this.campoDatos);
+        contextPanel.add(this.campoDatos, c2);
         
         //Relación entre etiqueta y campo de texto
-        etiquetaDatos.setLabelFor(campoDatos);
+        etiquetaDatos.setLabelFor(this.campoDatos);
   		//Asignación de mnemónico
         etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_D);
 
-        panel.add(contextPanel, c);
+        this.panel.add(contextPanel, c);
         
         c.gridy = c.gridy + 1;
         
@@ -179,7 +179,7 @@ public class ContextOptionsPane {
         
         JPanel panelValores = new JPanel(new GridLayout(1, 1));
         //Boton Valores por defecto
-        valores.setText(Messages.getString("Opciones.accesibilidad.valores"));
+        valores.setText(Messages.getString("Opciones.accesibilidad.valores")); //$NON-NLS-1$
         valores.addActionListener(new ActionListener() {
 			
 			@Override
@@ -200,17 +200,17 @@ public class ContextOptionsPane {
         // Rellenamos el hueco libre con un panel vacio
         c.gridy = c.gridy + 1;
         c.weighty = 1.0;
-        panel.add(new JPanel(), c);
+        this.panel.add(new JPanel(), c);
         
         
 		// Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoMotivo, "opciones.pdf.motivo");
-        HelpUtils.enableHelpKey(campoLugar, "opciones.pdf.lugar");
-        HelpUtils.enableHelpKey(campoDatos, "opciones.pdf.datos");
+        HelpUtils.enableHelpKey(this.campoMotivo, "opciones.pdf.motivo"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.campoLugar, "opciones.pdf.lugar"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.campoDatos, "opciones.pdf.datos"); //$NON-NLS-1$
     }
 	
 	public JPanel getConfigurationPanel() {
-		return panel;
+		return this.panel;
 	}
 
 	/**
@@ -218,9 +218,9 @@ public class ContextOptionsPane {
 	 * @param config Configuraci&oacute;n para cargar en el panel.
 	 */
 	public void loadConfig(Properties config) {
-		campoMotivo.setText(config.getProperty(ContextOptionsPane.KEY_SUBJECT));
-		campoLugar.setText(config.getProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE));
-		campoDatos.setText(config.getProperty(ContextOptionsPane.KEY_CONTACT_INFO));
+		this.campoMotivo.setText(config.getProperty(ContextOptionsPane.KEY_SUBJECT));
+		this.campoLugar.setText(config.getProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE));
+		this.campoDatos.setText(config.getProperty(ContextOptionsPane.KEY_CONTACT_INFO));
 	}
 	
 	/**
@@ -229,9 +229,9 @@ public class ContextOptionsPane {
 	 */
 	public Properties getConfig() {
 		Properties config = new Properties();
-    	config.setProperty(ContextOptionsPane.KEY_SUBJECT, campoMotivo.getText());
-    	config.setProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE, campoLugar.getText());
-    	config.setProperty(ContextOptionsPane.KEY_CONTACT_INFO, campoDatos.getText());
+    	config.setProperty(ContextOptionsPane.KEY_SUBJECT, this.campoMotivo.getText());
+    	config.setProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE, this.campoLugar.getText());
+    	config.setProperty(ContextOptionsPane.KEY_CONTACT_INFO, this.campoDatos.getText());
     	
     	return config;
 	}
@@ -242,14 +242,14 @@ public class ContextOptionsPane {
 	 */
 	public Properties getSignatureConfig() {
 		Properties config = new Properties();
-		if (campoMotivo.getText().trim().length() > 0) {
-			config.setProperty("signReason", campoMotivo.getText().trim());
+		if (this.campoMotivo.getText().trim().length() > 0) {
+			config.setProperty("signReason", this.campoMotivo.getText().trim());
 		}
-		if (campoLugar.getText().trim().length() > 0) {
-			config.setProperty("signatureProductionCity", campoLugar.getText().trim());
+		if (this.campoLugar.getText().trim().length() > 0) {
+			config.setProperty("signatureProductionCity", this.campoLugar.getText().trim());
 		}
-		if (campoDatos.getText().trim().length() > 0) {
-			config.setProperty("signerContact", campoDatos.getText().trim());
+		if (this.campoDatos.getText().trim().length() > 0) {
+			config.setProperty("signerContact", this.campoDatos.getText().trim());
 		}
 		return config;
 	}
@@ -265,12 +265,12 @@ public class ContextOptionsPane {
 	/**
 	 * Aplica el estado por defecto de los componentes de la ventana 
 	 */
-	private void restore(JPanel panel){
-		for (int i=0; i<panel.getComponentCount();i++){
-			if (panel.getComponent(i) instanceof JTextField){
-				((JTextField)panel.getComponent(i)).setText("");
-			} else if (panel.getComponent(i) instanceof JPanel){
-				JPanel interiorPanel = (JPanel)panel.getComponent(i);
+	private void restore(JPanel panel1){
+		for (int i=0; i<panel1.getComponentCount();i++){
+			if (panel1.getComponent(i) instanceof JTextField){
+				((JTextField)panel1.getComponent(i)).setText(""); //$NON-NLS-1$
+			} else if (panel1.getComponent(i) instanceof JPanel){
+				JPanel interiorPanel = (JPanel)panel1.getComponent(i);
 				restore(interiorPanel);
 			}
 		}

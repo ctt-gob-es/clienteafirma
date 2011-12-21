@@ -79,11 +79,11 @@ import es.gob.afirma.ui.utils.Utils;
 /**
  * Clase que muestra los elementos necesarios para realizar una firma.
  */
-public class Firma extends JPanel {
+public final class Firma extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    static Logger logger = Logger.getLogger(Firma.class.getName());
+    private static Logger logger = Logger.getLogger(Firma.class.getName());
 
     // Nombres de los diferentes formatos de firmado
     private List<String> formatosL = new ArrayList<String>(Arrays.asList(
@@ -122,8 +122,8 @@ public class Firma extends JPanel {
 
         // Etiqueta fichero a firmar digitalmente
         JLabel etiquetaFichero = new JLabel();
-        etiquetaFichero.setText(Messages.getString("Firma.buscar")); // NOI18N
-        etiquetaFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.description")); // NOI18N
+        etiquetaFichero.setText(Messages.getString("Firma.buscar")); // NOI18N //$NON-NLS-1$
+        etiquetaFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.description")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaFichero);
         Utils.setFontBold(etiquetaFichero);
         add(etiquetaFichero, c);
@@ -135,11 +135,11 @@ public class Firma extends JPanel {
 
         // Campo donde se guarda el nombre del fichero a firmar
         final JTextField campoFichero = new JTextField();
-        campoFichero.setToolTipText(Messages.getString("Firma.buscar.caja.description")); // NOI18N
+        campoFichero.setToolTipText(Messages.getString("Firma.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         campoFichero.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
         campoFichero.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.buscar.caja.description.status")));
         campoFichero.getAccessibleContext().setAccessibleName(etiquetaFichero.getText()+" "+"ALT + G.");
-        campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N
+        campoFichero.getAccessibleContext().setAccessibleDescription(Messages.getString("Firma.buscar.caja.description")); // NOI18N //$NON-NLS-1$
         campoFichero.addAncestorListener(new RequestFocusListener(false));
         Utils.remarcar(campoFichero);
         if (GeneralConfig.isBigCaret()) {
@@ -149,9 +149,9 @@ public class Firma extends JPanel {
         Utils.setFontBold(campoFichero);
         add(campoFichero, c);
 
-        //Relación entre etiqueta y campo de texto
+        //Relacion entre etiqueta y campo de texto
         etiquetaFichero.setLabelFor(campoFichero);
-        //Asignación de mnemónico
+        //Asignacion de mnemonico
         etiquetaFichero.setDisplayedMnemonic(KeyEvent.VK_G);
 
         c.insets = new Insets(0, 10, 0, 13);
@@ -162,8 +162,8 @@ public class Firma extends JPanel {
         // Boton examinar
         JButton examinar = new JButton();
         examinar.setMnemonic(KeyEvent.VK_E);
-        examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N
-        examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N
+        examinar.setText(Messages.getString("PrincipalGUI.Examinar")); // NOI18N //$NON-NLS-1$
+        examinar.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); // NOI18N //$NON-NLS-1$
         examinar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
         examinar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.Examinar.description.status")));
         //examinar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.Examinar") + " " + Messages.getString("PrincipalGUI.Examinar.description.status"));
@@ -200,7 +200,7 @@ public class Firma extends JPanel {
 
         // Etiqueta para el Almacen / repositorio
         JLabel etiquetaAlmacen = new JLabel();
-        etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N
+        etiquetaAlmacen.setText(Messages.getString("Firma.almacen.certificados")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaAlmacen);
         Utils.setFontBold(etiquetaAlmacen);
         add(etiquetaAlmacen, c);
@@ -213,7 +213,7 @@ public class Firma extends JPanel {
 
         // Combo con las opciones del almacen o repositorio
         final JComboBox comboAlmacen = new JComboBox();
-        comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N
+        comboAlmacen.setToolTipText(Messages.getString("Firma.almacen.certificados.description")); // NOI18N //$NON-NLS-1$
         comboAlmacen.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
         comboAlmacen.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.almacen.certificados.description")));
         //comboAlmacen.getAccessibleContext().setAccessibleName(etiquetaAlmacen.getText()+" "+Messages.getString("Firma.almacen.certificados.description") + " ALT + A."); // NOI18N
@@ -224,9 +224,9 @@ public class Firma extends JPanel {
         Utils.setFontBold(comboAlmacen);
         add(comboAlmacen, c);
 
-        //Relación entre etiqueta y combo
+        //Relacion entre etiqueta y combo
         etiquetaAlmacen.setLabelFor(comboAlmacen);
-        //Asignación de mnemónico
+        //Asignacion de mnemonico
         etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
 
         //Espacio en blanco
@@ -248,7 +248,7 @@ public class Firma extends JPanel {
 
         // Etiqueta formato / formato
         JLabel etiquetaFormato = new JLabel();
-        etiquetaFormato.setText(Messages.getString("Firma.formato")); // NOI18N
+        etiquetaFormato.setText(Messages.getString("Firma.formato")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaFormato);
         Utils.setFontBold(etiquetaFormato);
         add(etiquetaFormato, c);
@@ -261,7 +261,7 @@ public class Firma extends JPanel {
 
         // Combo con los diferentes formatos de firma
         final JComboBox comboFormato = new JComboBox();
-        comboFormato.setToolTipText(Messages.getString("Firma.formato.description")); // NOI18N
+        comboFormato.setToolTipText(Messages.getString("Firma.formato.description")); // NOI18N //$NON-NLS-1$
         comboFormato.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status")));
         comboFormato.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status")));
         //comboFormato.getAccessibleContext().setAccessibleName(etiquetaFormato.getText()+" " + Messages.getString("Firma.formato.description") + " ALT + O."); // NOI18N
@@ -286,9 +286,9 @@ public class Firma extends JPanel {
         Utils.setFontBold(comboFormato);
         add(comboFormato, c);
 
-        //Relación entre etiqueta y combo
+        //Relacion entre etiqueta y combo
         etiquetaFormato.setLabelFor(comboFormato);
-        //Asignación de mnemónico
+        //Asignacion de mnemonico
         etiquetaFormato.setDisplayedMnemonic(KeyEvent.VK_O);
 
         c.weighty = 1.0;
@@ -304,7 +304,7 @@ public class Firma extends JPanel {
         JPanel panelBotones = new JPanel(new GridBagLayout());
 
         GridBagConstraints cons = new GridBagConstraints();
-        cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientación de componentes al redimensionar
+        cons.anchor = GridBagConstraints.FIRST_LINE_START; //control de la orientacion de componentes al redimensionar
         cons.fill = GridBagConstraints.HORIZONTAL;
         cons.ipadx = 15;
         cons.gridx = 0;
@@ -317,8 +317,8 @@ public class Firma extends JPanel {
         // Boton firmar
         JButton firmar = new JButton();
         firmar.setMnemonic(KeyEvent.VK_R);
-        firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N
-        firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
+        firmar.setText(Messages.getString("PrincipalGUI.firmar")); // NOI18N //$NON-NLS-1$
+        firmar.setToolTipText(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
         //firmar.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.firmar") + " " + Messages.getString("PrincipalGUI.firmar.description.status"));
         firmar.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
         firmar.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("PrincipalGUI.firmar.description.status")));
@@ -328,7 +328,7 @@ public class Firma extends JPanel {
                 firmarActionPerformed(comboAlmacen, comboFormato, campoFichero);
             }
         });
-        firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N
+        firmar.getAccessibleContext().setAccessibleDescription(Messages.getString("PrincipalGUI.firmar.description")); // NOI18N //$NON-NLS-1$
         Utils.remarcar(firmar);
         Utils.setContrastColor(firmar);
         Utils.setFontBold(firmar);
@@ -386,7 +386,7 @@ public class Firma extends JPanel {
      * @param comboFormato		Combo con los formatos de firmado
      * @param campoFichero		Campo con el nombre del archivo a firmar
      */
-    private void firmarActionPerformed(JComboBox comboAlmacen, JComboBox comboFormato, JTextField campoFichero) {//GEN-FIRST:event_firmarActionPerformed
+    void firmarActionPerformed(JComboBox comboAlmacen, JComboBox comboFormato, JTextField campoFichero) {//GEN-FIRST:event_firmarActionPerformed
         // Obtenemos la constante del formato a utilizar
         String formato = this.formatosV.get(comboFormato.getSelectedIndex());
 
@@ -395,13 +395,13 @@ public class Firma extends JPanel {
 
         // Obtenemos la ruta del fichero a firmar
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) {
-            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             campoFichero.requestFocusInWindow();
             return;
         }
 
       //Mensaje que indica que se va a realizar el proceso de firma y que puede llevar un tiempo
-    	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE);
+    	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.info"), Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma"), JOptionPane.INFORMATION_MESSAGE); //$NON-NLS-1$
         
         try {
             PasswordCallback pssCallback;
@@ -412,19 +412,19 @@ public class Firma extends JPanel {
                     store == AOKeyStore.SINGLE) 
                 pssCallback = new NullPasswordCallback();
             else if(store==AOKeyStore.PKCS12){
-            	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", SwingUtilities.getRoot(this),
-            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+            	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", SwingUtilities.getRoot(this), //$NON-NLS-1$
+            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
             	File selectedFile = SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter)Utils.getRepositoryFileFilter()); //$NON-NLS-1$
                 if (selectedFile != null) {
                 	lib = selectedFile.getAbsolutePath();
-                } else {
+                } 
+                else {
                 	return;
                 }
             }
-            else
-            {
-            	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", SwingUtilities.getRoot(this),
-            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+            else {
+            	pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", SwingUtilities.getRoot(this), //$NON-NLS-1$
+            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             try {
@@ -436,12 +436,12 @@ public class Firma extends JPanel {
                         this
                 );
             } catch (InvalidKeyException e) {
-            	//Control de la excepción generada al introducir mal la contraseña para el almacén
-            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            	//Control de la excepcion generada al introducir mal la contrasena para el almacén
+            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
                 return;
             }  catch (AOKeystoreAlternativeException e) {
 
-            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
                  return;
             }
 
@@ -459,8 +459,8 @@ public class Firma extends JPanel {
                 privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, SwingUtilities.getRoot(this)));
             }
             catch (KeyException e) {
-            	//Control de la excepción generada al introducir mal la contraseña para el certificado
-            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            	//Control de la excepcion generada al introducir mal la contrasena para el certificado
+            	CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
                 return;
             }
             catch (AOCancelledOperationException e) {
@@ -470,9 +470,7 @@ public class Firma extends JPanel {
                 throw e;
             }
             catch (Exception e) {
-                e.printStackTrace();
-                logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e);
-                throw new AOException("No se ha podido recuperar el certificado seleccionado");
+                throw new AOException("No se ha podido recuperar el certificado seleccionado: " + selectedcert); //$NON-NLS-1$
             }
 
             if (privateKeyEntry == null) {
@@ -495,8 +493,8 @@ public class Firma extends JPanel {
             try {
                 uri = AOUtil.createURI(campoFichero.getText());
             } catch (Exception e) {
-                logger.severe("La ruta del fichero de datos no es v\u00E1lida: " + e); //$NON-NLS-1$ //$NON-NLS-2$ 
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.ruta"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+                logger.severe("La ruta del fichero de datos no es v\u00E1lida: " + e); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.ruta"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 campoFichero.requestFocusInWindow();
                 return;
@@ -521,7 +519,12 @@ public class Firma extends JPanel {
             } finally {
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 if (fileIn != null) {
-                    try { fileIn.close(); } catch (Exception e) { }
+                    try { 
+                        fileIn.close(); 
+                    } 
+                    catch (Exception e) {
+                        /* Ignorada */ 
+                    }
                 }
             }
 
@@ -551,16 +554,16 @@ public class Firma extends JPanel {
                         prop
                 );
             } catch (AOFormatFileException e) {
-                logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
+                logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.generar.formato"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             } catch (AOException e) {
-                logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
+                logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
                 e.printStackTrace();
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             } catch (Exception e) {
-                logger.severe("Ocurrio un error al generar la firma electronica: " + e); //$NON-NLS-1$
+                logger.severe("Error al generar la firma electronica: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, Messages.getString("Firma.msg.error.generar.firma"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -587,14 +590,14 @@ public class Firma extends JPanel {
 
         } catch (AOCancelledOperationException e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            logger.severe("Operacion cancelada por el usuario");
+            logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
         } catch (AOException e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            logger.severe("Error: "+e.getMessage());
+            logger.severe("Error: " + e.getMessage()); //$NON-NLS-1$
             CustomDialog.showMessageDialog(SwingUtilities.getRoot(this), true, e.getMessage(), "Firma", JOptionPane.ERROR_MESSAGE);
         } catch(Exception e) {
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            logger.severe("Ocurrio un error al generar la firma electronica: "+e);
+            logger.severe("Error al generar la firma electronica: "+e); //$NON-NLS-1$
         }
     }
 

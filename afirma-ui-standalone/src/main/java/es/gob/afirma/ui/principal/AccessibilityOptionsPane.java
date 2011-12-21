@@ -27,28 +27,28 @@ import es.gob.afirma.ui.utils.Utils;
  * @author inteco
  *
  */
-public class AccessibilityOptionsPane {
+public final class AccessibilityOptionsPane {
 	 
 	/** Clave para la configuraci&oacute;n de tama&ntilde;o de fuente. */
-	public static final String MAIN_FONT_SIZE = "main.fontSize";
+	public static final String MAIN_FONT_SIZE = "main.fontSize"; //$NON-NLS-1$
 	
 	/** Clave para la configuraci&oacute;n de estilo de fuente. */
-	public static final String MAIN_FONT_STYLE = "main.fontStyle";
+	public static final String MAIN_FONT_STYLE = "main.fontStyle"; //$NON-NLS-1$
 	
 	/** Clave para la configuraci&oacute;n de vista en alto contraste. */
-	public static final String MAIN_HIGHT_CONTRAST = "main.hightContrast";
+	public static final String MAIN_HIGHT_CONTRAST = "main.hightContrast"; //$NON-NLS-1$
 	
 	/** Clave para la configuraci&oacute;n de visibilidad del foco. */
-	public static final String MAIN_FOCUS_VISIBLE = "main.focusVisible";
+	public static final String MAIN_FOCUS_VISIBLE = "main.focusVisible"; //$NON-NLS-1$
 	
 	/** Clave para la configuraci&oacute;n de tama&ntilde;o de ventana. */
-	public static final String MAIN_WINDOWS_SIZE = "main.windowsSize";
+	public static final String MAIN_WINDOWS_SIZE = "main.windowsSize"; //$NON-NLS-1$
 	
 	/** Clave para la configuraci&oacute;n de tama&ntilde;o de ventana. */
-	public static final String MAIN_WINDOWS_ACCESSIBILITY = "main.windowsAccessibility";
+	public static final String MAIN_WINDOWS_ACCESSIBILITY = "main.windowsAccessibility"; //$NON-NLS-1$
 	
 	/** Clave para la configuraci&oacute;n de tama&ntilde;o del cursor de texto. */
-	public static final String MAIN_CURSOR_SIZE = "main.cursorSize";
+	public static final String MAIN_CURSOR_SIZE = "main.cursorSize"; //$NON-NLS-1$
 	
 	/** Panel sobre el que se montan los componentes. */
 	private final JPanel panel;
@@ -190,10 +190,10 @@ public class AccessibilityOptionsPane {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (isChangeHighContrast){
-					isChangeHighContrast = false;
+				if (AccessibilityOptionsPane.this.isChangeHighContrast){
+					AccessibilityOptionsPane.this.isChangeHighContrast = false;
 				} else {
-					isChangeHighContrast = true;
+					AccessibilityOptionsPane.this.isChangeHighContrast = true;
 				}
 			}
 		});
@@ -362,9 +362,9 @@ public class AccessibilityOptionsPane {
         
         JPanel panelAplicar = new JPanel(new GridLayout(1, 1));
         //Boton aplicar
-        aplicar.setText(Messages.getString("Opciones.accesibilidad.aplicar"));
-        aplicar.setMnemonic(KeyEvent.VK_I);
-        aplicar.addActionListener(new ActionListener() {
+        this.aplicar.setText(Messages.getString("Opciones.accesibilidad.aplicar")); //$NON-NLS-1$
+        this.aplicar.setMnemonic(KeyEvent.VK_I);
+        this.aplicar.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -372,11 +372,11 @@ public class AccessibilityOptionsPane {
 				
 			}
 		});
-        Utils.remarcar(aplicar);
-        Utils.setContrastColor(aplicar);
-        Utils.setFontBold(aplicar);
+        Utils.remarcar(this.aplicar);
+        Utils.setContrastColor(this.aplicar);
+        Utils.setFontBold(this.aplicar);
         
-        panelAplicar.add(aplicar);
+        panelAplicar.add(this.aplicar);
         buttonPanel.add(panelAplicar);
 
         this.panel.add(buttonPanel, c);
@@ -386,14 +386,14 @@ public class AccessibilityOptionsPane {
         this.panel.add(new JPanel(), c);
         
         //Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(this.checkFontSize, "accesibilidad.texto");
-        HelpUtils.enableHelpKey(this.checkFontStyle, "accesibilidad.texto");
-        HelpUtils.enableHelpKey(this.checkHighContrast, "accesibilidad.color");
-        HelpUtils.enableHelpKey(this.checkFocusVisible, "accesibilidad.foco");
-        HelpUtils.enableHelpKey(this.checkWindowSize, "accesibilidad.ventana");
-        HelpUtils.enableHelpKey(this.checkCursorSize, "accesibilidad.cursor");
-        HelpUtils.enableHelpKey(valores, "accesibilidad.defecto");
-        HelpUtils.enableHelpKey(aplicar, "accesibilidad.aplicar");
+        HelpUtils.enableHelpKey(this.checkFontSize, "accesibilidad.texto"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkFontStyle, "accesibilidad.texto"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkHighContrast, "accesibilidad.color"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkFocusVisible, "accesibilidad.foco"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkWindowSize, "accesibilidad.ventana"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkCursorSize, "accesibilidad.cursor"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(valores, "accesibilidad.defecto"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.aplicar, "accesibilidad.aplicar"); //$NON-NLS-1$
 	}
 
 	/**
@@ -419,7 +419,7 @@ public class AccessibilityOptionsPane {
 
 		// Comprobamos si esta activada al menos una de las opciones de accesibilidad sobre textos 
 		if (Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE)) || Boolean.parseBoolean(config.getProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE))){
-    		isBigStyle = true;
+    		this.isBigStyle = true;
     	}		
 	}
 
@@ -439,7 +439,7 @@ public class AccessibilityOptionsPane {
     	config.setProperty(AccessibilityOptionsPane.MAIN_CURSOR_SIZE, Boolean.toString(this.checkCursorSize.isSelected()));
     	
     	// Comprobamos si se han desactivados las dos opciones de accesibilidad sobre texto 
-    	if (isBigStyle && (!this.checkFontSize.isSelected() && !this.checkFontStyle.isSelected())){
+    	if (this.isBigStyle && (!this.checkFontSize.isSelected() && !this.checkFontStyle.isSelected())){
 			continueBigStyle = true;
 		}
     	
@@ -458,16 +458,18 @@ public class AccessibilityOptionsPane {
 	/**
 	 * Aplica el estado por defecto de los componentes de la ventana 
 	 */
-	private void restore(JPanel panel){
-		for (int i=0; i<panel.getComponentCount();i++){
-			if (panel.getComponent(i) instanceof JCheckBox){
-				if (((JCheckBox)panel.getComponent(i)).getName()!=null){
-					((JCheckBox)panel.getComponent(i)).setSelected(true);
-				} else {
-					((JCheckBox)panel.getComponent(i)).setSelected(false);
+	private void restore(final JPanel p){
+		for (int i=0; i<p.getComponentCount();i++){
+			if (p.getComponent(i) instanceof JCheckBox){
+				if (((JCheckBox)p.getComponent(i)).getName()!=null){
+					((JCheckBox)p.getComponent(i)).setSelected(true);
+				} 
+				else {
+					((JCheckBox)p.getComponent(i)).setSelected(false);
 				}
-			} else if (panel.getComponent(i) instanceof JPanel){
-				JPanel interiorPanel = (JPanel)panel.getComponent(i);
+			} 
+			else if (p.getComponent(i) instanceof JPanel){
+				JPanel interiorPanel = (JPanel)p.getComponent(i);
 				restore(interiorPanel);
 			}
 		}
@@ -476,7 +478,7 @@ public class AccessibilityOptionsPane {
 	/**
 	 * Aplica la configuraci&oacute;n de accesibilidad indicada en la pantalla
 	 */
-	private void aplicar(){
+	void aplicar(){
 		// Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
     	if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.optionActualPositionX = this.parent.getX();
@@ -485,7 +487,7 @@ public class AccessibilityOptionsPane {
 	    	PrincipalGUI.optionActualHeight = this.parent.getHeight();
     	}
 		((Opciones)this.parent).setAplicar(true);
-		if (!isChangeHighContrast){
+		if (!this.isChangeHighContrast){
 			//no se ha modificado el estado del Alto Contraste
 			
 			//se guarda el estado actual de la configuracion de la herramienta
@@ -508,8 +510,8 @@ public class AccessibilityOptionsPane {
 			// Se ha modificado el estado del Alto Contraste por lo que es necesario ocultar y volver a mostrar la ventana de opciones para que cargue el alto contraste
 			
 			((Opciones)this.parent).getAceptar().doClick();
-			mainGui.setAplicar(true);
-			((JMenuItem)mainGui.getMenu().getMenu(0).getMenuComponent(0)).doClick();			
+			this.mainGui.setAplicar(true);
+			((JMenuItem)this.mainGui.getMenu().getMenu(0).getMenuComponent(0)).doClick();			
 		}
 	}
 }
