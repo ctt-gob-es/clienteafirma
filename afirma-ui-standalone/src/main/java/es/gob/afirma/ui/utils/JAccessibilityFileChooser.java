@@ -501,7 +501,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Se almacena la posición actual.
 	 */
-	void resized(){
+	public void resized(){
 		if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.fileActualPositionX = this.dialog.getX();
 	    	PrincipalGUI.fileActualPositionY = this.dialog.getY();

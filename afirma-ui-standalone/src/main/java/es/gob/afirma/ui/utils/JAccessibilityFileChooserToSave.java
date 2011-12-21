@@ -309,7 +309,8 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	/**
 	 * Se almacena la posición actual.
 	 */
-	private void resized(){
+	@Override
+	public void resized(){
 		if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.fileActualPositionX = dialog.getX();
 	    	PrincipalGUI.fileActualPositionY = dialog.getY();
