@@ -37,6 +37,7 @@ import javax.help.JHelp;
 import javax.help.JHelpContentViewer;
 import javax.help.JHelpNavigator;
 import javax.help.WindowPresentation;
+import javax.help.plaf.basic.BasicIndexCellRenderer;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -54,6 +55,8 @@ import javax.swing.JTree;
 import javax.swing.JViewport;
 import javax.swing.JWindow;
 import javax.swing.text.html.HTMLDocument;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
 
 import es.gob.afirma.ui.listeners.ElementDescriptionFocusListener;
 import es.gob.afirma.ui.listeners.ElementDescriptionMouseListener;
@@ -68,8 +71,6 @@ public class HelpUtils {
 	private static Hashtable<String, Component> components = new Hashtable<String, Component>();
 	private static HelpBroker helpBroker = null;
 	private static HelpSet helpset = null;
-//	private static Style hightContrast;
-//    private static Style normalContrast;
 	/**
 	 * Variable que almacena el icono original del botón de ayuda.
 	 */
@@ -172,7 +173,6 @@ public class HelpUtils {
 	
 	
 	public static void visualize(String pagina){
-		//getHelp().setDisplayed(true);
 		getHelp().setCurrentID(pagina);
 		if (GeneralConfig.isBigFontSize() && GeneralConfig.isFontBold()){
 			helpBroker.setFont(new Font(helpBroker.getFont().getName(), helpBroker.getFont().getStyle(), 16));
@@ -380,29 +380,7 @@ public class HelpUtils {
 				}
 				
 				h.getStyleSheet().addRule(bodyRule);
-			}
-			
-			
-//			final StyleContext sc = new StyleContext();
-//	        hightContrast = sc.addStyle("hightContrast", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
-//	       	StyleConstants.setForeground(hightContrast, Color.WHITE);
-//	        
-//	        //StyleConstants.setBackground(this.linkUnfocusedStyle, new Color(0, 0, 0, 0));
-//	        
-//	        normalContrast = sc.addStyle("normalContrast", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
-//	        //StyleConstants.setBackground(this.linkFocusedStyle, Color.BLUE); //$NON-NLS-1$
-//	        StyleConstants.setForeground(normalContrast, Color.BLACK); //$NON-NLS-1$
-//	        
-//	        ((HTMLDocument) editorPane.getDocument()).removeStyle("hightContrast");
-//	        ((HTMLDocument) editorPane.getDocument()).setCharacterAttributes(
-//                    0,
-//                    150, 
-//                    hightContrast, 
-//                    false
-//               );
-//	        //editorPane.setBackground(Color.BLACK);
-			
-			
+			}		
 		}
 	}
 
@@ -477,93 +455,6 @@ public class HelpUtils {
 		}
 	}
 	private static void setHighContrastComponentTabbedPane(JTabbedPane tabbedPane, final JEditorPane editorPane, final boolean activate){
-//		for (int i = 0; i<tabbedPane.getComponentCount();i++){
-//			System.out.println(tabbedPane.getComponent(i).getClass().getName());
-//			if (tabbedPane.getComponent(i) instanceof JHelpIndexNavigator){
-//				JHelpIndexNavigator jhin = (JHelpIndexNavigator)tabbedPane.getComponent(i);
-//				for (int j = 0; j < jhin.getComponentCount();j++){
-//					System.out.println(".."+jhin.getComponent(j).getClass().getName());
-//					if (jhin.getComponent(j) instanceof JPanel){
-//						JPanel p = (JPanel)jhin.getComponent(j);
-//						for (int k = 0;k<p.getComponentCount();k++){
-//							System.out.println("...."+p.getComponent(k).getClass().getName());
-//						}
-//					} else if (jhin.getComponent(j) instanceof JScrollPane){
-//						JScrollPane sp = (JScrollPane)jhin.getComponent(j);
-//						for (int k = 0; k<sp.getComponentCount();k++){
-//							System.out.println("...."+sp.getComponent(k).getClass().getName());
-//							if (sp.getComponent(k) instanceof JViewport){
-//								JViewport vp = (JViewport)sp.getComponent(k);
-//								for (int l = 0;l<vp.getComponentCount();l++){
-//									System.out.println("......" + vp.getComponent(l).getClass().getName());
-//									if (vp.getComponent(l) instanceof JTree){
-//										JTree t = (JTree)vp.getComponent(l);
-////										if (activate){
-////											t.setBackground(Color.black);
-////										}
-//										t.addMouseListener(new MouseListener() {
-//											
-//											@Override
-//											public void mouseReleased(MouseEvent e) {
-//												// TODO Auto-generated method stub
-//												HelpUtils.setHighContrastEditorPane(editorPane, activate);
-//											}
-//											
-//											@Override
-//											public void mousePressed(MouseEvent e) {
-//												// TODO Auto-generated method stub
-//												
-//											}
-//											
-//											@Override
-//											public void mouseExited(MouseEvent e) {
-//												// TODO Auto-generated method stub
-//												
-//											}
-//											
-//											@Override
-//											public void mouseEntered(MouseEvent e) {
-//												// TODO Auto-generated method stub
-//												
-//											}
-//											
-//											@Override
-//											public void mouseClicked(MouseEvent e) {
-//												// TODO Auto-generated method stub
-//												
-//											}
-//										});
-//										for (int m = 0; m<t.getComponentCount();m++){
-//											System.out.println("........" + t.getComponent(m).getClass().getName());
-//											if (t.getComponent(m) instanceof CellRendererPane){
-//												CellRendererPane crp = (CellRendererPane)t.getComponent(m);
-//												for (int n = 0;n<crp.getComponentCount();n++){
-//													System.out.println(".........." + crp.getComponent(n).getClass().getName());
-//													if (crp.getComponent(n) instanceof BasicIndexCellRenderer){
-//														BasicIndexCellRenderer bicr = (BasicIndexCellRenderer)crp.getComponent(n);
-//														System.out.println("............=" + ((JLabel)bicr).getText());
-//														bicr.setBackground(Color.GREEN);
-//														for (int o = 0; o<bicr.getComponentCount();o++){
-//															
-//															System.out.println("............" + bicr.getComponent(o).getClass().getName());
-//														}
-//													} else if (crp.getComponent(n) instanceof com.sun.java.swing.plaf.windows.WindowsTreeUI.WindowsTreeCellRenderer){
-//														
-//													}
-//												}
-//											}
-//										}
-//										
-//									}
-//								}
-//							}
-//						}
-//					}
-//				}
-//			} else if (tabbedPane.getComponent(i) instanceof JHelpTOCNavigator){
-//				
-//			}
-//		}
         if (tabbedPane != null) {
             for(Component componentTabbed : tabbedPane.getComponents()) {
                 if (componentTabbed instanceof JHelpNavigator) {
@@ -573,6 +464,45 @@ public class HelpUtils {
                                  if(component instanceof JViewport) {
                                      for(Component component9 : ((JViewport) component).getComponents()) {
                                     	 if (component9 instanceof JTree) {
+                                    		 
+                                    		 /*CAMBIAR EL COMPORTAMIENTO DEL RENDER DE LAS CELDAS*/
+                                    		 TreeCellRenderer cr = ((JTree) component9).getCellRenderer();
+                                    		 
+                                    		 if(cr instanceof BasicIndexCellRenderer){
+                                    			 ((JTree) component9).setCellRenderer(new BasicIndexCellRenderer() {
+													public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
+														//DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
+														super.getTreeCellRendererComponent(pTree,pValue,pIsSelected,pIsExpanded,pIsLeaf,pRow,pHasFocus);
+														if (activate){
+															setForeground(Color.WHITE);
+															setBackgroundNonSelectionColor(Color.BLACK);
+														}
+														else{
+															setForeground(Color.BLACK);
+															setBackgroundNonSelectionColor(Color.WHITE);
+														}
+														return (this);
+													}
+												});
+                                    		 }
+                                    		 else /*if(cr instanceof BasicTOCCellRenderer)*/{
+                                    			 ((JTree) component9).setCellRenderer(new DefaultTreeCellRenderer() {
+ 													public Component getTreeCellRendererComponent(JTree pTree,Object pValue,boolean pIsSelected,boolean pIsExpanded,boolean pIsLeaf,int pRow,boolean pHasFocus) {
+ 														//DefaultMutableTreeNode node = (DefaultMutableTreeNode) pValue;
+ 														super.getTreeCellRendererComponent(pTree,pValue,pIsSelected,pIsExpanded,pIsLeaf,pRow,pHasFocus);
+ 														if(activate){
+ 															setForeground(Color.WHITE);
+ 															setBackgroundNonSelectionColor(Color.BLACK);
+ 														}
+ 														else{
+ 															setForeground(Color.BLACK);
+ 															setBackgroundNonSelectionColor(Color.WHITE);
+ 														}
+ 														return (this);
+ 													}
+ 												});
+                                    		 }
+                                    		 
                                     		 if (activate){
                                     			 ((JTree)component9).setBackground(Color.black);
                                     		 } else { 
@@ -630,47 +560,9 @@ public class HelpUtils {
 													
 												}
 											});
-//                                              for(Component cell : ((JTree) component9).getComponents()) {
-//                                                 if (cell instanceof CellRendererPane) {
-//                                                	 System.out
-//															.println("qq");
-//                                                     cell.setBackground(Color.BLACK);
-//                                                     cell.setForeground(Color.WHITE);
-//                                                 }
-//                                              }
                                          }
-//                                        if (component9 instanceof JTree) {
-//                                        	
-//                                        	if (activate){
-//                                        		((JTree)component9).setBackground(Color.BLACK);
-//                                        	} else {
-//                                        		((JTree)component9).setBackground(Color.WHITE);
-//                                        	}
-//                                        	JTree arbol = (JTree) component9;
-//                                        	arbolito(arbol);
-                                        	
-//                                             for(Component cell : ((JTree) component9).getComponents()) {
-//                                            	 
-//                                                if (cell instanceof CellRendererPane) {
-//                                                    //cell.setBackground(Color.BLACK);
-//                                                    //cell.setForeground(Color.WHITE);
-//                                                    for (Component aaa : ((CellRendererPane) cell).getComponents()){
-//                                                    	System.out
-//																.println(aaa.getClass().getName());
-////                                                    	if (aaa instanceof com.sun.java.swing.plaf.windows.WindowsTreeUI.WindowsTreeCellRenderer){
-////                                                    		
-////                                                    		//aaa.setForeground(Color.WHITE);
-////                                                    		//((BasicIndexCellRenderer)aaa).setForeground(Color.WHITE);
-////                                                    		
-////                                                    	}
-//                                                    }
-//                                                }
-//                                             }
-                                            
-//                                        }
                                      }   
-                                 }
-                                 
+                                 }                                 
                              }
                          } if (panel instanceof JPanel){
                         	 for(Component component : ((JPanel) panel).getComponents()) {
@@ -706,17 +598,7 @@ public class HelpUtils {
             }
         }
     }
-	
-//	private static void arbolito(JTree a){
-//		if(a.getCellRenderer() instanceof DefaultTreeCellRenderer){
-//			aaa((DefaultTreeCellRenderer)a.getCellRenderer());
-//		}
-//	}
-//	
-//	private static void aaa(DefaultTreeCellRenderer d){
-//		System.out.println(d.getComponentCount());
-//		d.setForeground(Color.GREEN);
-//	}
+
 }
 
 
