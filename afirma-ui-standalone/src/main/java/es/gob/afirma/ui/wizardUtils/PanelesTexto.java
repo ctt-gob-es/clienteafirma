@@ -19,10 +19,6 @@ import es.gob.afirma.ui.utils.Utils;
  */
 public class PanelesTexto {
 
-	public PanelesTexto () {
-		
-	}
-
 	/**
 	 * Genera un panel con un bloque de texto
 	 * @param bundleTexto	Texto a buscar en el ResourceBundle para el panel

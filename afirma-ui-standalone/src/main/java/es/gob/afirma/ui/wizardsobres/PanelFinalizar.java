@@ -34,7 +34,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  *
  * Panel explicativo de finalizacion.
  */
-public class PanelFinalizar extends JAccessibilityDialogWizard {
+class PanelFinalizar extends JAccessibilityDialogWizard {
 	/**
 	 * UID.
 	 */
@@ -69,7 +69,7 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
      */
     private void initComponents() {
     	// Titulo de la ventana
-    	setTitulo(Messages.getString("Wizard.sobres.titulo"));
+    	setTitulo(Messages.getString("Wizard.sobres.titulo")); //$NON-NLS-1$
     	
     	// Panel con la imagen lateral
         ImagenLateral panelIzdo = new ImagenLateral();
@@ -100,8 +100,8 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 		c.anchor = GridBagConstraints.NORTHWEST;
         
 		// Etiqueta "felicidades" y "Ha finalizado con..."
-		String textLabel = Messages.getString("Wizard.sobres.final1") +
-				"<br>"+"<br>" + Messages.getString("Wizard.sobres.final2") ;
+		String textLabel = Messages.getString("Wizard.sobres.final1") + //$NON-NLS-1$
+				"<br>" + "<br>" + Messages.getString("Wizard.sobres.final2") ; //$NON-NLS-3$
 		
 		InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
 		 //Foco al contenido
@@ -112,12 +112,12 @@ public class PanelFinalizar extends JAccessibilityDialogWizard {
 		
     	// Imagen de DNIe
     	JLabel etiquetaDNIe = new JLabel();
-    	etiquetaDNIe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/dnie.png")));
+    	etiquetaDNIe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/images/dnie.png"))); //$NON-NLS-1$
         panelCentral.add(etiquetaDNIe, c);
 
         c.gridy = 2;
         // Etiqueta con el texto "Recuerde que si ha..."
-        InfoLabel rememberLabel = new InfoLabel(Messages.getString("Wizard.sobres.final3"), false);
+        InfoLabel rememberLabel = new InfoLabel(Messages.getString("Wizard.sobres.final3"), false); //$NON-NLS-1$
         panelCentral.add(rememberLabel, c);
 
     	getContentPane().add(panelCentral, BorderLayout.CENTER);

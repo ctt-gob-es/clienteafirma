@@ -26,7 +26,7 @@ public class AsistenteRemitentes {
 	 */
 	private String rutaFichero;
 	
-    public AsistenteRemitentes(String rutafichero) {
+    public AsistenteRemitentes(final String rutafichero) {
         this.rutaFichero = rutafichero;
         initComponents();
     }
@@ -44,7 +44,7 @@ public class AsistenteRemitentes {
     	ventanas.add(panelPresentacion);
     	
     	// Pagina 2: Panel anadir nuevos remitentes
-    	PanelRemitentes panelDestinatarios = new PanelRemitentes(rutaFichero);
+    	PanelRemitentes panelDestinatarios = new PanelRemitentes(this.rutaFichero);
     	ventanas.add(panelDestinatarios);
     	
     	// Pagina 3: Panel finalizar

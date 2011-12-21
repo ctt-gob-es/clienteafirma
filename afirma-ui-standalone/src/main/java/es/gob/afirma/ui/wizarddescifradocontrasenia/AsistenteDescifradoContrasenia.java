@@ -21,7 +21,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * Clase principal del wizard de descifrado de contraseña. Contiene a los paneles de
  * explicacion y contenido.
  */
-public class AsistenteDescifradoContrasenia {
+public final class AsistenteDescifradoContrasenia {
 
     private String algoritmo;
 
@@ -46,7 +46,7 @@ public class AsistenteDescifradoContrasenia {
     	ventanas.add(panelPresentacion);
     	
     	// Pagina 2: Panel descifrar por contrasena
-    	PanelContrasenia panelContrasenia = new PanelContrasenia(algoritmo, rutaFichero);
+    	PanelContrasenia panelContrasenia = new PanelContrasenia(this.algoritmo, this.rutaFichero);
     	ventanas.add(panelContrasenia);
     	
     	// Pagina 3: Dialogo finalizar

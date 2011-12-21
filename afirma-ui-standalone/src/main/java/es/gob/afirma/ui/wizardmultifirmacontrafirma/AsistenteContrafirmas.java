@@ -44,11 +44,11 @@ public class AsistenteContrafirmas {
     	ventanas.add(panelPresentacion);
     	
     	// Pagina 2: Panel entrada de un archivo
-    	PanelEntrada panelEntrada = new PanelEntrada(kssc);
+    	PanelEntrada panelEntrada = new PanelEntrada(this.kssc);
     	ventanas.add(panelEntrada);
     	
     	// Pagina 3: Panel multifirma de un archivo
-    	PanelMultifirma panelMultifirma = new PanelMultifirma(kssc);
+    	PanelMultifirma panelMultifirma = new PanelMultifirma(this.kssc);
     	ventanas.add(panelMultifirma);
     	
     	// Pagina 4: Dialogo finalizar

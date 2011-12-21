@@ -20,7 +20,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * Clase principal que contiene la operatividad de movimiento dentro del wizard
  * y que contiene los paneles de explicacion y contenido para crear un sobre digital.
  */
-public class AsistenteEnsobrar {
+public final class AsistenteEnsobrar {
 
 	/**
 	 * Tipo de ensobrado
@@ -37,7 +37,7 @@ public class AsistenteEnsobrar {
 	 * @param rutafichero
 	 * @param tipo
 	 */
-    public AsistenteEnsobrar(String rutafichero, int tipo) {
+    public AsistenteEnsobrar(final String rutafichero, final int tipo) {
         this.rutaFichero = rutafichero;
         this.tipo = tipo;
         initComponents();
@@ -48,7 +48,7 @@ public class AsistenteEnsobrar {
      */
     private void initComponents() {   	
     	// Generamos la lista para el control de la botonera
-    	List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
+    	final List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
     	
     	// Obtenemos todas las paginas
     	// Pagina 1: Panel presentacion

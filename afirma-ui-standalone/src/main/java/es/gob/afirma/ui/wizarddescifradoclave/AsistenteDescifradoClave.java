@@ -42,7 +42,7 @@ public class AsistenteDescifradoClave {
     	ventanas.add(panelPresentacion);
     	
     	// Pagina 2: Panel clave de cifrado
-    	PanelClave panelContrasenia = new PanelClave(algoritmo, rutaFichero);
+    	PanelClave panelContrasenia = new PanelClave(this.algoritmo, this.rutaFichero);
     	ventanas.add(panelContrasenia);
     	
     	// Pagina 3: Dialogo finalizar

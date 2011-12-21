@@ -17,7 +17,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 /**
  * Clase principal del asistente de cifrado de clave. 
  */
-public class AsistenteCifradoClave {
+public final class AsistenteCifradoClave {
 
 	private static final long serialVersionUID = 1L;
 
@@ -50,7 +50,7 @@ public class AsistenteCifradoClave {
     	ventanas.add(panelPresentacion);
     	
     	// Pagina 2: Panel contrasenias
-    	PanelClaveCifrado panelClaveCifrado = new PanelClaveCifrado(algoritmo, rutaFichero);
+    	PanelClaveCifrado panelClaveCifrado = new PanelClaveCifrado(this.algoritmo, this.rutaFichero);
     	ventanas.add(panelClaveCifrado);
     	
     	// Pagina 3: Dialogo finalizar

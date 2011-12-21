@@ -132,13 +132,14 @@ public class BotoneraInferior extends JPanel {
 		panelVacio.setPreferredSize(new Dimension(60, 10));
 		add(panelVacio);		
 		
-		JPanel panelAnterior = new JPanel(new GridLayout(1, 1));
+		final JPanel panelAnterior = new JPanel(new GridLayout(1, 1));
     	// Boton anterior
-		 int paginas = this.ventanas.size() - 1;
-	     if (this.posicion == 0 || paginas == this.posicion)
+		int paginas = this.ventanas.size() - 1;
+	    if (this.posicion == 0 || paginas == this.posicion) {
         	anterior.setEnabled(false);
+	    }
         else {
-        	 anterior.setMnemonic(KeyEvent.VK_A); //Mnem�nico para el bot�n de anterior
+        	 anterior.setMnemonic(KeyEvent.VK_A); //Mnemonico para el boton de anterior
         	anterior.setEnabled(true);
         }
         anterior.setText(Messages.getString("Wizard.anterior")); // NOI18N //$NON-NLS-1$
@@ -158,10 +159,11 @@ public class BotoneraInferior extends JPanel {
         
         JPanel panelSiguiente = new JPanel(new GridLayout(1, 1));
         // Boton siguiente
-        if (this.ventanas.size() == 1 || paginas == this.posicion)
+        if (this.ventanas.size() == 1 || paginas == this.posicion) {
         	this.siguiente.setVisible(false);
+        }
         else {
-        	this.siguiente.setMnemonic(KeyEvent.VK_S); //Mnem�nico para el bot�n de siguiente
+        	this.siguiente.setMnemonic(KeyEvent.VK_S); //Mnemonico para el boton de siguiente
         	this.siguiente.setVisible(true);
         }
         this.siguiente.setText(Messages.getString("Wizard.siguiente")); // NOI18N //$NON-NLS-1$
@@ -184,12 +186,13 @@ public class BotoneraInferior extends JPanel {
 		panelVacio.setSize(new Dimension(20, 10));
 		add(panelVacio);
         
-		JPanel panelCancelar = new JPanel(new GridLayout(1, 1));
+		final JPanel panelCancelar = new JPanel(new GridLayout(1, 1));
         // Boton cancelar
-		if (paginas == this.posicion)
+		if (paginas == this.posicion) {
 			cancelar.setVisible(false);
+		}
         else {
-        	cancelar.setMnemonic(KeyEvent.VK_C); //Mnem�nico para el bot�n de cancelar
+        	cancelar.setMnemonic(KeyEvent.VK_C); //Mnemonico para el boton de cancelar
         	cancelar.setVisible(true);
         }
         cancelar.setText(Messages.getString("Wizard.cancelar")); // NOI18N //$NON-NLS-1$
@@ -213,8 +216,10 @@ public class BotoneraInferior extends JPanel {
         if (this.ventanas.size() == 1 || paginas == this.posicion) {
             this.finalizar.setMnemonic(KeyEvent.VK_F); //Mnemonico para el boton de finalizar
             this.finalizar.setVisible(true);
-        } else 
+        } 
+        else { 
         	this.finalizar.setVisible(false);
+        }
 
         this.finalizar.setText(Messages.getString("Wizard.finalizar")); // NOI18N //$NON-NLS-1$
 
@@ -251,10 +256,12 @@ public class BotoneraInferior extends JPanel {
 			//Se obtiene el diálogo
 			JAccessibilityDialogWizard wizard = (JAccessibilityDialogWizard)this.ventanas.get(indice);
 			//Se comprueba si estamos en la última ventana del wizard
-			if (indice < this.ventanas.size()-1) 
+			if (indice < this.ventanas.size()-1) { 
 				wizard.getRootPane().setDefaultButton(wizard.getBotonera().getSiguiente());
-			else
+			}
+			else {
 				wizard.getRootPane().setDefaultButton(wizard.getBotonera().getFinalizar());
+			}
 		}
 		this.ventanas.get(indice).setVisibleAndHide(true, this.ventanas.get(this.posicion));
 		

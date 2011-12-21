@@ -19,7 +19,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  *
  * Clase que realiza la multifirma masiva.
  */
-public class AsistenteMultifirmaMasiva {
+public final class AsistenteMultifirmaMasiva {
 	
     /**
 	 * Configuracion del KeyStore

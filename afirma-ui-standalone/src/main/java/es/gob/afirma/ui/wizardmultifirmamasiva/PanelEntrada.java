@@ -47,7 +47,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  * @author inteco
  *
  */
-class PanelEntrada extends JAccessibilityDialogWizard {
+final class PanelEntrada extends JAccessibilityDialogWizard {
 	/**
 	 * UID.
 	 */
@@ -56,7 +56,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 	/**
 	 * Indica si el asistente se ha saltado la pagina anterior.
 	 */
-	private boolean salto = false;
+	boolean salto = false;
 	
 	/**
 	 * Relacion minima para el redimensionado de componentes.
@@ -153,9 +153,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.setFontBold(this.campoDirectorio);
         panelCentral.add(this.campoDirectorio, c);
         
-        //Relación entre etiqueta y campo de texto
+        //Relacion entre etiqueta y campo de texto
         etiquetaFirma.setLabelFor(this.campoDirectorio);
-  		//Asignación de mnemónico
+  		//Asignacion de mnemonico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_D);
         
         c.insets = new Insets(0, 10, 0, 20);
@@ -231,9 +231,9 @@ class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.setFontBold(this.campoExtensiones);
         panelCentral.add(this.campoExtensiones, c);
         
-        //Relación entre etiqueta y campo de texto
+        //Relacion entre etiqueta y campo de texto
         etiquetaAplicar.setLabelFor(this.campoExtensiones);
-  		//Asignación de mnemónico
+  		//Asignacion de mnemonico
         etiquetaAplicar.setDisplayedMnemonic(KeyEvent.VK_P);
     
         c.fill = GridBagConstraints.BOTH;
@@ -259,7 +259,7 @@ class PanelEntrada extends JAccessibilityDialogWizard {
      * Comprueba que el fichero seleccionado es valido y guarda su nombre en el campo de texto
      */
     void examinarActionPerformed() {
-    	File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title"));    	 //$NON-NLS-1$
+    	final File selectedFile = SelectionDialog.showDirOpenDialog(this, Messages.getString("PrincipalGUI.chooser.dir.title"));    	 //$NON-NLS-1$
     	if (selectedFile != null) {
     		this.campoDirectorio.setText(selectedFile.getAbsolutePath());
     	}
@@ -312,14 +312,15 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 				JButton siguiente, JButton finalizar) {
 			
 			if (PanelEntrada.this.salto) {
-				//Se asigna un botón por defecto al wizard
+				//Se asigna un boton por defecto al wizard
 				if (getVentanas().get(1) instanceof JAccessibilityDialogWizard) {
 					getVentanas().get(1).getRootPane().setDefaultButton(((JAccessibilityDialogWizard)getVentanas().get(1)).getBotonera().getSiguiente());
 				}
 			    getVentanas().get(1).setVisibleAndHide(true, getVentanas().get(3));
 			}
-			else
+			else {
 				super.anteriorActionPerformed(anterior, siguiente, finalizar);
+			}
 		}
 	}
 
@@ -338,7 +339,6 @@ class PanelEntrada extends JAccessibilityDialogWizard {
 			CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.multifirma.error.directorio.origen2"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 			return false;
 		}
-		
 		return true;
 	}
 }

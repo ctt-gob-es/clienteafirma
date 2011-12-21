@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 public class ImagenLateral extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private String rutaImagen = "/resources/images/nubes.png";
+	private String rutaImagen = "/resources/images/nubes.png"; //$NON-NLS-1$
 	private Dimension dimensiones = new Dimension(145, 388);
 
 	public ImagenLateral() {
@@ -56,11 +56,11 @@ public class ImagenLateral extends JPanel {
 	private void initComponents() {
 		// Configuracion panel
 		setLayout(new BorderLayout());
-		setPreferredSize(dimensiones);
+		setPreferredSize(this.dimensiones);
 		setBackground(Color.WHITE); //El fondo se pone a blanco
 		
 		JLabel etiqueta = new JLabel();
-		etiqueta.setIcon(new ImageIcon(getClass().getResource(rutaImagen))); // NOI18N
+		etiqueta.setIcon(new ImageIcon(getClass().getResource(this.rutaImagen))); // NOI18N
 		
         add(etiqueta, BorderLayout.CENTER);
     }

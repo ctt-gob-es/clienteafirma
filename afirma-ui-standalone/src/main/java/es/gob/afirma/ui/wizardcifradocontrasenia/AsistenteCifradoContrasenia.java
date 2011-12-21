@@ -19,7 +19,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 /**
  * Clase principal del wizard de cifrado de contraseña. 
  */
-public class AsistenteCifradoContrasenia extends JDialog {
+public final class AsistenteCifradoContrasenia extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
@@ -46,7 +46,7 @@ public class AsistenteCifradoContrasenia extends JDialog {
     	ventanas.add(panelPresentacion);
     	
     	// Pagina 2: Panel clave de cifrado
-    	PanelContrasenia panelContrasenia = new PanelContrasenia(algoritmo, rutaFichero);
+    	PanelContrasenia panelContrasenia = new PanelContrasenia(this.algoritmo, this.rutaFichero);
     	ventanas.add(panelContrasenia);
     	
     	// Pagina 3: Dialogo finalizar

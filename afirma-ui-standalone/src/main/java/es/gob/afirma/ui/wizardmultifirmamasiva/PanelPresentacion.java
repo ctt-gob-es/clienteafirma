@@ -33,7 +33,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  *
  * Panel explicativo de presentacion
  */
-class PanelPresentacion extends JAccessibilityDialogWizard {
+final class PanelPresentacion extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -64,10 +64,10 @@ class PanelPresentacion extends JAccessibilityDialogWizard {
      */
     private void initComponents() {
     	// Titulo de la ventana
-    	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana"));
+    	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana")); //$NON-NLS-1$
     	
     	// Panel con la imagen lateral
-        ImagenLateral panelIzdo = new ImagenLateral();
+        final ImagenLateral panelIzdo = new ImagenLateral();
         if (Main.isOSHighContrast){
         	panelIzdo.setOpaque(false);
         }
@@ -95,10 +95,10 @@ class PanelPresentacion extends JAccessibilityDialogWizard {
 		c.anchor = GridBagConstraints.NORTHWEST;
 		
 		//Etiqueta con el texto "Bienvenido al asistente..."
-        String textLabel = Messages.getString("Wizard.multifirma.presentacion.parte1") +
-        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.presentacion.parte2")+
-        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.presentacion.parte3")+
-        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.presentacion.parte4");
+        String textLabel = Messages.getString("Wizard.multifirma.presentacion.parte1") + //$NON-NLS-1$
+        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.presentacion.parte2")+ //$NON-NLS-3$
+        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.presentacion.parte3")+ //$NON-NLS-3$
+        		"<br>"+"<br>"+Messages.getString("Wizard.multifirma.presentacion.parte4"); //$NON-NLS-3$
         InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         //Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));

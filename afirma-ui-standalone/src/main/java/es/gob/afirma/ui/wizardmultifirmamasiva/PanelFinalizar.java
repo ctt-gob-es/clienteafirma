@@ -33,7 +33,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
  *
  * Panel explicativo de finalizaci�n
  */
-class PanelFinalizar extends JAccessibilityDialogWizard {
+final class PanelFinalizar extends JAccessibilityDialogWizard {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -62,7 +62,7 @@ class PanelFinalizar extends JAccessibilityDialogWizard {
      */
     private void initComponents() {
     	// Titulo de la ventana
-    	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana"));
+    	setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana")); //$NON-NLS-1$
     	
     	// Panel con la imagen lateral
         ImagenLateral panelIzdo = new ImagenLateral();
@@ -93,8 +93,8 @@ class PanelFinalizar extends JAccessibilityDialogWizard {
 		c.anchor = GridBagConstraints.NORTHWEST;
 		
 		 // Etiqueta "felicidades" y "Ha finalizado con..."
-		String textLabel = Messages.getString("Wizard.sobres.final1") +
-				"<br>"+"<br>" + Messages.getString("Wizard.multifirma.simple.final.descripcion") ;
+		String textLabel = Messages.getString("Wizard.sobres.final1") + //$NON-NLS-1$
+				"<br>"+"<br>" + Messages.getString("Wizard.multifirma.simple.final.descripcion") ; //$NON-NLS-3$
 		
 		InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
 		 //Foco al contenido

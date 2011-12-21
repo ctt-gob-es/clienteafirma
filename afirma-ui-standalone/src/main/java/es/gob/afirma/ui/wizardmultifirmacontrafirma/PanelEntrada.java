@@ -60,7 +60,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 /**
  * Panel de entrada del archivo.
  */
-public class PanelEntrada extends JAccessibilityDialogWizard {
+final class PanelEntrada extends JAccessibilityDialogWizard {
 
 	/**
 	 * UID.
@@ -111,11 +111,11 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
      */
     private void initComponents() {
     	// Titulo de la ventana
-    	setTitulo(Messages.getString("Wizard.multifirma.simple.contrafirma.titulo"));
+    	setTitulo(Messages.getString("Wizard.multifirma.simple.contrafirma.titulo")); //$NON-NLS-1$
     	
     	// Panel con la cabecera
-        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana1.titulo", 
-        		"Wizard.multifirma.simple.contrafirma.ventana1.titulo.descripcion", null, true);
+        CabeceraAsistente panelSuperior = new CabeceraAsistente("Wizard.multifirma.simple.contrafirma.ventana1.titulo",  //$NON-NLS-1$
+        		"Wizard.multifirma.simple.contrafirma.ventana1.titulo.descripcion", null, true); //$NON-NLS-1$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -134,7 +134,7 @@ public class PanelEntrada extends JAccessibilityDialogWizard {
     	
     	// Etiqueta "Fichero de datos:"
     	JLabel etiquetaFirma = new JLabel();
-    	etiquetaFirma.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero"));
+    	etiquetaFirma.setText(Messages.getString("Wizard.multifirma.simple.contrafirma.ventana1.fichero")); //$NON-NLS-1$
     	Utils.setContrastColor(etiquetaFirma);
     	Utils.setFontBold(etiquetaFirma);
         panelCentral.add(etiquetaFirma, c);

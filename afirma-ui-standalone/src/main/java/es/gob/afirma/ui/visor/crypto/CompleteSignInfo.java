@@ -33,7 +33,7 @@ public final class CompleteSignInfo {
      * @see #setSignData(byte[])
      */
     public byte[] getSignData() {
-        return this.signData;
+        return this.signData.clone();
     }
 
     /**
@@ -41,7 +41,7 @@ public final class CompleteSignInfo {
      * @param signData Firma.
      */
     public void setSignData(final byte[] signData) {
-        this.signData = signData;
+        this.signData = signData.clone();
     }
 
     /**
@@ -89,6 +89,6 @@ public final class CompleteSignInfo {
      * @param data Datos que se firmaron.
      */
     public void setData(final byte[] data) {
-        this.data = data;
+        this.data = data.clone();
     }
 }

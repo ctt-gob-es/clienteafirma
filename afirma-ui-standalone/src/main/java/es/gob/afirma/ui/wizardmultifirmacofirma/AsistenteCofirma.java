@@ -18,7 +18,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 /**
  * Clase que realiza la cofirma.
  */
-public class AsistenteCofirma {
+public final class AsistenteCofirma {
 
 	/**
 	 * Configuracion del KeyStore
@@ -43,7 +43,7 @@ public class AsistenteCofirma {
     	ventanas.add(panelPresentacion);
     	
     	// Pagina 2: Panel descifrar por contrasena
-    	PanelCofirma panelContrasenia = new PanelCofirma(kssc);
+    	PanelCofirma panelContrasenia = new PanelCofirma(this.kssc);
     	ventanas.add(panelContrasenia);
     	
     	// Pagina 3: Dialogo finalizar
