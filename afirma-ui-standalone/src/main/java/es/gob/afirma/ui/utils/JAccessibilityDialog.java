@@ -90,36 +90,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	 * @return int Relación mínima
 	 */
 	public abstract int getMinimumRelation();
-	
-	/**
-	 * Obtiene un componente de un contenedor a traves de su nombre
-	 * @param name Nombre del componente a buscar
-	 * @param container Contenedor donde se encuentra el componente a buscar
-	 * @return
-	 *//*
-	private Component getComponentByName(String name, Container container){
-		if(name.equals(container.getName())){
-			return container;
-		}
-		else {
-			Component[] componentes = container.getComponents();
-			for(int i = 0; i < componentes.length; i++){
-				if(componentes[i] instanceof Container){
-					Component res = getComponentByName(name, (Container) componentes[i]);
-					if(res != null){
-						return res;
-					}
-				}
-				else{
-					if(componentes[i].getName().equals(name)){
-						return componentes[i];
-					}
-				}
-			}
-		}
-		return null;
-	}*/
-	
+
 	/**
 	 * Evento de redimensionado. Comprueba el tamaÃ±o de la ventana para habilitar o deshabilitar el boton
 	 *  de Maximizar ventana. Tambien almacena el tamaño y posicion de la ventana para su restauracion.
@@ -139,29 +110,17 @@ public abstract class JAccessibilityDialog extends JDialog {
 		//Dimensiones que se van a considerar de maximizado
 	    Dimension fullScreen = new Dimension(maxWidth, maxHeight);//new Dimension((int)screenSize.getWidth(), (int)screenSize.getHeight()-35);
 
-	    //Dimensiones actuales del dialogo
-	    Dimension actualSize = this.getSize();
-	    if (actualSize.equals(fullScreen)){
-	    	this.setResizable(false);
-	    } else {
-	    	this.setResizable(true);
-	    }
-//		    Component botonMaximizar = getComponentByName("maximizar", getJAccessibilityDialog(this));
-//		    Component botonRestaurar = getComponentByName("restaurar", getJAccessibilityDialog(this));
-//		    if(botonMaximizar != null){
-//		    	if (actualSize.equals(fullScreen)){
-//					/*botonMaximizar.setEnabled(false);
-//					if (botonRestaurar != null) {
-//		    			//Si la ventana está maximizada, el botón de restaurar debe estar visible
-//		    			botonRestaurar.setEnabled(true);
-//		    		}*/
-//			    } else {
-//			    	botonMaximizar.setEnabled(true);
-//			    	if (botonRestaurar != null) {
-//				    	botonRestaurar.setEnabled(false); //Se deshabilita
-//			    	}
-//			    }
-//		    }
+
+		//Se comprueba el so
+		if (!Platform.getOS().equals(Platform.OS.LINUX)){
+		    //Dimensiones actuales del dialogo
+		    Dimension actualSize = this.getSize();
+		    if (actualSize.equals(fullScreen)){
+		    	this.setResizable(false);
+		    } else {
+		    	this.setResizable(true);
+		    }
+		}
 	}
 	
 	/**
