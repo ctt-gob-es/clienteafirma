@@ -53,6 +53,7 @@ import es.gob.afirma.core.signers.AOSigner;
 import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.signers.pades.AOPDFSigner;
+import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
 import es.gob.afirma.standalone.crypto.CertAnalyzer;
@@ -65,6 +66,7 @@ final class SignDataPanel extends JPanel {
 
     private static final String FILE_ICON_PDF = "/resources/icon_pdf.png";  //$NON-NLS-1$
     private static final String FILE_ICON_SIGN = "/resources/icon_sign.png"; //$NON-NLS-1$
+    private static final String FILE_ICON_FACTURAE = "/resources/icon_facturae.png"; //$NON-NLS-1$
 
     private final JLabel certDescText = new JLabel();
     private final JLabel filePathText = new JLabel();
@@ -120,9 +122,13 @@ final class SignDataPanel extends JPanel {
         else {
             final String fileIcon;
             final String fileTooltip;
-            if (isPDF) {
+            if (DataAnalizerUtil.isPDF(sign)) {
                 fileIcon = FILE_ICON_PDF;
                 fileTooltip = Messages.getString("SignDataPanel.9"); //$NON-NLS-1$
+            }
+            else if (DataAnalizerUtil.isFacturae(sign)) {
+                fileIcon = FILE_ICON_FACTURAE;
+                fileTooltip = Messages.getString("SignDataPanel.10"); //$NON-NLS-1$
             }
             else {
                 fileIcon = FILE_ICON_SIGN;
@@ -170,7 +176,6 @@ final class SignDataPanel extends JPanel {
             filePathPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         }
         
-
         JPanel certDescPanel = null;
 
         // Panel con los datos del certificado
@@ -257,7 +262,8 @@ final class SignDataPanel extends JPanel {
         CompleteSignInfo signInfo;
         try {
             signInfo = this.getSignInfo(sign);
-        } catch (final Exception e) {
+        } 
+        catch (final Exception e) {
             signInfo = null;
         }
         final JScrollPane detailPanel = new JScrollPane(signInfo == null ? null : this.getSignDataTree(signInfo));
