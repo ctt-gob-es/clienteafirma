@@ -104,11 +104,11 @@ public class BotoneraSuperior extends JPanel {
 	public void maximizarActionPerformed(){
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
 
-		JAccessibilityDialogWizard.actualPositionX = j.getX();
-		JAccessibilityDialogWizard.actualPositionY = j.getY();
-		JAccessibilityDialogWizard.actualWidth = j.getWidth();
-		JAccessibilityDialogWizard.actualHeight = j.getHeight();
-		
+		JAccessibilityDialogWizard.setActualPositionX(j.getX());
+		JAccessibilityDialogWizard.setActualPositionY(j.getY());
+		JAccessibilityDialogWizard.setActualWidth(j.getWidth());
+		JAccessibilityDialogWizard.setActualHeight(j.getHeight());
+
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
@@ -133,8 +133,8 @@ public class BotoneraSuperior extends JPanel {
 	 */
 	public void restaurarActionPerformed(){
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
-		if (JAccessibilityDialogWizard.actualPositionX != -1 && JAccessibilityDialogWizard.actualPositionY != -1 && JAccessibilityDialogWizard.actualWidth != -1 && JAccessibilityDialogWizard.actualHeight != -1){
-			j.setBounds(JAccessibilityDialogWizard.actualPositionX, JAccessibilityDialogWizard.actualPositionY, JAccessibilityDialogWizard.actualWidth, JAccessibilityDialogWizard.actualHeight);
+		if (JAccessibilityDialogWizard.getActualPositionX() != -1 && JAccessibilityDialogWizard.getActualPositionY() != -1 && JAccessibilityDialogWizard.getActualWidth() != -1 && JAccessibilityDialogWizard.getActualHeight() != -1){
+			j.setBounds(JAccessibilityDialogWizard.getActualPositionX(), JAccessibilityDialogWizard.getActualPositionY(), JAccessibilityDialogWizard.getActualWidth(), JAccessibilityDialogWizard.getActualHeight());
 		} else {
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			if (Platform.getOS().equals(Platform.OS.LINUX)){

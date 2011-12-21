@@ -30,22 +30,22 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	/**
 	 * Posicion X actual.
 	 */
-	public static int actualPositionX = -1;
+	private static int actualPositionX = -1;
 	
 	/**
 	 * Posicion Y actual.
 	 */
-	public static int actualPositionY = -1;
+	private static int actualPositionY = -1;
 	
 	/**
 	 * Ancho actual.
 	 */
-	public static int actualWidth = -1;
+	private static int actualWidth = -1;
 	
 	/**
 	 * Alto actual.
 	 */
-	public static int actualHeight = -1;
+	private static int actualHeight = -1;
 	
 	/**
 	 * Botonera.
@@ -289,5 +289,58 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 	public void setBotoneraSuperior(BotoneraSuperior botonera) {
 		this.botoneraSuperior=botonera;
 		Utils.setContrastColor(this.botoneraSuperior);
+	}
+
+	/**
+     * Getter para la variable ActualPositionX.
+     * @return ActualPositionX
+     */
+	public static int getActualPositionX() {
+		return actualPositionX;
+	}
+	/**
+     * Setter para la variable ActualPositionX.
+     */
+	public static void setActualPositionX(int actualPositionX) {
+		JAccessibilityDialogWizard.actualPositionX = actualPositionX;
+	}
+	/**
+     * Getter para la variable ActualPositionY.
+     * @return ActualPositionY
+     */
+	public static int getActualPositionY() {
+		return actualPositionY;
+	}
+	/**
+     * Setter para la variable ActualPositionY.
+     */
+	public static void setActualPositionY(int actualPositionY) {
+		JAccessibilityDialogWizard.actualPositionY = actualPositionY;
+	}
+	/**
+     * Getter para la variable ActualWidth.
+     * @return ActualWidth
+     */
+	public static int getActualWidth() {
+		return actualWidth;
+	}
+	/**
+     * Setter para la variable ActualWidth.
+     */
+	public static void setActualWidth(int actualWidth) {
+		JAccessibilityDialogWizard.actualWidth = actualWidth;
+	}
+	/**
+     * Getter para la variable ActualHeight.
+     * @return ActualHeight
+     */
+	public static int getActualHeight() {
+		return actualHeight;
+	}
+	/**
+     * Setter para la variable ActualHeight.
+     */
+	public static void setActualHeight(int actualHeight) {
+		JAccessibilityDialogWizard.actualHeight = actualHeight;
 	}
 }
