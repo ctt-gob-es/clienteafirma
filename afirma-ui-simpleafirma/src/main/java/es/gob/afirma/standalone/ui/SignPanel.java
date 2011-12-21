@@ -106,7 +106,7 @@ public final class SignPanel extends JPanel {
     private static final String FILE_ICON_XML = "/resources/icon_xml.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_BINARY = "/resources/icon_binary.svg"; //$NON-NLS-1$
     private static final String FILE_ICON_SIGN = "/resources/icon_sign.svg"; //$NON-NLS-1$
-    private static final String FILE_ICON_FACTURAE = "/resources/icon_sign.svg"; //$NON-NLS-1$
+    private static final String FILE_ICON_FACTURAE = "/resources/icon_facturae.svg"; //$NON-NLS-1$
 
     AOSigner signer;
     byte[] dataToSign = null;
