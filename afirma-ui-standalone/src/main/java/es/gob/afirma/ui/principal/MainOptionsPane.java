@@ -75,10 +75,10 @@ public class MainOptionsPane {
 	 private JCheckBox checkAddPolicy;
 	 
 	 /** URL de la pol&iacute;tica de firma. */
-	 private JTextField textPolicyUrl;
+	 JTextField textPolicyUrl;
 	 
 	 /** OID de la pol&iacute;tica de firma. */
-	 private JTextField textPolicyOid;
+	 JTextField textPolicyOid;
 	 
 	/**
 	 * Crea la vista y componentes de la pesta&ntilde;a principal de configuraci&oacute;n.
@@ -282,7 +282,7 @@ public class MainOptionsPane {
         
         JPanel panelValores = new JPanel(new GridLayout(1, 1));
         //Boton Valores por defecto
-        valores.setText(Messages.getString("Opciones.accesibilidad.valores"));
+        valores.setText(Messages.getString("Opciones.accesibilidad.valores")); //$NON-NLS-1$
         valores.addActionListener(new ActionListener() {
 			
 			@Override
@@ -309,7 +309,7 @@ public class MainOptionsPane {
 				boolean state = (e.getStateChange() == ItemEvent.SELECTED);
 				MainOptionsPane.this.textPolicyOid.setEnabled(state);
 				MainOptionsPane.this.textPolicyUrl.setEnabled(state);
-				//Asignacion de mnemonicos según el estado
+				//Asignacion de mnemonicos segun el estado
 				if (state) {
 					policyOidLabel.setDisplayedMnemonic(KeyEvent.VK_I);
 					policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText() + "ALT + I.");
@@ -318,7 +318,8 @@ public class MainOptionsPane {
 					policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText() + "ALT + T.");
 					policyUrlLabel.setFocusable(false);
 				
-				} else {
+				} 
+				else {
 					//Se eliminan los atajos porque los cuadros de texto están deshabilitados
 					policyOidLabel.setDisplayedMnemonic(0);
 					policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText()+". Este cuadro de texto esta deshabilitado por defecto.");
@@ -329,12 +330,12 @@ public class MainOptionsPane {
 		});
         
 		// Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(this.checkHabilitar, "opciones.general");
-        HelpUtils.enableHelpKey(this.comboAlgoritmo, "opciones.algoritmo");
-        HelpUtils.enableHelpKey(this.checkXML, "opciones.referenciasInternas");
+        HelpUtils.enableHelpKey(this.checkHabilitar, "opciones.general"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.comboAlgoritmo, "opciones.algoritmo"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkXML, "opciones.referenciasInternas"); //$NON-NLS-1$
     }
 	
-	public JPanel getConfigurationPanel() {
+	JPanel getConfigurationPanel() {
 		return this.panel;
 	}
 	
@@ -406,12 +407,15 @@ public class MainOptionsPane {
 		for (int i=0; i<panel1.getComponentCount();i++){
 			if (panel1.getComponent(i) instanceof JTextField){
 				((JTextField)panel1.getComponent(i)).setText("");
-			} else if(panel1.getComponent(i) instanceof JCheckBox){
+			} 
+			else if(panel1.getComponent(i) instanceof JCheckBox){
 				((JCheckBox)panel1.getComponent(i)).setSelected(false);				
-			} else if (panel1.getComponent(i) instanceof JComboBox){
+			} 
+			else if (panel1.getComponent(i) instanceof JComboBox){
 				((JComboBox)panel1.getComponent(i)).setSelectedIndex(0);
 				
-			}else if (panel1.getComponent(i) instanceof JPanel){
+			}
+			else if (panel1.getComponent(i) instanceof JPanel){
 				JPanel interiorPanel = (JPanel)panel1.getComponent(i);
 				restore(interiorPanel);
 			}

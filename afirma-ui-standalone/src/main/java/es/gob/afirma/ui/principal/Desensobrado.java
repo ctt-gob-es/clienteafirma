@@ -453,8 +453,9 @@ final class Desensobrado extends JPanel {
     	PasswordCallback pssCallback;
     	AOKeyStore store = ksConfiguration.getType();
     	String lib = ksConfiguration.getLib();
-    	if (store == AOKeyStore.WINDOWS ||
-    			store == AOKeyStore.WINROOT) pssCallback = new NullPasswordCallback();
+    	if (store == AOKeyStore.WINDOWS || store == AOKeyStore.WINROOT) {
+    	    pssCallback = new NullPasswordCallback();
+    	}
     	else if (store==AOKeyStore.PKCS12){
     		pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), SwingUtilities.getRoot(this), //$NON-NLS-1$
         			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -501,8 +502,9 @@ final class Desensobrado extends JPanel {
     			new Vector<CertificateFilter>(0), false);
 
     	// Comprobamos si se ha cancelado la seleccion
-    	if (selectedcert == null) 
+    	if (selectedcert == null) {
     		throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
+    	}
 
     	// Recuperamos la clave del certificado
     	PrivateKeyEntry privateKeyEntry = null;

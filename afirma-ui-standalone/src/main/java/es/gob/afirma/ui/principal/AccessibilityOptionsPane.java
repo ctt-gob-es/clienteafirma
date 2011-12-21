@@ -507,9 +507,9 @@ public final class AccessibilityOptionsPane {
 			//aplicamos los cambios a la pantalla de opciones
 			((Opciones)this.parent).initComponents();
 			((Opciones)this.parent).callResize();
-		} else {
+		} 
+		else {
 			// Se ha modificado el estado del Alto Contraste por lo que es necesario ocultar y volver a mostrar la ventana de opciones para que cargue el alto contraste
-			
 			((Opciones)this.parent).getAceptar().doClick();
 			this.mainGui.setAplicar(true);
 			((JMenuItem)this.mainGui.getMenu().getMenu(0).getMenuComponent(0)).doClick();			

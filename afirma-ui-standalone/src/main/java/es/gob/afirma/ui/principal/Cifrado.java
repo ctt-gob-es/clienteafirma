@@ -346,8 +346,8 @@ final class Cifrado extends JPanel {
 
 		JPanel panelAyuda = new JPanel();
 		// Boton ayuda
-		JButton botonAyuda = HelpUtils.helpButton("cifrado");
-		botonAyuda.setName("helpButton");
+		JButton botonAyuda = HelpUtils.helpButton("cifrado"); //$NON-NLS-1$
+		botonAyuda.setName("helpButton"); //$NON-NLS-1$
 		
 		cons.ipadx = 15;
 		cons.weightx = 0.0;
@@ -380,10 +380,12 @@ final class Cifrado extends JPanel {
 			JTextField campoFichero) {
 		String algoritmo;
 		String mecanismo = this.mecanismos.get(comboMecanismo.getSelectedIndex());
-		if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD))
+		if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
 			algoritmo = this.algoritmoVc[comboAlgoritmo.getSelectedIndex()];
-		else
+		}
+		else {
 			algoritmo = this.algoritmoVr[comboAlgoritmo.getSelectedIndex()];
+		}
 		
 		// Sacamos la ruta del archivo
 		if (campoFichero.getText() == null || campoFichero.getText().equals("")) { //$NON-NLS-1$
@@ -422,8 +424,9 @@ final class Cifrado extends JPanel {
 	 */
 	void comboMecanismoItemStateChanged(JComboBox comboMecanismo, JComboBox comboAlgoritmo) {
 		String mecanismo = this.mecanismos.get(comboMecanismo.getSelectedIndex());
-		if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD))
+		if (mecanismo.equals(AOCipherConstants.KEY_MODE_PASSWORD)) {
 			comboAlgoritmo.setModel(new DefaultComboBoxModel(this.algoritmoLc.toArray()));
+		}
 		else {
 			String[] algoritmoLr = new String[]{
 					"Advanced Encryption Standard (AES)", //$NON-NLS-1$

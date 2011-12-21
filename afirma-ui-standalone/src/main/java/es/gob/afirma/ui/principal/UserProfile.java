@@ -44,7 +44,7 @@ import es.gob.afirma.ui.utils.ProfileManager;
  * @author inteco
  *
  */
-public class UserProfile extends JAccessibilityFrameAdvisor {
+class UserProfile extends JAccessibilityFrameAdvisor {
 
 	/**
 	 * UID.
@@ -85,7 +85,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 	 * @return int Posición Y
 	 */
 	public int getInitialY() {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
 		if (Platform.getOS().equals(Platform.OS.MACOSX)){
 			return (screenSize.height - 340) / 2;
 		}
@@ -148,7 +148,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		c.gridy = c.gridy + 1;
 		
         // Etiqueta de la lista de usuarios
-		JLabel label = new JLabel();
+		final JLabel label = new JLabel();
 		label.setText(Messages.getString("UserProfile.list.label")); // NOI18N //$NON-NLS-1$
 		label.setDisplayedMnemonic(KeyEvent.VK_P);
 		label.setLabelFor(this.comboPerfiles);
@@ -157,9 +157,9 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		c.gridy = c.gridy + 1;
 		
 		// Lista de usuarios
-		List<String> profileNames = new ArrayList<String>();
+		final List<String> profileNames = new ArrayList<String>();
 		profileNames.add(ProfileManager.DEFAULT_PROFILE_NAME);
-		for (String profileName : ProfileManager.getProfilesNames()) {
+		for (final String profileName : ProfileManager.getProfilesNames()) {
 			profileNames.add(profileName);
 		}
 		
@@ -178,8 +178,7 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
 		add(createButtonsPanel(), c);
 		
         //Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(this.comboPerfiles, "perfil.cargar");
-       
+        HelpUtils.enableHelpKey(this.comboPerfiles, "perfil.cargar"); //$NON-NLS-1$
 		
 	}
 
@@ -233,8 +232,8 @@ public class UserProfile extends JAccessibilityFrameAdvisor {
         
 		JPanel panelAyuda = new JPanel(new GridLayout(1, 1));
 		// Boton ayuda
-		JButton botonAyuda = HelpUtils.helpButton("perfiles.usuario");
-		botonAyuda.setName("helpButton");
+		JButton botonAyuda = HelpUtils.helpButton("perfiles.usuario"); //$NON-NLS-1$
+		botonAyuda.setName("helpButton"); //$NON-NLS-1$
 		config(botonAyuda);
 		
         cons.ipadx = 15;

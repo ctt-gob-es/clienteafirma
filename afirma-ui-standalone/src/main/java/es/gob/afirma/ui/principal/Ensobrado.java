@@ -152,10 +152,12 @@ final class Ensobrado extends JPanel {
         this.checkAnadir.addChangeListener(new ChangeListener() {	
 			@Override
             public void stateChanged(ChangeEvent arg0) {
-				if (Ensobrado.this.checkAnadir.isSelected())
+				if (Ensobrado.this.checkAnadir.isSelected()) {
 					Ensobrado.this.comboTipos.setEnabled(false);
-				else
+				}
+				else {
 					Ensobrado.this.comboTipos.setEnabled(true);
+				}
 			}
 		});
         Utils.remarcar(this.checkAnadir);
@@ -262,8 +264,8 @@ final class Ensobrado extends JPanel {
 
 		JPanel panelAyuda = new JPanel();
         // Boton ayuda
-		JButton botonAyuda = HelpUtils.helpButton("ensobrado");
-		botonAyuda.setName("helpButton");
+		JButton botonAyuda = HelpUtils.helpButton("ensobrado"); //$NON-NLS-1$
+		botonAyuda.setName("helpButton"); //$NON-NLS-1$
         
         cons.ipadx = 15;
 		cons.weightx = 0.0;

@@ -360,8 +360,9 @@ final class Descifrado extends JPanel {
      */
     void examinarActionPerformed(JTextField campoFichero) {
     	File selectedFile = SelectionDialog.showFileOpenDialog(this,Messages.getString("Seleccione.fichero.descifrar") ); //$NON-NLS-1$
-    	if (selectedFile != null) 
+    	if (selectedFile != null) {
     		campoFichero.setText(selectedFile.getAbsolutePath());
+    	}
     }
     
     /**
@@ -371,10 +372,12 @@ final class Descifrado extends JPanel {
 	 */
     void comboMecanismoItemStateChanged(JComboBox comboMecanismo, JComboBox comboAlgoritmo) {
         String mecanismo = MECANISMOS.get(comboMecanismo.getSelectedIndex());
-        if (mecanismo.equals("PASSWORD")) //$NON-NLS-1$
+        if (mecanismo.equals("PASSWORD")) { //$NON-NLS-1$
         	comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LC.toArray()));
-        else
+        }
+        else {
         	comboAlgoritmo.setModel(new DefaultComboBoxModel(ALGORITMO_LR.toArray()));
+        }
     }
 
     /**

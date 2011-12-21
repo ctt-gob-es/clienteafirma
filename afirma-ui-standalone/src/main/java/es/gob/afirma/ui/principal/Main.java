@@ -38,10 +38,10 @@ public class Main {
     /** Indica si el SO tiene activado el alto contraste con color negro de fondo */
     public static boolean isOSHighContrast = false;
 	
-    public static boolean showHelp = false;
+    static boolean showHelp = false;
     
     /** Almacena el indice a cargar para la ayuda en alto contraste */
-    public static String helpIndex;
+    static String helpIndex;
     
     /**
      * Arranca la interfaz de escritorio del Cliente @firma.
