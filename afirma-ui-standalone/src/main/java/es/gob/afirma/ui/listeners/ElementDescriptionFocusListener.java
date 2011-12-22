@@ -16,35 +16,35 @@ import es.gob.afirma.ui.utils.JStatusBar;
 
 /**
  * Manejador para que se muestre un texto en la barra de estado cada vez que se enfoque
- * el componente. Cuando se piera el foco se eliminar&aacute; el texto de la barra de estado.   
+ * el componente. Cuando se piera el foco se eliminar&aacute; el texto de la barra de estado.
  */
-public class ElementDescriptionFocusListener implements FocusListener {
+public final class ElementDescriptionFocusListener implements FocusListener {
 
-	/** Barra de estado. */
-	private JStatusBar statusBar;
-	
-	/** Texto descriptivo. */
-	private String textDescription;
-	
-	/**
-	 * Crea un manejador que muestra un texto en la barra de estado indicada cuando se
-	 * enfoca el componente y lo borra cuando el foco sale del mismo.
-	 * @param statusBar Barra de estado en la que mostrar el texto.
-	 * @param description Texto que se desea mostrar.
-	 */
-	public ElementDescriptionFocusListener(JStatusBar statusBar, String description) {
-		this.statusBar = statusBar;
-		this.textDescription = description;
-	}
+    /** Barra de estado. */
+    private final JStatusBar statusBar;
 
-	@Override
-    public void focusGained(FocusEvent e) {
-		this.statusBar.setStatus(this.textDescription);
-	}
+    /** Texto descriptivo. */
+    private final String textDescription;
 
-	@Override
-    public void focusLost(FocusEvent e) {
-		this.statusBar.setStatus(""); //$NON-NLS-1$
-	}
+    /**
+     * Crea un manejador que muestra un texto en la barra de estado indicada cuando se
+     * enfoca el componente y lo borra cuando el foco sale del mismo.
+     * @param statusBar Barra de estado en la que mostrar el texto.
+     * @param description Texto que se desea mostrar.
+     */
+    public ElementDescriptionFocusListener(final JStatusBar statusBar, final String description) {
+        this.statusBar = statusBar;
+        this.textDescription = description;
+    }
+
+    @Override
+    public void focusGained(final FocusEvent e) {
+        this.statusBar.setStatus(this.textDescription);
+    }
+
+    @Override
+    public void focusLost(final FocusEvent e) {
+        this.statusBar.setStatus(""); //$NON-NLS-1$
+    }
 
 }

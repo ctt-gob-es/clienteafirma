@@ -4,7 +4,7 @@ package es.gob.afirma.signature;
  * Indica cuando los datos contenidos en una firma no coincide con los datos firmados.
  * @author Carlos Gamuci
  */
-class NoMatchDataException extends Exception {
+final class NoMatchDataException extends Exception {
 
     /** Serial ID. */
     private static final long serialVersionUID = 1L;

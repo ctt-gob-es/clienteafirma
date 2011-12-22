@@ -45,13 +45,13 @@ public final class AccessibilityOptionsPane {
     public static final String MAIN_HIGHT_CONTRAST = "main.hightContrast"; //$NON-NLS-1$
 
     /** Clave para la configuraci&oacute;n de tama&ntilde;o de ventana. */
-    public static final String MAIN_WINDOWS_ACCESSIBILITY = "main.windowsAccessibility"; //$NON-NLS-1$
+    static final String MAIN_WINDOWS_ACCESSIBILITY = "main.windowsAccessibility"; //$NON-NLS-1$
 
     /** Clave para la configuraci&oacute;n de tama&ntilde;o de ventana. */
     public static final String MAIN_WINDOWS_SIZE = "main.windowsSize"; //$NON-NLS-1$
 
     /** Boton aplicar cambios. */
-    public JButton aplicar = new JButton();
+    JButton aplicar = new JButton();
 
     /** Casilla de verificacion del tama&ntilde;o del cursor de texto. */
     private JCheckBox checkCursorSize;

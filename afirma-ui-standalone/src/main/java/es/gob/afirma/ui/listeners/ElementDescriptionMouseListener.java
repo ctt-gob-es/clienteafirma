@@ -17,50 +17,50 @@ import es.gob.afirma.ui.utils.JStatusBar;
 /**
  * Manejador para que se muestre un texto en la barra de estado cada vez que se pase el rat&oacute;n
  * por encima de &eacute;l. Cuando se quite el rat&oacute;n de encima de elemento, se eliminar&aacute;
- * el texto de la barra de estado.   
+ * el texto de la barra de estado.
  */
-public class ElementDescriptionMouseListener implements MouseListener {
+public final class ElementDescriptionMouseListener implements MouseListener {
 
-	/** Barra de estado. */
-	private JStatusBar statusBar;
-	
-	/** Texto descriptivo. */
-	private String textDescription;
-	
-	/**
-	 * Crea un manejador que muestra un texto en la barra de estado indicada cuando se situa
-	 * el puntero el rat&oacute;n sobre el componente y lo borra cuando se sale del mismo.
-	 * @param statusBar Barra de estado en la que mostrar el texto.
-	 * @param description Texto que se desea mostrar.
-	 */
-	public ElementDescriptionMouseListener(JStatusBar statusBar, String description) {
-		this.statusBar = statusBar;
-		this.textDescription = description;
-	}
-	
-	@Override
-    public void mouseClicked(MouseEvent e) {
-	    // Vacio
-	}
+    /** Barra de estado. */
+    private final JStatusBar statusBar;
 
-	@Override
-    public void mouseEntered(MouseEvent e) {
-		this.statusBar.setStatus(this.textDescription);
-	}
+    /** Texto descriptivo. */
+    private final String textDescription;
 
-	@Override
-    public void mouseExited(MouseEvent e) {
-		this.statusBar.setStatus(""); //$NON-NLS-1$
-	}
+    /**
+     * Crea un manejador que muestra un texto en la barra de estado indicada cuando se situa
+     * el puntero el rat&oacute;n sobre el componente y lo borra cuando se sale del mismo.
+     * @param statusBar Barra de estado en la que mostrar el texto.
+     * @param description Texto que se desea mostrar.
+     */
+    public ElementDescriptionMouseListener(final JStatusBar statusBar, final String description) {
+        this.statusBar = statusBar;
+        this.textDescription = description;
+    }
 
-	@Override
-    public void mousePressed(MouseEvent e) {
-	 // Vacio
-	}
+    @Override
+    public void mouseClicked(final MouseEvent e) {
+        // Vacio
+    }
 
-	@Override
-    public void mouseReleased(MouseEvent e) {
-	 // Vacio
-	}
+    @Override
+    public void mouseEntered(final MouseEvent e) {
+        this.statusBar.setStatus(this.textDescription);
+    }
+
+    @Override
+    public void mouseExited(final MouseEvent e) {
+        this.statusBar.setStatus(""); //$NON-NLS-1$
+    }
+
+    @Override
+    public void mousePressed(final MouseEvent e) {
+        // Vacio
+    }
+
+    @Override
+    public void mouseReleased(final MouseEvent e) {
+        // Vacio
+    }
 
 }
