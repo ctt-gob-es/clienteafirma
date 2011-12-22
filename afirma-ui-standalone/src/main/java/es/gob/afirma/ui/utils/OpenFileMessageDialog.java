@@ -37,7 +37,7 @@ public class OpenFileMessageDialog {
 
         if (file == null)
         {
-            throw new NullPointerException("No se ha indicado el fichero que desea abrir"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se ha indicado el fichero que desea abrir"); //$NON-NLS-1$
         }
 
         if (CustomDialog.showConfirmDialog(parent, true, (String) message, title, JOptionPane.OK_CANCEL_OPTION, optionType) == JOptionPane.OK_OPTION) {

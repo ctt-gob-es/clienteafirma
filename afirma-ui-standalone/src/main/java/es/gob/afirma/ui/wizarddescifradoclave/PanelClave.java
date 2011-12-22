@@ -245,7 +245,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
      * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto. */
     private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
         if (this.rutaFichero == null) {
-            throw new NullPointerException("No se ha indicado un fichero de entrada"); //$NON-NLS-1$
+            throw new IllegalArgumentException("No se ha indicado un fichero de entrada"); //$NON-NLS-1$
         }
         return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
     }

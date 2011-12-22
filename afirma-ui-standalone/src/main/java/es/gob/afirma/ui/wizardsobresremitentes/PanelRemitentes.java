@@ -71,7 +71,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /** Clase que contiene los elementos necesarios para crear un grupo de Remitentes
  * a partir de una seleccion de certificados de remitentes. */
-public class PanelRemitentes extends JAccessibilityDialogWizard {
+final class PanelRemitentes extends JAccessibilityDialogWizard {
     /** Botonera con funciones para la pagina panel de multifirma - cofirma */
     private class Botonera extends BotoneraInferior {
         /** UID. */
@@ -111,10 +111,10 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     private AOKeyStoreManager keyStoreManager;
 
     /** Lista con los remitentes */
-    private final List<CertificateDestiny> listaCertificadosRe = new ArrayList<CertificateDestiny>();
+    final List<CertificateDestiny> listaCertificadosRe = new ArrayList<CertificateDestiny>();
 
     /** Lista de remitentes. */
-    private final JList listaRemitentes = new JList();
+    final JList listaRemitentes = new JList();
 
     /** Ruta donde se encuentra el fichero a ensobrar */
     private final String rutafichero;
@@ -190,7 +190,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
                 comboRepositorios.setEnabled(false);
                 this.etiquetaAnadir.setDisplayedMnemonic(0); // Se asigna un atajo vacío puesto que se ha deshabilitado el combo asociado
                 this.etiquetaAnadir.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " "
-                                                                             + Messages.getString("wizard.sobres.etiquetaAnadir"));
+                                                                             + Messages.getString("wizard.sobres.etiquetaAnadir")); //$NON-NLS-1$
                 this.etiquetaAnadir.setFocusable(true);
                 eliminar.setEnabled(true);
                 eliminar.setMnemonic(KeyEvent.VK_E); // Se asigna un atajo al boton ya que ha sido habilitado
@@ -198,8 +198,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
             else {
                 CustomDialog.showMessageDialog(this,
                                                true,
-                                               Messages.getString("Wizard.sobres.error.usuario"),
-                                               Messages.getString("error"),
+                                               Messages.getString("Wizard.sobres.error.usuario"), //$NON-NLS-1$
+                                               Messages.getString("error"), //$NON-NLS-1$
                                                JOptionPane.WARNING_MESSAGE);
             }
         }
@@ -224,7 +224,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 
             // Guardamos el sobre generado
             final File savedFile =
-                SelectionDialog.saveDataToFile(Messages.getString("wizard.sobres.remitentes.filechooser.save.title"),
+                SelectionDialog.saveDataToFile(Messages.getString("wizard.sobres.remitentes.filechooser.save.title"), //$NON-NLS-1$
                                                envelopedData,
                                                new File(this.rutafichero + ".csig").getName(), //$NON-NLS-1$
                                                SignFileUtils.getOutFileFilter(AOSignConstants.SIGN_FORMAT_CMS),
@@ -238,14 +238,14 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
                 dataFis.close();
             }
             catch (final Exception e) {
-                logger.warning("No se pudo cerrar el fichero de datos");
+                logger.warning("No se pudo cerrar el fichero de datos"); //$NON-NLS-1$
             }
         }
         catch (final AOCancelledOperationException e) {
-            logger.warning("La operaci&oacute;n ha sido cancelada por el usuario: " + e);
+            logger.info("La operacion ha sido cancelada por el usuario: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
-                                           Messages.getString("Ensobrado.msg.error.generacion"),
+                                           Messages.getString("Ensobrado.msg.error.generacion"), //$NON-NLS-1$
                                            Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return false;
         }
@@ -256,11 +256,11 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
             return false;
         }
         catch (final Exception e) {
-            logger.warning("Error durante el proceso de a&ntilde;dir un nuevo remitente: " + e);
+            logger.warning("Error durante el proceso de andir un nuevo remitente: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
-                                           Messages.getString("Wizard.sobres.almacen.anadir.remitentes"),
-                                           Messages.getString("error"),
+                                           Messages.getString("Wizard.sobres.almacen.anadir.remitentes"), //$NON-NLS-1$
+                                           Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -293,8 +293,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         else {
             CustomDialog.showMessageDialog(this,
                                            true,
-                                           Messages.getString("Wizard.sobres.almacen.sobre.soportado"),
-                                           Messages.getString("error"),
+                                           Messages.getString("Wizard.sobres.almacen.sobre.soportado"), //$NON-NLS-1$
+                                           Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return null;
         }
@@ -341,7 +341,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         }
         else {
             CustomDialog.showMessageDialog(this, true, Messages.getString("Wizard.sobres.almacen.certificado.soportado"), //$NON-NLS-1$
-                                           Messages.getString("error"),
+                                           Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return null;
         }
@@ -353,7 +353,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param comboRepositorios Combo con el repositorio / almacen
      * @param eliminar Boton para eliminar un remitente de la lista
      * @param anadir Boton para anadir un remitente a la lista */
-    private void eliminarActionPerformed(final JComboBox comboRepositorios, final JButton eliminar, final JButton anadir) {
+    void eliminarActionPerformed(final JComboBox comboRepositorios, final JButton eliminar, final JButton anadir) {
         for (int i = 0; i < this.listaCertificadosRe.size(); i++) {
             if (this.listaCertificadosRe.get(i).getAlias().equals(this.listaRemitentes.getSelectedValue())) {
                 this.listaCertificadosRe.remove(this.listaCertificadosRe.get(i));
@@ -382,7 +382,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param kStore Almac&eacuten de claves */
     private PasswordCallback getPreferredPCB(final AOKeyStore kStore) {
         if (kStore == null) {
-            throw new NullPointerException("No se ha indicado el KeyStore del que desea " + "obtener el PasswordCallBack");
+            throw new IllegalArgumentException("No se ha indicado el KeyStore del que desea obtener el PasswordCallBack"); //$NON-NLS-1$
         }
 
         PasswordCallback pssCallback;
@@ -393,23 +393,23 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         else {
             // pssCallback = new UIPasswordCallback(Messages.getString("Wizard.sobres.almacen.pass")+" "+kStore.getDescription(), this);
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getDescription(),
+                new UIPasswordCallbackAccessibility(Messages.getString("Wizard.sobres.almacen.pass") + " " + kStore.getDescription(), //$NON-NLS-1$
                                                     this,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"),
+                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
                                                     KeyEvent.VK_O,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
         }
 
         return pssCallback;
     }
 
     /** Obtiene la clave privada
-     * @param keyStoreManager Manager del KeyStore
+     * @param keyStoreManager1 Manager del KeyStore
      * @param seleccionado Certificado seleccionado
-     * @param kconf Configuracion del KeyStore
+     * @param kconf1 Configuracion del KeyStore
      * @return
      * @throws AOException */
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, final String seleccionado, final KeyStoreConfiguration kconf) throws AOException {
+    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager1, final String seleccionado, final KeyStoreConfiguration kconf1) throws AOException {
 
         // Comprobamos si se ha cancelado la seleccion
         if (seleccionado == null)
@@ -420,7 +420,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         // Recuperamos la clave del certificado
         PrivateKeyEntry privateKeyEntry = null;
         try {
-            privateKeyEntry = keyStoreManager.getKeyEntry(seleccionado, Utils.getCertificatePC(kconf.getType(), this));
+            privateKeyEntry = keyStoreManager1.getKeyEntry(seleccionado, Utils.getCertificatePC(kconf1.getType(), this));
         }
         catch (final KeyException e) {
             throw new AOException("Error al recuperar la clave privada del certificado", e); //$NON-NLS-1$
@@ -442,11 +442,11 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
     /** Inicializacion de componentes */
     private void initComponents() {
         // Titulo de la ventana
-        setTitulo(Messages.getString("Wizard.sobres.titulo"));
+        setTitulo(Messages.getString("Wizard.sobres.titulo")); //$NON-NLS-1$
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-            new CabeceraAsistente("Wizard.sobres.remitentes.titulo", "Wizard.sobres.remitentes.titulo.explicacion", null, true);
+            new CabeceraAsistente("Wizard.sobres.remitentes.titulo", "Wizard.sobres.remitentes.titulo.explicacion", null, true);  //$NON-NLS-1$//$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -465,14 +465,14 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         c.gridx = 0;
 
         // Etiqueta con el texto "Puede anadir uno o..."
-        final InfoLabel labelText = new InfoLabel(Messages.getString("Wizard.sobres.remitentes.contenido.explicacion1"), false);
+        final InfoLabel labelText = new InfoLabel(Messages.getString("Wizard.sobres.remitentes.contenido.explicacion1"), false); //$NON-NLS-1$
         panelCentral.add(labelText, c);
 
         c.gridy = 1;
         c.gridwidth = 1;
 
         // Etiqueta con el texto "Anadir remitente desde..."
-        this.etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante"));
+        this.etiquetaAnadir.setText(Messages.getString("Wizard.sobres.aniadir.originante")); //$NON-NLS-1$
         Utils.setContrastColor(this.etiquetaAnadir);
         Utils.setFontBold(this.etiquetaAnadir);
         panelCentral.add(this.etiquetaAnadir, c);
@@ -486,7 +486,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 
         // Combo con los repositorios / almacenes
         final JComboBox comboRepositorios = new JComboBox();
-        comboRepositorios.setToolTipText(Messages.getString("wizard.comboRepositorios.description"));
+        comboRepositorios.setToolTipText(Messages.getString("wizard.comboRepositorios.description")); //$NON-NLS-1$
         comboRepositorios.getAccessibleContext().setAccessibleName(this.etiquetaAnadir.getText() + " "
                                                                    + comboRepositorios.getToolTipText()
                                                                    + " ALT + D.");
@@ -521,7 +521,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         final JButton anadir = new JButton();
         final JButton eliminar = new JButton();
         anadir.setToolTipText(Messages.getString("Wizard.sobres.aniadir.originante.description"));
-        anadir.setText(Messages.getString("wizard.aniadir"));
+        anadir.setText(Messages.getString("wizard.aniadir")); //$NON-NLS-1$
         anadir.setAutoscrolls(true);
         anadir.setMnemonic(KeyEvent.VK_R); // Se asigna un atajo al boton
         anadir.getAccessibleContext().setAccessibleName(anadir.getText() + " " + anadir.getToolTipText());
@@ -546,7 +546,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Remitentes"
         final JLabel senderLabel = new JLabel();
-        senderLabel.setText(Messages.getString("wizard.sobres.listaRemitentes"));
+        senderLabel.setText(Messages.getString("wizard.sobres.listaRemitentes")); //$NON-NLS-1$
         Utils.setContrastColor(senderLabel);
         Utils.setFontBold(senderLabel);
         panelCentral.add(senderLabel, c);
@@ -564,7 +564,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         panelCentral.add(panelLista, c);
 
         // Listado de remitentes
-        this.listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description"));
+        this.listaRemitentes.setToolTipText(Messages.getString("Wizard.sobres.listaRemitentes.description")); //$NON-NLS-1$
         this.listaRemitentes.setModel(new DefaultListModel());
         this.listaRemitentes.getAccessibleContext().setAccessibleName(senderLabel.getText() + " " + this.listaRemitentes.getToolTipText());
         this.listaRemitentes.getAccessibleContext().setAccessibleDescription(this.listaRemitentes.getToolTipText());
@@ -606,7 +606,7 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
                 eliminarActionPerformed(comboRepositorios, eliminar, anadir);
             }
         });
-        eliminar.getAccessibleContext().setAccessibleDescription(Messages.getString("wizard.sobres.eliminar.remitente"));
+        eliminar.getAccessibleContext().setAccessibleDescription(Messages.getString("wizard.sobres.eliminar.remitente")); //$NON-NLS-1$
         Utils.remarcar(eliminar);
         Utils.setContrastColor(eliminar);
         Utils.setFontBold(eliminar);
@@ -616,8 +616,8 @@ public class PanelRemitentes extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
 
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(comboRepositorios, "ensobrado.wizard.repositorio.remitente");
-        HelpUtils.enableHelpKey(labelText, "ensobrado.wizard.remitentes");
+        HelpUtils.enableHelpKey(comboRepositorios, "ensobrado.wizard.repositorio.remitente"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(labelText, "ensobrado.wizard.remitentes"); //$NON-NLS-1$
     }
 
     /** Guarda todas las ventanas del asistente para poder controlar la botonera

@@ -43,53 +43,53 @@ public final class ValidateBinarySignature {
      * @return <code>true</code> si la firma es v&aacute;lida, <code>false</code> en caso contrario
      */
     public static SignValidity validate(final byte[] sign, final byte[] data) {
-    	if (sign == null) {
-    		throw new NullPointerException("La firma a validar no puede ser nula"); //$NON-NLS-1$
-    	}
+        if (sign == null) {
+            throw new IllegalArgumentException("La firma a validar no puede ser nula"); //$NON-NLS-1$
+        }
 
-    	AOSigner signer = new AOCMSSigner();
-    	if (!signer.isSign(sign)) {
-    	    signer = new AOCAdESSigner();
-    	    if (!signer.isSign(sign)) {
-    	        return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
-    	    }
-    	}
+        AOSigner signer = new AOCMSSigner();
+        if (!signer.isSign(sign)) {
+            signer = new AOCAdESSigner();
+            if (!signer.isSign(sign)) {
+                return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
+            }
+        }
 
-    	Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
 
-    	try {
-    	    byte[] signedData = null;
-    	    if (data == null) {
-    	        signedData = signer.getData(sign);
-    	        if (signedData == null) {
-    	            return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA);
-    	        }
-    	    }
-    	    verifySignatures(sign, data != null ? data : signedData);
-    	} catch (final CertStoreException e) {
-    	    // Ocurrio un error al recuperar los certificados o estos no son validos
+        try {
+            byte[] signedData = null;
+            if (data == null) {
+                signedData = signer.getData(sign);
+                if (signedData == null) {
+                    return new SignValidity(SIGN_DETAIL_TYPE.UNKNOWN, VALIDITY_ERROR.NO_DATA);
+                }
+            }
+            verifySignatures(sign, data != null ? data : signedData);
+        } catch (final CertStoreException e) {
+            // Ocurrio un error al recuperar los certificados o estos no son validos
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_PROBLEM);
         } catch (final CertificateExpiredException e) {
-         // Certificado caducado
+            // Certificado caducado
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_EXPIRED);
         } catch (final CertificateNotYetValidException e) {
-         // Certificado aun no valido
+            // Certificado aun no valido
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CERTIFICATE_NOT_VALID_YET);
         } catch (final NoSuchAlgorithmException e) {
-         // Algoritmo no reconocido
+            // Algoritmo no reconocido
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.ALGORITHM_NOT_SUPPORTED);
         } catch (final NoMatchDataException e) {
-         // Los datos indicados no coinciden con los datos de firma
+            // Los datos indicados no coinciden con los datos de firma
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.NO_MATCH_DATA);
         } catch (final CRLException e) {
-         // Problema en la validacion de las CRLs de la firma
+            // Problema en la validacion de las CRLs de la firma
             return new SignValidity(SIGN_DETAIL_TYPE.KO, VALIDITY_ERROR.CRL_PROBLEM);
         } catch (final Exception e) {
             // La firma no es una firma binaria valida
             return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
         }
 
-    	return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
+        return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
     }
 
     /**
@@ -109,10 +109,10 @@ public final class ValidateBinarySignature {
      * @throws Exception Cuando la firma resulte no v&aacute;lida.
      */
     @SuppressWarnings("deprecation")
-	private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
+    private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
 
         final CMSSignedData s = new CMSSignedData(sign);
-		final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$ 
+        final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$
         final SignerInformationStore signers = s.getSignerInfos();
         final Iterator<?> it = signers.getSigners().iterator();
 
@@ -120,7 +120,7 @@ public final class ValidateBinarySignature {
             final SignerInformation signer = (SignerInformation) it.next();
             final Iterator<?> certIt = certStore.getCertificates(signer.getSID()).iterator();
             final X509Certificate cert = (X509Certificate) certIt.next();
-            
+
             if (!signer.verify(cert, BouncyCastleProvider.PROVIDER_NAME)) {
                 throw new Exception("Firma no valida"); //$NON-NLS-1$
             }
@@ -154,7 +154,7 @@ public final class ValidateBinarySignature {
                 }
 
                 if (!MessageDigest.isEqual(MessageDigest.getInstance(mdAlgorithm).digest(data),
-                        signer.getContentDigest())) {
+                                           signer.getContentDigest())) {
                     throw new NoMatchDataException("Los datos introducidos no coinciden con los firmados"); //$NON-NLS-1$
                 }
             }
