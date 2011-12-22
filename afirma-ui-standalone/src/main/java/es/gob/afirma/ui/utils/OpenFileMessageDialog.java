@@ -14,38 +14,34 @@ import java.io.File;
 
 import javax.swing.JOptionPane;
 
-/**
- * Clase con m&eacute;todos para mostrar un di&aacute;logo que pide al usuario
- * confirmaci&oacute;n para abrir un fichero.
- */
+/** Clase con m&eacute;todos para mostrar un di&aacute;logo que pide al usuario
+ * confirmaci&oacute;n para abrir un fichero. */
 public class OpenFileMessageDialog {
 
-	/**
-	 * Muestra un di&aacute;logo que consulta al usuario si desea abrir un fichero.
-	 * @param parent Componente padre sobre el que se muestra el i&aacute;logo. 
-	 * @param message Contenido del panel del di&aacute;logo.
-	 * @param title T&iacute;tulo del di&aacute;logo.
-	 * @param file Fichero que se desea abrir.
-	 */
-	public static void show(Component parent, Object message, String title, File file) {
-		show(parent, message, title, file, JOptionPane.INFORMATION_MESSAGE);
-	}
-	
-	/**
-	 * Muestra un di&aacute;logo que consulta al usuario si desea abrir un fichero.
-	 * @param parent Componente padre sobre el que se muestra el i&aacute;logo. 
-	 * @param message Contenido del panel del di&aacute;logo.
-	 * @param title T&iacute;tulo del di&aacute;logo.
-	 * @param file Fichero que se desea abrir.
-	 * @param optionType Tipo de di&aacute;logo.
-	 */
-	public static void show(Component parent, Object message, String title, File file, int optionType) {
+    /** Muestra un di&aacute;logo que consulta al usuario si desea abrir un fichero.
+     * @param parent Componente padre sobre el que se muestra el i&aacute;logo.
+     * @param message Contenido del panel del di&aacute;logo.
+     * @param title T&iacute;tulo del di&aacute;logo.
+     * @param file Fichero que se desea abrir. */
+    public static void show(final Component parent, final Object message, final String title, final File file) {
+        show(parent, message, title, file, JOptionPane.INFORMATION_MESSAGE);
+    }
 
-		if(file == null)
-			throw new NullPointerException("No se ha indicado el fichero que desea abrir"); //$NON-NLS-1$
-		
-		if(CustomDialog.showConfirmDialog(
-				parent, true, (String)message, title, JOptionPane.OK_CANCEL_OPTION, optionType) == JOptionPane.OK_OPTION)
-			Utils.openFile(file.getAbsolutePath());
-	}
+    /** Muestra un di&aacute;logo que consulta al usuario si desea abrir un fichero.
+     * @param parent Componente padre sobre el que se muestra el i&aacute;logo.
+     * @param message Contenido del panel del di&aacute;logo.
+     * @param title T&iacute;tulo del di&aacute;logo.
+     * @param file Fichero que se desea abrir.
+     * @param optionType Tipo de di&aacute;logo. */
+    public static void show(final Component parent, final Object message, final String title, final File file, final int optionType) {
+
+        if (file == null)
+        {
+            throw new NullPointerException("No se ha indicado el fichero que desea abrir"); //$NON-NLS-1$
+        }
+
+        if (CustomDialog.showConfirmDialog(parent, true, (String) message, title, JOptionPane.OK_CANCEL_OPTION, optionType) == JOptionPane.OK_OPTION) {
+            Utils.openFile(file.getAbsolutePath());
+        }
+    }
 }

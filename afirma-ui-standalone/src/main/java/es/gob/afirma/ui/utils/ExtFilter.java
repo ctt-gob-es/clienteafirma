@@ -12,8 +12,22 @@ import javax.swing.filechooser.FileFilter;
  * @version 0.3 */
 public final class ExtFilter extends FileFilter implements java.io.FileFilter {
 
-    private String[] extensions;
-    private String description;
+    /** Devuelve la extensi&oacute;n de un fichero.
+     * @param f
+     *        Fichero del cual queremos conocer la extensi&oacute;n
+     * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
+     *         tiene extensi&oacute;n */
+    private final static String getExtension(final File f) {
+        final String s = f.getName();
+        final int i = s.lastIndexOf('.');
+        if (i > 0 && i < s.length() - 1) {
+            return s.substring(i + 1).toLowerCase();
+        }
+        return ""; //$NON-NLS-1$
+    }
+    private final String description;
+
+    private final String[] extensions;
 
     /** Construye un filtro para la selecci&oacute;n de ficheros en un <code>JFileChooser</code>.
      * @param exts
@@ -21,7 +35,7 @@ public final class ExtFilter extends FileFilter implements java.io.FileFilter {
      * @param desc
      *        Descripci&oacute;n del tipo de fichero correspondiente a
      *        las extensiones */
-    public ExtFilter(final String[] exts, String desc) {
+    public ExtFilter(final String[] exts, final String desc) {
         if (exts == null || exts.length < 1) {
             throw new IllegalArgumentException("No se puede crear un filtro vacio"); //$NON-NLS-1$
         }
@@ -48,20 +62,6 @@ public final class ExtFilter extends FileFilter implements java.io.FileFilter {
     @Override
     public String getDescription() {
         return this.description;
-    }
-
-    /** Devuelve la extensi&oacute;n de un fichero.
-     * @param f
-     *        Fichero del cual queremos conocer la extensi&oacute;n
-     * @return Extensi&oacute;n del fichero o cadena vac&iacute;a si este no
-     *         tiene extensi&oacute;n */
-    private final static String getExtension(final File f) {
-        final String s = f.getName();
-        final int i = s.lastIndexOf('.');
-        if (i > 0 && i < s.length() - 1) {
-            return s.substring(i + 1).toLowerCase();
-        }
-        return ""; //$NON-NLS-1$
     }
 
 }

@@ -3,67 +3,48 @@ package es.gob.afirma.ui.utils;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-/**
- * Componente etiqueta que contiene un icono.
- * @author inteco
- *
- */
-public class IconLabel extends JLabel{
+/** Componente etiqueta que contiene un icono.
+ * @author inteco */
+public class IconLabel extends JLabel {
 
-	/**
-	 * UID.
-	 */
-	private static final long serialVersionUID = 1L;
+    /** UID. */
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Icono.
-	 */
-	private Icon icon = null;
-	
-	/**
-	 * Icono original.
-	 */
-	private Icon originalIcon = null;
-	
-	
+    /** Icono. */
+    private Icon icon = null;
 
-	/**
-	 * Constructor.
-	 */
-	public IconLabel(){
-		
-	}
+    /** Icono original. */
+    private Icon originalIcon = null;
 
-	/**
-	 * Devuelve el icono asociado.
-	 * @return
-	 */
-	public Icon getIcon() {
-		return icon;
-	}
+    /** Constructor. */
+    public IconLabel() {
 
-	/**
-	 * Asigna el icono.
-	 * @param icon
-	 */
-	public void setIcon(Icon icon) {
-		this.icon = icon;
-	}
+    }
 
-	/**
-	 * Obtener el icono original.
-	 * @return icono original.
-	 */
-	public Icon getOriginalIcon() {
-		return originalIcon;
-	}
+    /** Devuelve el icono asociado.
+     * @return */
+    @Override
+    public Icon getIcon() {
+        return this.icon;
+    }
 
-	/**
-	 * Asignar el icono original.
-	 * @param originalIcon
-	 */
-	public void setOriginalIcon(Icon originalIcon) {
-		this.originalIcon = originalIcon;
-	}
-	
+    /** Obtener el icono original.
+     * @return icono original. */
+    public Icon getOriginalIcon() {
+        return this.originalIcon;
+    }
+
+    /** Asigna el icono.
+     * @param icon */
+    @Override
+    public void setIcon(final Icon icon) {
+        this.icon = icon;
+    }
+
+    /** Asignar el icono original.
+     * @param originalIcon */
+    public void setOriginalIcon(final Icon originalIcon) {
+        this.originalIcon = originalIcon;
+    }
+
 }

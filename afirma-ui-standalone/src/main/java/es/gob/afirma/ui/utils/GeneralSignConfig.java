@@ -9,64 +9,60 @@
  */
 package es.gob.afirma.ui.utils;
 
-/**
- * Clase que guarda una configuracion generica de firma
- */
+/** Clase que guarda una configuracion generica de firma */
 public class GeneralSignConfig {
 
-	private String signatureProductionPlace = "";
-	private String signReason = "";
-	private String signContact = "";
-	
-	private String signAlgorithm = null;
-	
-	private boolean useAlgorithmInternally = false; 
-	
-	/**
-	 * Establece una configuracion generica de firma. 
-	 * @param algorithm Algoritmo de firma.
-	 */
-	public GeneralSignConfig(String algorithm) {
-		this.signAlgorithm = algorithm;
-	}
+    private String signAlgorithm = null;
+    private String signatureProductionPlace = "";
+    private String signContact = "";
 
-	public String getSignatureProductionPlace() {
-		return signatureProductionPlace;
-	}
+    private String signReason = "";
 
-	public void setSignatureProductionPlace(String signatureProductionPlace) {
-		this.signatureProductionPlace = signatureProductionPlace;
-	}
+    private boolean useAlgorithmInternally = false;
 
-	public String getSignReason() {
-		return signReason;
-	}
+    /** Establece una configuracion generica de firma.
+     * @param algorithm Algoritmo de firma. */
+    public GeneralSignConfig(final String algorithm) {
+        this.signAlgorithm = algorithm;
+    }
 
-	public void setSignReason(String signReason) {
-		this.signReason = signReason;
-	}
+    public String getSignAlgorithm() {
+        return this.signAlgorithm;
+    }
 
-	public String getSignContact() {
-		return signContact;
-	}
+    public String getSignatureProductionPlace() {
+        return this.signatureProductionPlace;
+    }
 
-	public void setSignContact(String signContact) {
-		this.signContact = signContact;
-	}
+    public String getSignContact() {
+        return this.signContact;
+    }
 
-	public String getSignAlgorithm() {
-		return signAlgorithm;
-	}
+    public String getSignReason() {
+        return this.signReason;
+    }
 
-	public void setSignAlgorithm(String signAlgorithm) {
-		this.signAlgorithm = signAlgorithm;
-	}
+    public boolean isUseAlgorithmInternally() {
+        return this.useAlgorithmInternally;
+    }
 
-	public boolean isUseAlgorithmInternally() {
-		return useAlgorithmInternally;
-	}
+    public void setSignAlgorithm(final String signAlgorithm) {
+        this.signAlgorithm = signAlgorithm;
+    }
 
-	public void setUseAlgorithmInternally(boolean useAlgorithmInternally) {
-		this.useAlgorithmInternally = useAlgorithmInternally;
-	}
+    public void setSignatureProductionPlace(final String signatureProductionPlace) {
+        this.signatureProductionPlace = signatureProductionPlace;
+    }
+
+    public void setSignContact(final String signContact) {
+        this.signContact = signContact;
+    }
+
+    public void setSignReason(final String signReason) {
+        this.signReason = signReason;
+    }
+
+    public void setUseAlgorithmInternally(final boolean useAlgorithmInternally) {
+        this.useAlgorithmInternally = useAlgorithmInternally;
+    }
 }

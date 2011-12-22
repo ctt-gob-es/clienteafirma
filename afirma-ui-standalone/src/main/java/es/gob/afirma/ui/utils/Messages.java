@@ -4,21 +4,24 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-/**
- * Clase para acceder a los mensajes del properties sin lanzar excepciones de error
- */
+/** Clase para acceder a los mensajes del properties sin lanzar excepciones de error */
 public class Messages {
 
-	private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
-	
-	public static String getString(String codeString) {
-		try {
-			return bundle.getString(codeString);
-		} catch (MissingResourceException e) {
-			return "##ERROR## Cadena no disponible."; //$NON-NLS-1$
-		}
-	}
-	
+    private static ResourceBundle bundle = ResourceBundle.getBundle("resources/properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
+
+    public static void changeLocale() {
+        bundle = ResourceBundle.getBundle("properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
+    }
+
+    public static String getString(final String codeString) {
+        try {
+            return bundle.getString(codeString);
+        }
+        catch (final MissingResourceException e) {
+            return "##ERROR## Cadena no disponible."; //$NON-NLS-1$
+        }
+    }
+
     /** Recupera el texto identificado con la clave proporcionada y sustituye la
      * subcadenas "%0" por el texto proporcionado.
      * @param key
@@ -34,8 +37,4 @@ public class Messages {
             return '!' + key + '!';
         }
     }
-	
-	public static void changeLocale () {
-		bundle = ResourceBundle.getBundle("properties/Idioma", Locale.getDefault()); //$NON-NLS-1$
-	}
 }

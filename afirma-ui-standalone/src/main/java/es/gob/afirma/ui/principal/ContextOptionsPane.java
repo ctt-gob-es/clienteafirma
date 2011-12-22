@@ -23,124 +23,118 @@ import es.gob.afirma.ui.utils.HelpUtils;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
-/**
- * Panel con la configuraci&oacute;n de contexto de las firmas de la interfaz.
- */
+/** Panel con la configuraci&oacute;n de contexto de las firmas de la interfaz. */
 public final class ContextOptionsPane {
 
-	/** Clave para el algoritmo de firma por defecto. */
-	public static final String KEY_SUBJECT = "context.subject"; //$NON-NLS-1$
-	
-	/** Clave para el algoritmo de firma por defecto. */
-	public static final String KEY_PRODUCTION_PLACE = "context.productionPlace"; //$NON-NLS-1$
-	
-	/** Clave para el algoritmo de firma por defecto. */
-	public static final String KEY_CONTACT_INFO = "context.contactInfo"; //$NON-NLS-1$
-	
-	
-	/** Panel sobre el que se montan los componentes. */
-	private final JPanel panel;
-	
-	 /** Motivo de la firma. */
-	 private JTextField campoMotivo;
-	 
-	 /** Lugar en donde se realiza la firma. */
-	 private JTextField campoLugar;
-	 
-	 /** Informaci&oacute;n de contacto para la firma. */
-	 private JTextField campoDatos;
-	
-	/**
-	 * Crea la vista y componentes de la pesta&ntilde;a principal de configuraci&oacute;n.
-	 */
-	public ContextOptionsPane() {
-		
-    	this.panel = new JPanel(new GridBagLayout());
-        
-        GridBagConstraints c = new GridBagConstraints();
+    /** Clave para el algoritmo de firma por defecto. */
+    public static final String KEY_CONTACT_INFO = "context.contactInfo"; //$NON-NLS-1$
+
+    /** Clave para el algoritmo de firma por defecto. */
+    public static final String KEY_PRODUCTION_PLACE = "context.productionPlace"; //$NON-NLS-1$
+
+    /** Clave para el algoritmo de firma por defecto. */
+    public static final String KEY_SUBJECT = "context.subject"; //$NON-NLS-1$
+
+    /** Informaci&oacute;n de contacto para la firma. */
+    private final JTextField campoDatos;
+
+    /** Lugar en donde se realiza la firma. */
+    private final JTextField campoLugar;
+
+    /** Motivo de la firma. */
+    private final JTextField campoMotivo;
+
+    /** Panel sobre el que se montan los componentes. */
+    private final JPanel panel;
+
+    /** Crea la vista y componentes de la pesta&ntilde;a principal de configuraci&oacute;n. */
+    public ContextOptionsPane() {
+
+        this.panel = new JPanel(new GridBagLayout());
+
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
         c.weighty = 0.0;
         c.insets = new Insets(13, 13, 0, 13);
         c.gridy = 0;
-        
+
         // Panel firmas de documentos
-        JPanel contextPanel = new JPanel(new GridBagLayout());
+        final JPanel contextPanel = new JPanel(new GridBagLayout());
         contextPanel.setBorder(BorderFactory.createTitledBorder(Messages.getString("Opciones.firmas"))); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(contextPanel);
         Utils.setFontBold(contextPanel);
-        
-        GridBagConstraints c2 = new GridBagConstraints();
+
+        final GridBagConstraints c2 = new GridBagConstraints();
         c2.fill = GridBagConstraints.HORIZONTAL;
         c2.insets = new Insets(4, 13, 0, 13);
         c2.weightx = 1.0;
         c2.gridy = 0;
-        
+
         // Etiqueta motivo / razon de la firma
-        JLabel etiquetaMotivo = new JLabel();
+        final JLabel etiquetaMotivo = new JLabel();
         etiquetaMotivo.setText(Messages.getString("Opciones.firmas.motivo")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaMotivo);
         Utils.setFontBold(etiquetaMotivo);
         contextPanel.add(etiquetaMotivo, c2);
-        
+
         c2.insets = new Insets(5, 13, 0, 13);
         c2.gridy = 1;
-        
+
         // Caja de texto para el motivo de la firma
         this.campoMotivo = new JTextField();
         this.campoMotivo.getAccessibleContext().setAccessibleName(etiquetaMotivo.getText() + " ALT + O."); // NOI18N
         this.campoMotivo.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.motivo")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
-			Caret caret = new ConfigureCaret();
-			this.campoMotivo.setCaret(caret);
-		}
+            final Caret caret = new ConfigureCaret();
+            this.campoMotivo.setCaret(caret);
+        }
         Utils.remarcar(this.campoMotivo);
         Utils.setContrastColor(this.campoMotivo);
         Utils.setFontBold(this.campoMotivo);
         contextPanel.add(this.campoMotivo, c2);
-        
-        //Relación entre etiqueta y campo de texto
+
+        // Relación entre etiqueta y campo de texto
         etiquetaMotivo.setLabelFor(this.campoMotivo);
-  		//Asignación de mnemónico
+        // Asignación de mnemónico
         etiquetaMotivo.setDisplayedMnemonic(KeyEvent.VK_T);
-        
-        
+
         c2.insets = new Insets(13, 13, 0, 13);
         c2.gridy = 2;
-        
+
         // Etiqueta lugar donde se realiza la firma
-        JLabel etiquetaLugar = new JLabel();
+        final JLabel etiquetaLugar = new JLabel();
         etiquetaLugar.setText(Messages.getString("Opciones.firmas.lugar")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaLugar);
         Utils.setFontBold(etiquetaLugar);
         contextPanel.add(etiquetaLugar, c2);
-        
+
         c2.insets = new Insets(5, 13, 0, 13);
         c2.gridy = 3;
-        
+
         // Caja de texto para el lugar donde se realiza la firma
         this.campoLugar = new JTextField();
         this.campoLugar.getAccessibleContext().setAccessibleName(etiquetaLugar.getText() + " ALT + L."); // NOI18N
         this.campoLugar.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.lugar")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
-			Caret caret = new ConfigureCaret();
-			this.campoLugar.setCaret(caret);
-		}
+            final Caret caret = new ConfigureCaret();
+            this.campoLugar.setCaret(caret);
+        }
         Utils.remarcar(this.campoLugar);
         Utils.setContrastColor(this.campoLugar);
         Utils.setFontBold(this.campoLugar);
         contextPanel.add(this.campoLugar, c2);
-        
-        //Relación entre etiqueta y campo de texto
+
+        // Relación entre etiqueta y campo de texto
         etiquetaLugar.setLabelFor(this.campoLugar);
-  		//Asignación de mnemónico
+        // Asignación de mnemónico
         etiquetaLugar.setDisplayedMnemonic(KeyEvent.VK_L);
-        
+
         c2.insets = new Insets(13, 13, 0, 13);
         c2.gridy = 4;
-        
+
         // Etiqueta de los datos de contacto
-        JLabel etiquetaDatos = new JLabel();
+        final JLabel etiquetaDatos = new JLabel();
         etiquetaDatos.setText(Messages.getString("Opciones.firmas.datos")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaDatos);
         Utils.setFontBold(etiquetaDatos);
@@ -148,131 +142,120 @@ public final class ContextOptionsPane {
 
         c2.insets = new Insets(5, 13, 5, 13);
         c2.gridy = 5;
-        
+
         // Caja de texto para los datos de contacto
         this.campoDatos = new JTextField();
         this.campoDatos.getAccessibleContext().setAccessibleName(etiquetaDatos.getText() + " ALT + D."); // NOI18N
         this.campoDatos.getAccessibleContext().setAccessibleDescription(Messages.getString("Opciones.firmas.datos")); // NOI18N //$NON-NLS-1$
         if (GeneralConfig.isBigCaret()) {
-			Caret caret = new ConfigureCaret();
-			this.campoDatos.setCaret(caret);
-		}
+            final Caret caret = new ConfigureCaret();
+            this.campoDatos.setCaret(caret);
+        }
         Utils.remarcar(this.campoDatos);
         Utils.setContrastColor(this.campoDatos);
         Utils.setFontBold(this.campoDatos);
         contextPanel.add(this.campoDatos, c2);
-        
-        //Relación entre etiqueta y campo de texto
+
+        // Relación entre etiqueta y campo de texto
         etiquetaDatos.setLabelFor(this.campoDatos);
-  		//Asignación de mnemónico
+        // Asignación de mnemónico
         etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_D);
 
         this.panel.add(contextPanel, c);
-        
+
         c.gridy = c.gridy + 1;
-        
-        //Botones
-        JPanel buttonPanel = new JPanel( new FlowLayout(FlowLayout.RIGHT, 1, 1));
-        
-        //Definicion de botones
+
+        // Botones
+        final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 1, 1));
+
+        // Definicion de botones
         final JButton valores = new JButton();
-        
-        JPanel panelValores = new JPanel(new GridLayout(1, 1));
-        //Boton Valores por defecto
+
+        final JPanel panelValores = new JPanel(new GridLayout(1, 1));
+        // Boton Valores por defecto
         valores.setText(Messages.getString("Opciones.accesibilidad.valores")); //$NON-NLS-1$
         valores.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				valoresActionPerformed();
-				
-				
-			}
-		});
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                valoresActionPerformed();
+
+            }
+        });
         valores.setMnemonic(KeyEvent.VK_O);
         Utils.remarcar(valores);
         Utils.setContrastColor(valores);
         Utils.setFontBold(valores);
         panelValores.add(valores);
-        buttonPanel.add(panelValores);        
+        buttonPanel.add(panelValores);
 
         this.panel.add(buttonPanel, c);
         // Rellenamos el hueco libre con un panel vacio
         c.gridy = c.gridy + 1;
         c.weighty = 1.0;
         this.panel.add(new JPanel(), c);
-        
-        
-		// Accesos rapidos al menu de ayuda
+
+        // Accesos rapidos al menu de ayuda
         HelpUtils.enableHelpKey(this.campoMotivo, "opciones.pdf.motivo"); //$NON-NLS-1$
         HelpUtils.enableHelpKey(this.campoLugar, "opciones.pdf.lugar"); //$NON-NLS-1$
         HelpUtils.enableHelpKey(this.campoDatos, "opciones.pdf.datos"); //$NON-NLS-1$
     }
-	
-	public JPanel getConfigurationPanel() {
-		return this.panel;
-	}
 
-	/**
-	 * Carga en el panel la configuraci&oacute;n indicada en un properties.
-	 * @param config Configuraci&oacute;n para cargar en el panel.
-	 */
-	public void loadConfig(Properties config) {
-		this.campoMotivo.setText(config.getProperty(ContextOptionsPane.KEY_SUBJECT));
-		this.campoLugar.setText(config.getProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE));
-		this.campoDatos.setText(config.getProperty(ContextOptionsPane.KEY_CONTACT_INFO));
-	}
-	
-	/**
-	 * Recupera el estado actual del panel.
-	 * return Relaci&oacute;n con toda la configuraci&oacute;n del panel.
-	 */
-	public Properties getConfig() {
-		Properties config = new Properties();
-    	config.setProperty(ContextOptionsPane.KEY_SUBJECT, this.campoMotivo.getText());
-    	config.setProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE, this.campoLugar.getText());
-    	config.setProperty(ContextOptionsPane.KEY_CONTACT_INFO, this.campoDatos.getText());
-    	
-    	return config;
-	}
-	
-	/**
-	 * Recupera la configuraci&oacute;n de firma establecida en este panel.
-	 * @return Propiedades para la configuraci&oacute;n de la firma.
-	 */
-	public Properties getSignatureConfig() {
-		Properties config = new Properties();
-		if (this.campoMotivo.getText().trim().length() > 0) {
-			config.setProperty("signReason", this.campoMotivo.getText().trim());
-		}
-		if (this.campoLugar.getText().trim().length() > 0) {
-			config.setProperty("signatureProductionCity", this.campoLugar.getText().trim());
-		}
-		if (this.campoDatos.getText().trim().length() > 0) {
-			config.setProperty("signerContact", this.campoDatos.getText().trim());
-		}
-		return config;
-	}
-	
-	/**
-	 * Aplica los valores por defecto.
-	 */
-	void valoresActionPerformed(){
-		Opciones.setUpdate(true);
-		restore(this.panel);
-	}
-	
-	/**
-	 * Aplica el estado por defecto de los componentes de la ventana 
-	 */
-	private void restore(JPanel panel1){
-		for (int i=0; i<panel1.getComponentCount();i++){
-			if (panel1.getComponent(i) instanceof JTextField){
-				((JTextField)panel1.getComponent(i)).setText(""); //$NON-NLS-1$
-			} else if (panel1.getComponent(i) instanceof JPanel){
-				JPanel interiorPanel = (JPanel)panel1.getComponent(i);
-				restore(interiorPanel);
-			}
-		}
-	}
+    /** Recupera el estado actual del panel.
+     * return Relaci&oacute;n con toda la configuraci&oacute;n del panel. */
+    public Properties getConfig() {
+        final Properties config = new Properties();
+        config.setProperty(ContextOptionsPane.KEY_SUBJECT, this.campoMotivo.getText());
+        config.setProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE, this.campoLugar.getText());
+        config.setProperty(ContextOptionsPane.KEY_CONTACT_INFO, this.campoDatos.getText());
+
+        return config;
+    }
+
+    public JPanel getConfigurationPanel() {
+        return this.panel;
+    }
+
+    /** Recupera la configuraci&oacute;n de firma establecida en este panel.
+     * @return Propiedades para la configuraci&oacute;n de la firma. */
+    public Properties getSignatureConfig() {
+        final Properties config = new Properties();
+        if (this.campoMotivo.getText().trim().length() > 0) {
+            config.setProperty("signReason", this.campoMotivo.getText().trim());
+        }
+        if (this.campoLugar.getText().trim().length() > 0) {
+            config.setProperty("signatureProductionCity", this.campoLugar.getText().trim());
+        }
+        if (this.campoDatos.getText().trim().length() > 0) {
+            config.setProperty("signerContact", this.campoDatos.getText().trim());
+        }
+        return config;
+    }
+
+    /** Carga en el panel la configuraci&oacute;n indicada en un properties.
+     * @param config Configuraci&oacute;n para cargar en el panel. */
+    public void loadConfig(final Properties config) {
+        this.campoMotivo.setText(config.getProperty(ContextOptionsPane.KEY_SUBJECT));
+        this.campoLugar.setText(config.getProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE));
+        this.campoDatos.setText(config.getProperty(ContextOptionsPane.KEY_CONTACT_INFO));
+    }
+
+    /** Aplica el estado por defecto de los componentes de la ventana */
+    private void restore(final JPanel panel1) {
+        for (int i = 0; i < panel1.getComponentCount(); i++) {
+            if (panel1.getComponent(i) instanceof JTextField) {
+                ((JTextField) panel1.getComponent(i)).setText(""); //$NON-NLS-1$
+            }
+            else if (panel1.getComponent(i) instanceof JPanel) {
+                final JPanel interiorPanel = (JPanel) panel1.getComponent(i);
+                restore(interiorPanel);
+            }
+        }
+    }
+
+    /** Aplica los valores por defecto. */
+    void valoresActionPerformed() {
+        Opciones.setUpdate(true);
+        restore(this.panel);
+    }
 }

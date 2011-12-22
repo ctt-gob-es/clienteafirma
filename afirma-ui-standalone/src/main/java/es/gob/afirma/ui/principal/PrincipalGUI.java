@@ -60,535 +60,211 @@ import es.gob.afirma.ui.utils.JStatusBar;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
-/**
- *
- * Ventana principal de la aplicacion. Desde aqui se invocan a todas los paneles
+/** Ventana principal de la aplicacion. Desde aqui se invocan a todas los paneles
  * que contienen el resto de objetos: firma, validacion, cifrado, descifrado,
- * ensobrado y desensobrado.
- * 
- */
+ * ensobrado y desensobrado. */
 public class PrincipalGUI extends JAccessibilityFrame {
 
-	private static final long serialVersionUID = 1L;
+    public static int aboutActualHeight = -1;
 
-	private static final String DEFAULT_LOCALE = "es_ES"; //$NON-NLS-1$
-	
+    public static int aboutActualPositionX = -1;
+
+    public static int aboutActualPositionY = -1;
+
+    public static int aboutActualWidth = -1;
+
+    public static JStatusBar bar = new JStatusBar();
+
+    private static final String DEFAULT_LOCALE = "es_ES"; //$NON-NLS-1$
+
+    public static int fileActualHeight = -1;
+
+    public static int fileActualPositionX = -1;
+
+    public static int fileActualPositionY = -1;
+
+    public static int fileActualWidth = -1;
+
     /** Ruta del JAR en donde se almacenan los iconos de la aplicaci&oacute;n. */
-    private static final String ICON_DIR_PATH = "/resources/images/";  //$NON-NLS-1$
-    
+    private static final String ICON_DIR_PATH = "/resources/images/"; //$NON-NLS-1$
+
     /** Ruta del JAR en donde se almacenan las im&aacute;agnees de la aplicaci&oacute;n. */
-    private static final String IMAGE_DIR_PATH = "/resources/images/";  //$NON-NLS-1$
-    
-	private int actualPositionX = -1;
-	
-	private int actualPositionY = -1;
-	
-	private int actualWidth = -1;
-	
-	private int actualHeight = -1;
-	
-	private double maximizedHight = 0;
-	
-	private double maximizedWidth = 0;
-	
-	public static int optionActualPositionX = -1;
-	
-	public static int optionActualPositionY = -1;
-	
-	public static int optionActualWidth = -1;
-	
-	public static int optionActualHeight = -1;
-	
-	public static int wizardActualPositionX = -1;
-	
-	public static int wizardActualPositionY = -1;
-	
-	public static int wizardActualWidth = -1;
-	
-	public static int wizardActualHeight = -1;
-	
-	public static int aboutActualPositionX = -1;
-	
-	public static int aboutActualPositionY = -1;
-	
-	public static int aboutActualWidth = -1;
-	
-	public static int aboutActualHeight = -1;
-	
-	public static int fileActualPositionX = -1;
-	
-	public static int fileActualPositionY = -1;
-	
-	public static int fileActualWidth = -1;
-	
-	public static int fileActualHeight = -1;
-	
-	private JMenuBar menu;
-	
-	public static JStatusBar bar = new JStatusBar();
-	
-	private static int linuxMargin = 35;
-	
-	private boolean aplicar = false;
-	
-	private boolean accesibilidad = false;
-	
-	public void setAplicar(boolean aplicar){
-		this.aplicar = aplicar;
-	}
-	
-	public JMenuBar getMenu(){
-		return this.menu;
-	}
-	/**
-	 * Tema por defecto de tipo Metal.
-	 */
-	private MetalTheme defaultTheme = MetalLookAndFeel.getCurrentTheme();
-	
-	/**
-	 * LookAndFeel por defecto.
-	 */
-	private LookAndFeel defaultLookAndFeel = UIManager.getLookAndFeel();
-	
-//	private JTabbedPane panelPest = null;
-	
-	private HorizontalTabbedPanel htPanel;
-		
-	@Override
-	public int getMinimumRelation(){
-		return 7;
-	}
-	
-	/**
-	 * Posicion X inicial de la ventana dependiendo de la resolucion de pantalla.
-	 * @return int Posicion X
-	 */
-	public int getInitialX() {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		return (screenSize.width - 500) / 2 ;
-	}
-	
-	/**
-	 * Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
-	 * resolucion de pantalla.
-	 * @return int Posicion Y
-	 */
-	public int getInitialY() {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
-		if (Platform.getOS().equals(Platform.OS.MACOSX)){
-			return (screenSize.height - 340) / 2;
-		}
-		return (screenSize.height - 320) / 2;
-	}
-		
-	PrincipalGUI() {
-		super();
-		initComponents();
-		iniciarProveedores();
-		this.addComponentListener(new ComponentAdapter() {
+    private static final String IMAGE_DIR_PATH = "/resources/images/"; //$NON-NLS-1$
+
+    private static int linuxMargin = 35;
+
+    public static int optionActualHeight = -1;
+
+    public static int optionActualPositionX = -1;
+
+    public static int optionActualPositionY = -1;
+
+    public static int optionActualWidth = -1;
+
+    private static final long serialVersionUID = 1L;
+
+    public static int wizardActualHeight = -1;
+
+    public static int wizardActualPositionX = -1;
+
+    public static int wizardActualPositionY = -1;
+
+    public static int wizardActualWidth = -1;
+
+    /** Escribe el nuevo estado en la barra de estado.
+     * @param nuevoEstado Estado que hay que introducir en la barra de estado. */
+    public static void setNuevoEstado(final String nuevoEstado) {
+        bar.setStatus(nuevoEstado);
+    }
+
+    private final boolean accesibilidad = false;
+
+    private int actualHeight = -1;
+
+    private int actualPositionX = -1;
+
+    private int actualPositionY = -1;
+
+    private int actualWidth = -1;
+
+    private boolean aplicar = false;
+
+    /** LookAndFeel por defecto. */
+    private final LookAndFeel defaultLookAndFeel = UIManager.getLookAndFeel();
+
+    /** Tema por defecto de tipo Metal. */
+    private final MetalTheme defaultTheme = MetalLookAndFeel.getCurrentTheme();
+
+    private HorizontalTabbedPanel htPanel;
+
+    private double maximizedHight = 0;
+
+    private double maximizedWidth = 0;
+
+    private JMenuBar menu;
+
+    // private JTabbedPane panelPest = null;
+
+    PrincipalGUI() {
+        super();
+        initComponents();
+        iniciarProveedores();
+        this.addComponentListener(new ComponentAdapter() {
             @Override
-		    public void componentResized(ComponentEvent e) {
-		    	resized();
-		    }
+            public void componentMoved(final ComponentEvent e) {
+                resized();
+            }
+
             @Override
-		    public void componentMoved(ComponentEvent e) {
-		    	resized();
-		    }
-		});
-		
-	}
+            public void componentResized(final ComponentEvent e) {
+                resized();
+            }
+        });
 
-	/**
-	 * Inicializacion de los componentes
-	 */
-	private void initComponents() {
-		if (getBackground().getRGB()==-16777216){
-			Main.isOSHighContrast = true;			
-		}
-		// Dimensiones de la ventana
-		setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
-		// Parametros ventana
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
-		setTitle("Firma"); //$NON-NLS-1$
-		getContentPane().setLayout(new BorderLayout(11, 7));
-		setMinimumSize(getSize());
+    }
 
-		// Icono de @firma
-        setIconImage(this.loadIcon("afirma_ico.png").getImage()); //$NON-NLS-1$
-		
-		// Componentes principales
-		this.htPanel = new HorizontalTabbedPanel();
-		getContentPane().add(this.htPanel, BorderLayout.CENTER);
-		
-		// Menu
-		this.menu = new JMenuBar();
-		// Menu de herramientas
-		generarMenuHerramientas();
-		// Menu accesibilidad
-		generarMenuAccesibilidad();
-		// Menu de ayuda
-		generarMenuAyuda();	
-		
-		setJMenuBar(this.menu);
-		
-		// Panel superior
-		JPanel arriba = new JPanel();
-		arriba.setMinimumSize(new Dimension(1, 1));
-		arriba.setPreferredSize(new Dimension(1, 1));
-		getContentPane().add(arriba, BorderLayout.PAGE_START);
+    /** Seleccion menu acerca de: Muestra la ventana con la informacion de aFirma */
+    void acercaActionPerformed() {
+        Acercade.main();
+    }
 
-		// Panel derecho
-		JPanel derecha = new JPanel();
-		derecha.setMinimumSize(new Dimension(1, 1));
-		derecha.setPreferredSize(new Dimension(1, 1));
-		getContentPane().add(derecha, BorderLayout.LINE_END);
+    /** Seleccion menu ayuda: Muestra la ventana con el panel de ayuda */
+    void ayudaHTMLActionPerformed() {
+        HelpUtils.visualize(true);
+    }
 
-		// Panel izquierdo
-		JPanel izquierda = new JPanel();
-		izquierda.setMinimumSize(new Dimension(1, 1));
-		izquierda.setPreferredSize(new Dimension(1, 1));
-		getContentPane().add(izquierda, BorderLayout.LINE_START);
+    /** Seleccion idiomas: Cambia el idioma de la aplicaci�n
+     * @param locale Nuevo Locale */
+    void cambiarIdioma(final Locale locale) {
+        Locale.setDefault(locale);
+        HelpUtils.change(locale.toString());
+        this.getContentPane().removeAll();
 
-		// Barra de estado
-		bar.setLabelWidth((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth());
-		bar.setStatus(""); //$NON-NLS-1$
-		bar.setLeftMargin(3);
-		
-		getContentPane().add(bar, BorderLayout.SOUTH);
+        // Cambia el idioma de los mensajes
+        Messages.changeLocale();
+        initComponents();
+        SwingUtilities.updateComponentTreeUI(this);
+    }
 
-		crearPaneles();
-	}
+    /** Construye el panel principal de la aplicaci&oacute;n con las pesta&ntilde;as de
+     * las distintas funcionalidades. */
+    public void crearPaneles() {
 
-	/**
-	 * Genera el menu Herramientas con los submenus Opciones, Idiomas, Salir.
-	 * @return	Menu de herramientas
-	 */
-	public JMenu generarMenuHerramientas() {
-		this.menu.removeAll();
-		// Opcion del menu principal - Herramientas
-		JMenu herramientas = new JMenu();
-		herramientas.setMnemonic(KeyEvent.VK_S);
-		herramientas.setText(Messages.getString("PrincipalGUI.herramientas.text")); //$NON-NLS-1$
-        herramientas.setToolTipText(Messages.getString("PrincipalGUI.herramientas.text")); //$NON-NLS-1$
-        Utils.setContrastColor(herramientas);
-		Utils.setFontBold(herramientas);
-		Utils.remarcar(herramientas);
-		this.menu.add(herramientas);
-		
-		// Subopcion menu Herramientas - Opciones
-		JMenuItem opciones = new JMenuItem();
-		opciones.setText(Messages.getString("Opciones.opciones")); //$NON-NLS-1$
-		opciones.setMnemonic(KeyEvent.VK_O); //Se asigna un atajo al menu
-		opciones.addActionListener(new ActionListener() {
-            @Override
-			public void actionPerformed(ActionEvent evt) {
-				opcionesActionPerformed();
-			}
-		});
-		Utils.setContrastColor(opciones);
-		Utils.setFontBold(opciones);
-		herramientas.add(opciones);
-		
-		// Subopcion menu Herramientas - Idiomas
-		JMenu menuIdioma = new JMenu();
-		menuIdioma.setText(Messages.getString("Opciones.general.idioma")); //$NON-NLS-1$
-		menuIdioma.setMnemonic(KeyEvent.VK_I); //Se asigna un atajo al menu
-		
-		// Obtenemos ruta donde se encuentra la aplicacion
-		URL baseDirectory = getClass().getProtectionDomain().getCodeSource().getLocation();
-		File languagesDirectory = null;
+        this.htPanel.reset();
 
-		// Obtenemos el contenido del directorio languages
-		try {
-			File fileDirectory =  new File(baseDirectory.toURI());
-			if (fileDirectory.isFile())
-				fileDirectory = fileDirectory.getParentFile();
-			languagesDirectory  = new File (fileDirectory, "languages"); //$NON-NLS-1$
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}        	
+        // Comprobacion del estado de Ventanas Maximizadas para que se genere
+        // la ventana principal con el tamaño adecuado
+        if (this.getExtendedState() == MAXIMIZED_BOTH) {
+            this.maximizedWidth = this.getSize().getWidth();
+            this.maximizedHight = this.getSize().getHeight();
+        }
+        if (GeneralConfig.isMaximized()) {
+            if (Platform.getOS().equals(Platform.OS.LINUX)) {
+                // Se obtienen las dimensiones totales disponibles para mostrar una ventana
+                final Rectangle rect = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
 
-		// Inicialmente introducimos el espanol
-		List<String> languages = new ArrayList<String>();
-		languages.add(DEFAULT_LOCALE);
-		
-		// Parseamos los nombres de las librerias de idiomas para obtener los codigos
-		// del idioma.
-		if ((languagesDirectory != null) && (languagesDirectory.isDirectory())) {        	
-			File[] listFiles = languagesDirectory.listFiles();
+                // Se obtienen las dimensiones de maximizado
+                final int maxWidth = (int) rect.getWidth();
+                final int maxHeight = (int) rect.getHeight();
+                if (!Platform.getOS().equals(Platform.OS.LINUX)) {
+                    // Se hace el resize
+                    this.setBounds(0, 0, maxWidth, maxHeight);
+                }
+                else {
+                    // Se hace el resize
+                    this.setBounds(0, 0, maxWidth, maxHeight - linuxMargin);
+                }
 
-			for (int i=0; i<listFiles.length; i++) {
-				if (listFiles[i] != null && listFiles[i].isFile() && listFiles[i].getName().startsWith("help")) {
-					String locale = listFiles[i].getName().substring(5,listFiles[i].getName().indexOf(".jar")); 
-					languages.add(locale);
-				}
-			}
-		}
-		
-		//Lista de mnemonicos usados para los radio buttons de lenguajes
-		List<Character> mnemonicList = new ArrayList<Character>();
-		
-		// Generamos las opciones del menu idiomas
-		ButtonGroup grupo = new ButtonGroup();
-		for (String language : languages)
-			if (language != null) {
-				final Locale locale = new Locale(language.substring(0, 2), language.substring(3));
-				String languageName = locale.getDisplayLanguage(locale);
-				JRadioButtonMenuItem opcionIdioma = new JRadioButtonMenuItem(languageName.substring(0, 1).toUpperCase() + languageName.substring(1));
-				
-				//Se asigna un mnemonico que no haya sido utilizado
-				opcionIdioma.setMnemonic(Utils.getLanguageMnemonic(mnemonicList, languageName.toLowerCase()));
-				
-				Utils.setContrastColor(opcionIdioma);
-				Utils.setFontBold(opcionIdioma);
-				menuIdioma.add(opcionIdioma);
-				grupo.add(opcionIdioma);
+            }
+            else {
+                this.setExtendedState(MAXIMIZED_BOTH);
+            }
+        }
+        else {
+            if (this.actualPositionX != -1 && this.actualPositionY != -1 && this.actualWidth != -1 && this.actualHeight != -1) {
+                if (this.actualWidth == this.maximizedWidth && this.actualHeight == this.maximizedHight) {
+                    this.setExtendedState(MAXIMIZED_BOTH);
+                }
+                else {
+                    this.setExtendedState(0);
+                    this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
+                }
+            }
+            else {
+                this.setExtendedState(0);
+                setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
+            }
+        }
 
-				if (Locale.getDefault().equals(locale)){
-					opcionIdioma.setSelected(true);  
-				}
+        // Comprobacion del estado del Alto Contraste para que se creen los paneles
+        // con la configuracion adecuada
+        if (GeneralConfig.isHighContrast()) {
+            setHighContrast(true);
+        }
+        else {
+            setHighContrast(false);
+        }
+        Utils.setContrastColor(bar);
 
-				opcionIdioma.addItemListener(new ItemListener() {
-					@Override
-                    public void itemStateChanged(ItemEvent e) {
-						if (e.getStateChange() == ItemEvent.SELECTED)
-							cambiarIdioma(locale);
-					}
-				});
-			}
+        final Icon baseIcon = this.loadIcon("boton_transparente.png"); //$NON-NLS-1$
 
-		Utils.setContrastColor(menuIdioma);
-		Utils.setFontBold(menuIdioma);
-		herramientas.add(menuIdioma);
-
-		
-		// Separador
-		JSeparator separador = new JSeparator();
-		herramientas.add(separador);
-
-		// Subopcion menu Herramientas - Salir
-		JMenuItem salir = new JMenuItem();
-		salir.setText(Messages.getString("PrincipalGUI.salir")); // NOI18N //$NON-NLS-1$
-		salir.setMnemonic(KeyEvent.VK_L); //Se asigna un atajo al menu
-		salir.addActionListener(new ActionListener() {
-			@Override
-            public void actionPerformed(ActionEvent evt) {
-				salirActionPerformed();
-			}
-		});
-		Utils.setContrastColor(salir);
-		Utils.setFontBold(salir);
-		herramientas.add(salir);
-		
-		return herramientas;
-	}
-	
-	JMenu generarMenuAccesibilidad(){
-		// Opcion del menu principal - Accesibilidad
-		JMenu access = new JMenu();
-		access.setMnemonic(KeyEvent.VK_L);
-		access.setText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N //$NON-NLS-1$
-		access.setToolTipText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N //$NON-NLS-1$
-		Utils.setContrastColor(access);
-		Utils.setFontBold(access);
-		Utils.remarcar(access);
-		this.menu.add(access);
-		
-		// Subopcion menu Ayuda - Ayuda
-		JMenuItem accesibilidadItem = new JMenuItem();
-		accesibilidadItem.setText(Messages.getString("PrincipalGUI.accesibilidad.contenido")); // NOI18N //$NON-NLS-1$
-		accesibilidadItem.setMnemonic(KeyEvent.VK_U); //Se asigna un atajo al menu
-		accesibilidadItem.addActionListener(new ActionListener() {
-			@Override
-            public void actionPerformed(ActionEvent evt) {
-				HelpUtils.visualize("opciones.accesibilidad"); //$NON-NLS-1$
-				Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, true, true);
-				ventanaOpciones.setModal(true);
-				ventanaOpciones.setVisible(true);
-				setAplicar(false);
-			}
-		});
-		Utils.setContrastColor(accesibilidadItem);
-		Utils.setFontBold(accesibilidadItem);
-		access.add(accesibilidadItem);
-		
-		this.callResize();
-		return access;
-	}
-	
-	/**
-	 * Genera el menu de ayuda con las opciones Ayuda, Acerca de.
-	 * @return	Menu de ayuda
-	 */
-	public JMenu generarMenuAyuda() {
-		// Opcion del menu principal - Ayuda
-		JMenu ayuda = new JMenu();
-		ayuda.setMnemonic(KeyEvent.VK_Y);
-		ayuda.setText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N //$NON-NLS-1$
-		ayuda.setToolTipText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N //$NON-NLS-1$
-		Utils.setContrastColor(ayuda);
-		Utils.setFontBold(ayuda);
-		Utils.remarcar(ayuda);
-		this.menu.add(ayuda);
-
-		// Subopcion menu Ayuda - Ayuda
-		JMenuItem ayudaHTML = new JMenuItem();
-		ayudaHTML.setText(Messages.getString("ayudaHTML.contenido")); // NOI18N //$NON-NLS-1$
-		ayudaHTML.setMnemonic(KeyEvent.VK_U); //Se asigna un atajo al menu
-		ayudaHTML.addActionListener(new ActionListener() {
-			@Override
-            public void actionPerformed(ActionEvent evt) {
-				ayudaHTMLActionPerformed();
-			}
-		});
-		Utils.setContrastColor(ayudaHTML);
-		Utils.setFontBold(ayudaHTML);
-		ayuda.add(ayudaHTML);
-		
-		// Subopcion menu Ayuda - Acerca de
-		JMenuItem acerca = new JMenuItem();
-		acerca.setText(Messages.getString("ayuda.contenido")); // NOI18N //$NON-NLS-1$
-		acerca.setMnemonic(KeyEvent.VK_C); //Se asigna un atajo al menu
-		acerca.addActionListener(new ActionListener() {
-			@Override
-            public void actionPerformed(ActionEvent evt) {
-				acercaActionPerformed();
-			}
-		});
-
-		Utils.setContrastColor(acerca);
-		Utils.setFontBold(acerca);
-		ayuda.add(acerca);
-		
-		this.callResize();
-		return ayuda;
-	}
-
-	/**
-	 * Seleccion menu opciones: Muestra la ventana modal con las opciones
-	 */
-	void opcionesActionPerformed() {
-		HelpUtils.visualize("opciones.configuracion"); //$NON-NLS-1$
-		Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, this.aplicar, this.accesibilidad);
-		ventanaOpciones.setModal(true);
-		ventanaOpciones.setVisible(true);
-		setAplicar(false);
-	}
-
-	/**
-	 * Seleccion idiomas: Cambia el idioma de la aplicaci�n
-	 * @param locale	Nuevo Locale
-	 */
-	void cambiarIdioma(Locale locale) {
-		Locale.setDefault(locale);
-		HelpUtils.change(locale.toString());
-		this.getContentPane().removeAll();
-		
-		// Cambia el idioma de los mensajes
-		Messages.changeLocale();
-		initComponents();
-		SwingUtilities.updateComponentTreeUI(this);
-	}
-	
-	/**
-	 * Seleccion menu salir: Cierra la aplicaci�n
-	 */
-	void salirActionPerformed() {
-		System.exit(0);
-	}
-
-	/**
-	 * Seleccion menu acerca de: Muestra la ventana con la informacion de aFirma
-	 */
-	void acercaActionPerformed() {
-		Acercade.main();
-	}
-
-	/**
-	 * Seleccion menu ayuda: Muestra la ventana con el panel de ayuda
-	 */
-	void ayudaHTMLActionPerformed() {
-		HelpUtils.visualize(true);
-	}
-	
-	/**
-	 * Construye el panel principal de la aplicaci&oacute;n con las pesta&ntilde;as de
-	 * las distintas funcionalidades.
-	 */
-	public void crearPaneles() {
-	    
-	    this.htPanel.reset();
-
-	    // Comprobacion del estado de Ventanas Maximizadas para que se genere 
-	    // la ventana principal con el tamaño adecuado
-	    if (this.getExtendedState()==MAXIMIZED_BOTH){
-	    	this.maximizedWidth = this.getSize().getWidth();
-			this.maximizedHight = this.getSize().getHeight();
-	    }
-	    if (GeneralConfig.isMaximized()){
-	    	if (Platform.getOS().equals(Platform.OS.LINUX)) {
-	    		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
-	    		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
-
-	    		//Se obtienen las dimensiones de maximizado
-	    		int maxWidth = (int)rect.getWidth();
-	    		int maxHeight = (int)rect.getHeight();
-	    		if (!Platform.getOS().equals(Platform.OS.LINUX)) {
-	    			//Se hace el resize
-	    			this.setBounds(0,0, maxWidth, maxHeight);
-	    		} else {
-	    			//Se hace el resize
-	    			this.setBounds(0,0, maxWidth, maxHeight-linuxMargin);
-	    		}
-	    		
-	    	} else {
-	    		this.setExtendedState(MAXIMIZED_BOTH);
-	    	}
-		} else {
-			if (this.actualPositionX != -1 && this.actualPositionY != -1 && this.actualWidth != -1 && this.actualHeight != -1){
-				if (this.actualWidth == this.maximizedWidth && this.actualHeight == this.maximizedHight){
-					this.setExtendedState(MAXIMIZED_BOTH);
-				} else{
-					this.setExtendedState(0);
-					this.setBounds(this.actualPositionX, this.actualPositionY, this.actualWidth, this.actualHeight);
-				}
-			} else {
-				this.setExtendedState(0);
-				setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
-			}
-		}
-	    	
-	    // Comprobacion del estado del Alto Contraste para que se creen los paneles
-	    // con la configuracion adecuada
-	    if (GeneralConfig.isHighContrast()){
-			setHighContrast(true);
-		} else {
-			setHighContrast(false);
-		}
-	    Utils.setContrastColor(bar);
-	    
-	    Icon baseIcon = this.loadIcon("boton_transparente.png"); //$NON-NLS-1$
-	    
-	    // Panel de firma
-	    ToggleImageButton buttonFirma = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma")); //$NON-NLS-1$
+        // Panel de firma
+        final ToggleImageButton buttonFirma = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma")); //$NON-NLS-1$
         buttonFirma.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonFirma.setToggledIcon(this.loadIcon("boton_firma_ico.png"), baseIcon); //$NON-NLS-1$
         buttonFirma.setSelectedToggledIcon(this.loadIcon("boton_firma_sel_ico.png"), baseIcon); //$NON-NLS-1$
-        
+
         buttonFirma.setMnemonic(KeyEvent.VK_F);
         buttonFirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.botonpricipal.status"))); //$NON-NLS-1$
         buttonFirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.botonpricipal.status"))); //$NON-NLS-1$
-        buttonFirma.getAccessibleContext().setAccessibleName(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma") + " " + //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
+        buttonFirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                                                             Messages.getString("PrincipalGUI.TabConstraints.tabTitleFirma.description")); //$NON-NLS-1$
         buttonFirma.setName("firma"); //$NON-NLS-1$
-        JPanel panelFirma = new Firma();
+        final JPanel panelFirma = new Firma();
         this.htPanel.addTab(buttonFirma, panelFirma);
-	    
-     // Panel de multifirma
-        ToggleImageButton buttonMultifirma = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma")); //$NON-NLS-1$
+
+        // Panel de multifirma
+        final ToggleImageButton buttonMultifirma = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma")); //$NON-NLS-1$
         buttonMultifirma.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonMultifirma.setToggledIcon(this.loadIcon("boton_multifirma_ico.png"), baseIcon); //$NON-NLS-1$
         buttonMultifirma.setSelectedToggledIcon(this.loadIcon("boton_multifirma_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -596,39 +272,39 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonMultifirma.setMnemonic(KeyEvent.VK_M);
         buttonMultifirma.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Multifirma.botonpricipal.status"))); //$NON-NLS-1$
         buttonMultifirma.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Multifirma.botonpricipal.status"))); //$NON-NLS-1$
-        buttonMultifirma.getAccessibleContext().setAccessibleName(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
+        buttonMultifirma.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                                                                  Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirma.description")); //$NON-NLS-1$
         buttonMultifirma.setName("multifirma"); //$NON-NLS-1$
-        JPanel panelMultifirmaSimple = new MultifirmaSimple();
+        final JPanel panelMultifirmaSimple = new MultifirmaSimple();
         this.htPanel.addTab(buttonMultifirma, panelMultifirmaSimple);
-	    
+
         // Panel de multifirma masiva
-        ToggleImageButton buttonMultifirmaMasiva = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva")); //$NON-NLS-1$
+        final ToggleImageButton buttonMultifirmaMasiva =
+            this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva")); //$NON-NLS-1$
         buttonMultifirmaMasiva.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonMultifirmaMasiva.setToggledIcon(this.loadIcon("boton_masiva_ico.png"), baseIcon); //$NON-NLS-1$
         buttonMultifirmaMasiva.setSelectedToggledIcon(this.loadIcon("boton_masiva_sel_ico.png"), baseIcon); //$NON-NLS-1$
         buttonMultifirmaMasiva.setDisabledToggledIcon(this.loadIcon("boton_masiva_dis_ico.png"), baseIcon); //$NON-NLS-1$
 
-        buttonMultifirmaMasiva.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
-        buttonMultifirmaMasiva.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
-        buttonMultifirmaMasiva.getAccessibleContext().setAccessibleName(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description")); //$NON-NLS-1$
-        
+        buttonMultifirmaMasiva.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+                                                                                    Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
+        buttonMultifirmaMasiva.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+                                                                                    Messages.getString("Masiva.botonpricipal.status"))); //$NON-NLS-1$
+        buttonMultifirmaMasiva.getAccessibleContext()
+        .setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                           Messages.getString("PrincipalGUI.TabConstraints.tabTitleMultifirmaMasiva.description")); //$NON-NLS-1$
+
         buttonMultifirmaMasiva.setEnabled(GeneralConfig.isAvanzados());
         buttonMultifirmaMasiva.setName("firma.masiva"); //$NON-NLS-1$
         if (buttonMultifirmaMasiva.isEnabled()) {
             buttonMultifirmaMasiva.setMnemonic(KeyEvent.VK_I);
         }
-        
-        JPanel panelMultifirmaMasiva =  new MultifirmaMasiva();
+
+        final JPanel panelMultifirmaMasiva = new MultifirmaMasiva();
         this.htPanel.addTab(buttonMultifirmaMasiva, panelMultifirmaMasiva);
 
         // Panel de validacion y extraccion de documentos
-        ToggleImageButton buttonValidacion = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion")); //$NON-NLS-1$
+        final ToggleImageButton buttonValidacion = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion")); //$NON-NLS-1$
         buttonValidacion.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonValidacion.setToggledIcon(this.loadIcon("boton_validacion_ico.png"), baseIcon); //$NON-NLS-1$
         buttonValidacion.setSelectedToggledIcon(this.loadIcon("boton_validacion_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -636,16 +312,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonValidacion.setMnemonic(KeyEvent.VK_V);
         buttonValidacion.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Validacion.botonpricipal.status"))); //$NON-NLS-1$
         buttonValidacion.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Validacion.botonpricipal.status"))); //$NON-NLS-1$
-        buttonValidacion.getAccessibleContext().setAccessibleName(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion") + " " + //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
-        buttonValidacion.setName("validacion");         //$NON-NLS-1$
-        JPanel panelValidacion = new Validacion();
+        buttonValidacion.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                                                                  Messages.getString("PrincipalGUI.TabConstraints.tabTitleValidacion.description")); //$NON-NLS-1$
+        buttonValidacion.setName("validacion"); //$NON-NLS-1$
+        final JPanel panelValidacion = new Validacion();
         this.htPanel.addTab(buttonValidacion, panelValidacion);
 
         // Panel de cifrado simetrico
-        ToggleImageButton buttonCifrado = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado")); //$NON-NLS-1$
+        final ToggleImageButton buttonCifrado = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado")); //$NON-NLS-1$
         buttonCifrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonCifrado.setToggledIcon(this.loadIcon("boton_cifrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonCifrado.setSelectedToggledIcon(this.loadIcon("boton_cifrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -653,16 +327,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonCifrado.setMnemonic(KeyEvent.VK_C);
         buttonCifrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonCifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Cifrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonCifrado.getAccessibleContext().setAccessibleName(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " +  //$NON-NLS-1$  //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
+        buttonCifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado") + " " + //$NON-NLS-1$  //$NON-NLS-2$
+                                                               Messages.getString("PrincipalGUI.TabConstraints.tabTitleCifrado.description")); //$NON-NLS-1$
         buttonCifrado.setName("cifrado"); //$NON-NLS-1$
-        JPanel panelCifrado = new Cifrado();
+        final JPanel panelCifrado = new Cifrado();
         this.htPanel.addTab(buttonCifrado, panelCifrado);
 
         // Panel de Descifrado
-        ToggleImageButton buttonDescifrado = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado")); //$NON-NLS-1$
+        final ToggleImageButton buttonDescifrado = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado")); //$NON-NLS-1$
         buttonDescifrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonDescifrado.setToggledIcon(this.loadIcon("boton_descifrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonDescifrado.setSelectedToggledIcon(this.loadIcon("boton_descifrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -670,16 +342,14 @@ public class PrincipalGUI extends JAccessibilityFrame {
         buttonDescifrado.setMnemonic(KeyEvent.VK_D);
         buttonDescifrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonDescifrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Descifrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonDescifrado.getAccessibleContext().setAccessibleName(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
+        buttonDescifrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                                                                  Messages.getString("PrincipalGUI.TabConstraints.tabTitleDescifrado.description")); //$NON-NLS-1$
         buttonDescifrado.setName("descifrado"); //$NON-NLS-1$
-        JPanel panelDescifrado = new Descifrado();
+        final JPanel panelDescifrado = new Descifrado();
         this.htPanel.addTab(buttonDescifrado, panelDescifrado);
 
         // Panel de Ensobrado
-        ToggleImageButton buttonEnsobrado = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado")); //$NON-NLS-1$
+        final ToggleImageButton buttonEnsobrado = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado")); //$NON-NLS-1$
         buttonEnsobrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonEnsobrado.setToggledIcon(this.loadIcon("boton_ensobrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonEnsobrado.setSelectedToggledIcon(this.loadIcon("boton_ensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
@@ -687,213 +357,503 @@ public class PrincipalGUI extends JAccessibilityFrame {
 
         buttonEnsobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
         buttonEnsobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Ensobrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonEnsobrado.getAccessibleContext().setAccessibleName(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado") + " " +  //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
-        
+        buttonEnsobrado.getAccessibleContext().setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                                                                 Messages.getString("PrincipalGUI.TabConstraints.tabTitleEnsobrado.description")); //$NON-NLS-1$
+
         buttonEnsobrado.setEnabled(GeneralConfig.isAvanzados());
         if (buttonEnsobrado.isEnabled()) {
-            buttonEnsobrado.setMnemonic(KeyEvent.VK_B);    
+            buttonEnsobrado.setMnemonic(KeyEvent.VK_B);
         }
         buttonEnsobrado.setName("ensobrado"); //$NON-NLS-1$
-        JPanel panelEnsobrado = new Ensobrado();
+        final JPanel panelEnsobrado = new Ensobrado();
         this.htPanel.addTab(buttonEnsobrado, panelEnsobrado);
 
         // Panel de Desensobrado
-        ToggleImageButton buttonDesensobrado = this.createToggleButton(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado")); //$NON-NLS-1$
+        final ToggleImageButton buttonDesensobrado = this.createToggleButton(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado")); //$NON-NLS-1$
         buttonDesensobrado.setSelectedImage(this.loadImage("boton_fondo.png")); //$NON-NLS-1$
         buttonDesensobrado.setToggledIcon(this.loadIcon("boton_desensobrado_ico.png"), baseIcon); //$NON-NLS-1$
         buttonDesensobrado.setSelectedToggledIcon(this.loadIcon("boton_desensobrado_sel_ico.png"), baseIcon); //$NON-NLS-1$
         buttonDesensobrado.setDisabledToggledIcon(this.loadIcon("boton_desensobrado_dis_ico.png"), baseIcon); //$NON-NLS-1$
 
-        
-        buttonDesensobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonDesensobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
-        buttonDesensobrado.getAccessibleContext().setAccessibleName(
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
-                Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description")); //$NON-NLS-1$
-        
+        buttonDesensobrado.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar,
+                                                                                Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonDesensobrado.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar,
+                                                                                Messages.getString("Desensobrado.botonpricipal.status"))); //$NON-NLS-1$
+        buttonDesensobrado.getAccessibleContext()
+        .setAccessibleName(Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado") + " " + //$NON-NLS-1$ //$NON-NLS-2$
+                           Messages.getString("PrincipalGUI.TabConstraints.tabTitleDesensobrado.description")); //$NON-NLS-1$
+
         buttonDesensobrado.setEnabled(GeneralConfig.isAvanzados());
         if (buttonDesensobrado.isEnabled()) {
-            buttonDesensobrado.setMnemonic(KeyEvent.VK_N);    
+            buttonDesensobrado.setMnemonic(KeyEvent.VK_N);
         }
         buttonDesensobrado.setName("desensobrado"); //$NON-NLS-1$
-        JPanel panelDesensobrado = new Desensobrado();
+        final JPanel panelDesensobrado = new Desensobrado();
         this.htPanel.addTab(buttonDesensobrado, panelDesensobrado);
-        
-		HelpUtils.enableHelpKey(panelFirma, "firma"); //$NON-NLS-1$
-		HelpUtils.enableHelpKey(panelMultifirmaSimple, "multifirma"); //$NON-NLS-1$
-		HelpUtils.enableHelpKey(panelMultifirmaMasiva, "firma.masiva"); //$NON-NLS-1$
-		HelpUtils.enableHelpKey(panelValidacion, "validacion"); //$NON-NLS-1$
-		HelpUtils.enableHelpKey(panelCifrado, "cifrado"); //$NON-NLS-1$
-		HelpUtils.enableHelpKey(panelDescifrado, "descifrado"); //$NON-NLS-1$
-		HelpUtils.enableHelpKey(panelEnsobrado, "ensobrado"); //$NON-NLS-1$
-		HelpUtils.enableHelpKey(panelDesensobrado, "desensobrado"); //$NON-NLS-1$
-		
-		//Al repintar la pantalla principal para quitar o poner las opciones avanzadas hay que ajustar 
-		//la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
-		this.callResize();
-		
-	}
 
-	/**
-     * Crea un bot&oacute;n que se queda pulsado tras hacer clic en &eacute;l. Al volver a
+        HelpUtils.enableHelpKey(panelFirma, "firma"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(panelMultifirmaSimple, "multifirma"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(panelMultifirmaMasiva, "firma.masiva"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(panelValidacion, "validacion"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(panelCifrado, "cifrado"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(panelDescifrado, "descifrado"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(panelEnsobrado, "ensobrado"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(panelDesensobrado, "desensobrado"); //$NON-NLS-1$
+
+        // Al repintar la pantalla principal para quitar o poner las opciones avanzadas hay que ajustar
+        // la fuente para que se mantenga tal y como la tenia el usuario antes de cambiar esta opcion
+        this.callResize();
+
+    }
+
+    /** Crea un bot&oacute;n que se queda pulsado tras hacer clic en &eacute;l. Al volver a
      * hacer clic sobre &eacute;l vuelve a su posici&oacute;n original.
      * @param text Texto del bot&oacute;n.
-     * @return Bot&oacute;n creado.
-     */
+     * @return Bot&oacute;n creado. */
     private ToggleImageButton createToggleButton(final String text) {
 
-        ToggleImageButton tButton = new ToggleImageButton();
+        final ToggleImageButton tButton = new ToggleImageButton();
         tButton.setHorizontalAlignment(SwingConstants.LEFT);
         tButton.setButtonText(text);
-       
+
         Utils.remarcar(tButton);
         Utils.setContrastColor(tButton);
         Utils.setFontBold(tButton);
         return tButton;
     }
-	
-    /**
-     * Carga un icono contenido en el directorio de iconos del proyecto.
+
+    JMenu generarMenuAccesibilidad() {
+        // Opcion del menu principal - Accesibilidad
+        final JMenu access = new JMenu();
+        access.setMnemonic(KeyEvent.VK_L);
+        access.setText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N //$NON-NLS-1$
+        access.setToolTipText(Messages.getString("PrincipalGUI.accesibilidad.text")); // NOI18N //$NON-NLS-1$
+        Utils.setContrastColor(access);
+        Utils.setFontBold(access);
+        Utils.remarcar(access);
+        this.menu.add(access);
+
+        // Subopcion menu Ayuda - Ayuda
+        final JMenuItem accesibilidadItem = new JMenuItem();
+        accesibilidadItem.setText(Messages.getString("PrincipalGUI.accesibilidad.contenido")); // NOI18N //$NON-NLS-1$
+        accesibilidadItem.setMnemonic(KeyEvent.VK_U); // Se asigna un atajo al menu
+        accesibilidadItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                HelpUtils.visualize("opciones.accesibilidad"); //$NON-NLS-1$
+                final Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, true, true);
+                ventanaOpciones.setModal(true);
+                ventanaOpciones.setVisible(true);
+                setAplicar(false);
+            }
+        });
+        Utils.setContrastColor(accesibilidadItem);
+        Utils.setFontBold(accesibilidadItem);
+        access.add(accesibilidadItem);
+
+        this.callResize();
+        return access;
+    }
+
+    /** Genera el menu de ayuda con las opciones Ayuda, Acerca de.
+     * @return Menu de ayuda */
+    public JMenu generarMenuAyuda() {
+        // Opcion del menu principal - Ayuda
+        final JMenu ayuda = new JMenu();
+        ayuda.setMnemonic(KeyEvent.VK_Y);
+        ayuda.setText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N //$NON-NLS-1$
+        ayuda.setToolTipText(Messages.getString("PrincipalGUI.ayuda.text")); // NOI18N //$NON-NLS-1$
+        Utils.setContrastColor(ayuda);
+        Utils.setFontBold(ayuda);
+        Utils.remarcar(ayuda);
+        this.menu.add(ayuda);
+
+        // Subopcion menu Ayuda - Ayuda
+        final JMenuItem ayudaHTML = new JMenuItem();
+        ayudaHTML.setText(Messages.getString("ayudaHTML.contenido")); // NOI18N //$NON-NLS-1$
+        ayudaHTML.setMnemonic(KeyEvent.VK_U); // Se asigna un atajo al menu
+        ayudaHTML.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                ayudaHTMLActionPerformed();
+            }
+        });
+        Utils.setContrastColor(ayudaHTML);
+        Utils.setFontBold(ayudaHTML);
+        ayuda.add(ayudaHTML);
+
+        // Subopcion menu Ayuda - Acerca de
+        final JMenuItem acerca = new JMenuItem();
+        acerca.setText(Messages.getString("ayuda.contenido")); // NOI18N //$NON-NLS-1$
+        acerca.setMnemonic(KeyEvent.VK_C); // Se asigna un atajo al menu
+        acerca.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                acercaActionPerformed();
+            }
+        });
+
+        Utils.setContrastColor(acerca);
+        Utils.setFontBold(acerca);
+        ayuda.add(acerca);
+
+        this.callResize();
+        return ayuda;
+    }
+
+    /** Genera el menu Herramientas con los submenus Opciones, Idiomas, Salir.
+     * @return Menu de herramientas */
+    public JMenu generarMenuHerramientas() {
+        this.menu.removeAll();
+        // Opcion del menu principal - Herramientas
+        final JMenu herramientas = new JMenu();
+        herramientas.setMnemonic(KeyEvent.VK_S);
+        herramientas.setText(Messages.getString("PrincipalGUI.herramientas.text")); //$NON-NLS-1$
+        herramientas.setToolTipText(Messages.getString("PrincipalGUI.herramientas.text")); //$NON-NLS-1$
+        Utils.setContrastColor(herramientas);
+        Utils.setFontBold(herramientas);
+        Utils.remarcar(herramientas);
+        this.menu.add(herramientas);
+
+        // Subopcion menu Herramientas - Opciones
+        final JMenuItem opciones = new JMenuItem();
+        opciones.setText(Messages.getString("Opciones.opciones")); //$NON-NLS-1$
+        opciones.setMnemonic(KeyEvent.VK_O); // Se asigna un atajo al menu
+        opciones.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                opcionesActionPerformed();
+            }
+        });
+        Utils.setContrastColor(opciones);
+        Utils.setFontBold(opciones);
+        herramientas.add(opciones);
+
+        // Subopcion menu Herramientas - Idiomas
+        final JMenu menuIdioma = new JMenu();
+        menuIdioma.setText(Messages.getString("Opciones.general.idioma")); //$NON-NLS-1$
+        menuIdioma.setMnemonic(KeyEvent.VK_I); // Se asigna un atajo al menu
+
+        // Obtenemos ruta donde se encuentra la aplicacion
+        final URL baseDirectory = getClass().getProtectionDomain().getCodeSource().getLocation();
+        File languagesDirectory = null;
+
+        // Obtenemos el contenido del directorio languages
+        try {
+            File fileDirectory = new File(baseDirectory.toURI());
+            if (fileDirectory.isFile()) {
+                fileDirectory = fileDirectory.getParentFile();
+            }
+            languagesDirectory = new File(fileDirectory, "languages"); //$NON-NLS-1$
+        }
+        catch (final Exception ex) {
+            ex.printStackTrace();
+        }
+
+        // Inicialmente introducimos el espanol
+        final List<String> languages = new ArrayList<String>();
+        languages.add(DEFAULT_LOCALE);
+
+        // Parseamos los nombres de las librerias de idiomas para obtener los codigos
+        // del idioma.
+        if ((languagesDirectory != null) && (languagesDirectory.isDirectory())) {
+            final File[] listFiles = languagesDirectory.listFiles();
+
+            for (final File listFile : listFiles) {
+                if (listFile != null && listFile.isFile() && listFile.getName().startsWith("help")) {
+                    final String locale = listFile.getName().substring(5, listFile.getName().indexOf(".jar"));
+                    languages.add(locale);
+                }
+            }
+        }
+
+        // Lista de mnemonicos usados para los radio buttons de lenguajes
+        final List<Character> mnemonicList = new ArrayList<Character>();
+
+        // Generamos las opciones del menu idiomas
+        final ButtonGroup grupo = new ButtonGroup();
+        for (final String language : languages) {
+            if (language != null) {
+                final Locale locale = new Locale(language.substring(0, 2), language.substring(3));
+                final String languageName = locale.getDisplayLanguage(locale);
+                final JRadioButtonMenuItem opcionIdioma = new JRadioButtonMenuItem(languageName.substring(0, 1).toUpperCase() + languageName.substring(1));
+
+                // Se asigna un mnemonico que no haya sido utilizado
+                opcionIdioma.setMnemonic(Utils.getLanguageMnemonic(mnemonicList, languageName.toLowerCase()));
+
+                Utils.setContrastColor(opcionIdioma);
+                Utils.setFontBold(opcionIdioma);
+                menuIdioma.add(opcionIdioma);
+                grupo.add(opcionIdioma);
+
+                if (Locale.getDefault().equals(locale)) {
+                    opcionIdioma.setSelected(true);
+                }
+
+                opcionIdioma.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(final ItemEvent e) {
+                        if (e.getStateChange() == ItemEvent.SELECTED) {
+                            cambiarIdioma(locale);
+                        }
+                    }
+                });
+            }
+        }
+
+        Utils.setContrastColor(menuIdioma);
+        Utils.setFontBold(menuIdioma);
+        herramientas.add(menuIdioma);
+
+        // Separador
+        final JSeparator separador = new JSeparator();
+        herramientas.add(separador);
+
+        // Subopcion menu Herramientas - Salir
+        final JMenuItem salir = new JMenuItem();
+        salir.setText(Messages.getString("PrincipalGUI.salir")); // NOI18N //$NON-NLS-1$
+        salir.setMnemonic(KeyEvent.VK_L); // Se asigna un atajo al menu
+        salir.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent evt) {
+                salirActionPerformed();
+            }
+        });
+        Utils.setContrastColor(salir);
+        Utils.setFontBold(salir);
+        herramientas.add(salir);
+
+        return herramientas;
+    }
+
+    /** Posicion X inicial de la ventana dependiendo de la resolucion de pantalla.
+     * @return int Posicion X */
+    public int getInitialX() {
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
+        return (screenSize.width - 500) / 2;
+    }
+
+    /** Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
+     * resolucion de pantalla.
+     * @return int Posicion Y */
+    public int getInitialY() {
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
+        if (Platform.getOS().equals(Platform.OS.MACOSX)) {
+            return (screenSize.height - 340) / 2;
+        }
+        return (screenSize.height - 320) / 2;
+    }
+
+    public JMenuBar getMenu() {
+        return this.menu;
+    }
+
+    @Override
+    public int getMinimumRelation() {
+        return 7;
+    }
+
+    /** Inicia los proveedores */
+    private void iniciarProveedores() {
+        if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
+            Security.removeProvider("SunMSCAPI"); //$NON-NLS-1$
+            try {
+                Security.addProvider((Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
+            }
+            catch (final InstantiationException e) {
+                e.printStackTrace();
+            }
+            catch (final IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            catch (final ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /** Inicializacion de los componentes */
+    private void initComponents() {
+        if (getBackground().getRGB() == -16777216) {
+            Main.isOSHighContrast = true;
+        }
+        // Dimensiones de la ventana
+        setBounds(this.getInitialX(), this.getInitialY(), Constants.WINDOW_INITIAL_WIDTH, Constants.WINDOW_INITIAL_HEIGHT);
+        // Parametros ventana
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // NOI18N
+        setTitle("Firma"); //$NON-NLS-1$
+        getContentPane().setLayout(new BorderLayout(11, 7));
+        setMinimumSize(getSize());
+
+        // Icono de @firma
+        setIconImage(this.loadIcon("afirma_ico.png").getImage()); //$NON-NLS-1$
+
+        // Componentes principales
+        this.htPanel = new HorizontalTabbedPanel();
+        getContentPane().add(this.htPanel, BorderLayout.CENTER);
+
+        // Menu
+        this.menu = new JMenuBar();
+        // Menu de herramientas
+        generarMenuHerramientas();
+        // Menu accesibilidad
+        generarMenuAccesibilidad();
+        // Menu de ayuda
+        generarMenuAyuda();
+
+        setJMenuBar(this.menu);
+
+        // Panel superior
+        final JPanel arriba = new JPanel();
+        arriba.setMinimumSize(new Dimension(1, 1));
+        arriba.setPreferredSize(new Dimension(1, 1));
+        getContentPane().add(arriba, BorderLayout.PAGE_START);
+
+        // Panel derecho
+        final JPanel derecha = new JPanel();
+        derecha.setMinimumSize(new Dimension(1, 1));
+        derecha.setPreferredSize(new Dimension(1, 1));
+        getContentPane().add(derecha, BorderLayout.LINE_END);
+
+        // Panel izquierdo
+        final JPanel izquierda = new JPanel();
+        izquierda.setMinimumSize(new Dimension(1, 1));
+        izquierda.setPreferredSize(new Dimension(1, 1));
+        getContentPane().add(izquierda, BorderLayout.LINE_START);
+
+        // Barra de estado
+        bar.setLabelWidth((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth());
+        bar.setStatus(""); //$NON-NLS-1$
+        bar.setLeftMargin(3);
+
+        getContentPane().add(bar, BorderLayout.SOUTH);
+
+        crearPaneles();
+    }
+
+    /** Carga un icono contenido en el directorio de iconos del proyecto.
      * @param filename Nombre del icono.
-     * @return Icono.
-     */
+     * @return Icono. */
     private ImageIcon loadIcon(final String filename) {
         return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
     }
-    
-    /**
-     * Carga una imagen contenido en el directorio de imagenes del proyecto.
+
+    /** Carga una imagen contenido en el directorio de imagenes del proyecto.
      * @param filename Nombre del fichero de imagen.
-     * @return Imagen.
-     */
+     * @return Imagen. */
     private Image loadImage(final String filename) {
-        return Toolkit.getDefaultToolkit().createImage(
-                this.getClass().getResource(IMAGE_DIR_PATH + filename));
+        return Toolkit.getDefaultToolkit().createImage(this.getClass().getResource(IMAGE_DIR_PATH + filename));
     }
 
-	/**
-	 * Inicia los proveedores
-	 */
-	private void iniciarProveedores(){
-		if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
-			Security.removeProvider("SunMSCAPI"); //$NON-NLS-1$
-			try {
-				Security.addProvider((Provider) Class.forName("sun.security.mscapi.SunMSCAPI").newInstance()); //$NON-NLS-1$
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * Escribe el nuevo estado en la barra de estado.
-	 * @param nuevoEstado Estado que hay que introducir en la barra de estado.
-	 */
-	public static void setNuevoEstado(String nuevoEstado){
-		bar.setStatus(nuevoEstado);
-	}
-
-	/**
-	 * Muestra la ventana de la aplicaci�n
-	 */
-	public void main() {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
+    /** Muestra la ventana de la aplicaci�n */
+    public void main() {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-				setVisible(true);
-			}
-		});
-	}
-	
-	/**
-	 * Evento de redimensionado. Redimensiona el tamaño de la barra de estado 
-	 * y de su contenido, tambien almacena los valores actuales de posicion y tama�o de
-	 * la ventana.
-	 * 
-	 */
-	public void resized() {
-		//Tamaño de la ventana
-		Dimension screenSize = this.getSize();
-	    bar.setPreferredSize(new Dimension((int) screenSize.getWidth()*10/100,(int) screenSize.getHeight()*5/100));
-	    bar.setLabelSize((int) screenSize.getWidth(),(int) screenSize.getHeight()*4/100);
-	    
-	    //Se guarda la posición en el caso de que no se haya maximizado por configuración
-		if (!GeneralConfig.isMaximized()){
-			this.actualPositionX = this.getX();
-			this.actualPositionY = this.getY();
-			this.actualWidth = this.getWidth();
-			this.actualHeight = this.getHeight();
-		}
-	}
-	
-	/**
-	 * Activa y desactiva el visionado en alto contraste
-	 * @param highContrast Boolean que indica el estado del Alto Contraste
-	 */
-	public void setHighContrast(boolean highContrast) {
-		// TODO Alto contraste en ventanas de Cargar / Guardar fichero
-//		UIDefaults d = UIManager.getDefaults();
-//		Enumeration<Object> claves = d.keys();
-//		while (claves.hasMoreElements())
-//		   System.out.println(claves.nextElement());
-		try {
-			if (highContrast) {
-				//Tema de alto contraste
-				MetalTheme theme = new HighContrastTheme();
-				// set the chosen theme
-				MetalLookAndFeel.setCurrentTheme(theme);
-				
-				//set Metal look and feel
-				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel"); //$NON-NLS-1$
+                setVisible(true);
+            }
+        });
+    }
 
-//				UIManager.put("OptionPane.messageForeground",Color.WHITE);
-//				UIManager.put("Button.foreground",Color.WHITE);
-//				UIManager.put("ToolTip.foreground",Color.WHITE);
-//				UIManager.put("ToolTip.background",Color.BLACK);
-//				UIManager.put("Label.foreground",Color.WHITE);
-				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI");  //$NON-NLS-1$//$NON-NLS-2$
-//				UIManager.put("TableHeader.foreground", Color.WHITE);
-				
+    /** Seleccion menu opciones: Muestra la ventana modal con las opciones */
+    void opcionesActionPerformed() {
+        HelpUtils.visualize("opciones.configuracion"); //$NON-NLS-1$
+        final Opciones ventanaOpciones = new Opciones(PrincipalGUI.this, this.aplicar, this.accesibilidad);
+        ventanaOpciones.setModal(true);
+        ventanaOpciones.setVisible(true);
+        setAplicar(false);
+    }
 
-			} else {
-				
-				//Se comprueba si el lookAndFeel por defecto es el que se habia modificado para el modo
-				//Alto contraste
-				if (this.defaultLookAndFeel instanceof MetalLookAndFeel) {
-					MetalLookAndFeel.setCurrentTheme(this.defaultTheme); //Se asigna el tema por defecto
-				}
-				
-				//Se asigna el lookAndFeel que habia por defecto
-				UIManager.setLookAndFeel(this.defaultLookAndFeel);
-				
-//				UIManager.put("OptionPane.messageForeground",Color.BLACK);
-//				UIManager.put("Button.foreground",Color.BLACK);
-//				UIManager.put("ToolTip.foreground",Color.BLACK);
-//				UIManager.put("ToolTip.background",new Color(255,255,225));
-//				UIManager.put("Label.foreground",Color.BLACK);
-				UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$ //$NON-NLS-2$
-//				UIManager.put("TableHeader.foreground", Color.BLACK);
-			}
-			
-		} catch (ClassNotFoundException e1) {
-			System.out.println(e1.getMessage());
-		} catch (InstantiationException e1) {
-			System.out.println(e1.getMessage());
-		} catch (IllegalAccessException e1) {
-			System.out.println(e1.getMessage());
-		} catch (UnsupportedLookAndFeelException e1) {
-			System.out.println(e1.getMessage());
-		}
-		SwingUtilities.updateComponentTreeUI(this);
+    /** Evento de redimensionado. Redimensiona el tamaño de la barra de estado
+     * y de su contenido, tambien almacena los valores actuales de posicion y tama�o de
+     * la ventana. */
+    public void resized() {
+        // Tamaño de la ventana
+        final Dimension screenSize = this.getSize();
+        bar.setPreferredSize(new Dimension((int) screenSize.getWidth() * 10 / 100, (int) screenSize.getHeight() * 5 / 100));
+        bar.setLabelSize((int) screenSize.getWidth(), (int) screenSize.getHeight() * 4 / 100);
 
-		this.validate();
-		this.repaint();
-	}
+        // Se guarda la posición en el caso de que no se haya maximizado por configuración
+        if (!GeneralConfig.isMaximized()) {
+            this.actualPositionX = this.getX();
+            this.actualPositionY = this.getY();
+            this.actualWidth = this.getWidth();
+            this.actualHeight = this.getHeight();
+        }
+    }
+
+    /** Seleccion menu salir: Cierra la aplicaci�n */
+    void salirActionPerformed() {
+        System.exit(0);
+    }
+
+    public void setAplicar(final boolean aplicar) {
+        this.aplicar = aplicar;
+    }
+
+    /** Activa y desactiva el visionado en alto contraste
+     * @param highContrast Boolean que indica el estado del Alto Contraste */
+    public void setHighContrast(final boolean highContrast) {
+        // TODO Alto contraste en ventanas de Cargar / Guardar fichero
+        // UIDefaults d = UIManager.getDefaults();
+        // Enumeration<Object> claves = d.keys();
+        // while (claves.hasMoreElements())
+        // System.out.println(claves.nextElement());
+        try {
+            if (highContrast) {
+                // Tema de alto contraste
+                final MetalTheme theme = new HighContrastTheme();
+                // set the chosen theme
+                MetalLookAndFeel.setCurrentTheme(theme);
+
+                // set Metal look and feel
+                UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel"); //$NON-NLS-1$
+
+                // UIManager.put("OptionPane.messageForeground",Color.WHITE);
+                // UIManager.put("Button.foreground",Color.WHITE);
+                // UIManager.put("ToolTip.foreground",Color.WHITE);
+                // UIManager.put("ToolTip.background",Color.BLACK);
+                // UIManager.put("Label.foreground",Color.WHITE);
+                UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$//$NON-NLS-2$
+                // UIManager.put("TableHeader.foreground", Color.WHITE);
+
+            }
+            else {
+
+                // Se comprueba si el lookAndFeel por defecto es el que se habia modificado para el modo
+                // Alto contraste
+                if (this.defaultLookAndFeel instanceof MetalLookAndFeel) {
+                    MetalLookAndFeel.setCurrentTheme(this.defaultTheme); // Se asigna el tema por defecto
+                }
+
+                // Se asigna el lookAndFeel que habia por defecto
+                UIManager.setLookAndFeel(this.defaultLookAndFeel);
+
+                // UIManager.put("OptionPane.messageForeground",Color.BLACK);
+                // UIManager.put("Button.foreground",Color.BLACK);
+                // UIManager.put("ToolTip.foreground",Color.BLACK);
+                // UIManager.put("ToolTip.background",new Color(255,255,225));
+                // UIManager.put("Label.foreground",Color.BLACK);
+                UIManager.put("FileChooserUI", "com.sun.java.swing.plaf.windows.WindowsFileChooserUI"); //$NON-NLS-1$ //$NON-NLS-2$
+                // UIManager.put("TableHeader.foreground", Color.BLACK);
+            }
+
+        }
+        catch (final ClassNotFoundException e1) {
+            System.out.println(e1.getMessage());
+        }
+        catch (final InstantiationException e1) {
+            System.out.println(e1.getMessage());
+        }
+        catch (final IllegalAccessException e1) {
+            System.out.println(e1.getMessage());
+        }
+        catch (final UnsupportedLookAndFeelException e1) {
+            System.out.println(e1.getMessage());
+        }
+        SwingUtilities.updateComponentTreeUI(this);
+
+        this.validate();
+        this.repaint();
+    }
 }
