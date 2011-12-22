@@ -17,51 +17,43 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-/**
- * Clase para generar la imagen lateral de los asistente
- */
+/** Clase para generar la imagen lateral de los asistente */
 public class ImagenLateral extends JPanel {
 
-	private static final long serialVersionUID = 1L;
-	private String rutaImagen = "/resources/images/nubes.png"; //$NON-NLS-1$
-	private Dimension dimensiones = new Dimension(145, 388);
+    private static final long serialVersionUID = 1L;
+    private Dimension dimensiones = new Dimension(145, 388);
+    private String rutaImagen = "/resources/images/nubes.png"; //$NON-NLS-1$
 
-	public ImagenLateral() {
-		initComponents();
-	}
-	
-	/**
-	 * Inicializa la imagen a mostrar en el panel
-	 * @param rutaImagen	Ruta del panel
-	 */
-	public ImagenLateral(String rutaImagen) {
-		this.rutaImagen	= rutaImagen;
-		initComponents();
-	}
-	
-	/**
-	 * Inicializa la imagen a mostrar en el panel
-	 * @param rutaImagen	Ruta del panel
-	 * @param dimensiones	Dimensiones del panel
-	 */
-	public ImagenLateral(String rutaImagen, Dimension dimensiones) {
-		this.rutaImagen	= rutaImagen;
-		this.dimensiones = dimensiones;
-		initComponents();
-	}
-	
-	/**
-	 * Inicializamos los componentes
-	 */
-	private void initComponents() {
-		// Configuracion panel
-		setLayout(new BorderLayout());
-		setPreferredSize(this.dimensiones);
-		setBackground(Color.WHITE); //El fondo se pone a blanco
-		
-		JLabel etiqueta = new JLabel();
-		etiqueta.setIcon(new ImageIcon(getClass().getResource(this.rutaImagen))); // NOI18N
-		
+    public ImagenLateral() {
+        initComponents();
+    }
+
+    /** Inicializa la imagen a mostrar en el panel
+     * @param rutaImagen Ruta del panel */
+    public ImagenLateral(final String rutaImagen) {
+        this.rutaImagen = rutaImagen;
+        initComponents();
+    }
+
+    /** Inicializa la imagen a mostrar en el panel
+     * @param rutaImagen Ruta del panel
+     * @param dimensiones Dimensiones del panel */
+    public ImagenLateral(final String rutaImagen, final Dimension dimensiones) {
+        this.rutaImagen = rutaImagen;
+        this.dimensiones = dimensiones;
+        initComponents();
+    }
+
+    /** Inicializamos los componentes */
+    private void initComponents() {
+        // Configuracion panel
+        setLayout(new BorderLayout());
+        setPreferredSize(this.dimensiones);
+        setBackground(Color.WHITE); // El fondo se pone a blanco
+
+        final JLabel etiqueta = new JLabel();
+        etiqueta.setIcon(new ImageIcon(getClass().getResource(this.rutaImagen))); // NOI18N
+
         add(etiqueta, BorderLayout.CENTER);
     }
 }

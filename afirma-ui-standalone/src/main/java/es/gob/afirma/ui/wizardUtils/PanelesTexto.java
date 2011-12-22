@@ -14,20 +14,16 @@ import javax.swing.JTextPane;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
-/**
- * Clase para generar bloques de texto
- */
+/** Clase para generar bloques de texto */
 public class PanelesTexto {
 
-	/**
-	 * Genera un panel con un bloque de texto
-	 * @param bundleTexto	Texto a buscar en el ResourceBundle para el panel
-	 * @param opaco	Indica si el fondo debe ser blanco (true) o gris (false)
-	 * @return	Panel con un bloque de texto
-	 */
-	public static JTextPane generarPanelTexto(String bundleTexto, boolean opaco) {
+    /** Genera un panel con un bloque de texto
+     * @param bundleTexto Texto a buscar en el ResourceBundle para el panel
+     * @param opaco Indica si el fondo debe ser blanco (true) o gris (false)
+     * @return Panel con un bloque de texto */
+    public static JTextPane generarPanelTexto(final String bundleTexto, final boolean opaco) {
         // Bloque de texto
-        JTextPane bloqueTexto = new JTextPane();
+        final JTextPane bloqueTexto = new JTextPane();
         bloqueTexto.setEditable(false);
         bloqueTexto.setText(Messages.getString(bundleTexto));
         bloqueTexto.setOpaque(opaco);
@@ -36,7 +32,7 @@ public class PanelesTexto {
         Utils.remarcar(bloqueTexto);
         Utils.setContrastColor(bloqueTexto);
         Utils.setFontBold(bloqueTexto);
-        
+
         return bloqueTexto;
-	}
+    }
 }

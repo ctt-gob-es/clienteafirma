@@ -16,31 +16,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
-/**
- * Dialogo configurado con los parametros del asistente
- */
+/** Dialogo configurado con los parametros del asistente */
 public class JDialogWizard extends JDialog implements ComponentListener {
 
-	/**
-	 * UID.
-	 */
+    /** UID. */
     private static final long serialVersionUID = 1L;
-    /**
-     * Ventana anterior.
-     */
+    /** Ventana anterior. */
     private JDialogWizard ventanaAnterior;
 
-    /**
-     * Método que asigna el titulo.
-     * @param titulo titulo de la ventana.
-     */
-    public void setTitulo(String titulo) {
-        setTitle(titulo);
-    }
-    /**
-     * Constructor.
-     */
-    public JDialogWizard () {
+    /** Constructor. */
+    public JDialogWizard() {
         // Configuracion de la ventana
         setDefaultLookAndFeelDecorated(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -48,43 +33,40 @@ public class JDialogWizard extends JDialog implements ComponentListener {
         addComponentListener(this);
 
         // Icono de @firma
-        setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage());
+        setIconImage(new ImageIcon(getClass().getResource("/resources/images/afirma_ico.png")).getImage()); //$NON-NLS-1$
     }
 
-    /**
-     * Muestra la ventana modal y oculta la anterior
-     * @param mostrar	Indica si muestra o esconde la ventana
-     * @param ventana	Ventana que se debe ocultar al mostrar la ventana
-     */
-    public void setVisibleAndHide(boolean mostrar, JDialogWizard ventana) {
+    /** Evento que se lanza cuando se oculta la ventana modal. */
+    @Override
+    public void componentHidden(final ComponentEvent e) { /* No es necesario implementarlo */}
+
+    /** Evento que se lanza cuando se mueve la ventana modal. */
+    @Override
+    public void componentMoved(final ComponentEvent e) { /* No es necesario implementarlo */}
+
+    /** Evento que se lanza cuando se redimensiona la ventana modal. */
+    @Override
+    public void componentResized(final ComponentEvent e) { /* No es necesario implementarlo */}
+
+    /** Cuando se muestra la ventana modal ocultamos la pagina anterior */
+    @Override
+    public void componentShown(final ComponentEvent e) {
+        if (this.ventanaAnterior != null) {
+            this.ventanaAnterior.dispose();
+        }
+    }
+
+    /** Método que asigna el titulo.
+     * @param titulo titulo de la ventana. */
+    public void setTitulo(final String titulo) {
+        setTitle(titulo);
+    }
+
+    /** Muestra la ventana modal y oculta la anterior
+     * @param mostrar Indica si muestra o esconde la ventana
+     * @param ventana Ventana que se debe ocultar al mostrar la ventana */
+    public void setVisibleAndHide(final boolean mostrar, final JDialogWizard ventana) {
         this.ventanaAnterior = ventana;
         super.setVisible(mostrar);
-    }
-
-    /**
-     * Evento que se lanza cuando se oculta la ventana modal.
-     */
-    @Override
-    public void componentHidden(ComponentEvent e) { /* No es necesario implementarlo */ }
-
-    /**
-     * Evento que se lanza cuando se mueve la ventana modal.
-     */
-    @Override
-    public void componentMoved(ComponentEvent e) { /* No es necesario implementarlo */ }
-
-    /**
-     * Evento que se lanza cuando se redimensiona la ventana modal.
-     */
-    @Override
-    public void componentResized(ComponentEvent e) { /* No es necesario implementarlo */ }
-
-    /**
-     * Cuando se muestra la ventana modal ocultamos la pagina anterior
-     */
-    @Override
-    public void componentShown(ComponentEvent e) {
-        if (this.ventanaAnterior != null)
-            this.ventanaAnterior.dispose();
     }
 }

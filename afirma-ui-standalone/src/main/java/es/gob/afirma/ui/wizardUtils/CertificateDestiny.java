@@ -26,80 +26,80 @@ import es.gob.afirma.ui.utils.CustomDialog;
 import es.gob.afirma.ui.utils.Messages;
 import es.gob.afirma.ui.utils.Utils;
 
-/**
- * Certificado destinatario de un sobre digital. 
- */
+/** Certificado destinatario de un sobre digital. */
 public class CertificateDestiny {
 
-	static Logger logger = Logger.getLogger(CertificateDestiny.class.getName());
-	
-	/**
-	 * Alias del certificado
-	 */
-	private String alias = null;
-	
-	/**
-	 * Certificado
-	 */
-	private Certificate cert = null;
+    static Logger logger = Logger.getLogger(CertificateDestiny.class.getName());
 
-	public Certificate getCertificate() {
-		return this.cert;
-	}
-	
-	public String getAlias() {
-		return this.alias;
-	}
-	
-	public CertificateDestiny(String alias, Certificate cert) {
-		this.alias = alias;
-		this.cert = cert;
-	}
-	
-	public CertificateDestiny(AOKeyStoreManager keyStoreManager, JDialogWizard dialogo) {
-		try {
-			// Seleccionamos un certificado
-			String selectedcert = Utils.showCertSelectionDialog(
-			        keyStoreManager.getAliases(), keyStoreManager, dialogo, false, true, true, 
-			        new Vector<CertificateFilter>(0), false);
+    /** Alias del certificado */
+    private String alias = null;
 
-			// Comprobamos si se ha cancelado la seleccion
-			if (selectedcert == null) {
-				throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
-			}
+    /** Certificado */
+    private Certificate cert = null;
 
-			Certificate cert = null;
-			for (final KeyStore tmpKs : keyStoreManager.getKeyStores()) {
-				try {
-					cert = tmpKs.getCertificate(selectedcert);
-					if (cert != null) {
-						break;
-					}
-					throw new AOException("El alias '" + selectedcert + "' no se corresponde con ning\u00FAn certificado accesible"); //$NON-NLS-1$ //$NON-NLS-2$
-				} 
-				catch (final KeyStoreException e) {
-					throw new AOException("El almacen seleccionado no estaba inicializado: " + e); //$NON-NLS-1$
-				}
-			}
+    public CertificateDestiny(final AOKeyStoreManager keyStoreManager, final JDialogWizard dialogo) {
+        try {
+            // Seleccionamos un certificado
+            final String selectedcert =
+                Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
+                                              keyStoreManager,
+                                              dialogo,
+                                              false,
+                                              true,
+                                              true,
+                                              new Vector<CertificateFilter>(0),
+                                              false);
 
-			if (!(cert instanceof X509Certificate)) {
-				throw new AOException("El certificado recuperado no es un certificado v\u00E1lido para esta operaci\u00F3n"); //$NON-NLS-1$
-			}
-			
-			this.alias = selectedcert;
-			this.cert = cert;
-		} 
-		catch (final AOCancelledOperationException e) {
-			logger.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
-		} 
-		catch (final AOException e) {
-			logger.severe(e.getMessage() + ": " + e); //$NON-NLS-1$
-			CustomDialog.showMessageDialog(dialogo, true, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-		} 
-		catch (final Exception e) {
-			logger.severe("No se ha podido recuperar el certificado seleccionado: " + e); //$NON-NLS-1$
-			CustomDialog.showMessageDialog(dialogo, true, Messages.getString("Certificado.no.soportado"),  //$NON-NLS-1$
-					Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-		}
-	}	
+            // Comprobamos si se ha cancelado la seleccion
+            if (selectedcert == null) {
+                throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
+            }
+
+            Certificate cert1 = null;
+            for (final KeyStore tmpKs : keyStoreManager.getKeyStores()) {
+                try {
+                    cert1 = tmpKs.getCertificate(selectedcert);
+                    if (cert1 != null) {
+                        break;
+                    }
+                    throw new AOException("El alias '" + selectedcert + "' no se corresponde con ning\u00FAn certificado accesible"); //$NON-NLS-1$ //$NON-NLS-2$
+                }
+                catch (final KeyStoreException e) {
+                    throw new AOException("El almacen seleccionado no estaba inicializado: " + e); //$NON-NLS-1$
+                }
+            }
+
+            if (!(cert1 instanceof X509Certificate)) {
+                throw new AOException("El certificado recuperado no es un certificado v\u00E1lido para esta operaci\u00F3n"); //$NON-NLS-1$
+            }
+
+            this.alias = selectedcert;
+            this.cert = cert1;
+        }
+        catch (final AOCancelledOperationException e) {
+            logger.severe("Operacion cancelada por el usuario"); //$NON-NLS-1$
+        }
+        catch (final AOException e) {
+            logger.severe(e.getMessage() + ": " + e); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(dialogo, true, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            logger.severe("No se ha podido recuperar el certificado seleccionado: " + e); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(dialogo, true, Messages.getString("Certificado.no.soportado"), //$NON-NLS-1$
+                                           Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+        }
+    }
+
+    public CertificateDestiny(final String alias, final Certificate cert) {
+        this.alias = alias;
+        this.cert = cert;
+    }
+
+    public String getAlias() {
+        return this.alias;
+    }
+
+    public Certificate getCertificate() {
+        return this.cert;
+    }
 }

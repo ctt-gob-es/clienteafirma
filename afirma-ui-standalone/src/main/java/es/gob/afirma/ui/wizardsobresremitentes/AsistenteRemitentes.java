@@ -14,50 +14,44 @@ import java.util.List;
 
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
-/**
- * Clase principal que contiene la operatividad de movimiento dentro del wizard
+/** Clase principal que contiene la operatividad de movimiento dentro del wizard
  * y que contiene los paneles de explicacion y contenido para anadir nuevos remitentes
- * a un sobre digital.
- */
+ * a un sobre digital. */
 public class AsistenteRemitentes {
 
-	/**
-	 * Ruta del fichero a ensobrar
-	 */
-	private String rutaFichero;
-	
+    /** Ruta del fichero a ensobrar */
+    private final String rutaFichero;
+
     public AsistenteRemitentes(final String rutafichero) {
         this.rutaFichero = rutafichero;
         initComponents();
     }
 
-    /**
-     * Inicializacion de componentes
-     */
-	private void initComponents() {
-		// Generamos la lista para el control de la botonera
-    	List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
-    	
-    	// Obtenemos todas las paginas
-    	// Pagina 1: Panel presentacion
-    	PanelPresentacion panelPresentacion = new PanelPresentacion();
-    	ventanas.add(panelPresentacion);
-    	
-    	// Pagina 2: Panel anadir nuevos remitentes
-    	PanelRemitentes panelDestinatarios = new PanelRemitentes(this.rutaFichero);
-    	ventanas.add(panelDestinatarios);
-    	
-    	// Pagina 3: Panel finalizar
-    	PanelFinalizar panelFinalizar = new PanelFinalizar();
-    	ventanas.add(panelFinalizar);
-    	
-    	// Cargamos el listado de ventanas en todas las paginas con controles
-    	// para inicializar sus botoneras
+    /** Inicializacion de componentes */
+    private void initComponents() {
+        // Generamos la lista para el control de la botonera
+        final List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
+
+        // Obtenemos todas las paginas
+        // Pagina 1: Panel presentacion
+        final PanelPresentacion panelPresentacion = new PanelPresentacion();
+        ventanas.add(panelPresentacion);
+
+        // Pagina 2: Panel anadir nuevos remitentes
+        final PanelRemitentes panelDestinatarios = new PanelRemitentes(this.rutaFichero);
+        ventanas.add(panelDestinatarios);
+
+        // Pagina 3: Panel finalizar
+        final PanelFinalizar panelFinalizar = new PanelFinalizar();
+        ventanas.add(panelFinalizar);
+
+        // Cargamos el listado de ventanas en todas las paginas con controles
+        // para inicializar sus botoneras
         panelPresentacion.setVentanas(ventanas);
         panelDestinatarios.setVentanas(ventanas);
         panelFinalizar.setVentanas(ventanas);
-        
+
         // Mostramos la primera ventana
         panelPresentacion.setVisible(true);
-	}  
+    }
 }
