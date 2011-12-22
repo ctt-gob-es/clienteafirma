@@ -143,7 +143,6 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
             return;
         }
         catch (final Exception e) {
-            e.printStackTrace();
             logger.severe("No se ha podido abrir el almacen de certificados: " + e); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,

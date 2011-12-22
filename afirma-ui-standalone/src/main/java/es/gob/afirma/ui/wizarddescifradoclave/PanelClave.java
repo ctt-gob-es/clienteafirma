@@ -130,7 +130,6 @@ final class PanelClave extends JAccessibilityDialogWizard {
         }
         catch (final NullPointerException ex) {
             logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
-            ex.printStackTrace();
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Descifrado.msg.fichero"), //$NON-NLS-1$
@@ -140,7 +139,6 @@ final class PanelClave extends JAccessibilityDialogWizard {
         }
         catch (final FileNotFoundException ex) {
             logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
-            ex.printStackTrace();
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Descifrado.msg.fichero2"), //$NON-NLS-1$
@@ -150,7 +148,6 @@ final class PanelClave extends JAccessibilityDialogWizard {
         }
         catch (final Exception ex) {
             logger.warning("Ocurri\u00F3 un error durante la lectura del fichero de datos: " + ex); //$NON-NLS-1$
-            ex.printStackTrace();
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Descifrado.msg.fichero2"), //$NON-NLS-1$
@@ -178,7 +175,6 @@ final class PanelClave extends JAccessibilityDialogWizard {
         }
         catch (final Exception ex) {
             logger.severe("Error al descifrar: " + ex); //$NON-NLS-1$
-            ex.printStackTrace();
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Descifrado.msg.error.operacion"), //$NON-NLS-1$
@@ -203,8 +199,8 @@ final class PanelClave extends JAccessibilityDialogWizard {
         if (!AOCipherKeyStoreHelper.storeExists()) {
             CustomDialog.showMessageDialog(this,
                                            true,
-                                           Messages.getString("WizardDescifrado.msg.error.almacen"),
-                                           Messages.getString("WizardDescifrado.msg.error.titulo"),
+                                           Messages.getString("WizardDescifrado.msg.error.almacen"), //$NON-NLS-1$
+                                           Messages.getString("WizardDescifrado.msg.error.titulo"), //$NON-NLS-1$
                                            JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -266,7 +262,7 @@ final class PanelClave extends JAccessibilityDialogWizard {
                                                                                 true,
                                                                                 null,
                                                                                 false,
-                                                                                Messages.getString("WizardDescifrado.clave.pass"),
+                                                                                Messages.getString("WizardDescifrado.clave.pass"), //$NON-NLS-1$
                                                                                 KeyEvent.VK_O,
                                                                                 Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
                                                                                 JOptionPane.QUESTION_MESSAGE));

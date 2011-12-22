@@ -103,7 +103,7 @@ final class Desensobrado extends JPanel {
     void extraerActionPerformed(final JComboBox comboAlmacen, final JTextField campoFichero, final JCheckBox checkIniciar) {
         // Obtenemos la ruta del sobre
         final String envelopPath = campoFichero.getText();
-        if (envelopPath == null || envelopPath.equals("") || !new File(envelopPath).exists() || !new File(envelopPath).isFile()) {
+        if (envelopPath == null || envelopPath.equals("") || !new File(envelopPath).exists() || !new File(envelopPath).isFile()) { //$NON-NLS-1$
             CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                            true,
                                            Messages.getString("Desensobrado.msg.erro.fichero"), Messages.getString("Desensobrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -155,14 +155,14 @@ final class Desensobrado extends JPanel {
                 logger.severe("Error al abrir el almacen de claves del usuario: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
-                                               Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                                               Messages.getString("Desensobrado.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
             catch (final Exception e) {
                 logger.severe("Error al recuperar el certificado del usuario: " + e); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
-                                               Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                                               Messages.getString("Desensobrado.msg.error.certificado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
 
@@ -305,7 +305,6 @@ final class Desensobrado extends JPanel {
             throw e;
         }
         catch (final Exception e) {
-            e.printStackTrace();
             logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
             throw new AOException(e.getMessage());
         }
