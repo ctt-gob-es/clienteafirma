@@ -29,87 +29,80 @@ import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
+/** Panel explicativo de presentacion */
+final class PanelPresentacion extends JAccessibilityDialogWizard {
+    /** UID. */
+    private static final long serialVersionUID = 1L;
 
-/**
- * Panel explicativo de presentacion
- */
-public class PanelPresentacion extends JAccessibilityDialogWizard {
-	/**
-	 * UID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Constructor.
-	 */
+    /** Constructor. */
     public PanelPresentacion() {
         initComponents();
     }
-    /**
-	 * Relacion minima para el redimensionado de componentes.
-	 */
+
+    /** Relacion minima para el redimensionado de componentes. */
     @Override
-	public int getMinimumRelation(){
-		return 9;
-	}
-	
-    /**
-     * Guarda todas las ventanas del asistente para poder controlar la botonera
-     * @param ventanas	Listado con todas las paginas del asistente
-     */
-    public void setVentanas(List<JDialogWizard> ventanas) {
-    	this.setBotoneraSuperior(new BotoneraSuperior(ventanas));
-    	this.setBotonera(new BotoneraInferior(ventanas, 0));
-    	getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
-    	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
-    	//Se asigna el botón por defecto
-    	this.getRootPane().setDefaultButton(getBotonera().getSiguiente());
+    public int getMinimumRelation() {
+        return 9;
     }
-    
-    /**
-     * Inicializacion de los componentes
-     */
-    private void initComponents() {    	    	
-    	// Titulo de la ventana
-    	setTitulo(Messages.getString("WizardCifrado.titulo"));
-    	
-    	// Panel con la imagen lateral
-        ImagenLateral panelIzdo = new ImagenLateral();
-        if (Main.isOSHighContrast){
-        	panelIzdo.setOpaque(false);
+
+    /** Inicializacion de los componentes */
+    private void initComponents() {
+        // Titulo de la ventana
+        setTitulo(Messages.getString("WizardCifrado.titulo"));
+
+        // Panel con la imagen lateral
+        final ImagenLateral panelIzdo = new ImagenLateral();
+        if (Main.isOSHighContrast) {
+            panelIzdo.setOpaque(false);
         }
         Utils.setContrastColor(panelIzdo);
         getContentPane().add(panelIzdo, BorderLayout.WEST);
-        
-        GridBagConstraints c = new GridBagConstraints();
+
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(20, 20, 0, 20);
-		c.weightx = 1.0;
-		c.weighty = 1.0;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.anchor = GridBagConstraints.NORTHWEST;
-        
+        c.insets = new Insets(20, 20, 0, 20);
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.NORTHWEST;
+
         // Panel con el contenido
-        JPanel panelCentral = new JPanel();
+        final JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
         // si el color de fondo ya no es blanco
-        if (Main.isOSHighContrast){
-        	panelCentral.setOpaque(false);
+        if (Main.isOSHighContrast) {
+            panelCentral.setOpaque(false);
         }
         Utils.setContrastColor(panelCentral);
         panelCentral.setLayout(new GridBagLayout());
-        
-        //Etiqueta con el texto "Bienvenido al asistente..."
-        String textLabel = Messages.getString("Wizard.sobres.presentacion.pass.presentacion1") +
-        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion2")+
-        		"<br>"+"<br>"+Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
-        InfoLabel presentationLabel = new InfoLabel(textLabel, false);
-        //Foco al contenido
+
+        // Etiqueta con el texto "Bienvenido al asistente..."
+        final String textLabel =
+            Messages.getString("Wizard.sobres.presentacion.pass.presentacion1") + "<br>"
+            + "<br>"
+            + Messages.getString("Wizard.sobres.presentacion.pass.presentacion2")
+            + "<br>"
+            + "<br>"
+            + Messages.getString("Wizard.sobres.presentacion.pass.presentacion3");
+        final InfoLabel presentationLabel = new InfoLabel(textLabel, false);
+        // Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));
-        
-        //Se añade la etiqueta al panel
+
+        // Se añade la etiqueta al panel
         panelCentral.add(presentationLabel, c);
-        
+
         getContentPane().add(panelCentral, BorderLayout.CENTER);
+    }
+
+    /** Guarda todas las ventanas del asistente para poder controlar la botonera
+     * @param ventanas Listado con todas las paginas del asistente */
+    public void setVentanas(final List<JDialogWizard> ventanas) {
+        this.setBotoneraSuperior(new BotoneraSuperior(ventanas));
+        this.setBotonera(new BotoneraInferior(ventanas, 0));
+        getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
+        getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
+        // Se asigna el botón por defecto
+        this.getRootPane().setDefaultButton(getBotonera().getSiguiente());
     }
 }

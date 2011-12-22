@@ -14,47 +14,43 @@ import java.util.List;
 
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
-/**
- * Clase principal del wizard de descifrado de clave. 
- */
+/** Clase principal del wizard de descifrado de clave. */
 public class AsistenteDescifradoClave {
 
-    private String algoritmo;
+    private final String algoritmo;
 
-    private String rutaFichero;
+    private final String rutaFichero;
 
-    public AsistenteDescifradoClave(String algoritmo, String rutaFichero) {
+    public AsistenteDescifradoClave(final String algoritmo, final String rutaFichero) {
         this.algoritmo = algoritmo;
         this.rutaFichero = rutaFichero;
         initComponents();
     }
-    
-    /**
-     * Inicializacion de componentes
-     */
+
+    /** Inicializacion de componentes */
     private void initComponents() {
-    	// Generamos la lista para el control de la botonera
-    	List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
-    	
-    	// Obtenemos todas las paginas
-    	// Pagina 1: Panel presentacion
-    	PanelPresentacion panelPresentacion = new PanelPresentacion();
-    	ventanas.add(panelPresentacion);
-    	
-    	// Pagina 2: Panel clave de cifrado
-    	PanelClave panelContrasenia = new PanelClave(this.algoritmo, this.rutaFichero);
-    	ventanas.add(panelContrasenia);
-    	
-    	// Pagina 3: Dialogo finalizar
-    	PanelFinalizar panelFinalizar = new PanelFinalizar();
-    	ventanas.add(panelFinalizar);
-        
+        // Generamos la lista para el control de la botonera
+        final List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
+
+        // Obtenemos todas las paginas
+        // Pagina 1: Panel presentacion
+        final PanelPresentacion panelPresentacion = new PanelPresentacion();
+        ventanas.add(panelPresentacion);
+
+        // Pagina 2: Panel clave de cifrado
+        final PanelClave panelContrasenia = new PanelClave(this.algoritmo, this.rutaFichero);
+        ventanas.add(panelContrasenia);
+
+        // Pagina 3: Dialogo finalizar
+        final PanelFinalizar panelFinalizar = new PanelFinalizar();
+        ventanas.add(panelFinalizar);
+
         // Cargamos el listado de ventanas en todas las paginas con controles
-    	// para inicializar sus botoneras
+        // para inicializar sus botoneras
         panelPresentacion.setVentanas(ventanas);
         panelContrasenia.setVentanas(ventanas);
         panelFinalizar.setVentanas(ventanas);
-        
+
         // Mostramos la primera ventana
         panelPresentacion.setVisible(true);
     }

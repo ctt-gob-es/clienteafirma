@@ -29,84 +29,71 @@ import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
 import es.gob.afirma.ui.wizardUtils.ImagenLateral;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
+/** Panel explicativo de finalizaci�n */
+final class PanelFinalizar extends JAccessibilityDialogWizard {
+    /** UID. */
+    private static final long serialVersionUID = 1L;
 
-/**
- *
- * Panel explicativo de finalizaci�n
- */
-public class PanelFinalizar extends JAccessibilityDialogWizard {
-	/**
-	 * UID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Constructor.
-	 */
-	public PanelFinalizar() {
+    /** Constructor. */
+    public PanelFinalizar() {
         initComponents();
     }
-	/**
-	 * Relacion minima para el redimensionado de componentes.
-	 */
-	@Override
-	public int getMinimumRelation(){
-		return 9;
-	}
-    
-	/**
-     * Guarda todas las ventanas del asistente para poder controlar la botonera
-     * @param ventanas	Listado con todas las paginas del asistente
-     */
-    public void setVentanas(List<JDialogWizard> ventanas) {
-    	this.setBotoneraSuperior(new BotoneraSuperior(ventanas));
-    	this.setBotonera(new BotoneraInferior(ventanas, 2));
-    	getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
-    	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
+
+    /** Relacion minima para el redimensionado de componentes. */
+    @Override
+    public int getMinimumRelation() {
+        return 9;
     }
-	
-    /**
-     * Inicializacion de los componentes
-     */
+
+    /** Inicializacion de los componentes */
     private void initComponents() {
-    	// Titulo de la ventana
-    	setTitulo(Messages.getString("WizardCifrado.titulo"));
-    	
-    	// Panel con la imagen lateral
-        ImagenLateral panelIzdo = new ImagenLateral();
-        if (Main.isOSHighContrast){
-        	panelIzdo.setOpaque(false);
+        // Titulo de la ventana
+        setTitulo(Messages.getString("WizardCifrado.titulo"));
+
+        // Panel con la imagen lateral
+        final ImagenLateral panelIzdo = new ImagenLateral();
+        if (Main.isOSHighContrast) {
+            panelIzdo.setOpaque(false);
         }
         Utils.setContrastColor(panelIzdo);
         getContentPane().add(panelIzdo, BorderLayout.WEST);
-    	
-        GridBagConstraints c = new GridBagConstraints();
+
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(20, 20, 0, 20);
-		c.weightx = 1.0;
-		c.weighty = 1.0;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.anchor = GridBagConstraints.NORTHWEST;
-        
-    	// Panel central
-        JPanel panelCentral = new JPanel();
+        c.insets = new Insets(20, 20, 0, 20);
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.NORTHWEST;
+
+        // Panel central
+        final JPanel panelCentral = new JPanel();
         panelCentral.setBackground(Color.WHITE);
         // si el color de fondo ya no es blanco
-        if (Main.isOSHighContrast){
-        	panelCentral.setOpaque(false);
+        if (Main.isOSHighContrast) {
+            panelCentral.setOpaque(false);
         }
         panelCentral.setLayout(new GridBagLayout());
         Utils.setContrastColor(panelCentral);
         Utils.setFontBold(panelCentral);
-        
-     // Etiqueta "felicidades" y "Ha finalizado con..."
-     	String textLabel = Messages.getString("Wizard.sobres.final1") +
-     			"<br>"+"<br>" + Messages.getString("Wizard.sobres.final.final1") ;
-     	InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
-     	 //Foco al contenido
-        finalizeLabel.addAncestorListener(new RequestFocusListener(false));
-		panelCentral.add(finalizeLabel, c);
 
-    	getContentPane().add(panelCentral, BorderLayout.CENTER);
+        // Etiqueta "felicidades" y "Ha finalizado con..."
+        final String textLabel = Messages.getString("Wizard.sobres.final1") + "<br>" + "<br>" + Messages.getString("Wizard.sobres.final.final1");
+        final InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
+        // Foco al contenido
+        finalizeLabel.addAncestorListener(new RequestFocusListener(false));
+        panelCentral.add(finalizeLabel, c);
+
+        getContentPane().add(panelCentral, BorderLayout.CENTER);
+    }
+
+    /** Guarda todas las ventanas del asistente para poder controlar la botonera
+     * @param ventanas Listado con todas las paginas del asistente */
+    public void setVentanas(final List<JDialogWizard> ventanas) {
+        this.setBotoneraSuperior(new BotoneraSuperior(ventanas));
+        this.setBotonera(new BotoneraInferior(ventanas, 2));
+        getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
+        getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
 }

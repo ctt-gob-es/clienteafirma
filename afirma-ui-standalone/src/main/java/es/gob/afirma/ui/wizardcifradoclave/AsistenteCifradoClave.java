@@ -14,55 +14,47 @@ import java.util.List;
 
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
-/**
- * Clase principal del asistente de cifrado de clave. 
- */
+/** Clase principal del asistente de cifrado de clave. */
 public final class AsistenteCifradoClave {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Algoritmo de cifrado seleccionado
-	 */
-	private String algoritmo;
-	
-	/**
-	 * Ruta donde se encuentra el archivo a cifrar
-	 */
-	private String rutaFichero;
+    /** Algoritmo de cifrado seleccionado */
+    private final String algoritmo;
 
-    public AsistenteCifradoClave(String algoritmo, String rutaFichero) {
+    /** Ruta donde se encuentra el archivo a cifrar */
+    private final String rutaFichero;
+
+    public AsistenteCifradoClave(final String algoritmo, final String rutaFichero) {
         this.algoritmo = algoritmo;
         this.rutaFichero = rutaFichero;
         initComponents();
     }
 
-    /**
-     * Inicializacion de componentes
-     */
-    private void initComponents() {   	
-    	// Generamos la lista para el control de la botonera
-    	List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
-    	
-    	// Obtenemos todas las paginas
-    	// Pagina 1: Panel presentacion
-    	PanelPresentacion panelPresentacion = new PanelPresentacion();
-    	ventanas.add(panelPresentacion);
-    	
-    	// Pagina 2: Panel contrasenias
-    	PanelClaveCifrado panelClaveCifrado = new PanelClaveCifrado(this.algoritmo, this.rutaFichero);
-    	ventanas.add(panelClaveCifrado);
-    	
-    	// Pagina 3: Dialogo finalizar
-    	PanelFinalizar panelFinalizar = new PanelFinalizar();
-    	ventanas.add(panelFinalizar);
-        
+    /** Inicializacion de componentes */
+    private void initComponents() {
+        // Generamos la lista para el control de la botonera
+        final List<JDialogWizard> ventanas = new ArrayList<JDialogWizard>();
+
+        // Obtenemos todas las paginas
+        // Pagina 1: Panel presentacion
+        final PanelPresentacion panelPresentacion = new PanelPresentacion();
+        ventanas.add(panelPresentacion);
+
+        // Pagina 2: Panel contrasenias
+        final PanelClaveCifrado panelClaveCifrado = new PanelClaveCifrado(this.algoritmo, this.rutaFichero);
+        ventanas.add(panelClaveCifrado);
+
+        // Pagina 3: Dialogo finalizar
+        final PanelFinalizar panelFinalizar = new PanelFinalizar();
+        ventanas.add(panelFinalizar);
+
         // Cargamos el listado de ventanas en todas las paginas con controles
-    	// para inicializar sus botoneras
+        // para inicializar sus botoneras
         panelPresentacion.setVentanas(ventanas);
         panelClaveCifrado.setVentanas(ventanas);
         panelFinalizar.setVentanas(ventanas);
-        
+
         // Mostramos la primera ventana
         panelPresentacion.setVisible(true);
     }

@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -61,163 +63,448 @@ import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 import es.gob.afirma.util.AOBase64;
 
-/**
- * Dialogo con la pagina 2: Clave de cifrado
- */
-public class PanelClaveCifrado extends JAccessibilityDialogWizard {
-	/**
-	 * UID.
-	 */
-	private static final long serialVersionUID = 1L;
-	/**
-	 * Log.
-	 */
-	static Logger logger = Logger.getLogger(PanelClaveCifrado.class.getName());
-	/**
-	 * Relacion minima para el redimensionado de componentes.
-	 */
-	@Override
-	public int getMinimumRelation(){
-		return 9;
-	}
-		
-	/**
-	 * Cifrador configurado para un algoritmo dado
-	 */
-	private CipherConfig cipherConfig;
-    
-	/**
-	 * Clave de cifrado
-	 */
-	private Key cipherKey;
-	
-	/**
-	 * Ruta donde se encuentra el archivo a cifrar
-	 */
-	private String rutaFichero = "";
-	
-   /**
-    * Campo donde se guarda la clave generada.
-    */
-    private JTextField campoClave = new JTextField();
-    
-    /**
-     * Check que indica si se debe guardar la clave en el almacen.
-     */
-    JCheckBox checkGuardar = new JCheckBox();
-    
-    /**
-     * Guarda todas las ventanas del asistente para poder controlar la botonera
-     * @param ventanas	Listado con todas las paginas del asistente
-     */
-    public void setVentanas(List<JDialogWizard> ventanas) {
-    	this.setBotonera(new Botonera(ventanas, 1));
-     	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
+/** Dialogo con la pagina 2: Clave de cifrado */
+final class PanelClaveCifrado extends JAccessibilityDialogWizard {
+    /** Botonera con funciones para la pagina panel de cifrado */
+    private class Botonera extends BotoneraInferior {
+        /** UID. */
+        private static final long serialVersionUID = 1L;
+
+        /** Constructor.
+         * @param ventanas Lista de ventanas que componen el wizard.
+         * @param posicion posicion de la ventana donde se inserta esta botonera. */
+        public Botonera(final List<JDialogWizard> ventanas, final int posicion) {
+            super(ventanas, posicion);
+        }
+
+        /** Accion para el boton siguiente. */
+        @Override
+        protected void siguienteActionPerformed(final JButton anterior, final JButton siguiente, final JButton finalizar) {
+
+            boolean continuar = true;
+            continuar = cifrarFichero();
+
+            if (continuar) {
+                super.siguienteActionPerformed(anterior, siguiente, finalizar);
+            }
+            else {
+                // Si ha ocurrido algun error durante el proceso de cifrado mediante clave
+                // el foco vuelve al campo de insercion de clave
+                getCampoClave().requestFocusInWindow();
+            }
+        }
     }
-    /**
-     * Constructor.
+    /** Log. */
+    static Logger logger = Logger.getLogger(PanelClaveCifrado.class.getName());
+
+    /** UID. */
+    private static final long serialVersionUID = 1L;
+
+    /** Campo donde se guarda la clave generada. */
+    private final JTextField campoClave = new JTextField();
+
+    /** Check que indica si se debe guardar la clave en el almacen. */
+    JCheckBox checkGuardar = new JCheckBox();
+
+    /** Cifrador configurado para un algoritmo dado */
+    private final CipherConfig cipherConfig;
+
+    /** Clave de cifrado */
+    private Key cipherKey;
+
+    /** Ruta donde se encuentra el archivo a cifrar */
+    private String rutaFichero = "";
+
+    /** Constructor.
      * @param algoritmo
-     * @param rutaFichero
-     */
-    public PanelClaveCifrado(String algoritmo, String rutaFichero) {
-    	this.cipherConfig = new CipherConfig(algoritmo);
-    	this.rutaFichero = rutaFichero;
+     * @param rutaFichero */
+    public PanelClaveCifrado(final String algoritmo, final String rutaFichero) {
+        this.cipherConfig = new CipherConfig(algoritmo);
+        this.rutaFichero = rutaFichero;
         initComponents();
     }
 
-    
-    /**
-     * Inicializacion de componentes
-     */
-    private void initComponents() {    	
-    	// Titulo de la ventana
-    	setTitulo(Messages.getString("WizardCifrado.titulo")); //$NON-NLS-1$
-    	
-    	// Panel con la cabecera
-        CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.explicacion.titulo", "WizardCifrado.explicacion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
+    /** Obtenemos una clase del almacen/repositorio */
+    void almacenActionPerformed() {
+        // Comprobamos que el almacen exista.
+        if (!AOCipherKeyStoreHelper.storeExists()) {
+            CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.almacen.noexiste"), //$NON-NLS-1$
+                                           Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+            return;
+        }
+
+        // Mostramos la clave de cifrado recuperada del almacen
+        try {
+            this.campoClave.setText(getKeyFromCipherKeyStore());
+            this.checkGuardar.setEnabled(false);
+        }
+        catch (final AOCancelledOperationException e) {
+            logger.warning("El usuario ha cancelado la recuperacion de claves de cifrado del almacen" //$NON-NLS-1$
+            );
+        }
+        catch (final IOException e) {
+            CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.msg.error.contrasenia"), //$NON-NLS-1$
+                                           Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+        }
+        catch (final AOException e) {
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           e.getMessage(),
+                                           Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("WizardCifrado.almacen.error.clave"), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+        }
+    }
+
+    /** Genera la clave */
+    void autogenerarActionPerformed() {
+        try {
+            generateKey(this.cipherConfig.getConfig());
+        }
+        catch (final Exception ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+
+        this.campoClave.setText(AOBase64.encode(this.cipherKey.getEncoded(), false));
+        this.checkGuardar.setEnabled(true);
+    }
+
+    /** Cifra un fichero dado
+     * @return true o false indicando si se ha cifrado correctamente */
+    boolean cifrarFichero() {
+
+        // Comprobamos si se ha generado alguna clave
+        if (this.campoClave.getText() == null || this.campoClave.getText().equals("")) {
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return false;
+        }
+        // Generamos la clave necesaria para el cifrado
+        try {
+            this.cipherKey = this.cipherConfig.getCipher().decodeKey(this.campoClave.getText(), this.cipherConfig.getConfig(), null);
+        }
+        catch (final Exception ex) {
+            logger.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("Cifrado.msg.error.cifrado"),
+                                           Messages.getString("error"),
+                                           JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Leemos el fichero de datos
+        byte[] fileContent = null;
+        try {
+            fileContent = getFileContent();
+        }
+        catch (final NullPointerException ex) {
+            logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return false;
+        }
+        catch (final FileNotFoundException ex) {
+            logger.warning("No se encuentra el fichero: " + ex); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return false;
+        }
+        catch (final Exception ex) {
+            logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            return false;
+        }
+
+        // Ciframos los datos
+        byte[] result = null;
+        try {
+            result = this.cipherConfig.getCipher().cipher(fileContent, this.cipherConfig.getConfig(), this.cipherKey);
+        }
+        catch (final KeyException e) {
+            logger.severe("Clave no valida: " + e); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clave"), //$NON-NLS-1$
+                                           Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+            return false;
+        }
+        catch (final Exception ex) {
+            logger.warning("Error al cifrar: " + ex); //$NON-NLS-1$
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.operacion"), //$NON-NLS-1$
+                                           Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+
+            return false;
+        }
+
+        // Guardamos los datos
+        if (result == null) {
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$//$NON-NLS-2$
+            return false;
+        }
+        // Almacenamos el fichero de salida de la operacion
+        final File savedFile =
+            SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.clave.filechooser.save.title"), result, "cifrado", null, this); //$NON-NLS-1$
+        if (savedFile == null) {
+            return false;
+        }
+
+        // Guardamos la clave de cifrado si se solicito
+        if (this.checkGuardar.isSelected()) {
+            guardarClaveCifrado();
+        }
+
+        return true;
+    }
+
+    /** Genera una clave v&aacute;lida para un algoritmo de cifrado y la almacena en el repoitorio de @firma si
+     * as&iacute; lo indica el usuario.
+     * @param algorithmConfig Configuraci&oacute;n de cifrado.
+     * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo de cifrado
+     * @throws NoSuchProviderException Cuando no se reconoce el proveedor para la generaci&oacute;n de claves
+     * @throws InvalidKeySpecException Cuando la contrase&ntilde;a introducida no cumple los requisitos necesarios
+     * @throws AOCipherAlgorithmException Cuando el algoritmo indicado no soporta el modo de generaci&oacute;n de clave
+     * @throws AOException Cuando se produce un error al auto generar las claves.
+     * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado no esta soportado. */
+    private void generateKey(final AOCipherConfig algorithmConfig) throws AOException, NoSuchAlgorithmException {
+        this.cipherKey = this.cipherConfig.getCipher().generateKey(algorithmConfig);
+    }
+
+    /** Getter para el campo de la clave.
+     * @return Campo de la clave. */
+    public JTextField getCampoClave() {
+        return this.campoClave;
+    }
+
+    /** Obtiene el contenido del fichero seleccionado por el usuario.
+     * @return Contenido del fichero.
+     * @throws FileNotFoundException Cuando no se encuentra o no puede leerse el fichero seleccionado.
+     * @throws IOException Cuando ocurre un error durante la lectura de un fichero local.
+     * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto. */
+    private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
+        if (this.rutaFichero == null)
+        {
+            throw new NullPointerException("No se ha indicado un fichero de entrada"); //$NON-NLS-1$
+        }
+        return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
+    }
+
+    /** Obtiene una clave de cifrado en base 64 del almac&eacute;n de claves del usuario.
+     * Se pedira al usuario que inserte la contrase&ntilde;a del almac&eacute;n de claves
+     * y seleccione la clave que desea recuperar del mismo. Devuelve {@code null} si
+     * ocurre un error durante la transformaci&oacute;n a base 64.
+     * @return Clave en base 64 o {@code}
+     * @throws AOException Ocurri&oacute; un error durate el proceso de configuraci&oacute;n. */
+    private String getKeyFromCipherKeyStore() throws AOException, IOException {
+        // Abrimos el Almacen de claves de cifrado preguntandole al usuario la clave si no
+        // la indico
+        AOCipherKeyStoreHelper cKs = null;
+        try {
+            cKs =
+                new AOCipherKeyStoreHelper(CustomDialog.showInputPasswordDialog(this,
+                                                                                true,
+                                                                                null,
+                                                                                false,
+                                                                                Messages.getString("WizardCifrado.almacen.claves.contrasenia"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE)); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        catch (final AOCancelledOperationException e) {
+            throw e;
+        }
+        catch (final IOException e) {
+            throw e; // Se lanza el tipo de excepción IO
+        }
+        catch (final Exception e) {
+            throw new AOException(Messages.getString("WizardCifrado.almacen.error.abrir"), e); //$NON-NLS-1$
+        }
+
+        // Si no se establecio el alias de la clave de cifrado, se la pedimos al usuario
+        String alias = null;
+        try {
+            alias = Utils.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true, new Vector<CertificateFilter>(0), false);
+        }
+        catch (final AOCancelledOperationException e) {
+            throw e;
+        }
+        catch (final Exception e) {
+            throw new AOException(Messages.getString("WizardCifrado.almacen.error.seleccionar"), e); //$NON-NLS-1$
+        }
+
+        return AOBase64.encode(cKs.getKey(alias).getEncoded(), false);
+    }
+
+    /** Relacion minima para el redimensionado de componentes. */
+    @Override
+    public int getMinimumRelation() {
+        return 9;
+    }
+
+    /** Almacena la clave de cifrado configurada. */
+    private void guardarClaveCifrado() {
+        try {
+            boolean gainedAccess;
+            int tries = 0;
+            AOCipherKeyStoreHelper cksh = null;
+            do {
+                gainedAccess = true;
+                tries++;
+                try {
+                    if (!AOCipherKeyStoreHelper.storeExists()) {
+                        cksh =
+                            new AOCipherKeyStoreHelper(CustomDialog.showInputPasswordDialog(this,
+                                                                                            true,
+                                                                                            null,
+                                                                                            false,
+                                                                                            Messages.getString("Cifrado.introducir.pass"), //$NON-NLS-1$
+                                                                                            KeyEvent.VK_O,
+                                                                                            Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
+                                                                                            JOptionPane.QUESTION_MESSAGE));
+
+                    }
+                    else {
+                        final PasswordCallback pssCallback =
+                            new UIPasswordCallbackAccessibility(Messages.getString("Cifrado.introducir.pass.almacen"), this, //$NON-NLS-1$
+                                                                Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+                        cksh = new AOCipherKeyStoreHelper(pssCallback.getPassword());
+                    }
+                }
+                catch (final IOException e) {
+                    if (tries < 3) {
+                        CustomDialog.showMessageDialog(this,
+                                                       true,
+                                                       Messages.getString("WizardCifrado.msg.error.contrasenia"),
+                                                       Messages.getString("Cifrado.msg.error.titulo"),
+                                                       JOptionPane.WARNING_MESSAGE);
+                    }
+                    else {
+                        // Abortamos al tercer intento incorrecto de introducir la clave
+                        CustomDialog.showMessageDialog(this,
+                                                       true,
+                                                       Messages.getString("Cifrado.msg.error.pass.incorrecto.almacenar"),
+                                                       Messages.getString("Cifrado.msg.error.titulo"),
+                                                       JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    gainedAccess = false;
+                }
+            } while (!gainedAccess);
+
+            final String alias =
+                CustomDialog.showInputDialog(this,
+                                             true,
+                                             Messages.getString("Cifrado.introducir.alias"), KeyEvent.VK_I, Messages.getString("Cifrado.introducir.alias.titulo"), JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            cksh.storeKey(alias + " (" + this.cipherConfig.getConfig().getAlgorithm().getName() + ")", this.cipherKey);
+        }
+        catch (final AOCancelledOperationException e) {
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cancelar"), //$NON-NLS-1$
+                                           Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+        }
+        catch (final AOException e) {
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clavecifrar"), //$NON-NLS-1$
+                                           Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+        }
+        catch (final Exception e) {
+            CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clavecifrar"), //$NON-NLS-1$
+                                           Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+        }
+    }
+
+    /** Inicializacion de componentes */
+    private void initComponents() {
+        // Titulo de la ventana
+        setTitulo(Messages.getString("WizardCifrado.titulo")); //$NON-NLS-1$
+
+        // Panel con la cabecera
+        final CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.explicacion.titulo", "WizardCifrado.explicacion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
-        
-    	// Panel central
-    	JPanel panelCentral = new JPanel();
-    	panelCentral.setMinimumSize(new Dimension(603, 289));
-    	panelCentral.setLayout(new GridBagLayout());
-        
-    	GridBagConstraints c = new GridBagConstraints();
+
+        // Panel central
+        final JPanel panelCentral = new JPanel();
+        panelCentral.setMinimumSize(new Dimension(603, 289));
+        panelCentral.setLayout(new GridBagLayout());
+
+        final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(5, 20, 0, 20);
-		c.weightx = 1.0;
-		c.gridwidth = 3;
-		c.gridx = 0;
-		c.gridy = 0;
+        c.insets = new Insets(5, 20, 0, 20);
+        c.weightx = 1.0;
+        c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 0;
 
-    	
         // Etiqueta que contiene el texto "Introduzca una clave de..."
-		InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto1"), false); //$NON-NLS-1$
-		panelCentral.add(insertLabel, c);
+        final InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto1"), false); //$NON-NLS-1$
+        panelCentral.add(insertLabel, c);
 
-		c.fill = GridBagConstraints.BOTH;
+        c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(0, 20, 0, 20);
-		c.gridy = 1;
-		c.weighty = 1;
-        
-		 // Etiqueta que contiene el texto "Adicionalmente, puede almacenar..."
-        InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto5"), false); //$NON-NLS-1$
-		panelCentral.add(lostLabel, c);
-		
-		c.gridy = 2;
-		c.gridwidth = 1;
-		c.weighty = 0;
-		c.insets = new Insets(0, 20, 0, 20);
-    	
-    	//Etiqueta con el texto Clave de cifrado
-    	JLabel encodeKeyLabel = new JLabel (Messages.getString("WizardCifrado.claveCifrado")); //$NON-NLS-1$
-    	Utils.setContrastColor(encodeKeyLabel);
-    	Utils.setFontBold(encodeKeyLabel);
-    	panelCentral.add(encodeKeyLabel, c);
-        
-    	 c.gridx = 0;
-    	 c.gridy = 3;
-    	 c.insets = new Insets(0, 20, 0, 0);
-    	
+        c.gridy = 1;
+        c.weighty = 1;
+
+        // Etiqueta que contiene el texto "Adicionalmente, puede almacenar..."
+        final InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contenido.texto5"), false); //$NON-NLS-1$
+        panelCentral.add(lostLabel, c);
+
+        c.gridy = 2;
+        c.gridwidth = 1;
+        c.weighty = 0;
+        c.insets = new Insets(0, 20, 0, 20);
+
+        // Etiqueta con el texto Clave de cifrado
+        final JLabel encodeKeyLabel = new JLabel(Messages.getString("WizardCifrado.claveCifrado")); //$NON-NLS-1$
+        Utils.setContrastColor(encodeKeyLabel);
+        Utils.setFontBold(encodeKeyLabel);
+        panelCentral.add(encodeKeyLabel, c);
+
+        c.gridx = 0;
+        c.gridy = 3;
+        c.insets = new Insets(0, 20, 0, 0);
+
         // Caja de texto donde se escribe la clave
         this.campoClave.setToolTipText(Messages.getString("WizardCifrado.campoClave.description")); // NOI18N //$NON-NLS-1$
         this.campoClave.getAccessibleContext().setAccessibleName(encodeKeyLabel.getText() + " " + "ALT + V.");
         this.campoClave.getAccessibleContext().setAccessibleDescription(encodeKeyLabel.getToolTipText());
         this.campoClave.addKeyListener(new KeyAdapter() {
-        	@Override
-            public void keyPressed(KeyEvent e) {
-        		PanelClaveCifrado.this.checkGuardar.setEnabled(true);
-        	}
-		});
+            @Override
+            public void keyPressed(final KeyEvent e) {
+                PanelClaveCifrado.this.checkGuardar.setEnabled(true);
+            }
+        });
         if (GeneralConfig.isBigCaret()) {
-			Caret caret = new ConfigureCaret();
-			this.campoClave.setCaret(caret);
-		}
+            final Caret caret = new ConfigureCaret();
+            this.campoClave.setCaret(caret);
+        }
         Utils.remarcar(this.campoClave);
         Utils.setContrastColor(this.campoClave);
         Utils.setFontBold(this.campoClave);
         panelCentral.add(this.campoClave, c);
-        
-        //Relación entre etiqueta y campo de texto
+
+        // Relación entre etiqueta y campo de texto
         encodeKeyLabel.setLabelFor(this.campoClave);
-      	//Asignación de mnemónico
+        // Asignación de mnemónico
         encodeKeyLabel.setDisplayedMnemonic(KeyEvent.VK_V);
-        
+
         c.weightx = 0.0;
         c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 1;
-        
-        JPanel panelAutogenerar = new JPanel(new GridLayout(1, 1));
+
+        final JPanel panelAutogenerar = new JPanel(new GridLayout(1, 1));
         // Boton autogenerar
-        JButton autogenerar = new JButton();
+        final JButton autogenerar = new JButton();
         autogenerar.setMnemonic(KeyEvent.VK_U);
         autogenerar.setToolTipText(Messages.getString("WizardCifrado.autogenerar.description")); // NOI18N //$NON-NLS-1$
         autogenerar.setText(Messages.getString("WizardCifrado.autogenerar")); // NOI18N //$NON-NLS-1$
         autogenerar.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent evt) {
+            public void actionPerformed(final ActionEvent evt) {
                 autogenerarActionPerformed();
             }
         });
@@ -228,39 +515,39 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         Utils.setFontBold(autogenerar);
         panelAutogenerar.add(autogenerar);
         panelCentral.add(panelAutogenerar, c);
-        
+
         c.insets = new Insets(0, 10, 0, 20);
         c.weightx = 0.0;
         c.gridx = 2;
-        
-        JPanel panelAlmacen = new JPanel(new GridLayout(1, 1));
+
+        final JPanel panelAlmacen = new JPanel(new GridLayout(1, 1));
         // Boton cargar clave del almacen
-        JButton almacen = new JButton();
+        final JButton almacen = new JButton();
         almacen.setMnemonic(KeyEvent.VK_L);
         almacen.setToolTipText(Messages.getString("WizardCifrado.almacen.description")); // NOI18N //$NON-NLS-1$
         almacen.setText(Messages.getString("WizardCifrado.almacen")); // NOI18N //$NON-NLS-1$
         almacen.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent evt) {
-            	almacenActionPerformed();
+            public void actionPerformed(final ActionEvent evt) {
+                almacenActionPerformed();
             }
         });
-        almacen.getAccessibleContext().setAccessibleName(almacen.getText()+ " " + almacen.getToolTipText()); // NOI18N
+        almacen.getAccessibleContext().setAccessibleName(almacen.getText() + " " + almacen.getToolTipText()); // NOI18N
         almacen.getAccessibleContext().setAccessibleDescription(almacen.getToolTipText()); // NOI18N
         Utils.remarcar(almacen);
         Utils.setContrastColor(almacen);
         Utils.setFontBold(almacen);
         panelAlmacen.add(almacen);
         panelCentral.add(panelAlmacen, c);
-        
-		c.insets = new Insets(10, 20, 0, 20);
-		c.weightx = 1.0;
-		c.gridwidth = 3;
-		c.gridy = 4;
-		c.gridx = 0;
-		
-		JPanel panelCheckGuardar = new JPanel(new GridLayout(1, 1));
-		// Checkbox para guardar en el almacen
+
+        c.insets = new Insets(10, 20, 0, 20);
+        c.weightx = 1.0;
+        c.gridwidth = 3;
+        c.gridy = 4;
+        c.gridx = 0;
+
+        final JPanel panelCheckGuardar = new JPanel(new GridLayout(1, 1));
+        // Checkbox para guardar en el almacen
         this.checkGuardar.setText(Messages.getString("WizardCifrado.check")); // NOI18N //$NON-NLS-1$
         this.checkGuardar.setToolTipText(Messages.getString("WizardCifrado.check.description")); // NOI18N //$NON-NLS-1$
         this.checkGuardar.getAccessibleContext().setAccessibleDescription(this.checkGuardar.getToolTipText()); // NOI18N
@@ -270,318 +557,26 @@ public class PanelClaveCifrado extends JAccessibilityDialogWizard {
         Utils.setFontBold(this.checkGuardar);
         panelCheckGuardar.add(this.checkGuardar);
         panelCentral.add(panelCheckGuardar, c);
-        
+
         c.gridy = c.gridy + 1;
         c.weighty = 1.0;
         panelCentral.add(new JPanel(), c);
-        
+
         getContentPane().add(panelCentral, BorderLayout.CENTER);
 
         // La botonera se carga desde el asistente
-        
+
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(this.campoClave, "cifrado.wizard.autogenerar");   //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.campoClave, "cifrado.wizard.autogenerar"); //$NON-NLS-1$
         HelpUtils.enableHelpKey(autogenerar, "cifrado.wizard.autogenerar"); //$NON-NLS-1$
         HelpUtils.enableHelpKey(almacen, "cifrado.wizard.almacen"); //$NON-NLS-1$
         HelpUtils.enableHelpKey(this.checkGuardar, "cifrado.wizard.salvar"); //$NON-NLS-1$
     }
 
-    /**
-     * Obtenemos una clase del almacen/repositorio
-     */
-	void almacenActionPerformed() {
-		// Comprobamos que el almacen exista.
-    	if(!AOCipherKeyStoreHelper.storeExists()) {
-    		CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.almacen.noexiste"),  //$NON-NLS-1$
-    				Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-    		return;
-    	}
-
-    	// Mostramos la clave de cifrado recuperada del almacen
-    	try {
-    		this.campoClave.setText(getKeyFromCipherKeyStore());
-    		this.checkGuardar.setEnabled(false);
-    	} 
-    	catch (final AOCancelledOperationException e) {
-    		logger.warning(
-               "El usuario ha cancelado la recuperacion de claves de cifrado del almacen" //$NON-NLS-1$
-            );
-    	}  
-    	catch (final IOException e) {
-    		CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.msg.error.contrasenia"),  //$NON-NLS-1$
-    				Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-    	}
-    	catch (AOException e) {
-    		CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-    	} 
-    	catch (Exception e) {
-    		CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.almacen.error.clave"), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-    	}
-	}
-	
-	/**
-     * Obtiene una clave de cifrado en base 64 del almac&eacute;n de claves del usuario.
-     * Se pedira al usuario que inserte la contrase&ntilde;a del almac&eacute;n de claves
-     * y seleccione la clave que desea recuperar del mismo. Devuelve {@code null} si
-     * ocurre un error durante la transformaci&oacute;n a base 64.
-     * @return Clave en base 64 o {@code}
-     * @throws AOException Ocurri&oacute; un error durate el proceso de configuraci&oacute;n. 
-     */
-    private String getKeyFromCipherKeyStore() throws AOException, IOException {
-    	// Abrimos el Almacen de claves de cifrado preguntandole al usuario la clave si no
-    	// la indico
-    	AOCipherKeyStoreHelper cKs = null;
-    	try {
-    		cKs = new AOCipherKeyStoreHelper(
-    				CustomDialog.showInputPasswordDialog(this, true, null, false, Messages.getString("WizardCifrado.almacen.claves.contrasenia"),  KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title"), JOptionPane.QUESTION_MESSAGE)); //$NON-NLS-1$ //$NON-NLS-2$
-    	} 
-    	catch (AOCancelledOperationException e) {
-    		throw e;
-    	} 
-    	catch (IOException e) {
-	            throw e; //Se lanza el tipo de excepción IO
-    	} 
-    	catch (Exception e) {
-    		throw new AOException(Messages.getString("WizardCifrado.almacen.error.abrir"), e); //$NON-NLS-1$
-    	}
-
-    	// Si no se establecio el alias de la clave de cifrado, se la pedimos al usuario
-    	String alias = null;
-    	try {
-    		alias = Utils.showCertSelectionDialog(cKs.getAliases(), null, this, true, true, true,
-    				new Vector<CertificateFilter>(0), false);
-    	} 
-    	catch (AOCancelledOperationException e) {
-    		throw e;
-    	} 
-    	catch (Exception e) {
-    		throw new AOException(Messages.getString("WizardCifrado.almacen.error.seleccionar"), e); //$NON-NLS-1$
-    	}
-    	
-    	return AOBase64.encode(cKs.getKey(alias).getEncoded(), false);
+    /** Guarda todas las ventanas del asistente para poder controlar la botonera
+     * @param ventanas Listado con todas las paginas del asistente */
+    public void setVentanas(final List<JDialogWizard> ventanas) {
+        this.setBotonera(new Botonera(ventanas, 1));
+        getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
     }
-
-	/**
-     * Genera la clave
-     */
-    void autogenerarActionPerformed() {
-        try {
-            generateKey(this.cipherConfig.getConfig());
-        } catch (Exception ex) {
-        	logger.log(Level.SEVERE, null, ex);
-        }
-        
-        this.campoClave.setText(AOBase64.encode(this.cipherKey.getEncoded(), false));
-        this.checkGuardar.setEnabled(true);
-    }
-
-    /**
-	 * Genera una clave v&aacute;lida para un algoritmo de cifrado y la almacena en el repoitorio de @firma si
-	 * as&iacute; lo indica el usuario.
-	 * @param algorithmConfig Configuraci&oacute;n de cifrado.
-	 * @throws NoSuchAlgorithmException Cuando no se reconoce el algoritmo de cifrado
-	 * @throws NoSuchProviderException Cuando no se reconoce el proveedor para la generaci&oacute;n de claves
-	 * @throws InvalidKeySpecException Cuando la contrase&ntilde;a introducida no cumple los requisitos necesarios
-	 * @throws AOCipherAlgorithmException Cuando el algoritmo indicado no soporta el modo de generaci&oacute;n de clave
-	 * @throws AOException Cuando se produce un error al auto generar las claves.
-	 * @throws NoSuchAlgorithmException Cuando el algoritmo de cifrado no esta soportado.
-	 */
-	private void generateKey(AOCipherConfig algorithmConfig) throws AOException, NoSuchAlgorithmException {
-		this.cipherKey = this.cipherConfig.getCipher().generateKey(algorithmConfig);
-	}
-	
-	/**
-	 * Botonera con funciones para la pagina panel de cifrado
-	 */
-	private class Botonera extends BotoneraInferior {
-		/**
-		 * UID.
-		 */
-		private static final long serialVersionUID = 1L;
-		/**
-		 * Constructor.
-		 * @param ventanas Lista de ventanas que componen el wizard.
-		 * @param posicion posicion de la ventana donde se inserta esta botonera.
-		 */
-		public Botonera(List<JDialogWizard> ventanas, int posicion) {
-			super(ventanas, posicion);
-		}
-
-		/**
-		 * Accion para el boton siguiente.
-		 */
-		@Override
-		protected void siguienteActionPerformed(JButton anterior,
-				JButton siguiente, JButton finalizar) {
-
-			boolean continuar = true;
-			continuar = cifrarFichero();
-
-			if (continuar) {
-				super.siguienteActionPerformed(anterior, siguiente, finalizar);
-			} 
-			else {
-				//Si ha ocurrido algun error durante el proceso de cifrado mediante clave
-				//el foco vuelve al campo de insercion de clave
-				getCampoClave().requestFocusInWindow();
-			}
-		}
-	}
-	
-	/**
-	 * Cifra un fichero dado
-	 * @return	true o false indicando si se ha cifrado correctamente
-	 */
-	boolean cifrarFichero() {
-
-	    // Comprobamos si se ha generado alguna clave
-	    if (this.campoClave.getText() == null || this.campoClave.getText().equals("")){
-	    	CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-	        return false;
-	    }
-	    // Generamos la clave necesaria para el cifrado
-	    try {
-	        this.cipherKey = this.cipherConfig.getCipher().decodeKey(this.campoClave.getText(), this.cipherConfig.getConfig(), null);
-	    } 
-	    catch (Exception ex) {
-	        logger.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
-	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cifrado"), 
-	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
-	        return false;
-	    }
-
-	    // Leemos el fichero de datos
-	    byte[] fileContent = null;
-	    try {
-	        fileContent = getFileContent();
-	    } catch (NullPointerException ex) {
-	        logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
-	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-	        return false;
-	    } catch (FileNotFoundException ex) {
-	        logger.warning("No se encuentra el fichero: " + ex); //$NON-NLS-1$
-	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-	        return false;
-	    } catch (Exception ex) {
-	        logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
-	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-	        return false;
-	    }                
-
-	    // Ciframos los datos
-	    byte[] result = null;
-	    try {
-	        result = this.cipherConfig.getCipher().cipher(fileContent, this.cipherConfig.getConfig(), this.cipherKey);
-	    } catch (KeyException e) {
-	        logger.severe("Clave no valida: " + e); //$NON-NLS-1$
-	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clave"),  //$NON-NLS-1$
-	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-	        return false;
-	    } catch (Exception ex) {
-	        logger.warning("Error al cifrar: " + ex); //$NON-NLS-1$
-	        CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.operacion"),  //$NON-NLS-1$
-	                Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-
-	        return false;
-	    }
-
-	    // Guardamos los datos
-	    if (result == null) {
-	    	CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);  //$NON-NLS-1$//$NON-NLS-2$
-	        return false;
-	    }
-	    // Almacenamos el fichero de salida de la operacion
-	    final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.clave.filechooser.save.title"), result, "cifrado", null, this); //$NON-NLS-1$
-	    if (savedFile == null) {
-	        return false;
-	    }
-
-	    // Guardamos la clave de cifrado si se solicito 
-	    if (this.checkGuardar.isSelected()) {
-	        guardarClaveCifrado();
-	    }
-
-	    return true;
-	}
-	
-	/**
-	 * Obtiene el contenido del fichero seleccionado por el usuario.
-	 * @return Contenido del fichero.
-	 * @throws FileNotFoundException Cuando no se encuentra o no puede leerse el fichero seleccionado.
-	 * @throws IOException Cuando ocurre un error durante la lectura de un fichero local.
-	 * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto.
-	 */
-	private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
-		if(this.rutaFichero == null) 
-			throw new NullPointerException("No se ha indicado un fichero de entrada"); //$NON-NLS-1$
-		return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
-	}
-	
-	/**
-     * Almacena la clave de cifrado configurada.
-     */
-	private void guardarClaveCifrado() {
-		try {
-			boolean gainedAccess;
-			int tries = 0;
-			AOCipherKeyStoreHelper cksh = null;
-			do {
-				gainedAccess = true;
-				tries++;
-				try {
-					if (!AOCipherKeyStoreHelper.storeExists()) {
-						cksh = new AOCipherKeyStoreHelper(
-							CustomDialog.showInputPasswordDialog(
-                                 this, 
-                                 true, 
-                                 null, 
-                                 false, 
-                                 Messages.getString("Cifrado.introducir.pass"),  //$NON-NLS-1$
-                                 KeyEvent.VK_O, 
-                                 Messages.getString("CustomDialog.showInputPasswordDialog.title"),  //$NON-NLS-1$
-                                 JOptionPane.QUESTION_MESSAGE
-                             )
-                         );
-						
-					} 
-					else {
-						PasswordCallback pssCallback = new UIPasswordCallbackAccessibility(Messages.getString("Cifrado.introducir.pass.almacen"), this, //$NON-NLS-1$
-		            			Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
-						cksh = new AOCipherKeyStoreHelper(pssCallback.getPassword());
-					}
-				} catch (IOException e) {
-					if (tries < 3) {
-						CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.msg.error.contrasenia"),
-								Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
-					} else {
-						// Abortamos al tercer intento incorrecto de introducir la clave
-						CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.pass.incorrecto.almacenar"),
-								Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE);
-						return;
-					}
-					gainedAccess = false;
-				}
-			} while (!gainedAccess);
-    		
-    		String alias = CustomDialog.showInputDialog(this, true, Messages.getString("Cifrado.introducir.alias"), KeyEvent.VK_I, Messages.getString("Cifrado.introducir.alias.titulo"), JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-    		cksh.storeKey(alias + " (" + this.cipherConfig.getConfig().getAlgorithm().getName() + ")", this.cipherKey);
-		} catch(AOCancelledOperationException e) {
-			CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cancelar"), //$NON-NLS-1$
-    				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-    	} catch (AOException e) {
-    		CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.clavecifrar"), //$NON-NLS-1$
-    				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
-    	} catch(Exception e) {
-    		CustomDialog.showMessageDialog(this, true,  Messages.getString("Cifrado.msg.error.clavecifrar"), //$NON-NLS-1$
-    				Messages.getString("Cifrado.msg.error.titulo"), JOptionPane.ERROR_MESSAGE ); //$NON-NLS-1$
-    	}
-	}
-	
-	/**
-	 * Getter para el campo de la clave.
-	 * @return Campo de la clave.
-	 */
-	public JTextField getCampoClave() {
-		return this.campoClave;
-	}
 }

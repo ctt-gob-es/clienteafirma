@@ -52,284 +52,99 @@ import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.CabeceraAsistente;
 import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
-/**
- * Dialogo con la pagina 2: Clave de cifrado
- */
-public class PanelContrasenia extends JAccessibilityDialogWizard {
-	/**
-	 * UID.
-	 */
-    private static final long serialVersionUID = 1L;
-    /**
-     * Log.
-     */
-    static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
-
-    /**
-     * Cifrador configurado para un algoritmo dado
-     */
-    private CipherConfig cipherConfig;
-    
-    /**
-     * Ruta donde se encuentra el archivo a cifrar
-     */
-    private String rutaFichero = "";
-
-    /**
-     * Clave de cifrado
-     */
-    private Key cipherKey;
-    
-    /**
-     * Campo donde se guarda la contrasenia.
-     */
-    private JPasswordField campoContrasenia = new JPasswordField();
-
-    /**
-     * Campo donde se guarda la contrasenia repetida.
-     */
-    private JPasswordField campoContraseniaRep = new JPasswordField();
-    /**
-	 * Relacion minima para el redimensionado de componentes.
-	 */
-    @Override
-    public int getMinimumRelation(){
-        return 8;
-    }
-
-    /**
-     * Guarda todas las ventanas del asistente para poder controlar la botonera
-     * @param ventanas	Listado con todas las paginas del asistente
-     */
-    public void setVentanas(List<JDialogWizard> ventanas) {
-        this.setBotonera(new Botonera(ventanas, 1));
-    	getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
-    }
-    /**
-     * Constructor.
-     * @param algoritmo
-     * @param rutaFichero
-     */
-    public PanelContrasenia(String algoritmo, String rutaFichero) {
-        this.cipherConfig = new CipherConfig(algoritmo);
-        this.rutaFichero = rutaFichero;
-        initComponents();
-    }
-
-   
-
-    /**
-     * Inicializacion de componentes
-     */
-    private void initComponents() {    	
-        // Titulo de la ventana
-        setTitulo(Messages.getString("WizardCifrado.titulo"));
-
-        // Panel con la cabecera
-        CabeceraAsistente panelSuperior = new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null, true);
-        Utils.setContrastColor(panelSuperior);
-        Utils.setFontBold(panelSuperior);
-        getContentPane().add(panelSuperior, BorderLayout.NORTH);
-
-        // Panel central
-        JPanel panelCentral = new JPanel();
-        panelCentral.setMinimumSize(new Dimension(603, 289));
-        panelCentral.setLayout(new GridBagLayout());
-
-        // Configuramos el layout
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(20, 20, 0, 20);
-        c.weightx = 1.0;
-        c.gridx = 0;
-
-        // Etiqueta que contiene el texto "Introduzca una contrasenia de..."
-        InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto1"), false);
-        panelCentral.add(insertLabel, c);
-
-        c.gridy = 1;
-        c.insets = new Insets(20, 20, 0, 20);
-
-        // Etiqueta con el texto "Introduzca una contrasenia"
-        JLabel etiquetaContrasenia = new JLabel();
-        etiquetaContrasenia.setText(Messages.getString("WizardCifrado.contrasenia")); // NOI18N
-        Utils.setContrastColor(etiquetaContrasenia);
-        Utils.setFontBold(etiquetaContrasenia);
-        panelCentral.add(etiquetaContrasenia, c);
-
-        c.gridy = 2;
-        c.insets = new Insets(5, 20, 0, 20);
-
-        // Caja de texto con la contrasenia
-        campoContrasenia.setToolTipText(Messages.getString("WizardCifrado.contrasenia.description")); // NOI18N
-        campoContrasenia.getAccessibleContext().setAccessibleName(etiquetaContrasenia.getText() + " " + campoContrasenia.getToolTipText() + "ALT + I.");
-        campoContrasenia.getAccessibleContext().setAccessibleDescription(campoContrasenia.getToolTipText());
-        campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
-        if (GeneralConfig.isBigCaret()) {
-            Caret caret = new ConfigureCaret();
-            campoContrasenia.setCaret(caret);
-        }
-        Utils.remarcar(campoContrasenia);
-        Utils.setContrastColor(campoContrasenia);
-        Utils.setFontBold(campoContrasenia);
-        panelCentral.add(campoContrasenia, c);
-
-        //Relación entre etiqueta y campo de contraseña
-        etiquetaContrasenia.setLabelFor(campoContrasenia);
-        //Asignación de mnemónico
-        etiquetaContrasenia.setDisplayedMnemonic(KeyEvent.VK_I);
-
-        c.gridy = 3;
-        c.insets = new Insets(20, 20, 0, 20);
-
-        // Etiqueta con el texto "Introduzca de nuevo..."
-        JLabel etiquetaContraseniaRep = new JLabel();
-        etiquetaContraseniaRep.setText(Messages.getString("WizardCifrado.recontrasenia")); // NOI18N
-        Utils.setContrastColor(etiquetaContraseniaRep);
-        Utils.setFontBold(etiquetaContraseniaRep);
-        panelCentral.add(etiquetaContraseniaRep, c);
-
-        c.gridy = 4;
-        c.insets = new Insets(5, 20, 0, 20);
-
-        // Caja de texto con la contrasenia
-        campoContraseniaRep.setToolTipText(Messages.getString("WizardCifrado.recontrasenia.description")); // NOI18N
-        campoContraseniaRep.getAccessibleContext().setAccessibleName(etiquetaContraseniaRep.getText()+" "+ campoContraseniaRep.getToolTipText() +"ALT+N.");
-        campoContraseniaRep.getAccessibleContext().setAccessibleDescription(campoContraseniaRep.getToolTipText());
-        campoContraseniaRep.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
-        if (GeneralConfig.isBigCaret()) {
-            Caret caret = new ConfigureCaret();
-            campoContraseniaRep.setCaret(caret);
-        }
-        Utils.remarcar(campoContraseniaRep);
-        Utils.setContrastColor(campoContraseniaRep);
-        Utils.setFontBold(campoContraseniaRep);
-        panelCentral.add(campoContraseniaRep, c);
-
-        //Relación entre etiqueta y campo de contraseña
-        etiquetaContraseniaRep.setLabelFor(campoContraseniaRep);
-        //Asignación de mnemónico
-        etiquetaContraseniaRep.setDisplayedMnemonic(KeyEvent.VK_N);       
-
-        c.gridy = 5;
-        c.insets = new Insets(5, 20, 0, 20);        
-        
-        //Check de mostrar contraseña o no
-		JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
-		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
-		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
-		showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
-		showPassCheckBox.setMnemonic(KeyEvent.VK_T);
-		
-		//Se almacena el caracter por defecto para ocultar la contraseña
-		final char defaultChar = campoContrasenia.getEchoChar();
-		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
-		showPassCheckBox.addItemListener(new ItemListener() {
-			@Override
-            public void itemStateChanged(ItemEvent evt) {
-				if (evt.getStateChange() == ItemEvent.SELECTED){
-					//Se muestra la contraseña
-					campoContrasenia.setEchoChar((char)0);
-					campoContraseniaRep.setEchoChar((char)0);
-					
-				} else if (evt.getStateChange() == ItemEvent.DESELECTED){
-					//Se oculta la contraseña
-					campoContrasenia.setEchoChar(defaultChar);
-					campoContraseniaRep.setEchoChar(defaultChar);
-				}
-				
-				//Foco al input
-				campoContrasenia.requestFocus();
-			}
-		});
-		Utils.remarcar(showPassCheckBox);
-		Utils.setContrastColor(showPassCheckBox);
-		Utils.setFontBold(showPassCheckBox);
-		panelCheckShowPass.add(showPassCheckBox);
-		
-		panelCentral.add(panelCheckShowPass, c);        
-        
-		c.fill = GridBagConstraints.BOTH;
-        c.gridy = 6;
-        c.weighty = 1.0;
-        c.insets = new Insets(20, 20, 0, 20);        
-
-        // Etiqueta que contiene el texto "El olvido o perdida..."
-        InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto5"), false);
-        panelCentral.add(lostLabel, c);
-
-        getContentPane().add(panelCentral, BorderLayout.CENTER);
-
-        // La botonera se carga desde el asistente
-
-        // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(campoContrasenia, "cifrado.wizard.password");
-        HelpUtils.enableHelpKey(campoContraseniaRep, "cifrado.wizard.repeatpassword");
-    }
-
-    /**
-     * Botonera con funciones para la pagina panel de cifrado
-     */
+/** Dialogo con la pagina 2: Clave de cifrado */
+public final class PanelContrasenia extends JAccessibilityDialogWizard {
+    /** Botonera con funciones para la pagina panel de cifrado */
     private class Botonera extends BotoneraInferior {
-    	/**
-    	 * UID.
-    	 */
+        /** UID. */
         private static final long serialVersionUID = 1L;
-        /**
-		 * Constructor.
-		 * @param ventanas Lista de ventanas que componen el wizard.
-		 * @param posicion posicion de la ventana donde se inserta esta botonera.
-		 */
-        public Botonera(List<JDialogWizard> ventanas, int posicion) {
+
+        /** Constructor.
+         * @param ventanas Lista de ventanas que componen el wizard.
+         * @param posicion posicion de la ventana donde se inserta esta botonera. */
+        public Botonera(final List<JDialogWizard> ventanas, final int posicion) {
             super(ventanas, posicion);
         }
-        /**
-		 * Accion para el boton siguiente.
-		 */
+
+        /** Accion para el boton siguiente. */
         @Override
-        protected void siguienteActionPerformed(JButton anterior,
-                JButton siguiente, JButton finalizar) {
+        protected void siguienteActionPerformed(final JButton anterior, final JButton siguiente, final JButton finalizar) {
 
             boolean continuar = true;
             continuar = cifrarFichero();
 
             if (continuar) {
                 super.siguienteActionPerformed(anterior, siguiente, finalizar);
-            } 
+            }
             else {
-				//Si ha ocurrido algun error durante el proceso de cifrado mediante contrasenia
-				//el foco vuelve al campo de insercion de contrasenia
-				getCampoContrasenia().requestFocusInWindow();
-			}
+                // Si ha ocurrido algun error durante el proceso de cifrado mediante contrasenia
+                // el foco vuelve al campo de insercion de contrasenia
+                getCampoContrasenia().requestFocusInWindow();
+            }
         }
     }
+    /** Log. */
+    static Logger logger = Logger.getLogger(PanelContrasenia.class.getName());
 
-    /**
-     * Cifra un fichero dado
-     * @return	true o false indicando si se ha cifrado correctamente
-     */
+    /** UID. */
+    private static final long serialVersionUID = 1L;
+
+    /** Campo donde se guarda la contrasenia. */
+    private final JPasswordField campoContrasenia = new JPasswordField();
+
+    /** Campo donde se guarda la contrasenia repetida. */
+    private final JPasswordField campoContraseniaRep = new JPasswordField();
+
+    /** Cifrador configurado para un algoritmo dado */
+    private final CipherConfig cipherConfig;
+
+    /** Clave de cifrado */
+    private Key cipherKey;
+
+    /** Ruta donde se encuentra el archivo a cifrar */
+    private String rutaFichero = "";
+
+    /** Constructor.
+     * @param algoritmo
+     * @param rutaFichero */
+    public PanelContrasenia(final String algoritmo, final String rutaFichero) {
+        this.cipherConfig = new CipherConfig(algoritmo);
+        this.rutaFichero = rutaFichero;
+        initComponents();
+    }
+
+    /** Cifra un fichero dado
+     * @return true o false indicando si se ha cifrado correctamente */
     private boolean cifrarFichero() {
-        char[] contrasenia = campoContrasenia.getPassword();
-        char[] contraseniaRep = campoContraseniaRep.getPassword();
+        final char[] contrasenia = this.campoContrasenia.getPassword();
+        final char[] contraseniaRep = this.campoContraseniaRep.getPassword();
 
         // Comprobamos las dos contrasenias
         if (contrasenia == null || new String(contrasenia).trim().equals("")) {
-        	CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.contrasenia.error2"),
-                    Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("WizardCifrado.contrasenia.error2"), //$NON-NLS-1$
+                                           Messages.getString("error"), //$NON-NLS-1$
+                                           JOptionPane.ERROR_MESSAGE);
             return false;
-        } else if (!Arrays.equals(contrasenia, contraseniaRep)) {
-        	CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.contrasenia.error"),
-                    Messages.getString("error"),JOptionPane.ERROR_MESSAGE);
+        }
+        else if (!Arrays.equals(contrasenia, contraseniaRep)) {
+            CustomDialog.showMessageDialog(this,
+                                           true,
+                                           Messages.getString("WizardCifrado.contrasenia.error"), //$NON-NLS-1$
+                                           Messages.getString("error"), //$NON-NLS-1$
+                                           JOptionPane.ERROR_MESSAGE);
             return false;
-        } else {
+        }
+        else {
             // Generamos la clave necesaria para el cifrado
             try {
-                this.cipherKey = this.cipherConfig.getCipher()
-                .decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
-            } catch (Exception ex) {
+                this.cipherKey = this.cipherConfig.getCipher().decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
+            }
+            catch (final Exception ex) {
                 logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
-                        Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                                               Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 
                 return false;
             }
@@ -337,40 +152,62 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
             byte[] fileContent = null;
             try {
                 fileContent = this.getFileContent();
-            } catch (NullPointerException ex) {
+            }
+            catch (final NullPointerException ex) {
                 logger.warning("No se ha indicado un fichero de datos: " + ex);
-                CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.fichero"),  Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(this,
+                                               true,
+                                               Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return false;
-            } catch (FileNotFoundException ex) {
+            }
+            catch (final FileNotFoundException ex) {
                 logger.warning("No se encuentra el fichero: " + ex);
-                CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(this,
+                                               true,
+                                               Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return false;
-            } catch (Exception ex) {
+            }
+            catch (final Exception ex) {
                 logger.warning("Ocurrio un error al leer el fichero: " + ex);
-                CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(this,
+                                               true,
+                                               Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return false;
             }
 
             byte[] result = null;
             try {
-                result = cipherConfig.getCipher().cipher(fileContent, cipherConfig.getConfig(), cipherKey);
-            } catch (InvalidKeyException ex) {
-                logger.severe("No se cumplen con los requisitos de contrase\u00F1a del algoritmo: " + ex);
-                CustomDialog.showMessageDialog(this, true, Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                result = this.cipherConfig.getCipher().cipher(fileContent, this.cipherConfig.getConfig(), this.cipherKey);
+            }
+            catch (final InvalidKeyException ex) {
+                logger.severe("No se cumplen con los requisitos de contrasena del algoritmo: " + ex); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(this,
+                                               true,
+                                               Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
                 return false;
-            } catch (Exception ex) {
-                logger.warning("Error al cifrar: " + ex);
-                CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.operacion"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            catch (final Exception ex) {
+                logger.warning("Error al cifrar: " + ex); //$NON-NLS-1$
+                CustomDialog.showMessageDialog(this,
+                                               true,
+                                               Messages.getString("Cifrado.msg.error.operacion"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 
                 return false;
             }
 
-            if (result == null) 
-            	CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.noresultado"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE);
+            if (result == null) {
+                CustomDialog.showMessageDialog(this,
+                                               true,
+                                               Messages.getString("Cifrado.msg.error.noresultado"), //$NON-NLS-1$
+                                               Messages.getString("error"), //$NON-NLS-1$
+                                               JOptionPane.ERROR_MESSAGE);
+            }
             else {
                 // Almacenamos el fichero de salida de la operacion
-                final File savedFile = SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.contrasenia.filechooser.save.title"), result,
-                        "cifrado", null, this); //$NON-NLS-1$
+                final File savedFile =
+                    SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.contrasenia.filechooser.save.title"),
+                                                   result,
+                                                   "cifrado", null, this); //$NON-NLS-1$
                 if (savedFile == null) {
                     return false;
                 }
@@ -380,25 +217,188 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
         return true;
     }
 
-    /**
-     * Obtiene el contenido del fichero seleccionado por el usuario.
+    /** Getter para el campo de contrasenia.
+     * @return Campo de contrasenia. */
+    public JPasswordField getCampoContrasenia() {
+        return this.campoContrasenia;
+    }
+
+    /** Obtiene el contenido del fichero seleccionado por el usuario.
      * @return Contenido del fichero.
      * @throws FileNotFoundException Cuando no se encuentra o no puede leerse el fichero seleccionado.
      * @throws IOException Cuando ocurre un error durante la lectura de un fichero local.
-     * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto.
-     */
+     * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto. */
     private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
-        if (rutaFichero == null) 
+        if (this.rutaFichero == null) {
             throw new NullPointerException("No se ha indicado un fichero de entrada");
-        return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(rutaFichero)));
+        }
+        return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
     }
 
-	/**
-	 * Getter para el campo de contrasenia.
-	 * @return Campo de contrasenia.
-	 */
-	public JPasswordField getCampoContrasenia() {
-		return campoContrasenia;
-	}
+    /** Relacion minima para el redimensionado de componentes. */
+    @Override
+    public int getMinimumRelation() {
+        return 8;
+    }
+
+    /** Inicializacion de componentes */
+    private void initComponents() {
+        // Titulo de la ventana
+        setTitulo(Messages.getString("WizardCifrado.titulo"));
+
+        // Panel con la cabecera
+        final CabeceraAsistente panelSuperior =
+            new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null, true);
+        Utils.setContrastColor(panelSuperior);
+        Utils.setFontBold(panelSuperior);
+        getContentPane().add(panelSuperior, BorderLayout.NORTH);
+
+        // Panel central
+        final JPanel panelCentral = new JPanel();
+        panelCentral.setMinimumSize(new Dimension(603, 289));
+        panelCentral.setLayout(new GridBagLayout());
+
+        // Configuramos el layout
+        final GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(20, 20, 0, 20);
+        c.weightx = 1.0;
+        c.gridx = 0;
+
+        // Etiqueta que contiene el texto "Introduzca una contrasenia de..."
+        final InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto1"), false);
+        panelCentral.add(insertLabel, c);
+
+        c.gridy = 1;
+        c.insets = new Insets(20, 20, 0, 20);
+
+        // Etiqueta con el texto "Introduzca una contrasenia"
+        final JLabel etiquetaContrasenia = new JLabel();
+        etiquetaContrasenia.setText(Messages.getString("WizardCifrado.contrasenia")); // NOI18N
+        Utils.setContrastColor(etiquetaContrasenia);
+        Utils.setFontBold(etiquetaContrasenia);
+        panelCentral.add(etiquetaContrasenia, c);
+
+        c.gridy = 2;
+        c.insets = new Insets(5, 20, 0, 20);
+
+        // Caja de texto con la contrasenia
+        this.campoContrasenia.setToolTipText(Messages.getString("WizardCifrado.contrasenia.description")); // NOI18N
+        this.campoContrasenia.getAccessibleContext().setAccessibleName(etiquetaContrasenia.getText() + " "
+                                                                       + this.campoContrasenia.getToolTipText()
+                                                                       + "ALT + I.");
+        this.campoContrasenia.getAccessibleContext().setAccessibleDescription(this.campoContrasenia.getToolTipText());
+        this.campoContrasenia.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
+        if (GeneralConfig.isBigCaret()) {
+            final Caret caret = new ConfigureCaret();
+            this.campoContrasenia.setCaret(caret);
+        }
+        Utils.remarcar(this.campoContrasenia);
+        Utils.setContrastColor(this.campoContrasenia);
+        Utils.setFontBold(this.campoContrasenia);
+        panelCentral.add(this.campoContrasenia, c);
+
+        // Relación entre etiqueta y campo de contrasena
+        etiquetaContrasenia.setLabelFor(this.campoContrasenia);
+        // Asignación de mnemónico
+        etiquetaContrasenia.setDisplayedMnemonic(KeyEvent.VK_I);
+
+        c.gridy = 3;
+        c.insets = new Insets(20, 20, 0, 20);
+
+        // Etiqueta con el texto "Introduzca de nuevo..."
+        final JLabel etiquetaContraseniaRep = new JLabel();
+        etiquetaContraseniaRep.setText(Messages.getString("WizardCifrado.recontrasenia")); // NOI18N
+        Utils.setContrastColor(etiquetaContraseniaRep);
+        Utils.setFontBold(etiquetaContraseniaRep);
+        panelCentral.add(etiquetaContraseniaRep, c);
+
+        c.gridy = 4;
+        c.insets = new Insets(5, 20, 0, 20);
+
+        // Caja de texto con la contrasenia
+        this.campoContraseniaRep.setToolTipText(Messages.getString("WizardCifrado.recontrasenia.description")); // NOI18N //$NON-NLS-1$
+        this.campoContraseniaRep.getAccessibleContext().setAccessibleName(etiquetaContraseniaRep.getText() + " "
+                                                                          + this.campoContraseniaRep.getToolTipText()
+                                                                          + "ALT+N.");
+        this.campoContraseniaRep.getAccessibleContext().setAccessibleDescription(this.campoContraseniaRep.getToolTipText());
+        this.campoContraseniaRep.setDocument(new JSEUIManager.JTextFieldASCIIFilter(true));
+        if (GeneralConfig.isBigCaret()) {
+            final Caret caret = new ConfigureCaret();
+            this.campoContraseniaRep.setCaret(caret);
+        }
+        Utils.remarcar(this.campoContraseniaRep);
+        Utils.setContrastColor(this.campoContraseniaRep);
+        Utils.setFontBold(this.campoContraseniaRep);
+        panelCentral.add(this.campoContraseniaRep, c);
+
+        // Relación entre etiqueta y campo de contrasena
+        etiquetaContraseniaRep.setLabelFor(this.campoContraseniaRep);
+        // Asignación de mnemónico
+        etiquetaContraseniaRep.setDisplayedMnemonic(KeyEvent.VK_N);
+
+        c.gridy = 5;
+        c.insets = new Insets(5, 20, 0, 20);
+
+        // Check de mostrar contrasena o no
+        final JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
+        final JCheckBox showPassCheckBox = new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
+        showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
+        showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
+        showPassCheckBox.setMnemonic(KeyEvent.VK_T);
+
+        // Se almacena el caracter por defecto para ocultar la contrasena
+        final char defaultChar = this.campoContrasenia.getEchoChar();
+        showPassCheckBox.setSelected(false); // Check noseleccionado por defecto
+        showPassCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent evt) {
+                if (evt.getStateChange() == ItemEvent.SELECTED) {
+                    // Se muestra la contrasena
+                    PanelContrasenia.this.campoContrasenia.setEchoChar((char) 0);
+                    PanelContrasenia.this.campoContraseniaRep.setEchoChar((char) 0);
+
+                }
+                else if (evt.getStateChange() == ItemEvent.DESELECTED) {
+                    // Se oculta la contrasena
+                    PanelContrasenia.this.campoContrasenia.setEchoChar(defaultChar);
+                    PanelContrasenia.this.campoContraseniaRep.setEchoChar(defaultChar);
+                }
+
+                // Foco al input
+                PanelContrasenia.this.campoContrasenia.requestFocus();
+            }
+        });
+        Utils.remarcar(showPassCheckBox);
+        Utils.setContrastColor(showPassCheckBox);
+        Utils.setFontBold(showPassCheckBox);
+        panelCheckShowPass.add(showPassCheckBox);
+
+        panelCentral.add(panelCheckShowPass, c);
+
+        c.fill = GridBagConstraints.BOTH;
+        c.gridy = 6;
+        c.weighty = 1.0;
+        c.insets = new Insets(20, 20, 0, 20);
+
+        // Etiqueta que contiene el texto "El olvido o perdida..."
+        final InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto5"), false);
+        panelCentral.add(lostLabel, c);
+
+        getContentPane().add(panelCentral, BorderLayout.CENTER);
+
+        // La botonera se carga desde el asistente
+
+        // Accesos rapidos al menu de ayuda
+        HelpUtils.enableHelpKey(this.campoContrasenia, "cifrado.wizard.password");
+        HelpUtils.enableHelpKey(this.campoContraseniaRep, "cifrado.wizard.repeatpassword");
+    }
+
+    /** Guarda todas las ventanas del asistente para poder controlar la botonera
+     * @param ventanas Listado con todas las paginas del asistente */
+    public void setVentanas(final List<JDialogWizard> ventanas) {
+        this.setBotonera(new Botonera(ventanas, 1));
+        getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
+    }
 
 }
