@@ -407,6 +407,38 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		return Base64.encodeBytes(plainText.getBytes());
 	}
 
+    /**
+     * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
+     * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
+     * descripci&oacute;n del problema.
+     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @throws InvalidExternalLibraryException Cuando se encuentra alguna incopatibilidad en el entorno de
+     * ejecuci&oacute;n.
+     * @deprecated Se externaliza las comprobaciones de entorno.
+     */
+	@Deprecated
+	public void verifyPlatform() throws PrivilegedActionException {
+		this.cleanErrorMessage();
+		try {
+            AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
+        }
+        catch (final PrivilegedActionException e) {
+            setErrorMessage(e);
+            throw e;
+        }
+	}
+	
+	/**
+	 * Recupera la version de Java en una cadena de la forma "JX". En donde 'X' es
+	 * la versi&oacute;n principal de Java (J5, J6, J7...).
+	 * @return Versi&oacute;n de la JVM.
+	 * @deprecated Se externaliza las comprobaciones de entorno.
+	 */
+	@Deprecated
+	public String getEcoJava() { 
+		return AccessController.doPrivileged(new GetEcoJavaVersionAction()).toString();
+	}
+	
 	@Override
 	public void init() {
 		this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
