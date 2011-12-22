@@ -90,10 +90,10 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
     private static final long serialVersionUID = 1L;
 
     /** Campo donde se guarda la contrasenia. */
-    private final JPasswordField campoContrasenia = new JPasswordField();
+    final JPasswordField campoContrasenia = new JPasswordField();
 
     /** Campo donde se guarda la contrasenia repetida. */
-    private final JPasswordField campoContraseniaRep = new JPasswordField();
+    final JPasswordField campoContraseniaRep = new JPasswordField();
 
     /** Cifrador configurado para un algoritmo dado */
     private final CipherConfig cipherConfig;
@@ -115,12 +115,12 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
 
     /** Cifra un fichero dado
      * @return true o false indicando si se ha cifrado correctamente */
-    private boolean cifrarFichero() {
+    boolean cifrarFichero() {
         final char[] contrasenia = this.campoContrasenia.getPassword();
         final char[] contraseniaRep = this.campoContraseniaRep.getPassword();
 
         // Comprobamos las dos contrasenias
-        if (contrasenia == null || new String(contrasenia).trim().equals("")) {
+        if (contrasenia == null || new String(contrasenia).trim().equals("")) { //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("WizardCifrado.contrasenia.error2"), //$NON-NLS-1$
@@ -142,7 +142,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
                 this.cipherKey = this.cipherConfig.getCipher().decodePassphrase(contrasenia, this.cipherConfig.getConfig(), null);
             }
             catch (final Exception ex) {
-                logger.severe("Ocurrio un error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
+                logger.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(this, true, Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
                                                Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
 
@@ -154,21 +154,21 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
                 fileContent = this.getFileContent();
             }
             catch (final NullPointerException ex) {
-                logger.warning("No se ha indicado un fichero de datos: " + ex);
+                logger.warning("No se ha indicado un fichero de datos: " + ex); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(this,
                                                true,
                                                Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return false;
             }
             catch (final FileNotFoundException ex) {
-                logger.warning("No se encuentra el fichero: " + ex);
+                logger.warning("No se encuentra el fichero: " + ex); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(this,
                                                true,
                                                Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return false;
             }
             catch (final Exception ex) {
-                logger.warning("Ocurrio un error al leer el fichero: " + ex);
+                logger.warning("Error al leer el fichero: " + ex); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(this,
                                                true,
                                                Messages.getString("Cifrado.msg.error.lectura"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -183,7 +183,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
                 logger.severe("No se cumplen con los requisitos de contrasena del algoritmo: " + ex); //$NON-NLS-1$
                 CustomDialog.showMessageDialog(this,
                                                true,
-                                               Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                                               Messages.getString("WizardCifrado.contrasenia.error.requerimientos"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return false;
             }
             catch (final Exception ex) {
@@ -205,7 +205,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
             else {
                 // Almacenamos el fichero de salida de la operacion
                 final File savedFile =
-                    SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.contrasenia.filechooser.save.title"),
+                    SelectionDialog.saveDataToFile(Messages.getString("WizardCifrado.contrasenia.filechooser.save.title"), //$NON-NLS-1$
                                                    result,
                                                    "cifrado", null, this); //$NON-NLS-1$
                 if (savedFile == null) {
@@ -230,7 +230,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
      * @throws AOException Cuando ocurre un error al formar una ruta remota o al leer un fichero remoto. */
     private byte[] getFileContent() throws FileNotFoundException, IOException, AOException, NullPointerException {
         if (this.rutaFichero == null) {
-            throw new NullPointerException("No se ha indicado un fichero de entrada");
+            throw new NullPointerException("No se ha indicado un fichero de entrada"); //$NON-NLS-1$
         }
         return AOUtil.getDataFromInputStream(AOUtil.loadFile(AOUtil.createURI(this.rutaFichero)));
     }
@@ -244,11 +244,11 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
     /** Inicializacion de componentes */
     private void initComponents() {
         // Titulo de la ventana
-        setTitulo(Messages.getString("WizardCifrado.titulo"));
+        setTitulo(Messages.getString("WizardCifrado.titulo")); //$NON-NLS-1$
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-            new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null, true);
+            new CabeceraAsistente("WizardCifrado.contrasenia.explicacion.titulo", "wizardCifrado.contrasenia.explicacion", null, true);  //$NON-NLS-1$//$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -266,7 +266,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
         c.gridx = 0;
 
         // Etiqueta que contiene el texto "Introduzca una contrasenia de..."
-        final InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto1"), false);
+        final InfoLabel insertLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto1"), false); //$NON-NLS-1$
         panelCentral.add(insertLabel, c);
 
         c.gridy = 1;
@@ -274,7 +274,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Introduzca una contrasenia"
         final JLabel etiquetaContrasenia = new JLabel();
-        etiquetaContrasenia.setText(Messages.getString("WizardCifrado.contrasenia")); // NOI18N
+        etiquetaContrasenia.setText(Messages.getString("WizardCifrado.contrasenia")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaContrasenia);
         Utils.setFontBold(etiquetaContrasenia);
         panelCentral.add(etiquetaContrasenia, c);
@@ -283,7 +283,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
         c.insets = new Insets(5, 20, 0, 20);
 
         // Caja de texto con la contrasenia
-        this.campoContrasenia.setToolTipText(Messages.getString("WizardCifrado.contrasenia.description")); // NOI18N
+        this.campoContrasenia.setToolTipText(Messages.getString("WizardCifrado.contrasenia.description")); // NOI18N //$NON-NLS-1$
         this.campoContrasenia.getAccessibleContext().setAccessibleName(etiquetaContrasenia.getText() + " "
                                                                        + this.campoContrasenia.getToolTipText()
                                                                        + "ALT + I.");
@@ -308,7 +308,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Introduzca de nuevo..."
         final JLabel etiquetaContraseniaRep = new JLabel();
-        etiquetaContraseniaRep.setText(Messages.getString("WizardCifrado.recontrasenia")); // NOI18N
+        etiquetaContraseniaRep.setText(Messages.getString("WizardCifrado.recontrasenia")); // NOI18N //$NON-NLS-1$
         Utils.setContrastColor(etiquetaContraseniaRep);
         Utils.setFontBold(etiquetaContraseniaRep);
         panelCentral.add(etiquetaContraseniaRep, c);
@@ -342,8 +342,8 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
 
         // Check de mostrar contrasena o no
         final JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
-        final JCheckBox showPassCheckBox = new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
-        showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
+        final JCheckBox showPassCheckBox = new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text")); //$NON-NLS-1$
+        showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip")); //$NON-NLS-1$
         showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
         showPassCheckBox.setMnemonic(KeyEvent.VK_T);
 
@@ -382,7 +382,7 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
         c.insets = new Insets(20, 20, 0, 20);
 
         // Etiqueta que contiene el texto "El olvido o perdida..."
-        final InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto5"), false);
+        final InfoLabel lostLabel = new InfoLabel(Messages.getString("WizardCifrado.contrasenia.contenido.texto5"), false); //$NON-NLS-1$
         panelCentral.add(lostLabel, c);
 
         getContentPane().add(panelCentral, BorderLayout.CENTER);
@@ -390,8 +390,8 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
         // La botonera se carga desde el asistente
 
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(this.campoContrasenia, "cifrado.wizard.password");
-        HelpUtils.enableHelpKey(this.campoContraseniaRep, "cifrado.wizard.repeatpassword");
+        HelpUtils.enableHelpKey(this.campoContrasenia, "cifrado.wizard.password"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.campoContraseniaRep, "cifrado.wizard.repeatpassword"); //$NON-NLS-1$
     }
 
     /** Guarda todas las ventanas del asistente para poder controlar la botonera
