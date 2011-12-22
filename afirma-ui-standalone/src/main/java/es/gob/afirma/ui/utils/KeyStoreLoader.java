@@ -1,6 +1,7 @@
 package es.gob.afirma.ui.utils;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStore;
@@ -15,7 +16,7 @@ public class KeyStoreLoader {
      * @return Listado de almacenes. */
     public static KeyStoreConfiguration[] getKeyStoresToSign() {
 
-        final Vector<KeyStoreConfiguration> stores = new Vector<KeyStoreConfiguration>();
+        final List<KeyStoreConfiguration> stores = new ArrayList<KeyStoreConfiguration>();
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             stores.add(new KeyStoreConfiguration(AOKeyStore.WINDOWS, null, null));
@@ -39,7 +40,7 @@ public class KeyStoreLoader {
      * @return Listado de almacenes. */
     public static KeyStoreConfiguration[] getKeyStoresToWrap() {
 
-        final Vector<KeyStoreConfiguration> stores = new Vector<KeyStoreConfiguration>();
+        final List<KeyStoreConfiguration> stores = new ArrayList<KeyStoreConfiguration>();
 
         stores.add(new KeyStoreConfiguration(AOKeyStore.SINGLE, null, null));
         stores.add(new KeyStoreConfiguration(AOKeyStore.PKCS12, null, null));

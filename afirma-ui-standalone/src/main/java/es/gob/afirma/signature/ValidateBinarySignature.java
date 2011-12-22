@@ -2,6 +2,7 @@ package es.gob.afirma.signature;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.cert.CRLException;
 import java.security.cert.CertStore;
@@ -106,10 +107,11 @@ public final class ValidateBinarySignature {
      * algoritmos utilizados en la firma.
      * @throws NoMatchDataException Cuando los datos introducidos no coinciden con los firmados.
      * @throws CRLException Cuando ocurre un error con las CRL de la firma.
+     * @throws NoSuchProviderException
      * @throws Exception Cuando la firma resulte no v&aacute;lida.
      */
     @SuppressWarnings("deprecation")
-    private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, Exception {
+    private static void verifySignatures(final byte[] sign, final byte[] data) throws CMSException, CertStoreException, CertificateExpiredException, CertificateNotYetValidException, NoSuchAlgorithmException, NoMatchDataException, CRLException, NoSuchProviderException {
 
         final CMSSignedData s = new CMSSignedData(sign);
         final CertStore certStore = s.getCertificatesAndCRLs("Collection", BouncyCastleProvider.PROVIDER_NAME);  //$NON-NLS-1$
@@ -122,7 +124,7 @@ public final class ValidateBinarySignature {
             final X509Certificate cert = (X509Certificate) certIt.next();
 
             if (!signer.verify(cert, BouncyCastleProvider.PROVIDER_NAME)) {
-                throw new Exception("Firma no valida"); //$NON-NLS-1$
+                throw new CMSException("Firma no valida"); //$NON-NLS-1$
             }
 
             if (data != null) {
