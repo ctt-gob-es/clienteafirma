@@ -84,8 +84,8 @@ import es.gob.afirma.core.util.tree.AOTreeNode;
 import es.gob.afirma.signers.xml.Utils;
 
 
-/** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible con OpenOffice.org 3 y
- * superiores.
+/** Manejador de firmas electr&oacute;nicas XML de ficheros ODF en formato compatible
+ * con OpenOffice.org 3.2 y superiores.
  * @version 0.2 */
 public final class AOODFSigner implements AOSigner {
     
