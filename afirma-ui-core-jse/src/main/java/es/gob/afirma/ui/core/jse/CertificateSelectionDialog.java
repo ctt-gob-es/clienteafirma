@@ -13,7 +13,7 @@ import es.gob.afirma.core.ui.NameCertificateBean;
  * Windows 7.
  * @author Carlos Gamuci
  */
-public class CertificateSelectionDialog {
+public final class CertificateSelectionDialog {
 
 	private final JOptionPane optionPane;
 	
@@ -41,8 +41,7 @@ public class CertificateSelectionDialog {
 	 * lo cancela o cierra sin seleccionar.
 	 */
 	public String showDialog() {
-		
-		JDialog certDialog = this.optionPane.createDialog(this.parent, JSEUIMessages.getString("CertificateSelectionDialog.0")); //$NON-NLS-1$
+		final JDialog certDialog = this.optionPane.createDialog(this.parent, JSEUIMessages.getString("CertificateSelectionDialog.0")); //$NON-NLS-1$
 		certDialog.setBackground(Color.WHITE);
 		certDialog.setModal(true);
 		certDialog.setVisible(true);
@@ -52,7 +51,7 @@ public class CertificateSelectionDialog {
 			certDialog.dispose();
 			return null;
 		}
-		String selectedAlias = (String) this.optionPane.getInputValue();
+		final String selectedAlias = (String) this.optionPane.getInputValue();
 		certDialog.dispose();
 		return selectedAlias;
 	}

@@ -54,14 +54,16 @@ import es.gob.afirma.core.ui.NameCertificateBean;
 /**
  * Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7.
  */
-public class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
+public final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
 	
 	/** Serial version */
 	private static final long serialVersionUID = 6288294705582545804L;
-
-	private static final Font TITLE_FONT = new Font("Verdana", Font.BOLD, 14); //$NON-NLS-1$
 	
-	private static final Font TEXT_FONT = new Font("Verdana", Font.PLAIN, 12); //$NON-NLS-1$
+	private static final String VERDANA_FONT_NAME = "Verdana"; //$NON-NLS-1$
+
+	private static final Font TITLE_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14); 
+	
+	private static final Font TEXT_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 12); 
 	
 	/** Altura de un elemento de la lista de certificados. */
 	private static final int CERT_LIST_ELEMENT_HEIGHT = 86;
@@ -88,7 +90,7 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 		c.weighty = 0.0;
 		c.gridy = 0;
 		
-		JLabel mainMessage = new JLabel(JSEUIMessages.getString("CertificateSelectionPanel.0")); //$NON-NLS-1$
+		final JLabel mainMessage = new JLabel(JSEUIMessages.getString("CertificateSelectionPanel.0")); //$NON-NLS-1$
 		mainMessage.setFont(TITLE_FONT);
 		mainMessage.setForeground(Color.decode("0x0033BC")); //$NON-NLS-1$
 		this.add(mainMessage, c);
@@ -97,7 +99,7 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 			c.insets = new Insets(0, 15, 4, 15);
 			c.gridy++;
 
-			JTextPane textMessage = new JTextPane();
+			final JTextPane textMessage = new JTextPane();
 			textMessage.setText(JSEUIMessages.getString("CertificateSelectionPanel.1")); //$NON-NLS-1$
 			textMessage.setFont(TEXT_FONT);
 			textMessage.setBorder(null);
@@ -115,11 +117,12 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 		c.gridy++;
 		
 		CertificateLine certLine;
-		Vector<CertificateLine> certLines = new java.util.Vector<CertificateSelectionPanel.CertificateLine>();
-		for (NameCertificateBean nameCert : el) {
+		final Vector<CertificateLine> certLines = new java.util.Vector<CertificateSelectionPanel.CertificateLine>();
+		for (final NameCertificateBean nameCert : el) {
 		    try {
 		    	certLine = createCertLine(nameCert.getName(), nameCert.getCertificate() );
-		    } catch(Exception e) {
+		    } 
+		    catch(final Exception e) {
 		        continue;
 		    }
 			certLine.setPreferredSize(new Dimension(0, CERT_LIST_ELEMENT_HEIGHT));
@@ -134,12 +137,13 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 			this.certList.setSelectedIndex(0);
 		}
 		
-		JScrollPane sPane = new JScrollPane(
+		final JScrollPane sPane = new JScrollPane(
 				this.certList,
 				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+		);
 		
-		CertLinkMouseListener listener = new CertLinkMouseListener(this.optionPane);
+		final CertLinkMouseListener listener = new CertLinkMouseListener(this.optionPane);
 		this.certList.addMouseMotionListener(listener);
 		this.certList.addMouseListener(listener);
 		this.certList.addListSelectionListener(this);
@@ -164,9 +168,9 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 		/** Serial Version */
 		private static final long serialVersionUID = 5012625058876812352L;
 
-		private static final Font SUBJECT_FONT = new Font("Verdana", Font.BOLD, 14); //$NON-NLS-1$
+		private static final Font SUBJECT_FONT = new Font(VERDANA_FONT_NAME, Font.BOLD, 14); 
 		
-		private static final Font DETAILS_FONT = new Font("Verdana", Font.PLAIN, 11); //$NON-NLS-1$
+		private static final Font DETAILS_FONT = new Font(VERDANA_FONT_NAME, Font.PLAIN, 11); 
 		
 		private JLabel propertiesLink = null;
 		
@@ -195,11 +199,11 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 				return new SearchFilter(
 						"(&(cn=AC DNIE *)(ou=DNIE)(o=DIRECCION GENERAL DE LA POLICIA)(c=ES))") //$NON-NLS-1$
 				.check(attrs);
-			} catch (Exception e) {
+			} 
+			catch (final Exception e) {
 				return false;
 			}
 		}
-		
 		
 		public X509Certificate getCertificate() {
 			return this.cert;
@@ -215,7 +219,7 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 
 			setBackground(Color.WHITE);
 
-			GridBagConstraints c = new GridBagConstraints();
+			final GridBagConstraints c = new GridBagConstraints();
 			c.gridx = 1;
 			c.gridy = 1;
 			c.gridheight = 4;
@@ -335,14 +339,14 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 					CertificateUtils.openCert(
 							CertificateSelectionPanel.this,
 							((CertificateLine)((JList) me.getSource()).getSelectedValue()).getCertificate());
-				} catch (AOCancelledOperationException e) {
+				} 
+				catch (final AOCancelledOperationException e) {
 					/* No hacemos nada */
 				}
-			} else {
-				if (me.getClickCount() == 2) {
-					if (this.dialogPane != null) {
-						this.dialogPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
-					}
+			} 
+			else {
+				if (me.getClickCount() == 2 && this.dialogPane != null) {
+					this.dialogPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
 				}
 			}
 		}
@@ -353,7 +357,8 @@ public class CertificateSelectionPanel extends JPanel implements ListSelectionLi
 					((JList) me.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 					this.entered = true;
 				}
-			} else if (this.entered) {
+			} 
+			else if (this.entered) {
 				((JList) me.getSource()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				this.entered = false;
 			}
