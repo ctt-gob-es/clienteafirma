@@ -2,6 +2,8 @@ package es.gob.afirma.ui.core.jse;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -13,8 +15,10 @@ import es.gob.afirma.core.ui.NameCertificateBean;
  * Windows 7.
  * @author Carlos Gamuci
  */
-public final class CertificateSelectionDialog {
+public final class CertificateSelectionDialog implements MouseListener {
 
+	private final CertificateSelectionPanel csd;
+	
 	private final JOptionPane optionPane;
 	
 	private final Component parent;
@@ -27,13 +31,20 @@ public final class CertificateSelectionDialog {
 	 */
 	public CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
 
+		this.csd = new CertificateSelectionPanel(el);
 		this.parent = parent;
-		this.optionPane = new JOptionPane();
-		CertificateSelectionPanel csd = new CertificateSelectionPanel(el, this.optionPane);
-		this.optionPane.setMessage(csd);
+		this.optionPane = (el.length > 1) ?
+				new CertOptionPane(this.csd) : new JOptionPane();
+		
+		this.csd.addCertificateListMouseListener(this);
+		
+		this.optionPane.setMessage(this.csd);
 		this.optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
 		this.optionPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+
 	}
+	
+
 	
 	/**
 	 * Muestra el di&aacute;logo de selecci&oacute;n de certificados.
@@ -51,8 +62,47 @@ public final class CertificateSelectionDialog {
 			certDialog.dispose();
 			return null;
 		}
-		final String selectedAlias = (String) this.optionPane.getInputValue();
+		final String selectedAlias = this.csd.getSelectedCertificate();
 		certDialog.dispose();
 		return selectedAlias;
 	}
+
+	public void mouseClicked(MouseEvent me) {
+		if (me.getClickCount() == 2 && this.optionPane != null) {
+			this.optionPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
+		}
+	}
+
+	public void mouseReleased(MouseEvent me) {
+		/* No hacemos nada */
+	}
+	
+	public void mousePressed(MouseEvent me) {
+		/* No hacemos nada */
+	}
+	
+	public void mouseExited(MouseEvent me) {
+		/* No hacemos nada */
+	}
+	
+	public void mouseEntered(MouseEvent me) {
+		/* No hacemos nada */
+	}
+	
+	private class CertOptionPane extends JOptionPane {
+		
+		private static final long serialVersionUID = 1L;
+
+		private final CertificateSelectionPanel selectionPanel;
+		
+		public CertOptionPane(final CertificateSelectionPanel csd) {
+			this.selectionPanel = csd;
+		}
+		
+		@Override
+        public void selectInitialValue() {
+			this.selectionPanel.selectCertificateList();
+        }		
+	}
+	
 }

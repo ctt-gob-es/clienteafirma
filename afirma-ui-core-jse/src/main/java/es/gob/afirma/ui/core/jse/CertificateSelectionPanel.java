@@ -35,7 +35,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -56,7 +55,7 @@ import es.gob.afirma.core.ui.NameCertificateBean;
  */
 public final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
 	
-	/** Serial version */
+	/** Serial version */ 
 	private static final long serialVersionUID = 6288294705582545804L;
 	
 	private static final String VERDANA_FONT_NAME = "Verdana"; //$NON-NLS-1$
@@ -70,10 +69,9 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 	
 	private JList certList;
 	
-	private JOptionPane optionPane;
+	private String selectedValue = null;
 	
-	CertificateSelectionPanel(final NameCertificateBean[] el, JOptionPane optionPane) {
-		this.optionPane = optionPane;
+	CertificateSelectionPanel(final NameCertificateBean[] el) {
 		this.createUI((el == null) ? new NameCertificateBean[0] : el);
 	}
 	
@@ -82,6 +80,7 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 		this.setLayout(new GridBagLayout());
 		
 		this.setBackground(Color.WHITE);
+		this.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 		
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
@@ -143,26 +142,48 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
 		);
 		
-		final CertLinkMouseListener listener = new CertLinkMouseListener(this.optionPane);
+		this.certList.addListSelectionListener(this);
+		final CertLinkMouseListener listener = new CertLinkMouseListener();
 		this.certList.addMouseMotionListener(listener);
 		this.certList.addMouseListener(listener);
-		this.certList.addListSelectionListener(this);
 		
 		this.certList.setSelectedIndex(0);
-		this.optionPane.setInputValue(this.certList.getSelectedValue().toString());
+		this.selectedValue = this.certList.getSelectedValue().toString();
 		
 		sPane.setBorder(null);
 		sPane.setPreferredSize(new Dimension(420, CERT_LIST_ELEMENT_HEIGHT * this.certList.getVisibleRowCount()));
 		
 		this.add(sPane, c);
 	}
-		
+	
+	/** Selecciona la lista de certificados. */
+	public void selectCertificateList() {
+		this.certList.requestFocusInWindow();
+	}
+	
+	/**
+	 * Recupera el nombre descriptor del certificado seleccionado.
+	 * @return Nombre del certificado seleccionado.
+	 */
+	public String getSelectedCertificate() {
+		return this.selectedValue;
+	}
+	
+	/**
+	 * Agrega un gestor de eventos de rat&oacute;n a la lista de certificados para poder
+	 * gestionar a trav&eacute;s de &eacute;l eventos especiales sobre la lista.
+	 * @param listener Manejador de eventos de rat&oacute;n.
+	 */
+	public void addCertificateListMouseListener(MouseListener listener) {
+		this.certList.addMouseListener(listener);
+	}
+	
 	private CertificateLine createCertLine(final String friendlyName, final X509Certificate cert) {
 		final CertificateLine certLine = new CertificateLine(friendlyName, cert);
 		certLine.setFocusable(true);
 		return certLine;
 	}
-    
+
 	private static class CertificateLine extends JPanel {
 		
 		/** Serial Version */
@@ -218,7 +239,7 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 			setLayout(new GridBagLayout());
 
 			setBackground(Color.WHITE);
-
+			
 			final GridBagConstraints c = new GridBagConstraints();
 			c.gridx = 1;
 			c.gridy = 1;
@@ -317,7 +338,7 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 	}
 	
 	public void valueChanged(ListSelectionEvent e) {
-		this.optionPane.setInputValue(this.certList.getSelectedValue().toString());
+		this.selectedValue = this.certList.getSelectedValue().toString();
 	}
 	
 	/**
@@ -327,14 +348,13 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 
 		private boolean entered = false;
 		
-		private JOptionPane dialogPane;
-		
-		CertLinkMouseListener(JOptionPane optionPane) {
-			this.dialogPane = optionPane;
+		CertLinkMouseListener() {
+			/* Contructor por defecto */
 		}
-
+		
 		public void mouseClicked(MouseEvent me) {
-			if (((CertificateLine)((JList) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
+			if (me.getClickCount() == 1 &&
+					((CertificateLine)((JList) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
 				try {
 					CertificateUtils.openCert(
 							CertificateSelectionPanel.this,
@@ -344,11 +364,6 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 					/* No hacemos nada */
 				}
 			} 
-			else {
-				if (me.getClickCount() == 2 && this.dialogPane != null) {
-					this.dialogPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
-				}
-			}
 		}
 		
 		public void mouseMoved(MouseEvent me) {
