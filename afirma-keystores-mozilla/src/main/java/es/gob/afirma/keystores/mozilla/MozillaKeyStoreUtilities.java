@@ -46,7 +46,9 @@ final class MozillaKeyStoreUtilities {
     private static final String SQLITE3_DLL = "sqlite3.dll"; //$NON-NLS-1$
     
     // Novedades de Firefox 9
-    private static final String MSVCR80_DLL = "msvcr80.dll"; // Runtime de VC++ 8.0 //$NON-NLS-1$
+    // IMPORTANTE:
+    // No se puede cargar el entorno de ejecucion de Visual C++ 8 ("msvcr80.dll") porque requiere
+    // que el EXE de carga tenga empotrado un MANIFEST adecuado
     private static final String MOZUTILS_DLL = "mozutils.dll"; //$NON-NLS-1$
     
     private static final String NSPR4_SO = "/lib/libnspr4.so"; //$NON-NLS-1$
@@ -237,11 +239,6 @@ final class MozillaKeyStoreUtilities {
                             tmpFile2 = new File(dir + File.separator + NSSDBM3_DLL); 
                             if (tmpFile2.exists()) {
                                 AOUtil.copyFile(tmpFile2, new File(dest + NSSDBM3_DLL)); 
-                            }
-                            
-                            tmpFile2 = new File(dir + File.separator + MSVCR80_DLL); 
-                            if (tmpFile2.exists()) {
-                                AOUtil.copyFile(tmpFile2, new File(dest + MSVCR80_DLL)); 
                             }
                             
                             tmpFile2 = new File(dir + File.separator + MOZUTILS_DLL); 
@@ -600,8 +597,7 @@ final class MozillaKeyStoreUtilities {
 
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             return new String[] {
-                nssPath + MOZUTILS_DLL,   // Firefox 9
-                nssPath + MSVCR80_DLL,    // Firefox 9             
+                nssPath + MOZUTILS_DLL,   // Firefox 9             
                 nssPath + MOZCRT19_DLL,   // Firefox desde 3 hasta 8
                 nssPath + NSPR4_DLL,      // Firefox 2 y superior
                 nssPath + PLDS4_DLL,      // Firefox 2 y superior
