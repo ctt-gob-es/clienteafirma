@@ -1,15 +1,8 @@
 package es.gob.afirma.ui.core.jse;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Hashtable;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
 import es.gob.afirma.core.ui.NameCertificateBean;
 
 /**
@@ -23,6 +16,9 @@ public class CertificateSelectionDialogTest {
     private static final String CERT_PATH = "multi_almacen.p12"; //$NON-NLS-1$
     private static final String CERT_PASS = "1111"; //$NON-NLS-1$
     
+	/** Para pruebas sin JUnit
+	 * @param args
+	 * @throws Exception */
 	public static void main(String[] args) throws Exception {
 
 		KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -41,6 +37,6 @@ public class CertificateSelectionDialogTest {
 		
 		String selectedAlias = dialog.showDialog();
 		
-		System.out.println("Certificado selecionado: " + selectedAlias);
+		System.out.println("Certificado selecionado: " + selectedAlias); //$NON-NLS-1$
 	}
 }
