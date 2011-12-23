@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 
 import es.gob.afirma.core.misc.Platform;
+import es.gob.afirma.ui.principal.AccessibilityOptionsPane;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 import es.gob.afirma.ui.wizardUtils.BotoneraInferior;
 import es.gob.afirma.ui.wizardUtils.BotoneraSuperior;
@@ -101,7 +102,15 @@ public abstract class JAccessibilityDialogWizard extends JDialogWizard{
 			}
 		} else {
 			if (PrincipalGUI.wizardActualPositionX != -1){
-	    		setBounds(PrincipalGUI.wizardActualPositionX, PrincipalGUI.wizardActualPositionY, PrincipalGUI.wizardActualWidth, PrincipalGUI.wizardActualHeight);
+				if (AccessibilityOptionsPane.continueBigStyle){
+					if (Platform.getOS().equals(Platform.OS.LINUX)){
+						setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT_LINUX) / 2, Constants.WIZARD_INITIAL_WIDTH_LINUX, Constants.WIZARD_INITIAL_HEIGHT_LINUX);
+					} else {
+						setBounds((screenSize.width - Constants.WIZARD_INITIAL_WIDTH) / 2, (screenSize.height - Constants.WIZARD_INITIAL_HEIGHT) / 2, Constants.WIZARD_INITIAL_WIDTH, Constants.WIZARD_INITIAL_HEIGHT);
+					}
+				} else {
+					setBounds(PrincipalGUI.wizardActualPositionX, PrincipalGUI.wizardActualPositionY, PrincipalGUI.wizardActualWidth, PrincipalGUI.wizardActualHeight);
+				}
 	    		if (Platform.getOS().equals(Platform.OS.LINUX)){
 	    			//Se comprueba si esta activado el modo negrita o fuente grande
 					if(GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
