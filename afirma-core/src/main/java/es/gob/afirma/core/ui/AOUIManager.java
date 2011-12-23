@@ -59,6 +59,14 @@ public interface AOUIManager {
     Object showInputDialog(Object parentComponent, Object message, String title, int messageType, Object icon, Object[] selectionValues, Object initialSelectionValue);
     
     /**
+     * Di&aacute;logo de selecci&oacute;n de certificados.
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param selectionValues Listado de valores seleccionables de tipo Nombre-Certificado.
+     * @return Valor seleccionado
+     */
+    Object showCertificateSelectionDialog(Object parentComponent, NameCertificateBean[] selectionValues);
+    
+    /**
      * JOptionPane.showConfirmDialog().
      * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
      * @param message Mensaje

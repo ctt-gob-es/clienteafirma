@@ -147,6 +147,16 @@ public final class AOUIFactory {
         return uiManager.showInputDialog(parentComponent, message, title, messageType, icon, selectionValues, initialSelectionValue);
     }
     
+    /**
+     * Di&aacute;logo de selecci&oacute;n de certificados.
+     * @param parentComponent Componente padre (se descarta si no es del tipo <code>java.awt.Component</code> en la implementaci&oacute;n Swing
+     * @param selectionValues Listado de valores seleccionables Nombre-Certificado.
+     * @return Valor seleccionado
+     */
+    public static Object showCertificateSelectionDialog(final Object parentComponent, final NameCertificateBean[] selectionValues) {
+        return uiManager.showCertificateSelectionDialog(parentComponent, selectionValues);
+    }
+    
     /** Pregunta al usuario por un nombre de fichero para su carga.
      * @param extensions
      *        Extensiones predeterminadas para el fichero

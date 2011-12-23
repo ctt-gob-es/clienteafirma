@@ -31,6 +31,7 @@ import javax.swing.text.PlainDocument;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.ui.AOUIManager;
+import es.gob.afirma.core.ui.NameCertificateBean;
 
 /** Gestor de componentes de interfas gr&aacute;fico (tanto para Applet como para
  * aplicaci&oacute;n de escritorio) de la aplicaci&oacute;n.
@@ -131,6 +132,16 @@ public final class JSEUIManager implements AOUIManager {
         return JOptionPane.showInputDialog(parent, message, title, messageType, dialogIcon, selectionValues, initialSelectionValue);
     }
     
+    /** {@inheritDoc} */
+    public Object showCertificateSelectionDialog(	final Object parentComponent,
+    												final NameCertificateBean[] selectionValues) {
+    	Component parent = null;
+    	if (parentComponent instanceof Component) {
+    		parent = (Component) parentComponent;
+    	}
+		return new CertificateSelectionDialog(selectionValues, parent).showDialog();
+    }
+        
     /** Original code: <a
      * href="http://tactika.com/realhome/realhome.html">http://
      * tactika.com/realhome/realhome.html</a>
@@ -515,5 +526,4 @@ public final class JSEUIManager implements AOUIManager {
         }
         return fc.getSelectedFile();
     }
-
 }

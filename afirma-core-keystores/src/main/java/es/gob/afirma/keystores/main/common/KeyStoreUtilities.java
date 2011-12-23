@@ -36,6 +36,7 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
+import es.gob.afirma.core.ui.NameCertificateBean;
 import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
 import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
 import es.gob.afirma.keystores.main.filters.CertificateFilter;
@@ -423,10 +424,17 @@ public final class KeyStoreUtilities {
         }
 
         // Ordenamos el array de alias justo antes de mostrarlo, ignorando entre
-        // mayusculas y minúsculas
-        final String[] finalOrderedAliases = aliassesByFriendlyName.values().toArray(new String[0]);
-        Arrays.sort(finalOrderedAliases, new Comparator<String>() {
-            public int compare(final String o1, final String o2) {
+        // mayusculas y minusculas
+        int i = 0;
+        final NameCertificateBean[] orderedFriendlyNames =
+        	new NameCertificateBean[aliassesByFriendlyName.size()]; 
+        for (String certAlias : aliassesByFriendlyName.keySet().toArray(new String[0])) {
+        	orderedFriendlyNames[i++] = new NameCertificateBean(
+        			aliassesByFriendlyName.get(certAlias),
+        			ksm.getCertificate(certAlias));
+        }
+        Arrays.sort(orderedFriendlyNames, new Comparator<NameCertificateBean>() {
+            public int compare(final NameCertificateBean o1, final NameCertificateBean o2) {
                 if (o1 == null && o2 == null) {
                     return 0;
                 }
@@ -437,20 +445,14 @@ public final class KeyStoreUtilities {
                     return -1;
                 }
                 else{
-                    return o1.compareToIgnoreCase(o2);
+                    return o1.getName().compareToIgnoreCase(o2.getName());
                 }
             }
         });
-
-        final Object o = AOUIFactory.showInputDialog(
-             parentComponent, KeyStoreMessages.getString("KeyStoreUtilities.0"), //$NON-NLS-1$
-             KeyStoreMessages.getString("KeyStoreUtilities.1"), //$NON-NLS-1$
-             AOUIFactory.PLAIN_MESSAGE,
-             null,
-             finalOrderedAliases,
-             null
-        );
-
+        
+        final Object o = AOUIFactory.showCertificateSelectionDialog(
+                parentComponent, orderedFriendlyNames);
+        
         final String certName;
         if (o != null) {
             certName = o.toString();
