@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import es.gob.afirma.core.misc.Platform;
@@ -90,7 +91,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	    if (GeneralConfig.isHighContrast()){
 			setHighContrast(this);
 		}
-		
+        
 		//Asignacion de mnemonics
 		
 		//Etiqueta buscar en ...
@@ -295,8 +296,24 @@ public class JAccessibilityFileChooser extends JFileChooser{
                 AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY,
                 title);
 
-        this.dialog = new JDialog((Frame) this.getParent(), title, true);
-        
+       // this.dialog = new JDialog((Frame) this.getParent(), title, true);
+        //Se comprueba el tipo de componente padre, para asignar el correcto y que así se muestre el icono asociado.
+        if (parent instanceof JDialog) {
+        	this.dialog = new JDialog((JDialog)parent, title, true);
+        } else if (parent instanceof Frame){
+        	this.dialog = new JDialog((Frame)parent, title, true);
+        }else {
+        	//Se obtiene el componente root
+	        Component root = SwingUtilities.getRoot(parent);
+	        if ((root!=null) && (root instanceof Frame)) {
+	        	this.dialog = new JDialog((Frame)root, title, true);
+	        } else {
+	        	this.dialog = new JDialog();
+	        	this.dialog.setTitle(title);
+	        	this.dialog.setModal(true);
+	        }
+        }
+
         this.dialog.setComponentOrientation(this .getComponentOrientation());
         
       //Se obtienen las dimensiones totales disponibles para mostrar una ventana
