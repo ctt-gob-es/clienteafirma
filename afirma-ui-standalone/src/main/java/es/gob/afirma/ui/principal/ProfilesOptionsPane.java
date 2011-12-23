@@ -229,7 +229,7 @@ final class ProfilesOptionsPane {
                 final int idx = this.profileManagmentList.getSelectedIndex();
                 final String profileName = this.profileManagmentList.getSelectedValue().toString();
 
-                if (UserProfile.currentProfileId != null && profileName.equals(ProfileManager.getProfileName(UserProfile.currentProfileId))) {
+                if (UserProfile.getCurrentProfileId() != null && profileName.equals(ProfileManager.getProfileName(UserProfile.getCurrentProfileId()))) {
                     final int confirm =
                         CustomDialog.showConfirmDialog(this.parent,
                                                        true,
@@ -241,7 +241,7 @@ final class ProfilesOptionsPane {
                     if (confirm == JOptionPane.YES_OPTION) {
                         ((DefaultListModel) this.profileManagmentList.getModel()).remove(idx);
                         this.currentProfileTitleLabel.setText(ProfileManager.DEFAULT_PROFILE_NAME);
-                        UserProfile.currentProfileId = null;
+                        UserProfile.setCurrentProfileId(null);
                         this.parent.aceptarActionPerformed(ProfileManager.getDefaultConfiguration(), this.getProfiles());
                     }
                 }
@@ -283,7 +283,7 @@ final class ProfilesOptionsPane {
     }
 
     private String getCurrentProfileId() {
-        return UserProfile.currentProfileId;
+        return UserProfile.getCurrentProfileId();
     }
 
     private String getCurrentProfileName() {
@@ -328,12 +328,12 @@ final class ProfilesOptionsPane {
             }
             if (ProfileManager.DEFAULT_PROFILE_NAME.equals(profileName)) {
                 this.currentProfileTitleLabel.setText(profileName);
-                UserProfile.currentProfileId = null;
+                UserProfile.setCurrentProfileId(null);
                 this.parent.aceptarActionPerformed(ProfileManager.getDefaultConfiguration(), this.getProfiles());
             }
             else {
                 this.currentProfileTitleLabel.setText(profileName);
-                UserProfile.currentProfileId = ProfileManager.getProfileIdByName(profileName);
+                UserProfile.setCurrentProfileId(ProfileManager.getProfileIdByName(profileName));
                 this.parent.aceptarActionPerformed(ProfileManager.getConfiguration(profileName), this.getProfiles());
             }
         }

@@ -65,7 +65,7 @@ public class Main {
         }
 
         if (ProfileManager.getProfilesNames().length < 1) {
-            UserProfile.currentProfileId = null;
+            UserProfile.setCurrentProfileId(null);
             new PrincipalGUI().main();
         }
         else {

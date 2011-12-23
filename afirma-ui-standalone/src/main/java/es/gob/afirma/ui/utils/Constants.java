@@ -209,5 +209,15 @@ public class Constants {
 	 * C&oacute;digo HTML para el salto de l&iacute;nea
 	 */
 	public static final String HTML_SALTO_LINEA = "<br>";
+	
+	/**
+	 * C&oacute;digo HTML para el p&aacute:rrafo de texto
+	 */
+	public static final String HTML_PARRAFO = "<p>";
+	
+	/**
+	 * C&oacute;digo HTML para el cierre de p&aacute:rrafo de texto
+	 */
+	public static final String HTML_PARRAFO_CIERRE = "</p>";
 }
 

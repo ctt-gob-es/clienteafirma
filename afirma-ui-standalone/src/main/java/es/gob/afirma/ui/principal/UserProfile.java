@@ -44,22 +44,36 @@ import es.gob.afirma.ui.utils.ProfileManager;
 class UserProfile extends JAccessibilityFrameAdvisor {
 
     /** Perfil actual. */
-    public static String currentProfileId;
+    private static String currentProfileId;
 
     /** UID. */
     private static final long serialVersionUID = 1L;
 
     /** Combo perfiles. */
-    JComboBox comboPerfiles = new JComboBox();
+    private JComboBox comboPerfiles = new JComboBox();
 
     /** Constructor. */
     public UserProfile() {
         super();
         initComponents();
         HelpUtils.visualize("perfiles.usuario"); //$NON-NLS-1$
-    }
+    }      
 
-    /** Accion aceptar. */
+    public static String getCurrentProfileId() {
+		return currentProfileId;
+	}
+
+
+
+
+	public static void setCurrentProfileId(String currentProfileId) {
+		UserProfile.currentProfileId = currentProfileId;
+	}
+
+
+
+
+	/** Accion aceptar. */
     void aceptarPerformed() {
 
         final String profileName = this.comboPerfiles.getSelectedItem().toString();
@@ -77,9 +91,6 @@ class UserProfile extends JAccessibilityFrameAdvisor {
             currentProfileId = ProfileManager.getProfileIdByName(profileName);
 
             final Properties c = ProfileManager.getConfiguration(currentProfileId);
-            for (final String key : c.keySet().toArray(new String[0])) {
-                System.out.println(key + ": " + c.getProperty(key));
-            }
 
             GeneralConfig.loadConfig(ProfileManager.getConfiguration(profileName));
         }
@@ -269,7 +280,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
 
         // Cuerpo del mensaje
         final InfoLabel text =
-            new InfoLabel("<p>"   + Messages.getString("UserProfile.welcome") + "</p>" + "<p>" + Messages.getString("UserProfile.body1") + "</p>" + "<p>" + Messages.getString("UserProfile.body2") + "</p>" + "<p>" + Messages.getString("UserProfile.body3") + "</p>", false); //$NON-NLS-2$ //$NON-NLS-5$ //$NON-NLS-8$//$NON-NLS-11$
+            new InfoLabel(Constants.HTML_PARRAFO   + Messages.getString("UserProfile.welcome") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body1") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body2") + Constants.HTML_PARRAFO_CIERRE + Constants.HTML_PARRAFO + Messages.getString("UserProfile.body3") + Constants.HTML_PARRAFO_CIERRE, false); //$NON-NLS-2$ //$NON-NLS-5$ //$NON-NLS-8$//$NON-NLS-11$
         config(text);
 
         add(text, c);

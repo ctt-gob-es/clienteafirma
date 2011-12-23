@@ -85,7 +85,7 @@ public class DescifradoAccessibilityTest {
 		
 		//Se obtiene la cofiguración general
 		//Se añade el perfil por defecto
-		UserProfile.currentProfileId=Constants.defaultUser;
+		UserProfile.setCurrentProfileId(Constants.defaultUser);
 		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
 		//Se cambia al modo avanzado
@@ -134,7 +134,7 @@ public class DescifradoAccessibilityTest {
 		
 		//Se obtiene la cofiguración general
 		//Se añade el perfil por defecto
-		UserProfile.currentProfileId=Constants.defaultUser;
+		UserProfile.setCurrentProfileId(Constants.defaultUser);
 		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
 		//Se cambia al modo avanzado
@@ -181,7 +181,7 @@ public class DescifradoAccessibilityTest {
 		
 		//Se obtiene la cofiguración general
 		//Se añade el perfil por defecto
-		UserProfile.currentProfileId=Constants.defaultUser;
+		UserProfile.setCurrentProfileId(Constants.defaultUser);
 		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
 		//Se cambia al modo avanzado
