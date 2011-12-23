@@ -86,7 +86,6 @@ import es.gob.afirma.signers.cades.AOCAdESSigner;
 import es.gob.afirma.signers.pades.AOPDFSigner;
 import es.gob.afirma.signers.xades.AOFacturaESigner;
 import es.gob.afirma.signers.xades.AOXAdESSigner;
-import es.gob.afirma.signers.xmldsig.AOXMLDSigSigner;
 import es.gob.afirma.standalone.DataAnalizerUtil;
 import es.gob.afirma.standalone.LookAndFeelManager;
 import es.gob.afirma.standalone.Messages;
@@ -839,7 +838,7 @@ public final class SignPanel extends JPanel {
                     ".pdf"}; //$NON-NLS-1$
                 filterDescription = Messages.getString("SignPanel.72"); //$NON-NLS-1$
             }
-            else if (SignPanel.this.signer instanceof AOXMLDSigSigner || SignPanel.this.signer instanceof AOXAdESSigner) {
+            else if (SignPanel.this.signer instanceof AOXAdESSigner) {
                 newFileName = newFileName.replace(".", "_") + ".xsig"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 filterExtensions = new String[] {
                         ".xsig", ".xml"}; //$NON-NLS-1$ //$NON-NLS-2$
