@@ -8,7 +8,7 @@ import javax.swing.filechooser.FileFilter;
  * Filtro de ficheros basado en extensiones de fichero para di&aacute;logos de selecci&opacute;n.
  * @author Carlos Gamuci
  */
-public class FileExtensionFilter extends FileFilter {
+class FileExtensionFilter extends FileFilter {
 
 	private String[] exts;
 	
@@ -20,8 +20,8 @@ public class FileExtensionFilter extends FileFilter {
 	 * @param extensions Extensiones que se desean visualizar en el panel de selecci&oacute;n.
 	 * @param description Descripci&oacute;n asignada al tipo de fichero que se busca.
 	 */
-	public FileExtensionFilter(String[] extensions, final String description) {
-		this.exts = extensions;
+	FileExtensionFilter(String[] extensions, final String description) {
+		this.exts = extensions.clone();
 		this.desc = description;
 	}
 	
