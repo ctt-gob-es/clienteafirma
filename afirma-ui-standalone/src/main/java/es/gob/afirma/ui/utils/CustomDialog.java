@@ -131,7 +131,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param typeMessage tipo de mensaje
 	 * @param isInputDialog indica sies una alerta de tipo input
 	 */
-	public CustomDialog(JDialog componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
+	private CustomDialog(JDialog componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
 		super(componentParent, modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
@@ -148,7 +148,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param typeMessage tipo de mensaje
 	 * @param isInputDialog indica sies una alerta de tipo input
 	 */
-	public CustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
+	private CustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
 		super();
 		this.setModal(modal);
 		initComponents(message, title, typeMessage, isInputDialog);
@@ -166,7 +166,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param typeMessage tipo de mensaje
 	 * @param isInputDialog indica sies una alerta de tipo input
 	 */
-	public CustomDialog(JFrame componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
+	private CustomDialog(JFrame componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
 		super(componentParent, modal);
 		initComponents(message, title, typeMessage, isInputDialog);
 		setLocationRelativeTo(componentParent);
@@ -176,7 +176,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n X
 	 */
-    public int getInitialX(int width) {
+    private int getInitialX(int width) {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
 		return ((screenSize.width/2) - (width / 2)) ;
 	}
@@ -186,7 +186,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n Y
 	 */
-	public int getInitialY(int height) {
+	private int getInitialY(int height) {
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         return ((screenSize.height/2) - (height / 2)) ;
 	}
@@ -1054,22 +1054,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * @return the answer
 	 */
-	public final int getAnswer() {
+	private final int getAnswer() {
 		return answer;
-	}
-
-	/**
-	 * @param answer
-	 *            the answer to set
-	 */
-	public final void setAnswer(int answer) {
-		this.answer = answer;
 	}
 	
 	/**
 	 * Cambia el tama&ntilde;o de la ventana al tama&ntilde;o m&aacute;ximo de pantalla menos el tama&ntilde;o de la barra de tareas de windows
 	 */
-	public void maximizarActionPerformed(){
+	private void maximizarActionPerformed(){
 		actualPositionX = this.getX();
 		actualPositionY = this.getY();
 		actualWidth = this.getWidth();
@@ -1090,7 +1082,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	/**
 	 * Restaura el tama&ntilde;o de la ventana a la posicion anterior al maximizado
 	 */
-	public void restaurarActionPerformed(){
+	private void restaurarActionPerformed(){
 		//Dimensiones de restaurado
 		int minWidth = Constants.CUSTOMDIALOG_INITIAL_WIDTH;
 		int minHeight = Constants.CUSTOMDIALOG_INITIAL_HEIGHT;
@@ -1124,7 +1116,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * @param isInputDialog indica sies una alerta de tipo input
 	 * @return instancia de CustomDialog.
 	 */
-	public static CustomDialog getInstanceCustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
+	private static CustomDialog getInstanceCustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
 		CustomDialog customDialog = null;
 		//Se chequea cual será el componente padre.
 		if (componentParent instanceof JDialog) {
@@ -1137,7 +1129,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		return customDialog;
 	}
 
-
+	/**
+	 * Accion correspondiente a los botones de las alertas.
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
