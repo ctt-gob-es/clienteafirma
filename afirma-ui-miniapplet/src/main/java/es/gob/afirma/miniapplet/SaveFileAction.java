@@ -75,7 +75,15 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
     	return new FileFilter() {
 			@Override
 			public String getDescription() {
-				return description;
+				if (description != null) {
+					return description;
+				}
+				
+				final StringBuilder buffer = new StringBuilder();
+				for (int i = 0; i < extensions.length; i++) {
+					buffer.append(i == 0 ? "*." : ",*.").append(extensions[i]); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				return buffer.toString();
 			}
 			
 			@Override
@@ -84,7 +92,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
 					return true;
 				}
 				for (final String ext : extensions) {
-					if (f.getName().endsWith(ext)) {
+					if (f.getName().endsWith("." + ext)) { //$NON-NLS-1$
 						return true;
 					}
 				}

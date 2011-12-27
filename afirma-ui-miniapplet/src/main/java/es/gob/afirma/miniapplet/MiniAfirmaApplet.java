@@ -238,21 +238,21 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
 
-		final String[] extensions = (extension == null || extension.trim().length() < 1 ?
+		final String[] exts = (extension == null || extension.trim().length() < 1 ?
 				null : new String[] { extension.trim() });
 
-		final String descFiles = (extensions != null && description != null && description.trim().length() > 0 ?
-				description.trim() : (extensions != null ? extension : null));
+		final String descFiles = (description == null || description.trim().length() < 1 ?
+				null : description.trim());
 
-		final File fileHint = (fileName != null && fileName.trim().length() > 0 ?
-				new File(this.pathHint, fileName) : this.pathHint);
+		final File fileHint = (fileName == null || fileName.trim().length() < 1 ?
+				this.pathHint : new File(this.pathHint, fileName));
 
 		try {
 			return AccessController.doPrivileged(
                  new SaveFileAction(
                         titleDialog, 
                         Base64.decode(data),
-					    extensions, 
+					    exts, 
 					    descFiles, 
 					    fileHint, 
 					    this
@@ -279,10 +279,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
 
 		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-				null : new String[] { extensions.trim() });
+				null : extensions.trim().split(",")); //$NON-NLS-1$
 
-		final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
-				description.trim() : (exts != null ? extensions : null));
+		final String descFiles = (description == null || description.trim().length() < 1 ?
+				null : description.trim());
 
 		try {
 			return AccessController.doPrivileged(
@@ -293,7 +293,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 					this
 				 )
             );
-		} 
+		}
 		catch (final AOCancelledOperationException e) {
 			return null;
 		}
@@ -311,10 +311,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
 
 		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-				null : new String[] { extensions.trim() });
+				null : extensions.trim().split(",")); //$NON-NLS-1$
 
-		final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
-				description.trim() : (exts != null ? extensions : null));
+		final String descFiles = (description == null || description.trim().length() < 1 ?
+				null : description.trim());
 
 		try {
 			return Base64.encodeBytes(AccessController.doPrivileged(new GetFileContentAction(
@@ -329,8 +329,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
         }
 	}
 
-	/** {@inheritDoc} 
-	 * @deprecated */
+	/** {@inheritDoc} */
 	@Deprecated
     public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException {
 		this.cleanErrorMessage();
@@ -350,11 +349,12 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		this.cleanErrorMessage();
 
 		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+		
 		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-				null : new String[] { extensions.trim() });
+				null : extensions.trim().split(",")); //$NON-NLS-1$
 
-		final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
-				description.trim() : (exts != null ? extensions : null));
+		final String descFiles = (description == null || description.trim().length() < 1 ?
+				null : description.trim());
 
 		try { 
 			return AccessController.doPrivileged(new GetFileNameContentAction(
@@ -594,8 +594,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		 javax.swing.JFrame.setDefaultLookAndFeelDecorated(true);
 	 }
 
-	 /** {@inheritDoc} 
-	  * @deprecated */
+	 /** {@inheritDoc} */ 
 	 @Deprecated
 	 public String[] getMultiFileNameContentText(final String title, 
 	                                             final String extensions, 
@@ -610,25 +609,39 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	        return this.getMultiFileNameContent(title, extensions, description, true);
 	 }
 	 
+	 /**
+	  * Permite seleccionar al usuario un conjunto de ficheros y devuelve las tuplas con cada
+	  * nombre de fichero y contenido separados por ('|').
+	  * @param title T&iacute;tulo de la ventana de selecci&oacute;n.
+	  * @param extensions Extensiones de fichero permitidas separadas por coma (',').
+	  * @param description Descripci&oacute;n del tipo de fichero.
+	  * @param asBase64 Si es {@code true} devuelve el contenido en Base64, si es {@code false}
+	  * 				lo devuelve en texto plano.
+	  * @return Listado de tuplas "NombreFichero|Contenido".
+	  * @throws PrivilegedActionException Cuando ocurre alg&uacute;n error durante la operaci&oacute;n.
+	  */
 	 private String[] getMultiFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
-	        this.cleanErrorMessage();
-	        final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
-	        final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-	                null : new String[] { extensions.trim() });
-	        final String descFiles = (exts != null && description != null && description.trim().length() > 0 ?
-	                description.trim() : (exts != null ? extensions : null));
-	        try { 
-	            return AccessController.doPrivileged(new GetFileNameContentAction(
-	                    titleDialog, exts, descFiles, true, asBase64, this)); 
-	        } 
-	        catch (final AOCancelledOperationException e) {
-	            return null;
-	        }
-	        catch (final PrivilegedActionException e) {
-	            setErrorMessage(e);
-	            throw e;
-	        }
-     }
 
+		 this.cleanErrorMessage();
 
+		 final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+
+		 final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
+				 null : extensions.trim().split(",")); //$NON-NLS-1$
+
+		 final String descFiles = (description == null || description.trim().length() < 1 ?
+				 null : description.trim());
+		 
+		 try { 
+			 return AccessController.doPrivileged(new GetFileNameContentAction(
+					 titleDialog, exts, descFiles, true, asBase64, this)); 
+		 } 
+		 catch (final AOCancelledOperationException e) {
+			 return null;
+		 }
+		 catch (final PrivilegedActionException e) {
+			 setErrorMessage(e);
+			 throw e;
+		 }
+	 }
 }

@@ -136,7 +136,7 @@ interface MiniAfirma {
      * @param title T&iacute;tulo para el di&aacute;logo.
      * @param fileName Nombre que se debe proponer al usuario en el di&aacute;logo para
      * guardar el fichero. Puede ser nulo.
-     * @param extension Extensi&oacute;n del fichero a guardar (que habitualmente indica el tipo)
+     * @param extension Extensi&oacute;n del fichero a guardar. Ejemplos, "csig", "pdf", "xsig"...
      * @param description Descripci&oacute;n del tipo de fichero que se desea guardar.
      * @return {@code true} en caso de guardarse correctamente, {@code false} en caso
      * contrario.
@@ -149,7 +149,8 @@ interface MiniAfirma {
      * que se devolver&aacute; el contenido en Base64. Si el usuario cancela la operaci&oacute;n
      * de selecci&oacute;n del fichero se devuelve {@code null}.
      * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param extensions Extensiones de b&uacute;squeda.
+     * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
+     * Por ejemplo: "pdf,xml,doc".
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El contenido del fichero codificado en Base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
@@ -163,12 +164,13 @@ interface MiniAfirma {
      * car&aacute;cter '|'. Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
      * del fichero se devuelve {@code null}.
      * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param extensions Extensiones de b&uacute;squeda.
+     * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El nombre del fichero y su contenido en unicode.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @deprecated */
+     * @deprecated Los ficheros deben cargarse en base64 (getFileNameContentBase64) y despu&eacute;s
+	 * convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64).  */
     @Deprecated
     String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException;
     
@@ -184,7 +186,8 @@ interface MiniAfirma {
      * @return Array con los nombres del ficheros y sus contenidos en unicode.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @deprecated */
+     * @deprecated Los ficheros deben cargarse en base64 (getMultiFileNameContentBase64) y
+     * despu&eacute;s convertirse a texto con la codificaci&oacute;n que se desee (getTextFromBase64). */
     @Deprecated
     String[] getMultiFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException;
     
@@ -194,7 +197,7 @@ interface MiniAfirma {
      * car&aacute;cter '|'. Si el usuario cancela la operaci&oacute;n de selecci&oacute;n
      * del fichero se devuelve {@code null}.
      * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param extensions Extensiones de b&uacute;squeda.
+     * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return El nombre del fichero y su contenido en base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
@@ -220,7 +223,7 @@ interface MiniAfirma {
      * del que se recuperar&aacute; su ruta absoluta. Si no se selecciona
      * ning&uacute;n fichero, se devuelve {@code null}.
      * @param title T&iacute;tulo para el di&aacute;logo.
-     * @param extensions Extensiones de b&uacute;squeda.
+     * @param extensions Extensiones de b&uacute;squeda separadas por comas (',').
      * @param description Descripci&oacute;n del tipo de fichero que se desea cargar.
      * @return Nombre del fichero seleccionado.
      * @throws IOException Cuando se produce un error al seleccionar el fichero.
