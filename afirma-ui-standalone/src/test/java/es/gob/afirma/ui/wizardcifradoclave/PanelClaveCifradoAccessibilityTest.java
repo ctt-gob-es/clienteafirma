@@ -39,7 +39,7 @@ public class PanelClaveCifradoAccessibilityTest {
 	static Logger logger = Logger.getLogger(PanelClaveCifradoAccessibilityTest.class.getName());
 	
 	/**
-	 * Comprobación de que el campo labelFor de las etiquetas no esté duplicado. 
+	 * Comprobacion de que el campo labelFor de las etiquetas no esté duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedLabelForProperty() {
@@ -91,13 +91,13 @@ public class PanelClaveCifradoAccessibilityTest {
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		componentSet = new HashSet<Component>(componentList);
-		//Si el tamaño de la lista y del conjunto son iguales, no hay duplicados
+		//Si el tamano de la lista y del conjunto son iguales, no hay duplicados
 		assertTrue(componentList.size() == componentSet.size());
 
 	}
 
 	/**
-	 * Comprobación de que el campo Mnemocic de las etiquetas,botones y checkbox no estén duplicados. 
+	 * Comprobacion de que el campo Mnemocic de las etiquetas,botones y checkbox no estén duplicados. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
@@ -106,9 +106,9 @@ public class PanelClaveCifradoAccessibilityTest {
 		//Instancia del panel que se va a analizar
 		PanelClaveCifrado panelClaveCifrado = new PanelClaveCifrado("", "");
 
-		//Lista de mnemónicos
+		//Lista de mnemonicos
 		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemónicos
+		//Conjunto de mnemonicos
 		Set <Integer> keyCodesSet = null;
 		
 		//Componentes del wizard
@@ -127,7 +127,7 @@ public class PanelClaveCifradoAccessibilityTest {
 					Component componentRootPane = componentsRootPane[j];
 					//Si es un panel se trata
 					if (componentRootPane instanceof JPanel) {
-						//Se llama al método que obtiene una lista de códigos de atajos asociados a los componentes del panel
+						//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
 						getKeyCodeList ((JPanel) componentRootPane, keyCodes);
 						
 					} else if (componentRootPane instanceof JLayeredPane) { //Si es un layeredPane se obtienen sus componentes
@@ -138,7 +138,7 @@ public class PanelClaveCifradoAccessibilityTest {
 							Component componentLayeredPane = componentsLayeredPane[z];
 							//Si es instancia de JPanel se trata
 							if (componentLayeredPane instanceof JPanel) {
-								//Se llama al método que obtiene una lista de códigos de atajos asociados a los componentes del panel
+								//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
 								getKeyCodeList ((JPanel) componentLayeredPane, keyCodes);
 							}
 						}
@@ -149,12 +149,12 @@ public class PanelClaveCifradoAccessibilityTest {
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 
 	/**
-	 * Método que obtiene una lista de códigos de atajos a los componentes (Etiqueta, Botón) de un panel.
+	 * Método que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton) de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -168,25 +168,25 @@ public class PanelClaveCifradoAccessibilityTest {
 				//Se comprueba si es una etiqueta
 				if (component instanceof JLabel) {
 					JLabel label = (JLabel) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = label.getDisplayedMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
 				} else if (component instanceof JButton) {
 					JButton button = (JButton) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = button.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
 				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkbox
 					JCheckBox checkBox = (JCheckBox) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = checkBox.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
@@ -200,7 +200,7 @@ public class PanelClaveCifradoAccessibilityTest {
 	}//getKeyCodeList
 
 	/**
-	 * Comprobación de que el campo nombre accesible para botones, radiobuttons combos y checks
+	 * Comprobacion de que el campo nombre accesible para botones, radiobuttons combos y checks
 	 * no esté vacío. 
 	 */
 	@Test
@@ -263,7 +263,7 @@ public class PanelClaveCifradoAccessibilityTest {
 			//Se obtiene el componente
 			Component component = panel.getComponent(i);
 			if (!(component instanceof JPanel)) {
-				if (component instanceof JButton) { //Se comprueba si es un botón
+				if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
 					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
 						return false; //Si no tiene asignado un nombre accesible se sale del método
@@ -316,7 +316,7 @@ public class PanelClaveCifradoAccessibilityTest {
 					JLabel label = (JLabel) component;
 					//Se obtiene el componente asociado a la propiedad labelFor
 					labelForComponent = label.getLabelFor();
-					//Se añade a la lista si no es nulo
+					//Se anade a la lista si no es nulo
 					if (labelForComponent != null) {
 						componentList.add(labelForComponent);
 					}

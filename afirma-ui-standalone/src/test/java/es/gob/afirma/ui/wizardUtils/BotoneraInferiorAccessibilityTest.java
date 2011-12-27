@@ -31,7 +31,7 @@ public class BotoneraInferiorAccessibilityTest {
 
 
 	/**
-	 * Comprobación de que el campo Mnemocic de los botones no esté duplicado. 
+	 * Comprobacion de que el campo Mnemocic de los botones no esté duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
@@ -44,22 +44,22 @@ public class BotoneraInferiorAccessibilityTest {
 		//Panel botonera inferior
 		BotoneraInferior botoneraInferior = new BotoneraInferior(dialogs, 1);
 		
-		//Lista de mnemónicos
+		//Lista de mnemonicos
 		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemónicos
+		//Conjunto de mnemonicos
 		Set <Integer> keyCodesSet = null;
 		
-		//Se llama al método que obtiene una lista de códigos de atajos asociados a los componentes del panel
+		//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
 		getKeyCodeList (botoneraInferior, keyCodes);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 
 	/**
-	 * Método que obtiene una lista de códigos de atajos a los componentes botones de un panel.
+	 * Método que obtiene una lista de codigos de atajos a los componentes botones de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -72,9 +72,9 @@ public class BotoneraInferiorAccessibilityTest {
 			if (!(component instanceof JPanel)) {
 				if (component instanceof JButton) {
 					JButton button = (JButton) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = button.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}

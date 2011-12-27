@@ -33,7 +33,7 @@ public class MainOptionsPaneAccessibilityTest {
 	static Logger logger = Logger.getLogger(MainOptionsPaneAccessibilityTest.class.getName());
 	
 	/**
-	 * Comprobación de que el campo labelFor de las etiquetas no esté duplicado. 
+	 * Comprobacion de que el campo labelFor de las etiquetas no esté duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedLabelForProperty() {
@@ -57,13 +57,13 @@ public class MainOptionsPaneAccessibilityTest {
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		componentSet = new HashSet<Component>(componentList);
-		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(componentSet.size() == componentList.size());
 
 	}
 	
 	/**
-	 * Comprobación de que el campo Mnemocic de las etiquetas, botones y checkbox no esté duplicado. 
+	 * Comprobacion de que el campo Mnemocic de las etiquetas, botones y checkbox no esté duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic() {
@@ -71,9 +71,9 @@ public class MainOptionsPaneAccessibilityTest {
 
 		//Instancia de la clase que se va a analizar
 		MainOptionsPane mainOptionsPane = new MainOptionsPane();
-		//Lista de mnemónicos
+		//Lista de mnemonicos
 		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemónicos
+		//Conjunto de mnemonicos
 		Set <Integer> keyCodesSet = null;
 		
 		//Se obtiene el panel principal
@@ -83,17 +83,17 @@ public class MainOptionsPaneAccessibilityTest {
 		//todos los componentes que estuvieran deshabilitados
 		activateAllCheckBox(mainPanel);
 		
-		//Se llama al método que obtiene una lista de códigos de atajos asociados a los componentes del panel
+		//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
 		getKeyCodeList (mainPanel, keyCodes);
 		
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 	
 	/**
-	 * Comprobación de que el campo nombre accesible para botones, radiobuttons, combos y checks
+	 * Comprobacion de que el campo nombre accesible para botones, radiobuttons, combos y checks
 	 * no esté vacío. 
 	 */
 	@Test
@@ -124,7 +124,7 @@ public class MainOptionsPaneAccessibilityTest {
 			//Se obtiene el componente
 			Component component = panel.getComponent(i);
 			if (!(component instanceof JPanel)) {
-				if (component instanceof JButton) { //Se comprueba si es un botón
+				if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
 					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
 						return false; //Si no tiene asignado un nombre accesible se sale del método
@@ -160,7 +160,7 @@ public class MainOptionsPaneAccessibilityTest {
 	}
 	
 	/**
-	 * Método que obtiene una lista de códigos de atajos a los botones, etiquetas y checkbox de un panel.
+	 * Método que obtiene una lista de codigos de atajos a los botones, etiquetas y checkbox de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -174,25 +174,25 @@ public class MainOptionsPaneAccessibilityTest {
 				//Se comprueba si es una etiqueta
 				if (component instanceof JLabel) {
 					JLabel label = (JLabel) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = label.getDisplayedMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
-				} else if (component instanceof JButton) { //Se comprueba si es un botón
+				} else if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = button.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
 				} else if (component instanceof JCheckBox) { //Se comprueba si es un checkbox
 					JCheckBox checkBox = (JCheckBox) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = checkBox.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
@@ -250,7 +250,7 @@ public class MainOptionsPaneAccessibilityTest {
 					JLabel label = (JLabel) component;
 					//Se obtiene el componente asociado a la propiedad labelFor
 					labelForComponent = label.getLabelFor();
-					//Se añade a la lista si no es nulo
+					//Se anade a la lista si no es nulo
 					if (labelForComponent != null) {
 						componentList.add(labelForComponent);
 					}

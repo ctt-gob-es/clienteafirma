@@ -37,7 +37,7 @@ public class MultifirmaSimpleAccessibilityTest {
 	static Logger logger = Logger.getLogger(MultifirmaSimpleAccessibilityTest.class.getName());
 	
 	/**
-	 * Comprobación de que el campo labelFor de las etiquetas no esté duplicado. 
+	 * Comprobacion de que el campo labelFor de las etiquetas no esté duplicado. 
 	 */
 	@Test
 	public void testNotDuplicatedLabelForProperty() {
@@ -60,19 +60,19 @@ public class MultifirmaSimpleAccessibilityTest {
 				Component component = label.getLabelFor();
 				//Para este panel hasta el momento todas las etiquetas tienen asociado el campo labelFor
 				assertNotNull(component);
-				//Se añade a la lista el componente
+				//Se anade a la lista el componente
 				componentList.add(component);
 			}
 		}
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		componentSet = new HashSet<Component>(componentList);
-		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(componentSet.size() == componentList.size());
 
 	}
 
 	/**
-	 * Comprobación de que el campo Mnemocic de las etiquetas, botones y botones de radio
+	 * Comprobacion de que el campo Mnemocic de las etiquetas, botones y botones de radio
 	 *  no esté duplicado. Modo Simple.
 	 */
 	@Test
@@ -82,30 +82,30 @@ public class MultifirmaSimpleAccessibilityTest {
 		//Instancia del panel que se va a analizar
 		MultifirmaSimple multifirmaPanel = new MultifirmaSimple();
 		
-		//Lista de mnemónicos
+		//Lista de mnemonicos
 		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemónicos
+		//Conjunto de mnemonicos
 		Set <Integer> keyCodesSet = null;
 		
-		//Se llama al método que obtiene una lista de códigos de atajos asociados a los componentes del panel
+		//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
 		getKeyCodeList (multifirmaPanel, keyCodes);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 
 	/**
-	 * Comprobación de que el campo Mnemocic de las etiquetas, botones y botones de radio
+	 * Comprobacion de que el campo Mnemocic de las etiquetas, botones y botones de radio
 	 *  no esté duplicado. Modo Avanzado.
 	 */
 	@Test
 	public void testNotDuplicatedDisplayedMnemonic_AdvancedMode() {
 		logger.info("testNotDuplicatedDisplayedMnemonic_AdvancedMode");
 
-		//Se obtiene la cofiguración general
-		//Se añade el perfil por defecto
+		//Se obtiene la cofiguracion general
+		//Se anade el perfil por defecto
 		UserProfile.setCurrentProfileId(Constants.defaultUser);
 		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
@@ -119,22 +119,22 @@ public class MultifirmaSimpleAccessibilityTest {
 		//Instancia del panel que se va a analizar
 		MultifirmaSimple multifirmaPanel = new MultifirmaSimple();
 		
-		//Lista de mnemónicos
+		//Lista de mnemonicos
 		List <Integer> keyCodes = new ArrayList<Integer>();
-		//Conjunto de mnemónicos
+		//Conjunto de mnemonicos
 		Set <Integer> keyCodesSet = null;
 		
-		//Se llama al método que obtiene una lista de códigos de atajos asociados a los componentes del panel
+		//Se llama al método que obtiene una lista de codigos de atajos asociados a los componentes del panel
 		getKeyCodeList (multifirmaPanel, keyCodes);
 
 		//Se crea un conjunto a partir de la lista para eliminar duplicados
 		keyCodesSet = new HashSet<Integer>(keyCodes);
-		//Si el tamaño de la lista y del conjunto no son iguales, no hay duplicados
+		//Si el tamano de la lista y del conjunto no son iguales, no hay duplicados
 		assertTrue(keyCodesSet.size() == keyCodes.size());
 	}
 	
 	/**
-	 * Comprobación de que el campo nombre accesible para botones, combos y checks
+	 * Comprobacion de que el campo nombre accesible para botones, combos y checks
 	 * no esté vacío. 
 	 */
 	@Test
@@ -147,14 +147,14 @@ public class MultifirmaSimpleAccessibilityTest {
 	}
 	
 	/**
-	 * Comprobación de que el campo nombre accesible para botones, radioButtons, combos y checks
+	 * Comprobacion de que el campo nombre accesible para botones, radioButtons, combos y checks
 	 * no esté vacío. 
 	 */
 	@Test
 	public void testNotEmptyAccessibleName_AdvancedMode() {
 		logger.info("testNotEmptyAccessibleName_AdvancedMode()");
-		//Se obtiene la cofiguración general
-		//Se añade el perfil por defecto
+		//Se obtiene la cofiguracion general
+		//Se anade el perfil por defecto
 		UserProfile.setCurrentProfileId(Constants.defaultUser);
 		GeneralConfig.loadConfig(GeneralConfig.getConfig());
 		Properties config = GeneralConfig.getConfig();
@@ -184,7 +184,7 @@ public class MultifirmaSimpleAccessibilityTest {
 			//Se obtiene el componente
 			Component component = panel.getComponent(i);
 			if (!(component instanceof JPanel)) {
-				if (component instanceof JButton) { //Se comprueba si es un botón
+				if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
 					if (button.getAccessibleContext().getAccessibleName().equalsIgnoreCase("")) {
 						return false; //Si no tiene asignado un nombre accesible se sale del método
@@ -220,7 +220,7 @@ public class MultifirmaSimpleAccessibilityTest {
 	}
 
 	/**
-	 * Método que obtiene una lista de códigos de atajos a los componentes (Etiqueta, Botón, radio button) de un panel.
+	 * Método que obtiene una lista de codigos de atajos a los componentes (Etiqueta, Boton, radio button) de un panel.
 	 */
 	@Ignore
 	private void getKeyCodeList(JPanel panel, List <Integer> keyCodeList) {
@@ -234,25 +234,25 @@ public class MultifirmaSimpleAccessibilityTest {
 				//Se comprueba si es una etiqueta
 				if (component instanceof JLabel) {
 					JLabel label = (JLabel) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = label.getDisplayedMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
-				} else if (component instanceof JButton) { //Se comprueba si es un botón
+				} else if (component instanceof JButton) { //Se comprueba si es un boton
 					JButton button = (JButton) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = button.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
-				} else if (component instanceof JRadioButton) { //Se comprueba si es un botón de radio
+				} else if (component instanceof JRadioButton) { //Se comprueba si es un boton de radio
 					JRadioButton radioButton = (JRadioButton) component;
-					//Se obtiene el código del atajo asociado
+					//Se obtiene el codigo del atajo asociado
 					keyCode = radioButton.getMnemonic();
-					//Se añade a la lista si existe este código, es decir, si es distinto de 0
+					//Se anade a la lista si existe este codigo, es decir, si es distinto de 0
 					if (keyCode != 0) {
 						keyCodeList.add(new Integer(keyCode));
 					}
