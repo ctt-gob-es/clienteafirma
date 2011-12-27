@@ -17,7 +17,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -90,7 +89,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
 
             currentProfileId = ProfileManager.getProfileIdByName(profileName);
 
-            final Properties c = ProfileManager.getConfiguration(currentProfileId);
+            ProfileManager.getConfiguration(currentProfileId);
 
             GeneralConfig.loadConfig(ProfileManager.getConfiguration(profileName));
         }
