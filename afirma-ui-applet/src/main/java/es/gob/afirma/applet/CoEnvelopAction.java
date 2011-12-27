@@ -12,8 +12,8 @@ package es.gob.afirma.applet;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOInvalidFormatException;
-import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.common.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 
 /** Acci&oacute;n privilegiada para agregar un nuevo remitentes a un sobre
  * electr&oacute;nico. La ejecuci&oacute;n de la acci&oacute;n devuelve {@code true} o {@code false} y el resultado almacenado es un array de bytes. */

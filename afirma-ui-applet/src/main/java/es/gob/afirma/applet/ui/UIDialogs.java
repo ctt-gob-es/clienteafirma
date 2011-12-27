@@ -25,8 +25,8 @@ import javax.swing.tree.TreeSelectionModel;
 
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.ui.jse.JSEUtils;
 import es.gob.afirma.core.util.tree.AOTreeModel;
+import es.gob.afirma.ui.core.jse.JSEUtils;
 
 
 /**
@@ -62,15 +62,15 @@ public class UIDialogs {
                 if (tempFile.exists()) {
                     if (tempFile.isDirectory() && !tempFile.canWrite()) {
                         JOptionPane.showMessageDialog(parentComponent,
-                                                      Messages.getString("AOUIManager.74") + jfc.getSelectedFile().getAbsolutePath() + ".", //$NON-NLS-1$ //$NON-NLS-2$
-                                                      Messages.getString("AOUIManager.81"), //$NON-NLS-1$
+                        		AppletMessages.getString("AOUIManager.74") + jfc.getSelectedFile().getAbsolutePath() + ".", //$NON-NLS-1$ //$NON-NLS-2$
+                        		AppletMessages.getString("AOUIManager.81"), //$NON-NLS-1$
                                                       JOptionPane.WARNING_MESSAGE);
                         continue;
                     }
                     final int resp =
                             JOptionPane.showConfirmDialog(parentComponent,
-                                                          Messages.getString("AOUIManager.77") + "\r\n" + jfc.getSelectedFile().getAbsolutePath(), //$NON-NLS-1$ //$NON-NLS-2$
-                                                          Messages.getString("AOUIManager.81"), //$NON-NLS-1$
+                            		AppletMessages.getString("AOUIManager.77") + "\r\n" + jfc.getSelectedFile().getAbsolutePath(), //$NON-NLS-1$ //$NON-NLS-2$
+                            		AppletMessages.getString("AOUIManager.81"), //$NON-NLS-1$
                                                           JOptionPane.YES_NO_CANCEL_OPTION,
                                                           JOptionPane.QUESTION_MESSAGE);
                     if (resp == JOptionPane.YES_OPTION) { // Sobreescribir
@@ -148,13 +148,13 @@ public class UIDialogs {
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
-        panel.add(new JLabel(Messages.getString("AOUIManager.65")), c); //$NON-NLS-1$
+        panel.add(new JLabel(AppletMessages.getString("AOUIManager.65")), c); //$NON-NLS-1$
         c.weighty = 1.0;
         c.gridy = 1;
         panel.add(spArbolNodos, c);
 
         do {
-            final int action = JOptionPane.showConfirmDialog(parentComponent, panel, Messages.getString("AOUIManager.66"), //$NON-NLS-1$
+            final int action = JOptionPane.showConfirmDialog(parentComponent, panel, AppletMessages.getString("AOUIManager.66"), //$NON-NLS-1$
                                                              JOptionPane.OK_CANCEL_OPTION);
             if (action != JOptionPane.OK_OPTION) {
                 throw new AOCancelledOperationException("La operacion de firma ha sido cancelada por el usuario"); //$NON-NLS-1$
@@ -162,7 +162,7 @@ public class UIDialogs {
 
             if (jList.getSelectedIndices() == null || jList.getSelectedIndices().length < 1) {
                 JOptionPane.showMessageDialog(parentComponent,
-                                              Messages.getString("AOUIManager.20"), Messages.getString("AOUIManager.21"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                		AppletMessages.getString("AOUIManager.20"), AppletMessages.getString("AOUIManager.21"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
         } while (jList.getSelectedIndices() == null || jList.getSelectedIndices().length < 1);
@@ -219,13 +219,13 @@ public class UIDialogs {
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1.0;
-        panel.add(new JLabel(Messages.getString("AOUIManager.60")), c); //$NON-NLS-1$
+        panel.add(new JLabel(AppletMessages.getString("AOUIManager.60")), c); //$NON-NLS-1$
         c.weighty = 1.0;
         c.gridy = 1;
         panel.add(spArbolNodos, c);
 
         do {
-            final int action = JOptionPane.showConfirmDialog(parentComponent, panel, Messages.getString("AOUIManager.61"), //$NON-NLS-1$
+            final int action = JOptionPane.showConfirmDialog(parentComponent, panel, AppletMessages.getString("AOUIManager.61"), //$NON-NLS-1$
                                                              JOptionPane.OK_CANCEL_OPTION,
                                                              JOptionPane.PLAIN_MESSAGE);
             if (action != JOptionPane.OK_OPTION) {
@@ -234,7 +234,7 @@ public class UIDialogs {
 
             if (arbolNodos.getSelectionRows() == null || arbolNodos.getSelectionRows().length < 1) {
                 JOptionPane.showMessageDialog(parentComponent,
-                                              Messages.getString("AOUIManager.18"), Messages.getString("AOUIManager.19"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                		AppletMessages.getString("AOUIManager.18"), AppletMessages.getString("AOUIManager.19"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
         } while (arbolNodos.getSelectionRows() == null || arbolNodos.getSelectionRows().length < 1);

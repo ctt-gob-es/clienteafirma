@@ -11,8 +11,8 @@
 package es.gob.afirma.applet;
 
 import es.gob.afirma.core.signers.AOSignConstants;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 
 /** Normaliza las cadenas de texto introducidas por los usuarios/integradores
  * para la configuraci&oacute;n de los distintos almacenes de certificados,

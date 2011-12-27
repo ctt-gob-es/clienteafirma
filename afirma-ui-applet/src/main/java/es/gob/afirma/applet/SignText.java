@@ -34,17 +34,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
-import es.gob.afirma.keystores.callbacks.NullPasswordCallback;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.core.signers.AOSignerFactory;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
-import es.gob.afirma.util.AOBase64;
+import es.gob.afirma.keystores.main.callbacks.NullPasswordCallback;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 import es.gob.afirma.util.AOCertVerifier;
 import es.gob.afirma.util.AOCertificateRevokedException;
-import es.gob.afirma.util.signers.AOSignerFactory;
 
 
 /** Clase para la firma electr&oacute;nica de cadenas de texto simulando el
@@ -174,9 +174,8 @@ public final class SignText {
         try {
             aliasesByFriendlyName =
                     KeyStoreUtilities.getAliasesByFriendlyName(this.alias, // aliases
-                                                                kss.getKeyStores(), // KeyStores
+                                                                this.kss, // KeyStores
                                                                 true, // checkPrivateKeys
-                                                                true, // checkValidity
                                                                 true, // showExpiredCertificates
                                                                 Collections.singletonList((CertificateFilter) new RFC2254CertificateFilter(null,
                                                                                                                                            issuerFilter)) // filtros
@@ -198,7 +197,7 @@ public final class SignText {
         // En "auto" seleccionamos automaticamente el primero de la lista
         if ("auto".equals(caOption)) { //$NON-NLS-1$
             final Hashtable<String, String> tmpHash = new Hashtable<String, String>(1);
-            final String key = aliasesByFriendlyName.keys().nextElement();
+            final String key = aliasesByFriendlyName.keySet().iterator().next();
             tmpHash.put(key, aliasesByFriendlyName.get(key));
             createUI(stringToSign, tmpHash);
         }
@@ -228,13 +227,12 @@ public final class SignText {
                 final AOSigner signer = AOSignerFactory.getSigner(
                         this.useCAdES ? AOSignConstants.SIGN_FORMAT_CADES : AOSignConstants.SIGN_FORMAT_CMS);
                 
-                return AOBase64.encode(
+                return Base64.encodeBytes(
                         signer.sign(
                                 stringToSign.getBytes(),
                                 AOSignConstants.SIGN_ALGORITHM_SHA1WITHRSA,
                                 keyEntry,
-                                null),
-                        false);
+                                null));
         }
         catch (final Exception e) {
             Logger.getLogger("es.gob.afirma").severe("Error creando la firma: " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -268,7 +266,7 @@ public final class SignText {
         }
     }
 
-    private void createUI(final String stringToSign, final Hashtable<String, String> aliasesByFriendlyName) {
+    private void createUI(final String stringToSign, final Map<String, String> aliasesByFriendlyName) {
 
         final JTextArea textArea = new JTextArea(stringToSign);
         textArea.setEditable(false);
@@ -325,7 +323,7 @@ public final class SignText {
         }
         else {
             offset = -25;
-            label2.setText("Se utilizar\u00E1 el siguiente certificado: " + aliasesByFriendlyName.keys().nextElement());
+            label2.setText("Se utilizar\u00E1 el siguiente certificado: " + aliasesByFriendlyName.keySet().iterator().next());
         }
         pane.add(label2);
 

@@ -55,23 +55,26 @@ import es.gob.afirma.core.misc.MimeHelper;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.signers.AOSigner;
+import es.gob.afirma.core.signers.AOSignerFactory;
+import es.gob.afirma.core.signers.CounterSignTarget;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.core.ui.AOUIManager;
 import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
-import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.common.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 import es.gob.afirma.keystores.filters.rfc.KeyUsageFilter;
 import es.gob.afirma.keystores.filters.rfc.RFC2254CertificateFilter;
 import es.gob.afirma.massive.DirectorySignatureHelper;
 import es.gob.afirma.massive.MassiveSignatureHelper;
 import es.gob.afirma.massive.MassiveSignatureHelper.MassiveSignConfiguration;
 import es.gob.afirma.massive.MassiveType;
+import es.gob.afirma.signers.cades.AOCAdESSigner;
+import es.gob.afirma.signers.cms.AOCMSSigner;
 import es.gob.afirma.util.AOBase64;
-import es.gob.afirma.util.signers.AOSignerFactory;
 
 
 /** Reimplementaci&oacute;n del Applet original de firma del cliente AFirma.
@@ -260,7 +263,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     /** Construye la clase asegurandose de que se inicializan todas las
      * propiedades necesarias. */
     public SignApplet() {
-        Platform.init();
         this.ksConfigManager = new KeyStoreConfigurationManager(AOKeyStore.PKCS12, this);
         this.cipherManager = new CipherManager(this);
         this.enveloperManager = new EnveloperManager(this);
@@ -269,22 +271,16 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
     @Override
     public void init() {
 
-        final InitializePlatformAction initializePlatformAction = new InitializePlatformAction();
-        initializePlatformAction.setUserAgent(getParameter("userAgent")); //$NON-NLS-1$
-        AccessController.doPrivileged(initializePlatformAction);
-
-        LOGGER.info("Cliente @firma V3.2"); //$NON-NLS-1$
+    	LOGGER.info("Cliente @firma V3.2"); //$NON-NLS-1$
         LOGGER.info("Versi\u00F3n: " + getVersion()); //$NON-NLS-1$
 
         LOGGER.info("Sistema operativo: " + Platform.getOS().toString()); //$NON-NLS-1$
-        LOGGER.info("Version del sistema operativo: " + Platform.getOsVersion()); //$NON-NLS-1$
-        LOGGER.info("Arquitectura del sistema operativo: " + Platform.getOsArch()); //$NON-NLS-1$
         LOGGER.info("Arquitectura del JRE: " + Platform.getJavaArch()); //$NON-NLS-1$
 
         this.setLookAndFeel();
 
         // Configuramos el almacen de claves que corresponda
-        final AOKeyStore keyStore = this.configureDefaultStore(Platform.getOS(), Platform.getBrowser());
+        final AOKeyStore keyStore = this.configureDefaultStore(Platform.getOS(), Platform.getBrowser(getParameter("userAgent")));
         this.ksConfigManager = new KeyStoreConfigurationManager(keyStore, this);
 
         LOGGER.info("Almacen de certificados preestablecido: " + keyStore.getDescription()); //$NON-NLS-1$
@@ -1039,7 +1035,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
 
                 // Obtenemos los parametros para la contrafirma de nodos
-                else if (target == AOSignConstants.CounterSignTarget.NODES) {
+                else if (target == CounterSignTarget.NODES) {
                     // Si no se establecen los nodos de firma mediante
                     // setSignersToCounterSign(String)
                     // mostramos el panel de seleccion de nodos. Este
@@ -1445,7 +1441,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                         signs =
                                 massiveSigner.hashesMassiveSign(SignApplet.this.hashesToSign.toArray(new String[0]),
                                                                 ke,
-                                                                (X509Certificate) ke.getCertificate(),
                                                                 // Recuperamos el signer que se
                                                                 // utilizara para la operacion de firma
                                                                 // masiva para poder agregarle
@@ -1943,7 +1938,6 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                                                       true,
                                                       SignApplet.this.originalFormat,
                                                       ke,
-                                                      (X509Certificate) ke.getCertificate(),
                                                       SignApplet.this.genericConfig);
                 }
                 catch (final Exception e) {
@@ -2044,7 +2038,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
                 }
 
                 // Cargamos los datos de la URI configurada
-                final LoadFileAction loadFileAction = new LoadFileAction(this.fileUri, SignApplet.this);
+                final LoadFileAction loadFileAction = new LoadFileAction(this.fileUri);
                 loadFileAction.setBase64Encoded(this.fileBase64);
                 AccessController.doPrivileged(loadFileAction);
                 if (loadFileAction.isError()) {
@@ -2572,7 +2566,7 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         }
 
         try {
-            return getFileBase64Encoded(AOUtil.createURI(filename), showProgress);
+            return getFileBase64Encoded(filename, showProgress);
         }
         catch (final Exception e) {
             LOGGER.severe("Error al leer el fichero '" + filename + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$

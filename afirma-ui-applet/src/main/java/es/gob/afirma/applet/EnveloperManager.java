@@ -35,8 +35,8 @@ import es.gob.afirma.core.signers.AOSignConstants;
 import es.gob.afirma.core.ui.AOUIFactory;
 import es.gob.afirma.envelopers.cms.AOCMSEnveloper;
 import es.gob.afirma.envelopers.cms.AOInvalidRecipientException;
-import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.common.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
 
 /** Manejador para el ensobrado de datos por parte del Applet Cliente @firma.
  * Esta clase almacena toda la informaci&oacute;n relevante para las operaciones

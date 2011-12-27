@@ -21,9 +21,6 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.swing.JOptionPane;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;
-
 import es.gob.afirma.ciphers.AOCipherConstants;
 import es.gob.afirma.ciphers.AOCipherKeyStoreHelper;
 import es.gob.afirma.ciphers.jce.AOSunJCECipher;
@@ -35,9 +32,10 @@ import es.gob.afirma.core.ciphers.CipherConstants.AOCipherAlgorithm;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherBlockMode;
 import es.gob.afirma.core.ciphers.CipherConstants.AOCipherPadding;
 import es.gob.afirma.core.misc.AOUtil;
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.ui.AOUIFactory;
-import es.gob.afirma.keystores.callbacks.UIPasswordCallback;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.callbacks.UIPasswordCallback;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
 
 /** Manejador de las funcionalidades de cifrado del Cliente @firma. */
 public final class CipherManager {
@@ -355,7 +353,7 @@ public final class CipherManager {
     /** Recupera en base 64 los datos cifrados.
      * @return Datos cifrados en base 64. */
     public String getCipheredDataB64Encoded() {
-        return (this.cipheredData == null ? null : StringUtils.newStringUtf8(Base64.encodeBase64(this.cipheredData, false)));
+        return (this.cipheredData == null ? null : Base64.encodeBytes(this.cipheredData));
     }
 
     /** Establece los datos cifrados para descifrar.
@@ -369,7 +367,7 @@ public final class CipherManager {
      * @param cipheredDataB64
      *        Datos cifrados en base 64. */
     public void setCipheredData(final String cipheredDataB64) {
-        this.cipheredData = (cipheredDataB64 == null ? null : Base64.decodeBase64(cipheredDataB64));
+        this.cipheredData = (cipheredDataB64 == null ? null : Base64.decode(cipheredDataB64));
     }
 
     /** Cifra los datos con la configuraci&oacute;n establecida.
@@ -485,7 +483,7 @@ public final class CipherManager {
         // Tomamos o generamos la clave, segun nos indique el modo de clave.
         if (this.keyMode.equals(AOCipherConstants.KEY_MODE_GENERATEKEY)) {
             cipherKey = cipher.generateKey(config);
-            this.cipherB64Key = Base64.encodeBase64String(cipherKey.getEncoded());
+            this.cipherB64Key = Base64.encodeBytes(cipherKey.getEncoded());
 
             // Si se permite el almacenamiento de las claves, le damos la
             // posibilidad al usuario
@@ -580,7 +578,7 @@ public final class CipherManager {
             // En este punto, tenemos la URI de los datos de entrada
             final InputStream is =  AOUtil.loadFile(this.fileUri);
             if (this.fileBase64) {
-                dataToDecipher = Base64.decodeBase64(
+                dataToDecipher = Base64.decode(
                         AOUtil.getDataFromInputStream(is));
             } else {
                 dataToDecipher = AOUtil.getDataFromInputStream(is);
