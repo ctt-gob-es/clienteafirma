@@ -8,7 +8,7 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
-package es.gob.afirma.applet.actions;
+package es.gob.afirma.applet;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;

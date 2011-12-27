@@ -44,14 +44,6 @@ import javax.swing.UIManager;
 
 import org.ietf.jgss.Oid;
 
-import es.gob.afirma.applet.actions.BasicPrivilegedAction;
-import es.gob.afirma.applet.actions.CipherAction;
-import es.gob.afirma.applet.actions.CoEnvelopAction;
-import es.gob.afirma.applet.actions.DecipherAction;
-import es.gob.afirma.applet.actions.InitializePlatformAction;
-import es.gob.afirma.applet.actions.LoadFileAction;
-import es.gob.afirma.applet.actions.UnwrapAction;
-import es.gob.afirma.applet.actions.WrapAction;
 import es.gob.afirma.applet.ui.UIDialogs;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
@@ -3836,8 +3828,9 @@ public final class SignApplet extends JApplet implements EntryPointsCrypto, Entr
         LOGGER.info("Invocando getSignCertificate"); //$NON-NLS-1$
         final X509Certificate cert = this.ksConfigManager.getSelectedCertificate();
         if (cert == null) {
-            LOGGER.warning("No se dispone del certificado de firma, se nulo"); //$NON-NLS-1$
+            LOGGER.warning("No se dispone del certificado de firma, se devolvera nulo"); //$NON-NLS-1$
         }
+        
         return cert;
     }
 

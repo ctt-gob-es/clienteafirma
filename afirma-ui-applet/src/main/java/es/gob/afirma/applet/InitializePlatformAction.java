@@ -7,7 +7,7 @@
  * condiciones que figuran en el fichero 'licence' que se acompana. Si se distribuyera este
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
-package es.gob.afirma.applet.actions;
+package es.gob.afirma.applet;
 
 import es.gob.afirma.core.misc.Platform;
 

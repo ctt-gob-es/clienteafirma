@@ -4,7 +4,6 @@ import java.net.URI;
 import java.security.AccessController;
 import java.util.logging.Logger;
 
-import es.gob.afirma.applet.actions.LoadFileAction;
 
 /** Funciones de utilidad orientadas al uso de ficheros, teniendo en cuenta que
  * estas deben tratarse como funciones privilegiadas. */

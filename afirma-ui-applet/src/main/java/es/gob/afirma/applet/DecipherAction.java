@@ -8,12 +8,11 @@
  * fichero individualmente, deben incluirse aqui las condiciones expresadas alli.
  */
 
-package es.gob.afirma.applet.actions;
+package es.gob.afirma.applet;
 
 import java.io.IOException;
 import java.security.KeyException;
 
-import es.gob.afirma.applet.CipherManager;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.AOException;
 
