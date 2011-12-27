@@ -30,7 +30,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.swing.BorderFactory;
@@ -520,18 +519,18 @@ public final class Utils {
      * @param defaultValue
      *        Valor por defecto.
      * @return Devuelve el valor de la preferencia indicada o {@code defaultValue} si no est&aacute;a establecida. */
-    public static String getPreference(final String key, final String defaultValue, Preferences preferences) {
+    /*public static String getPreference(final String key, final String defaultValue, Preferences preferences) {
         return preferences.get(key, defaultValue);
-    }
+    }*/
 
     /** Establece una preferencia para la aplicaci&oacute;n.
      * @param key
      *        Clave de la preferencia.
      * @param value
      *        Valor asignado. */
-    public static void setPreference(final String key, final String value, Preferences preferences) {
+    /*public static void setPreference(final String key, final String value, Preferences preferences) {
         preferences.put(key, value);
-    }
+    }*/
     
     /** Muestra un di&aacute;logo para que el usuario seleccione entre los
      * certificados mostrados. Es posible indicar que s&ocuate;lo puede haber un
