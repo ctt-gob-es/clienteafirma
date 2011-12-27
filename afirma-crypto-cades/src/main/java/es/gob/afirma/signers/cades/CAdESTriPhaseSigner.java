@@ -3,7 +3,7 @@
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
  *   - the GNU General Public License as published by the Free Software Foundation; 
  *     either version 2 of the License, or (at your option) any later version.
- *   - or The European Software License; either versión 1.1 or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
@@ -84,7 +84,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  * <p><b>Pre-firma:</b></p>
  * <p align="center"><img src="doc-files/CAdESTriPhaseSigner-1.png"></p>
  * <ul>
- *  <li>El dispositivo móvil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
+ *  <li>El dispositivo movil solicita una pre-firma al servidor Web indicando un identificador de documento.</li>
  *  <li>El servidor Web solicita el documento a servidor documental.</li>
  *  <li>
  *   El servidor documental entrega el documento al servidor Web.<br> Es importante recalcar que el servidor
@@ -121,7 +121,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  </li>
  *  <li>El servidor documental almacena el nuevo documento y devuelve un identificador al servidor Web.</li>
  *  <li>
- *   El servidor Web comunica al dispositivo el éxito de la operación y el identificador del fichero 
+ *   El servidor Web comunica al dispositivo el éxito de la operacion y el identificador del fichero 
  *   ya firmado y almacenado.
  *  </li>
  * </ul>

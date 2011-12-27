@@ -3,7 +3,7 @@
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
  *   - the GNU General Public License as published by the Free Software Foundation; 
  *     either version 2 of the License, or (at your option) any later version.
- *   - or The European Software License; either versión 1.1 or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
@@ -220,7 +220,7 @@ public final class CAdESUtils {
 
             // Algoritmo para el hash
             final AlgorithmIdentifier hashid;
-            // si tenemos algoritmo de cálculo de hash, lo ponemos
+            // si tenemos algoritmo de calculo de hash, lo ponemos
             if(policy.getPolicyIdentifierHashAlgorithm()!=null){
                 hashid = SigUtils.makeAlgId(
                                     AOAlgorithmID.getOID(
