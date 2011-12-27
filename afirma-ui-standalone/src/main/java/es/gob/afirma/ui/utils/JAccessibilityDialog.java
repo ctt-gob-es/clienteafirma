@@ -1,7 +1,6 @@
 package es.gob.afirma.ui.utils;
 
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -95,7 +94,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	 * Evento de redimensionado. Comprueba el tamaÃ±o de la ventana para habilitar o deshabilitar el boton
 	 *  de Maximizar ventana. Tambien almacena el tamaño y posicion de la ventana para su restauracion.
 	 */
-	public void resized(ComponentEvent e) {
+	private void resized(ComponentEvent e) {
 
 		//Se obtienen las dimensiones totales disponibles para mostrar una ventana
 		Rectangle rect =  GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -128,7 +127,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	 * @param component El componente.
 	 * @return El JAccessibilityDialog buscado.
 	 */
-	public static JAccessibilityDialog getJAccessibilityDialog(Component component)
+	/*public static JAccessibilityDialog getJAccessibilityDialog(Component component)
 	{
 		JAccessibilityDialog  resultingJAccessibilityDialog = null;
 		while (component != null && resultingJAccessibilityDialog == null)
@@ -141,7 +140,7 @@ public abstract class JAccessibilityDialog extends JDialog {
 	        }
 		 }
 		 return resultingJAccessibilityDialog;
-	 }
+	 }*/
 	
 	 /**
      * Carga un icono contenido en el directorio de iconos del proyecto.
