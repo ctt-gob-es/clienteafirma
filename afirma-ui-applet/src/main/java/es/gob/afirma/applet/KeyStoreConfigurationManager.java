@@ -17,6 +17,7 @@ import java.security.KeyStore.PrivateKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.security.auth.callback.PasswordCallback;
@@ -25,14 +26,14 @@ import javax.swing.JOptionPane;
 import es.gob.afirma.applet.callbacks.CachePasswordCallback;
 import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.Platform;
-import es.gob.afirma.keystores.common.AOCertificatesNotFoundException;
-import es.gob.afirma.keystores.common.AOKeyStore;
-import es.gob.afirma.keystores.common.AOKeyStoreManager;
-import es.gob.afirma.keystores.common.AOKeyStoreManagerException;
-import es.gob.afirma.keystores.common.AOKeyStoreManagerFactory;
-import es.gob.afirma.keystores.common.AOKeystoreAlternativeException;
-import es.gob.afirma.keystores.common.KeyStoreUtilities;
-import es.gob.afirma.keystores.filters.CertificateFilter;
+import es.gob.afirma.keystores.main.common.AOCertificatesNotFoundException;
+import es.gob.afirma.keystores.main.common.AOKeyStore;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerException;
+import es.gob.afirma.keystores.main.common.AOKeyStoreManagerFactory;
+import es.gob.afirma.keystores.main.common.AOKeystoreAlternativeException;
+import es.gob.afirma.keystores.main.common.KeyStoreUtilities;
+import es.gob.afirma.keystores.main.filters.CertificateFilter;
 
 /** Almacena una configuracui&oacute;n para el almac&eacute;bn establecido del
  * Cliente @firma. Gestiona su inicializaci&oacute;n y la selecci&oacute;n de
@@ -74,7 +75,7 @@ final class KeyStoreConfigurationManager {
 
     private boolean showExpiratedCertificates = false;
     private boolean mandatoryCert = false;
-    private final Vector<CertificateFilter> certFilters = new Vector<CertificateFilter>();
+    private final ArrayList<CertificateFilter> certFilters = new ArrayList<CertificateFilter>();
 
     /** Construye la configuraci&oacute;n por defecto para el Cliente, pudiendo
      * variar el almac&eacute;n seg&uacute;n el sistema operativo:
@@ -128,7 +129,7 @@ final class KeyStoreConfigurationManager {
     }
 
     private void resetFilters() {
-        this.certFilters.removeAllElements();
+        this.certFilters.clear();
     }
 
     void addCertFilter(final CertificateFilter certFilter) {
@@ -400,7 +401,7 @@ final class KeyStoreConfigurationManager {
     private String showCertSelectionDialog(final String[] certAlias, final boolean checkPrivateKey) throws AOCertificatesNotFoundException,
                                                                                                    AOCancelledOperationException {
         return KeyStoreUtilities.showCertSelectionDialog(certAlias, // Aliases
-                                                   (this.ksManager == null) ? null : this.ksManager.getKeyStores(), // KeyStores
+                                                   this.ksManager, // KeyStoreManager
                                                    this.parent, // Panel sobre el que mostrar el dialogo
                                                    checkPrivateKey, // Comprobar accesibilidad de claves privadas
                                                    true, // Advierte si el certificado esta caducado
