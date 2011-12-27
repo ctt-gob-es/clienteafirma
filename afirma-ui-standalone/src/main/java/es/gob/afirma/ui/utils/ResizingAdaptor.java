@@ -365,7 +365,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @para h Height inicial de la imagen
 	 * @param multiplicando Valor de multiplicacion para el nuevo tamaño de la imagen. Es mayor cuanto menor sea el tamaño inicial de la imagen
 	 */
-	public final void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
+	private final void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
 		if (theFileChooser==null){			
 			ImageIcon image = new ImageIcon();
 			//Se comprueba si el componente es instancia de IconLabel
@@ -387,7 +387,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param factor factor de redimensi&oacute;n
 	 * @param c Componente de tipo JButton en el que se encuentra la imagen
 	 */
-	public final void resizeImageButton(double factor, Component c) {
+	private final void resizeImageButton(double factor, Component c) {
 		
 		if (theFileChooser==null && theFileChooserToSave==null){
 			
