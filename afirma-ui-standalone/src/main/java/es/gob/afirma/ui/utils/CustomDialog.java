@@ -1062,10 +1062,10 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 * Cambia el tama&ntilde;o de la ventana al tama&ntilde;o m&aacute;ximo de pantalla menos el tama&ntilde;o de la barra de tareas de windows
 	 */
 	private void maximizarActionPerformed(){
-		actualPositionX = this.getX();
-		actualPositionY = this.getY();
-		actualWidth = this.getWidth();
-		actualHeight = this.getHeight();
+		setActualPositionX(this.getX());
+		setActualPositionY(this.getY());
+		setActualWidth(this.getWidth());
+		setActualHeight(this.getHeight());
 		
 		//Se obtienen las dimensiones de maximizado
 		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
@@ -1095,8 +1095,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		setMinimumSize(new Dimension(minWidth, minHeight));
 		
 		//Se situa el diálogo
-		if (actualPositionX != -1 && actualPositionY != -1 && actualWidth != -1 && actualHeight != -1){
-			this.setBounds(actualPositionX, actualPositionY, actualWidth, actualHeight);
+		if (getActualPositionX() != -1 && getActualPositionY() != -1 && getActualWidth() != -1 && getActualHeight() != -1){
+			this.setBounds(getActualPositionX(), getActualPositionY(), getActualWidth(), getActualHeight());
 		} else {
     		setBounds(getInitialX(minWidth), getInitialY(minHeight), minWidth, minHeight);
 		}
@@ -1144,6 +1144,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		}
 		setVisible(false);
 	}
+	
+	
 	
 	 /** Original code: <a
      * href="http://tactika.com/realhome/realhome.html">http://

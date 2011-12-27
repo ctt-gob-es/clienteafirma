@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.utils;
 
-import java.awt.Component;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -25,22 +24,22 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	/**
 	 * Posicion X actual.
 	 */
-	protected static int actualPositionX = -1;
+	private static int actualPositionX = -1;
 	
 	/**
 	 * Posicion Y actual.
 	 */
-	protected static int actualPositionY = -1;
+	private static int actualPositionY = -1;
 	
 	/**
 	 * Ancho actual.
 	 */
-	protected static int actualWidth = -1;
+	private static int actualWidth = -1;
 	
 	/**
 	 * Alto actual.
 	 */
-	protected static int actualHeight = -1;
+	private static int actualHeight = -1;
 
 	/**
 	 * Indica si la ventana está maximizada.
@@ -150,7 +149,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 * Evento de redimensionado. Comprueba el tamanio de la ventana para habilitar o deshabilitar el boton
 	 *  de Maximizar ventana. Tambien almacena el tamaño y posicion de la ventana para su restauracion.
 	 */
-	public void resized(ComponentEvent e) {
+	private void resized(ComponentEvent e) {
 		//Variable que controlará sin las dimensiones van a exceder el límite
 		boolean limitControl = false;
 		
@@ -214,42 +213,13 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	    }*/
 	}
 	
-	/**
-	 * Obtiene un componente de un contenedor a traves de su nombre
-	 * @param name Nombre del componente a buscar
-	 * @param container Contenedor donde se encuentra el componente a buscar
-	 * @return
-	 */
-	/*private Component getComponentByName(String name, Container container){
-		if(name.equals(container.getName())){
-			return container;
-		}
-		else {
-			Component[] componentes = container.getComponents();
-			for(int i = 0; i < componentes.length; i++){
-				if(componentes[i] instanceof Container){
-					Component res = getComponentByName(name, (Container) componentes[i]);
-					if(res != null){
-						return res;
-					}
-				}
-				else{
-					if(componentes[i].getName().equals(name)){
-						return componentes[i];
-					}
-				}
-			}
-		}
-		return null;
-	}*/
-	
 	
 	/**
 	 * Busca el JAccessibilityCustomDialog padre de un componente.
 	 * @param component El componente.
 	 * @return El JAccessibilityCustomDialog buscado.
 	 */
-	public static JAccessibilityCustomDialog getJAccessibilityCustomDialog(Component component)
+	/*public static JAccessibilityCustomDialog getJAccessibilityCustomDialog(Component component)
 	{
 		JAccessibilityCustomDialog  resultingJAccessibilityCustomDialog = null;
 		while (component != null && resultingJAccessibilityCustomDialog == null)
@@ -262,7 +232,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	        }
 		 }
 		 return resultingJAccessibilityCustomDialog;
-	 }
+	 }*/
 	
     /**
      * Carga un icono contenido en el directorio de iconos del proyecto.
@@ -272,6 +242,59 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
     private ImageIcon loadIcon(final String filename) {
         return new ImageIcon(this.getClass().getResource(ICON_DIR_PATH + filename));
     }
+    
+    /**
+     * Getter para la variable ActualPositionX.
+     * @return ActualPositionX
+     */
+	public static int getActualPositionX() {
+		return actualPositionX;
+	}
+	/**
+     * Setter para la variable ActualPositionX.
+     */
+	public static void setActualPositionX(int actualPositionX) {
+		JAccessibilityCustomDialog.actualPositionX = actualPositionX;
+	}
+	/**
+     * Getter para la variable ActualPositionY.
+     * @return ActualPositionY
+     */
+	public static int getActualPositionY() {
+		return actualPositionY;
+	}
+	/**
+     * Setter para la variable ActualPositionY.
+     */
+	public static void setActualPositionY(int actualPositionY) {
+		JAccessibilityCustomDialog.actualPositionY = actualPositionY;
+	}
+	/**
+     * Getter para la variable ActualWidth.
+     * @return ActualWidth
+     */
+	public static int getActualWidth() {
+		return actualWidth;
+	}
+	/**
+     * Setter para la variable ActualWidth.
+     */
+	public static void setActualWidth(int actualWidth) {
+		JAccessibilityCustomDialog.actualWidth = actualWidth;
+	}
+	/**
+     * Getter para la variable ActualHeight.
+     * @return ActualHeight
+     */
+	public static int getActualHeight() {
+		return actualHeight;
+	}
+	/**
+     * Setter para la variable ActualHeight.
+     */
+	public static void setActualHeight(int actualHeight) {
+		JAccessibilityCustomDialog.actualHeight = actualHeight;
+	}
 
 	/**
 	 * Indica si el diálogo debe tener un tamaño grande por defecto.
