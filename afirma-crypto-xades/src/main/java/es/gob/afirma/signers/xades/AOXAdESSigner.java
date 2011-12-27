@@ -3,7 +3,7 @@
  * "Cliente @Firma" is free software; you can redistribute it and/or modify it under the terms of:
  *   - the GNU General Public License as published by the Free Software Foundation; 
  *     either version 2 of the License, or (at your option) any later version.
- *   - or The European Software License; either versión 1.1 or (at your option) any later version.
+ *   - or The European Software License; either version 1.1 or (at your option) any later version.
  * Date: 11/01/11
  * You may contact the copyright holder at: soporte.afirma5@mpt.es
  */
@@ -1604,7 +1604,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con 
      *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
      *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES, 
-     *  el resultado global de la firma se adec&uacute;a al estándar más amplio, XMLDSig en este caso.
+     *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
      * </p>
      * @param data Datos que deseamos firmar.
      * @param sign Documento con las firmas iniciales. 
@@ -1890,7 +1890,7 @@ public final class AOXAdESSigner implements AOSigner {
      *  de XMLDSig, el resultado de una cofirma XAdES sobre un documento firmado previamente con 
      *  XMLDSig (o viceversa), son dos firmas independientes, una en XAdES y otra en XMLDSig.<br>
      *  Dado que todas las firmas XAdES son XMLDSig pero no todas las firmas XMLDSig son XAdES, 
-     *  el resultado global de la firma se adec&uacute;a al estándar más amplio, XMLDSig en este caso.
+     *  el resultado global de la firma se adec&uacute;a al estandar mas amplio, XMLDSig en este caso.
      * </p>
      * @param sign Documento con las firmas iniciales. 
      * @param algorithm Algoritmo a usar para la firma.
