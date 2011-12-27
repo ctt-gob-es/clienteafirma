@@ -77,12 +77,14 @@ public final class SSLFilter extends CertificateFilter {
 				if (this.matches(cert)) {
 					if (this.isAuthenticationDnieCert(cert)) {
 						for (int j = 0; j < aliases.length; j++) {
-							cert2 = ksm.getCertificate(aliases[j]);				
-							if (i != j && this.isSignatureDnieCert(cert2) && this.getSubjectSN(cert2) != null &&
-									this.getSubjectSN(cert2).equalsIgnoreCase(this.getSubjectSN(cert)) &&
-									this.getExpiredDate(cert2).equals(this.getExpiredDate(cert))) {
-								filteredCerts.add(aliases[j]);
-								break;
+							if (i != j) {
+								cert2 = ksm.getCertificate(aliases[j]);				
+								if (this.isSignatureDnieCert(cert2) && this.getSubjectSN(cert2) != null &&
+										this.getSubjectSN(cert2).equalsIgnoreCase(this.getSubjectSN(cert)) &&
+										this.getExpiredDate(cert2).equals(this.getExpiredDate(cert))) {
+									filteredCerts.add(aliases[j]);
+									break;
+								}
 							}
 						}
 					}
