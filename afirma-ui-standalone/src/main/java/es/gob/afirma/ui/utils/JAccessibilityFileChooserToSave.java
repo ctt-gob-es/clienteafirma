@@ -292,8 +292,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	/**
 	 * Elimina la barra de accesos a carpetas de windows de la ventana
 	 */
-	@Override
-	public void removeWindowsToolBar(){
+	private void removeWindowsToolBar(){
 		
 		for (int i=0; i<this.getComponentCount();i++){
 			if (this.getComponent(i) instanceof JToolBar){
@@ -318,16 +317,14 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	/**
 	 * Ajuste de fuentes.
 	 */
-	@Override
-	public final void callResize(){
+	private final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
 	
 	/**
 	 * Se almacena la posición actual.
 	 */
-	@Override
-	public void resized(){
+	private void resized(){
 		if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.fileActualPositionX = dialog.getX();
 	    	PrincipalGUI.fileActualPositionY = dialog.getY();

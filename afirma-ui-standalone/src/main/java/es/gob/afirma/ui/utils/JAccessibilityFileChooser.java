@@ -10,7 +10,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -32,8 +31,6 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-
-import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.ui.principal.PrincipalGUI;
 
 /**
@@ -112,23 +109,23 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 * Posici&oacute;n X inicial de la ventana dependiendo de la resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n X
 	 */
-    public int getInitialX() {
+    /*public int getInitialX() {
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); //329
 		return (screenSize.width - 426) / 2 ;
-	}
+	}*/
     
     /**
 	 * Posici&oacute;n Y inicial de la ventana dependiendo del sistema operativo y de la
 	 * resoluci&oacute;n de pantalla.
 	 * @return int Posici&oacute;n Y
 	 */
-	public int getInitialY() {
+	/*public int getInitialY() {
         Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if (Platform.getOS().equals(Platform.OS.MACOSX)){
         	return (screenSize.height - 485) / 2;
         } 
         return (screenSize.height - 456) / 2;
-	}
+	}*/
 	
 	/**
 	 * Asigna el mnem&oacute;nico indicado al bot&oacute;n identificado por la clave .
@@ -471,7 +468,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Elimina la barra de accesos a carpetas de windows de la ventana
 	 */
-	public void removeWindowsToolBar(){
+	private void removeWindowsToolBar(){
 		
 		for (int i=0; i<this.getComponentCount();i++){
 			if (this.getComponent(i) instanceof JToolBar){
@@ -511,14 +508,14 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Ajuste de fuentes.
 	 */
-	public void callResize(){
+	private void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
 	}
 
 	/**
 	 * Se almacena la posición actual.
 	 */
-	public void resized(){
+	private void resized(){
 		if (!GeneralConfig.isMaximized()){
 	    	PrincipalGUI.fileActualPositionX = this.dialog.getX();
 	    	PrincipalGUI.fileActualPositionY = this.dialog.getY();
