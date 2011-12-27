@@ -217,7 +217,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
 
     /** Posicion X inicial de la ventana dependiendo de la resolucion de pantalla.
      * @return int Posicion X */
-    public int getInitialX() {
+    private int getInitialX() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
         return (screenSize.width - 500) / 2;
     }
@@ -225,7 +225,7 @@ class UserProfile extends JAccessibilityFrameAdvisor {
     /** Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
      * resolucion de pantalla.
      * @return int Posicion Y */
-    public int getInitialY() {
+    private int getInitialY() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
         if (Platform.getOS().equals(Platform.OS.MACOSX)) {
             return (screenSize.height - 340) / 2;
