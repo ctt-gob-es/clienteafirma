@@ -77,7 +77,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *  sigPolicyId           SigPolicyId,
  *  sigPolicyHash         SigPolicyHash,
  *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
- *                          SigPolicyQualifierInfo OPTIONAL}
+ *                          AOSigPolicyQualifierInfo OPTIONAL}
  *
  *  SigPolicyId ::= OBJECT IDENTIFIER
  *
@@ -85,7 +85,7 @@ import es.gob.afirma.signers.pkcs7.SigUtils;
  *     hashAlgorithm    AlgorithmIdentifier,
  *     hashValue        OCTET STRING }
  *
- *  SigPolicyQualifierInfo ::= SEQUENCE {
+ *  AOSigPolicyQualifierInfo ::= SEQUENCE {
  *       SigPolicyQualifierId  SigPolicyQualifierId,
  *       SigQualifier          ANY DEFINED BY policyQualifierId }
  *

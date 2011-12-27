@@ -47,7 +47,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  *           sigPolicyId           SigPolicyId,
  *           sigPolicyHash         SigPolicyHash,
  *           sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
- *                                   SigPolicyQualifierInfo OPTIONAL}
+ *                                   AOSigPolicyQualifierInfo OPTIONAL}
  * </code>
  * </pre>
  */

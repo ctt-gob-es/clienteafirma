@@ -19,10 +19,10 @@ import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
-/** Tipo <i>SigPolicyQualifierInfo</i> de ASN.1 para CADES-EPES.
+/** Tipo <i>AOSigPolicyQualifierInfo</i> de ASN.1 para CADES-EPES.
  *
  * <pre>
- *   SigPolicyQualifierInfo ::= SEQUENCE {
+ *   AOSigPolicyQualifierInfo ::= SEQUENCE {
  *       sigPolicyQualifierId  sigPolicyQualifierId,
  *       sigQualifier          ANY DEFINED BY policyQualifierId }
  * </pre>
@@ -31,16 +31,16 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
  * para crear un Signature Policy qualifiers basandose en BouncyCastle: <a
  * href="http://www.bouncycastle.org/">www.bouncycastle.org</a> de la clase
  * Policy qualifiers. */
-final class SigPolicyQualifierInfo extends ASN1Encodable {
+final class AOSigPolicyQualifierInfo extends ASN1Encodable {
 
     private final DERObjectIdentifier sigPolicyQualifierId;
     private final DEREncodable sigQualifier;
 
-    /** Crea un nuevo <code>SigPolicyQualifierInfo</code> con su calificador
+    /** Crea un nuevo <code>AOSigPolicyQualifierInfo</code> con su calificador
      * cPSuri.
      * @param cps
      *        El CPS (certification practice statement) uri como <code>String</code>. */
-    SigPolicyQualifierInfo(final String cps) {
+    AOSigPolicyQualifierInfo(final String cps) {
         this.sigPolicyQualifierId = PKCSObjectIdentifiers.id_spq_ets_uri;
         this.sigQualifier = new DERIA5String(cps);
     }

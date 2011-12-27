@@ -245,13 +245,13 @@ public final class CAdESUtils {
             final DigestInfo otherHashAlgAndValue = new DigestInfo(hashid, hashed);
             
             /**
-             *   SigPolicyQualifierInfo ::= SEQUENCE {
+             *   AOSigPolicyQualifierInfo ::= SEQUENCE {
              *       SigPolicyQualifierId  SigPolicyQualifierId,
              *       SigQualifier          ANY DEFINED BY policyQualifierId }
              */
-            SigPolicyQualifierInfo spqInfo = null;
+            AOSigPolicyQualifierInfo spqInfo = null;
             if(policy.getPolicyQualifier()!=null){
-                spqInfo = new SigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
+                spqInfo = new AOSigPolicyQualifierInfo(policy.getPolicyQualifier().toString());
             }
             
             /**
@@ -259,7 +259,7 @@ public final class CAdESUtils {
              *  sigPolicyId           SigPolicyId,
              *  sigPolicyHash         SigPolicyHash,
              *  sigPolicyQualifiers   SEQUENCE SIZE (1..MAX) OF
-             *                          SigPolicyQualifierInfo OPTIONAL}
+             *                          AOSigPolicyQualifierInfo OPTIONAL}
              *
              */
             final ASN1EncodableVector v = new ASN1EncodableVector();
