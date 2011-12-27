@@ -18,7 +18,7 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 
 /**
  *
- * Clase principal del wizard de descifrado de contraseña. Contiene a los paneles de
+ * Clase principal del wizard de descifrado de contrasena. Contiene a los paneles de
  * explicacion y contenido.
  */
 public final class AsistenteDescifradoContrasenia {

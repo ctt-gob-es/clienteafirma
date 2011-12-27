@@ -84,15 +84,15 @@ public abstract class JAccessibilityDialog extends JDialog {
 	}
 	
 	/**
-	 * Relación mínima que se aplica para la redimensión de los componentes.
-	 * Cuanto menor es este número menor es la redimensión aplicada.
-	 * @return int Relación mínima
+	 * Relacion mínima que se aplica para la redimension de los componentes.
+	 * Cuanto menor es este número menor es la redimension aplicada.
+	 * @return int Relacion mínima
 	 */
 	public abstract int getMinimumRelation();
 
 	/**
 	 * Evento de redimensionado. Comprueba el tamaÃ±o de la ventana para habilitar o deshabilitar el boton
-	 *  de Maximizar ventana. Tambien almacena el tamaño y posicion de la ventana para su restauracion.
+	 *  de Maximizar ventana. Tambien almacena el tamano y posicion de la ventana para su restauracion.
 	 */
 	private void resized(ComponentEvent e) {
 

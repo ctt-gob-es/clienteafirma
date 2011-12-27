@@ -340,7 +340,7 @@ public class HelpUtils {
     }
 
     /** Establece el alto contraste para el indice de la ayuda.
-     * @param tabbedPane pestañas del indice.
+     * @param tabbedPane pestanas del indice.
      * @param editorPane panel donde se muestra la ayuda.
      * @param activate indica si el modo alto contraste está activado o no. */
     private static void setHighContrastComponentTabbedPane(final JTabbedPane tabbedPane, final JEditorPane editorPane, final boolean activate) {

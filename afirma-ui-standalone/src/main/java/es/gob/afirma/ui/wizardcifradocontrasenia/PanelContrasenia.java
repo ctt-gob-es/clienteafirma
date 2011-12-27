@@ -298,9 +298,9 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
         Utils.setFontBold(this.campoContrasenia);
         panelCentral.add(this.campoContrasenia, c);
 
-        // Relación entre etiqueta y campo de contrasena
+        // Relacion entre etiqueta y campo de contrasena
         etiquetaContrasenia.setLabelFor(this.campoContrasenia);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiquetaContrasenia.setDisplayedMnemonic(KeyEvent.VK_I);
 
         c.gridy = 3;
@@ -332,9 +332,9 @@ public final class PanelContrasenia extends JAccessibilityDialogWizard {
         Utils.setFontBold(this.campoContraseniaRep);
         panelCentral.add(this.campoContraseniaRep, c);
 
-        // Relación entre etiqueta y campo de contrasena
+        // Relacion entre etiqueta y campo de contrasena
         etiquetaContraseniaRep.setLabelFor(this.campoContraseniaRep);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiquetaContraseniaRep.setDisplayedMnemonic(KeyEvent.VK_N);
 
         c.gridy = 5;

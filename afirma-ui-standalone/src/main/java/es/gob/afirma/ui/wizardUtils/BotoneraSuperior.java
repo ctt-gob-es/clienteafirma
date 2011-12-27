@@ -99,7 +99,7 @@ public class BotoneraSuperior extends JPanel {
 	}	
 	
 	/**
-	 * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
+	 * Cambia el tamano de la ventana al tamano maximo de pantalla menos el tamano de la barra de tareas de windows
 	 */
 	public void maximizarActionPerformed(){
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
@@ -123,13 +123,13 @@ public class BotoneraSuperior extends JPanel {
 			j.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
 		}
 				
-		//Se deshabilita el botón de maximizar puesto que se ha pulsado.
+		//Se deshabilita el boton de maximizar puesto que se ha pulsado.
 		this.maximizeButton.setEnabled(false);
 		this.restoreButton.setEnabled(true);
 	}
 	
 	/**
-	 * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+	 * Restaura el tamano de la ventana a la posicion anterior al maximizado
 	 */
 	public void restaurarActionPerformed(){
 		JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
@@ -144,7 +144,7 @@ public class BotoneraSuperior extends JPanel {
 			}
     		j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
 		}
-		//Se deshabilita el botón de restaurar puesto que se ha pulsado.
+		//Se deshabilita el boton de restaurar puesto que se ha pulsado.
 		this.maximizeButton.setEnabled(true);
 		this.restoreButton.setEnabled(false);
 	}
@@ -280,7 +280,7 @@ public class BotoneraSuperior extends JPanel {
 		
 		panel.add(maximizePanel, consButtons);
 
-		//Se añade al panel general
+		//Se anade al panel general
 		//Restricciones para el panel de botones
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.NONE;
@@ -296,14 +296,14 @@ public class BotoneraSuperior extends JPanel {
 		
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized()){
-    		//Se deshabilita el botón de maximizado
+    		//Se deshabilita el boton de maximizado
     		this.maximizeButton.setEnabled(false);
-    		//Se habilita el botón de restaurar
+    		//Se habilita el boton de restaurar
     		this.restoreButton.setEnabled(true);
     	} else {
-    		//Se habilita el botón de maximizado
+    		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
-    		//Se deshabilita el botón de restaurar
+    		//Se deshabilita el boton de restaurar
     		this.restoreButton.setEnabled(false);
     	}
 		

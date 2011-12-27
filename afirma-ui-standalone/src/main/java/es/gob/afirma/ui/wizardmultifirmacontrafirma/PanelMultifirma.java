@@ -210,7 +210,7 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
                 return this.strings[i];
             }
 
-            /** Devuelve el tamaño. */
+            /** Devuelve el tamano. */
             @Override
             public int getSize() {
                 return this.strings.length;
@@ -444,9 +444,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
         Utils.setFontBold(this.comboFirmas);
         panelCentral.add(this.comboFirmas, c);
 
-        // Relación entre etiqueta y combo
+        // Relacion entre etiqueta y combo
         etiquetaFirmas.setLabelFor(this.comboFirmas);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiquetaFirmas.setDisplayedMnemonic(KeyEvent.VK_F);
 
         c.insets = new Insets(20, 20, 0, 20);
@@ -527,9 +527,9 @@ public class PanelMultifirma extends JAccessibilityDialogWizard {
         panelLista.setViewportView(this.listaFirmantes);
         panelCentral.add(panelLista, c);
 
-        // Relación entre etiqueta y arbol
+        // Relacion entre etiqueta y arbol
         etiqueta.setLabelFor(this.arbolFirmas);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiqueta.setDisplayedMnemonic(KeyEvent.VK_B);
 
         getContentPane().add(panelCentral, BorderLayout.CENTER);

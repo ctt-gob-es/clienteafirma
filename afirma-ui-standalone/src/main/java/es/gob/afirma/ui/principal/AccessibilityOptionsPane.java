@@ -162,7 +162,7 @@ public final class AccessibilityOptionsPane {
         return this.panel;
     }
 
-    /** Inicialización de componentes. */
+    /** Inicializacion de componentes. */
     private void initComponents() {
         this.panel.removeAll();
         final GridBagConstraints c = new GridBagConstraints();

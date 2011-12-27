@@ -45,7 +45,7 @@ public class JStatusBar extends JComponent {
         return null;
     }
 
-    /** Define el tamaño de la etiqueta
+    /** Define el tamano de la etiqueta
      * @param width Ancho de la etiqueta
      * @param height Alto de la etiqueta */
     public void setLabelSize(final int width, final int height) {

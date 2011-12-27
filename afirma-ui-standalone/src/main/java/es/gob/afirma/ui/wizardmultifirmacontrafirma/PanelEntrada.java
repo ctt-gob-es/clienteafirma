@@ -156,9 +156,9 @@ final class PanelEntrada extends JAccessibilityDialogWizard {
         Utils.setFontBold(this.campoFirma);
         panelCentral.add(this.campoFirma, c);
         
-        //Relación entre etiqueta y campo de texto
+        //Relacion entre etiqueta y campo de texto
         etiquetaFirma.setLabelFor(this.campoFirma);
-  		//Asignación de mnemónico
+  		//Asignacion de mnemonico
         etiquetaFirma.setDisplayedMnemonic(KeyEvent.VK_F);
         
         c.insets = new Insets(0, 10, 0, 20);

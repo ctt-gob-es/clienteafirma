@@ -354,7 +354,7 @@ class Opciones extends JAccessibilityDialog {
         this.mainPanel.setMnemonicAt(tabNum+2, KeyEvent.VK_S); //atajo para la tercera pestana
         this.mainPanel.setMnemonicAt(tabNum+3, KeyEvent.VK_P); //atajo para la cuarta pestana
         
-        //Foco a la pestaña seleccionada
+        //Foco a la pestana seleccionada
         this.mainPanel.addAncestorListener(new RequestFocusListener(false));
         
         if (this.aplicar){
@@ -498,7 +498,7 @@ class Opciones extends JAccessibilityDialog {
 		// Boton aceptar
         this.aceptar.setText(Messages.getString("PrincipalGUI.aceptar")); // NOI18N
         this.aceptar.setMnemonic(KeyEvent.VK_A); //Se asigna un atajo al boton aceptar
-        this.getRootPane().setDefaultButton(this.aceptar); //Se asigna el botón por defecto para la ventana
+        this.getRootPane().setDefaultButton(this.aceptar); //Se asigna el boton por defecto para la ventana
         this.aceptar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -898,7 +898,7 @@ class Opciones extends JAccessibilityDialog {
 		
 		panel.add(maximizePanel, consButtons);
 
-		//Se añade al panel general
+		//Se anade al panel general
 		//Restricciones para el panel de botones
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.NONE;
@@ -914,14 +914,14 @@ class Opciones extends JAccessibilityDialog {
 		
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized()){
-    		//Se deshabilita el botón de maximizado
+    		//Se deshabilita el boton de maximizado
     		this.maximizeButton.setEnabled(false);
-    		//Se habilita el botón de restaurar
+    		//Se habilita el boton de restaurar
     		this.restoreButton.setEnabled(true);
     	} else {
-    		//Se habilita el botón de maximizado
+    		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
-    		//Se deshabilita el botón de restaurar
+    		//Se deshabilita el boton de restaurar
     		this.restoreButton.setEnabled(false);
     	}
 		

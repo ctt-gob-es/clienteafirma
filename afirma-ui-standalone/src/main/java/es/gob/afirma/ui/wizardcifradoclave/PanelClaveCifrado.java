@@ -319,7 +319,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             throw e;
         }
         catch (final IOException e) {
-            throw e; // Se lanza el tipo de excepción IO
+            throw e; // Se lanza el tipo de excepcion IO
         }
         catch (final Exception e) {
             throw new AOException(Messages.getString("WizardCifrado.almacen.error.abrir"), e); //$NON-NLS-1$
@@ -487,9 +487,9 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         Utils.setFontBold(this.campoClave);
         panelCentral.add(this.campoClave, c);
 
-        // Relación entre etiqueta y campo de texto
+        // Relacion entre etiqueta y campo de texto
         encodeKeyLabel.setLabelFor(this.campoClave);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         encodeKeyLabel.setDisplayedMnemonic(KeyEvent.VK_V);
 
         c.weightx = 0.0;

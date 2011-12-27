@@ -48,7 +48,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
     /** Inicializacion de componentes */
     private void initComponents() {
         // Titulo de la ventana
-        setTitulo(Messages.getString("Wizard.sobres.titulo"));
+        setTitulo(Messages.getString("Wizard.sobres.titulo")); //$NON-NLS-1$
 
         // Panel con la imagen lateral
         final ImagenLateral panelIzdo = new ImagenLateral();
@@ -80,18 +80,18 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
 
         // Etiqueta con el texto "Bienvenido al asistente..."
         final String textLabel =
-            Messages.getString("Wizard.sobres.presentacion1") + "<br>"
+            Messages.getString("Wizard.sobres.presentacion1") + "<br>" //$NON-NLS-1$
             + "<br>"
-            + Messages.getString("Wizard.sobres.presentacion2")
-            + "<br>"
-            + "<br>"
-            + Messages.getString("Wizard.sobres.presentacion3")
+            + Messages.getString("Wizard.sobres.presentacion2") //$NON-NLS-1$
             + "<br>"
             + "<br>"
-            + Messages.getString("Wizard.sobres.presentacion4")
+            + Messages.getString("Wizard.sobres.presentacion3") //$NON-NLS-1$
             + "<br>"
             + "<br>"
-            + Messages.getString("Wizard.sobres.presentacion5");
+            + Messages.getString("Wizard.sobres.presentacion4") //$NON-NLS-1$
+            + "<br>"
+            + "<br>"
+            + Messages.getString("Wizard.sobres.presentacion5"); //$NON-NLS-1$
         final InfoLabel presentationLabel = new InfoLabel(textLabel, false);
         // Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));
@@ -107,7 +107,7 @@ public class PanelPresentacion extends JAccessibilityDialogWizard {
         this.setBotonera(new BotoneraInferior(ventanas, 0));
         getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
         getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
-        // Se asigna el botón por defecto
+        // Se asigna el boton por defecto
         this.getRootPane().setDefaultButton(getBotonera().getSiguiente());
     }
 }

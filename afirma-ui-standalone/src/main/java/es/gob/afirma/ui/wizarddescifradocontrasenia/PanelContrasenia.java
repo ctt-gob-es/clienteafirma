@@ -173,33 +173,33 @@ public class PanelContrasenia extends JAccessibilityDialogWizard {
 	     Utils.setFontBold(this.campoContrasenia);
 	     panelCentral.add(this.campoContrasenia, c);
     	
-        //Relación entre etiqueta y campo de texto
+        //Relacion entre etiqueta y campo de texto
         passwordLabel.setLabelFor(this.campoContrasenia);
-      	//Asignación de mnemónico
+      	//Asignacion de mnemonico
         passwordLabel.setDisplayedMnemonic(KeyEvent.VK_O);       
         
         c.gridy = 3;
         c.insets = new Insets(5, 20, 0, 20);        
         
-        //Check de mostrar contraseña o no
+        //Check de mostrar contrasena o no
 		JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
 		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
 		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
 		showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
 		showPassCheckBox.setMnemonic(KeyEvent.VK_T);
 		
-		//Se almacena el caracter por defecto para ocultar la contraseña
+		//Se almacena el caracter por defecto para ocultar la contrasena
 		final char defaultChar = this.campoContrasenia.getEchoChar();
 		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
 		showPassCheckBox.addItemListener(new ItemListener() {
 			@Override
             public void itemStateChanged(ItemEvent evt) {
 				if (evt.getStateChange() == ItemEvent.SELECTED){
-					//Se muestra la contraseña
+					//Se muestra la contrasena
 					PanelContrasenia.this.campoContrasenia.setEchoChar((char)0);
 					
 				} else if (evt.getStateChange() == ItemEvent.DESELECTED){
-					//Se oculta la contraseña
+					//Se oculta la contrasena
 					PanelContrasenia.this.campoContrasenia.setEchoChar(defaultChar);
 				}
 				

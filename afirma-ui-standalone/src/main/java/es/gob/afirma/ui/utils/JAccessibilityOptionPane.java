@@ -12,7 +12,7 @@ public class JAccessibilityOptionPane extends JOptionPane {
     /** UID. */
     private static final long serialVersionUID = 1L;
 
-    /** Muestra un diálogo de confirmación.
+    /** Muestra un diálogo de confirmacion.
      * @param componentParent componente padre
      * @param message mensaje a mostrar
      * @param title título del diálogo
@@ -28,7 +28,7 @@ public class JAccessibilityOptionPane extends JOptionPane {
         return JOptionPane.showConfirmDialog(componentParent, infoLabel, title, messageType);
     }
 
-    /** Muestra un diálogo de insercción.
+    /** Muestra un diálogo de inserccion.
      * @param componentParent componente padre
      * @param message mensaje a mostrar
      * @param title título del diálogo

@@ -711,7 +711,7 @@ public final class Utils {
     }
     
     /**
-	 * Método que sumbraya el mnemónico correspondiente para texto HTML.
+	 * Método que sumbraya el mnemonico correspondiente para texto HTML.
 	 *
 	 * @param text	Texto en el que hay que subrayar el carácter.
 	 * @param key	Caracter a subrayar.

@@ -52,7 +52,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	private JDialog dialog;
 
 	/**
-	 * Relación mínima.
+	 * Relacion mínima.
 	 */
 	public int getMinimumRelation(){
 		return 9;
@@ -197,10 +197,10 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
             	if (this.getComponent(i).getClass().getName().equals("javax.swing.JToolBar")){
             		jTool = (JToolBar)this.getComponent(i);
             		for (int j = 0; j<jTool.getComponentCount();j++){
-                		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
+                		// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
                 		if (jTool.getComponent(j).getClass().getName().equals("javax.swing.JToggleButton")){
                 			final JToggleButton boton = ((JToggleButton)jTool.getComponent(j));
-                			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamaño del texto
+                			// Al cambiar entre vista en lista y detalles se llama a adjustWindowFonts para que calcule el tamano del texto
                 			((JToggleButton)(jTool.getComponent(j))).addMouseListener(new MouseListener() {
         						
         						@Override
@@ -322,7 +322,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	}
 	
 	/**
-	 * Se almacena la posición actual.
+	 * Se almacena la posicion actual.
 	 */
 	private void resized(){
 		if (!GeneralConfig.isMaximized()){

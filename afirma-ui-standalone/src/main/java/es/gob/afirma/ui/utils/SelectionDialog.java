@@ -159,7 +159,7 @@ public class SelectionDialog {
                 if (file.exists()) {
                 	//Path al fichero
                 	String filePath = file.getAbsolutePath();
-                	//Comprobación del número de caracteres para acortar o no el path que se muestra en la alerta de sobreescritura de fichero
+                	//Comprobacion del número de caracteres para acortar o no el path que se muestra en la alerta de sobreescritura de fichero
                 	if (filePath.length() >20) {
                 		//Se obtiene el índice del final del primer directorio                		
                 		int indexFirstDirectory = filePath.indexOf(File.separator,1);                		
@@ -171,9 +171,9 @@ public class SelectionDialog {
                 		int indexLastDirectory = subSequence.lastIndexOf(File.separator);                		
                 		//Si el primer directorio y el último no son el mismo
                 		if (indexFirstDirectory<indexLastDirectory){
-                			//Se añaden unos puntos suspensivos al primer directorio
+                			//Se anaden unos puntos suspensivos al primer directorio
                 			filePathTemp = filePathTemp +"...";
-                			//Se añade el último directorio y el nombre del fichero
+                			//Se anade el último directorio y el nombre del fichero
                 			filePathTemp = filePathTemp + filePath.substring(indexLastDirectory, filePath.length());
                 			//Se sustituye el path completo por el path acortado
                 			filePath = filePathTemp;

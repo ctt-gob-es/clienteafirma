@@ -122,9 +122,9 @@ final class MultifirmaMasiva extends JPanel {
         c.insets = new Insets(0, 0, 0, 0);
         add(emptyPanel01, c);
 
-        // Relación entre etiqueta y combo
+        // Relacion entre etiqueta y combo
         etiquetaAlmacen.setLabelFor(comboAlmacen);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiquetaAlmacen.setDisplayedMnemonic(KeyEvent.VK_A);
 
         c.insets = new Insets(13, 13, 0, 13);
@@ -172,7 +172,7 @@ final class MultifirmaMasiva extends JPanel {
         final JPanel panelBotones = new JPanel(new GridBagLayout());
 
         final GridBagConstraints cons = new GridBagConstraints();
-        cons.anchor = GridBagConstraints.FIRST_LINE_START; // control de la orientación de componentes al redimensionar
+        cons.anchor = GridBagConstraints.FIRST_LINE_START; // control de la orientacion de componentes al redimensionar
         cons.fill = GridBagConstraints.HORIZONTAL;
         cons.ipadx = 15;
         cons.gridx = 0;

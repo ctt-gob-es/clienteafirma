@@ -166,7 +166,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
                 listaModel.addElement(certDest.getAlias());
                 this.listaCertificados.add(certDest);
                 eliminar.setEnabled(true);
-                eliminar.setMnemonic(KeyEvent.VK_E); // Se asigna un atajo al botón ya que ha sido habilitado
+                eliminar.setMnemonic(KeyEvent.VK_E); // Se asigna un atajo al boton ya que ha sido habilitado
             }
             else {
                 CustomDialog.showMessageDialog(this,
@@ -198,7 +198,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
 
         if (listaModel.isEmpty()) {
             eliminar.setEnabled(false);
-            eliminar.setMnemonic(0); // Se asigna un atajo vacío al botón ya que ha sido deshabilitado
+            eliminar.setMnemonic(0); // Se asigna un atajo vacío al boton ya que ha sido deshabilitado
         }
     }
 
@@ -296,9 +296,9 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
         Utils.setFontBold(comboDestinatarios);
         panelCentral.add(comboDestinatarios, c);
 
-        // Relación entre etiqueta y combo
+        // Relacion entre etiqueta y combo
         etiquetaAnadir.setLabelFor(comboDestinatarios);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiquetaAnadir.setDisplayedMnemonic(KeyEvent.VK_D);
 
         c.insets = new Insets(0, 10, 0, 20);
@@ -366,9 +366,9 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
 
         panelLista.setViewportView(this.listaDestinatarios);
 
-        // Relación entre etiqueta y lista
+        // Relacion entre etiqueta y lista
         destLabel.setLabelFor(this.listaDestinatarios);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         destLabel.setDisplayedMnemonic(KeyEvent.VK_T);
 
         c.ipady = 0;

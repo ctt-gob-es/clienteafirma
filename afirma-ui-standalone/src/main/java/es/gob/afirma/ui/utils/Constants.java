@@ -111,22 +111,22 @@ public class Constants {
     public static final int WIZARD_INITIAL_HEIGHT_LINUX = 560;
     
     /**
-     * Width inicial de los JAccessibilityDialogWizard de la aplicacion con variación de fuente.
+     * Width inicial de los JAccessibilityDialogWizard de la aplicacion con variacion de fuente.
      */
     public static final int WIZARD_FONT_INITIAL_WIDTH = 750;
     
     /**
-     * Height inicial de los JAccessibilityDialogWizard de la aplicacion con variación de fuente.
+     * Height inicial de los JAccessibilityDialogWizard de la aplicacion con variacion de fuente.
      */
     public static final int WIZARD_FONT_INITIAL_HEIGHT = 665;
     
     /**
-     * Width inicial de los JAccessibilityDialogWizard de la aplicacion con variación de fuente en LINUX.
+     * Width inicial de los JAccessibilityDialogWizard de la aplicacion con variacion de fuente en LINUX.
      */
     public static final int WIZARD_FONT_INITIAL_WIDTH_LINUX = 780;
     
     /**
-     * Height inicial de los JAccessibilityDialogWizard de la aplicacion con variación de fuente en LINUX.
+     * Height inicial de los JAccessibilityDialogWizard de la aplicacion con variacion de fuente en LINUX.
      */
     public static final int WIZARD_FONT_INITIAL_HEIGHT_LINUX = 600;
     
@@ -191,17 +191,17 @@ public class Constants {
     public static String defaultUser = "Por defecto";
     
     /**
-     * Margen a restar para calcular el tamaño de una ventana maximizada para linux.
+     * Margen a restar para calcular el tamano de una ventana maximizada para linux.
      */
     public static int maximizeVerticalMarginLinux = 52;
     
 	 /**
-	 * Variable que almacena el icono original del botón de maximizar.
+	 * Variable que almacena el icono original del boton de maximizar.
 	 */
 	public static final ImageIcon IMAGEICONMAXIMIZE = new ImageIcon(Utils.class.getResource("/resources/images/maximize.png"));
 	
 	 /**
-	 * Variable que almacena el icono original del botón de restaurar.
+	 * Variable que almacena el icono original del boton de restaurar.
 	 */
 	public static final ImageIcon IMAGEICONRESTORE = new ImageIcon(Utils.class.getResource("/resources/images/restore.png"));
 	

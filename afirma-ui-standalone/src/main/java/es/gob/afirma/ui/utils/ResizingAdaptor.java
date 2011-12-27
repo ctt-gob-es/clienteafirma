@@ -120,7 +120,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	}
 
 	/**
-	 * Ajusta el tamaño de fuente de una ventana
+	 * Ajusta el tamano de fuente de una ventana
 	 * 
 	 * @param components
 	 */
@@ -171,7 +171,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 				}
 			}
 			
-			//Se calcula la relación de los valores obtenidos
+			//Se calcula la relacion de los valores obtenidos
 			relation = Math.round(relWidth * relHeight * theDialogWizard.getMinimumRelation());
 			
 		} else if (theDialogAdvisor != null){
@@ -285,7 +285,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 					float resizeFactor = Math.round(relation / getResizingFactorDialogWizard());
 					String bodyRule = "body { font-family: " + actualComponent.getFont().getFamily() + "; " + "font-size: " + (7 + resizeFactor) + "pt; }";
 					((HTMLDocument)editorPanel.getDocument()).getStyleSheet().addRule(bodyRule);
-					// Resize del texto del enlace, porque tiene un estilo a nivel de linea entonces es necesario cambiar el tamaño del texto a nivel de linea
+					// Resize del texto del enlace, porque tiene un estilo a nivel de linea entonces es necesario cambiar el tamano del texto a nivel de linea
 					Style link;
 					StyleContext sc = new StyleContext();
 					link= sc.addStyle("link", sc.getStyle(StyleContext.DEFAULT_STYLE)); //$NON-NLS-1$
@@ -363,7 +363,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	 * @param c Componente de tipo JLabel en el que se encuentra la imagen
 	 * @param w Width inicial de la imagen
 	 * @para h Height inicial de la imagen
-	 * @param multiplicando Valor de multiplicacion para el nuevo tamaño de la imagen. Es mayor cuanto menor sea el tamaño inicial de la imagen
+	 * @param multiplicando Valor de multiplicacion para el nuevo tamano de la imagen. Es mayor cuanto menor sea el tamano inicial de la imagen
 	 */
 	private final void resizeImage(double factor, Component c, int w, int h, int multiplicando) {
 		if (theFileChooser==null){			
@@ -398,7 +398,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 		//Se almacena el factor
 		double factorAux = factor;
 		
-		//Se comprueba si se trata del botón de ayuda
+		//Se comprueba si se trata del boton de ayuda
 		if ((button.getName() != null) && (button.getName().equalsIgnoreCase("helpButton"))) {
 			imageIcon = HelpUtils.IMAGEICONHELP; //Se carga la imagen original
 		} else if ((button.getName() != null) && (button.getName().equalsIgnoreCase("maximizar"))) {
@@ -430,7 +430,7 @@ public class ResizingAdaptor extends ComponentAdapter {
 	}
 	
 	/**
-	 * Devuelve el tamaño de la fuente en función de las opciones de accesibilidad
+	 * Devuelve el tamano de la fuente en funcion de las opciones de accesibilidad
 	 * @return
 	 */
 	private float getFontSize(){

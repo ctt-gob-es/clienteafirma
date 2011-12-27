@@ -94,9 +94,9 @@ public final class ContextOptionsPane {
         Utils.setFontBold(this.campoMotivo);
         contextPanel.add(this.campoMotivo, c2);
 
-        // Relación entre etiqueta y campo de texto
+        // Relacion entre etiqueta y campo de texto
         etiquetaMotivo.setLabelFor(this.campoMotivo);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiquetaMotivo.setDisplayedMnemonic(KeyEvent.VK_T);
 
         c2.insets = new Insets(13, 13, 0, 13);
@@ -125,9 +125,9 @@ public final class ContextOptionsPane {
         Utils.setFontBold(this.campoLugar);
         contextPanel.add(this.campoLugar, c2);
 
-        // Relación entre etiqueta y campo de texto
+        // Relacion entre etiqueta y campo de texto
         etiquetaLugar.setLabelFor(this.campoLugar);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiquetaLugar.setDisplayedMnemonic(KeyEvent.VK_L);
 
         c2.insets = new Insets(13, 13, 0, 13);
@@ -156,9 +156,9 @@ public final class ContextOptionsPane {
         Utils.setFontBold(this.campoDatos);
         contextPanel.add(this.campoDatos, c2);
 
-        // Relación entre etiqueta y campo de texto
+        // Relacion entre etiqueta y campo de texto
         etiquetaDatos.setLabelFor(this.campoDatos);
-        // Asignación de mnemónico
+        // Asignacion de mnemonico
         etiquetaDatos.setDisplayedMnemonic(KeyEvent.VK_D);
 
         this.panel.add(contextPanel, c);

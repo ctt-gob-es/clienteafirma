@@ -189,7 +189,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             // Control de la excepcion generada al introducir una contraseoa vacia para el almacen
             CustomDialog.showMessageDialog(this,
                                            true,
-                                           Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                                           Messages.getString("Wizard.sobres.error.almacen.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return;
         }
         catch (final Exception e) {

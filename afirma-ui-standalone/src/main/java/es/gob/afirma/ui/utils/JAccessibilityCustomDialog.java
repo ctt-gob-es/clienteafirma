@@ -47,7 +47,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	//private static boolean isMaximized = false;
 
 	/**
-	 * Indica si el diálogo requiere un tamaño grande por defecto.
+	 * Indica si el diálogo requiere un tamano grande por defecto.
 	 */
 	private boolean bigSizeDefault = false;
 	
@@ -138,16 +138,16 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	}
 	
 	/**
-	 * Relacion minima que se aplica para la redimensión de los componentes.
-	 * Cuanto menor es este número menor es la redimensión aplicada.
-	 * @return int Relación mínima
+	 * Relacion minima que se aplica para la redimension de los componentes.
+	 * Cuanto menor es este número menor es la redimension aplicada.
+	 * @return int Relacion mínima
 	 */
 	public abstract int getMinimumRelation();
 
 	
 	/**
 	 * Evento de redimensionado. Comprueba el tamanio de la ventana para habilitar o deshabilitar el boton
-	 *  de Maximizar ventana. Tambien almacena el tamaño y posicion de la ventana para su restauracion.
+	 *  de Maximizar ventana. Tambien almacena el tamano y posicion de la ventana para su restauracion.
 	 */
 	private void resized(ComponentEvent e) {
 		//Variable que controlará sin las dimensiones van a exceder el límite
@@ -297,7 +297,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	}
 
 	/**
-	 * Indica si el diálogo debe tener un tamaño grande por defecto.
+	 * Indica si el diálogo debe tener un tamano grande por defecto.
 	 * @return boolean
 	 */
 	public boolean isBigSizeDefault() {
@@ -305,7 +305,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	}
 
 	/**
-	 * Asigna la variable que indica si el diálogo debe tener un tamaño grande por defecto.
+	 * Asigna la variable que indica si el diálogo debe tener un tamano grande por defecto.
 	 * @param bigSizeDefault
 	 */
 	public void setBigSizeDefault(boolean bigSizeDefault) {

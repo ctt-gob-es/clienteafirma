@@ -120,7 +120,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         panel.add(respectLabel, c);
 
         c.insets = new Insets(10, 20, 0, 20);
-        panelCentral.add(panel, c); // Se añade el panel con la etiqueta
+        panelCentral.add(panel, c); // Se anade el panel con la etiqueta
 
         c.gridy = 1;
 
@@ -161,7 +161,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         radioTodos.getAccessibleContext().setAccessibleName(radioTodos.getText() + " "
                                                             + Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description")); //$NON-NLS-1$
         radioTodos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio1.description")); //$NON-NLS-1$
-        radioTodos.setMnemonic(KeyEvent.VK_O); // Se asigna un atajo al botón de radio
+        radioTodos.setMnemonic(KeyEvent.VK_O); // Se asigna un atajo al boton de radio
         radioTodos.setSelected(true);
         Utils.remarcar(radioTodos);
         Utils.setContrastColor(radioTodos);
@@ -175,7 +175,7 @@ class PanelConfiguracion extends JAccessibilityDialogWizard {
         this.radioUltimos.getAccessibleContext()
         .setAccessibleName(this.radioUltimos.getText() + " " + Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description")); //$NON-NLS-2$
         this.radioUltimos.getAccessibleContext().setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana2.panel.radio2.description")); //$NON-NLS-1$
-        this.radioUltimos.setMnemonic(KeyEvent.VK_N); // Se asigna un atajo al botón de radio
+        this.radioUltimos.setMnemonic(KeyEvent.VK_N); // Se asigna un atajo al boton de radio
         Utils.remarcar(this.radioUltimos);
         Utils.setContrastColor(this.radioUltimos);
         Utils.setFontBold(this.radioUltimos);

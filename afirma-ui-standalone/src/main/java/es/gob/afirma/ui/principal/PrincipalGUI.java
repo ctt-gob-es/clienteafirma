@@ -193,7 +193,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         this.htPanel.reset();
 
         // Comprobacion del estado de Ventanas Maximizadas para que se genere
-        // la ventana principal con el tamaño adecuado
+        // la ventana principal con el tamano adecuado
         if (this.getExtendedState() == MAXIMIZED_BOTH) {
             this.maximizedWidth = this.getSize().getWidth();
             this.maximizedHight = this.getSize().getHeight();
@@ -764,16 +764,16 @@ public class PrincipalGUI extends JAccessibilityFrame {
         setAplicar(false);
     }
 
-    /** Evento de redimensionado. Redimensiona el tamaño de la barra de estado
+    /** Evento de redimensionado. Redimensiona el tamano de la barra de estado
      * y de su contenido, tambien almacena los valores actuales de posicion y tama�o de
      * la ventana. */
     public void resized() {
-        // Tamaño de la ventana
+        // Tamano de la ventana
         final Dimension screenSize = this.getSize();
         bar.setPreferredSize(new Dimension((int) screenSize.getWidth() * 10 / 100, (int) screenSize.getHeight() * 5 / 100));
         bar.setLabelSize((int) screenSize.getWidth(), (int) screenSize.getHeight() * 4 / 100);
 
-        // Se guarda la posición en el caso de que no se haya maximizado por configuración
+        // Se guarda la posicion en el caso de que no se haya maximizado por configuracion
         if (!GeneralConfig.isMaximized()) {
             this.actualPositionX = this.getX();
             this.actualPositionY = this.getY();

@@ -208,7 +208,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 
         panel.add(maximizePanel, consButtons);
 
-        //Se añade al panel general
+        //Se anade al panel general
         //Restricciones para el panel de botones
         final GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.NONE;
@@ -224,14 +224,14 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
 
         // Habilitado/Deshabilitado de botones restaurar/maximizar
         if (GeneralConfig.isMaximized()){
-            //Se deshabilita el botón de maximizado
+            //Se deshabilita el boton de maximizado
             this.maximizeButton.setEnabled(false);
-            //Se habilita el botón de restaurar
+            //Se habilita el boton de restaurar
             this.restoreButton.setEnabled(true);
         } else {
-            //Se habilita el botón de maximizado
+            //Se habilita el boton de maximizado
             this.maximizeButton.setEnabled(true);
-            //Se deshabilita el botón de restaurar
+            //Se deshabilita el boton de restaurar
             this.restoreButton.setEnabled(false);
         }
 
@@ -249,7 +249,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
     }
 
     /**
-     * Cambia el tamaño de la ventana al tamaño maximo de pantalla menos el tamaño de la barra de tareas de windows
+     * Cambia el tamano de la ventana al tamano maximo de pantalla menos el tamano de la barra de tareas de windows
      */
     public void maximizarActionPerformed(){
 
@@ -274,7 +274,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
             j.setBounds(0,0, maxWidth, maxHeight - Constants.maximizeVerticalMarginLinux);
         }
 
-        //Se deshabilita el botón de maximizar puesto que se ha pulsado.
+        //Se deshabilita el boton de maximizar puesto que se ha pulsado.
         this.maximizeButton.setEnabled(false);
         this.restoreButton.setEnabled(true);
     }
@@ -374,7 +374,7 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
     }
 
     /**
-     * Restaura el tamaño de la ventana a la posicion anterior al maximizado
+     * Restaura el tamano de la ventana a la posicion anterior al maximizado
      */
     public void restaurarActionPerformed(){
 
@@ -390,16 +390,16 @@ public final class VisorPanel extends JAccessibilityDialogWizard {
             }
             j.setMinimumSize(new Dimension(j.getSize().width, j.getSize().height));
         }
-        //Se deshabilita el botón de restaurar puesto que se ha pulsado.
+        //Se deshabilita el boton de restaurar puesto que se ha pulsado.
         this.maximizeButton.setEnabled(true);
         this.restoreButton.setEnabled(false);
     }
 
     /**
-     * Guarda el tamaño y posicion de la ventana antes de cerrarse
+     * Guarda el tamano y posicion de la ventana antes de cerrarse
      */
     public void saveSizePosition(){
-        // Guardamos la posición y tamaño actual de la ventana sólo en caso de no estar maximizada por configuración
+        // Guardamos la posicion y tamano actual de la ventana solo en caso de no estar maximizada por configuracion
         if (!GeneralConfig.isMaximized()){
             final JAccessibilityDialogWizard j = JAccessibilityDialogWizard.getJAccessibilityDialogWizard(this);
             PrincipalGUI.wizardActualPositionX = j.getX();

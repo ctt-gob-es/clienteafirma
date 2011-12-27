@@ -54,7 +54,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * Etiqueta con la información de la alerta.
+	 * Etiqueta con la informacion de la alerta.
 	 * 
 	 */
 	private InfoLabel infoLabel = null;
@@ -75,7 +75,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private JPanel mainPanel = null;
 	
 	/**
-	 * Campo de texto o campo de contraseña
+	 * Campo de texto o campo de contrasena
 	 */
 	private JComponent component = null;
 	
@@ -116,7 +116,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	private int answer;
 	
 	/**
-	 * Texto para el botón 
+	 * Texto para el boton 
 	 */
 	private static String cancellText = Messages.getString("PrincipalGUI.cancelar");
 
@@ -204,9 +204,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
 		int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
 		
-		//Se establece el tamaño mínimo
+		//Se establece el tamano mínimo
 		setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_INITIAL_WIDTH, Constants.CUSTOMDIALOG_INITIAL_HEIGHT));
-		//Se establece el tamaño máximo
+		//Se establece el tamano máximo
 		setMaximumSize(new Dimension(maxWidth,maxHeight));
 		
 		
@@ -215,7 +215,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
     		//Se maximiza
     		this.setBounds(0,0, maxWidth, maxHeight);
     	} else {
-    		//Se establece el tamaño mínimo en base a las opciones activas
+    		//Se establece el tamano mínimo en base a las opciones activas
     		if (GeneralConfig.isBigFontSize() || GeneralConfig.isFontBold()){
     			setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH, Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT));
     		}	
@@ -270,7 +270,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         
         //this.infoLabel.setOpaque(true);
         //this.infoLabel.setBackground(Color.red);
-		//Se añade la etiqueta al panel de información general
+		//Se anade la etiqueta al panel de informacion general
 		this.mainPanel.add(this.infoLabel, c);
 
 		//Panel de botones
@@ -289,7 +289,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         cons.gridwidth = 1;
         cons.gridheight = 2;
 
-        //Se añade el icono
+        //Se anade el icono
         container.add(iconPanel, cons);
         
         cons.gridwidth = 2;
@@ -298,7 +298,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         cons.gridy = 0;
         cons.weighty = 0.0;
         cons.weightx = 0.0;
-        //Se añade el panel de botones relacionados con la accesibilidad
+        //Se anade el panel de botones relacionados con la accesibilidad
         container.add(this.accessibilityButtonsPanel, cons);
        // accessibilityButtonsPanel.setBackground(Color.green);
 
@@ -308,7 +308,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         cons.weightx = 1.0;
         cons.weighty = 2.0;
         
-        //se añade el panel de información
+        //se anade el panel de informacion
         container.add(this.mainPanel, cons);
         
         cons.gridx = 0;
@@ -319,7 +319,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         
         //buttonsPanel.setBackground(Color.green);
         
-        //Se añade el panel de botones
+        //Se anade el panel de botones
         container.add(this.buttonsPanel, cons);
 
 	}
@@ -471,7 +471,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		panel.add(maximizePanel, consButtons);
 
-		//Se añade al panel general
+		//Se anade al panel general
 		//Restricciones para el panel de botones
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.NONE;
@@ -487,14 +487,14 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		// Habilitado/Deshabilitado de botones restaurar/maximizar
     	if (GeneralConfig.isMaximized()){
-    		//Se deshabilita el botón de maximizado
+    		//Se deshabilita el boton de maximizado
     		this.maximizeButton.setEnabled(false);
-    		//Se habilita el botón de restaurar
+    		//Se habilita el boton de restaurar
     		this.restoreButton.setEnabled(true);
     	} else {
-    		//Se habilita el botón de maximizado
+    		//Se habilita el boton de maximizado
     		this.maximizeButton.setEnabled(true);
-    		//Se deshabilita el botón de restaurar
+    		//Se deshabilita el boton de restaurar
     		this.restoreButton.setEnabled(false);
     	}
 		
@@ -523,7 +523,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		this.buttonsPanel.add(okPanel, consButtons);
 
 		this.okButton.addActionListener(this);
-		//Se asigna este botón como botón por defecto de la ventana.
+		//Se asigna este boton como boton por defecto de la ventana.
 		this.getRootPane().setDefaultButton(this.okButton);
 		
 	}
@@ -568,26 +568,26 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 
 		//Se comprueba el tipo de diálogo
 		if (typeOption == JOptionPane.YES_NO_OPTION) {
-			//Botón Sí
+			//Boton Sí
 			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
 			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
-			//Botón no
+			//Boton no
 			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N);
 			JPanel noPanel = new JPanel();
 			noPanel.add(customDialog.noButton);
 			customDialog.buttonsPanel.add(noPanel, cons);
 			customDialog.noButton.addActionListener(customDialog);
 		} else if (typeOption == JOptionPane.YES_NO_CANCEL_OPTION) {
-			//Botón Sí
+			//Boton Sí
 			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
 			customDialog.okButton.setMnemonic(KeyEvent.VK_S);
-			//Botón No
+			//Boton No
 			customDialog.noButton = customDialog.getButton(Messages.getString("CustomDialog.confirmDialog.no"), KeyEvent.VK_N);
 			JPanel noPanel = new JPanel();
 			noPanel.add(customDialog.noButton);
 			customDialog.buttonsPanel.add(noPanel, cons);
 			customDialog.noButton.addActionListener(customDialog);
-			//Botón Cancelar
+			//Boton Cancelar
 			//cons.gridx = 4;
 			cancelButton = customDialog.getButton(cancellText, KeyEvent.VK_C);
 			JPanel cancelPanel = new JPanel();
@@ -596,7 +596,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			cancelButton.addActionListener(customDialog);
 		}
 		else {
-			//Botón Cancelar
+			//Boton Cancelar
 			cancelButton = customDialog.getButton(cancellText, KeyEvent.VK_C);
 			JPanel cancelPanel = new JPanel();
 			cancelPanel.add(cancelButton);
@@ -640,7 +640,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
         customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +".  ALT + " + String.valueOf((char) mnemonic) + ". ");
-       //Se añade el campo de texto al panel de información general
+       //Se anade el campo de texto al panel de informacion general
         customDialog.mainPanel.add(customDialog.component, c);
         
         //Etiqueta principal
@@ -673,7 +673,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		customDialog.setVisible(true);
 		
-		//Control para saber si se ha pulsado el botón cancelar
+		//Control para saber si se ha pulsado el boton cancelar
 		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JTextField)customDialog.component).getText();
 		}
@@ -682,7 +682,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	}
 
 	/**
-	 * Muestra un dialogo de insercion. El componente de inserción será un combo.
+	 * Muestra un dialogo de insercion. El componente de insercion será un combo.
 	 * @param componentParent componente padre
 	 * @param modal modal
 	 * @param message mensaje a mostrar
@@ -718,7 +718,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
         customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +".  ALT + " + String.valueOf((char) mnemonic) + ". ");
-       //Se añade el campo de texto al panel de información general
+       //Se anade el campo de texto al panel de informacion general
         customDialog.mainPanel.add(customDialog.component, c);
         
        //Etiqueta principal
@@ -751,7 +751,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		customDialog.setVisible(true);
 		
-		//Control para saber si se ha pulsado el botón cancelar
+		//Control para saber si se ha pulsado el boton cancelar
 		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JComboBox)customDialog.component).getSelectedItem();
 		}
@@ -775,8 +775,8 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	public static String showInputDialog(Component componentParent, boolean modal, String message, int mnemonic, List<String> list, String nameListElements, String title, int typeMessage){
 
 		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, true);
-		customDialog.setBigSizeDefault(true); //Se indica que este tipo de diálogo requiere un tamaño grande por defecto
-		//Se establece un tamaño mínimo por defecto
+		customDialog.setBigSizeDefault(true); //Se indica que este tipo de diálogo requiere un tamano grande por defecto
+		//Se establece un tamano mínimo por defecto
 		customDialog.setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH, Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT));
 		
 		//Nombre accesible para el cuadro de texto
@@ -809,7 +809,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		scrPane.getViewport().add(panel, constraints);
 		
 		//Se crean etiquetas con cada elemento que contiene la lista
-		//y se añaden al scroll
+		//y se anaden al scroll
         if ((list!= null) && (list.size()>0)) {
         	int index = 1;
         	 for (final String str : list) {
@@ -830,7 +830,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		Utils.remarcar(scrPane);
         Utils.setContrastColor(scrPane);
         Utils.setFontBold(scrPane);
-        //Se añade el scroll al panel principal
+        //Se anade el scroll al panel principal
 		customDialog.mainPanel.add(scrPane, c);
 		
 		c.insets = new Insets(7,10,0,10);  //right padding
@@ -844,7 +844,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.remarcar(customDialog.component);
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
-       //Se añade el campo de texto al panel de información general
+       //Se anade el campo de texto al panel de informacion general
         customDialog.mainPanel.add(customDialog.component, c);
         //Se le asigna el nombre accesible
         customDialog.component.getAccessibleContext().setAccessibleName(fullAccesibleName.replaceAll(Constants.HTML_SALTO_LINEA, "") +" ALT + " + String.valueOf((char) mnemonic) + ". ");
@@ -877,7 +877,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		customDialog.setVisible(true);
 		
-		//Control para saber si se ha pulsado el botón cancelar
+		//Control para saber si se ha pulsado el boton cancelar
 		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JTextField)customDialog.component).getText();
 		}
@@ -920,7 +920,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         Utils.setContrastColor(customDialog.component);
         Utils.setFontBold(customDialog.component);
         customDialog.component.getAccessibleContext().setAccessibleName(message.replaceAll(Constants.HTML_SALTO_LINEA, "") +"  ALT + " + String.valueOf((char) mnemonic) + ". ");
-        //Se añade el campo de texto al panel de información general
+        //Se anade el campo de texto al panel de informacion general
         customDialog.mainPanel.add(customDialog.component, c);
 
 	   	 if (charSet != null) {
@@ -936,16 +936,16 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		String text = Utils.remarkMnemonic(customDialog.infoLabel.getText(), mnemonic);
 		customDialog.infoLabel.setText(text);
 		
-		//Check de mostrar contraseña o no
+		//Check de mostrar contrasena o no
 		JPanel panelCheckShowPass = new JPanel(new GridLayout(1, 1));
 		final JCheckBox showPassCheckBox= new JCheckBox(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.text"));
 		showPassCheckBox.setToolTipText(Messages.getString("CustomDialog.showInputPasswordDialog.showPassCheckBox.tooltip"));
 		showPassCheckBox.getAccessibleContext().setAccessibleDescription(showPassCheckBox.getToolTipText());
-		//se asigna un mnemónico que debe ser diferente al del campo de contraseña
+		//se asigna un mnemonico que debe ser diferente al del campo de contrasena
 		if (mnemonic != KeyEvent.VK_T) {
 			showPassCheckBox.setMnemonic(KeyEvent.VK_T);
 		}
-		//Se almacena el caracter por defecto para ocultar la contraseña
+		//Se almacena el caracter por defecto para ocultar la contrasena
 		final char defaultChar = ((JPasswordField)customDialog.component).getEchoChar();
 		showPassCheckBox.setSelected(false); //Check noseleccionado por defecto
 		showPassCheckBox.addItemListener(new ItemListener() {
@@ -955,11 +955,11 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			@Override
             public void itemStateChanged(ItemEvent evt) {
 				if (evt.getStateChange() == ItemEvent.SELECTED){
-					//Se muestra la contraseña
+					//Se muestra la contrasena
 					((JPasswordField)customDialog.component).setEchoChar((char)0);
 					
 				} else if (evt.getStateChange() == ItemEvent.DESELECTED){
-					//Se oculta la contraseña
+					//Se oculta la contrasena
 					((JPasswordField)customDialog.component).setEchoChar(defaultChar);
 				}
 				
@@ -976,7 +976,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.insets = new Insets(0,0,0,10);  //right padding
 		c.gridy = 2;
 
-		//Se añade el check al panel de información general
+		//Se anade el check al panel de informacion general
         customDialog.mainPanel.add(panelCheckShowPass, c);
 		
 		//Restricciones del panel de botones
@@ -1001,7 +1001,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 
 		customDialog.setVisible(true);
 		
-		//Control para saber si se ha pulsado el botón cancelar
+		//Control para saber si se ha pulsado el boton cancelar
 		if (customDialog.getAnswer()== JOptionPane.YES_OPTION) {
 			return ((JPasswordField)customDialog.component).getPassword();
 		}
@@ -1010,11 +1010,11 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	}
 
 	/**
-	 * Método que crea un botón.
-	 * Si el botón corresponde al de cancelar, se le asigna la tecla esc.
-	 * @param text texto del botón
+	 * Método que crea un boton.
+	 * Si el boton corresponde al de cancelar, se le asigna la tecla esc.
+	 * @param text texto del boton
 	 * @param mnemonic atajo
-	 * @return botón
+	 * @return boton
 	 */
 	private JButton getButton(String text, int mnemonic){
 		JButton button = new JButton (text);
@@ -1022,9 +1022,9 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		Utils.remarcar(button);
         Utils.setContrastColor(button);
         Utils.setFontBold(button);
-        //Se comprueba si el botón es el de cancelar
+        //Se comprueba si el boton es el de cancelar
         if (text.equalsIgnoreCase(cancellText)) {
-        	//Se asigna la tecla escape a dicho botón
+        	//Se asigna la tecla escape a dicho boton
         	String cancelKey = "cancel";
     		this.getRootPane().getInputMap (JComponent.WHEN_IN_FOCUSED_WINDOW).put (KeyStroke.getKeyStroke (KeyEvent.VK_ESCAPE, 0), cancelKey);
     		this.getRootPane ().getActionMap ().put (cancelKey, new AbstractAction () {
@@ -1033,7 +1033,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 				 */
 				private static final long serialVersionUID = 1L;
 				/**
-				 * Indica que la acción es la de pulsar el botón cancelar.
+				 * Indica que la accion es la de pulsar el boton cancelar.
 				 */
 				public void actionPerformed (ActionEvent event) {
     				CustomDialog.cancelButton.doClick ();
@@ -1091,7 +1091,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 			minWidth = Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH;
 			minHeight = Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT;
 		}
-		//Se establece el tamaño mínimo
+		//Se establece el tamano mínimo
 		setMinimumSize(new Dimension(minWidth, minHeight));
 		
 		//Se situa el diálogo

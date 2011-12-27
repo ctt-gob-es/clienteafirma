@@ -90,7 +90,7 @@ final class PanelPresentacion extends JAccessibilityDialogWizard {
         // Foco al contenido
         presentationLabel.addAncestorListener(new RequestFocusListener(false));
 
-        // Se añade la etiqueta al panel
+        // Se anade la etiqueta al panel
         panelCentral.add(presentationLabel, c);
 
         getContentPane().add(panelCentral, BorderLayout.CENTER);
@@ -104,7 +104,7 @@ final class PanelPresentacion extends JAccessibilityDialogWizard {
         this.setBotonera(new BotoneraInferior(ventanas, 0));
         getContentPane().add(getBotoneraSuperior(), BorderLayout.PAGE_START);
         getContentPane().add(getBotonera(), BorderLayout.PAGE_END);
-        // Se asigna el botón por defecto
+        // Se asigna el boton por defecto
         this.getRootPane().setDefaultButton(getBotonera().getSiguiente());
     }
 
