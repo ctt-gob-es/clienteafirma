@@ -1,6 +1,5 @@
 package es.gob.afirma.ui.utils;
 
-import java.awt.Component;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -47,16 +46,16 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	/**
 	 * Ajuste de fuentes.
 	 */
-	public final void callResize(){
+	/*public final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
-	}
+	}*/
 	
 	/**
 	 * Busca el JAccessibilityFrameAdvisor padre de un componente.
 	 * @param component El componente.
 	 * @return El JAccessibilityFrameAdvisor buscado.
 	 */
-	public static JAccessibilityFrameAdvisor getJAccessibilityFrameAdvisor(Component component)
+	/*public static JAccessibilityFrameAdvisor getJAccessibilityFrameAdvisor(Component component)
 	{
 		JAccessibilityFrameAdvisor  resultingJAccessibilityFrameAdvisor = null;
 		while (component != null && resultingJAccessibilityFrameAdvisor == null)
@@ -69,36 +68,7 @@ public abstract class JAccessibilityFrameAdvisor extends JFrame {
 	        }
 		 }
 		 return resultingJAccessibilityFrameAdvisor;
-	 }
-	
-	/**
-	 * Obtiene un componente de un contenedor a traves de su nombre
-	 * @param name Nombre del componente a buscar
-	 * @param container Contenedor donde se encuentra el componente a buscar
-	 * @return
-	 *//*
-	private Component getComponentByName(String name, Container container){
-		if(name.equals(container.getName())){
-			return container;
-		}
-		else {
-			Component[] componentes = container.getComponents();
-			for(int i = 0; i < componentes.length; i++){
-				if(componentes[i] instanceof Container){
-					Component res = getComponentByName(name, (Container) componentes[i]);
-					if(res != null){
-						return res;
-					}
-				}
-				else{
-					if(componentes[i].getName().equals(name)){
-						return componentes[i];
-					}
-				}
-			}
-		}
-		return null;
-	}*/
+	 }*/
 	
 	/**
      * Carga un icono contenido en el directorio de iconos del proyecto.

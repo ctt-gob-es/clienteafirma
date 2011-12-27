@@ -1,5 +1,4 @@
 package es.gob.afirma.ui.utils;
-import java.awt.Component;
 
 import javax.swing.JFrame;
 
@@ -40,16 +39,16 @@ public abstract class JAccessibilityFrameAbout extends JFrame {
 	/**
 	 * Ajuste de fuentes.
 	 */
-	public final void callResize(){
+	/*public final void callResize(){
 		this.resizingAdaptor.adjustWindowFonts();
-	}
+	}*/
 	
 	/**
 	 * Busca el JAccessibilityFrame padre de un componente.
 	 * @param component El componente.
 	 * @return El JAccessibilityFrame buscado.
 	 */
-	public static JAccessibilityFrameAbout getJAccessibilityFrameAbout(Component component)
+	/*public static JAccessibilityFrameAbout getJAccessibilityFrameAbout(Component component)
 	{
 		JAccessibilityFrameAbout  resultingJAccessibilityFrameAbout = null;
 		while (component != null && resultingJAccessibilityFrameAbout == null)
@@ -62,5 +61,5 @@ public abstract class JAccessibilityFrameAbout extends JFrame {
 	        }
 		 }
 		 return resultingJAccessibilityFrameAbout;
-	 }
+	 }*/
 }
