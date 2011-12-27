@@ -41,7 +41,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
 	private static final String APPLET_PARAM_USER_AGENT = "userAgent"; //$NON-NLS-1$
-	
+
 	private static final String APPLET_PARAM_USER_KEYSTORE = "keystore"; //$NON-NLS-1$
 
 	/** Identificador del navegador Web que carga el applet. */
@@ -49,10 +49,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** Tipo de almac&eacute;n de claves del que extraer los certificados. */
 	private AOKeyStore keystoreType = null;
-	
+
 	/** Ruta de la biblioteca o almac&eacute;n del que extraer los certificados. */
 	private String keystoreLib = null;
-	
+
 	/** Ruta recomendada para la apertura de di&aacute;logos se seleccion y guardado de ficheros. */
 	private File pathHint = new File(Platform.getUserHome());
 
@@ -61,128 +61,128 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** {@inheritDoc} */
 	public String sign(final String dataB64, 
-	                   final String algorithm, 
-	                   final String format, 
-	                   final String extraParams) throws AOFormatFileException, 
-	                                                    PrivilegedActionException, 
-	                                                    IOException {
+			final String algorithm, 
+			final String format, 
+			final String extraParams) throws AOFormatFileException, 
+			PrivilegedActionException, 
+			IOException {
 		this.cleanErrorMessage();
-		
-        if (dataB64 == null) {
-            final IllegalArgumentException e = new IllegalArgumentException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
-            setErrorMessage(e);
-            throw e;
-        }
 
-        final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
-        
-        try {
-            return Base64.encodeBytes(AccessController.doPrivileged(new SignAction(
-                 this.selectSigner((format == null || format.trim().length() < 1 ? null : format.trim()), null), 
-                 Base64.decode(dataB64),
-                 (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim()), 
-                 this.selectPrivateKey(params), 
-                 ExtraParamsProcessor.expandProperties(params)
-            )));
-        }
-        catch (final AOFormatFileException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-        catch (final IOException e) {
-            setErrorMessage(e);
-            throw e;
-        }
+		if (dataB64 == null) {
+			final IllegalArgumentException e = new IllegalArgumentException("Se han introducido datos nulos para firmar"); //$NON-NLS-1$
+			setErrorMessage(e);
+			throw e;
+		}
+
+		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
+
+		try {
+			return Base64.encodeBytes(AccessController.doPrivileged(new SignAction(
+					this.selectSigner(this.cleanParam(format), null), 
+					Base64.decode(dataB64),
+					this.cleanParam(algorithm), 
+					this.selectPrivateKey(params), 
+					ExtraParamsProcessor.expandProperties(params)
+			)));
+		}
+		catch (final AOFormatFileException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		catch (final IOException e) {
+			setErrorMessage(e);
+			throw e;
+		}
 
 	}
 
 	/** {@inheritDoc} */
 	public String coSign(final String signB64, 
-	                     final String dataB64, 
-	                     final String algorithm, 
-	                     final String format, 
-	                     final String extraParams) throws AOFormatFileException, 
-	                                                      PrivilegedActionException, 
-	                                                      IOException {
+			final String dataB64, 
+			final String algorithm, 
+			final String format, 
+			final String extraParams) throws AOFormatFileException, 
+			PrivilegedActionException, 
+			IOException {
 		this.cleanErrorMessage();
 
 		if (signB64 == null) {
-		    final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
-            setErrorMessage(e);
-            throw e; 
+			final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
+			setErrorMessage(e);
+			throw e; 
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
 		try {
-		    final byte[] sign = Base64.decode(signB64);
-            return Base64.encodeBytes(AccessController.doPrivileged(new CoSignAction(
-               this.selectSigner((format == null || format.trim().length() < 1 ? null : format.trim()), sign), 
-               sign, 
-               (dataB64 == null ? null : Base64.decode(dataB64)),
-               (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim()), 
-               this.selectPrivateKey(params), 
-               ExtraParamsProcessor.expandProperties(params)
-            )));
-        }
-        catch (final AOFormatFileException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-        catch (final IOException e) {
-            setErrorMessage(e);
-            throw e;
-        } 
+			final byte[] sign = Base64.decode(signB64);
+			return Base64.encodeBytes(AccessController.doPrivileged(new CoSignAction(
+					this.selectSigner(this.cleanParam(format), sign), 
+					sign, 
+					(dataB64 == null ? null : Base64.decode(dataB64)),
+					this.cleanParam(algorithm), 
+					this.selectPrivateKey(params), 
+					ExtraParamsProcessor.expandProperties(params)
+			)));
+		}
+		catch (final AOFormatFileException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		catch (final IOException e) {
+			setErrorMessage(e);
+			throw e;
+		} 
 
 	}
 
 	/** {@inheritDoc} */
 	public String counterSign(final String signB64, 
-	                          final String algorithm, 
-	                          final String format, 
-	                          final String extraParams) throws AOFormatFileException, 
-	                                                           PrivilegedActionException, 
-	                                                           IOException {
+			final String algorithm, 
+			final String format, 
+			final String extraParams) throws AOFormatFileException, 
+			PrivilegedActionException, 
+			IOException {
 		this.cleanErrorMessage();
 
 		if (signB64 == null) {
-            final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
-            setErrorMessage(e);
-            throw e; 
+			final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido una firma nula para contrafirmar"); //$NON-NLS-1$
+			setErrorMessage(e);
+			throw e; 
 		}
 
 		final Properties params = ExtraParamsProcessor.convertToProperties(extraParams);
 
 		try {
-		    final byte[] sign = Base64.decode(signB64);
-            return Base64.encodeBytes(AccessController.doPrivileged(new CounterSignAction(
-               this.selectSigner((format == null || format.trim().length() < 1 ? null : format.trim()), sign), 
-               sign,
-               (algorithm == null || algorithm.trim().length() < 1 ? null : algorithm.trim()), 
-               this.selectPrivateKey(params), 
-               ExtraParamsProcessor.expandProperties(params)
-            )));
-        }
-        catch (final AOFormatFileException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-        catch (final IOException e) {
-            setErrorMessage(e);
-            throw e;
-        } 
+			final byte[] sign = Base64.decode(signB64);
+			return Base64.encodeBytes(AccessController.doPrivileged(new CounterSignAction(
+					this.selectSigner(this.cleanParam(format), sign), 
+					sign,
+					this.cleanParam(algorithm), 
+					this.selectPrivateKey(params), 
+					ExtraParamsProcessor.expandProperties(params)
+			)));
+		}
+		catch (final AOFormatFileException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		catch (final IOException e) {
+			setErrorMessage(e);
+			throw e;
+		} 
 
 	}
 
@@ -192,30 +192,30 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		this.cleanErrorMessage();
 
 		if (signB64 == null) {
-		    final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
-		    setErrorMessage(e);
-		    throw e;
+			final IllegalArgumentException e = new IllegalArgumentException("Se ha introducido un firma nula para la extraccion de firmantes"); //$NON-NLS-1$
+			setErrorMessage(e);
+			throw e;
 		}
 
 		final byte[] sign;
 		final AOSigner signer;
-        try {
-            sign = Base64.decode(signB64);
-            signer = this.getSigner(sign);
-        }
-        catch (final IOException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-		
+		try {
+			sign = Base64.decode(signB64);
+			signer = this.getSigner(sign);
+		}
+		catch (final IOException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+
 		if (signer == null) {
-		    final AOFormatFileException e = new AOFormatFileException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
-		    setErrorMessage(e);
-		    throw e;
+			final AOFormatFileException e = new AOFormatFileException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
+			setErrorMessage(e);
+			throw e;
 		}
 
 		return AOUtil.showTreeAsString(signer.getSignersStructure(sign, false), null, null);
@@ -224,10 +224,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 	/** {@inheritDoc} */
 	public boolean saveDataToFile(final String data, 
-	                              final String title, 
-	                              final String fileName, 
-	                              final String extension, 
-	                              final String description) throws PrivilegedActionException, IOException {
+			final String title, 
+			final String fileName, 
+			final String extension, 
+			final String description) throws PrivilegedActionException, IOException {
 
 		this.cleanErrorMessage();
 
@@ -236,39 +236,39 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			return false;
 		}
 
-		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
+		final String titleDialog = this.cleanParam(title);
 
-		final String[] exts = (extension == null || extension.trim().length() < 1 ?
-				null : new String[] { extension.trim() });
+		final String depuredExts = this.cleanParam(extension);
+		final String[] exts = (depuredExts == null ? null : new String[] { depuredExts });
 
-		final String descFiles = (description == null || description.trim().length() < 1 ?
-				null : description.trim());
+		final String descFiles = this.cleanParam(description);
 
-		final File fileHint = (fileName == null || fileName.trim().length() < 1 ?
+		final String depuredFileName = this.cleanParam(fileName);
+		final File fileHint = (depuredFileName == null ?
 				this.pathHint : new File(this.pathHint, fileName));
 
 		try {
 			return AccessController.doPrivileged(
-                 new SaveFileAction(
-                        titleDialog, 
-                        Base64.decode(data),
-					    exts, 
-					    descFiles, 
-					    fileHint, 
-					    this
-				 )).booleanValue();
+					new SaveFileAction(
+							titleDialog, 
+							Base64.decode(data),
+							exts, 
+							descFiles, 
+							fileHint, 
+							this
+					)).booleanValue();
 		} 
 		catch (final AOCancelledOperationException e) {
 			return false;
 		}
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
-        catch (final IOException e) {
-            setErrorMessage(e);
-            throw e;
-        }
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+		catch (final IOException e) {
+			setErrorMessage(e);
+			throw e;
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -276,31 +276,28 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.cleanErrorMessage();
 
-		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
-
-		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-				null : extensions.trim().split(",")); //$NON-NLS-1$
-
-		final String descFiles = (description == null || description.trim().length() < 1 ?
-				null : description.trim());
+		final String titleDialog = this.cleanParam(title);
+		final String cleanExts = this.cleanParam(extensions);
+		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
+		final String descFiles = this.cleanParam(description);
 
 		try {
 			return AccessController.doPrivileged(
-                 new GetFilePathAction(
-					titleDialog, 
-					exts, 
-					descFiles, 
-					this
-				 )
-            );
+					new GetFilePathAction(
+							titleDialog, 
+							exts, 
+							descFiles, 
+							this
+					)
+			);
 		}
 		catch (final AOCancelledOperationException e) {
 			return null;
 		}
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -308,13 +305,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.cleanErrorMessage();
 
-		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
-
-		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-				null : extensions.trim().split(",")); //$NON-NLS-1$
-
-		final String descFiles = (description == null || description.trim().length() < 1 ?
-				null : description.trim());
+		final String titleDialog = this.cleanParam(title);
+		final String cleanExts = this.cleanParam(extensions);
+		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
+		final String descFiles = this.cleanParam(description);
 
 		try {
 			return Base64.encodeBytes(AccessController.doPrivileged(new GetFileContentAction(
@@ -323,15 +317,15 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final AOCancelledOperationException e) {
 			return null;
 		}
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
 	}
 
 	/** {@inheritDoc} */
 	@Deprecated
-    public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException {
+	public String getFileNameContentText(final String title, final String extensions, final String description) throws PrivilegedActionException {
 		this.cleanErrorMessage();
 		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
 		return this.getFileNameContent(title, extensions, description, false);
@@ -341,20 +335,17 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public String getFileNameContentBase64(final String title, final String extensions, final String description) throws PrivilegedActionException {
 		this.cleanErrorMessage();
 		// Se llama a setError() desde getFileNameContent, no es necesario repetirlo aqui
-        return this.getFileNameContent(title, extensions, description, true);
+		return this.getFileNameContent(title, extensions, description, true);
 	}
 
 	private String getFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
 
 		this.cleanErrorMessage();
 
-		final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
-		
-		final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-				null : extensions.trim().split(",")); //$NON-NLS-1$
-
-		final String descFiles = (description == null || description.trim().length() < 1 ?
-				null : description.trim());
+		final String titleDialog = this.cleanParam(title);
+		final String cleanExts = this.cleanParam(extensions);
+		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
+		final String descFiles = this.cleanParam(description);
 
 		try { 
 			return AccessController.doPrivileged(new GetFileNameContentAction(
@@ -363,10 +354,59 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		catch (final AOCancelledOperationException e) {
 			return null;
 		}
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
+	}
+
+
+	/** {@inheritDoc} */ 
+	@Deprecated
+	public String[] getMultiFileNameContentText(final String title, 
+			final String extensions, 
+			final String description) throws PrivilegedActionException {
+		return this.getMultiFileNameContent(title, extensions, description, false);
+	}
+
+	/** {@inheritDoc} */
+	public String[] getMultiFileNameContentBase64(final String title, 
+			final String extensions, 
+			final String description) throws IOException, PrivilegedActionException {
+		return this.getMultiFileNameContent(title, extensions, description, true);
+	}
+
+	/**
+	 * Permite seleccionar al usuario un conjunto de ficheros y devuelve las tuplas con cada
+	 * nombre de fichero y contenido separados por ('|').
+	 * @param title T&iacute;tulo de la ventana de selecci&oacute;n.
+	 * @param extensions Extensiones de fichero permitidas separadas por coma (',').
+	 * @param description Descripci&oacute;n del tipo de fichero.
+	 * @param asBase64 Si es {@code true} devuelve el contenido en Base64, si es {@code false}
+	 * 				lo devuelve en texto plano.
+	 * @return Listado de tuplas "NombreFichero|Contenido".
+	 * @throws PrivilegedActionException Cuando ocurre alg&uacute;n error durante la operaci&oacute;n.
+	 */
+	private String[] getMultiFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
+
+		this.cleanErrorMessage();
+
+		final String titleDialog = this.cleanParam(title);
+		final String cleanExts = this.cleanParam(extensions);
+		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
+		final String descFiles = this.cleanParam(description);
+
+		try { 
+			return AccessController.doPrivileged(new GetFileNameContentAction(
+					titleDialog, exts, descFiles, true, asBase64, this)); 
+		} 
+		catch (final AOCancelledOperationException e) {
+			return null;
+		}
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -378,15 +418,16 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			return null;
 		}
 		try {
-		    if (charset != null && charset.trim().length() > 0) {
-	            return new String(Base64.decode(base64Data), charset);
-	        }
-            return new String(Base64.decode(base64Data));
-        }
-        catch (final IOException e) {
-            setErrorMessage(e);
-            throw e;
-        }
+			final String cleanCharset = this.cleanParam(charset);
+			if (cleanCharset != null) {
+				return new String(Base64.decode(base64Data), cleanCharset);
+			}
+			return new String(Base64.decode(base64Data));
+		}
+		catch (final IOException e) {
+			setErrorMessage(e);
+			throw e;
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -395,39 +436,41 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		if (plainText == null) {
 			return null;
 		}
-		if (charset != null && charset.trim().length() > 0) {
+
+		final String cleanCharset = this.cleanParam(charset);
+		if (cleanCharset != null) {
 			try {
-                return Base64.encodeBytes(plainText.getBytes(charset));
-            }
-            catch (final UnsupportedEncodingException e) {
-                setErrorMessage(e);
-                throw e;
-            }
+				return Base64.encodeBytes(plainText.getBytes(cleanCharset));
+			}
+			catch (final UnsupportedEncodingException e) {
+				setErrorMessage(e);
+				throw e;
+			}
 		}
 		return Base64.encodeBytes(plainText.getBytes());
 	}
 
-    /**
-     * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
-     * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
-     * descripci&oacute;n del problema.
-     * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-     * @throws InvalidExternalLibraryException Cuando se encuentra alguna incopatibilidad en el entorno de
-     * ejecuci&oacute;n.
-     * @deprecated Se externaliza las comprobaciones de entorno.
-     */
+	/**
+	 * Verifica los requisitos m&iacute;nimos de la plataforma en la que se ejecuta el applet.
+	 * Si no cumple los requisitos m&iacute;nimos lanza una excepci&oacute;n con la
+	 * descripci&oacute;n del problema.
+	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+	 * @throws InvalidExternalLibraryException Cuando se encuentra alguna incopatibilidad en el entorno de
+	 * ejecuci&oacute;n.
+	 * @deprecated Se externaliza las comprobaciones de entorno.
+	 */
 	@Deprecated
 	public void verifyPlatform() throws PrivilegedActionException {
 		this.cleanErrorMessage();
 		try {
-            AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
-        }
-        catch (final PrivilegedActionException e) {
-            setErrorMessage(e);
-            throw e;
-        }
+			AccessController.doPrivileged(new VerifyPlatformAction(this.userAgent));
+		}
+		catch (final PrivilegedActionException e) {
+			setErrorMessage(e);
+			throw e;
+		}
 	}
-	
+
 	/**
 	 * Recupera la version de Java en una cadena de la forma "JX". En donde 'X' es
 	 * la versi&oacute;n principal de Java (J5, J6, J7...).
@@ -438,14 +481,13 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public String getEcoJava() { 
 		return AccessController.doPrivileged(new GetEcoJavaVersionAction()).toString();
 	}
-	
+
 	@Override
 	public void init() {
 		this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
-		
-		String keystoreParam = this.getParameter(APPLET_PARAM_USER_KEYSTORE);
+
+		String keystoreParam = this.cleanParam(this.getParameter(APPLET_PARAM_USER_KEYSTORE));
 		if (keystoreParam != null && !keystoreParam.equals("null")) { //$NON-NLS-1$
-			keystoreParam = keystoreParam.trim();
 			int separatorPos = keystoreParam.indexOf(':');
 			try {
 				if (separatorPos == -1) {
@@ -477,171 +519,132 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @param e Excepci&oacute;n que produjo el error.
 	 * @throws Exception Excepci&oacute;n recibida.
 	 */
-	 private void setErrorMessage(final Exception e) {
-		 this.errorMessage = (e.getLocalizedMessage() != null ? e.getLocalizedMessage() :
-			 (e.getMessage() != null ? e.getMessage() : e.toString()));
-		 if (this.errorMessage.startsWith("java.security.PrivilegedActionException:")) { //$NON-NLS-1$
-			 this.errorMessage = this.errorMessage.substring(
-					 "java.security.PrivilegedActionException:".length()).trim(); //$NON-NLS-1$
-		 }
-		 final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		 PrintWriter writer = new PrintWriter(baos);
-		 e.printStackTrace(writer);
-		 writer.flush();
-		 writer.close();
-		 
-	     Logger.getLogger("es.gob.afirma.MiniAfirmaApplet").severe(new String(baos.toByteArray())); //$NON-NLS-1$
-	 }
+	private void setErrorMessage(final Exception e) {
+		this.errorMessage = (e.getLocalizedMessage() != null ? e.getLocalizedMessage() :
+			(e.getMessage() != null ? e.getMessage() : e.toString()));
+		if (this.errorMessage.startsWith("java.security.PrivilegedActionException:")) { //$NON-NLS-1$
+			this.errorMessage = this.errorMessage.substring(
+					"java.security.PrivilegedActionException:".length()).trim(); //$NON-NLS-1$
+		}
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintWriter writer = new PrintWriter(baos);
+		e.printStackTrace(writer);
+		writer.flush();
+		writer.close();
 
-	 /** Elimina el mensaje de error establecido previamente. */
-	 private void cleanErrorMessage() {
-		 this.errorMessage = null;
-	 }
+		Logger.getLogger("es.gob.afirma.MiniAfirmaApplet").severe(new String(baos.toByteArray())); //$NON-NLS-1$
+	}
 
-	 /**
-	  * Permite que el usuario seleccione un certificado del almac&eacute;n configurado, o
-	  * el por defecto si no se indic&oacute;, y devuelve su clave privada.
-	  * @param params Configuraci&oacute;n general establecida para la operaci&oacute;n.
-	  * @return Clave privada asociada al certificado seleccionado.
-	  * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-	  * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
-	  */
-	 private PrivateKeyEntry selectPrivateKey(final Properties params) throws PrivilegedActionException {
-		 
-		 final SelectPrivateKeyAction selectPrivateKeyAction;
-		 if (this.keystoreType == null) {
-			 selectPrivateKeyAction = new SelectPrivateKeyAction(
-					 Platform.getOS(), 
-					 Platform.getBrowser(this.userAgent), 
-					 new CertFilterManager(params), 
-					 this);
-		 } 
-		 else {
-			 selectPrivateKeyAction = new SelectPrivateKeyAction(
-					 this.keystoreType,
-					 this.keystoreLib,
-					 new CertFilterManager(params),
-					 this);
-		 }
-		 return AccessController.doPrivileged(selectPrivateKeyAction);
-	 }
+	/** Elimina el mensaje de error establecido previamente. */
+	private void cleanErrorMessage() {
+		this.errorMessage = null;
+	}
 
-	 /** Devuelve un manejador de firma compatible con un formato de firma o, de no establecerse, con
-	  * una firma electr&oacute;nica concreta.
-	  * @param format Formato de firma.
-	  * @param sign Firma electr&oacute;nica.
-	  * @return Manejador de firma.
-	  * @throws AOFormatFileException Cuando el formato o la firma no estan soportados.
-	  * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
-	  * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
-	  */
-	 private AOSigner selectSigner(final String format, final byte[] sign) throws AOFormatFileException, PrivilegedActionException {
-		 final AOSigner signer;
-		 if (format != null) {
-			 signer = this.getSigner(format);
-			 if (signer == null) {
-			     throw new AOFormatFileException("El formato de firma indicado no esta soportado"); //$NON-NLS-1$
-			 }
-			 if (sign != null &&  !signer.isSign(sign)) {
-			     throw new AOFormatFileException("La firma electronica no es compatible con el formato de firma indicado"); //$NON-NLS-1$
-			 }
-		 } 
-		 else if (sign != null) {
-			 signer = this.getSigner(sign);
-			 if (signer == null) {
-			     throw new IllegalArgumentException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
-			 }
-		 } 
-		 else {
-			 throw new IllegalArgumentException("No se ha indicado el formato ni la firma que se desea tratar"); //$NON-NLS-1$
-		 }
-		 return signer;
-	 }
+	/**
+	 * Permite que el usuario seleccione un certificado del almac&eacute;n configurado, o
+	 * el por defecto si no se indic&oacute;, y devuelve su clave privada.
+	 * @param params Configuraci&oacute;n general establecida para la operaci&oacute;n.
+	 * @return Clave privada asociada al certificado seleccionado.
+	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+	 * @throws AOCancelledOperationException Cuando se cancela la operaci&oacute;n.
+	 */
+	private PrivateKeyEntry selectPrivateKey(final Properties params) throws PrivilegedActionException {
 
-	 /** Recupera un manejador de firma compatible con el formato indicado. Si no se encuentra uno
-	  * compatible, se devuelve {@code null}.
-	  * @param format Nombre de un formato de firma.
-	  * @return Manejador de firma.
-	  * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
-	  */
-	 private AOSigner getSigner(final String format) throws PrivilegedActionException {
-		 return AccessController.doPrivileged(new SelectSignerAction(format));
-	 }
+		final SelectPrivateKeyAction selectPrivateKeyAction;
+		if (this.keystoreType == null) {
+			selectPrivateKeyAction = new SelectPrivateKeyAction(
+					Platform.getOS(), 
+					Platform.getBrowser(this.userAgent), 
+					new CertFilterManager(params), 
+					this);
+		} 
+		else {
+			selectPrivateKeyAction = new SelectPrivateKeyAction(
+					this.keystoreType,
+					this.keystoreLib,
+					new CertFilterManager(params),
+					this);
+		}
+		return AccessController.doPrivileged(selectPrivateKeyAction);
+	}
 
-	 /** Recupera un manejador de firma compatible con la firma indicada. Si no se encuentra uno
-	  * compatible, se devuelve {@code null}.
-	  * @param signature Firma electr&oacute;nica.
-	  * @return Manejador de firma.
-	  * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
-	  */
-	 private AOSigner getSigner(final byte[] signature) throws PrivilegedActionException {
-		 return AccessController.doPrivileged(new SelectSignerAction(signature));
-	 }
+	/** Devuelve un manejador de firma compatible con un formato de firma o, de no establecerse, con
+	 * una firma electr&oacute;nica concreta.
+	 * @param format Formato de firma.
+	 * @param sign Firma electr&oacute;nica.
+	 * @return Manejador de firma.
+	 * @throws AOFormatFileException Cuando el formato o la firma no estan soportados.
+	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+	 * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
+	 */
+	private AOSigner selectSigner(final String format, final byte[] sign) throws AOFormatFileException, PrivilegedActionException {
+		final AOSigner signer;
+		if (format != null) {
+			signer = this.getSigner(format);
+			if (signer == null) {
+				throw new AOFormatFileException("El formato de firma indicado no esta soportado"); //$NON-NLS-1$
+			}
+			if (sign != null &&  !signer.isSign(sign)) {
+				throw new AOFormatFileException("La firma electronica no es compatible con el formato de firma indicado"); //$NON-NLS-1$
+			}
+		} 
+		else if (sign != null) {
+			signer = this.getSigner(sign);
+			if (signer == null) {
+				throw new IllegalArgumentException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
+			}
+		} 
+		else {
+			throw new IllegalArgumentException("No se ha indicado el formato ni la firma que se desea tratar"); //$NON-NLS-1$
+		}
+		return signer;
+	}
 
-	 /** Configura la apariencia de los di&aacute;logos Java siguiendo la configuraci&oacute;n
-	  * establecida en el sistema. 
-	  */
-	 private void configureLookAndFeel() {
-		 try {
-			 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		 }
-		 catch (final Exception e) {
-			 LOGGER.warning("No se ha podido establecer el Look&Feel: " + e); //$NON-NLS-1$
-		 }
+	/** Recupera un manejador de firma compatible con el formato indicado. Si no se encuentra uno
+	 * compatible, se devuelve {@code null}.
+	 * @param format Nombre de un formato de firma.
+	 * @return Manejador de firma.
+	 * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
+	 */
+	private AOSigner getSigner(final String format) throws PrivilegedActionException {
+		return AccessController.doPrivileged(new SelectSignerAction(format));
+	}
 
-		 // Nos aseguramos de que los dialogos salgan decorados
-		 javax.swing.JDialog.setDefaultLookAndFeelDecorated(true);
-		 javax.swing.JFrame.setDefaultLookAndFeelDecorated(true);
-	 }
+	/** Recupera un manejador de firma compatible con la firma indicada. Si no se encuentra uno
+	 * compatible, se devuelve {@code null}.
+	 * @param signature Firma electr&oacute;nica.
+	 * @return Manejador de firma.
+	 * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
+	 */
+	private AOSigner getSigner(final byte[] signature) throws PrivilegedActionException {
+		return AccessController.doPrivileged(new SelectSignerAction(signature));
+	}
 
-	 /** {@inheritDoc} */ 
-	 @Deprecated
-	 public String[] getMultiFileNameContentText(final String title, 
-	                                             final String extensions, 
-	                                             final String description) throws PrivilegedActionException {
-	        return this.getMultiFileNameContent(title, extensions, description, false);
-	 }
-	 
-	 /** {@inheritDoc} */
-	 public String[] getMultiFileNameContentBase64(final String title, 
-	                                               final String extensions, 
-	                                               final String description) throws IOException, PrivilegedActionException {
-	        return this.getMultiFileNameContent(title, extensions, description, true);
-	 }
-	 
-	 /**
-	  * Permite seleccionar al usuario un conjunto de ficheros y devuelve las tuplas con cada
-	  * nombre de fichero y contenido separados por ('|').
-	  * @param title T&iacute;tulo de la ventana de selecci&oacute;n.
-	  * @param extensions Extensiones de fichero permitidas separadas por coma (',').
-	  * @param description Descripci&oacute;n del tipo de fichero.
-	  * @param asBase64 Si es {@code true} devuelve el contenido en Base64, si es {@code false}
-	  * 				lo devuelve en texto plano.
-	  * @return Listado de tuplas "NombreFichero|Contenido".
-	  * @throws PrivilegedActionException Cuando ocurre alg&uacute;n error durante la operaci&oacute;n.
-	  */
-	 private String[] getMultiFileNameContent(final String title, final String extensions, final String description, final boolean asBase64) throws PrivilegedActionException {
+	/** Configura la apariencia de los di&aacute;logos Java siguiendo la configuraci&oacute;n
+	 * establecida en el sistema. 
+	 */
+	private void configureLookAndFeel() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+		catch (final Exception e) {
+			LOGGER.warning("No se ha podido establecer el Look&Feel: " + e); //$NON-NLS-1$
+		}
 
-		 this.cleanErrorMessage();
+		// Nos aseguramos de que los dialogos salgan decorados
+		javax.swing.JDialog.setDefaultLookAndFeelDecorated(true);
+		javax.swing.JFrame.setDefaultLookAndFeelDecorated(true);
+	}
 
-		 final String titleDialog = (title == null || title.trim().length() < 1 ? null : title.trim());
-
-		 final String[] exts = (extensions == null || extensions.trim().length() < 1 ?
-				 null : extensions.trim().split(",")); //$NON-NLS-1$
-
-		 final String descFiles = (description == null || description.trim().length() < 1 ?
-				 null : description.trim());
-		 
-		 try { 
-			 return AccessController.doPrivileged(new GetFileNameContentAction(
-					 titleDialog, exts, descFiles, true, asBase64, this)); 
-		 } 
-		 catch (final AOCancelledOperationException e) {
-			 return null;
-		 }
-		 catch (final PrivilegedActionException e) {
-			 setErrorMessage(e);
-			 throw e;
-		 }
-	 }
+	/**
+	 * Limpia los par&aacute;metros recibidos en las funciones del applet sustituyendo
+	 * cadenas vac&iacute;as por nulos y eliminando los espacios en blanco al principio
+	 * y final de las cadenas
+	 * @param appletParam Par&aacute;metro que se desea limpiar.
+	 * @return Par&aacute;metro preparado para su uso.
+	 */
+	private String cleanParam(String appletParam) {
+		return appletParam == null || appletParam.trim().length() < 1 ?
+				null : appletParam.trim();
+	}
 }
