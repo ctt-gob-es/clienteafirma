@@ -136,8 +136,7 @@ public final class CAdESUtils {
                 /** SigningCertificateV2 ::= SEQUENCE { certs SEQUENCE OF
                  * ESSCertIDv2, policies SEQUENCE OF PolicyInformation OPTIONAL
                  * } */
-                scv2 = new SigningCertificateV2(essCertIDv2, getPolicyInformation(policy)); // con
-                                                                  // politica
+                scv2 = new SigningCertificateV2(essCertIDv2, getPolicyInformation(policy)); // con politica
             }
             else {
                 scv2 = new SigningCertificateV2(essCertIDv2); // Sin politica

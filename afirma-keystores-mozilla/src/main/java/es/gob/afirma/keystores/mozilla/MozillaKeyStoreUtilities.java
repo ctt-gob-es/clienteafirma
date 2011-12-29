@@ -400,6 +400,7 @@ final class MozillaKeyStoreUtilities {
                 return firefoxDirectories.get(0);
             }
             Collections.sort(firefoxDirectories, new Comparator<String>() {
+                /** {@inheritDoc} */
                 public int compare(final String o1, final String o2) {
                     return o1.compareTo(o2);
                 }
