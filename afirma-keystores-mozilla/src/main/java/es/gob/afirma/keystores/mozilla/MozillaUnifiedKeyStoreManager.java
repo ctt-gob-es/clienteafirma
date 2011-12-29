@@ -225,6 +225,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         this.externallPasswordCallback = externallPC;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String[] getAliases() {
         if (this.kss == null) {
@@ -246,6 +247,7 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         return tmpAlias.clone();
     }
 
+    /** {@inheritDoc} */
     @Override
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) {
 
@@ -267,11 +269,13 @@ public final class MozillaUnifiedKeyStoreManager extends AOKeyStoreManager {
         return keyEntry;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<KeyStore> getKeyStores() {
         return this.kss;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "Almacen de claves de tipo Firefox unificado"; //$NON-NLS-1$
