@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOInvalidFormatException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.util.windows.WinRegistryWrapper;
@@ -351,13 +350,10 @@ final class MozillaKeyStoreUtilities {
      * @return Directorio de las bibliotecas NSS del sistema
      * @throws FileNotFoundException
      *         Si no se puede encontrar NSS en el sistema
-     * @throws AOInvalidFormatException
-     *         Cuando se encuentra un NSS en una arquitectura distinta de la
-     *         del entorno de ejecuci&oacute;n de Java (32 &oacute; 64 bits)
      * @throws AOException
      *         Cuando no se ha podido encontrar y cargar una versi&oacute;n
      *         v&aacute;lidad de NSS. */
-    static String getSystemNSSLibDir() throws FileNotFoundException, AOInvalidFormatException {
+    static String getSystemNSSLibDir() throws FileNotFoundException {
 
         if (nssLibDir != null) {
             return nssLibDir;
