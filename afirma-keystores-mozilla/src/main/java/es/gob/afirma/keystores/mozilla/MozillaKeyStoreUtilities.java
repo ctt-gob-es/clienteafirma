@@ -133,7 +133,7 @@ final class MozillaKeyStoreUtilities {
 
     }
 
-    private static String getSystemNSSLibDirWindows() throws FileNotFoundException, AOInvalidFormatException {
+    private static String getSystemNSSLibDirWindows() throws FileNotFoundException {
 
         // Intentamos extraer la ruta de instalacion de Firefox del registro
         String dir = WinRegistryWrapper.getString(WinRegistryWrapper.HKEY_CURRENT_USER, "Software\\Classes\\FirefoxURL\\shell\\open\\command", ""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -166,19 +166,6 @@ final class MozillaKeyStoreUtilities {
                         if (dir.contains("\u007E")) { //$NON-NLS-1$
                             throw new FileNotFoundException("No se ha podido obtener el nombre del directorio del modulo PKCS#11, parece estar establecido como un nombre corto (8+3): " + e); //$NON-NLS-1$
                         }
-                    }
-
-                    // Tenemos NSS en el sistema, comprobamos arquitectura
-                    // cargando una de las bibliotecas
-                    try {
-                        final String[] libs = getSoftkn3Dependencies(dir);
-                        if (libs != null && libs.length > 0) {
-                            System.load(libs[0]);
-                        }
-                    }
-                    catch (final Exception e) {
-                        throw new AOInvalidFormatException(
-                           "El NSS del sistema (" + dir + ") es de una arquitectura incompatible: " + e, e); //$NON-NLS-1$ //$NON-NLS-2$
                     }
 
                     // Tenemos la ruta del NSS, comprobamos adecuacion por bugs de Java
