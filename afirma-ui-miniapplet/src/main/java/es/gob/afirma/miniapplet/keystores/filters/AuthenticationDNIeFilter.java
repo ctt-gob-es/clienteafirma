@@ -37,6 +37,7 @@ public final class AuthenticationDNIeFilter extends CertificateFilter {
 		this.keyUsageFilter = new KeyUsageFilter(AUTHENTICATION_CERT_USAGE);
 	}
 	
+	/** {@inheritDoc} */
 	@Override
 	public boolean matches(final X509Certificate cert) {
 		return this.keyUsageFilter.matches(cert) && this.rfc2254Filter.matches(cert);

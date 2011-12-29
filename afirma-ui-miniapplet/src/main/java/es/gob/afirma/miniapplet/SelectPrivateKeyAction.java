@@ -87,6 +87,7 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 		this.parent = parent;
 	}
 	
+	/** {@inheritDoc} */
 	public PrivateKeyEntry run() throws KeyException, AOKeystoreAlternativeException, AOException {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			this.keyStore, 

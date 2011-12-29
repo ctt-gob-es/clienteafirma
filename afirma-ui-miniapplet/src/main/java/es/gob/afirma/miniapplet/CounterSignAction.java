@@ -56,6 +56,7 @@ final class CounterSignAction implements PrivilegedExceptionAction<byte[]> {
 		this.extraParams = extraParams;
 	}
 	
+	/** {@inheritDoc} */
 	public byte[] run() throws AOException {
 		CounterSignTarget target = CounterSignTarget.LEAFS;
 		if (this.extraParams.containsKey(COUNTERSIGN_TARGET_KEY)) {

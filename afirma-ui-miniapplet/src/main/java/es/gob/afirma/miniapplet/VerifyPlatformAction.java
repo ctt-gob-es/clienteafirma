@@ -28,6 +28,7 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 		this.userAgent = userAgent;
 	}
 
+	/** {@inheritDoc} */
 	public Void run() throws InvalidExternalLibraryException {
 		this.verificaSunMSCAPINeeded();
 		this.verificaBCVersion();

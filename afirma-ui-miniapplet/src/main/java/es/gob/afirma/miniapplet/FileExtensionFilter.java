@@ -25,6 +25,7 @@ class FileExtensionFilter extends FileFilter {
 		this.desc = description;
 	}
 	
+	/** {@inheritDoc} */
 	@Override
 	public String getDescription() {
 		if (this.desc != null) {
@@ -38,6 +39,7 @@ class FileExtensionFilter extends FileFilter {
 		return buffer.toString();
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public boolean accept(final File f) {
 		if (f.isDirectory()) {

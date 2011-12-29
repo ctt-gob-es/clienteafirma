@@ -49,6 +49,7 @@ final class SignAction implements PrivilegedExceptionAction<byte[]> {
 		this.extraParams = extraParams;
 	}
 	
+	/** {@inheritDoc} */
 	public byte[] run() throws AOException {
 		return this.signer.sign(this.data, this.algorithm, this.keyEntry, this.extraParams);
 	}

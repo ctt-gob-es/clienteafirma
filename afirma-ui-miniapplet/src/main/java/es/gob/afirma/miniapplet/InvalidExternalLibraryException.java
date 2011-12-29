@@ -29,6 +29,7 @@ final class InvalidExternalLibraryException extends Exception {
         this.localizedMessageParams = (localizedStringParams != null) ? localizedStringParams.clone() : null;
     }
     
+    /** {@inheritDoc} */
     @Override
     public String getLocalizedMessage() {
         return MiniAppletMessages.getString(this.localizedMessageKey, this.localizedMessageParams);

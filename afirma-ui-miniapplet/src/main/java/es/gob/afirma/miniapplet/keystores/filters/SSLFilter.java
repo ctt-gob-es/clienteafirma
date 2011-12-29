@@ -55,11 +55,13 @@ public final class SSLFilter extends CertificateFilter {
 		this.signatureDnieCertFilter = new SignatureDNIeFilter();
 	}
 	
+	/** {@inheritDoc} */
 	@Override
     public boolean matches(final X509Certificate cert) {
 		return this.prepareSerialNumber(this.getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
 	}
 	
+	/** {@inheritDoc} */
 	@Override
 	public String[] matches(String[] aliases, AOKeyStoreManager ksm) {
 

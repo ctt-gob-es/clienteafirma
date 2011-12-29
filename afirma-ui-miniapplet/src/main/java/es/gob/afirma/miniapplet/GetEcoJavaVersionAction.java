@@ -24,6 +24,8 @@ import es.gob.afirma.core.misc.Platform.JREVER;
  */
 @Deprecated
 class GetEcoJavaVersionAction implements PrivilegedAction<Platform.JREVER> {
+    
+    /** {@inheritDoc} */
     public Platform.JREVER run() { 
         final String jreVersion = System.getProperty("java.version");  //$NON-NLS-1$ 
         if (    jreVersion.startsWith("0.")  || //$NON-NLS-1$

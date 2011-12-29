@@ -53,6 +53,7 @@ final class CoSignAction implements PrivilegedExceptionAction<byte[]> {
 		this.extraParams = extraParams;
 	}
 	
+	/** {@inheritDoc} */
 	public byte[] run() throws AOException {
 		if (this.data == null) {
 			return this.signer.cosign(this.sign, this.algorithm, this.keyEntry, this.extraParams);
