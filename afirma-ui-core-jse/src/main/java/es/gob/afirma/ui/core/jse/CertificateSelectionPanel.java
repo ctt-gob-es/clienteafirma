@@ -50,10 +50,8 @@ import es.gob.afirma.core.AOCancelledOperationException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.NameCertificateBean;
 
-/**
- * Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7.
- */
-public final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
+/** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
+final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
 	
 	/** Serial version */ 
 	private static final long serialVersionUID = 6288294705582545804L;
@@ -157,24 +155,20 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 	}
 	
 	/** Selecciona la lista de certificados. */
-	public void selectCertificateList() {
+    void selectCertificateList() {
 		this.certList.requestFocusInWindow();
 	}
 	
-	/**
-	 * Recupera el nombre descriptor del certificado seleccionado.
-	 * @return Nombre del certificado seleccionado.
-	 */
-	public String getSelectedCertificate() {
+	/** Recupera el nombre descriptor del certificado seleccionado.
+	 * @return Nombre del certificado seleccionado. */
+	String getSelectedCertificate() {
 		return this.selectedValue;
 	}
 	
-	/**
-	 * Agrega un gestor de eventos de rat&oacute;n a la lista de certificados para poder
+	/** Agrega un gestor de eventos de rat&oacute;n a la lista de certificados para poder
 	 * gestionar a trav&eacute;s de &eacute;l eventos especiales sobre la lista.
-	 * @param listener Manejador de eventos de rat&oacute;n.
-	 */
-	public void addCertificateListMouseListener(MouseListener listener) {
+	 * @param listener Manejador de eventos de rat&oacute;n. */
+	void addCertificateListMouseListener(MouseListener listener) {
 		this.certList.addMouseListener(listener);
 	}
 	
@@ -226,10 +220,11 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 			}
 		}
 		
-		public X509Certificate getCertificate() {
+		X509Certificate getCertificate() {
 			return this.cert;
 		}
 		
+		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return this.friendlyName;
@@ -312,23 +307,25 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 	/**
 	 * Renderer para mostrar la informaci&oacute;n de un certificado.
 	 */
-	private class CertListCellRendered implements ListCellRenderer {
+	private static final class CertListCellRendered implements ListCellRenderer {
 
 		CertListCellRendered() {
 			/* Limitamos la visibilidad del constructor */
 		}
 		
+		/** {@inheritDoc} */
 		public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus) {
 
-			CertificateLine line = (CertificateLine) value;
+			final CertificateLine line = (CertificateLine) value;
 			if (isSelected) {
 				line.setBackground(Color.decode("0xD9EAFF")); //$NON-NLS-1$
 				line.setBorder(BorderFactory.createCompoundBorder(
 						BorderFactory.createLineBorder(Color.WHITE, 1),
 						BorderFactory.createLineBorder(Color.decode("0x84ACDD"), 1))); //$NON-NLS-1$
 
-			} else {
+			} 
+			else {
 				line.setBackground(Color.WHITE);
 				line.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 4));
 			}
@@ -337,6 +334,7 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 		}
 	}
 	
+	/** {@inheritDoc} */
 	public void valueChanged(ListSelectionEvent e) {
 		this.selectedValue = this.certList.getSelectedValue().toString();
 	}
@@ -344,7 +342,7 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 	/**
 	 * Manejador de eventos de raton para la lista de certificados.
 	 */
-	private class CertLinkMouseListener implements MouseListener, MouseMotionListener {
+	private final class CertLinkMouseListener implements MouseListener, MouseMotionListener {
 
 		private boolean entered = false;
 		
@@ -352,6 +350,7 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 			/* Contructor por defecto */
 		}
 		
+		/** {@inheritDoc} */
 		public void mouseClicked(MouseEvent me) {
 			if (me.getClickCount() == 1 &&
 					((CertificateLine)((JList) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
@@ -366,6 +365,7 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 			} 
 		}
 		
+		/** {@inheritDoc} */
 		public void mouseMoved(MouseEvent me) {
 			if (((CertificateLine)((JList) me.getSource()).getSelectedValue()).getCertificateLinkBounds().contains(me.getX(), me.getY() % CERT_LIST_ELEMENT_HEIGHT)) {
 				if (!this.entered) {
@@ -379,22 +379,27 @@ public final class CertificateSelectionPanel extends JPanel implements ListSelec
 			}
 		}
 		
+		/** {@inheritDoc} */
 		public void mouseDragged(MouseEvent e) {
 			/* No hacemos nada */
 		}
 
+		/** {@inheritDoc} */
 		public void mouseReleased(MouseEvent me) {
 			/* No hacemos nada */
 		}
 		
+		/** {@inheritDoc} */
 		public void mousePressed(MouseEvent me) {
 			/* No hacemos nada */
 		}
 		
+		/** {@inheritDoc} */
 		public void mouseExited(MouseEvent me) {
 			/* No hacemos nada */
 		}
 		
+		/** {@inheritDoc} */
 		public void mouseEntered(MouseEvent me) {
 			/* No hacemos nada */
 		}

@@ -88,6 +88,7 @@ public final class JSEUIManager implements AOUIManager {
         final JOptionPane pane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) {
             private static final long serialVersionUID = -3012522768561175760L;
 
+            /** {@inheritDoc} */
             @Override
             public void selectInitialValue() {
                 pwd.requestFocusInWindow();
@@ -168,6 +169,7 @@ public final class JSEUIManager implements AOUIManager {
 
         private boolean beep = false;
 
+        /** {@inheritDoc} */
         @Override
         public void insertString(final int offset, final String str, final AttributeSet attr) throws BadLocationException {
             if (str == null) {
@@ -202,6 +204,7 @@ public final class JSEUIManager implements AOUIManager {
             this.beep = beepOnError;
         }
 
+        /** {@inheritDoc} */
         @Override
         public void insertString(final int offset, final String str, final AttributeSet attr) throws BadLocationException {
             if (str == null) {
@@ -447,6 +450,7 @@ public final class JSEUIManager implements AOUIManager {
             this.description = (desc != null) ? desc : JSEUIMessages.getString("JSEUIManager.0"); //$NON-NLS-1$
         }
 
+        /** {@inheritDoc} */
         @Override
         public boolean accept(final File f) {
             if (f.isDirectory()) {
@@ -463,6 +467,7 @@ public final class JSEUIManager implements AOUIManager {
             return false;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String getDescription() {
             return this.description;
@@ -495,7 +500,10 @@ public final class JSEUIManager implements AOUIManager {
      * @param parent
      *        Componente padre (para la modalidad, debe ser de tipo <code>java.awt.Component</code>)
      * @return Fichero seleccionado por el usuario */
-    public File getLoadFile(final String dialogTitle, final String fileName, final String description, final Object parent) {
+    public File getLoadFile(final String dialogTitle, 
+                            final String fileName, 
+                            final String description, 
+                            final Object parent) {
         
         Component parentComponent = null;
         if (parent instanceof Component) {
@@ -505,6 +513,7 @@ public final class JSEUIManager implements AOUIManager {
         final JFileChooser fc = new JFileChooser();
         fc.setDialogTitle(dialogTitle);
         fc.setFileFilter(new FileFilter() {
+            /** {@inheritDoc} */
             @Override
             public boolean accept(final File f) {
                 if (f == null) {
@@ -516,6 +525,7 @@ public final class JSEUIManager implements AOUIManager {
                 return false;
             }
 
+            /** {@inheritDoc} */
             @Override
             public String getDescription() {
                 return description;

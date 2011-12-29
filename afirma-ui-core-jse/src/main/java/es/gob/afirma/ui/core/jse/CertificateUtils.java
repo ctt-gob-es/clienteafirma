@@ -19,33 +19,33 @@ import es.gob.afirma.core.misc.Platform.OS;
 /**
  * Funciones de utilidad del di&aacute;logo de selecci&oacute;n de certificados.
  */
-public class CertificateUtils {
+final class CertificateUtils {
 
-	/**
-	 * Abre un certificado con la aplicaci&oacute;n por defecto del sistema. Si no
+	/** Abre un certificado con la aplicaci&oacute;n por defecto del sistema. Si no
 	 * puede hacerlo, permite que el usuario lo almacene en la ruta que desee.
 	 * @param parent Componente padre sobre el que se muestran los di&aacute;logos.
-	 * @param certificate Certificado que deseamos abrir.
-	 */
-	public static void openCert(final Component parent, final X509Certificate certificate) {
+	 * @param certificate Certificado que deseamos abrir. */
+	static void openCert(final Component parent, final X509Certificate certificate) {
 
 		// Tratamos de abrir el certificado en Java 6
 		Class<?> desktopClass;
 		try {
 			desktopClass = Class.forName("java.awt.Desktop"); //$NON-NLS-1$
-		} catch (ClassNotFoundException e) {
+		} 
+		catch (ClassNotFoundException e) {
 			desktopClass = null;
 		}
 		
 		if (desktopClass != null) {
 			try {
-				File certFile = saveTemp(certificate.getEncoded(), ".cer"); //$NON-NLS-1$
-				Method getDesktopMethod = desktopClass.getDeclaredMethod("getDesktop()", (Class[]) null); //$NON-NLS-1$
-				Object desktopObject = getDesktopMethod.invoke(null, (Object[]) null);
-				Method openMethod = desktopClass.getDeclaredMethod("open", File.class); //$NON-NLS-1$
+				final File certFile = saveTemp(certificate.getEncoded(), ".cer"); //$NON-NLS-1$
+				final Method getDesktopMethod = desktopClass.getDeclaredMethod("getDesktop()", (Class[]) null); //$NON-NLS-1$
+				final Object desktopObject = getDesktopMethod.invoke(null, (Object[]) null);
+				final Method openMethod = desktopClass.getDeclaredMethod("open", File.class); //$NON-NLS-1$
 				openMethod.invoke(desktopObject, certFile);
 				return;
-			} catch (Exception e) {
+			} 
+			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning("No ha sido posible abrir el certificado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
@@ -53,7 +53,7 @@ public class CertificateUtils {
 		// En entornos Java 5 intentamos abrirlo manualmente en Windows
 		if (Platform.getOS() == OS.WINDOWS) {
 			try {
-				File certFile = saveTemp(certificate.getEncoded(), ".cer"); //$NON-NLS-1$
+				final File certFile = saveTemp(certificate.getEncoded(), ".cer"); //$NON-NLS-1$
 				new ProcessBuilder(
 						new String[] {
 								"cmd", "/C", "start", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -61,9 +61,9 @@ public class CertificateUtils {
 								"\"" + certFile.getAbsolutePath() + "\""} //$NON-NLS-1$ //$NON-NLS-2$
 				).start();
 				return;
-			} catch (Exception e) {
+			} 
+			catch (final Exception e) {
 				Logger.getLogger("es.gob.afirma").warning("No ha sido posible abrir el certificado: " + e); //$NON-NLS-1$ //$NON-NLS-2$
-				e.printStackTrace();
 			}
 		}
 		
@@ -71,36 +71,39 @@ public class CertificateUtils {
 		try {
 			final File savedfile = selectFileToSave(parent, JSEUIMessages.getString("CertificateUtils.1")); //$NON-NLS-1$
 			saveFile(savedfile, certificate.getEncoded());
-		} catch (AOCancelledOperationException e) {
+		} 
+		catch (final AOCancelledOperationException e) {
 			throw e;
-		} catch (Exception e) {
+		} 
+		catch (final Exception e) {
 			new JSEUIManager().showConfirmDialog(
-					parent,
-					JSEUIMessages.getString("CertificateUtils.2"), //$NON-NLS-1$
-					JSEUIMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
-					JOptionPane.CLOSED_OPTION,
-					JOptionPane.ERROR_MESSAGE);
+				parent,
+				JSEUIMessages.getString("CertificateUtils.2"), //$NON-NLS-1$
+				JSEUIMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
+				JOptionPane.CLOSED_OPTION,
+				JOptionPane.ERROR_MESSAGE
+			);
 		}
 	}
 	
-	/**
-     * Pregunta al usuario por un nombre de fichero para salvar datos en disco.
+	/** Pregunta al usuario por un nombre de fichero para salvar datos en disco.
      * @param parent Componente padre sobre el que se muestran los di&aacute;logos.
      * @param title T&iacute;tulo del di&aacute;logo de guardado.
      * @return Nombre de fichero (con ruta) seleccionado por el usuario
      * @throws IOException Cuando se produzca un error durante la selecci&oacute;n del fichero.
-     * @throws AOCancelledOperationException Cuando el usuario cancele la operaci&oacute;n.
-     */
+     * @throws AOCancelledOperationException Cuando el usuario cancele la operaci&oacute;n. */
     private static File selectFileToSave(final Component parent, final String title) throws IOException {
 
     	final JFileChooser fc = new JFileChooser();
     	fc.setDialogTitle(title);
     	fc.setFileFilter(new FileFilter() {
+    	    /** {@inheritDoc} */
 			@Override
 			public String getDescription() {
 				return JSEUIMessages.getString("CertificateUtils.3"); //$NON-NLS-1$
 			}
 			
+			/** {@inheritDoc} */
 			@Override
 			public boolean accept(final File f) {
 				if (f.isDirectory()) {
@@ -160,21 +163,19 @@ public class CertificateUtils {
     }
     
     private static boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
-    	
-    	FileOutputStream fos = new FileOutputStream(file);
+    	final FileOutputStream fos = new FileOutputStream(file);
     	fos.write(dataToSave);
     	try {
     		fos.close();
-    	} catch (Exception e) {
+    	} 
+    	catch (final Exception e) {
     		/* No hacemos nada */
 		}
-    	
     	return true;
     }
     
-    private static File saveTemp(byte[] data, String suffix) throws IOException {
-    	
-    	File tempFile = File.createTempFile("afirma", suffix); //$NON-NLS-1$
+    private static File saveTemp(final byte[] data, final String suffix) throws IOException {
+    	final File tempFile = File.createTempFile("afirma", suffix); //$NON-NLS-1$
     	tempFile.deleteOnExit();
     	if (saveFile(tempFile, data)) {
     		return tempFile;

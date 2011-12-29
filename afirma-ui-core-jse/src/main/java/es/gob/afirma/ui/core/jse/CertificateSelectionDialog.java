@@ -10,12 +10,10 @@ import javax.swing.JOptionPane;
 
 import es.gob.afirma.core.ui.NameCertificateBean;
 
-/**
- * Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de
+/** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica similar al de
  * Windows 7.
- * @author Carlos Gamuci
- */
-public final class CertificateSelectionDialog implements MouseListener {
+ * @author Carlos Gamuci */
+final class CertificateSelectionDialog implements MouseListener {
 
 	private final CertificateSelectionPanel csd;
 	
@@ -23,13 +21,11 @@ public final class CertificateSelectionDialog implements MouseListener {
 	
 	private final Component parent;
 	
-	/**
-	 * Construye el di&aacute;logo de selecci&oacute;n de certificados a partir del listado con
+	/** Construye el di&aacute;logo de selecci&oacute;n de certificados a partir del listado con
 	 * sus nombres y los propios certificados. 
 	 * @param el Listado de certificados.
-	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo.
-	 */
-	public CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
+	 * @param parent Componente sobre el que se mostrar&aacute; el di&aacute;logo. */
+	CertificateSelectionDialog(final NameCertificateBean[] el, final Component parent) {
 
 		this.csd = new CertificateSelectionPanel(el);
 		this.parent = parent;
@@ -46,12 +42,10 @@ public final class CertificateSelectionDialog implements MouseListener {
 	
 
 	
-	/**
-	 * Muestra el di&aacute;logo de selecci&oacute;n de certificados.
+	/** Muestra el di&aacute;logo de selecci&oacute;n de certificados.
 	 * @return Alias del certificado seleccionado o {@code null} si el usuario
-	 * lo cancela o cierra sin seleccionar.
-	 */
-	public String showDialog() {
+	 * lo cancela o cierra sin seleccionar. */
+	String showDialog() {
 		final JDialog certDialog = this.optionPane.createDialog(this.parent, JSEUIMessages.getString("CertificateSelectionDialog.0")); //$NON-NLS-1$
 		certDialog.setBackground(Color.WHITE);
 		certDialog.setModal(true);
@@ -67,38 +61,44 @@ public final class CertificateSelectionDialog implements MouseListener {
 		return selectedAlias;
 	}
 
+	/** {@inheritDoc} */
 	public void mouseClicked(MouseEvent me) {
 		if (me.getClickCount() == 2 && this.optionPane != null) {
 			this.optionPane.setValue(Integer.valueOf(JOptionPane.OK_OPTION));
 		}
 	}
 
+	/** {@inheritDoc} */
 	public void mouseReleased(MouseEvent me) {
 		/* No hacemos nada */
 	}
 	
+	/** {@inheritDoc} */
 	public void mousePressed(MouseEvent me) {
 		/* No hacemos nada */
 	}
 	
+	/** {@inheritDoc} */
 	public void mouseExited(MouseEvent me) {
 		/* No hacemos nada */
 	}
 	
+	/** {@inheritDoc} */
 	public void mouseEntered(MouseEvent me) {
 		/* No hacemos nada */
 	}
 	
-	private class CertOptionPane extends JOptionPane {
+	private static final class CertOptionPane extends JOptionPane {
 		
 		private static final long serialVersionUID = 1L;
 
 		private final CertificateSelectionPanel selectionPanel;
 		
-		public CertOptionPane(final CertificateSelectionPanel csd) {
+		CertOptionPane(final CertificateSelectionPanel csd) {
 			this.selectionPanel = csd;
 		}
 		
+		/** {@inheritDoc} */
 		@Override
         public void selectInitialValue() {
 			this.selectionPanel.selectCertificateList();
