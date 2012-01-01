@@ -24,6 +24,7 @@ import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -35,6 +36,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.keystores.main.common.AOKeyStoreManager;
 import es.gob.afirma.signature.SignValidity;
@@ -447,8 +449,24 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     /** Muestra la ayuda de la aplicaci&oacute;n. */
     public void showHelp() {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
+            final File helpFile = new File(Platform.getUserHome() + "\\.afirma\\firmafacil\\FirmaFacil.chm"); //$NON-NLS-1$
             try {
-                Desktop.getDesktop().open(new File(ClassLoader.getSystemResource("FirmaFacil.chm").toURI())); //$NON-NLS-1$
+                if (!helpFile.exists()) {
+                    final File helpDir = new File(Platform.getUserHome() + "\\.afirma\\firmafacil"); //$NON-NLS-1$
+                    if (!helpDir.exists()) {
+                        helpDir.mkdirs();
+                    }
+                    final FileOutputStream fos = new FileOutputStream(helpFile);
+                    fos.write(AOUtil.getDataFromInputStream(ClassLoader.getSystemResourceAsStream("WinHelp/FirmaFacil.chm"))); //$NON-NLS-1$
+                    try {
+                        fos.flush();
+                        fos.close();
+                    }
+                    catch(final Exception e) {
+                        // Se ignora
+                    }
+                }
+                Desktop.getDesktop().open(helpFile);
                 return;
             }
             catch(final Exception e) {
