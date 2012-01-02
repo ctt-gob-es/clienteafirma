@@ -155,7 +155,9 @@ interface MiniAfirma {
      * @return El contenido del fichero codificado en Base64.
      * @throws IOException Cuando ocurre alg&uacute;n error en la lectura del fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @deprecated
      */
+    @Deprecated
     String getFileContent(String title, String extensions, String description) throws PrivilegedActionException;
 
     /** Muestra un di&aacute;logo modal para la selecci&oacute;n de un fichero del
@@ -228,7 +230,9 @@ interface MiniAfirma {
      * @return Nombre del fichero seleccionado.
      * @throws IOException Cuando se produce un error al seleccionar el fichero.
      * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
+     * @deprecated
      */
+    @Deprecated
     String loadFilePath(String title, String extensions, String description) throws PrivilegedActionException;
     
     

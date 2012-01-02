@@ -272,6 +272,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Deprecated
 	public String loadFilePath(final String title, final String extensions, final String description) throws PrivilegedActionException {
 
 		this.cleanErrorMessage();
@@ -301,6 +302,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	}
 
 	/** {@inheritDoc} */
+	@Deprecated
 	public String getFileContent(final String title, final String extensions, final String description) throws PrivilegedActionException {
 
 		this.cleanErrorMessage();
