@@ -259,7 +259,7 @@ public final class ReadNodesTree {
      * @param nodes
      *        array con posibles repetidos.
      * @return array sin repetidos. */
-    public int[] simplyArray(final int[] nodes) {
+    public static int[] simplyArray(final int[] nodes) {
         final List<Integer> devolver = new ArrayList<Integer>();
 
         for (int i = 0; i < nodes.length; i++) {
@@ -282,7 +282,7 @@ public final class ReadNodesTree {
      * @param serialNumber
      *        N&uacute;mero de serie del certificado a firmar.
      * @return El nombre com&uacute;n. */
-    private String searchName(final ASN1Set certificates, final DERInteger serialNumber) {
+    private static String searchName(final ASN1Set certificates, final DERInteger serialNumber) {
         final Enumeration<?> certSet = certificates.getObjects();
         while (certSet.hasMoreElements()) {
             final X509Certificate c;
@@ -309,7 +309,7 @@ public final class ReadNodesTree {
      *        N&uacute;mero de serie del certificado a firmar.
      * @return El certificado (en la posici&oacute;n 0 y su cadena de confianza
      *         en orden). */
-    private X509Certificate[] searchCert(final ASN1Set certificates, final DERInteger serialNumber) {
+    private static X509Certificate[] searchCert(final ASN1Set certificates, final DERInteger serialNumber) {
         final Enumeration<?> certSet = certificates.getObjects();
         while (certSet.hasMoreElements()) {
             final X509Certificate c;
@@ -328,7 +328,7 @@ public final class ReadNodesTree {
         return new X509Certificate[0];
     }
 
-    private Date getSigningTime(final SignerInfo si) {
+    private static Date getSigningTime(final SignerInfo si) {
         Date returnDate = null;
 
         if (si.getAuthenticatedAttributes() != null) {

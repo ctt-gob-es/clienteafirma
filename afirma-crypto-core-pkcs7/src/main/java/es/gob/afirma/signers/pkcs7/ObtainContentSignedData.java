@@ -33,7 +33,7 @@ public final class ObtainContentSignedData {
      * @param data
      *        datos que contienen la firma.
      * @return el contenido firmado. */
-    public byte[] obtainData(final byte[] data) {
+    public static byte[] obtainData(final byte[] data) {
         byte[] contenido = null;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);

@@ -316,7 +316,7 @@ public final class GenSignedData {
      *        Lista de atributos no firmados que se insertar&aacute;n dentro
      *        del archivo de firma.
      * @return Los atributos no firmados de la firma. */
-    private ASN1Set generateUnsignedInfo(final Map<String, byte[]> uatrib) {
+    private static ASN1Set generateUnsignedInfo(final Map<String, byte[]> uatrib) {
 
         // // ATRIBUTOS
 
