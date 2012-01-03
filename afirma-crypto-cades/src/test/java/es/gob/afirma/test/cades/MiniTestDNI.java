@@ -68,8 +68,6 @@ public class MiniTestDNI {
         
         Assert.assertNotNull(firma);
 
-        //System.out.println(AOUtil.hexify(firma, true));
-        
 //        java.io.FileOutputStream fos = new java.io.FileOutputStream("C:/pruebas/salida/MiniTestCadesNuevo"+ (omitContent ? "Expl" : "Impl") + ".csig");
 //        fos.write(firma);
 //        try { fos.close(); } catch (Exception e) { }
