@@ -43,7 +43,7 @@ public final class CAdESValidator {
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>Data</i>,
      * <code>false</code> en caso contrario. */
     @SuppressWarnings("unused")
-    boolean isCAdESData(final byte[] data) {
+	static boolean isCAdESData(final byte[] data) {
         try {
             // LEEMOS EL FICHERO QUE NOS INTRODUCEN
             final Enumeration<?> e = ((ASN1Sequence) new ASN1InputStream(data).readObject()).getObjects();
@@ -74,7 +74,7 @@ public final class CAdESValidator {
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedData</i>,
      * <code>false</code> en caso contrario. */
-    public boolean isCAdESSignedData(final byte[] data) {
+    public static boolean isCAdESSignedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -110,7 +110,7 @@ public final class CAdESValidator {
      * @param si <code>SignerInfo</code> para la verificaci&oacute;n del p&aacute;rametro
      *        adecuado.
      * @return si contiene el par&aacute;metro. */
-    private boolean verifySignerInfo(final SignerInfo si) {
+    private static boolean verifySignerInfo(final SignerInfo si) {
         boolean isSignerValid = false;
         final ASN1Set attrib = si.getAuthenticatedAttributes();
         final Enumeration<?> e = attrib.getObjects();
@@ -133,7 +133,7 @@ public final class CAdESValidator {
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>DigestedData</i>,
      * <code>false</code> en caso contrario. */
     @SuppressWarnings("unused")
-    boolean isCAdESDigestedData(final byte[] data) {
+	static boolean isCAdESDigestedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -167,7 +167,7 @@ public final class CAdESValidator {
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>EncryptedData</i>,
      * <code>false</code> en caso contrario. */
-    boolean isCAdESEncryptedData(final byte[] data) {
+    static boolean isCAdESEncryptedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -210,7 +210,7 @@ public final class CAdESValidator {
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>EnvelopedData</i>,
      * <code>false</code> en caso contrario. */
     @SuppressWarnings("unused")
-    boolean isCAdESEnvelopedData(final byte[] data) {
+	static boolean isCAdESEnvelopedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -244,7 +244,7 @@ public final class CAdESValidator {
      * @param data Datos PKCS#7/CMS/CAdES.
      * @return <code>true</code> si los datos proporcionados se corresponden con una estructura de tipo <i>SignedAndEnvelopedData</i>,
      * <code>false</code> en caso contrario. */
-    boolean isCAdESSignedAndEnvelopedData(final byte[] data) {
+    static boolean isCAdESSignedAndEnvelopedData(final byte[] data) {
         boolean isValid = false;
         try {
             final ASN1InputStream is = new ASN1InputStream(data);
@@ -299,22 +299,22 @@ public final class CAdESValidator {
      *         indicada, <code>false</code> en caso contrario. */
     public static boolean isCAdESValid(final byte[] signData, final String type) {
         if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DATA)) {
-            return new CAdESValidator().isCAdESData(signData);
+			return CAdESValidator.isCAdESData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDDATA)) {
-            return new CAdESValidator().isCAdESSignedData(signData);
+			return CAdESValidator.isCAdESSignedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_DIGESTEDDATA)) {
-            return new CAdESValidator().isCAdESDigestedData(signData);
+			return CAdESValidator.isCAdESDigestedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENCRYPTEDDATA)) {
-            return new CAdESValidator().isCAdESEncryptedData(signData);
+			return CAdESValidator.isCAdESEncryptedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_ENVELOPEDDATA)) {
-            return new CAdESValidator().isCAdESEnvelopedData(signData);
+			return CAdESValidator.isCAdESEnvelopedData(signData);
         }
         else if (type.equals(AOSignConstants.CMS_CONTENTTYPE_SIGNEDANDENVELOPEDDATA)) {
-            return new CAdESValidator().isCAdESSignedAndEnvelopedData(signData);
+			return CAdESValidator.isCAdESSignedAndEnvelopedData(signData);
         }
         LOGGER.warning("Tipo de contenido CADES no reconocido"); //$NON-NLS-1$
         return false;
@@ -341,27 +341,27 @@ public final class CAdESValidator {
             return false;
         }
 
-        // Comprobamos si su contenido es de tipo DATA
-        boolean valido = new CAdESValidator().isCAdESData(data);
+		// Comprobamos si su contenido es de tipo DATA
+        boolean valido = CAdESValidator.isCAdESData(data);
         // Comprobamos si su contenido es de tipo SIGNEDDATA
         if (!valido) {
-            valido = new CAdESValidator().isCAdESSignedData(data);
+			valido = CAdESValidator.isCAdESSignedData(data);
         }
         // Comprobamos si su contenido es de tipo DIGESTDATA
         if (!valido) {
-            valido = new CAdESValidator().isCAdESDigestedData(data);
+			valido = CAdESValidator.isCAdESDigestedData(data);
         }
         // Comprobamos si su contenido es de tipo ENCRYPTEDDATA
         if (!valido) {
-            valido = new CAdESValidator().isCAdESEncryptedData(data);
+			valido = CAdESValidator.isCAdESEncryptedData(data);
         }
         // Comprobamos si su contenido es de tipo ENVELOPEDDATA
         if (!valido) {
-            valido = new CAdESValidator().isCAdESEnvelopedData(data);
+			valido = CAdESValidator.isCAdESEnvelopedData(data);
         }
         // Comprobamos si su contenido es de tipo SIGNEDANDENVELOPED
         if (!valido) {
-            valido = new CAdESValidator().isCAdESSignedAndEnvelopedData(data);
+			valido = CAdESValidator.isCAdESSignedAndEnvelopedData(data);
         }
         return valido;
     }

@@ -84,7 +84,7 @@ public final class GenCAdESEPESSignedData {
      *         datos
      * @throws AOException
      *         Cuando ocurre alg&uacute;n error durante el proceso de codificaci&oacute;n ASN.1 */
-    public byte[] generateSignedData(final P7ContentSignerParameters parameters,
+    public static byte[] generateSignedData(final P7ContentSignerParameters parameters,
                                      final boolean omitContent,
                                      final AdESPolicy policy,
                                      final boolean signingCertificateV2,

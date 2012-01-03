@@ -151,7 +151,7 @@ public final class AOCAdESSigner implements AOSigner {
                 omitContent = true;
             }
                         
-            return new GenCAdESEPESSignedData().generateSignedData(
+			return GenCAdESEPESSignedData.generateSignedData(
                    csp,
                    omitContent,
                    new AdESPolicy(extraParams),
@@ -463,7 +463,7 @@ public final class AOCAdESSigner implements AOSigner {
             LOGGER.warning("Se han introducido datos nulos para su comprobacion"); //$NON-NLS-1$
             return false;
         }
-        return new CAdESValidator().isCAdESSignedData(data);
+		return CAdESValidator.isCAdESSignedData(data);
     }
 
     /** Comprueba si unos datos sos susceptibles de ser firmados por esta clase.
@@ -497,7 +497,7 @@ public final class AOCAdESSigner implements AOSigner {
         if (!CAdESValidator.isCAdESValid(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
-        return new ObtainContentSignedData().obtainData(signData);
+		return ObtainContentSignedData.obtainData(signData);
     }
 
     /** Devuelve el nombre de fichero de firma predeterminado que se recomienda usar para

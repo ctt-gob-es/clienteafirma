@@ -32,6 +32,7 @@ import es.gob.afirma.signers.pkcs7.P7ContentSignerParameters;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s
  *
  */
+@SuppressWarnings("restriction")
 public class MiniTestDNI {
     
     private static final String DNIE_DRIVER_PATH = "name=testdni\r\nlibrary=c:/windows/system32/UsrPkcs11.dll\r\nshowInfo=false"; //$NON-NLS-1$
@@ -46,7 +47,8 @@ public class MiniTestDNI {
      * Mini-prueba CAdES espec’fica para DNIe.
      * @throws Exception en caso de cualquier tipo de problema
      */
-    @Test
+    @SuppressWarnings({ "static-method" })
+	@Test
     public void testCAdESDNIe() throws Exception {
         
         Provider p = new SunPKCS11(new ByteArrayInputStream(DNIE_DRIVER_PATH.getBytes()));
@@ -58,16 +60,11 @@ public class MiniTestDNI {
         
         P7ContentSignerParameters p7ContentSignerParameters = new P7ContentSignerParameters(TEXTO_FIRMAR.getBytes("UTF-8"), "SHA1withRSA", (X509Certificate[]) pke.getCertificateChain());  //$NON-NLS-1$ //$NON-NLS-2$
         
-//        String policy = "http://www.boe.es/boe/dias/2011/07/30/pdfs/BOE-A-2011-13171.pdf"; //$NON-NLS-1$
-//        String qualifier = "2.16.724.1.3.1.1.2.1.8"; //$NON-NLS-1$
-        
-        GenCAdESEPESSignedData  genCAdESEPESSignedData = new GenCAdESEPESSignedData();                                         
-
         boolean omitContent = false; 
         boolean signingCertificateV2 = true; 
         byte[] messageDigest = null; // Se calcula internamente el digest de los datos a firmar. 
         
-        byte[] firma = genCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, new AdESPolicy(new Properties()), signingCertificateV2, pke, messageDigest, false);
+        byte[] firma = GenCAdESEPESSignedData.generateSignedData(p7ContentSignerParameters, omitContent, new AdESPolicy(new Properties()), signingCertificateV2, pke, messageDigest, false);
         
         Assert.assertNotNull(firma);
 
