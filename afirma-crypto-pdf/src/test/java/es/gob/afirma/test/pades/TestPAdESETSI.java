@@ -100,7 +100,8 @@ public final class TestPAdESETSI {
     
     /** Pruebas de firma con los ficheros de prueba y certificado de la ETSI.
      * @throws Exception */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testSignature() throws Exception {
      
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$

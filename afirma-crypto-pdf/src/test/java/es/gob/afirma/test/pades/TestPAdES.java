@@ -82,7 +82,8 @@ public class TestPAdES {
     
     /** Prueba de PDF con sello de tiempo contra la TSA de CATCert.
      * @throws Exception */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testTimestampedSignature() throws Exception {
         
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
@@ -125,7 +126,8 @@ public class TestPAdES {
      * Prueba la firma de un PDF protegido con contrase&ntilde;a.
      * @throws Exception en cualquier error
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testPasswordSignature() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
@@ -160,7 +162,8 @@ public class TestPAdES {
      * Prueba de firma convencional.
      * @throws Exception en cualquier error
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testSignature() throws Exception {
         
         Assert.assertEquals("file.signed.pdf", AOPDFSigner.getSignedName("file.pdf")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -235,7 +238,8 @@ public class TestPAdES {
      * Prueba la firma de un PDF certificado.
      * @throws Exception en cualquier error
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testCertifiedSignature() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;

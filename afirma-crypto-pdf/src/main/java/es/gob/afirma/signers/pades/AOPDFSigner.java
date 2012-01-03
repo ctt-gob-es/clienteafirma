@@ -771,7 +771,7 @@ public final class AOPDFSigner implements AOSigner {
     }
 
     @SuppressWarnings("unused")
-    private boolean isPdfFile(final byte[] data) {
+    private static boolean isPdfFile(final byte[] data) {
 
         byte[] buffer = new byte[PDF_FILE_HEADER.length()];
         try {
@@ -817,7 +817,7 @@ public final class AOPDFSigner implements AOSigner {
      * la firma. La medida de posicionamiento es el p&iacute;xel y se cuenta en
      * el eje horizontal de izquierda a derecha y en el vertical de abajo a
      * arriba. */
-    private Rectangle getSignaturePositionOnPage(final Properties extraParams) {
+    private static Rectangle getSignaturePositionOnPage(final Properties extraParams) {
         try {
             return new Rectangle(Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftX")), //$NON-NLS-1$
                                  Integer.parseInt(extraParams.getProperty("signaturePositionOnPageLowerLeftY")), //$NON-NLS-1$
@@ -1086,7 +1086,7 @@ public final class AOPDFSigner implements AOSigner {
         // **************** CALCULO DEL SIGNED DATA ***************************************
         // ********************************************************************************
 
-        byte[] pk = new GenCAdESEPESSignedData().generateSignedData(
+		byte[] pk = GenCAdESEPESSignedData.generateSignedData(
                     new P7ContentSignerParameters(inPDF, algorithm, chain), 
                     true, // omitContent
                     new AdESPolicy(extraParams),
