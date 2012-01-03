@@ -12,8 +12,6 @@ package es.gob.afirma.core.util.tree;
 
 final class AOTreePath {
 
-    private static final long serialVersionUID = 1L;
-
     /** Path representing the parent, null if lastPathComponent represents the
      * root. */
     private AOTreePath parentPath;

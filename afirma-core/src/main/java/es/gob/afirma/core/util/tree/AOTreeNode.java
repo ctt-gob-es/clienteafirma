@@ -18,8 +18,6 @@ import java.util.Vector;
 /** Adaptaci&oacute;n de las clases TreeNode de Swing para su uso sin interfaz gr6aacute;fico. */
 public final class AOTreeNode {
 
-    private static final long serialVersionUID = 1L;
-
     /** An enumeration that is always empty. This is used when an enumeration of
      * a leaf node's children is requested. */
     private static final Enumeration<AOTreeNode> EMPTY_ENUMERATION = new Enumeration<AOTreeNode>() {

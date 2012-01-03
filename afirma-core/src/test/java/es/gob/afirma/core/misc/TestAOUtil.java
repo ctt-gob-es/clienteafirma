@@ -21,7 +21,8 @@ public final class TestAOUtil {
 
     /** Prueba para el getCN(), reconstruido para prescindir de javax.naming.
      * @throws Exception */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testGetCN() throws Exception {
         final String principals[][] = {
                 {"CN=\"fulanito Menganito\", C=ES", "fulanito Menganito"}, //$NON-NLS-1$ //$NON-NLS-2$

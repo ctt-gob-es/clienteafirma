@@ -13,8 +13,6 @@ package es.gob.afirma.core.util.tree;
 /** Adaptaci&oacute;n de las clases AOTreeModel de Swing para su uso sin interfaz gr6aacute;fico. */
 public final class AOTreeModel {
 
-    private static final long serialVersionUID = 1L;
-
     /** Root of the tree. */
     private final AOTreeNode root;
 
@@ -91,7 +89,7 @@ public final class AOTreeModel {
      * @param parent
      *        a node in the tree, obtained from this data source
      * @return the child of <I>parent</I> at index <I>index</I> */
-    public Object getChild(final Object parent, final int index) {
+    public static Object getChild(final Object parent, final int index) {
         return ((AOTreeNode) parent).getChildAt(index);
     }
 
@@ -101,7 +99,7 @@ public final class AOTreeModel {
      * @param parent
      *        a node in the tree, obtained from this data source
      * @return the number of children of the node <I>parent</I> */
-    public int getChildCount(final Object parent) {
+    public static int getChildCount(final Object parent) {
         return ((AOTreeNode) parent).getChildCount();
     }
 
