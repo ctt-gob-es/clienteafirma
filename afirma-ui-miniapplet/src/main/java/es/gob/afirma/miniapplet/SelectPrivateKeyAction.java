@@ -13,7 +13,10 @@ package es.gob.afirma.miniapplet;
 import java.awt.Component;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedExceptionAction;
+import java.security.UnrecoverableEntryException;
 import java.util.List;
 
 import es.gob.afirma.core.AOException;
@@ -88,7 +91,12 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 	}
 	
 	/** {@inheritDoc} */
-	public PrivateKeyEntry run() throws KeyException, AOKeystoreAlternativeException, AOException {
+	public PrivateKeyEntry run() throws KeyException, 
+	                                    AOKeystoreAlternativeException, 
+	                                    AOException, 
+	                                    UnrecoverableEntryException,
+	                                    NoSuchAlgorithmException,
+	                                    KeyStoreException {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			this.keyStore, 
 			this.library, 

@@ -121,9 +121,6 @@ public class MultisignUtils {
         try {
             privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, padre));
         }
-        catch (final KeyException e) {
-            throw new AOException("Error obteniendo la clave privada del certificado", e); //$NON-NLS-1$
-        }
         catch (final AOCancelledOperationException e) {
             // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
             // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones

@@ -24,8 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
-import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -236,7 +236,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             try {
                 this.privateKeyEntry = getPrivateKeyEntry(keyStoreManager, certDest.getAlias(), this.kconf);
             }
-            catch (final KeyException e) {
+            catch (final UnrecoverableKeyException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el certificado
                 CustomDialog.showMessageDialog(this,
                                                true,
@@ -439,9 +439,9 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @param seleccionado Certificado seleccionado
      * @param kconf1 Configuracion del KeyStore
      * @return
-     * @throws AOException */
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, final String seleccionado, final KeyStoreConfiguration kconf1) throws AOException,
-    KeyException {
+     * @throws AOException 
+     * @throws UnrecoverableKeyException */
+    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, final String seleccionado, final KeyStoreConfiguration kconf1) throws AOException, UnrecoverableKeyException {
 
         // Comprobamos si se ha cancelado la seleccion
         if (seleccionado == null) {
@@ -453,14 +453,14 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         try {
             privateKeyEntry1 = keyStoreManager.getKeyEntry(seleccionado, Utils.getCertificatePC(kconf1.getType(), this));
         }
-        catch (final KeyException e) {
-            throw new KeyException("Error al extraer la clave del certificado", e); //$NON-NLS-1$
-        }
         catch (final AOCancelledOperationException e) {
             // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
             // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
             // que las relanza en forma de AOException
             throw e;
+        }
+        catch(final UnrecoverableKeyException e) {
+        	throw e;
         }
         catch (final Exception e) {
             logger.severe("No se ha podido obtener el certicado con el alias '" + seleccionado + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
@@ -653,7 +653,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
      * @return
      * @throws FileNotFoundException
      * @throws IOException */
-    private byte[] readFile(final String filepath) throws FileNotFoundException, IOException {
+    private static byte[] readFile(final String filepath) throws FileNotFoundException, IOException {
         byte[] data = null;
         InputStream fileIn = null;
         try {

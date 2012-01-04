@@ -270,7 +270,7 @@ final class Desensobrado extends JPanel {
         }
     }
 
-    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, final JComboBox comboAlmacen) throws AOException, KeyException {
+    private PrivateKeyEntry getPrivateKeyEntry(final AOKeyStoreManager keyStoreManager, final JComboBox comboAlmacen) throws AOException {
         // Seleccionamos un certificado
         final String selectedcert =
             Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
@@ -294,9 +294,6 @@ final class Desensobrado extends JPanel {
                 keyStoreManager.getKeyEntry(selectedcert,
                                             Utils.getCertificatePC(((KeyStoreConfiguration) comboAlmacen.getSelectedItem()).getType(),
                                                                    SwingUtilities.getRoot(this)));
-        }
-        catch (final KeyException e) {
-            throw e;
         }
         catch (final AOCancelledOperationException e) {
             // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.

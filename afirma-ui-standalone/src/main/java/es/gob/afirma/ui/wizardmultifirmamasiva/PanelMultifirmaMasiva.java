@@ -132,7 +132,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     }
 
     /** Log. */
-    static Logger logger = Logger.getLogger(PanelMultifirmaMasiva.class.getName());
+    private static Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$
 
     /** UID. */
     private static final long serialVersionUID = 1L;
@@ -222,7 +222,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
      * @param extensiones1 extensiones recogidas del wizard
      * @return filtro de extensiones */
     private FileFilter getExtensionFileFilter(final String extensiones1) {
-        if (extensiones1 == null || extensiones1.trim().equals("")) {
+        if (extensiones1 == null || extensiones1.trim().equals("")) { //$NON-NLS-1$
             return null;
         }
         return new ExtensionsFileFilter(extensiones1.split(","));
@@ -232,7 +232,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
      * @param tipo tipo de firma
      * @param hojas si se han de firmar las hojas
      * @return tipo de firma a realizar. */
-    private MassiveType getMassiveOperationType(final int tipo, final boolean hojas) {
+    private static MassiveType getMassiveOperationType(final int tipo, final boolean hojas) {
         MassiveType operation = null;
         switch (tipo) {
             case 0:
@@ -256,11 +256,11 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
     /** Inicializacion de componentes */
     private void initComponents() {
         // Titulo de la ventana
-        setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana"));
+        setTitulo(Messages.getString("Wizard.multifirma.titulo.ventana")); //$NON-NLS-1$
 
         // Panel con la cabecera
         final CabeceraAsistente panelSuperior =
-            new CabeceraAsistente("Wizard.multifirma.ventana4.titulo", "Wizard.multifirma.ventana4.titulo.descripcion", null, true);
+            new CabeceraAsistente("Wizard.multifirma.ventana4.titulo", "Wizard.multifirma.ventana4.titulo.descripcion", null, true); //$NON-NLS-1$ //$NON-NLS-2$
         Utils.setContrastColor(panelSuperior);
         Utils.setFontBold(panelSuperior);
         getContentPane().add(panelSuperior, BorderLayout.NORTH);
@@ -317,8 +317,8 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         // Boton examinar directorio firmas
         final JButton examinarDirectorio = new JButton();
         examinarDirectorio.setMnemonic(KeyEvent.VK_E);
-        examinarDirectorio.setText(Messages.getString("PrincipalGUI.Examinar"));
-        examinarDirectorio.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description"));
+        examinarDirectorio.setText(Messages.getString("PrincipalGUI.Examinar")); //$NON-NLS-1$
+        examinarDirectorio.setToolTipText(Messages.getString("PrincipalGUI.Examinar.description")); //$NON-NLS-1$
         examinarDirectorio.getAccessibleContext().setAccessibleName(examinarDirectorio.getText() + " " + examinarDirectorio.getToolTipText());
         examinarDirectorio.getAccessibleContext().setAccessibleDescription(examinarDirectorio.getToolTipText());
         examinarDirectorio.addActionListener(new ActionListener() {
@@ -340,12 +340,12 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
 
         final JPanel panelCheckSobrescribir = new JPanel(new GridLayout(1, 1));
         // Checkbox con el texto "Sobrescribir ficheros"
-        this.checkSobrescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir"));
+        this.checkSobrescribir.setText(Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir")); //$NON-NLS-1$
         this.checkSobrescribir.getAccessibleContext()
         .setAccessibleName(this.checkSobrescribir.getText() + " "
-                           + Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir.description"));
+                           + Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir.description")); //$NON-NLS-1$
         this.checkSobrescribir.getAccessibleContext()
-        .setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir.description"));
+        .setAccessibleDescription(Messages.getString("Wizard.multifirma.ventana4.check.sobrescribir.description")); //$NON-NLS-1$
         this.checkSobrescribir.setMnemonic(KeyEvent.VK_O); // Se asigna un atajo al checkbox
         Utils.remarcar(this.checkSobrescribir);
         Utils.setContrastColor(this.checkSobrescribir);
@@ -430,19 +430,19 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         getContentPane().add(panelCentral, BorderLayout.CENTER);
 
         // Accesos rapidos al menu de ayuda
-        HelpUtils.enableHelpKey(this.campoDirectorio, "multifirma.masiva.wizard.firma.directoriofirmas");
-        HelpUtils.enableHelpKey(this.checkSobrescribir, "multifirma.masiva.wizard.firma.sobrescribir");
-        HelpUtils.enableHelpKey(this.campoFicheroLog, "multifirma.masiva.wizard.firma.ficheroLog");
+        HelpUtils.enableHelpKey(this.campoDirectorio, "multifirma.masiva.wizard.firma.directoriofirmas"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.checkSobrescribir, "multifirma.masiva.wizard.firma.sobrescribir"); //$NON-NLS-1$
+        HelpUtils.enableHelpKey(this.campoFicheroLog, "multifirma.masiva.wizard.firma.ficheroLog"); //$NON-NLS-1$
     }
     /** Comprueba si los archivos son correctos
      * @return */
     boolean multifirmarFicheros() {
         // Comprobamos rutas de los ficheros
         final String directorio = this.campoDirectorio.getText();
-        if (directorio == null || directorio.equals("")) {
+        if (directorio == null || directorio.equals("")) { //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
-                                           Messages.getString("Wizard.multifirma.error.directorio.destino"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                                           Messages.getString("Wizard.multifirma.error.directorio.destino"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             return false;
         }
         // Comprobacion de las extensiones.
@@ -482,11 +482,11 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             }
             else {
                 pssCallback =
-                    new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " "
+                    new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " //$NON-NLS-1$
                                                         + store.getDescription()
                                                         + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.",
                                                         null,
-                                                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+                                                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
             }
             keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, this.kssc.toString(), pssCallback, this);
 
@@ -511,9 +511,6 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             try {
                 privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, this));
             }
-            catch (final KeyException e) {
-                throw e;
-            }
             catch (final AOCancelledOperationException e) {
                 // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
                 // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
@@ -521,22 +518,21 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
                 throw e;
             }
             catch (final Exception e) {
-                logger.severe("No se ha podido obtener el certicado con el alias '" + selectedcert + "': " + e);
-                throw new AOException("No se ha podido extraer el certificado seleccionado.");
+                throw new AOException("No se ha podido extraer el certificado seleccionado."); //$NON-NLS-1$
             }
 
             if (privateKeyEntry == null) {
-                throw new KeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero.");
+                throw new KeyException("No se pudo obtener la informacion del certificado, no se firmara el fichero."); //$NON-NLS-1$
             }
         }
         catch (final AOException e) {
-            logger.severe(e.toString());
+            LOGGER.severe(e.toString());
             // El pop-up muestra el mensaje de la excepcion
             CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return false;
         }
         catch (final Exception e) {
-            logger.severe(e.toString());
+            LOGGER.severe(e.toString());
             // El pop-up muestra el mensaje de la excepcion
             CustomDialog.showMessageDialog(this, true, e.getMessage(), Messages.getString("Wizard.multifirma.ok.titulo"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
             return false;
@@ -558,7 +554,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             config.setProperty("ignoreStyleSheets", "true"); //$NON-NLS-1$//$NON-NLS-2$
 
             // Seleccionamos el tipo de operacion
-            final MassiveType operation = this.getMassiveOperationType(this.tipo, this.tipoContrafirma);
+            final MassiveType operation = PanelMultifirmaMasiva.getMassiveOperationType(this.tipo, this.tipoContrafirma);
 
             // Creamos el archivo de log
             dSigner.setLogPath(this.campoFicheroLog.getText());
@@ -580,7 +576,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
             }
         }
         catch (final Exception e) {
-            logger.severe(e.toString());
+            LOGGER.severe(e.toString());
             resultadoFirma = false;
         }
 

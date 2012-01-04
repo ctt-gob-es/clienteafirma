@@ -27,6 +27,8 @@ import java.net.URI;
 import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -206,11 +208,11 @@ final class Firma extends JPanel {
             try {
                 privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, SwingUtilities.getRoot(this)));
             }
-            catch (final KeyException e) {
+            catch (final UnrecoverableKeyException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el certificado
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
-                                               Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$
+                                               Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
                 return;
             }
             catch (final AOCancelledOperationException e) {

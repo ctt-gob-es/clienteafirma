@@ -422,9 +422,6 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
         try {
             privateKeyEntry = keyStoreManager1.getKeyEntry(seleccionado, Utils.getCertificatePC(kconf1.getType(), this));
         }
-        catch (final KeyException e) {
-            throw new AOException("Error al recuperar la clave privada del certificado", e); //$NON-NLS-1$
-        }
         catch (final AOCancelledOperationException e) {
             // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
             // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
