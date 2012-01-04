@@ -15,13 +15,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.security.KeyException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
+import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -158,9 +161,6 @@ public class AOKeyStoreManager {
         try {
             this.ks.load(null, (pssCallBack != null) ? pssCallBack.getPassword() : null);
         }
-        catch (final AOCancelledOperationException e) {
-            throw e;
-        }
         catch (IOException e) {
             if (e.getCause() instanceof UnrecoverableKeyException ||
                     e.getCause() instanceof BadPaddingException) {
@@ -168,11 +168,16 @@ public class AOKeyStoreManager {
             }
             throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado", e); //$NON-NLS-1$
         }
-        catch (final Exception e) {
+        catch (final CertificateException e) {
             Security.removeProvider(p11Provider.getName());
             p11Provider = null;
-            throw new AOKeyStoreManagerException("No se ha podido obtener el almacen PKCS#11 solicitado", e); //$NON-NLS-1$
-        }
+            throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#11 solicitado", e); //$NON-NLS-1$
+        } 
+        catch (final NoSuchAlgorithmException e) {
+            Security.removeProvider(p11Provider.getName());
+            p11Provider = null;
+            throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#11 solicitado", e); //$NON-NLS-1$
+		}
         final List<KeyStore> ret = new ArrayList<KeyStore>(1);
         ret.add(this.ks);
         return ret;
@@ -238,9 +243,6 @@ public class AOKeyStoreManager {
             try {
                 this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
             catch (IOException e) {
                 if (e.getCause() instanceof UnrecoverableKeyException ||
                         e.getCause() instanceof BadPaddingException) {
@@ -248,9 +250,12 @@ public class AOKeyStoreManager {
                 }
                 throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
             }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
-            }
+            catch (final CertificateException e) {
+                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+            } 
+            catch (NoSuchAlgorithmException e) {
+            	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#7 / X.509 solicitado", e); //$NON-NLS-1$
+			}
             ret.add(this.ks);
             try {
                 store.close();
@@ -281,9 +286,6 @@ public class AOKeyStoreManager {
             try {
                 this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
             catch (IOException e) {
                 if (e.getCause() instanceof UnrecoverableKeyException ||
                         e.getCause() instanceof BadPaddingException) {
@@ -291,9 +293,12 @@ public class AOKeyStoreManager {
                 }
                 throw new AOKeyStoreManagerException("No se ha podido abrir el almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
             }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
-            }
+            catch (final CertificateException e) {
+                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
+            } 
+            catch (NoSuchAlgorithmException e) {
+                throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen JavaKeyStore solicitado", e); //$NON-NLS-1$
+			}
             ret.add(this.ks);
             try {
                 store.close();
@@ -323,9 +328,6 @@ public class AOKeyStoreManager {
             try {
                 this.ks.load(store, (pssCallBack != null) ? pssCallBack.getPassword() : null);
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
             catch (IOException e) {
                 if (e.getCause() instanceof UnrecoverableKeyException ||
                     e.getCause() instanceof BadPaddingException ||
@@ -334,9 +336,12 @@ public class AOKeyStoreManager {
                 }
                 throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#12 / PFX solicitado", e); //$NON-NLS-1$
             }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
-            }
+            catch (final CertificateException e) {
+                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
+            } 
+            catch (final NoSuchAlgorithmException e) {
+                throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen PKCS#12 / PFX solicitado.", e); //$NON-NLS-1$
+			}
             ret.add(this.ks);
             try {
                 store.close();
@@ -379,12 +384,12 @@ public class AOKeyStoreManager {
             try {
                 this.ks.load(null, null);
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen SunMSCAPI.MY", e); //$NON-NLS-1$
-            }
+            catch (final CertificateException e) {
+                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
+            } 
+            catch (final NoSuchAlgorithmException e) {
+            	throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen SunMSCAPI.MY", e); //$NON-NLS-1$
+			}
 
             // Tratamos los alias repetidos, situacion problematica afectada por el bug
             // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6483657
@@ -474,12 +479,12 @@ public class AOKeyStoreManager {
             try {
                 this.ks.load(store, null);
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final Exception e) {
-                throw new AOKeyStoreManagerException("No se ha podido abrir el almacen Apple.KeychainStore", e); //$NON-NLS-1$
-            }
+            catch (final CertificateException e) {
+                throw new AOKeyStoreManagerException("No se han podido cargar los certificados del almacen Apple.KeychainStore", e); //$NON-NLS-1$
+            } 
+            catch (final NoSuchAlgorithmException e) {
+                throw new AOKeyStoreManagerException("No se ha podido verificar la integridad del almacen Apple.KeychainStore", e); //$NON-NLS-1$
+			}
             ret.add(this.ks);
             return ret;
         }
@@ -498,12 +503,12 @@ public class AOKeyStoreManager {
      *        <i>CallBback</i> para obtener la contrase&ntilde;a del
      *        certificado que contiene la clave
      * @return Clave privada del certificado correspondiente al alias
-     * @throws AOCancelledOperationException
-     *         Cuando el usuario cancela el proceso antes de que finalice
-     * @throws KeyException
-     *         Cuando ocurren errores obteniendo la clave privada del
-     *         certificado */
-    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) throws KeyException {
+     * @throws KeyStoreException Cuando ocurren errores en el tratamiento del almac&eacute;n de claves
+     * @throws NoSuchAlgorithmException Cuando ocurren errores obteniendo la clave
+     * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
+     * @throws AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice
+     */
+    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
 
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
@@ -519,36 +524,22 @@ public class AOKeyStoreManager {
         // comprueba.
         // Esta cadena de texto debe contener unicamente caracteres ASCII.
         if ("KeychainStore".equals(this.ks.getType())) { //$NON-NLS-1$
-            try {
-                LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
-                Certificate[] certChain = this.ks.getCertificateChain(alias);
-                if (certChain == null) {
-                    LOGGER.warning("El certificado " + alias //$NON-NLS-1$
-                                                              + " no tiene su cadena completa de confianza " //$NON-NLS-1$
-                                                              + "instalada en el Llavero de Mac OS X, se insertara solo este certificado"); //$NON-NLS-1$
-                    certChain = new Certificate[] {
-                        this.ks.getCertificate(alias)
-                    };
-                }
+            LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
+            Certificate[] certChain = this.ks.getCertificateChain(alias);
+            if (certChain == null) {
+                LOGGER.warning("El certificado " + alias //$NON-NLS-1$
+                                                          + " no tiene su cadena completa de confianza " //$NON-NLS-1$
+                                                          + "instalada en el Llavero de Mac OS X, se insertara solo este certificado"); //$NON-NLS-1$
+                certChain = new Certificate[] {
+                    this.ks.getCertificate(alias)
+                };
+            }
 
-                keyEntry = new KeyStore.PrivateKeyEntry((PrivateKey) this.ks.getKey(alias, "dummy".toCharArray()), certChain); //$NON-NLS-1$
-            }
-            catch (final Exception e) {
-                throw new KeyException("Error intentando obtener la clave privada en Mac OS X", e); //$NON-NLS-1$
-            }
+            keyEntry = new KeyStore.PrivateKeyEntry((PrivateKey) this.ks.getKey(alias, "dummy".toCharArray()), certChain); //$NON-NLS-1$
         }
         else {
-            try {
-                keyEntry = (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, new KeyStore.PasswordProtection((pssCallback != null) ? pssCallback.getPassword() : null));
-            }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final Exception e) {
-                throw new KeyException("Error intentando obtener la clave privada", e); //$NON-NLS-1$
-            }
+            keyEntry = (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, new KeyStore.PasswordProtection((pssCallback != null) ? pssCallback.getPassword() : null));
         }
-
         return keyEntry;
     }
 

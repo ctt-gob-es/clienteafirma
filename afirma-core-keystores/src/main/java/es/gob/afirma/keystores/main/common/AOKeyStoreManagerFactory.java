@@ -14,11 +14,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
 
 import javax.security.auth.callback.PasswordCallback;
 
 import es.gob.afirma.core.AOCancelledOperationException;
+import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Platform;
 import es.gob.afirma.core.ui.AOUIFactory;
@@ -58,15 +58,15 @@ public final class AOKeyStoreManagerFactory {
      *         introducir la contrase&ntilde;a)
      * @throws AOKeystoreAlternativeException
      *         Cuando ocurre cualquier otro problema durante el proceso 
-     * @throws InvalidKeyException
-     *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta.
+     * @throws IOException
+     *         Cuando la contrase&ntilde;a del almac&eacute;n es incorrecta. 
      */
     public static AOKeyStoreManager getAOKeyStoreManager(final AOKeyStore store,
                                                          final String lib,
                                                          final String description,
                                                          final PasswordCallback pssCallback,
                                                          final Object parentComponent) throws AOKeystoreAlternativeException, 
-                                                                                              InvalidKeyException {
+                                                                                              IOException {
 
         final AOKeyStoreManager ksm = new AOKeyStoreManager();
 
@@ -118,13 +118,7 @@ public final class AOKeyStoreManagerFactory {
                 is = new FileInputStream(storeFilename);
                 ksm.init(store, is, pssCallback, null);
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final IOException e) {
-                throw new InvalidKeyException("La contrasena del almacen es incorrecta: " + e); //$NON-NLS-1$
-            }
-            catch (final Exception e) {
+            catch (final AOException e) {
                 throw new AOKeystoreAlternativeException(
                    getAlternateKeyStoreType(store),
                    "No se ha podido abrir el almacen de tipo " + store.getDescription(), //$NON-NLS-1$
@@ -170,10 +164,7 @@ public final class AOKeyStoreManagerFactory {
                         p11Lib, description
                 });
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final Exception e) {
+            catch (final AOException e) {
                 throw new AOKeystoreAlternativeException(
                      getAlternateKeyStoreType(store), 
                      "Error al inicializar el modulo PKCS#11", //$NON-NLS-1$ 
@@ -194,16 +185,13 @@ public final class AOKeyStoreManagerFactory {
             try {
                 ksm.init(store, null, new NullPasswordCallback(), null);
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final Exception e) {
+            catch (final AOException e) {
                 throw new AOKeystoreAlternativeException(
                      getAlternateKeyStoreType(store),
                      "Error al inicializar el almacen " + store.getDescription(), //$NON-NLS-1$
                      e
                 );
-            }
+            } 
             return ksm;
         }
 
@@ -222,10 +210,7 @@ public final class AOKeyStoreManagerFactory {
             try {
                 ksmUni.init(AOKeyStore.MOZ_UNI, null, pssCallback, null);
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final Exception e) {
+            catch (final AOException e) {
                 throw new AOKeystoreAlternativeException(
                     getAlternateKeyStoreType(store),
                     "Error al inicializar el almacen NSS unificado de Mozilla Firefox", //$NON-NLS-1$
@@ -249,10 +234,7 @@ public final class AOKeyStoreManagerFactory {
                      null
                 );
             }
-            catch (final AOCancelledOperationException e) {
-                throw e;
-            }
-            catch (final Exception e) {
+            catch (final AOException e) {
                 throw new AOKeystoreAlternativeException(getAlternateKeyStoreType(store), "Error al inicializar el Llavero de Mac OS X", e); //$NON-NLS-1$
             }
             return ksm;
