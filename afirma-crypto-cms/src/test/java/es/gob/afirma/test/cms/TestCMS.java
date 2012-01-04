@@ -89,7 +89,8 @@ public final class TestCMS {
      * Prueba de firma convencional.
      * @throws Exception en cualquier error
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testSignature() throws Exception {
       /*  
       es.gob.afirma.platform.ws.TestSignVerifier verifier = null;
@@ -170,7 +171,8 @@ public final class TestCMS {
      * Prueba de cofirma.
      * @throws Exception en cualquier error
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     @Ignore
     public void testCoSignature() throws Exception {
         
@@ -223,7 +225,7 @@ public final class TestCMS {
      * @param password Contrase&ntilde;a.
      * @return Clave privada del certificado.
      */
-    private PrivateKeyEntry loadKeyEntry(String pkcs12File, String alias, String password) throws Exception {
+    private static PrivateKeyEntry loadKeyEntry(String pkcs12File, String alias, String password) throws Exception {
         final PrivateKeyEntry pke;
 
         KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -233,22 +235,22 @@ public final class TestCMS {
         return pke;
     }
     
-    private byte[] sign(AOSigner signer, byte[] data, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
+    private static byte[] sign(AOSigner signer, byte[] data, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
         return signer.sign(data, algorithm, pke, params);
     }
     
     /** Cofirma sin necesidad de los datos originales. */
-    private byte[] cosign(AOSigner signer, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
+    private static byte[] cosign(AOSigner signer, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
         return signer.cosign(sign, algorithm, pke, params);
     }
     
 
-    private byte[] cosign(AOSigner signer, byte[] data, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
+    private static byte[] cosign(AOSigner signer, byte[] data, byte[] sign, String algorithm, PrivateKeyEntry pke, Properties params) throws Exception {
         return signer.cosign(data, sign, algorithm, pke, params);
     }
     
     /** Hace las comprobaciones b&aacute;sicas de una firma. */
-    private void checkSign(AOSigner signer, byte[] sign, PrivateKeyEntry[] pke, String[] signsAlias, String prueba) {
+    private static void checkSign(AOSigner signer, byte[] sign, PrivateKeyEntry[] pke, String[] signsAlias, String prueba) {
         Assert.assertNotNull(prueba, sign);
         Assert.assertTrue(signer.isSign(sign));
         
@@ -266,8 +268,6 @@ public final class TestCMS {
         Assert.assertEquals("Datos", root.getUserObject()); //$NON-NLS-1$
         for (int i = 0; i < signsAlias.length; i++) {
             AOSimpleSignInfo simpleSignInfo = (AOSimpleSignInfo) root.getChildAt(i).getUserObject();
-//          Assert.assertEquals("CMS", simpleSignInfo.getSignFormat());
-//          Assert.assertEquals(algo, simpleSignInfo.getSignAlgorithm());
             Assert.assertNotNull(simpleSignInfo.getSigningTime());
             Assert.assertEquals(pke[i].getCertificate(), simpleSignInfo.getCerts()[0]);
         }

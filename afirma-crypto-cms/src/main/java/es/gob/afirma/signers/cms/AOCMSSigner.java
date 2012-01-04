@@ -187,7 +187,7 @@ public final class AOCMSSigner implements AOSigner {
                     for (int i = 0; i < targets.length; i++) {
                         nodesID[i] = ((Integer) targets[i]).intValue();
                     }
-                    nodesID = new ReadNodesTree().simplyArray(nodesID);
+					nodesID = ReadNodesTree.simplyArray(nodesID);
                     dataSigned = new CounterSigner().counterSigner(csp, sign, CounterSignTarget.NODES, nodesID, keyEntry, this.dataType, this.atrib, this.uatrib);
                 }
                 // CASO DE FIRMA DE NODOS DE UNO O VARIOS FIRMANTES
@@ -273,7 +273,7 @@ public final class AOCMSSigner implements AOSigner {
         if (!ValidateCMSSignedData.isCMSSignedData(signData)) {
             throw new AOInvalidFormatException("Los datos introducidos no se corresponden con un objeto de firma"); //$NON-NLS-1$
         }
-        return new ObtainContentSignedData().obtainData(signData);
+		return ObtainContentSignedData.obtainData(signData);
     }
 
     /** {@inheritDoc} */
