@@ -1366,7 +1366,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es detached */
-    public boolean isDetached(final Element element) {
+    public static boolean isDetached(final Element element) {
         if (element == null) {
             return false;
         }
@@ -1381,7 +1381,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloped */
-    public boolean isEnveloped(final Element element) {
+    public static boolean isEnveloped(final Element element) {
         final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform"); //$NON-NLS-1$
         for (int i = 0; i < transformList.getLength(); i++) {
             if (((Element) transformList.item(i)).getAttribute("Algorithm").equals(Transform.ENVELOPED)) { //$NON-NLS-1$
@@ -1396,7 +1396,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Elemento que contiene el nodo ra&iacute;z del documento que se
      *        quiere comprobar
      * @return Valor booleano, siendo verdadero cuando la firma es enveloping */
-    public boolean isEnveloping(final Element element) {
+    public static boolean isEnveloping(final Element element) {
         if (element.getLocalName().equals(SIGNATURE_TAG) || 
            (element.getLocalName().equals(AFIRMA) && element.getFirstChild().getLocalName().equals(SIGNATURE_TAG))) {
             return true;
@@ -1424,7 +1424,7 @@ public final class AOXAdESSigner implements AOSigner {
             rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
             // si es detached
-            if (this.isDetached(rootSig)) {
+            if (AOXAdESSigner.isDetached(rootSig)) {
 
                 final Element firstChild = (Element) rootSig.getFirstChild();
                 // si el documento es un xml se extrae como tal
@@ -1448,7 +1448,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // si es enveloped
-            else if (this.isEnveloped(rootSig)) {
+            else if (AOXAdESSigner.isEnveloped(rootSig)) {
 
                 // TODO: Revisar si es conveniente eliminar las firmas a traves
                 // de transformadas
@@ -1463,7 +1463,7 @@ public final class AOXAdESSigner implements AOSigner {
             }
 
             // si es enveloping
-            else if (this.isEnveloping(rootSig)) {
+            else if (AOXAdESSigner.isEnveloping(rootSig)) {
 
                 // obtiene el nodo Object de la primera firma
                 final Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0); //$NON-NLS-1$
@@ -1504,7 +1504,7 @@ public final class AOXAdESSigner implements AOSigner {
      * @return Devuelve {@code true} si la transformaci&oacute;n est&aacute; definida, {@code false}
      * en caso contrario.
      */
-    private boolean isBase64TransformationDeclared(Element rootSig, String objectId) {
+    private static boolean isBase64TransformationDeclared(Element rootSig, String objectId) {
     	if (objectId == null || objectId.trim().equals("")) { //$NON-NLS-1$
     		return false;
     	}
@@ -1530,7 +1530,7 @@ public final class AOXAdESSigner implements AOSigner {
 		return false;
     }
     
-    private SignatureProductionPlace getSignatureProductionPlace(final String city,
+    private static SignatureProductionPlace getSignatureProductionPlace(final String city,
                                                                  final String province,
                                                                  final String postalCode,
                                                                  final String country) {
@@ -1540,7 +1540,7 @@ public final class AOXAdESSigner implements AOSigner {
         return new SignatureProductionPlaceImpl(city, province, postalCode, country);
     }
 
-    private SignaturePolicyIdentifier getPolicy(final String identifier,
+    private static SignaturePolicyIdentifier getPolicy(final String identifier,
                                                 final String identifierHash,
                                                 final String identifierHashAlgorithm,
                                                 final String description, 
@@ -2646,7 +2646,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Listado de nodos de firma.
      * @return Devuelve {@code true} cuando todos los nodos sean firmas en este
      *         formato. */
-    private boolean checkSignNodes(final List<Node> signNodes) {
+    private static boolean checkSignNodes(final List<Node> signNodes) {
         String xadesNamespace;
         for (final Node signNode : signNodes) {
             xadesNamespace = Utils.guessXAdESNamespaceURL(signNode);
@@ -2677,7 +2677,7 @@ public final class AOXAdESSigner implements AOSigner {
      *        Documento que estar&aacute; contenido en el nuevo documento.
      * @return Documento con ra&iacute;z "AFIRMA".
      * @throws ParserConfigurationException */
-    private Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
+    private static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
         // Nueva instancia de DocumentBuilderFactory que permita espacio de
         // nombres (necesario para XML)

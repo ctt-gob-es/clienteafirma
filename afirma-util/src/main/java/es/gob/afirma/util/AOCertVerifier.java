@@ -192,8 +192,7 @@ public final class AOCertVerifier {
             }
             server = tmpRoot;
         }
-        if (server.contains("/")) //$NON-NLS-1$
-         {
+        if (server != null && server.contains("/")) { //$NON-NLS-1$
             server = server.substring(0, server.indexOf('/')); 
         }
 
@@ -243,7 +242,7 @@ public final class AOCertVerifier {
     }
 
     /** Deshabilita las comprobaciones de revocaci&oacute;n por OCSP. */
-    public void disableOCSP() {
+    public static void disableOCSP() {
         Security.setProperty("ocsp.enable", "false"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
@@ -259,7 +258,7 @@ public final class AOCertVerifier {
      * @param responderCertSerialNumber
      *        N&uacute;mero de serie del certificado del <i>responder</i>
      *        OCSP (puede ser <code>null</code>) */
-    public void enableOCSP(final URL responderURL,
+    public static void enableOCSP(final URL responderURL,
                            final LdapName responderCertSubjectName,
                            final LdapName responderCertIssuerName,
                            final String responderCertSerialNumber) {
