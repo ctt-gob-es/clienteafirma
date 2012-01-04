@@ -152,7 +152,7 @@ public final class AOSunJCECipher implements AOCipher {
 
         // Inicializamos el cipher
         try {
-            cipher.init(Cipher.ENCRYPT_MODE, cipherKey, this.getParams(algorithmConfig));
+            cipher.init(Cipher.ENCRYPT_MODE, cipherKey, AOSunJCECipher.getParams(algorithmConfig));
         }
         catch (final InvalidKeyException e) {
             throw new KeyException("La clave de cifrado introducida no es valida para el algoritmo '" + //$NON-NLS-1$
@@ -189,7 +189,7 @@ public final class AOSunJCECipher implements AOCipher {
 
         // Inicializamos el cipher
         try {
-            cipher.init(Cipher.DECRYPT_MODE, decipherKey, this.getParams(algorithmConfig));
+            cipher.init(Cipher.DECRYPT_MODE, decipherKey, AOSunJCECipher.getParams(algorithmConfig));
         }
         catch (final InvalidKeyException e) {
             throw new KeyException("La clave de descifrado introducida no es valida para el algoritmo '" //$NON-NLS-1$
@@ -210,7 +210,8 @@ public final class AOSunJCECipher implements AOCipher {
     }
 
     /** {@inheritDoc} */
-    public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws KeyException {
+    @SuppressWarnings("restriction")
+	public Key decodeKey(final String base64Key, final AOCipherConfig algorithmConfig, final Object[] params) throws KeyException {
         if (base64Key == null || base64Key.length() < 1) {
             throw new IllegalArgumentException("La clave a descodificar no puede ser nula ni vacia"); //$NON-NLS-1$
         }
@@ -262,7 +263,7 @@ public final class AOSunJCECipher implements AOCipher {
      * @param algorithmConfig
      *        Configuracion de cifrado que debemos parametrizar.
      * @return Par&aacute;metros para operar. */
-    private AlgorithmParameterSpec getParams(final AOCipherConfig algorithmConfig) {
+    private static AlgorithmParameterSpec getParams(final AOCipherConfig algorithmConfig) {
         if (algorithmConfig.getAlgorithm().supportsPassword()) {
             return new PBEParameterSpec(SALT, ITERATION_COUNT);
         }
