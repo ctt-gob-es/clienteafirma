@@ -393,7 +393,7 @@ public class DirectorySignatureHelper {
 
         // Inicializamos el log de operacion
         if (this.activeLog) {
-            this.logHandler = this.initLogRegistry((this.logPath != null) ? this.logPath : (outDir + File.separator + DEFAULT_LOG_FILE));
+            this.logHandler = DirectorySignatureHelper.initLogRegistry((this.logPath != null) ? this.logPath : (outDir + File.separator + DEFAULT_LOG_FILE));
         }
 
         // Realizamos la operacion masiva correspondiente
@@ -557,7 +557,7 @@ public class DirectorySignatureHelper {
                     LOGGER.warning("El fichero '" + file.getPath() //$NON-NLS-1$
                                                               + "' no puede ser firmado con la configuracion de firma actual"); //$NON-NLS-1$
                     this.addLogRegistry(Level.WARNING, MassiveSignMessages.getString("DirectorySignatureHelper.4") + REG_FIELD_SEPARATOR + file.getPath()); //$NON-NLS-1$
-                    this.closeStream(fis);
+                    DirectorySignatureHelper.closeStream(fis);
                     allOK = false;
                     continue;
                 }
@@ -584,7 +584,7 @@ public class DirectorySignatureHelper {
                 continue;
             }
             finally {
-                this.closeStream(fis);
+                DirectorySignatureHelper.closeStream(fis);
             }
 
             // Deteccion del MIMEType, solo para XAdES y XMLDSig
@@ -609,14 +609,14 @@ public class DirectorySignatureHelper {
             catch(final UnsupportedOperationException e) {
                 LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
                 this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
-                this.closeStream(fis);
+                DirectorySignatureHelper.closeStream(fis);
                 allOK = false;
                 continue;
             }
             catch (final Exception e) {
                 LOGGER.severe("No ha sido posible firmar el fichero '" + file + "': " + e);   //$NON-NLS-1$//$NON-NLS-2$
                 this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.7") + REG_FIELD_SEPARATOR + file); //$NON-NLS-1$
-                this.closeStream(fis);
+                DirectorySignatureHelper.closeStream(fis);
                 allOK = false;
                 continue;
             }
@@ -825,7 +825,7 @@ public class DirectorySignatureHelper {
         for (final File file : files) {
             if (originalFormat) {
                 try {
-                    signer = this.getAppropiatedSigner(file);
+                    signer = DirectorySignatureHelper.getAppropiatedSigner(file);
                 }
                 catch (final Exception e) {
                     this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.15") + REG_FIELD_SEPARATOR + file + REG_FIELD_SEPARATOR + e.getMessage()); //$NON-NLS-1$
@@ -869,7 +869,7 @@ public class DirectorySignatureHelper {
                     continue;
                 }
                 finally {
-                    this.closeStream(fis);
+                    DirectorySignatureHelper.closeStream(fis);
                 }
             }
             else {
@@ -972,7 +972,7 @@ public class DirectorySignatureHelper {
             this.addLogRegistry(Level.SEVERE, MassiveSignMessages.getString("DirectorySignatureHelper.22") + REG_FIELD_SEPARATOR + finalFile); //$NON-NLS-1$
         }
         finally {
-            this.closeStream(fos);
+            DirectorySignatureHelper.closeStream(fos);
         }
 
         // Almacenamos el nombre de fichero con la firma
@@ -988,7 +988,7 @@ public class DirectorySignatureHelper {
      *        Fichero de firma.
      * @return Manejador de firma. 
      * @throws IOException  */
-    private AOSigner getAppropiatedSigner(final File file) throws IOException {
+    private static AOSigner getAppropiatedSigner(final File file) throws IOException {
         final AOSigner signer;
         signer = determineType(file);
         if (signer == null) {
@@ -1012,7 +1012,7 @@ public class DirectorySignatureHelper {
     private boolean isSign(final AOSigner signer, final File file) throws IOException {
         final InputStream is = this.getFileInputStream(file);
         final boolean isSignFile = signer.isSign(AOUtil.getDataFromInputStream(is));
-        this.closeStream(is);
+        DirectorySignatureHelper.closeStream(is);
         return isSignFile;
     }
 
@@ -1031,7 +1031,7 @@ public class DirectorySignatureHelper {
     private boolean isValidDataFile(final AOSigner signer, final File file) throws IOException {
         final InputStream is = this.getFileInputStream(file);
         final boolean isValidDataFile = signer.isValidDataFile(AOUtil.getDataFromInputStream(is));
-        this.closeStream(is);
+        DirectorySignatureHelper.closeStream(is);
         return isValidDataFile;
     }
 
@@ -1092,7 +1092,7 @@ public class DirectorySignatureHelper {
      * caso de error. Si la entrada es nula, no hace nada.
      * @param stream
      *        InputStream a cerrar. */
-    private void closeStream(final Closeable stream) {
+    private static void closeStream(final Closeable stream) {
         if (stream != null) {
             try {
                 stream.close();
@@ -1186,7 +1186,7 @@ public class DirectorySignatureHelper {
     /** Inicializa el fichero de log para la firma masiva.
      * @param outFile
      *        Ruta del fichero de log. */
-    protected OutputStream initLogRegistry(final String outFile) {
+    protected static OutputStream initLogRegistry(final String outFile) {
         try {
             return new FileOutputStream(outFile);
         }
