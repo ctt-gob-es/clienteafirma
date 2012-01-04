@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.UnrecoverableKeyException;
+import java.security.UnrecoverableEntryException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -150,8 +150,11 @@ final class Firma extends JPanel {
             }
             else if (store == AOKeyStore.PKCS12) {
                 pssCallback =
-                    new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", SwingUtilities.getRoot(this), //$NON-NLS-1$
-                                                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
+                    new UIPasswordCallbackAccessibility(
+                		Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$
+                		SwingUtilities.getRoot(this),
+                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
+                    );
                 final File selectedFile =
                     SelectionDialog.showFileOpenDialog(this, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
                 if (selectedFile != null) {
@@ -163,8 +166,11 @@ final class Firma extends JPanel {
             }
             else {
                 pssCallback =
-                    new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", SwingUtilities.getRoot(this), //$NON-NLS-1$
-                                                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
+                    new UIPasswordCallbackAccessibility(
+                		Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription() + ". \r\nSi no ha establecido ninguna, deje el campo en blanco.", //$NON-NLS-1$
+                		SwingUtilities.getRoot(this), 
+                        Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title") //$NON-NLS-1$ //$NON-NLS-2$
+                    );
             }
 
             try {
@@ -172,32 +178,41 @@ final class Firma extends JPanel {
             }
             catch (final IOException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el almacen
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    Messages.getString("Firma.msg.error.contrasenia"),  //$NON-NLS-1$
+                    Messages.getString("error"),  //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
                 return;
             }
             catch (final AOKeystoreAlternativeException e) {
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Firma.msg.error.almacen"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+                CustomDialog.showMessageDialog(
+            		SwingUtilities.getRoot(this),
+                    true,
+                    Messages.getString("Firma.msg.error.almacen"),  //$NON-NLS-1$
+                    Messages.getString("error"),  //$NON-NLS-1$
+                    JOptionPane.ERROR_MESSAGE
+                );
                 return;
             }
 
             // Seleccionamos un certificado
             final String selectedcert =
-                Utils.showCertSelectionDialog(keyStoreManager.getAliases(),
-                                              keyStoreManager,
-                                              SwingUtilities.getRoot(this),
-                                              true,
-                                              true,
-                                              true,
-                                              new Vector<CertificateFilter>(0),
-                                              false);
+                Utils.showCertSelectionDialog(
+            		keyStoreManager.getAliases(),
+                    keyStoreManager,
+                    SwingUtilities.getRoot(this),
+                    true,
+                    true,
+                    true,
+                    new Vector<CertificateFilter>(0),
+                    false
+                );
 
             // Comprobamos si se ha cancelado la seleccion
-            if (selectedcert == null)
-            {
+            if (selectedcert == null) {
                 throw new AOCancelledOperationException("Operacion de firma cancelada por el usuario"); //$NON-NLS-1$
             }
 
@@ -206,7 +221,7 @@ final class Firma extends JPanel {
             try {
                 privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, SwingUtilities.getRoot(this)));
             }
-            catch (final UnrecoverableKeyException e) {
+            catch (final UnrecoverableEntryException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el certificado
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,
