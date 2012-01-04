@@ -132,7 +132,8 @@ public final class TestXAdES {
     
     /** Pruebas de cofirma.
      * @throws Exception Cuando ocurre un error */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testCoSign() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         final PrivateKeyEntry pke;
@@ -198,7 +199,8 @@ public final class TestXAdES {
      * <b>Necesita GUI</b>
      * @throws Exception Cuando ocurre un error
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     @Ignore
     public void testSignExternalStyle() throws Exception {
         
@@ -278,7 +280,8 @@ public final class TestXAdES {
      * Prueba de firma convencional.
      * @throws Exception en cualquier error
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testSignature() throws Exception {
         
 //        TestSignVerifier verifier = null;
@@ -381,7 +384,7 @@ public final class TestXAdES {
      * @return {@code false} si se encuentra el nodo UnsignedSignatureProperties
      * vac&iacute;o, {@code true} en caso contrario.
      */
-    private boolean isValidUnsignedProperties(final InputStream sign, final String namespace) {
+    private static boolean isValidUnsignedProperties(final InputStream sign, final String namespace) {
         
         final Document document;
         try {

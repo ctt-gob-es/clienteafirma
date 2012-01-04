@@ -82,7 +82,8 @@ public final class TestFacturaE {
      * Prueba de firma convencional.
      * @throws Exception en cualquier error
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testSignature() throws Exception {
         
 //        TestSignVerifier verifier = null;
@@ -180,7 +181,7 @@ public final class TestFacturaE {
      * @return {@code false} si se encuentra el nodo UnsignedSignatureProperties
      * vac&iacute;o, {@code true} en caso contrario.
      */
-    private boolean isValidUnsignedProperties(final InputStream sign, final String namespace) {
+    private static boolean isValidUnsignedProperties(final InputStream sign, final String namespace) {
         
         final Document document;
         try {
