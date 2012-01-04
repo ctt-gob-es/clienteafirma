@@ -28,8 +28,6 @@ final class CheckAndInstallMissingParts {
     /** Gestor de registro. */
     private static final Logger LOGGER = Logger.getLogger("es.gob.afirma"); //$NON-NLS-1$;
 
-    private static final long serialVersionUID = -7508890516967067205L;
-
     /** JAR con las clases de compatibilidad del cliente con Java 5 (s&oacute;lo Java 5). */
     private static final String AFIRMA_JAVA5_JAR = "afirma_5_java_5.jar"; //$NON-NLS-1$
 
@@ -199,7 +197,7 @@ final class CheckAndInstallMissingParts {
 
     /** Indica si es necesario instalar el proveedor de seguridad SunPKCS11.
      * @return <code>true</code> si es necesaria la instalaci&oacute;n, <code>false</code> en caso contrario */
-    boolean isSunPKCS11Needed() {
+    static boolean isSunPKCS11Needed() {
         try {
             AOBootUtil.getCleanClassLoader().loadClass("sun.security.pkcs11.SunPKCS11"); //$NON-NLS-1$
         }
@@ -223,14 +221,11 @@ final class CheckAndInstallMissingParts {
             LOGGER.severe("No se ha podido determinar el directorio ENDORSED del JRE, por lo que no se considera necesario instalar Apache XALAN"); //$NON-NLS-1$
             return false;
         }
-        return !((new File(getEndorsedDir() + File.separator + "serializer.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
-                                                                                                      + "serializer-2.7.1.jar").exists()) && (new File(getEndorsedDir() + File.separator //$NON-NLS-1$
-                                                                                                                                                       + "xalan.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
-                                                                                                                                                                                           + "xalan-2.7.1.jar").exists()) //$NON-NLS-1$
-                                                                                                                                                                                           && (new File(getEndorsedDir() + File.separator + "xercesImpl.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
-                                                                                                                                                                                                                                                                                   + "xercesImpl-2.9.1.jar").exists()) && (new File(getEndorsedDir() + File.separator //$NON-NLS-1$
-                                                                                                                                                                                                                                                                                                                                    + "xml-apis.jar").exists() || new File(getEndorsedDir() + File.separator //$NON-NLS-1$
-                                                                                                                                                                                                                                                                                                                                                                           + "xml-apis-1.3.03.jar").exists())); //$NON-NLS-1$
+        return !((new File(getEndorsedDir() + File.separator + "serializer.jar").exists() ||  //$NON-NLS-1$
+        		  new File(getEndorsedDir() + File.separator + "serializer-2.7.1.jar").exists()) && (new File(getEndorsedDir() + File.separator + "xalan.jar").exists() ||  //$NON-NLS-1$ //$NON-NLS-2$
+        		  new File(getEndorsedDir() + File.separator + "xalan-2.7.1.jar").exists()) && (new File(getEndorsedDir() + File.separator + "xercesImpl.jar").exists() ||  //$NON-NLS-1$ //$NON-NLS-2$
+    			  new File(getEndorsedDir() + File.separator + "xercesImpl-2.9.1.jar").exists()) && (new File(getEndorsedDir() + File.separator + "xml-apis.jar").exists() ||  //$NON-NLS-1$ //$NON-NLS-2$
+				  new File(getEndorsedDir() + File.separator + "xml-apis-1.3.03.jar").exists())); //$NON-NLS-1$
     }
 
     /** Comprueba si se necesitan las dependencias para la compatibilidad del Cliente AFirma con Java 5.

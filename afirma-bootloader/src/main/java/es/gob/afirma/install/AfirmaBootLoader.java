@@ -64,7 +64,8 @@ public final class AfirmaBootLoader extends JApplet {
      * @param installType Contrucci&oacute;n que se desea instalar.
      * @param codeBase Direcci&oacute;n de donde descargar las bibliotecas a instralar
      */
-    private void install(final String build, final URL codeBase) {
+    @SuppressWarnings("static-method")
+	private void install(final String build, final URL codeBase) {
         LOGGER.info("Invocando instalar(" + build + ", " + codeBase + ")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         // Realizamos la instalacion

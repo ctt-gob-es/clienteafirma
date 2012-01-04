@@ -136,7 +136,7 @@ final class Installer {
         }
 
         try {
-            if (this.enviromentInstaller.isSunPKCS11Needed()) {
+            if (CheckAndInstallMissingParts.isSunPKCS11Needed()) {
                 if (!licenciaMostrada && !prepareInstall()) {
                     return;
                 }
