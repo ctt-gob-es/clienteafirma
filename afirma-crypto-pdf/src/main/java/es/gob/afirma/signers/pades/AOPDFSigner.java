@@ -252,12 +252,18 @@ public final class AOPDFSigner implements AOSigner {
         catch (final InvalidPdfException e) {
             throw new AOFormatFileException("El documento no era un PDF valido", e); //$NON-NLS-1$
         }
-        catch (final AOException e) {
-            throw e;
-        }
-        catch (final Exception e) {
-            throw new AOException("Error firmando el PDF: " + e, e); //$NON-NLS-1$
-        }
+        catch (final CertificateException e) {
+            throw new AOException("Error en el certificado de firma: " + e, e); //$NON-NLS-1$
+        } 
+        catch (NoSuchAlgorithmException e) {
+        	throw new AOException("Error el en algoritmo de firma: " + e, e); //$NON-NLS-1$
+		} 
+        catch (IOException e) {
+        	throw new AOException("Error firmando el PDF: " + e, e); //$NON-NLS-1$
+		} 
+        catch (DocumentException e) {
+        	throw new AOException("Error en el tratamiento del PDF: " + e, e); //$NON-NLS-1$
+		}
     }
 
     /** A&ntilde;ade una firma PAdES a un documento PDF. El comportamiento es exactamente el mismo que una llamada al m&eacute;todo <code>sign(...)</code>
