@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
@@ -72,10 +73,7 @@ final class CertificateUtils {
 			final File savedfile = selectFileToSave(parent, JSEUIMessages.getString("CertificateUtils.1")); //$NON-NLS-1$
 			saveFile(savedfile, certificate.getEncoded());
 		} 
-		catch (final AOCancelledOperationException e) {
-			throw e;
-		} 
-		catch (final Exception e) {
+		catch (final IOException e) {
 			new JSEUIManager().showConfirmDialog(
 				parent,
 				JSEUIMessages.getString("CertificateUtils.2"), //$NON-NLS-1$
@@ -83,6 +81,15 @@ final class CertificateUtils {
 				JOptionPane.CLOSED_OPTION,
 				JOptionPane.ERROR_MESSAGE
 			);
+		} 
+		catch (final CertificateEncodingException e) {
+			new JSEUIManager().showConfirmDialog(
+					parent,
+					JSEUIMessages.getString(JSEUIMessages.getString("CertificateUtils.4")), //$NON-NLS-1$
+					JSEUIMessages.getString("CertificateUtils.3"), //$NON-NLS-1$
+					JOptionPane.CLOSED_OPTION,
+					JOptionPane.ERROR_MESSAGE
+				);
 		}
 	}
 	
