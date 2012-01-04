@@ -51,6 +51,7 @@ import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.ui.NameCertificateBean;
 
 /** Di&aacute;logo de selecci&oacute;n de certificados con est&eacute;tica Windows 7. */
+@SuppressWarnings("restriction")
 final class CertificateSelectionPanel extends JPanel implements ListSelectionListener {
 	
 	/** Serial version */ 
@@ -172,7 +173,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		this.certList.addMouseListener(listener);
 	}
 	
-	private CertificateLine createCertLine(final String friendlyName, final X509Certificate cert) {
+	private static CertificateLine createCertLine(final String friendlyName, final X509Certificate cert) {
 		final CertificateLine certLine = new CertificateLine(friendlyName, cert);
 		certLine.setFocusable(true);
 		return certLine;
@@ -204,7 +205,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		 * @return Devuelve {@code true} si el certificado pertenece a un DNIe, {@code false}
 		 * en caso contrario.
 		 */
-		private boolean isDNIeCert(final X509Certificate certificate) {
+		private static boolean isDNIeCert(final X509Certificate certificate) {
 			
 			try {
 				final Attributes attrs = new BasicAttributes(true);
@@ -291,7 +292,7 @@ final class CertificateSelectionPanel extends JPanel implements ListSelectionLis
 		 * @param date Fecha.
 		 * @return Texto que representativo de la fecha.
 		 */
-		private String formatDate(Date date) {
+		private static String formatDate(Date date) {
 			return new SimpleDateFormat("dd/MM/yyyy").format(date); //$NON-NLS-1$
 		}
 		
