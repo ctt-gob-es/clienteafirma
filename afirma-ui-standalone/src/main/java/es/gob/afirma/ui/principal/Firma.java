@@ -24,10 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.security.InvalidKeyException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
-import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,13 +95,13 @@ final class Firma extends JPanel {
                                                                                AOSignConstants.SIGN_FORMAT_CADES,
                                                                                AOSignConstants.SIGN_FORMAT_PDF));
 
-    public Firma() {
+    Firma() {
         initComponents();
     }
 
     /** Carga el combo de almacen y repositorios
      * @param comboAlmacen Combo donde se guarda la lista */
-    private void cargarComboAlmacen(final JComboBox comboAlmacen) {
+    private static void cargarComboAlmacen(final JComboBox comboAlmacen) {
         comboAlmacen.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
     }
 
@@ -347,7 +345,7 @@ final class Firma extends JPanel {
             final File savedFile =
                 SelectionDialog.saveDataToFile(Messages.getString("Firma.filechooser.save.title"), //$NON-NLS-1$
                                                signedData,
-                                               SignedFileManager.getOutFileName(this.getFilename(campoFichero.getText()), formato),
+                                               SignedFileManager.getOutFileName(Firma.getFilename(campoFichero.getText()), formato),
                                                SignedFileManager.getOutFileFilter(formato),
                                                this);
 
@@ -375,7 +373,7 @@ final class Firma extends JPanel {
     /** Obtiene el nombre del archivo desde el path
      * @param path Path del archivo
      * @return Nombre del archivo */
-    private String getFilename(final String path) {
+    private static String getFilename(final String path) {
         final int i = path.lastIndexOf(System.getProperty("file.separator")); //$NON-NLS-1$
         if (i > 0 && i < path.length() - 1) {
             return path.substring(i + 1);
@@ -544,8 +542,8 @@ final class Firma extends JPanel {
         // Combo con los diferentes formatos de firma
         final JComboBox comboFormato = new JComboBox();
         comboFormato.setToolTipText(Messages.getString("Firma.formato.description")); // NOI18N //$NON-NLS-1$
-        comboFormato.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status")));
-        comboFormato.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status")));
+        comboFormato.addMouseListener(new ElementDescriptionMouseListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
+        comboFormato.addFocusListener(new ElementDescriptionFocusListener(PrincipalGUI.bar, Messages.getString("Firma.formato.description.status"))); //$NON-NLS-1$
         // comboFormato.getAccessibleContext().setAccessibleName(etiquetaFormato.getText()+" " + Messages.getString("Firma.formato.description") +
         // " ALT + O."); // NOI18N
 
