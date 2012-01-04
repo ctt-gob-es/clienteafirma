@@ -128,9 +128,13 @@ final class Firma extends JPanel {
 
         // Obtenemos la ruta del fichero a firmar
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) { //$NON-NLS-1$
-            CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                           true,
-                                           Messages.getString("Firma.msg.error.fichero"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            CustomDialog.showMessageDialog(
+               SwingUtilities.getRoot(this),
+               true,
+               Messages.getString("Firma.msg.error.fichero"),  //$NON-NLS-1$
+               Messages.getString("error"),  //$NON-NLS-1$
+               JOptionPane.ERROR_MESSAGE
+            ); 
             campoFichero.requestFocusInWindow();
             return;
         }
@@ -176,18 +180,18 @@ final class Firma extends JPanel {
             try {
                 keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, kssc.toString(), pssCallback, this);
             }
-            catch (final IOException e) {
-                // Control de la excepcion generada al introducir mal la contrasena para el almacen
-                CustomDialog.showMessageDialog(
-            		SwingUtilities.getRoot(this),
-                    true,
-                    Messages.getString("Firma.msg.error.contrasenia"),  //$NON-NLS-1$
-                    Messages.getString("error"),  //$NON-NLS-1$
-                    JOptionPane.ERROR_MESSAGE
-                );
-                return;
-            }
-            catch (final AOKeystoreAlternativeException e) {
+//            catch (final IOException e) {
+//                // Control de la excepcion generada al introducir mal la contrasena para el almacen
+//                CustomDialog.showMessageDialog(
+//            		SwingUtilities.getRoot(this),
+//                    true,
+//                    Messages.getString("Firma.msg.error.contrasenia"),  //$NON-NLS-1$
+//                    Messages.getString("error"),  //$NON-NLS-1$
+//                    JOptionPane.ERROR_MESSAGE
+//                );
+//                return;
+//            }
+            catch (final Exception e) {
                 CustomDialog.showMessageDialog(
             		SwingUtilities.getRoot(this),
                     true,
@@ -217,17 +221,17 @@ final class Firma extends JPanel {
             }
 
             // Recuperamos la clave del certificado
-            PrivateKeyEntry privateKeyEntry = null;
+            final PrivateKeyEntry privateKeyEntry;
             try {
                 privateKeyEntry = keyStoreManager.getKeyEntry(selectedcert, Utils.getCertificatePC(store, SwingUtilities.getRoot(this)));
             }
-            catch (final UnrecoverableEntryException e) {
-                // Control de la excepcion generada al introducir mal la contrasena para el certificado
-                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
-                                               true,
-                                               Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
-                return;
-            }
+//            catch (final java.security.UnrecoverableEntryException e) {
+//                // Control de la excepcion generada al introducir mal la contrasena para el certificado
+//                CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
+//                                               true,
+//                                               Messages.getString("Firma.msg.error.contrasenia"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+//                return;
+//            }
             catch (final AOCancelledOperationException e) {
                 // Si se ha cancelado la operacion lo informamos en el nivel superior para que se trate.
                 // Este relanzamiento se realiza para evitar la siguiente captura generica de excepciones
