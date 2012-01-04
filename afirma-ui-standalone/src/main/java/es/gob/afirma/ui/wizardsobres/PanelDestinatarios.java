@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +134,7 @@ final class PanelDestinatarios extends JAccessibilityDialogWizard {
             logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
             return;
         }
-        catch (final InvalidKeyException e) {
+        catch (final IOException e) {
             // Control de la excepcon generada al introducir mal la contrasena para el almacen
             CustomDialog.showMessageDialog(this,
                                            true,

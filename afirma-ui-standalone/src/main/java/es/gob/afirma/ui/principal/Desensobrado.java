@@ -259,9 +259,6 @@ final class Desensobrado extends JPanel {
         catch (final AOCancelledOperationException e) {
             throw e;
         }
-        catch (final InvalidKeyException e) {
-            throw e;
-        }
         catch (final AOKeystoreAlternativeException e) {
             throw e;
         }

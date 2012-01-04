@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
@@ -176,7 +175,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
             logger.info("Operacion cancelada por el usuario"); //$NON-NLS-1$
             return;
         }
-        catch (final InvalidKeyException e) {
+        catch (final IOException e) {
             // Control de la excepcion generada al introducir mal la contrasena para el almacen
             CustomDialog.showMessageDialog(this,
                                            true,
@@ -260,7 +259,7 @@ final class PanelRemitentes extends JAccessibilityDialogWizard {
     }
     /** Carga un combo con los repositorios/almacenes disponibles
      * @param comboRepositorios Combo donde se deben cargar los repositorios */
-    private void cargarCombo(final JComboBox comboRepositorios) {
+    private static void cargarCombo(final JComboBox comboRepositorios) {
         comboRepositorios.setModel(new DefaultComboBoxModel(KeyStoreLoader.getKeyStoresToSign()));
     }
 

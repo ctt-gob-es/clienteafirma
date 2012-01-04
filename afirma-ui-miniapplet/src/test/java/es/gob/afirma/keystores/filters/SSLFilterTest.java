@@ -11,7 +11,7 @@
 package es.gob.afirma.keystores.filters;
 
 import java.io.File;
-import java.security.InvalidKeyException;
+import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,12 +39,12 @@ public class SSLFilterTest {
 	
 	/**
 	 * Comprobaci&oacute;n del filtrado.
-	 * @throws InvalidKeyException Clave no v&aacute;lida.
+	 * @throws IOException Clave no v&aacute;lida.
 	 * @throws AOKeystoreAlternativeException Cuando no se puede abrir el almacen de claves.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public void match() throws InvalidKeyException, AOKeystoreAlternativeException {
+	public void match() throws IOException, AOKeystoreAlternativeException {
 		
 		SSLFilter filter = new SSLFilter(CERT_SN);
 		

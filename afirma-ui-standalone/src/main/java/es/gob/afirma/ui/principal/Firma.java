@@ -172,7 +172,7 @@ final class Firma extends JPanel {
             try {
                 keyStoreManager = AOKeyStoreManagerFactory.getAOKeyStoreManager(store, lib, kssc.toString(), pssCallback, this);
             }
-            catch (final InvalidKeyException e) {
+            catch (final IOException e) {
                 // Control de la excepcion generada al introducir mal la contrasena para el almacen
                 CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                                true,

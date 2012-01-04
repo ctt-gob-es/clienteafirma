@@ -10,6 +10,7 @@
 
 package es.gob.afirma.test.keystores.mozilla;
 
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,10 +30,10 @@ public class TestFirefoxFriendlyNames {
     
     /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI. 
      * @throws AOKeystoreAlternativeException 
-     * @throws InvalidKeyException */
+     * @throws IOException */
     @SuppressWarnings("static-method")
 	@Test
-    public void testWindowsFriendlyNames() throws InvalidKeyException, AOKeystoreAlternativeException {
+    public void testWindowsFriendlyNames() throws IOException, AOKeystoreAlternativeException {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
                AOKeyStore.MOZ_UNI, 
