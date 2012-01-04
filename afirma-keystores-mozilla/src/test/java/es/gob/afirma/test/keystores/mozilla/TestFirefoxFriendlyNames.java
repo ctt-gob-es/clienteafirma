@@ -30,7 +30,8 @@ public class TestFirefoxFriendlyNames {
     /** Prueba la conversi&oacute;n de alias en nombres significativos en CAPI. 
      * @throws AOKeystoreAlternativeException 
      * @throws InvalidKeyException */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testWindowsFriendlyNames() throws InvalidKeyException, AOKeystoreAlternativeException {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(

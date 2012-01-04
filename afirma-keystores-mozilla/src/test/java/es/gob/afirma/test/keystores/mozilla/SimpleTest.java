@@ -11,7 +11,8 @@ public final class SimpleTest {
     
     /** Prueba de la obtenci&oacute;n de almac&eacute;n y alias con Mozilla NSS.
      * @throws Exception */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testKeyStoreManagerCreation() throws Exception {
         final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
           AOKeyStore.MOZ_UNI, 
