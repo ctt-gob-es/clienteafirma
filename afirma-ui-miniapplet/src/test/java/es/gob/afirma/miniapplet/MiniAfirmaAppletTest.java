@@ -19,6 +19,7 @@ import es.gob.afirma.core.misc.Base64;
 public final class MiniAfirmaAppletTest {
 
 	/** Prueba de firma simple con DNIe. */
+	@SuppressWarnings("static-method")
 	@Test
 	@Ignore
 	public void signWithDNIe() {

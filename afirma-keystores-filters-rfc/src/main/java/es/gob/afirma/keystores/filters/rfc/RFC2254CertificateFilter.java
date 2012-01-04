@@ -50,14 +50,14 @@ public final class RFC2254CertificateFilter extends CertificateFilter {
         this.rfc2254SubjectFilter = subjectFilter;
     }
 
-    private boolean filterSubjectByRFC2254(final String filter, final X509Certificate cert) {
+    private static boolean filterSubjectByRFC2254(final String filter, final X509Certificate cert) {
         if (cert == null || filter == null) {
             return true;
         }
         return filterRFC2254(filter, cert.getSubjectDN().toString());
     }
 
-    private boolean filterIssuerByRFC2254(final String filter, final X509Certificate cert) {
+    private static boolean filterIssuerByRFC2254(final String filter, final X509Certificate cert) {
         if (cert == null || filter == null) {
             return true;
         }
@@ -72,7 +72,7 @@ public final class RFC2254CertificateFilter extends CertificateFilter {
      * @return <code>true</code> si el nombre LDAP es nulo o se adec&uacute;a al
      *         filtro o este &uacute;ltimo es nulo, <code>false</code> en caso
      *         contrario */
-    private boolean filterRFC2254(final String f, final String name) {
+    private static boolean filterRFC2254(final String f, final String name) {
         try {
             return filterRFC2254(f, new LdapName(name));
         }
@@ -94,7 +94,8 @@ public final class RFC2254CertificateFilter extends CertificateFilter {
      * @return <code>true</code> si el nombre LDAP es nulo o se adec&uacute;a al
      *         filtro o este &uacute;ltimo es nulo, <code>false</code> en caso
      *         contrario */
-    private boolean filterRFC2254(final String f, final LdapName name) {
+    @SuppressWarnings("restriction")
+	private static boolean filterRFC2254(final String f, final LdapName name) {
         if (f == null || name == null) {
             return true;
         }

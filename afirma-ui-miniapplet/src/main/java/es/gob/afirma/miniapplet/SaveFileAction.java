@@ -61,7 +61,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
      * @throws IOException Cuando se produce un error al almacenar el fichero.
      */
 	public Boolean run() throws IOException {
-    	return Boolean.valueOf(this.saveFile(this.selectFileToSave(), this.data));
+    	return Boolean.valueOf(SaveFileAction.saveFile(this.selectFileToSave(), this.data));
 	}
 	
     /**
@@ -128,7 +128,7 @@ final class SaveFileAction implements PrivilegedExceptionAction<Boolean> {
         return finalFile;
     }
     
-    private boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
+    private static boolean saveFile(final File file, final byte[] dataToSave) throws IOException {
     	
     	FileOutputStream fos = new FileOutputStream(file);
     	fos.write(dataToSave);

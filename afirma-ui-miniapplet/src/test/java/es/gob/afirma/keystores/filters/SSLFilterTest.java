@@ -42,6 +42,7 @@ public class SSLFilterTest {
 	 * @throws InvalidKeyException Clave no v&aacute;lida.
 	 * @throws AOKeystoreAlternativeException Cuando no se puede abrir el almacen de claves.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public void match() throws InvalidKeyException, AOKeystoreAlternativeException {
 		

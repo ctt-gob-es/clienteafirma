@@ -50,7 +50,7 @@ public final class SSLFilter extends CertificateFilter {
 	 * @param serialNumber N&uacute;mero de serie del certificado en hexadecimal.
 	 */
 	public SSLFilter(final String serialNumber) {
-		this.serialNumber = this.prepareSerialNumber(serialNumber);
+		this.serialNumber = SSLFilter.prepareSerialNumber(serialNumber);
 		this.authenticationDnieCertFilter = new AuthenticationDNIeFilter();
 		this.signatureDnieCertFilter = new SignatureDNIeFilter();
 	}
@@ -58,7 +58,7 @@ public final class SSLFilter extends CertificateFilter {
 	/** {@inheritDoc} */
 	@Override
     public boolean matches(final X509Certificate cert) {
-		return this.prepareSerialNumber(this.getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
+		return SSLFilter.prepareSerialNumber(SSLFilter.getCertificateSN(cert)).equalsIgnoreCase(this.serialNumber);
 	}
 	
 	/** {@inheritDoc} */
@@ -81,9 +81,9 @@ public final class SSLFilter extends CertificateFilter {
 						for (int j = 0; j < aliases.length; j++) {
 							if (i != j) {
 								cert2 = ksm.getCertificate(aliases[j]);				
-								if (this.isSignatureDnieCert(cert2) && this.getSubjectSN(cert2) != null &&
-										this.getSubjectSN(cert2).equalsIgnoreCase(this.getSubjectSN(cert)) &&
-										this.getExpiredDate(cert2).equals(this.getExpiredDate(cert))) {
+								if (this.isSignatureDnieCert(cert2) && SSLFilter.getSubjectSN(cert2) != null &&
+										SSLFilter.getSubjectSN(cert2).equalsIgnoreCase(SSLFilter.getSubjectSN(cert)) &&
+										SSLFilter.getExpiredDate(cert2).equals(SSLFilter.getExpiredDate(cert))) {
 									filteredCerts.add(aliases[j]);
 									break;
 								}
@@ -119,7 +119,7 @@ public final class SSLFilter extends CertificateFilter {
 	 * @param cert Certificado.
 	 * @return N&uacute;mero de serie del subject en hexadecimal.
 	 */
-	private String getSubjectSN(final X509Certificate cert) {
+	private static String getSubjectSN(final X509Certificate cert) {
 		final String principal = cert.getSubjectX500Principal().getName();
     	final List<Rdn> rdns;
 		try {
@@ -146,7 +146,7 @@ public final class SSLFilter extends CertificateFilter {
 	 * @param cert Certificado.
 	 * @return Fecha de caducidad.
 	 */
-	private String getExpiredDate(final X509Certificate cert) {
+	private static String getExpiredDate(final X509Certificate cert) {
 		return new SimpleDateFormat("yyyy-MM-dd").format(cert.getNotAfter()); //$NON-NLS-1$
 	}
 	
@@ -158,11 +158,11 @@ public final class SSLFilter extends CertificateFilter {
 	 * @param cert Certificado.
 	 * @return Numero de serie en hexadecimal.
 	 */
-	private String getCertificateSN(final X509Certificate cert) {
-    	return this.bigIntegerToHex(cert.getSerialNumber());
+	private static String getCertificateSN(final X509Certificate cert) {
+    	return SSLFilter.bigIntegerToHex(cert.getSerialNumber());
 	}
 	
-	private String bigIntegerToHex(final BigInteger bi) {
+	private static String bigIntegerToHex(final BigInteger bi) {
 		return AOUtil.hexify(bi.toByteArray(), ""); //$NON-NLS-1$
 	}
 	
@@ -172,7 +172,7 @@ public final class SSLFilter extends CertificateFilter {
 	 * @param serialNumber N&uacute;mero de serie en hexadecimal.
 	 * @return N&uacute;mero de serie preparado.
 	 */
-	private String prepareSerialNumber(final String sn) {
+	private static String prepareSerialNumber(final String sn) {
 		final String preparedSn = sn.trim().replace(" ", "").replace("#", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int n = 0;
 		while(n < preparedSn.length()) {

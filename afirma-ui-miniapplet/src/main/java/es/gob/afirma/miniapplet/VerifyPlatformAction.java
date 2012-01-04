@@ -31,7 +31,7 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 	/** {@inheritDoc} */
 	public Void run() throws InvalidExternalLibraryException {
 		this.verificaSunMSCAPINeeded();
-		this.verificaBCVersion();
+		VerifyPlatformAction.verificaBCVersion();
 		return null;
 	}
 
@@ -66,7 +66,7 @@ final class VerifyPlatformAction implements PrivilegedExceptionAction<Void> {
 
 	/** Indica si la versi&oacute;n de BouncyCastle es la adecuada para ejecutar el MiniApplet. 
 	 * @throws InvalidExternalLibraryException Si se encuentra una versi&oacute;n no compatible en en CLASSPATH de la aplicaci&oacute;n */
-	private void verificaBCVersion() throws InvalidExternalLibraryException {
+	private static void verificaBCVersion() throws InvalidExternalLibraryException {
 
 		try {	
 			AOUtil.classForName("org.bouncycastle.jce.provider.BouncyCastleProvider"); //$NON-NLS-1$

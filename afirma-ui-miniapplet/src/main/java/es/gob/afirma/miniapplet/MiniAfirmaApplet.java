@@ -78,9 +78,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		try {
 			return Base64.encodeBytes(AccessController.doPrivileged(new SignAction(
-					this.selectSigner(this.cleanParam(format), null), 
+					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), null), 
 					Base64.decode(dataB64),
-					this.cleanParam(algorithm), 
+					MiniAfirmaApplet.cleanParam(algorithm), 
 					this.selectPrivateKey(params), 
 					ExtraParamsProcessor.expandProperties(params)
 			)));
@@ -121,10 +121,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		try {
 			final byte[] sign = Base64.decode(signB64);
 			return Base64.encodeBytes(AccessController.doPrivileged(new CoSignAction(
-					this.selectSigner(this.cleanParam(format), sign), 
+					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign), 
 					sign, 
 					(dataB64 == null ? null : Base64.decode(dataB64)),
-					this.cleanParam(algorithm), 
+					MiniAfirmaApplet.cleanParam(algorithm), 
 					this.selectPrivateKey(params), 
 					ExtraParamsProcessor.expandProperties(params)
 			)));
@@ -164,9 +164,9 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		try {
 			final byte[] sign = Base64.decode(signB64);
 			return Base64.encodeBytes(AccessController.doPrivileged(new CounterSignAction(
-					this.selectSigner(this.cleanParam(format), sign), 
+					MiniAfirmaApplet.selectSigner(MiniAfirmaApplet.cleanParam(format), sign), 
 					sign,
-					this.cleanParam(algorithm), 
+					MiniAfirmaApplet.cleanParam(algorithm), 
 					this.selectPrivateKey(params), 
 					ExtraParamsProcessor.expandProperties(params)
 			)));
@@ -201,7 +201,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 		final AOSigner signer;
 		try {
 			sign = Base64.decode(signB64);
-			signer = this.getSigner(sign);
+			signer = MiniAfirmaApplet.getSigner(sign);
 		}
 		catch (final IOException e) {
 			setErrorMessage(e);
@@ -236,14 +236,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			return false;
 		}
 
-		final String titleDialog = this.cleanParam(title);
+		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
 
-		final String depuredExts = this.cleanParam(extension);
+		final String depuredExts = MiniAfirmaApplet.cleanParam(extension);
 		final String[] exts = (depuredExts == null ? null : new String[] { depuredExts });
 
-		final String descFiles = this.cleanParam(description);
+		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
-		final String depuredFileName = this.cleanParam(fileName);
+		final String depuredFileName = MiniAfirmaApplet.cleanParam(fileName);
 		final File fileHint = (depuredFileName == null ?
 				this.pathHint : new File(this.pathHint, fileName));
 
@@ -277,10 +277,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.cleanErrorMessage();
 
-		final String titleDialog = this.cleanParam(title);
-		final String cleanExts = this.cleanParam(extensions);
+		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
+		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
 		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
-		final String descFiles = this.cleanParam(description);
+		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
 		try {
 			return AccessController.doPrivileged(
@@ -307,10 +307,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.cleanErrorMessage();
 
-		final String titleDialog = this.cleanParam(title);
-		final String cleanExts = this.cleanParam(extensions);
+		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
+		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
 		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
-		final String descFiles = this.cleanParam(description);
+		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
 		try {
 			return Base64.encodeBytes(AccessController.doPrivileged(new GetFileContentAction(
@@ -344,10 +344,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.cleanErrorMessage();
 
-		final String titleDialog = this.cleanParam(title);
-		final String cleanExts = this.cleanParam(extensions);
+		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
+		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
 		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
-		final String descFiles = this.cleanParam(description);
+		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
 		try { 
 			return AccessController.doPrivileged(new GetFileNameContentAction(
@@ -393,10 +393,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 
 		this.cleanErrorMessage();
 
-		final String titleDialog = this.cleanParam(title);
-		final String cleanExts = this.cleanParam(extensions);
+		final String titleDialog = MiniAfirmaApplet.cleanParam(title);
+		final String cleanExts = MiniAfirmaApplet.cleanParam(extensions);
 		final String[] exts = (cleanExts == null ? null : cleanExts.split(",")); //$NON-NLS-1$
-		final String descFiles = this.cleanParam(description);
+		final String descFiles = MiniAfirmaApplet.cleanParam(description);
 
 		try { 
 			return AccessController.doPrivileged(new GetFileNameContentAction(
@@ -420,7 +420,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			return null;
 		}
 		try {
-			final String cleanCharset = this.cleanParam(charset);
+			final String cleanCharset = MiniAfirmaApplet.cleanParam(charset);
 			if (cleanCharset != null) {
 				return new String(Base64.decode(base64Data), cleanCharset);
 			}
@@ -439,7 +439,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			return null;
 		}
 
-		final String cleanCharset = this.cleanParam(charset);
+		final String cleanCharset = MiniAfirmaApplet.cleanParam(charset);
 		if (cleanCharset != null) {
 			try {
 				return Base64.encodeBytes(plainText.getBytes(cleanCharset));
@@ -480,7 +480,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @deprecated Se externaliza las comprobaciones de entorno.
 	 */
 	@Deprecated
-	public String getEcoJava() { 
+	public static String getEcoJava() { 
 		return AccessController.doPrivileged(new GetEcoJavaVersionAction()).toString();
 	}
 
@@ -489,7 +489,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	public void init() {
 		this.userAgent = this.getParameter(APPLET_PARAM_USER_AGENT);
 
-		String keystoreParam = this.cleanParam(this.getParameter(APPLET_PARAM_USER_KEYSTORE));
+		String keystoreParam = MiniAfirmaApplet.cleanParam(this.getParameter(APPLET_PARAM_USER_KEYSTORE));
 		if (keystoreParam != null && !keystoreParam.equals("null")) { //$NON-NLS-1$
 			int separatorPos = keystoreParam.indexOf(':');
 			try {
@@ -508,7 +508,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			}
 		}
 
-		this.configureLookAndFeel();
+		MiniAfirmaApplet.configureLookAndFeel();
 		LOGGER.info("Miniapplet Afirma"); //$NON-NLS-1$
 	}
 
@@ -580,10 +580,10 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @throws PrivilegedActionException Cuando ocurre un error de seguridad.
 	 * @throws NullPointerException Cuando no se indica ni formato ni firma como par&aacute;nmetro.
 	 */
-	private AOSigner selectSigner(final String format, final byte[] sign) throws AOFormatFileException, PrivilegedActionException {
+	private static AOSigner selectSigner(final String format, final byte[] sign) throws AOFormatFileException, PrivilegedActionException {
 		final AOSigner signer;
 		if (format != null) {
-			signer = this.getSigner(format);
+			signer = MiniAfirmaApplet.getSigner(format);
 			if (signer == null) {
 				throw new AOFormatFileException("El formato de firma indicado no esta soportado"); //$NON-NLS-1$
 			}
@@ -592,7 +592,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 			}
 		} 
 		else if (sign != null) {
-			signer = this.getSigner(sign);
+			signer = MiniAfirmaApplet.getSigner(sign);
 			if (signer == null) {
 				throw new IllegalArgumentException("Los datos introducidos no se corresponden con una firma soportada"); //$NON-NLS-1$
 			}
@@ -609,7 +609,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @return Manejador de firma.
 	 * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
 	 */
-	private AOSigner getSigner(final String format) throws PrivilegedActionException {
+	private static AOSigner getSigner(final String format) throws PrivilegedActionException {
 		return AccessController.doPrivileged(new SelectSignerAction(format));
 	}
 
@@ -619,14 +619,14 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @return Manejador de firma.
 	 * @throws PrivilegedActionException Cuando ocurre un problema de seguridad.
 	 */
-	private AOSigner getSigner(final byte[] signature) throws PrivilegedActionException {
+	private static AOSigner getSigner(final byte[] signature) throws PrivilegedActionException {
 		return AccessController.doPrivileged(new SelectSignerAction(signature));
 	}
 
 	/** Configura la apariencia de los di&aacute;logos Java siguiendo la configuraci&oacute;n
 	 * establecida en el sistema. 
 	 */
-	private void configureLookAndFeel() {
+	private static void configureLookAndFeel() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
@@ -646,7 +646,7 @@ public final class MiniAfirmaApplet extends JApplet implements MiniAfirma {
 	 * @param appletParam Par&aacute;metro que se desea limpiar.
 	 * @return Par&aacute;metro preparado para su uso.
 	 */
-	private String cleanParam(String appletParam) {
+	private static String cleanParam(String appletParam) {
 		return appletParam == null || appletParam.trim().length() < 1 ?
 				null : appletParam.trim();
 	}

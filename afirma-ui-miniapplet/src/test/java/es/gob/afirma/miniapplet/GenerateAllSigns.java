@@ -125,7 +125,8 @@ public class GenerateAllSigns {
      * @throws GeneralSecurityException
      * @throws IOException
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void generateSigns() throws AOException, NoSuchAlgorithmException, GeneralSecurityException, IOException {
 		
     	KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -172,7 +173,8 @@ public class GenerateAllSigns {
      * @throws GeneralSecurityException
      * @throws IOException
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void generateCosigns() throws AOException, NoSuchAlgorithmException, GeneralSecurityException, IOException {
 		
     	KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -218,7 +220,8 @@ public class GenerateAllSigns {
      * @throws GeneralSecurityException
      * @throws IOException
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
 	public void generateCounterSigns() throws AOException, NoSuchAlgorithmException, GeneralSecurityException, IOException {
 		
     	KeyStore ks = KeyStore.getInstance("PKCS12"); //$NON-NLS-1$
@@ -262,7 +265,7 @@ public class GenerateAllSigns {
 		}
 	}
     
-    private Map<String, byte[]> loadFiles() throws IOException {
+    private static Map<String, byte[]> loadFiles() throws IOException {
     	byte[] data;
     	Hashtable<String, byte[]> files = new Hashtable<String, byte[]>();
     	for (String[] formatsFiles : FORMATS_FILES) {
@@ -274,7 +277,7 @@ public class GenerateAllSigns {
     	return files;
 	}
 	
-    private byte[] loadFile(String path) {
+    private static byte[] loadFile(String path) {
     	FileInputStream fis = null;
     	try {
     		fis = new FileInputStream(path);
@@ -293,7 +296,7 @@ public class GenerateAllSigns {
     	}
     }
     
-    private void saveSign(byte[] signData, String filename) throws IOException {
+    private static void saveSign(byte[] signData, String filename) throws IOException {
     	
     	File signFile = new File(SIGNS_PATH + filename);
     	FileOutputStream fos = new FileOutputStream(signFile); 
