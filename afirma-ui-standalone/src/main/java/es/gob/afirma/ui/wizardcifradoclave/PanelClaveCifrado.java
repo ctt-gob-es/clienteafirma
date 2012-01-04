@@ -155,7 +155,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
         catch (final Exception e) {
             CustomDialog.showMessageDialog(this,
                                            true,
-                                           Messages.getString("WizardCifrado.almacen.error.clave"), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+                                           Messages.getString("WizardCifrado.almacen.error.clave"), Messages.getString("WizardCifrado.almacen.claves"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -177,7 +177,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
     boolean cifrarFichero() {
 
         // Comprobamos si se ha generado alguna clave
-        if (this.campoClave.getText() == null || this.campoClave.getText().equals("")) {
+        if (this.campoClave.getText() == null || this.campoClave.getText().equals("")) { //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
                                            Messages.getString("Cifrado.msg.clave"), Messages.getString("error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -191,8 +191,8 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
             logger.severe("Error durante el proceso de generacion de claves: " + ex); //$NON-NLS-1$
             CustomDialog.showMessageDialog(this,
                                            true,
-                                           Messages.getString("Cifrado.msg.error.cifrado"),
-                                           Messages.getString("error"),
+                                           Messages.getString("Cifrado.msg.error.cifrado"), //$NON-NLS-1$
+                                           Messages.getString("error"), //$NON-NLS-1$
                                            JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -371,7 +371,7 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
                     else {
                         final PasswordCallback pssCallback =
                             new UIPasswordCallbackAccessibility(Messages.getString("Cifrado.introducir.pass.almacen"), this, //$NON-NLS-1$
-                                                                Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
+                                                                Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$
                         cksh = new AOCipherKeyStoreHelper(pssCallback.getPassword());
                     }
                 }
@@ -379,16 +379,16 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
                     if (tries < 3) {
                         CustomDialog.showMessageDialog(this,
                                                        true,
-                                                       Messages.getString("WizardCifrado.msg.error.contrasenia"),
-                                                       Messages.getString("Cifrado.msg.error.titulo"),
+                                                       Messages.getString("WizardCifrado.msg.error.contrasenia"), //$NON-NLS-1$
+                                                       Messages.getString("Cifrado.msg.error.titulo"), //$NON-NLS-1$
                                                        JOptionPane.WARNING_MESSAGE);
                     }
                     else {
                         // Abortamos al tercer intento incorrecto de introducir la clave
                         CustomDialog.showMessageDialog(this,
                                                        true,
-                                                       Messages.getString("Cifrado.msg.error.pass.incorrecto.almacenar"),
-                                                       Messages.getString("Cifrado.msg.error.titulo"),
+                                                       Messages.getString("Cifrado.msg.error.pass.incorrecto.almacenar"), //$NON-NLS-1$
+                                                       Messages.getString("Cifrado.msg.error.titulo"), //$NON-NLS-1$
                                                        JOptionPane.WARNING_MESSAGE);
                         return;
                     }
@@ -396,10 +396,14 @@ final class PanelClaveCifrado extends JAccessibilityDialogWizard {
                 }
             } while (!gainedAccess);
 
-            final String alias =
-                CustomDialog.showInputDialog(this,
-                                             true,
-                                             Messages.getString("Cifrado.introducir.alias"), KeyEvent.VK_I, Messages.getString("Cifrado.introducir.alias.titulo"), JOptionPane.QUESTION_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+            final String alias = CustomDialog.showInputDialog(
+            		this,
+                    true,
+                    Messages.getString("Cifrado.introducir.alias"),  //$NON-NLS-1$
+                    KeyEvent.VK_I, 
+                    Messages.getString("Cifrado.introducir.alias.titulo"),  //$NON-NLS-1$
+                    JOptionPane.QUESTION_MESSAGE
+            );
             cksh.storeKey(alias + " (" + this.cipherConfig.getConfig().getAlgorithm().getName() + ")", this.cipherKey);
         }
         catch (final AOCancelledOperationException e) {

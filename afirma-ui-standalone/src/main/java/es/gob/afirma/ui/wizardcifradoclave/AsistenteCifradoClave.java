@@ -17,8 +17,6 @@ import es.gob.afirma.ui.wizardUtils.JDialogWizard;
 /** Clase principal del asistente de cifrado de clave. */
 public final class AsistenteCifradoClave {
 
-    private static final long serialVersionUID = 1L;
-
     /** Algoritmo de cifrado seleccionado */
     private final String algoritmo;
 

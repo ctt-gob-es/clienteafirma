@@ -48,7 +48,7 @@ final class PanelPresentacion extends JAccessibilityDialogWizard {
     /** Inicializacion de los componentes */
     private void initComponents() {
         // Titulo de la ventana
-        setTitulo(Messages.getString("WizardCifrado.titulo"));
+        setTitulo(Messages.getString("WizardCifrado.titulo")); //$NON-NLS-1$
 
         // Panel con la imagen lateral
         final ImagenLateral panelIzdo = new ImagenLateral();

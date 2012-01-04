@@ -83,7 +83,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	 }//constructor
 
 	/**
-	 * Inicializa el diálogo haciendo accesibles sus componentes.
+	 * Inicializa el dialogo haciendo accesibles sus componentes.
 	 */
 	private void init(){
 		//Se comprueba si se esta en el modo Alto contraste
@@ -108,7 +108,7 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	}
 
 	/**
-	 * Crea la ventana de diálogo.
+	 * Crea la ventana de dialogo.
 	 * @param Component parent
 	 */
 	@Override
@@ -306,8 +306,8 @@ public class JAccessibilityFileChooserToSave extends JAccessibilityFileChooser{
 	}
 
 	/**
-	 * Devuelve el diálogo.
-	 * return diálogo
+	 * Devuelve el dialogo.
+	 * return dialogo
 	 */
 	@Override
 	public JDialog getDialog(){

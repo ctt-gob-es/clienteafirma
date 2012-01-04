@@ -53,7 +53,8 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	/**
 	 * Relacion minima.
 	 */
-	public int getMinimumRelation(){
+	@SuppressWarnings("static-method")
+	int getMinimumRelation(){
 		return 9;
 	}
 	
@@ -81,10 +82,10 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	 }//constructor
 
 	/**
-	 * Inicializa el diálogo haciendo accesibles sus componentes.
+	 * Inicializa el dialogo haciendo accesibles sus componentes.
 	 */
 	private void init(){
-		//Se comprueba si se está en el modo Alto contraste
+		//Se comprueba si se esta en el modo Alto contraste
 	    if (GeneralConfig.isHighContrast()){
 			setHighContrast(this);
 		}
@@ -283,7 +284,7 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	  }
 	
 	/**
-	 * Crea la ventana de diálogo.
+	 * Crea la ventana de dialogo.
 	 * @param Component parent
 	 */
 	@Override
@@ -498,10 +499,10 @@ public class JAccessibilityFileChooser extends JFileChooser{
 	}
 
 	/**
-	 * Devuelve el diálogo.
-	 * return diálogo
+	 * Devuelve el dialogo.
+	 * return dialogo
 	 */
-	public JDialog getDialog(){
+	JDialog getDialog(){
 		return this.theDialog;
 	}
 

@@ -42,12 +42,12 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	private static int actualHeight = -1;
 
 	/**
-	 * Indica si la ventana está maximizada.
+	 * Indica si la ventana esta maximizada.
 	 */
 	//private static boolean isMaximized = false;
 
 	/**
-	 * Indica si el diálogo requiere un tamano grande por defecto.
+	 * Indica si el dialogo requiere un tamano grande por defecto.
 	 */
 	private boolean bigSizeDefault = false;
 	
@@ -55,9 +55,9 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
     private static final String ICON_DIR_PATH = "/resources/images/";
 	
 	/**
-	 * Constructor con parámetros.
+	 * Constructor con parametros.
 	 */
-	public JAccessibilityCustomDialog(JDialog dialog, boolean modal){
+	JAccessibilityCustomDialog(JDialog dialog, boolean modal){
 		super(dialog, modal);
 		// Icono de @firma
         setIconImage(this.loadIcon("afirma_ico.png").getImage());
@@ -84,9 +84,9 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	}
 	
 	/**
-	 * Constructor con parámetros.
+	 * Constructor con parametros.
 	 */
-	public JAccessibilityCustomDialog(JFrame frame, boolean modal){
+	JAccessibilityCustomDialog(JFrame frame, boolean modal){
 		super(frame, modal);
 		// Icono de @firma
         setIconImage(this.loadIcon("afirma_ico.png").getImage());
@@ -156,14 +156,14 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	 *  de Maximizar ventana. Tambien almacena el tamano y posicion de la ventana para su restauracion.
 	 */
 	void resized(ComponentEvent e) {
-		//Variable que controlará sin las dimensiones van a exceder el limite
+		//Variable que controlara sin las dimensiones van a exceder el limite
 		boolean limitControl = false;
 		
 		//Se obtienen las dimensiones de maximizado
 		int maxWidth = Constants.CUSTOMDIALOG_MAX_WIDTH;
 		int maxHeight = Constants.CUSTOMDIALOG_MAX_HEIGHT;
 	    
-	    //Se comprueba las bounds del diálogo actual
+	    //Se comprueba las bounds del dialogo actual
 	    if (e.getSource() instanceof CustomDialog) {
 	    	CustomDialog customDialog = (CustomDialog) e.getSource();
 	    	Rectangle rect = customDialog.getBounds();
@@ -259,7 +259,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	/**
      * Setter para la variable ActualPositionX.
      */
-	public static void setActualPositionX(int actualPositionX) {
+	static void setActualPositionX(int actualPositionX) {
 		JAccessibilityCustomDialog.actualPositionX = actualPositionX;
 	}
 	/**
@@ -272,7 +272,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	/**
      * Setter para la variable ActualPositionY.
      */
-	public static void setActualPositionY(int actualPositionY) {
+	static void setActualPositionY(int actualPositionY) {
 		JAccessibilityCustomDialog.actualPositionY = actualPositionY;
 	}
 	/**
@@ -285,7 +285,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	/**
      * Setter para la variable ActualWidth.
      */
-	public static void setActualWidth(int actualWidth) {
+	static void setActualWidth(int actualWidth) {
 		JAccessibilityCustomDialog.actualWidth = actualWidth;
 	}
 	/**
@@ -298,12 +298,12 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	/**
      * Setter para la variable ActualHeight.
      */
-	public static void setActualHeight(int actualHeight) {
+	static void setActualHeight(int actualHeight) {
 		JAccessibilityCustomDialog.actualHeight = actualHeight;
 	}
 
 	/**
-	 * Indica si el diálogo debe tener un tamano grande por defecto.
+	 * Indica si el dialogo debe tener un tamano grande por defecto.
 	 * @return boolean
 	 */
 	public boolean isBigSizeDefault() {
@@ -311,7 +311,7 @@ public abstract class JAccessibilityCustomDialog extends JDialog {
 	}
 
 	/**
-	 * Asigna la variable que indica si el diálogo debe tener un tamano grande por defecto.
+	 * Asigna la variable que indica si el dialogo debe tener un tamano grande por defecto.
 	 * @param bigSizeDefault
 	 */
 	public void setBigSizeDefault(boolean bigSizeDefault) {

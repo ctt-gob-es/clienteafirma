@@ -208,7 +208,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		
 		//Se establece el tamano minimo
 		setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_INITIAL_WIDTH, Constants.CUSTOMDIALOG_INITIAL_HEIGHT));
-		//Se establece el tamano máximo
+		//Se establece el tamano maximo
 		setMaximumSize(new Dimension(maxWidth,maxHeight));
 		
 		
@@ -227,12 +227,12 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		this.answer = JOptionPane.NO_OPTION;
-		//Contenedor del diálogo
+		//Contenedor del dialogo
 		Container container = getContentPane();
 		//Layout del contenedor
 		container.setLayout(new GridBagLayout());
 		
-		//Panel con los datos del diálogo
+		//Panel con los datos del dialogo
 		 this.mainPanel = new JPanel(new GridBagLayout());
 
 		//Restricciones para el panel de datos
@@ -242,7 +242,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.gridy = 0;
         c.insets = new Insets(5,10,0,10);
         
-        //Icono del diálogo
+        //Icono del dialogo
        setIconLabel(typeMessage);
        JPanel iconPanel = new JPanel(new GridBagLayout());
        GridBagConstraints  consIconPanel = new GridBagConstraints();
@@ -255,7 +255,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
        c.weightx = 1.0;
        c.weighty = 1.0;
 	       
-        //Etiqueta del diálogo
+        //Etiqueta del dialogo
         if (isInputDialog) {
         	//Se crea una etiqueta sencilla
         	this.infoLabel = new InfoLabel(message);
@@ -568,7 +568,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		cons.gridy = 0;
 		cons.insets = new Insets(0,0,0,10);  //right padding
 
-		//Se comprueba el tipo de diálogo
+		//Se comprueba el tipo de dialogo
 		if (typeOption == JOptionPane.YES_NO_OPTION) {
 			//Boton Si
 			customDialog.okButton.setText(Messages.getString("CustomDialog.confirmDialog.yes"));
@@ -635,7 +635,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.gridwidth = 2;
         c.insets = new Insets(10,0,0,10);  //right padding
         
-        //campo de texto del diálogo
+        //campo de texto del dialogo
         customDialog.component = new JTextField("");
         customDialog.component.addAncestorListener(new RequestFocusListener());
         Utils.remarcar(customDialog.component);
@@ -684,7 +684,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	}
 
 	/**
-	 * Muestra un dialogo de insercion. El componente de insercion será un combo.
+	 * Muestra un dialogo de insercion. El componente de insercion sera un combo.
 	 * @param componentParent componente padre
 	 * @param modal modal
 	 * @param message mensaje a mostrar
@@ -710,7 +710,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.gridwidth = 2;
         c.insets = new Insets(0,0,0,10);  //right padding
         
-        //campo de texto del diálogo
+        //campo de texto del dialogo
         customDialog.component = new JComboBox(selectionValues.clone());
         customDialog.component.addAncestorListener(new RequestFocusListener());
         if (initialSelectionValue != null) {
@@ -762,7 +762,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	}
 
 	/**
-	 * Muestra un dialogo de insercion que estará compuesto por dos etiquetas, una de ellas con posibilidad de mostrar
+	 * Muestra un dialogo de insercion que estara compuesto por dos etiquetas, una de ellas con posibilidad de mostrar
 	 * barras de scroll y un cuadro de texto.
 	 * @param componentParent componente padre
 	 * @param modal modal
@@ -777,7 +777,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	public static String showInputDialog(Component componentParent, boolean modal, String message, int mnemonic, List<String> list, String nameListElements, String title, int typeMessage){
 
 		CustomDialog customDialog = CustomDialog.getInstanceCustomDialog(componentParent, modal, message, title, typeMessage, true);
-		customDialog.setBigSizeDefault(true); //Se indica que este tipo de diálogo requiere un tamano grande por defecto
+		customDialog.setBigSizeDefault(true); //Se indica que este tipo de dialogo requiere un tamano grande por defecto
 		//Se establece un tamano minimo por defecto
 		customDialog.setMinimumSize(new Dimension(Constants.CUSTOMDIALOG_FONT_INITIAL_WIDTH, Constants.CUSTOMDIALOG_FONT_INITIAL_HEIGHT));
 		
@@ -840,7 +840,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		c.weighty = 0.5;
 		//c.gridheight = 1;
         
-        //campo de texto del diálogo
+        //campo de texto del dialogo
 		customDialog.component = new JTextField("");
         customDialog.component.addAncestorListener(new RequestFocusListener());
         Utils.remarcar(customDialog.component);
@@ -914,7 +914,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
         c.gridwidth = 2;
         c.insets = new Insets(10,0,0,10);  //right padding
         
-        //campo de password del diálogo
+        //campo de password del dialogo
         customDialog.component = new JPasswordField("");
         //((JPasswordField)customDialog.component).setEchoChar((char)0);
         customDialog.component.addAncestorListener(new RequestFocusListener());
@@ -1096,7 +1096,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 		//Se establece el tamano minimo
 		setMinimumSize(new Dimension(minWidth, minHeight));
 		
-		//Se situa el diálogo
+		//Se situa el dialogo
 		if (getActualPositionX() != -1 && getActualPositionY() != -1 && getActualWidth() != -1 && getActualHeight() != -1){
 			this.setBounds(getActualPositionX(), getActualPositionY(), getActualWidth(), getActualHeight());
 		} else {
@@ -1120,7 +1120,7 @@ public class CustomDialog extends JAccessibilityCustomDialog implements ActionLi
 	 */
 	private static CustomDialog getInstanceCustomDialog(Component componentParent, boolean modal, String message, String title, int typeMessage, boolean isInputDialog){
 		CustomDialog customDialog = null;
-		//Se chequea cual será el componente padre.
+		//Se chequea cual sera el componente padre.
 		if (componentParent instanceof JDialog) {
 			customDialog = new CustomDialog((JDialog)componentParent, modal, message, title, typeMessage, isInputDialog);
 		} else if (componentParent instanceof JFrame){

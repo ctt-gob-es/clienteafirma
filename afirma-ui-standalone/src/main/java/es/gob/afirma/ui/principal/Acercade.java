@@ -67,7 +67,7 @@ final class Acercade extends JAccessibilityFrameAbout {
 
     /** Posicion X inicial de la ventana dependiendo de la resolucion de pantalla.
      * @return int Posicion X */
-    public int getInitialX() {
+    public static int getInitialX() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
         if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)) {
             return (screenSize.width - 420) / 2;
@@ -78,7 +78,7 @@ final class Acercade extends JAccessibilityFrameAbout {
     /** Posicion Y inicial de la ventana dependiendo del sistema operativo y de la
      * resolucion de pantalla.
      * @return int Posicion Y */
-    public int getInitialY() {
+    public static int getInitialY() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 329
         if (Platform.getOS().equals(Platform.OS.MACOSX) || Platform.getOS().equals(Platform.OS.LINUX)) {
             return (screenSize.height - 360) / 2;
@@ -144,14 +144,14 @@ final class Acercade extends JAccessibilityFrameAbout {
             }
             else {
                 if (Platform.getOS().equals(Platform.OS.LINUX) || Platform.getOS().equals(Platform.OS.MACOSX)) {
-                    setBounds(this.getInitialX(),
-                              this.getInitialY(),
+                    setBounds(Acercade.getInitialX(),
+                              Acercade.getInitialY(),
                               Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX,
                               Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX);
                     setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH_LINUX, Constants.ABOUT_WINDOW_INITIAL_HEIGHT_LINUX));
                 }
                 else {
-                    setBounds(this.getInitialX(), this.getInitialY(), Constants.ABOUT_WINDOW_INITIAL_WIDTH, Constants.ABOUT_WINDOW_INITIAL_HEIGHT);
+                    setBounds(Acercade.getInitialX(), Acercade.getInitialY(), Constants.ABOUT_WINDOW_INITIAL_WIDTH, Constants.ABOUT_WINDOW_INITIAL_HEIGHT);
                     setMinimumSize(new Dimension(Constants.ABOUT_WINDOW_INITIAL_WIDTH, Constants.ABOUT_WINDOW_INITIAL_HEIGHT));
                 }
             }

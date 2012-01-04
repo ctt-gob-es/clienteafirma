@@ -103,7 +103,7 @@ public class HelpUtils {
     }
 
     /** Establece las opciones de accesibilidad para la ayuda.
-     * @param activate Indica si está activado el alto contraste. */
+     * @param activate Indica si esta activado el alto contraste. */
   /** public static void checkHelpAccessibility(final boolean activate) {
         final WindowPresentation wp = ((DefaultHelpBroker) getHelp()).getWindowPresentation();
         final JFrame helpwindow = (JFrame) wp.getHelpWindow();
@@ -342,7 +342,7 @@ public class HelpUtils {
     /** Establece el alto contraste para el indice de la ayuda.
      * @param tabbedPane pestanas del indice.
      * @param editorPane panel donde se muestra la ayuda.
-     * @param activate indica si el modo alto contraste está activado o no. */
+     * @param activate indica si el modo alto contraste esta activado o no. */
     private static void setHighContrastComponentTabbedPane(final JTabbedPane tabbedPane, final JEditorPane editorPane, final boolean activate) {
         if (tabbedPane != null) {
             for (final Component componentTabbed : tabbedPane.getComponents()) {
@@ -535,7 +535,7 @@ public class HelpUtils {
         }
     }
 
-    /** Establece el modo alto contraste para el editorPane que recibe como parámetro.
+    /** Establece el modo alto contraste para el editorPane que recibe como parametro.
      * @param editorPane panel de edicion. */
     static void setHighContrastEditorPane(final JEditorPane editorPane, final boolean activate) {
         if (editorPane != null) {

@@ -11,7 +11,7 @@ public class InfoLabel extends JLabel {
     private static final long serialVersionUID = 1L;
 
     /** Constructor sencillo.
-     * Se utilizará para etiquetas con un componente asociado.
+     * Se utilizara para etiquetas con un componente asociado.
      * @param text texto de la etiqueta */
     public InfoLabel(final String text) {
         super("<HTML>" + text + "</HTML>");

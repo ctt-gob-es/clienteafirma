@@ -219,7 +219,7 @@ public class MainOptionsPane {
 
         // Accesibilidad -- Lectores de pantalla
         policyOidLabel.setFocusable(true);
-        policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText() + ". Este cuadro de texto está deshabilitado por defecto.");
+        policyOidLabel.getAccessibleContext().setAccessibleName(policyOidLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
 
         Utils.remarcar(policyOidLabel);
         Utils.setContrastColor(policyOidLabel);
@@ -245,7 +245,7 @@ public class MainOptionsPane {
 
         // Accesibilidad -- Lectores de pantalla
         policyUrlLabel.setFocusable(true);
-        policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText() + ". Este cuadro de texto está deshabilitado por defecto.");
+        policyUrlLabel.getAccessibleContext().setAccessibleName(policyUrlLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
 
         Utils.remarcar(policyUrlLabel);
         Utils.setContrastColor(policyUrlLabel);
@@ -316,7 +316,7 @@ public class MainOptionsPane {
 
                 }
                 else {
-                    // Se eliminan los atajos porque los cuadros de texto están deshabilitados
+                    // Se eliminan los atajos porque los cuadros de texto estan deshabilitados
                     policyOidLabel.setDisplayedMnemonic(0);
                     policyOidLabel.getAccessibleContext()
                     .setAccessibleName(policyOidLabel.getText() + ". Este cuadro de texto esta deshabilitado por defecto.");
@@ -335,7 +335,7 @@ public class MainOptionsPane {
 
     /** Recupera el estado actual del panel.
      * return Relaci&oacute;n con toda la configuraci&oacute;n del panel. */
-    public Properties getConfig() {
+    Properties getConfig() {
         final Properties config = new Properties();
         config.setProperty(MainOptionsPane.MAIN_ADVANCED_VIEW, Boolean.toString(this.checkHabilitar.isSelected()));
         config.setProperty(MainOptionsPane.MAIN_DEFAULT_ALGORITHM, algoritmoV.get(this.comboAlgoritmo.getSelectedIndex()));

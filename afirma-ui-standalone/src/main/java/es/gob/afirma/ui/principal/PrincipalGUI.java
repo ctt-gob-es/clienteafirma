@@ -644,7 +644,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
         return (screenSize.height - 320) / 2;
     }
 
-    public JMenuBar getMenu() {
+    JMenuBar getMenu() {
         return this.menu;
     }
 
@@ -654,7 +654,7 @@ public class PrincipalGUI extends JAccessibilityFrame {
     }
 
     /** Inicia los proveedores */
-    private void iniciarProveedores() {
+    private static void iniciarProveedores() {
         if (Platform.getOS().equals(Platform.OS.WINDOWS)) {
             Security.removeProvider("SunMSCAPI"); //$NON-NLS-1$
             try {

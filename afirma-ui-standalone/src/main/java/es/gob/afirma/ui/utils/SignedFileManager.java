@@ -6,7 +6,7 @@ import es.gob.afirma.core.signers.AOSignConstants;
 
 public class SignedFileManager {
 
-    /** Obtiene un filtro de fichero correspondiente para los ficheros más comunes que contienen una firma.
+    /** Obtiene un filtro de fichero correspondiente para los ficheros mas comunes que contienen una firma.
      * @return filtro */
     public static final FileFilter getCommonSignedFileFilter() {
         final FileFilter fileFilter = new ExtFilter(new String[] {

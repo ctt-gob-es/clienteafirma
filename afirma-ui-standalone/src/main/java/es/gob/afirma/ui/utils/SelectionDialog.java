@@ -137,7 +137,7 @@ public class SelectionDialog {
 	            fileChooser.setCurrentDirectory(new File(currentDir));
 	        }
 	        
-	        fileChooser.setDialogTitle(dialogTitle); //Se le asigna un titulo al diálogo
+	        fileChooser.setDialogTitle(dialogTitle); //Se le asigna un titulo al dialogo
             fileChooser.getAccessibleContext().setAccessibleName(Messages.getString("SelectionDialog.saveDialog.accesible.name")); //$NON-NLS-1$
             fileChooser.getAccessibleContext().setAccessibleDescription(Messages.getString("SelectionDialog.saveDialog.accesible.desc")); //$NON-NLS-1$
             fileChooser.setToolTipText(Messages.getString("SelectionDialog.saveDialog.accesible.name")); //$NON-NLS-1$

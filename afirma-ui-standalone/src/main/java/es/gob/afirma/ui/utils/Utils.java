@@ -707,13 +707,13 @@ public final class Utils {
             || store == AOKeyStore.APPLE) {
                 return new NullPasswordCallback();
         }
-        return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-3$
+        return new UIPasswordCallbackAccessibility(Messages.getString("CustomDialog.showInputDialog.certificate.pass"), (Component)parent, Messages.getString("CustomDialog.showInputPasswordDialog.title"), KeyEvent.VK_O, Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
     
     /**
 	 * Metodo que sumbraya el mnemonico correspondiente para texto HTML.
 	 *
-	 * @param text	Texto en el que hay que subrayar el carácter.
+	 * @param text	Texto en el que hay que subrayar el caracter.
 	 * @param key	Caracter a subrayar.
 	 *
 	 * @return	Cadena con el texto subrayado.

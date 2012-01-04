@@ -21,8 +21,7 @@ public class IconLabel extends JLabel {
 
     }
 
-    /** Devuelve el icono asociado.
-     * @return */
+    /** {@inheritDoc} */
     @Override
     public Icon getIcon() {
         return this.icon;

@@ -38,7 +38,7 @@ public class MultisignUtils {
      * @param padre Componente padre
      * @return <code>AOKeyStoreManager</code> solicitado
      * @throws AOException Si ocurre cualquier error al intentar obtener el gestor del almac&eacute;n o repositorio de certificados */
-    public AOKeyStoreManager getAOKeyStoreManager(final KeyStoreConfiguration kssc, final Component padre) throws AOException {
+    public static AOKeyStoreManager getAOKeyStoreManager(final KeyStoreConfiguration kssc, final Component padre) throws AOException {
         PasswordCallback pssCallback;
 
         final AOKeyStore store = kssc.getType();
@@ -51,11 +51,11 @@ public class MultisignUtils {
             		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
             		null);*/
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(),
+                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), //$NON-NLS-1$
                                                     null,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"),
+                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
                                                     KeyEvent.VK_O,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
 
             final File selectedFile =
                 SelectionDialog.showFileOpenDialog(null, Messages.getString("Open.repository"), (ExtFilter) Utils.getRepositoryFileFilter()); //$NON-NLS-1$
@@ -71,11 +71,11 @@ public class MultisignUtils {
             		Messages.getString("Msg.pedir.contraenia", store.getDescription()),  //$NON-NLS-1$
             		null);*/
             pssCallback =
-                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(),
+                new UIPasswordCallbackAccessibility(Messages.getString("Msg.pedir.contraenia") + " " + store.getDescription(), //$NON-NLS-1$
                                                     null,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"),
+                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"), //$NON-NLS-1$
                                                     KeyEvent.VK_O,
-                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title"));
+                                                    Messages.getString("CustomDialog.showInputPasswordDialog.title")); //$NON-NLS-1$
         }
 
         try {
@@ -96,7 +96,7 @@ public class MultisignUtils {
      * @param padre Componente padre
      * @return
      * @throws AOException se ha producido un error al intentar obtener la clave privada */
-    public PrivateKeyEntry getPrivateKeyEntry(final KeyStoreConfiguration kssc, final AOKeyStoreManager keyStoreManager, final Component padre) throws AOException {
+    public static PrivateKeyEntry getPrivateKeyEntry(final KeyStoreConfiguration kssc, final AOKeyStoreManager keyStoreManager, final Component padre) throws AOException {
         // Recuperamos la clave del certificado
         PrivateKeyEntry privateKeyEntry = null;
 

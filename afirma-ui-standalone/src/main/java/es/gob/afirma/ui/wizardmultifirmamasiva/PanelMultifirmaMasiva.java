@@ -207,7 +207,7 @@ class PanelMultifirmaMasiva extends JAccessibilityDialogWizard {
         this.examinarFichero.setEnabled(true);
         this.examinarFichero.setMnemonic(KeyEvent.VK_X); // mnemonico asignado puesto que se habilita el boton
         this.campoFicheroLog.setEnabled(true);
-        this.etiquetaFichero.setFocusable(false); // Ahora el elemento focusable será el campo de texto, no la etiqueta
+        this.etiquetaFichero.setFocusable(false); // Ahora el elemento focusable sera el campo de texto, no la etiqueta
     }
 
     /** Comprueba que el archivo log seleccionado es correcto y guarda su nombre en el campo de texto */

@@ -354,7 +354,7 @@ public class BotoneraInferior extends JPanel {
 
         // Se asigna un boton por defecto al wizard
         if (this.ventanas.get(indice) instanceof JAccessibilityDialogWizard) {
-            // Se obtiene el diálogo
+            // Se obtiene el dialogo
             final JAccessibilityDialogWizard wizard = (JAccessibilityDialogWizard) this.ventanas.get(indice);
             // Se comprueba si estamos en la ultima ventana del wizard
             if (indice < this.ventanas.size() - 1) {

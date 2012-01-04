@@ -45,7 +45,7 @@ public class HighContrastTheme extends MetalTheme {
 
     /** TODO: Should this be getTextHighlightColor?
      * @return */
-    public final FontUIResource getEmphasisTextFont() {
+    final FontUIResource getEmphasisTextFont() {
         return this.windowTitleFont;
     }
 

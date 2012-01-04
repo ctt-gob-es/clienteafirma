@@ -138,7 +138,7 @@ public final class AccessibilityOptionsPane {
 
     /** Recupera el estado actual del panel.
      * return Relaci&oacute;n con toda la configuraci&oacute;n del panel. */
-    public Properties getConfig() {
+    Properties getConfig() {
         final Properties config = new Properties();
         config.setProperty(AccessibilityOptionsPane.MAIN_FONT_SIZE, Boolean.toString(this.checkFontSize.isSelected()));
         config.setProperty(AccessibilityOptionsPane.MAIN_FONT_STYLE, Boolean.toString(this.checkFontStyle.isSelected()));

@@ -24,7 +24,7 @@ final class LinksTreeCellRenderer extends DefaultTreeCellRenderer {
             	String text = getText();
             	//Color de fondo cuando se ha seleccionado el elemento
             	Color selectionColor =getBackgroundSelectionColor();
-            	//Color de fondo cuando un elemento no está seleccionado
+            	//Color de fondo cuando un elemento no esta seleccionado
             	Color nonSelectionColor =getBackgroundNonSelectionColor();
             	
             	if (text!=null && !text.equalsIgnoreCase("")) {

@@ -103,7 +103,7 @@ final class Cifrado extends JPanel {
         if (campoFichero.getText() == null || campoFichero.getText().equals("")) { //$NON-NLS-1$
             CustomDialog.showMessageDialog(SwingUtilities.getRoot(this),
                                            true,
-                                           Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
+                                           Messages.getString("Cifrado.msg.error.fichero"), Messages.getString("Cifrado.msg.titulo"), JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
             campoFichero.requestFocusInWindow(); // Foco al campo que contiene el path al fichero
         }
         else {

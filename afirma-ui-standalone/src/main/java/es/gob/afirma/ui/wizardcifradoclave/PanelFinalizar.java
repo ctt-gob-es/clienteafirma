@@ -48,7 +48,7 @@ final class PanelFinalizar extends JAccessibilityDialogWizard {
     /** Inicializacion de los componentes */
     private void initComponents() {
         // Titulo de la ventana
-        setTitulo(Messages.getString("WizardCifrado.titulo"));
+        setTitulo(Messages.getString("WizardCifrado.titulo")); //$NON-NLS-1$
 
         // Panel con la imagen lateral
         final ImagenLateral panelIzdo = new ImagenLateral();
@@ -79,7 +79,7 @@ final class PanelFinalizar extends JAccessibilityDialogWizard {
         Utils.setFontBold(panelCentral);
 
         // Etiqueta "felicidades" y "Ha finalizado con..."
-        final String textLabel = Messages.getString("Wizard.sobres.final1") + "<br>" + "<br>" + Messages.getString("Wizard.sobres.final.final1");
+        final String textLabel = Messages.getString("Wizard.sobres.final1") + "<br>" + "<br>" + Messages.getString("Wizard.sobres.final.final1");  //$NON-NLS-1$//$NON-NLS-4$
         final InfoLabel finalizeLabel = new InfoLabel(textLabel, false);
         // Foco al contenido
         finalizeLabel.addAncestorListener(new RequestFocusListener(false));

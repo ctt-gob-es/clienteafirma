@@ -203,7 +203,7 @@ public final class ContextOptionsPane {
 
     /** Recupera el estado actual del panel.
      * return Relaci&oacute;n con toda la configuraci&oacute;n del panel. */
-    public Properties getConfig() {
+    Properties getConfig() {
         final Properties config = new Properties();
         config.setProperty(ContextOptionsPane.KEY_SUBJECT, this.campoMotivo.getText());
         config.setProperty(ContextOptionsPane.KEY_PRODUCTION_PLACE, this.campoLugar.getText());
