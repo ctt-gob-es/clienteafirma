@@ -11,6 +11,7 @@
 package es.gob.afirma.miniapplet;
 
 import java.awt.Component;
+import java.io.IOException;
 import java.security.KeyException;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
@@ -96,7 +97,8 @@ final class SelectPrivateKeyAction implements PrivilegedExceptionAction<PrivateK
 	                                    AOException, 
 	                                    UnrecoverableEntryException,
 	                                    NoSuchAlgorithmException,
-	                                    KeyStoreException {
+	                                    KeyStoreException,
+	                                    IOException {
 		final AOKeyStoreManager ksm = AOKeyStoreManagerFactory.getAOKeyStoreManager(
 			this.keyStore, 
 			this.library, 
