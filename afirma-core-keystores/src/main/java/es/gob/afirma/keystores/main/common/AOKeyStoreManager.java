@@ -508,7 +508,10 @@ public class AOKeyStoreManager {
      * @throws UnrecoverableEntryException Si la contrase&ntilde;a proporcionada no es v&aacute;lida para obtener la clave privada
      * @throws AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice
      */
-    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, PasswordCallback pssCallback) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableEntryException {
+    public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, 
+    		                                    PasswordCallback pssCallback) throws KeyStoreException, 
+                                                                                     NoSuchAlgorithmException, 
+                                                                                     UnrecoverableEntryException {
 
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
@@ -516,12 +519,9 @@ public class AOKeyStoreManager {
 
         final KeyStore.PrivateKeyEntry keyEntry;
 
-        // El llavero de Mac OS X no responde al getKeyEntry(), solo al
-        // getKey(), pero
-        // obligartoriamente hay que proporcionarle una cadena de texto no vacia
-        // y no nula
-        // como contrasena. Esta cadena puede contener cualquier texto, no se
-        // comprueba.
+        // El llavero de Mac OS X no responde al getKeyEntry(), solo al getKey(), pero
+        // obligartoriamente hay que proporcionarle una cadena de texto no vacia y no nula
+        // como contrasena. Esta cadena puede contener cualquier texto, no se comprueba.
         // Esta cadena de texto debe contener unicamente caracteres ASCII.
         if ("KeychainStore".equals(this.ks.getType())) { //$NON-NLS-1$
             LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
