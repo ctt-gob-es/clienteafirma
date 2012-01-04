@@ -509,15 +509,13 @@ public class AOKeyStoreManager {
      * @throws AOCancelledOperationException Cuando el usuario cancela el proceso antes de que finalice
      */
     public KeyStore.PrivateKeyEntry getKeyEntry(final String alias, 
-    		                                    PasswordCallback pssCallback) throws KeyStoreException, 
-                                                                                     NoSuchAlgorithmException, 
-                                                                                     UnrecoverableEntryException {
+    		                                    final PasswordCallback pssCallback) throws KeyStoreException, 
+    		                                                                               NoSuchAlgorithmException, 
+    		                                                                               UnrecoverableEntryException {
 
         if (this.ks == null) {
             throw new IllegalStateException("Se han pedido claves a un almacen no inicializado"); //$NON-NLS-1$
         }
-
-        final KeyStore.PrivateKeyEntry keyEntry;
 
         // El llavero de Mac OS X no responde al getKeyEntry(), solo al getKey(), pero
         // obligartoriamente hay que proporcionarle una cadena de texto no vacia y no nula
@@ -527,20 +525,17 @@ public class AOKeyStoreManager {
             LOGGER.info("Detectado almacen Llavero de Mac OS X, se trataran directamente las claves privadas"); //$NON-NLS-1$
             Certificate[] certChain = this.ks.getCertificateChain(alias);
             if (certChain == null) {
-                LOGGER.warning("El certificado " + alias //$NON-NLS-1$
-                                                          + " no tiene su cadena completa de confianza " //$NON-NLS-1$
-                                                          + "instalada en el Llavero de Mac OS X, se insertara solo este certificado"); //$NON-NLS-1$
+                LOGGER.warning(
+                   "El certificado " + alias + " no tiene su cadena de confianza instalada en el Llavero de Mac OS X, se insertara solo este certificado" //$NON-NLS-1$ //$NON-NLS-2$
+                );
                 certChain = new Certificate[] {
                     this.ks.getCertificate(alias)
                 };
             }
 
-            keyEntry = new KeyStore.PrivateKeyEntry((PrivateKey) this.ks.getKey(alias, "dummy".toCharArray()), certChain); //$NON-NLS-1$
+            return new KeyStore.PrivateKeyEntry((PrivateKey) this.ks.getKey(alias, "dummy".toCharArray()), certChain); //$NON-NLS-1$
         }
-        else {
-            keyEntry = (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, new KeyStore.PasswordProtection((pssCallback != null) ? pssCallback.getPassword() : null));
-        }
-        return keyEntry;
+        return (KeyStore.PrivateKeyEntry) this.ks.getEntry(alias, new KeyStore.PasswordProtection((pssCallback != null) ? pssCallback.getPassword() : null));
     }
 
     /** Obtiene el certificado correspondiente a una clave privada.
