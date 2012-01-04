@@ -75,7 +75,7 @@ class DnieCertAnalyzer extends CertAnalyzer {
 	 * Obtiene un validador de certificados DNIe v&iacute;a OCSP.
 	 * @return Validador de certificados de DNIe
 	 */
-	private AOCertVerifier getDNIeCertVerifier() {
+	private static AOCertVerifier getDNIeCertVerifier() {
 
 		// Instanciamos la clase verificadora
 		final AOCertVerifier v = new AOCertVerifier();
@@ -134,7 +134,7 @@ class DnieCertAnalyzer extends CertAnalyzer {
 
 		// Habilitamos el OCSP (DNIe SHA-1)
 		try {
-			v.enableOCSP(
+			AOCertVerifier.enableOCSP(
 				new URL("http://ocsp.dnielectronico.es:80"),  //$NON-NLS-1$
 				null,
 				null,

@@ -243,7 +243,7 @@ public final class MainMenu extends JMenuBar {
         this.ayudaMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                MainMenu.this.saf.showHelp();
+                SimpleAfirma.showHelp();
             }
         });
         menuAyuda.add(this.ayudaMenuItem);

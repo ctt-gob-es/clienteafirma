@@ -360,7 +360,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
         }
     }
 
-    private Locale buildLocale(final String locale) {
+    private static Locale buildLocale(final String locale) {
         final String[] frags = locale.split("_"); //$NON-NLS-1$
         if (frags.length == 1) {
             return new Locale(frags[0]);
@@ -447,7 +447,7 @@ public final class SimpleAfirma extends JApplet implements PropertyChangeListene
     }
     
     /** Muestra la ayuda de la aplicaci&oacute;n. */
-    public void showHelp() {
+    public static void showHelp() {
         if (Platform.OS.WINDOWS.equals(Platform.getOS())) {
             final File helpFile = new File(Platform.getUserHome() + "\\.afirma\\firmafacil\\FirmaFacil.chm"); //$NON-NLS-1$
             try {

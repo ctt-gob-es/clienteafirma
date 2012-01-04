@@ -189,7 +189,7 @@ final class EditorFocusManager extends KeyAdapter implements FocusListener, Hype
         }
     }
     
-    private int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final String fontFamily, final int minSize) {
+    private static int getBestFontSizeForJOptionPane(final int width, final int height, final String text, final String fontFamily, final int minSize) {
         
         final String bodyRule = "body { font-family: " + fontFamily + "; font-size: %f%pt; }";  //$NON-NLS-1$//$NON-NLS-2$
         

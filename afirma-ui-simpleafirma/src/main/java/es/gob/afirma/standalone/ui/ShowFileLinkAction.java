@@ -41,7 +41,7 @@ final class ShowFileLinkAction {
             return;
         }
 
-        final String ext = this.getCommonDataExtension(this.data);
+        final String ext = ShowFileLinkAction.getCommonDataExtension(this.data);
 
         // Si conocemos la extension, intentamos abrir el fichero. Si no, permitimos
         // guardarlo con la extension que se desee.
@@ -78,7 +78,7 @@ final class ShowFileLinkAction {
         }
     }
 
-    private String getCommonDataExtension(final byte[] dat) {
+    private static String getCommonDataExtension(final byte[] dat) {
         return new MimeHelper(dat).getExtension();
     }
 

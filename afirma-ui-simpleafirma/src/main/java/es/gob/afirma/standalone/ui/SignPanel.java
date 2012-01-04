@@ -463,7 +463,8 @@ public final class SignPanel extends JPanel {
             String intro = Messages.getString("SignPanel.40"); //$NON-NLS-1$
             
             try {
-                int nReaders = javax.smartcardio.TerminalFactory.getDefault().terminals().list().size();
+                @SuppressWarnings("restriction")
+				int nReaders = javax.smartcardio.TerminalFactory.getDefault().terminals().list().size();
                 if (nReaders == 1) {
                     intro = intro + Messages.getString("SignPanel.2"); //$NON-NLS-1$
                 }

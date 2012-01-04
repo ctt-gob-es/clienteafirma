@@ -90,7 +90,7 @@ public class VisorFirma extends JApplet implements WindowListener {
         }
     }
 
-    private Locale buildLocale(final String locale) {
+    private static Locale buildLocale(final String locale) {
         final String[] frags = locale.split("_"); //$NON-NLS-1$
         if (frags.length == 1) {
             return new Locale(frags[0]);

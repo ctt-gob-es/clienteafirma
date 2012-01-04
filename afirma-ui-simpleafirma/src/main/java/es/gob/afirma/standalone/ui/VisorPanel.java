@@ -168,7 +168,7 @@ public final class VisorPanel extends JPanel {
      * @return {@code true} si la firma es v&acute;lida, {@code false} en caso contrario.
      * @throws Exception Cuando los datos introducidos no se corresponden con una firma.
      */
-    private SignValidity validateSign(final byte[] sign) throws Exception {
+    private static SignValidity validateSign(final byte[] sign) throws Exception {
         if (DataAnalizerUtil.isPDF(sign)) {
             return new SignValidity(SIGN_DETAIL_TYPE.OK, null);
         } 
@@ -181,13 +181,4 @@ public final class VisorPanel extends JPanel {
         return new SignValidity(SIGN_DETAIL_TYPE.KO, null);
     }
 
-//    public static void main(String[] args) {
-//
-//        File signFile = new File("C:/Users/A122466/Desktop/Escritorio/Firma.csig");
-//
-//        JPanel currentPanel = new VisorPanel(signFile, null, null);
-//        Container container = new MainScreen(null, currentPanel);
-//        Window window = (JFrame) container;
-//
-//    }
 }
