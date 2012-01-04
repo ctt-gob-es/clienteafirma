@@ -38,7 +38,8 @@ public class TestAOKeystoreFactory {
     /** Pruebas de AOKeyStoreFactory de los tipos sin dependencias de otros m&oacute;dulos
      * @throws Exception
      */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testAOKeystoreFactory() throws Exception {
         Logger.getLogger("es.gob.afirma").setLevel(Level.WARNING); //$NON-NLS-1$
         AOKeyStoreManager ksm;

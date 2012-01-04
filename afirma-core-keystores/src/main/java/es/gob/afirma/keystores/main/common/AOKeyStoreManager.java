@@ -556,7 +556,7 @@ public class AOKeyStoreManager {
      * @param privateKeyEntry
      *        Clave privada del certificado
      * @return Certificado cuya clave privada es la indicada */
-    public X509Certificate getCertificate(final KeyStore.PrivateKeyEntry privateKeyEntry) {
+    public static X509Certificate getCertificate(final KeyStore.PrivateKeyEntry privateKeyEntry) {
         return (X509Certificate) privateKeyEntry.getCertificate();
     }
 
@@ -597,7 +597,7 @@ public class AOKeyStoreManager {
      * @param privateKeyEntry
      *        Clave privada del certificado
      * @return Certificados de la cadena de certificaci&oacute;n. */
-    public X509Certificate[] getCertificateChain(final KeyStore.PrivateKeyEntry privateKeyEntry) {
+    public static X509Certificate[] getCertificateChain(final KeyStore.PrivateKeyEntry privateKeyEntry) {
         return (X509Certificate[]) privateKeyEntry.getCertificateChain();
     }
 

@@ -33,7 +33,8 @@ public class TestMacKeyChain {
     
     /** Prueba de carga y uso de un <i>KayChain</i> en fichero suelto.
      * @throws Exception */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testStandaloneKeyChain() throws Exception {
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;
@@ -71,7 +72,8 @@ public class TestMacKeyChain {
     /** Prueba de carga y uso del <i>KayChain</i> del sistema.
      * Requiere importada en el sistema una entrada con alias "anf usuario activo" que tenga clave privada
      * @throws Exception */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testSystemKeyChain() throws Exception {
         if (!Platform.OS.MACOSX.equals(Platform.getOS())) {
             return;

@@ -45,7 +45,8 @@ public class TestWindowsFriendlyNames {
      * @throws AOKeystoreAlternativeException 
      * @throws InvalidKeyException 
      * @throws IOException */
-    @Test
+    @SuppressWarnings("static-method")
+	@Test
     public void testWindowsFriendlyNames() throws InvalidKeyException, AOKeystoreAlternativeException, IOException {
         if (!Platform.OS.WINDOWS.equals(Platform.getOS())) {
             return;
